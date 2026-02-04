@@ -27,7 +27,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationService;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationProcessingService;
 
 @ActiveProfiles("integration")
 public class NotificationControllerTest {
@@ -37,7 +37,7 @@ public class NotificationControllerTest {
     private String json;
 
     @Mock
-    private NotificationService notificationService;
+    private NotificationProcessingService notificationProcessingService;
 
     @Mock
     private AuthorisationService authorisationService;
@@ -70,7 +70,7 @@ public class NotificationControllerTest {
 
         deserializer = new SscsCaseCallbackDeserializer(mapper);
 
-        notificationController = new NotificationController(notificationService, authorisationService, ccdService, deserializer, idamService);
+        notificationController = new NotificationController(notificationProcessingService, authorisationService, ccdService, deserializer, idamService);
         String path = getClass().getClassLoader().getResource("json/ccdResponse.json").getFile();
         json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = json.replace("hearingRouteReplace", "gaps");
@@ -82,7 +82,7 @@ public class NotificationControllerTest {
     @Test
     public void shouldCreateAndSendNotificationForSscsCaseData() {
         notificationController.sendNotification("", json);
-        verify(notificationService).manageNotificationAndSubscription(any(CcdNotificationWrapper.class), eq(false));
+        verify(notificationProcessingService).manageNotificationAndSubscription(any(CcdNotificationWrapper.class), eq(false));
     }
 
 }

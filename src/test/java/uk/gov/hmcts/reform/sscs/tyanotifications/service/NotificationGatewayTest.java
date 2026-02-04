@@ -19,8 +19,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.APPELLANT;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_RECEIVED;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationSender.DATE_TIME_FORMATTER;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationSender.ZONE_ID_LONDON;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationGateway.DATE_TIME_FORMATTER;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationGateway.ZONE_ID_LONDON;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -58,7 +58,7 @@ import uk.gov.service.notify.SendLetterResponse;
 import uk.gov.service.notify.SendSmsResponse;
 
 @ExtendWith(MockitoExtension.class)
-public class NotificationSenderTest {
+public class NotificationGatewayTest {
 
     private static final String SAMPLE_COVERSHEET = "pdf/direction-notice-coversheet-sample.pdf";
     private static final String LARGE_PDF = "pdf/eleven-page-test-document.pdf";
@@ -92,7 +92,7 @@ public class NotificationSenderTest {
     @Captor
     private ArgumentCaptor<Correspondence> correspondenceArgumentCaptor;
 
-    private NotificationSender notificationSender;
+    private NotificationGateway notificationGateway;
 
     private final NotificationWrapper wrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
             .notificationEventType(APPEAL_RECEIVED)
@@ -108,7 +108,7 @@ public class NotificationSenderTest {
     @BeforeEach
     public void setUp() {
         final Boolean saveCorrespondence = false;
-        notificationSender = new NotificationSender(
+        notificationGateway = new NotificationGateway(
                 notificationClient,
                 testNotificationClient,
                 bulkPrintService,
@@ -126,7 +126,7 @@ public class NotificationSenderTest {
             .thenReturn(sendEmailResponse);
         when(sendEmailResponse.getNotificationId()).thenReturn(UUID.randomUUID());
 
-        notificationSender
+        notificationGateway
                 .sendEmail(templateId, emailAddress, personalisation, reference, APPEAL_RECEIVED, SSCS_CASE_DATA);
 
         verifyNoInteractions(notificationClient);
@@ -140,7 +140,7 @@ public class NotificationSenderTest {
             .thenReturn(sendEmailResponse);
         when(sendEmailResponse.getNotificationId()).thenReturn(UUID.randomUUID());
 
-        notificationSender
+        notificationGateway
                 .sendEmail(templateId, emailAddress, personalisation, reference, APPEAL_RECEIVED, SSCS_CASE_DATA);
 
         verifyNoInteractions(testNotificationClient);
@@ -155,7 +155,7 @@ public class NotificationSenderTest {
             .thenReturn(sendEmailResponse);
         when(sendEmailResponse.getNotificationId()).thenReturn(UUID.randomUUID());
 
-        notificationSender
+        notificationGateway
                 .sendEmail(templateId, emailAddress, personalisation, reference, APPEAL_RECEIVED, SSCS_CASE_DATA);
 
         verifyNoInteractions(notificationClient);
@@ -169,7 +169,7 @@ public class NotificationSenderTest {
             .thenReturn(sendSmsResponse);
         when(sendSmsResponse.getNotificationId()).thenReturn(UUID.randomUUID());
 
-        notificationSender.sendSms(
+        notificationGateway.sendSms(
                 templateId, phoneNumber, personalisation, reference, SMS_SENDER, APPEAL_RECEIVED, SSCS_CASE_DATA
         );
 
@@ -185,7 +185,7 @@ public class NotificationSenderTest {
             .thenReturn(sendSmsResponse);
         when(sendSmsResponse.getNotificationId()).thenReturn(UUID.randomUUID());
 
-        notificationSender.sendSms(
+        notificationGateway.sendSms(
                 templateId, phoneNumber, personalisation, reference, SMS_SENDER, APPEAL_RECEIVED, SSCS_CASE_DATA
         );
 
@@ -195,13 +195,13 @@ public class NotificationSenderTest {
 
     @Test
     public void sendBundledLetterToNormalSender() throws IOException, NotificationClientException {
-        ReflectionTestUtils.setField(notificationSender, "saveCorrespondence", true);
+        ReflectionTestUtils.setField(notificationGateway, "saveCorrespondence", true);
         when(notificationClient.sendPrecompiledLetterWithInputStream(any(), any())).thenReturn(letterResponse);
         when(letterResponse.getNotificationId()).thenReturn(UUID.randomUUID());
         byte[] sampleCoversheet =
                 toByteArray(requireNonNull(getClass().getClassLoader().getResourceAsStream(SAMPLE_COVERSHEET)));
 
-        notificationSender.sendBundledLetter(wrapper, sampleCoversheet, "Bob Squires");
+        notificationGateway.sendBundledLetter(wrapper, sampleCoversheet, "Bob Squires");
 
         verifyNoInteractions(testNotificationClient);
         verify(notificationClient).sendPrecompiledLetterWithInputStream(any(), any());
@@ -216,7 +216,7 @@ public class NotificationSenderTest {
         byte[] largeLetter =
                 toByteArray(requireNonNull(getClass().getClassLoader().getResourceAsStream(LARGE_PDF)));
 
-        notificationSender.sendBundledLetter(wrapper, largeLetter, "Bob Squires");
+        notificationGateway.sendBundledLetter(wrapper, largeLetter, "Bob Squires");
 
         verifyNoInteractions(testNotificationClient);
         verify(notificationClient).sendPrecompiledLetterWithInputStream(any(), any());
@@ -231,7 +231,7 @@ public class NotificationSenderTest {
         byte[] sampleDirectionCoversheet = "sampleDirectionCoversheet".getBytes();
         wrapper.getNewSscsCaseData().getAppeal().getAppellant().getAddress().setPostcode(postcode);
 
-        notificationSender.sendBundledLetter(wrapper, sampleDirectionCoversheet, "Bob Squires");
+        notificationGateway.sendBundledLetter(wrapper, sampleDirectionCoversheet, "Bob Squires");
 
         verifyNoInteractions(notificationClient);
         verify(testNotificationClient).sendPrecompiledLetterWithInputStream(any(), any());
@@ -239,13 +239,13 @@ public class NotificationSenderTest {
 
     @Test
     public void sendLetterToNormalSender() throws NotificationClientException {
-        ReflectionTestUtils.setField(notificationSender, "saveCorrespondence", true);
+        ReflectionTestUtils.setField(notificationGateway, "saveCorrespondence", true);
         when(notificationClient.sendLetter(any(), any(), any())).thenReturn(sendLetterResponse);
         when(sendLetterResponse.getNotificationId()).thenReturn(UUID.randomUUID());
         Address address = Address.builder()
                 .line1("1 Appellant Ave").town("Sometown").county("Somecounty").postcode("LN8 4DX").build();
 
-        notificationSender
+        notificationGateway
                 .sendLetter(templateId, address, personalisation, APPEAL_RECEIVED, "Bob Squires", CASE_D);
 
         verifyNoInteractions(testNotificationClient);
@@ -262,7 +262,7 @@ public class NotificationSenderTest {
         Address address = Address.builder()
                 .line1("1 Appellant Ave").town("Sometown").county("Somecounty").postcode(postcode).build();
 
-        notificationSender
+        notificationGateway
                 .sendLetter(templateId, address, personalisation, APPEAL_RECEIVED, "Bob Squires", CASE_D);
 
         verifyNoInteractions(notificationClient);
@@ -271,13 +271,13 @@ public class NotificationSenderTest {
 
     @Test
     public void whenAnEmailIsSentWillSaveEmailNotificationInCcd() throws NotificationClientException {
-        ReflectionTestUtils.setField(notificationSender, "saveCorrespondence", true);
+        ReflectionTestUtils.setField(notificationGateway, "saveCorrespondence", true);
         String emailAddress = "random@example.com";
         when(notificationClient.sendEmail(templateId, emailAddress, personalisation, reference))
             .thenReturn(sendEmailResponse);
         when(sendEmailResponse.getNotificationId()).thenReturn(UUID.randomUUID());
 
-        notificationSender
+        notificationGateway
                 .sendEmail(templateId, emailAddress, personalisation, reference, APPEAL_RECEIVED, SSCS_CASE_DATA);
 
         verifyNoInteractions(testNotificationClient);
@@ -298,12 +298,12 @@ public class NotificationSenderTest {
     @Test
     public void whenAnEmailIsSentAndEmailResponseIsNullThenWillNotSaveEmailNotificationInCcd()
             throws NotificationClientException {
-        ReflectionTestUtils.setField(notificationSender, "saveCorrespondence", true);
+        ReflectionTestUtils.setField(notificationGateway, "saveCorrespondence", true);
         String emailAddress = "random@example.com";
         when(notificationClient.sendEmail(templateId, emailAddress, personalisation, reference))
             .thenReturn(null);
 
-        notificationSender
+        notificationGateway
                 .sendEmail(templateId, emailAddress, personalisation, reference, APPEAL_RECEIVED, SSCS_CASE_DATA);
 
         verifyNoInteractions(testNotificationClient);
@@ -314,13 +314,13 @@ public class NotificationSenderTest {
 
     @Test
     public void whenAnSmsIsSentWillSaveSmsNotificationInCcd() throws NotificationClientException {
-        ReflectionTestUtils.setField(notificationSender, "saveCorrespondence", true);
+        ReflectionTestUtils.setField(notificationGateway, "saveCorrespondence", true);
 
         String smsNumber = "07999999000";
         when(notificationClient.sendSms(templateId, smsNumber, personalisation, reference, "Sender"))
             .thenReturn(sendSmsResponse);
 
-        notificationSender.sendSms(
+        notificationGateway.sendSms(
                 templateId, smsNumber, personalisation, reference, "Sender", APPEAL_RECEIVED, SSCS_CASE_DATA
         );
 
@@ -346,13 +346,13 @@ public class NotificationSenderTest {
     public void whenAnSmsIsSentAndSmsResponseIsNullThenWillNotSaveSmsNotificationInCcd()
             throws NotificationClientException {
 
-        ReflectionTestUtils.setField(notificationSender, "saveCorrespondence", true);
+        ReflectionTestUtils.setField(notificationGateway, "saveCorrespondence", true);
 
         String smsNumber = "07999999000";
         when(notificationClient.sendSms(templateId, smsNumber, personalisation, reference, "Sender"))
             .thenReturn(null);
 
-        notificationSender.sendSms(
+        notificationGateway.sendSms(
                 templateId, smsNumber, personalisation, reference, "Sender", APPEAL_RECEIVED, SSCS_CASE_DATA
         );
 
@@ -371,7 +371,7 @@ public class NotificationSenderTest {
                 (error.equals("null")) ? new NullPointerException(error) : new NotificationClientException(error);
         doThrow(exception).when(testNotificationClient).sendEmail(templateId, emailAddress, personalisation, reference);
 
-        assertThrows(NotificationClientException.class, () -> notificationSender
+        assertThrows(NotificationClientException.class, () -> notificationGateway
                 .sendEmail(templateId, emailAddress, personalisation, reference, APPEAL_RECEIVED, SSCS_CASE_DATA));
     }
 
@@ -384,7 +384,7 @@ public class NotificationSenderTest {
         doThrow(exception).when(notificationClient)
                 .sendSms(templateId, smsNumber, personalisation, reference, "Sender");
 
-        assertThrows(NotificationClientException.class, () -> notificationSender.sendSms(
+        assertThrows(NotificationClientException.class, () -> notificationGateway.sendSms(
                 templateId, smsNumber, personalisation, reference, "Sender", APPEAL_RECEIVED, SSCS_CASE_DATA)
         );
     }
@@ -400,7 +400,7 @@ public class NotificationSenderTest {
                 (error.equals("null")) ? new NullPointerException(error) : new NotificationClientException(error);
         doThrow(exception).when(notificationClient).sendLetter(any(), any(), any());
 
-        assertThrows(NotificationClientException.class, () -> notificationSender
+        assertThrows(NotificationClientException.class, () -> notificationGateway
                 .sendLetter(templateId, address, personalisation, APPEAL_RECEIVED, "Bob Squires", CASE_D));
     }
 
@@ -413,14 +413,14 @@ public class NotificationSenderTest {
                 toByteArray(requireNonNull(getClass().getClassLoader().getResourceAsStream(SAMPLE_COVERSHEET)));
 
         assertThrows(NotificationClientException.class, () ->
-                notificationSender.sendBundledLetter(wrapper, sampleDirectionCoversheet, "Bob Squires"));
+                notificationGateway.sendBundledLetter(wrapper, sampleDirectionCoversheet, "Bob Squires"));
     }
 
     @Test
     public void saveLetterCorrespondence() {
         byte[] sampleLetter = "Letter".getBytes();
 
-        notificationSender
+        notificationGateway
                 .saveLettersToReasonableAdjustment(sampleLetter, APPEAL_RECEIVED, "Bob Squires", CASE_D, APPELLANT);
 
         verify(saveCorrespondenceAsyncService)
@@ -435,14 +435,14 @@ public class NotificationSenderTest {
 
     @Test
     public void saveLetterCorrespondence_emptyLetter() {
-        notificationSender
+        notificationGateway
                 .saveLettersToReasonableAdjustment(null, APPEAL_RECEIVED, "Bob Squires", CASE_D, APPELLANT);
         verifyNoInteractions(saveCorrespondenceAsyncService);
     }
 
     @Test
     public void recoverWillConsumeThrowable() {
-        notificationSender.getBackendResponseFallback(new NotificationClientException("400 BadRequestError"));
+        notificationGateway.getBackendResponseFallback(new NotificationClientException("400 BadRequestError"));
     }
 
     @Test

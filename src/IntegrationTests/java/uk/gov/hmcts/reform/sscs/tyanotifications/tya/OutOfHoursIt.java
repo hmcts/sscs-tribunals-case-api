@@ -51,14 +51,14 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.controller.NotificationControll
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationFactory;
 import uk.gov.hmcts.reform.sscs.tyanotifications.helper.IntegrationTestHelper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.MarkdownTransformationService;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationHandler;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationSender;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationService;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationDispatchService;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationExecutionManager;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationGateway;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationProcessingService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationValidService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.OutOfHoursCalculator;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.ReminderService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.SaveCorrespondenceAsyncService;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.SendNotificationService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis.PdfLetterService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.reminder.JobGroupGenerator;
 import uk.gov.service.notify.NotificationClient;
@@ -119,7 +119,7 @@ public class OutOfHoursIt {
     String json;
 
     @Autowired
-    private NotificationHandler notificationHandler;
+    private NotificationExecutionManager notificationExecutionManager;
 
     @MockitoBean
     private OutOfHoursCalculator outOfHoursCalculator;
@@ -159,11 +159,12 @@ public class OutOfHoursIt {
         when(outOfHoursCalculator.getStartOfNextInHoursPeriod()).thenReturn(zoned);
         when(outOfHoursCalculator.isItOutOfHours()).thenReturn(true);
 
-        notificationHandler = new NotificationHandler(outOfHoursCalculator, jobScheduler, jobGroupGenerator);
+        notificationExecutionManager =
+                new NotificationExecutionManager(outOfHoursCalculator, jobScheduler, jobGroupGenerator, null);
 
-        NotificationSender sender = new NotificationSender(notificationClient, null, bulkPrintService, notificationTestRecipients, markdownTransformationService, saveCorrespondenceAsyncService, false);
-        SendNotificationService sendNotificationService = new SendNotificationService(sender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
-        NotificationService service = new NotificationService(factory, reminderService, notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false);
+        NotificationGateway sender = new NotificationGateway(notificationClient, null, bulkPrintService, notificationTestRecipients, markdownTransformationService, saveCorrespondenceAsyncService, false);
+        NotificationDispatchService notificationDispatchService = new NotificationDispatchService(sender, notificationExecutionManager, notificationValidService, pdfLetterService, pdfStoreService);
+        NotificationProcessingService service = new NotificationProcessingService(factory, reminderService, notificationValidService, notificationExecutionManager, outOfHoursCalculator, notificationConfig, notificationDispatchService, false);
         controller = new NotificationController(service, authorisationService, ccdService, deserializer, idamService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         String path = getClass().getClassLoader().getResource("json/ccdResponse.json").getFile();

@@ -33,40 +33,40 @@ import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
 @Service
 @Slf4j
-public class NotificationService {
+public class NotificationProcessingService {
     private static final List<String> PROCESS_AUDIO_VIDEO_ACTIONS_THAT_REQUIRES_NOTICE = asList("issueDirectionsNotice", "excludeEvidence", "admitEvidence");
     private static final String READY_TO_LIST = "readyToList";
 
     private final NotificationFactory notificationFactory;
     private final ReminderService reminderService;
     private final NotificationValidService notificationValidService;
-    private final NotificationHandler notificationHandler;
+    private final NotificationExecutionManager notificationExecutionManager;
     private final OutOfHoursCalculator outOfHoursCalculator;
     private final NotificationConfig notificationConfig;
 
     @SuppressWarnings("squid:S107")
     @Autowired
-    public NotificationService(
+    public NotificationProcessingService(
         NotificationFactory notificationFactory,
         ReminderService reminderService,
         NotificationValidService notificationValidService,
-        NotificationHandler notificationHandler,
+        NotificationExecutionManager notificationExecutionManager,
         OutOfHoursCalculator outOfHoursCalculator,
         NotificationConfig notificationConfig,
-        SendNotificationService sendNotificationService,
+        NotificationDispatchService notificationDispatchService,
         @Value("${feature.covid19}") boolean covid19Feature) {
 
         this.notificationFactory = notificationFactory;
         this.reminderService = reminderService;
         this.notificationValidService = notificationValidService;
-        this.notificationHandler = notificationHandler;
+        this.notificationExecutionManager = notificationExecutionManager;
         this.outOfHoursCalculator = outOfHoursCalculator;
         this.notificationConfig = notificationConfig;
-        this.sendNotificationService = sendNotificationService;
+        this.notificationDispatchService = notificationDispatchService;
         this.covid19Feature = covid19Feature;
     }
 
-    private final SendNotificationService sendNotificationService;
+    private final NotificationDispatchService notificationDispatchService;
 
     private final boolean covid19Feature;
 
@@ -86,7 +86,7 @@ public class NotificationService {
                 && !fromReminderService
                 && !functionalTest(notificationWrapper.getNewSscsCaseData())) {
                 log.info("Notification event {} is delayed and scheduled for case id {}", notificationType.getId(), caseId);
-                notificationHandler.scheduleNotification(notificationWrapper, ZonedDateTime.now().plusSeconds(notificationType.getDelayInSeconds()));
+                notificationExecutionManager.scheduleNotification(notificationWrapper, ZonedDateTime.now().plusSeconds(notificationType.getDelayInSeconds()));
             } else {
                 log.info("Sending notification for Notification event {} and case id {}", notificationType.getId(), caseId);
                 sendNotificationPerSubscription(notificationWrapper);
@@ -95,7 +95,7 @@ public class NotificationService {
             }
         } else if (outOfHoursCalculator.isItOutOfHours()) {
             log.info("Notification event {} is out of hours and scheduled for case id {}", notificationType.getId(), caseId);
-            notificationHandler.scheduleNotification(notificationWrapper);
+            notificationExecutionManager.scheduleNotification(notificationWrapper);
         }
     }
 
@@ -225,7 +225,7 @@ public class NotificationService {
 
     private void sendNotification(NotificationWrapper notificationWrapper, SubscriptionWithType subscriptionWithType) {
         Notification notification = notificationFactory.create(notificationWrapper, subscriptionWithType);
-        sendNotificationService.sendEmailSmsLetterNotification(notificationWrapper, notification, subscriptionWithType, notificationWrapper.getNotificationType());
+        notificationDispatchService.dispatchNotification(notificationWrapper, notification, subscriptionWithType, notificationWrapper.getNotificationType());
         processOldSubscriptionNotifications(notificationWrapper, notification, subscriptionWithType, notificationWrapper.getNotificationType());
     }
 
@@ -272,7 +272,7 @@ public class NotificationService {
 
             SubscriptionWithType updatedSubscriptionWithType = new SubscriptionWithType(oldSubscription,
                 subscriptionWithType.getSubscriptionType(), subscriptionWithType.getParty(), subscriptionWithType.getEntity());
-            sendNotificationService.sendEmailSmsLetterNotification(wrapper, oldNotification, updatedSubscriptionWithType, eventType);
+            notificationDispatchService.dispatchNotification(wrapper, oldNotification, updatedSubscriptionWithType, eventType);
         }
     }
 

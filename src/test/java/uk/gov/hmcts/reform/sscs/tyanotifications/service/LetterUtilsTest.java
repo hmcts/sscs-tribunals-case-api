@@ -43,9 +43,13 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getA
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getAddressToUseForLetter;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getNameToUseForLetter;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.lines;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationServiceTest.APPELLANT_WITH_ADDRESS;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.service.SendNotificationServiceTest.APPELLANT_WITH_ADDRESS_AND_APPOINTEE;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.service.SendNotificationServiceTest.REP_WITH_ADDRESS;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationDispatchServiceTest.APPELLANT_WITH_ADDRESS_AND_APPOINTEE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationDispatchServiceTest.REP_WITH_ADDRESS;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationProcessingServiceTest.APPELLANT_WITH_ADDRESS;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationProcessingServiceTest.buildBaseWrapper;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationProcessingServiceTest.buildBaseWrapperJointParty;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationProcessingServiceTest.buildBaseWrapperOtherParty;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationProcessingServiceTest.buildBaseWrapperWithReasonableAdjustment;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -102,7 +106,7 @@ public class LetterUtilsTest {
 
     @Test
     public void useAppellantAddressForLetter() {
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
+        NotificationWrapper wrapper = buildBaseWrapper(
             SYA_APPEAL_CREATED,
             APPELLANT_WITH_ADDRESS,
             null,
@@ -120,7 +124,7 @@ public class LetterUtilsTest {
 
     @Test
     public void useAppointeeAddressForLetter() {
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
+        NotificationWrapper wrapper = buildBaseWrapper(
             SYA_APPEAL_CREATED,
             APPELLANT_WITH_ADDRESS_AND_APPOINTEE,
             null,
@@ -134,7 +138,7 @@ public class LetterUtilsTest {
 
     @Test
     public void useRepAddressForLetter() {
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
+        NotificationWrapper wrapper = buildBaseWrapper(
             SYA_APPEAL_CREATED,
             APPELLANT_WITH_ADDRESS_AND_APPOINTEE,
             REP_WITH_ADDRESS,
@@ -147,7 +151,7 @@ public class LetterUtilsTest {
 
     @Test
     public void useAppellantNameForLetter() {
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
+        NotificationWrapper wrapper = buildBaseWrapper(
             SYA_APPEAL_CREATED,
             APPELLANT_WITH_ADDRESS,
             null,
@@ -161,7 +165,7 @@ public class LetterUtilsTest {
 
     @Test
     public void useAppointeeNameForLetter() {
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
+        NotificationWrapper wrapper = buildBaseWrapper(
             SYA_APPEAL_CREATED,
             APPELLANT_WITH_ADDRESS_AND_APPOINTEE,
             null,
@@ -177,7 +181,7 @@ public class LetterUtilsTest {
     @Test
     public void useJointPartyAddressForLetter() {
         Address jointPartyAddress = Address.builder().county("county").line1("line1").line2("line2").postcode("EN1 1AF").build();
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapperJointParty(
+        NotificationWrapper wrapper = buildBaseWrapperJointParty(
             SYA_APPEAL_CREATED,
             APPELLANT_WITH_ADDRESS_AND_APPOINTEE,
             Name.builder().title("Mr").firstName("Joint").lastName("Party").build(),
@@ -192,7 +196,7 @@ public class LetterUtilsTest {
 
     @Test
     public void useAppellantAddressForJointPartyIfSameAsAppellantLetter() {
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapperJointParty(
+        NotificationWrapper wrapper = buildBaseWrapperJointParty(
             SYA_APPEAL_CREATED,
             APPELLANT_WITH_ADDRESS_AND_APPOINTEE,
             Name.builder()
@@ -218,7 +222,7 @@ public class LetterUtilsTest {
             .address(Address.builder().line1("Rep Line 1").town("Rep Town").county("Rep County").postcode("RE9 3LL").build())
             .build();
 
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
+        NotificationWrapper wrapper = buildBaseWrapper(
             SYA_APPEAL_CREATED,
             APPELLANT_WITH_ADDRESS_AND_APPOINTEE,
             rep,
@@ -287,7 +291,7 @@ public class LetterUtilsTest {
     @Test
     @Parameters({"APPELLANT", "JOINT_PARTY", "APPOINTEE", "REPRESENTATIVE"})
     public void isAlternativeLetterFormatRequired(SubscriptionType subscriptionType) {
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapperWithReasonableAdjustment();
+        NotificationWrapper wrapper = buildBaseWrapperWithReasonableAdjustment();
         assertTrue(LetterUtils.isAlternativeLetterFormatRequired(wrapper, new SubscriptionWithType(EMPTY_SUBSCRIPTION,
             subscriptionType, null, null)));
     }
@@ -415,7 +419,7 @@ public class LetterUtilsTest {
     @Test
     @Parameters({"OTHER_PARTY, 4", "OTHER_PARTY, 3", "OTHER_PARTY, 2"})
     public void useOtherPartyLetterNameAndAddress(SubscriptionType subscriptionType, String otherPartyId) {
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapperOtherParty(SYA_APPEAL_CREATED, Appellant.builder().build(), null);
+        NotificationWrapper wrapper = buildBaseWrapperOtherParty(SYA_APPEAL_CREATED, Appellant.builder().build(), null);
         final Address expectedAddress = getExpectedAddress(otherPartyId, wrapper);
 
         assertThat(LetterUtils.getAddressToUseForLetter(wrapper,

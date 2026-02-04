@@ -17,7 +17,10 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_5_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.defaultToEmptyStringIfNull;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.truncateAddressLine;
-import static uk.gov.hmcts.reform.sscs.model.PartyItemList.*;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.APPELLANT;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.DWP;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.HMCTS;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.REP_SALUTATION;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists.EVENTS_FOR_ACTION_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.*;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.hasAppointee;
@@ -111,7 +114,7 @@ public class LetterUtils {
 
     public static String getNameToUseForLetter(NotificationWrapper wrapper, SubscriptionWithType subscriptionWithType) {
         if (SubscriptionType.REPRESENTATIVE.equals(subscriptionWithType.getSubscriptionType())) {
-            return SendNotificationHelper.getRepSalutation(wrapper.getNewSscsCaseData().getAppeal().getRep(), false);
+            return getRepSalutation(wrapper.getNewSscsCaseData().getAppeal().getRep(), false);
         } else if (SubscriptionType.JOINT_PARTY.equals(subscriptionWithType.getSubscriptionType())) {
             return format("%s %s", wrapper.getNewSscsCaseData().getJointParty().getName().getFirstName(), wrapper.getNewSscsCaseData().getJointParty().getName().getLastName());
         } else {
@@ -123,6 +126,22 @@ public class LetterUtils {
             } else {
                 return wrapper.getNewSscsCaseData().getAppeal().getAppellant().getName().getFullNameNoTitle();
             }
+        }
+    }
+
+    public static String getRepSalutation(Representative rep, boolean ignoreOrg) {
+        Name name = rep.getName();
+        if (null == name
+                || null == name.getFirstName()
+                || "".equalsIgnoreCase(name.getFirstName())
+                || "undefined".equalsIgnoreCase(name.getFirstName())
+                || null == name.getLastName()
+                || "".equalsIgnoreCase(name.getLastName())
+                || "undefined".equalsIgnoreCase(name.getLastName())
+        ) {
+            return !ignoreOrg && null != rep.getOrganisation() && !"".equals(rep.getOrganisation()) ? rep.getOrganisation() : REP_SALUTATION;
+        } else {
+            return name.getFullNameNoTitle();
         }
     }
 
@@ -230,7 +249,7 @@ public class LetterUtils {
             if (originalSenderCode.equalsIgnoreCase(APPELLANT.getCode())) {
                 return sscsCaseData.getAppeal().getAppellant().getName().getFullNameNoTitle();
             } else if (originalSenderCode.equalsIgnoreCase(PartyItemList.REPRESENTATIVE.getCode())) {
-                return SendNotificationHelper.getRepSalutation(sscsCaseData.getAppeal().getRep(), false);
+                return getRepSalutation(sscsCaseData.getAppeal().getRep(), false);
             } else if (originalSenderCode.equalsIgnoreCase(PartyItemList.JOINT_PARTY.getCode())) {
                 return sscsCaseData.getJointParty().getName().getFullNameNoTitle();
             } else if (originalSenderCode.equalsIgnoreCase(DWP.getCode())) {

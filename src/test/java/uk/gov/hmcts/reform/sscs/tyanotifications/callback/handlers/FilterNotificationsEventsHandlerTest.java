@@ -38,16 +38,16 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseData
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationService;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.RetryNotificationService;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationExecutionManager;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationProcessingService;
 
 @RunWith(JUnitParamsRunner.class)
 public class FilterNotificationsEventsHandlerTest {
     @Mock
-    private NotificationService notificationService;
+    private NotificationProcessingService notificationProcessingService;
 
     @Mock
-    private RetryNotificationService retryNotificationService;
+    private NotificationExecutionManager notificationExecutionManager;
 
     @InjectMocks
     private FilterNotificationsEventsHandler handler;
@@ -220,35 +220,35 @@ public class FilterNotificationsEventsHandlerTest {
     @Test
     public void shouldCallToRescheduleNotificationWhenErrorIsNotificationServiceExceptionError() {
         doThrow(new NotificationServiceException("error msg test", new RuntimeException("error")))
-            .when(notificationService)
+            .when(notificationProcessingService)
             .manageNotificationAndSubscription(new CcdNotificationWrapper(callback), false);
 
         assertThatExceptionOfType(NotificationServiceException.class)
             .isThrownBy(() -> handler.handle(callback))
             .withMessageContaining("error msg test");
 
-        verify(retryNotificationService).rescheduleIfHandledGovNotifyErrorStatus(
+        verify(notificationExecutionManager).rescheduleIfHandledGovNotifyErrorStatus(
             eq(1), eq(new CcdNotificationWrapper(callback)), any(NotificationServiceException.class));
     }
 
     @Test
     public void shouldRescheduleNotificationWhenErrorIsNotANotificationServiceException() {
         doThrow(new RuntimeException("error msg test"))
-            .when(notificationService)
+            .when(notificationProcessingService)
             .manageNotificationAndSubscription(new CcdNotificationWrapper(callback), false);
 
         assertThatExceptionOfType(RuntimeException.class)
             .isThrownBy(() -> handler.handle(callback))
             .withMessageContaining("error msg test");
 
-        verifyNoInteractions(retryNotificationService);
+        verifyNoInteractions(notificationExecutionManager);
     }
 
     private void willHandle(NotificationSscsCaseDataWrapper callback) {
         assertThat(handler.canHandle(callback)).isTrue();
         handler.handle(callback);
-        verify(notificationService).manageNotificationAndSubscription(new CcdNotificationWrapper(callback), false);
-        verifyNoInteractions(retryNotificationService);
+        verify(notificationProcessingService).manageNotificationAndSubscription(new CcdNotificationWrapper(callback), false);
+        verifyNoInteractions(notificationExecutionManager);
     }
 
     private void willNotHandle(NotificationSscsCaseDataWrapper callback) {
@@ -256,8 +256,8 @@ public class FilterNotificationsEventsHandlerTest {
         assertThatExceptionOfType(IllegalStateException.class)
             .isThrownBy(() -> handler.handle(callback))
             .withMessage("Cannot handle callback");
-        verifyNoInteractions(notificationService);
-        verifyNoInteractions(retryNotificationService);
+        verifyNoInteractions(notificationProcessingService);
+        verifyNoInteractions(notificationExecutionManager);
     }
 
     private static String getIsAppointee(boolean appointee) {

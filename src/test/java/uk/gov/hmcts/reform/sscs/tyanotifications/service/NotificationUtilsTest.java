@@ -32,8 +32,9 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SYA_APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.UPDATE_OTHER_PARTY_DATA;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.VALID_APPEAL_CREATED;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationServiceTest.APPELLANT_WITH_ADDRESS;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationServiceTest.getSscsCaseDataBuilder;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationDispatchServiceTest.APPELLANT_WITH_ADDRESS_AND_APPOINTEE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationProcessingServiceTest.APPELLANT_WITH_ADDRESS;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationProcessingServiceTest.getSscsCaseDataBuilder;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.hasAppointee;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.hasAppointeeSubscriptionOrIsMandatoryAppointeeLetter;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.hasJointParty;
@@ -44,7 +45,6 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtil
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.isOkToSendNotification;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.isOkToSendSmsNotification;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.isValidSubscriptionOrIsMandatoryLetter;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.service.SendNotificationServiceTest.APPELLANT_WITH_ADDRESS_AND_APPOINTEE;
 
 import java.util.Arrays;
 import junitparams.JUnitParamsRunner;
@@ -91,7 +91,7 @@ public class NotificationUtilsTest {
 
     @Test
     public void trueWhenHasPopulatedAppointee() {
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
+        NotificationWrapper wrapper = NotificationProcessingServiceTest.buildBaseWrapper(
             SYA_APPEAL_CREATED,
             APPELLANT_WITH_ADDRESS_AND_APPOINTEE,
             null,
@@ -109,7 +109,7 @@ public class NotificationUtilsTest {
             .appointee(Appointee.builder().build())
             .build();
 
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
+        NotificationWrapper wrapper = NotificationProcessingServiceTest.buildBaseWrapper(
             SYA_APPEAL_CREATED,
             appellant,
             null,
@@ -121,7 +121,7 @@ public class NotificationUtilsTest {
 
     @Test
     public void falseWhenHasNullAppointee() {
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
+        NotificationWrapper wrapper = NotificationProcessingServiceTest.buildBaseWrapper(
             SYA_APPEAL_CREATED,
             APPELLANT_WITH_ADDRESS,
             null,
@@ -165,7 +165,7 @@ public class NotificationUtilsTest {
             .address(Address.builder().line1("Rep Line 1").town("Rep Town").county("Rep County").postcode("RE9 7SE").build())
             .build();
 
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
+        NotificationWrapper wrapper = NotificationProcessingServiceTest.buildBaseWrapper(
             SYA_APPEAL_CREATED,
             APPELLANT_WITH_ADDRESS,
             rep,
@@ -183,7 +183,7 @@ public class NotificationUtilsTest {
             .address(Address.builder().line1("Rep Line 1").town("Rep Town").county("Rep County").postcode("RE9 7SE").build())
             .build();
 
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
+        NotificationWrapper wrapper = NotificationProcessingServiceTest.buildBaseWrapper(
             SYA_APPEAL_CREATED,
             APPELLANT_WITH_ADDRESS,
             rep,
@@ -200,7 +200,7 @@ public class NotificationUtilsTest {
             .address(Address.builder().line1("Rep Line 1").town("Rep Town").county("Rep County").postcode("RE9 7SE").build())
             .build();
 
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
+        NotificationWrapper wrapper = NotificationProcessingServiceTest.buildBaseWrapper(
             SYA_APPEAL_CREATED,
             APPELLANT_WITH_ADDRESS,
             rep,
@@ -212,7 +212,7 @@ public class NotificationUtilsTest {
 
     @Test
     public void falseWhenHasNullPopulatedRep() {
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
+        NotificationWrapper wrapper = NotificationProcessingServiceTest.buildBaseWrapper(
             SYA_APPEAL_CREATED,
             APPELLANT_WITH_ADDRESS,
             Representative.builder().build(),
@@ -224,7 +224,7 @@ public class NotificationUtilsTest {
 
     @Test
     public void falseWhenHasNullRep() {
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
+        NotificationWrapper wrapper = NotificationProcessingServiceTest.buildBaseWrapper(
             SYA_APPEAL_CREATED,
             APPELLANT_WITH_ADDRESS,
             null,
@@ -316,7 +316,7 @@ public class NotificationUtilsTest {
 
     @Test
     public void itIsOkToSendNotification() {
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
+        NotificationWrapper wrapper = NotificationProcessingServiceTest.buildBaseWrapper(
             SYA_APPEAL_CREATED,
             APPELLANT_WITH_ADDRESS,
             null,
@@ -334,7 +334,7 @@ public class NotificationUtilsTest {
     @Test
     @Parameters(method = "isNotOkToSendNotificationResponses")
     public void isNotOkToSendNotification(boolean isNotificationStillValidToSendResponse, boolean isHearingTypeValidToSendNotificationResponse) {
-        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
+        NotificationWrapper wrapper = NotificationProcessingServiceTest.buildBaseWrapper(
             SYA_APPEAL_CREATED,
             APPELLANT_WITH_ADDRESS,
             null,

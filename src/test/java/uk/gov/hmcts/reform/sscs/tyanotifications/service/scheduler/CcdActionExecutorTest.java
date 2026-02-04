@@ -39,8 +39,8 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationService;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.RetryNotificationService;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationExecutionManager;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationProcessingService;
 import uk.gov.service.notify.NotificationClientException;
 
 @RunWith(JUnitParamsRunner.class)
@@ -51,7 +51,7 @@ public class CcdActionExecutorTest {
     private CcdActionExecutor ccdActionExecutor;
 
     @Mock
-    private NotificationService notificationService;
+    private NotificationProcessingService notificationProcessingService;
 
     @Mock
     private IdamService idamService;
@@ -63,7 +63,7 @@ public class CcdActionExecutorTest {
     private UpdateCcdCaseService updateCcdCaseService;
 
     @Mock
-    private RetryNotificationService retryNotificationService;
+    private NotificationExecutionManager notificationExecutionManager;
 
     private SscsCaseData newSscsCaseData;
     private SscsCaseDetails caseDetails;
@@ -87,7 +87,7 @@ public class CcdActionExecutorTest {
 
         final SscsCaseCallbackDeserializer deserializer = new SscsCaseCallbackDeserializer(mapper);
 
-        ccdActionExecutor = new CcdActionExecutor(notificationService, retryNotificationService, ccdService, updateCcdCaseService, idamService, deserializer);
+        ccdActionExecutor = new CcdActionExecutor(notificationProcessingService, notificationExecutionManager, ccdService, updateCcdCaseService, idamService, deserializer);
 
         caseDetails = SscsCaseDetails.builder().id(456L).caseTypeId("123").state("appealCreated").build();
 
@@ -104,7 +104,7 @@ public class CcdActionExecutorTest {
 
         ccdActionExecutor.execute(JOB_ID, JOB_GROUP, EVIDENCE_REMINDER.getId(), "123456");
 
-        verify(notificationService).manageNotificationAndSubscription(any(), eq(true));
+        verify(notificationProcessingService).manageNotificationAndSubscription(any(), eq(true));
         verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(123456)), eq("evidenceReminder"), eq("CCD Case"), eq("Notification Service updated case"), any(), any(Consumer.class));
     }
 
@@ -115,7 +115,7 @@ public class CcdActionExecutorTest {
 
         ccdActionExecutor.execute(JOB_ID, JOB_GROUP, SYA_APPEAL_CREATED.getId(), "123456");
 
-        verify(notificationService, times(1)).manageNotificationAndSubscription(any(), eq(true));
+        verify(notificationProcessingService, times(1)).manageNotificationAndSubscription(any(), eq(true));
         verify(ccdService, times(0)).updateCase(any(), any(), any(), any(), any(), any());
     }
 
@@ -134,7 +134,7 @@ public class CcdActionExecutorTest {
         when(ccdService.getByCaseId(eq(123456L), eq(idamTokens))).thenReturn(caseDetails);
         ccdActionExecutor.execute(JOB_ID, JOB_GROUP, SYA_APPEAL_CREATED.getId(), "123456,1");
 
-        verify(notificationService, times(1)).manageNotificationAndSubscription(any(), eq(true));
+        verify(notificationProcessingService, times(1)).manageNotificationAndSubscription(any(), eq(true));
         verify(ccdService, times(0)).updateCase(any(), eq(123456L), any(), any(), any(), any());
     }
 
@@ -142,11 +142,11 @@ public class CcdActionExecutorTest {
     @Parameters({"1", "2", "3"})
     public void shouldScheduleToRetryAgainWhenNotificationFails(int retry) {
         when(ccdService.getByCaseId(eq(123456L), eq(idamTokens))).thenReturn(caseDetails);
-        doThrow(new NotificationServiceException(caseDetails.getId().toString(), new NotificationClientException(new NullPointerException("error")))).when(notificationService).manageNotificationAndSubscription(any(), eq(true));
+        doThrow(new NotificationServiceException(caseDetails.getId().toString(), new NotificationClientException(new NullPointerException("error")))).when(notificationProcessingService).manageNotificationAndSubscription(any(), eq(true));
         final String payload = (retry == 0) ? "123456" : "123456," + retry;
         ccdActionExecutor.execute(JOB_ID, JOB_GROUP, SYA_APPEAL_CREATED.getId(), payload);
 
-        verify(retryNotificationService).rescheduleIfHandledGovNotifyErrorStatus(eq(retry + 1), any(), any(NotificationServiceException.class));
+        verify(notificationExecutionManager).rescheduleIfHandledGovNotifyErrorStatus(eq(retry + 1), any(), any(NotificationServiceException.class));
         verify(ccdService, times(0)).updateCase(any(), any(), any(), any(), any(), any());
     }
 
@@ -157,7 +157,7 @@ public class CcdActionExecutorTest {
 
         ccdActionExecutor.execute(JOB_ID, JOB_GROUP, SYA_APPEAL_CREATED.getId(), "123456");
 
-        verify(notificationService, times(1)).manageNotificationAndSubscription(any(), eq(true));
+        verify(notificationProcessingService, times(1)).manageNotificationAndSubscription(any(), eq(true));
         verify(ccdService, times(0)).updateCase(any(), eq(123456L), any(), any(), any(), any());
 
     }
