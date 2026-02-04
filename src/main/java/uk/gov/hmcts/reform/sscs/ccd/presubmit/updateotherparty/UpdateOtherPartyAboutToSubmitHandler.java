@@ -1,8 +1,11 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updateotherparty;
 
+import static java.time.LocalDateTime.now;
+import static java.util.Collections.emptyMap;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_OTHER_PARTY_DATA;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getUpdatedDirectionDueDate;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.validateHearingOptionsAndExcludeDates;
@@ -16,29 +19,33 @@ import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.roleAbsentForOthe
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.roleExistsForOtherParties;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.sendNewOtherPartyNotification;
 
-import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
-
 
 @Component
 @Slf4j
@@ -51,13 +58,17 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
         + "which is not valid for an SSCS5 case. This role will be ignored when the event completes.";
 
     private static final String ERR_ROLE_REQUIRED = "Role is required for the selected case";
-    private final CcdService ccdService;
+
+    private static final DateTimeFormatter formatter =
+        DateTimeFormatter.ofPattern("d MMM yyyy, h:mm:ss a", Locale.UK);
+    private final boolean cmOtherPartyConfidentialityEnabled;
     private IdamService idamService;
 
     @Autowired
-    UpdateOtherPartyAboutToSubmitHandler(IdamService idamService, CcdService ccdService) {
+    UpdateOtherPartyAboutToSubmitHandler(IdamService idamService,
+        @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
         this.idamService = idamService;
-        this.ccdService = ccdService;
+        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
 
     @Override
@@ -77,9 +88,6 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
             throw new IllegalStateException("Cannot handle callback");
         }
 
-
-        updateConfidentialityChangedDate(callback);
-
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         sscsCaseData.setOtherPartyUcb(getOtherPartyUcb(sscsCaseData.getOtherParties()));
         sscsCaseData.setIsConfidentialCase(isConfidential(sscsCaseData));
@@ -97,6 +105,10 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
         }
 
         sscsCaseData.setDirectionDueDate(getUpdatedDirectionDueDate(sscsCaseData));
+
+        if (cmOtherPartyConfidentialityEnabled) {
+            updateConfidentialityChangedDate(callback);
+        }
 
         if (sscsCaseData.getAppeal() != null && sscsCaseData.getAppeal().getBenefitType() != null
             && isBenefitTypeValidForOtherPartyValidation(sscsCaseData.getBenefitType())) {
@@ -119,19 +131,35 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
     }
 
     private void updateConfidentialityChangedDate(Callback<SscsCaseData> callback) {
-        SscsCaseDetails caseDetailsBefore = ccdService.getByCaseId(callback.getCaseDetails().getId(),
-            idamService.getIdamTokens());
 
-        callback.getCaseDetails().getCaseData().getOtherParties().forEach(
-            otherParty -> caseDetailsBefore.getData().getOtherParties().stream()
-                .filter(p -> p.getValue().getId().equals(otherParty.getValue().getId())).findFirst().ifPresent((a) -> {
+        var currentOtherParties = callback.getCaseDetails().getCaseData().getOtherParties();
+        if (isEmpty(currentOtherParties)) {
+            return;
+        }
 
-                    if (otherParty.getValue().getConfidentialityRequired() != a.getValue().getConfidentialityRequired()) {
-                        otherParty.getValue().setConfidentialityRequiredChangedDate(LocalDateTime.now());
-                    }
-                }));
+        var confidentialityBefore = callback.getCaseDetailsBefore()
+            .map(CaseDetails::getCaseData)
+            .flatMap(cd -> Optional.ofNullable(cd.getOtherParties()))
+            .map(otherPartiesBefore -> {
+                Map<String, YesNo> byId = new HashMap<>();
+                otherPartiesBefore.forEach(op -> {
+                    var prior = op.getValue();
+                    byId.put(prior.getId(), prior.getConfidentialityRequired());
+                });
+                return byId;
+            })
+            .orElseGet(Collections::emptyMap);
 
+        var changedDate = now().format(formatter);
 
+        currentOtherParties.forEach(otherParty -> {
+            var current = otherParty.getValue();
+            var priorConfidentiality = confidentialityBefore.get(current.getId());
+            if (priorConfidentiality == null
+                || !Objects.equals(priorConfidentiality, current.getConfidentialityRequired())) {
+                current.setConfidentialityRequiredChangedDate(changedDate);
+            }
+        });
     }
 
     private List<String> verifyHearingUnavailableDates(final List<CcdValue<OtherParty>> otherParties) {

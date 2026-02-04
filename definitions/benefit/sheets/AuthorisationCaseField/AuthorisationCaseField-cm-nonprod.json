@@ -1,4 +1,7 @@
 [
   {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "CaseFieldID": "appellantLabel", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
-  {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "CaseFieldID": "otherPartiesLabel", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"}
+  {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "CaseFieldID": "appellantNameLabel", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "CaseFieldID": "appellantConfidentialityLabel", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "CaseFieldID": "appellantConfidentialityUndeterminedLabel", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "CaseFieldID": "appellantConfidentialityChangeDateLabel", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"}
 ]

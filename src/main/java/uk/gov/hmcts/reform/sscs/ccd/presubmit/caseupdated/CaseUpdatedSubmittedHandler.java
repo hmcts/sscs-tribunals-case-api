@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
@@ -24,11 +23,9 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 public class CaseUpdatedSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private IdamService idamService;
     private final UpdateCcdCaseService updateCcdCaseService;
-    private final CcdService ccdService;
 
     @Autowired
-    public CaseUpdatedSubmittedHandler(CcdService ccdService,IdamService idamService, UpdateCcdCaseService updateCcdCaseService) {
-        this.ccdService = ccdService;
+    public CaseUpdatedSubmittedHandler(IdamService idamService, UpdateCcdCaseService updateCcdCaseService) {
         this.idamService = idamService;
         this.updateCcdCaseService = updateCcdCaseService;
     }
