@@ -1262,8 +1262,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
         configureHandler(true);
         final LocalDateTime thePast = now().minusHours(1);
         callback.getCaseDetailsBefore().orElseThrow().getCaseData().setAppeal(null);
-        var currentAppellant = callback.getCaseDetails().getCaseData().getAppeal().getAppellant();
-        currentAppellant.setConfidentialityRequiredChangedDate(thePast.format(formatter));
+        configureAppellantConfidentiality(callback.getCaseDetails(), YES, thePast);
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -1274,11 +1273,8 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
     void givenCaseDetailsBeforeHasSameConfidentialityRequired_doNotUpdateConfidentialityRequiredChangedDate() {
         configureHandler(true);
         final LocalDateTime thePast = now().minusHours(1);
-        var beforeAppellant = callback.getCaseDetailsBefore().orElseThrow().getCaseData().getAppeal().getAppellant();
-        beforeAppellant.setConfidentialityRequired(YES);
-        var currentAppellant = callback.getCaseDetails().getCaseData().getAppeal().getAppellant();
-        currentAppellant.setConfidentialityRequired(YES);
-        currentAppellant.setConfidentialityRequiredChangedDate(thePast.format(formatter));
+        configurePreviousAppellantConfidentiality(callback.getCaseDetailsBefore().orElseThrow());
+        configureAppellantConfidentiality(callback.getCaseDetails(), YES, formattedDate(thePast));
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -1289,11 +1285,8 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
     void givenCaseDetailsBeforeHasDifferentConfidentialityRequired_updateConfidentialityRequiredChangedDate() {
         configureHandler(true);
         final LocalDateTime thePast = now().minusHours(1);
-        var beforeAppellant = callback.getCaseDetailsBefore().orElseThrow().getCaseData().getAppeal().getAppellant();
-        beforeAppellant.setConfidentialityRequired(YES);
-        var currentAppellant = callback.getCaseDetails().getCaseData().getAppeal().getAppellant();
-        currentAppellant.setConfidentialityRequired(NO);
-        currentAppellant.setConfidentialityRequiredChangedDate(now().format(formatter));
+        configurePreviousAppellantConfidentiality(callback.getCaseDetailsBefore().orElseThrow());
+        configureAppellantConfidentiality(callback.getCaseDetails(), NO, now());
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -1303,16 +1296,13 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
     @Test
     void givenCaseDetailsBeforeHasDifferentConfidentialityRequired_withFeatureFlagOff_doNotUpdateConfidentialityRequiredChangedDate() {
         configureHandler(false);
-        final LocalDateTime now = now().minusHours(1);
-        var beforeAppellant = callback.getCaseDetailsBefore().orElseThrow().getCaseData().getAppeal().getAppellant();
-        beforeAppellant.setConfidentialityRequired(YES);
-        var currentAppellant = callback.getCaseDetails().getCaseData().getAppeal().getAppellant();
-        currentAppellant.setConfidentialityRequired(NO);
-        currentAppellant.setConfidentialityRequiredChangedDate(now.format(formatter));
+        final LocalDateTime thePast = now().minusHours(1);
+        configurePreviousAppellantConfidentiality(callback.getCaseDetailsBefore().orElseThrow());
+        configureAppellantConfidentiality(callback.getCaseDetails(), NO, formattedDate(thePast));
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(formattedStringToDate(response)).isEqualTo(LocalDateTime.parse(now.format(formatter), formatter));
+        assertThat(formattedStringToDate(response)).isEqualTo(formattedDate(thePast));
     }
 
     @Test
@@ -1856,6 +1846,17 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
     private static @NonNull LocalDateTime formattedStringToDate(PreSubmitCallbackResponse<SscsCaseData> response) {
         return LocalDateTime.parse(response.getData().getAppeal().getAppellant().getConfidentialityRequiredChangedDate(),
             formatter);
+    }
+
+    private void configurePreviousAppellantConfidentiality(CaseDetails<SscsCaseData> callback) {
+        var beforeAppellant = callback.getCaseData().getAppeal().getAppellant();
+        beforeAppellant.setConfidentialityRequired(YesNo.YES);
+    }
+
+    private void configureAppellantConfidentiality(CaseDetails<SscsCaseData> caseDetails, YesNo required, LocalDateTime thePast) {
+        var currentAppellant = caseDetails.getCaseData().getAppeal().getAppellant();
+        currentAppellant.setConfidentialityRequiredChangedDate(thePast.format(formatter));
+        currentAppellant.setConfidentialityRequired(required);
     }
 
     private void configureHandler(boolean cmOtherPartyConfidentialityEnabled) {

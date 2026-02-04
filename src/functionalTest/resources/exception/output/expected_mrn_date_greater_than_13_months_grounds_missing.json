@@ -67,6 +67,7 @@
           "isAddressSameAsAppointee": null,
           "isAppointee": "Yes",
           "confidentialityRequired": null,
+          "confidentialityRequiredChangedDate": null,
           "name": {
             "firstName": "Sarah",
             "lastName": "Smith",
