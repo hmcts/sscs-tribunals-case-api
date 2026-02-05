@@ -8,7 +8,7 @@ java:
   devmemoryRequests: 1Gi
   devmemoryLimits: 2Gi
   environment:
-    MYA_LINK: https://sscs-cor-frontend-pr-1234.preview.platform.hmcts.net//sign-in?tya=appeal_id
+    MYA_LINK: http://sscs-cor-frontend-aat.service.core-compute-aat.internal/sign-in?tya=appeal_id
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
     CORE_CASE_DATA_API_URL: ${CORE_CASE_DATA_API_URL}
     ROLE_ASSIGNMENT_API_URL: https://am-role-assignment-service-${SERVICE_FQDN}
@@ -48,7 +48,7 @@ java:
     ROBOTICS_EMAIL_PIP_AE_TO: "fake3"
     ISSUE_GENERIC_LETTER: true
     COH_URL: "http://coh-cor-aat.service.core-compute-aat.internal"
-    ONLINE_HEARING_LINK: "https://sscs-cor-frontend-pr-1234.preview.platform.hmcts.net/"
+    ONLINE_HEARING_LINK: "https://sscs-cor-frontend-aat.service.core-compute-aat.internal"
     JOB_SCHEDULER_DB_NAME: "{{ tpl .Values.global.databaseNamePrefix $}}sscs-job-scheduler"
     JOB_SCHEDULER_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
     JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
