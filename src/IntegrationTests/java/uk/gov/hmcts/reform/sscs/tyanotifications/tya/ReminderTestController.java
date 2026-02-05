@@ -65,7 +65,7 @@ public class ReminderTestController {
 
             callback.getCaseDetails().getCreatedDate();
             authorisationService.authorise(serviceAuthHeader);
-            notificationProcessingService.manageNotificationAndSubscription(new CcdNotificationWrapper(notificationSscsCaseDataWrapper), true);
+            notificationProcessingService.processNotification(new CcdNotificationWrapper(notificationSscsCaseDataWrapper), true);
         } catch (Exception e) {
             log.info("Exception thrown", e);
             throw e;

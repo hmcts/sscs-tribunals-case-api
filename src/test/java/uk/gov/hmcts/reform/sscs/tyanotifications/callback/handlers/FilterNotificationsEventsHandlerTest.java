@@ -221,7 +221,7 @@ public class FilterNotificationsEventsHandlerTest {
     public void shouldCallToRescheduleNotificationWhenErrorIsNotificationServiceExceptionError() {
         doThrow(new NotificationServiceException("error msg test", new RuntimeException("error")))
             .when(notificationProcessingService)
-            .manageNotificationAndSubscription(new CcdNotificationWrapper(callback), false);
+            .processNotification(new CcdNotificationWrapper(callback), false);
 
         assertThatExceptionOfType(NotificationServiceException.class)
             .isThrownBy(() -> handler.handle(callback))
@@ -235,7 +235,7 @@ public class FilterNotificationsEventsHandlerTest {
     public void shouldRescheduleNotificationWhenErrorIsNotANotificationServiceException() {
         doThrow(new RuntimeException("error msg test"))
             .when(notificationProcessingService)
-            .manageNotificationAndSubscription(new CcdNotificationWrapper(callback), false);
+            .processNotification(new CcdNotificationWrapper(callback), false);
 
         assertThatExceptionOfType(RuntimeException.class)
             .isThrownBy(() -> handler.handle(callback))
@@ -247,7 +247,7 @@ public class FilterNotificationsEventsHandlerTest {
     private void willHandle(NotificationSscsCaseDataWrapper callback) {
         assertThat(handler.canHandle(callback)).isTrue();
         handler.handle(callback);
-        verify(notificationProcessingService).manageNotificationAndSubscription(new CcdNotificationWrapper(callback), false);
+        verify(notificationProcessingService).processNotification(new CcdNotificationWrapper(callback), false);
         verifyNoInteractions(notificationExecutionManager);
     }
 

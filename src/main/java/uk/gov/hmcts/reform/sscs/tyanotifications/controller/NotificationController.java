@@ -64,7 +64,7 @@ public class NotificationController {
 
             callback.getCaseDetails().getCreatedDate();
             authorisationService.authorise(serviceAuthHeader);
-            notificationProcessingService.manageNotificationAndSubscription(new CcdNotificationWrapper(notificationSscsCaseDataWrapper), false);
+            notificationProcessingService.processNotification(new CcdNotificationWrapper(notificationSscsCaseDataWrapper), false);
         } catch (Exception e) {
             log.info("Exception thrown", e);
             throw e;

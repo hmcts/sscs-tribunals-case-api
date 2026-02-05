@@ -74,7 +74,7 @@ public abstract class BaseActionExecutor<T> implements JobExecutor<T> {
                 NotificationWrapper notificationWrapper = getWrapper(wrapper, payload);
 
                 try {
-                    notificationProcessingService.manageNotificationAndSubscription(notificationWrapper, true);
+                    notificationProcessingService.processNotification(notificationWrapper, true);
                     if (wrapper.getNotificationEventType().isReminder()) {
                         updateCase(caseId, wrapper, idamTokens);
                     }

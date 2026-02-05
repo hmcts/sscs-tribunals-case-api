@@ -59,7 +59,7 @@ public class FilterNotificationsEventsHandler implements CallbackHandler {
         }
         final CcdNotificationWrapper notificationWrapper = new CcdNotificationWrapper(callback);
         try {
-            notificationProcessingService.manageNotificationAndSubscription(notificationWrapper, false);
+            notificationProcessingService.processNotification(notificationWrapper, false);
         } catch (NotificationServiceException e) {
             notificationExecutionManager.rescheduleIfHandledGovNotifyErrorStatus(RETRY, notificationWrapper, e);
             throw e;

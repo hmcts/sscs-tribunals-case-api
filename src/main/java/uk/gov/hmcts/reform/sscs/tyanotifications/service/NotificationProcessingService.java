@@ -70,7 +70,7 @@ public class NotificationProcessingService {
 
     private final boolean covid19Feature;
 
-    public void manageNotificationAndSubscription(NotificationWrapper notificationWrapper, boolean fromReminderService) {
+    public void processNotification(NotificationWrapper notificationWrapper, boolean fromReminderService) {
         NotificationEventType notificationType = notificationWrapper.getNotificationType();
         final String caseId = notificationWrapper.getCaseId();
 
@@ -89,9 +89,9 @@ public class NotificationProcessingService {
                 notificationExecutionManager.scheduleNotification(notificationWrapper, ZonedDateTime.now().plusSeconds(notificationType.getDelayInSeconds()));
             } else {
                 log.info("Sending notification for Notification event {} and case id {}", notificationType.getId(), caseId);
-                sendNotificationPerSubscription(notificationWrapper);
+                processNotificationPerSubscription(notificationWrapper);
                 reminderService.createReminders(notificationWrapper);
-                sendSecondNotification(notificationWrapper);
+                processSecondNotification(notificationWrapper);
             }
         } else if (outOfHoursCalculator.isItOutOfHours()) {
             log.info("Notification event {} is out of hours and scheduled for case id {}", notificationType.getId(), caseId);
@@ -103,21 +103,21 @@ public class NotificationProcessingService {
         return YesNo.isYes(newSscsCaseData.getFunctionalTest());
     }
 
-    private void sendSecondNotification(NotificationWrapper notificationWrapper) {
+    private void processSecondNotification(NotificationWrapper notificationWrapper) {
         if (notificationWrapper.getNotificationType().equals(ISSUE_FINAL_DECISION_WELSH)) {
             // Gov Notify has a limit of 10 pages, so for long notifications (especially Welsh) we need to split the sending into 2 parts
             log.info("Trigger second notification event for {}", ISSUE_FINAL_DECISION.getId());
             notificationWrapper.getSscsCaseDataWrapper().setNotificationEventType(ISSUE_FINAL_DECISION);
             notificationWrapper.setSwitchLanguageType(true);
-            sendNotificationPerSubscription(notificationWrapper);
+            processNotificationPerSubscription(notificationWrapper);
         } else if (notificationWrapper.getNotificationType().equals(DWP_UPLOAD_RESPONSE)) {
             log.info("Trigger second notification event for {}", UPDATE_OTHER_PARTY_DATA.getId());
             notificationWrapper.getSscsCaseDataWrapper().setNotificationEventType(UPDATE_OTHER_PARTY_DATA);
-            sendNotificationPerSubscription(notificationWrapper);
+            processNotificationPerSubscription(notificationWrapper);
         }
     }
 
-    private void sendNotificationPerSubscription(NotificationWrapper notificationWrapper) {
+    private void processNotificationPerSubscription(NotificationWrapper notificationWrapper) {
         overrideNotificationType(notificationWrapper);
         String subscriptionTypes = notificationWrapper.getSubscriptionsBasedOnNotificationType().stream()
             .map(sub -> String.format("Party: %s, Entity %s, Party Id %s, Subscription Type %s, Subscription %s",
@@ -135,7 +135,7 @@ public class NotificationProcessingService {
         for (SubscriptionWithType subscriptionWithType : notificationWrapper.getSubscriptionsBasedOnNotificationType()) {
             if (isSubscriptionValidToSendAfterOverride(notificationWrapper, subscriptionWithType)
                 && isValidNotification(notificationWrapper, subscriptionWithType)) {
-                sendNotification(notificationWrapper, subscriptionWithType);
+                dispatchNotification(notificationWrapper, subscriptionWithType);
 
                 if (subscriptionWithType.getSubscription() != null
                     && NotificationEventType.SUBSCRIPTION_UPDATED.equals(notificationWrapper.getSscsCaseDataWrapper().getNotificationEventType())) {
@@ -223,7 +223,7 @@ public class NotificationProcessingService {
             || ((oldSubscription == null || !oldSubscription.isSmsSubscribed()) && newSubscription.isSmsSubscribed()));
     }
 
-    private void sendNotification(NotificationWrapper notificationWrapper, SubscriptionWithType subscriptionWithType) {
+    private void dispatchNotification(NotificationWrapper notificationWrapper, SubscriptionWithType subscriptionWithType) {
         Notification notification = notificationFactory.create(notificationWrapper, subscriptionWithType);
         notificationDispatchService.dispatchNotification(notificationWrapper, notification, subscriptionWithType, notificationWrapper.getNotificationType());
         processOldSubscriptionNotifications(notificationWrapper, notification, subscriptionWithType, notificationWrapper.getNotificationType());

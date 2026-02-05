@@ -113,10 +113,10 @@ public class NotificationDispatchService {
     boolean dispatchNotification(NotificationWrapper wrapper, Notification notification,
                                  SubscriptionWithType subscriptionWithType, NotificationEventType eventType) {
 
-        boolean emailSent = sendEmailNotification(wrapper, subscriptionWithType.getSubscription(), notification);
+        boolean emailSent = dispatchEmailNotification(wrapper, subscriptionWithType.getSubscription(), notification);
         notificationSuccessLog(wrapper, "Email", notification, notification.getEmailTemplate(), emailSent);
 
-        boolean smsSent = sendSmsNotification(wrapper, subscriptionWithType.getSubscription(), notification, eventType);
+        boolean smsSent = dispatchSmsNotification(wrapper, subscriptionWithType.getSubscription(), notification, eventType);
         if (nonNull(notification.getSmsTemplate())) {
             notificationSuccessLog(wrapper, "SMS", notification, String.join(", ", notification.getSmsTemplate()), smsSent);
         }
@@ -126,7 +126,7 @@ public class NotificationDispatchService {
 
         boolean letterSent = false;
         if (shouldSendLetter(wrapper, notification, isInterlocLetter, isDocmosisLetter)) {
-            letterSent = sendLetterNotification(wrapper, notification, subscriptionWithType, eventType);
+            letterSent = dispatchLetterNotification(wrapper, notification, subscriptionWithType, eventType);
             if (isDocmosisLetter) {
                 notificationSuccessLog(wrapper, "Docmosis Letter", notification, notification.getDocmosisLetterTemplate(), letterSent);
             } else {
@@ -186,15 +186,15 @@ public class NotificationDispatchService {
         return !isInterlocLetter && isNotBlank(notification.getLetterTemplate()) && State.READY_TO_LIST.getId().equals(createdInGapsFrom);
     }
 
-    private boolean sendSmsNotification(NotificationWrapper wrapper, Subscription subscription, Notification notification, NotificationEventType eventType) {
+    private boolean dispatchSmsNotification(NotificationWrapper wrapper, Subscription subscription, Notification notification, NotificationEventType eventType) {
         if (isOkToSendSmsNotification(wrapper, subscription, notification, eventType, notificationValidService)) {
             return Optional.ofNullable(notification.getSmsTemplate()).map(Collection::stream).orElseGet(Stream::empty)
-                .map(smsTemplateId -> sendSmsNotification(wrapper, notification, smsTemplateId)).reduce((previous, current) -> previous && current).orElse(false);
+                .map(smsTemplateId -> dispatchSmsNotification(wrapper, notification, smsTemplateId)).reduce((previous, current) -> previous && current).orElse(false);
         }
         return false;
     }
 
-    private boolean sendSmsNotification(NotificationWrapper wrapper, Notification notification, String smsTemplateId) {
+    private boolean dispatchSmsNotification(NotificationWrapper wrapper, Notification notification, String smsTemplateId) {
         NotificationExecutionManager.SendAction sendAction = () ->
             notificationGateway.sendSms(
                 smsTemplateId,
@@ -212,7 +212,7 @@ public class NotificationDispatchService {
         return notificationExecutionManager.executeNotification(wrapper, smsTemplateId, "SMS", sendAction);
     }
 
-    private boolean sendEmailNotification(NotificationWrapper wrapper, Subscription subscription, Notification notification) {
+    private boolean dispatchEmailNotification(NotificationWrapper wrapper, Subscription subscription, Notification notification) {
         if (isOkToSendEmailNotification(wrapper, subscription, notification, notificationValidService)) {
 
             NotificationExecutionManager.SendAction sendAction = () ->
@@ -235,25 +235,25 @@ public class NotificationDispatchService {
         return false;
     }
 
-    protected boolean sendLetterNotification(NotificationWrapper wrapper, Notification notification, SubscriptionWithType subscriptionWithType, NotificationEventType eventType) {
+    protected boolean dispatchLetterNotification(NotificationWrapper wrapper, Notification notification, SubscriptionWithType subscriptionWithType, NotificationEventType eventType) {
         log.info("Sending the letter for event {} and case id {}.", eventType.getId(), wrapper.getCaseId());
         Address addressToUse = getAddressToUseForLetter(wrapper, subscriptionWithType);
 
         if (isValidLetterAddress(addressToUse)) {
-            return sendMandatoryLetterNotification(wrapper, notification, subscriptionWithType, addressToUse);
+            return dispatchMandatoryLetterNotification(wrapper, notification, subscriptionWithType, addressToUse);
         } else {
             log.error("Failed to send letter for event id: {} for case id: {}, no address present", wrapper.getNotificationType().getId(), wrapper.getCaseId());
             return false;
         }
     }
 
-    private boolean sendMandatoryLetterNotification(NotificationWrapper wrapper, Notification notification, SubscriptionWithType subscriptionWithType, Address addressToUse) {
+    private boolean dispatchMandatoryLetterNotification(NotificationWrapper wrapper, Notification notification, SubscriptionWithType subscriptionWithType, Address addressToUse) {
         if (NotificationEventTypeLists.EVENT_TYPES_FOR_MANDATORY_LETTERS.contains(wrapper.getNotificationType())) {
             if (isBundledLetter(wrapper.getNotificationType()) || (isNotBlank(notification.getDocmosisLetterTemplate()))) {
-                return sendBundledAndDocmosisLetterNotification(wrapper, notification, getNameToUseForLetter(wrapper, subscriptionWithType), subscriptionWithType);
+                return dispatchBundledAndDocmosisLetterNotification(wrapper, notification, getNameToUseForLetter(wrapper, subscriptionWithType), subscriptionWithType);
             } else if (hasLetterTemplate(notification)) {
                 NotificationExecutionManager.SendAction sendAction = () ->
-                    sendLetterNotificationToAddress(wrapper, notification, addressToUse, subscriptionWithType);
+                    dispatchLetterNotificationToAddress(wrapper, notification, addressToUse, subscriptionWithType);
 
                 return notificationExecutionManager.executeNotification(wrapper, notification.getLetterTemplate(), NOTIFICATION_TYPE_LETTER, sendAction);
             }
@@ -261,7 +261,7 @@ public class NotificationDispatchService {
         return false;
     }
 
-    protected void sendLetterNotificationToAddress(NotificationWrapper wrapper, Notification notification, final Address address, SubscriptionWithType subscriptionWithType) throws NotificationClientException {
+    protected void dispatchLetterNotificationToAddress(NotificationWrapper wrapper, Notification notification, final Address address, SubscriptionWithType subscriptionWithType) throws NotificationClientException {
         if (address != null) {
             Map<String, Object> placeholders = notification.getPlaceholders();
             String fullNameNoTitle = getNameToUseForLetter(wrapper, subscriptionWithType);
@@ -304,10 +304,10 @@ public class NotificationDispatchService {
             && (YesNo.NO.equals(addressToUse.getInMainlandUk()) || isNotBlank(addressToUse.getPostcode()));
     }
 
-    private boolean sendBundledAndDocmosisLetterNotification(NotificationWrapper wrapper,
-                                                             Notification notification,
-                                                             String nameToUse,
-                                                             SubscriptionWithType subscriptionWithType) {
+    private boolean dispatchBundledAndDocmosisLetterNotification(NotificationWrapper wrapper,
+                                                                 Notification notification,
+                                                                 String nameToUse,
+                                                                 SubscriptionWithType subscriptionWithType) {
         try {
             byte[] bundledLetter;
             if (isNotBlank(notification.getDocmosisLetterTemplate())) {
