@@ -199,6 +199,7 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
     }
 
     private void triggerReadyToListEvent(Callback<SscsCaseData> callback) {
+        disableReviewFtaResponseTaskInit(callback);
         updateEventDetails(callback.getCaseDetails().getId(), EventType.READY_TO_LIST, "ready to list", "update to ready to list event as there is no further information to assist the tribunal and no dispute.",
                 sscsCaseDetails -> {
                     SscsCaseData sscsCaseData = sscsCaseDetails.getData();
@@ -219,6 +220,10 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
                 idamService.getIdamTokens(),
                 caseDetailsConsumer
         );
+    }
+
+    private void disableReviewFtaResponseTaskInit(Callback<SscsCaseData> callback) {
+        callback.getCaseDetails().getCaseData().getWorkAllocationFields().setFtaResponseReviewRequired(false);
     }
 
     @Override
