@@ -414,6 +414,19 @@
     "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
+    "CaseEventID": "dwpUploadResponse",
+    "CaseFieldID": "ftaResponseReviewRequired",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "21/08/2021",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "1.0",
+    "PageLabel": "Document types uploaded",
+    "FieldShowCondition": "[STATE]=\"DoNotShow\"",
+    "Publish": "${CCD_DEF_PUBLISH}"
+  },
+  {
     "CaseEventID": "dwpSupplementaryResponse",
     "CaseFieldID": "scannedDocumentTypes",
     "CaseTypeID": "Benefit",
