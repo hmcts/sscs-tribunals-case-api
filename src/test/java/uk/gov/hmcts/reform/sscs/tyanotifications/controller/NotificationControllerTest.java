@@ -82,7 +82,7 @@ public class NotificationControllerTest {
     @Test
     public void shouldCreateAndSendNotificationForSscsCaseData() {
         notificationController.sendNotification("", json);
-        verify(notificationProcessingService).manageNotificationAndSubscription(any(CcdNotificationWrapper.class), eq(false));
+        verify(notificationProcessingService).processNotification(any(CcdNotificationWrapper.class), eq(false));
     }
 
 }

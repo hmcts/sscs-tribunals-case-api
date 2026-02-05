@@ -90,7 +90,7 @@ public class NotificationsForSubscriptionUpdatedTest extends NotificationProcess
         SscsCaseData oldSscsCaseData = getSscsCaseData(oldSubscription, who);
         NotificationSscsCaseDataWrapper wrapper = getSscsCaseDataWrapper(newSscsCaseData, oldSscsCaseData, SUBSCRIPTION_UPDATED);
 
-        getNotificationProcessingService().manageNotificationAndSubscription(new CcdNotificationWrapper(wrapper), false);
+        getNotificationProcessingService().processNotification(new CcdNotificationWrapper(wrapper), false);
         verify(getNotificationGateway()).sendEmail(eq(subscriptionUpdatedEmailId), eq(newSubscription.getEmail()), any(), any(), any(), any());
         verifyNoMoreInteractions(getNotificationGateway());
     }
@@ -104,7 +104,7 @@ public class NotificationsForSubscriptionUpdatedTest extends NotificationProcess
         SscsCaseData oldSscsCaseData = getSscsCaseData(oldSubscription, appellant);
         NotificationSscsCaseDataWrapper wrapper = getSscsCaseDataWrapper(newSscsCaseData, oldSscsCaseData, SUBSCRIPTION_UPDATED);
 
-        getNotificationProcessingService().manageNotificationAndSubscription(new CcdNotificationWrapper(wrapper), false);
+        getNotificationProcessingService().processNotification(new CcdNotificationWrapper(wrapper), false);
         verify(getNotificationGateway()).sendSms(eq(subscriptionUpdatedSmsId), eq(newSubscription.getMobile()), any(), any(), any(), any(), any());
         verifyNoMoreInteractions(getNotificationGateway());
     }
@@ -118,7 +118,7 @@ public class NotificationsForSubscriptionUpdatedTest extends NotificationProcess
         SscsCaseData oldSscsCaseData = getSscsCaseData(oldSubscription, appointee);
         NotificationSscsCaseDataWrapper wrapper = getSscsCaseDataWrapper(newSscsCaseData, oldSscsCaseData, SUBSCRIPTION_UPDATED);
 
-        getNotificationProcessingService().manageNotificationAndSubscription(new CcdNotificationWrapper(wrapper), false);
+        getNotificationProcessingService().processNotification(new CcdNotificationWrapper(wrapper), false);
         verify(getNotificationGateway()).sendSms(eq(subscriptionUpdatedSmsId), eq(newSubscription.getMobile()), any(), any(), any(), any(), any());
         verifyNoMoreInteractions(getNotificationGateway());
     }
@@ -132,7 +132,7 @@ public class NotificationsForSubscriptionUpdatedTest extends NotificationProcess
         SscsCaseData oldSscsCaseData = getSscsCaseData(oldSubscription, representative);
         NotificationSscsCaseDataWrapper wrapper = getSscsCaseDataWrapper(newSscsCaseData, oldSscsCaseData, SUBSCRIPTION_UPDATED);
 
-        getNotificationProcessingService().manageNotificationAndSubscription(new CcdNotificationWrapper(wrapper), false);
+        getNotificationProcessingService().processNotification(new CcdNotificationWrapper(wrapper), false);
         verify(getNotificationGateway()).sendSms(eq(subscriptionCreatedRepresentativeSmsId), eq(newSubscription.getMobile()), any(), any(), any(), any(), any());
         verifyNoMoreInteractions(getNotificationGateway());
     }
@@ -146,7 +146,7 @@ public class NotificationsForSubscriptionUpdatedTest extends NotificationProcess
         SscsCaseData oldSscsCaseData = getSscsCaseData(oldSubscription, appellant);
         NotificationSscsCaseDataWrapper wrapper = getSscsCaseDataWrapper(newSscsCaseData, oldSscsCaseData, SUBSCRIPTION_UPDATED);
 
-        getNotificationProcessingService().manageNotificationAndSubscription(new CcdNotificationWrapper(wrapper), false);
+        getNotificationProcessingService().processNotification(new CcdNotificationWrapper(wrapper), false);
         verify(getNotificationGateway()).sendEmail(eq(subscriptionUpdatedEmailId), eq(newSubscription.getEmail()), any(), any(), any(), any());
         verify(getNotificationGateway()).sendSms(eq(subscriptionCreatedAppellantSmsId), eq(newSubscription.getMobile()), any(), any(), any(), any(), any());
 
@@ -162,7 +162,7 @@ public class NotificationsForSubscriptionUpdatedTest extends NotificationProcess
         SscsCaseData oldSscsCaseData = getSscsCaseData(oldSubscription, appointee);
         NotificationSscsCaseDataWrapper wrapper = getSscsCaseDataWrapper(newSscsCaseData, oldSscsCaseData, SUBSCRIPTION_UPDATED);
 
-        getNotificationProcessingService().manageNotificationAndSubscription(new CcdNotificationWrapper(wrapper), false);
+        getNotificationProcessingService().processNotification(new CcdNotificationWrapper(wrapper), false);
         verify(getNotificationGateway()).sendEmail(eq(subscriptionUpdatedEmailId), eq(newSubscription.getEmail()), any(), any(), any(), any());
         verify(getNotificationGateway()).sendSms(eq(subscriptionCreatedAppointeeSmsId), eq(newSubscription.getMobile()), any(), any(), any(), any(), any());
 
@@ -178,7 +178,7 @@ public class NotificationsForSubscriptionUpdatedTest extends NotificationProcess
         SscsCaseData oldSscsCaseData = getSscsCaseData(oldSubscription, representative);
         NotificationSscsCaseDataWrapper wrapper = getSscsCaseDataWrapper(newSscsCaseData, oldSscsCaseData, SUBSCRIPTION_UPDATED);
 
-        getNotificationProcessingService().manageNotificationAndSubscription(new CcdNotificationWrapper(wrapper), false);
+        getNotificationProcessingService().processNotification(new CcdNotificationWrapper(wrapper), false);
         verify(getNotificationGateway()).sendEmail(eq(subscriptionUpdatedEmailId), eq(newSubscription.getEmail()), any(), any(), any(), any());
         verify(getNotificationGateway()).sendSms(eq(subscriptionCreatedRepresentativeSmsId), eq(newSubscription.getMobile()), any(), any(), any(), any(), any());
 
@@ -195,7 +195,7 @@ public class NotificationsForSubscriptionUpdatedTest extends NotificationProcess
 
         NotificationSscsCaseDataWrapper wrapper = getSscsCaseDataWrapper(newSscsCaseData, oldSscsCaseData, SUBSCRIPTION_UPDATED);
 
-        getNotificationProcessingService().manageNotificationAndSubscription(new CcdNotificationWrapper(wrapper), false);
+        getNotificationProcessingService().processNotification(new CcdNotificationWrapper(wrapper), false);
 
         verify(getNotificationGateway()).sendEmail(eq(subscriptionUpdatedEmailId), eq(getSubscription().getEmail()), any(), any(), any(), any());
         verify(getNotificationGateway()).sendEmail(eq(subscriptionOldEmailId), eq(oldSubscription.getEmail()), any(), any(), any(), any());
@@ -213,7 +213,7 @@ public class NotificationsForSubscriptionUpdatedTest extends NotificationProcess
 
         NotificationSscsCaseDataWrapper wrapper = getSscsCaseDataWrapper(newSscsCaseData, oldSscsCaseData, SUBSCRIPTION_UPDATED);
 
-        getNotificationProcessingService().manageNotificationAndSubscription(new CcdNotificationWrapper(wrapper), false);
+        getNotificationProcessingService().processNotification(new CcdNotificationWrapper(wrapper), false);
 
         verify(getNotificationGateway()).sendSms(eq(subscriptionCreatedAppellantSmsId), eq(getSubscription().getMobile()), any(), any(), any(), any(), any());
         verify(getNotificationGateway()).sendSms(eq(subscriptionOldSmsId), eq(oldSubscription.getMobile()), any(), any(), any(), any(), any());
@@ -231,7 +231,7 @@ public class NotificationsForSubscriptionUpdatedTest extends NotificationProcess
 
         NotificationSscsCaseDataWrapper wrapper = getSscsCaseDataWrapper(newSscsCaseData, oldSscsCaseData, SUBSCRIPTION_UPDATED);
 
-        getNotificationProcessingService().manageNotificationAndSubscription(new CcdNotificationWrapper(wrapper), false);
+        getNotificationProcessingService().processNotification(new CcdNotificationWrapper(wrapper), false);
 
         verify(getNotificationGateway()).sendSms(eq(subscriptionCreatedAppointeeSmsId), eq(getSubscription().getMobile()), any(), any(), any(), any(), any());
         verify(getNotificationGateway()).sendSms(eq(subscriptionOldSmsId), eq(oldSubscription.getMobile()), any(), any(), any(), any(), any());
@@ -250,7 +250,7 @@ public class NotificationsForSubscriptionUpdatedTest extends NotificationProcess
 
         NotificationSscsCaseDataWrapper wrapper = getSscsCaseDataWrapper(newSscsCaseData, oldSscsCaseData, SUBSCRIPTION_UPDATED);
 
-        getNotificationProcessingService().manageNotificationAndSubscription(new CcdNotificationWrapper(wrapper), false);
+        getNotificationProcessingService().processNotification(new CcdNotificationWrapper(wrapper), false);
 
         verify(getNotificationGateway()).sendSms(eq(subscriptionCreatedRepresentativeSmsId), eq(getSubscription().getMobile()), any(), any(), any(), any(), any());
         verify(getNotificationGateway()).sendSms(eq(subscriptionOldSmsId), eq(oldSubscription.getMobile()), any(), any(), any(), any(), any());
@@ -268,7 +268,7 @@ public class NotificationsForSubscriptionUpdatedTest extends NotificationProcess
 
         NotificationSscsCaseDataWrapper wrapper = getSscsCaseDataWrapper(newSscsCaseData, oldSscsCaseData, SUBSCRIPTION_UPDATED);
 
-        getNotificationProcessingService().manageNotificationAndSubscription(new CcdNotificationWrapper(wrapper), false);
+        getNotificationProcessingService().processNotification(new CcdNotificationWrapper(wrapper), false);
 
         verify(getNotificationGateway()).sendEmail(eq(subscriptionUpdatedEmailId), eq(getSubscription().getEmail()), any(), any(), any(), any());
         verify(getNotificationGateway()).sendEmail(eq(subscriptionOldEmailId), eq(oldSubscription.getEmail()), any(), any(), any(), any());
@@ -288,7 +288,7 @@ public class NotificationsForSubscriptionUpdatedTest extends NotificationProcess
 
         NotificationSscsCaseDataWrapper wrapper = getSscsCaseDataWrapper(newSscsCaseData, oldSscsCaseData, SUBSCRIPTION_UPDATED);
 
-        getNotificationProcessingService().manageNotificationAndSubscription(new CcdNotificationWrapper(wrapper), false);
+        getNotificationProcessingService().processNotification(new CcdNotificationWrapper(wrapper), false);
 
         verify(getNotificationGateway()).sendEmail(eq(subscriptionUpdatedEmailId), eq(getSubscription().getEmail()), any(), any(), any(), any());
         verify(getNotificationGateway()).sendEmail(eq(subscriptionOldEmailId), eq(oldSubscription.getEmail()), any(), any(), any(), any());
@@ -308,7 +308,7 @@ public class NotificationsForSubscriptionUpdatedTest extends NotificationProcess
 
         NotificationSscsCaseDataWrapper wrapper = getSscsCaseDataWrapper(newSscsCaseData, oldSscsCaseData, SUBSCRIPTION_UPDATED);
 
-        getNotificationProcessingService().manageNotificationAndSubscription(new CcdNotificationWrapper(wrapper), false);
+        getNotificationProcessingService().processNotification(new CcdNotificationWrapper(wrapper), false);
 
         verify(getNotificationGateway()).sendEmail(eq(subscriptionUpdatedEmailId), eq(getSubscription().getEmail()), any(), any(), any(), any());
         verify(getNotificationGateway()).sendEmail(eq(subscriptionOldEmailId), eq(oldSubscription.getEmail()), any(), any(), any(), any());
@@ -324,7 +324,7 @@ public class NotificationsForSubscriptionUpdatedTest extends NotificationProcess
 
         NotificationSscsCaseDataWrapper wrapper = getSscsCaseDataWrapper(newSscsCaseData, oldSscsCaseData, SUBSCRIPTION_UPDATED);
 
-        getNotificationProcessingService().manageNotificationAndSubscription(new CcdNotificationWrapper(wrapper), false);
+        getNotificationProcessingService().processNotification(new CcdNotificationWrapper(wrapper), false);
 
         verifyNoMoreInteractions(getNotificationGateway());
     }
