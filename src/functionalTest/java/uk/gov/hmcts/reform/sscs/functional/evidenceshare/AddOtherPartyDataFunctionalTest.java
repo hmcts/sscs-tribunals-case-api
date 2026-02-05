@@ -26,6 +26,10 @@ import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 
 public class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
 
+    private static final String POSTCODE = "IG10 3XX";
+    private static final String ADDRESS_LINE_1 = "3 XX Road";
+    private static final String TOWN = "Lougthon";
+
     @Autowired
     private UpdateCcdCaseService updateCcdCaseService;
 
@@ -58,7 +62,11 @@ public class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
                 assertThat(cdAfterEvent.getState()).isEqualTo(State.AWAIT_CONFIDENTIALITY_REQUIREMENTS.toString());
                 assertThat(cdAfterEvent.getData().getExtendedSscsCaseData().getAwareOfAnyAdditionalOtherParties()).isEqualTo(YesNo.YES);
                 assertThat(cdAfterEvent.getData().getOtherParties().getFirst().getValue().getName().getFirstName()).isEqualTo("Bella");
+                assertThat(cdAfterEvent.getData().getOtherParties().getFirst().getValue().getName().getLastName()).isEqualTo("Kiki");
                 assertThat(cdAfterEvent.getData().getOtherParties().getFirst().getValue().getName().getTitle()).isEqualTo("Miss");
+                assertThat(cdAfterEvent.getData().getOtherParties().getFirst().getValue().getAddress().getPostcode()).isEqualTo(POSTCODE);
+                assertThat(cdAfterEvent.getData().getOtherParties().getFirst().getValue().getAddress().getTown()).isEqualTo(TOWN);
+                assertThat(cdAfterEvent.getData().getOtherParties().getFirst().getValue().getAddress().getLine1()).isEqualTo(ADDRESS_LINE_1);
             });
         }
     }
@@ -100,9 +108,9 @@ public class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
                 .lastName(lastName)
                 .build())
             .address(Address.builder()
-                .postcode("IG10 3XX")
-                .line1("3 XX Road")
-                .town("Lougthon")
+                .postcode(POSTCODE)
+                .line1(ADDRESS_LINE_1)
+                .town(TOWN)
                 .build())
             .build();
     }

@@ -85,8 +85,20 @@ public class AddOtherPartyMidEventHandlerTest {
             }
 
             @Test
+            public void givenAddOtherPartyEventAndChildSupportBenefitWithoutOtherPartyData_thenReturnFalse() {
+                var sscsCaseData = caseDataWithBenefit(CHILD_SUPPORT.getShortName());
+
+                when(callback.getEvent()).thenReturn(EventType.ADD_OTHER_PARTY_DATA);
+                when(callback.getCaseDetails()).thenReturn(caseDetails);
+                when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+                assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
+            }
+
+            @Test
             public void givenAddOtherPartyEventAndChildSupportBenefit_thenReturnTrue() {
                 var sscsCaseData = caseDataWithBenefit(CHILD_SUPPORT.getShortName());
+
                 when(callback.getEvent()).thenReturn(EventType.ADD_OTHER_PARTY_DATA);
                 when(callback.getCaseDetails()).thenReturn(caseDetails);
                 when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -139,7 +151,22 @@ public class AddOtherPartyMidEventHandlerTest {
             }
 
             @Test
-            void throwIllegalStateExceptionIfCannotHandle() {
+            void throwIllegalStateExceptionIfNoAnyOtherPartyProvided() {
+                var sscsCaseData = caseDataWithBenefit(CHILD_SUPPORT.getShortName());
+
+                when(callback.getEvent()).thenReturn(EventType.ADD_OTHER_PARTY_DATA);
+                when(callback.getCaseDetails()).thenReturn(caseDetails);
+                when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+                IllegalStateException ex = assertThrows(IllegalStateException.class,
+                    () -> handler.handle(MID_EVENT, callback, USER_AUTHORISATION));
+
+                assertThat(ex).hasMessage("Cannot handle callback");
+            }
+
+            @Test
+            void throwIllegalStateExceptionWhenCallbackTypeIsNotMidEvent() {
+
                 IllegalStateException ex = assertThrows(IllegalStateException.class,
                     () -> handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION));
 

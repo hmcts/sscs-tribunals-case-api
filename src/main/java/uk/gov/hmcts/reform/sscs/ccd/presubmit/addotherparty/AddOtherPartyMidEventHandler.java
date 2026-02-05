@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.addotherparty;
 
+import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +28,8 @@ public class AddOtherPartyMidEventHandler implements PreSubmitCallbackHandler<Ss
 
         if (!cmOtherPartyConfidentialityEnabled
             || callbackType != CallbackType.MID_EVENT
-            || callback.getEvent() != EventType.ADD_OTHER_PARTY_DATA) {
+            || callback.getEvent() != EventType.ADD_OTHER_PARTY_DATA
+            || isNull(callback.getCaseDetails().getCaseData().getOtherParties())) {
             return false;
         }
 
@@ -45,7 +47,8 @@ public class AddOtherPartyMidEventHandler implements PreSubmitCallbackHandler<Ss
         var preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 
         if (caseData.getOtherParties().size() > 1) {
-            log.warn("Only one other party data can be added using this event!. ccdCaseId: {}", caseData.getCcdCaseId());
+            log.warn("Only one other party data can be added using this event!. ccdCaseId: {}",
+                caseData.getCcdCaseId());
             preSubmitCallbackResponse.addError("Only one other party data can be added using this event!");
         }
 

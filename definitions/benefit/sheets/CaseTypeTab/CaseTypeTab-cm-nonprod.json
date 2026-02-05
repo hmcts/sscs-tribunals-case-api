@@ -1,3 +1,3 @@
 [
-  {"LiveFrom": "15/01/2026", "CaseTypeID": "Benefit", "TabID": "other_party_sscs", "TabLabel": "Other Party Details", "TabDisplayOrder": 29, "CaseFieldID": "awareOfAnyAdditionalOtherParties", "TabFieldDisplayOrder": 1}
+  {"LiveFrom": "15/01/2026", "CaseTypeID": "Benefit", "TabID": "other_party_sscs", "TabLabel": "Other Party Details", "TabDisplayOrder": 29, "CaseFieldID": "awareOfAnyAdditionalOtherParties", "TabFieldDisplayOrder": 2}
 ]

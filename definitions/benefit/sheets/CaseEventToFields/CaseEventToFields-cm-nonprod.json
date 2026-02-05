@@ -20,6 +20,6 @@
     "PageDisplayOrder": 2,
     "PageFieldDisplayOrder": 2,
     "PageID": "1.0",
-    "Publish": "${CCD_DEF_PUBLISH}"
+    "Publish": "N"
   }
 ]
