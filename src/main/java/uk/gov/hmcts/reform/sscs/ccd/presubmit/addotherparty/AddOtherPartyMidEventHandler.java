@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.addotherparty;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,7 @@ public class AddOtherPartyMidEventHandler implements PreSubmitCallbackHandler<Ss
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
+        requireNonNull(callback, "callback must not be null");
 
         if (!cmOtherPartyConfidentialityEnabled
             || callbackType != CallbackType.MID_EVENT
