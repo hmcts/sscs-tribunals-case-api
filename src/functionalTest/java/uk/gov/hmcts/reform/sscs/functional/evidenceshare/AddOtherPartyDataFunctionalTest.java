@@ -51,7 +51,7 @@ public class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
                 // add other party
                 var otherParty = buildOtherParty("Miss", "Bella", "Kiki");
 
-                updateCcdCaseService.updateCaseV2(caseWithState.getId(), ADD_OTHER_PARTY_DATA.getCcdType(), idamService.getIdamTokens(), (cd) -> {
+                updateCcdCaseService.updateCaseV2(caseWithState.getId(), ADD_OTHER_PARTY_DATA.getCcdType(), getIdamTokens(), (cd) -> {
                     cd.getData().setOtherParties(List.of(new CcdValue<>(otherParty)));
                     cd.getData().getExtendedSscsCaseData().setAwareOfAnyAdditionalOtherParties(YesNo.YES);
                     return new UpdateCcdCaseService.UpdateResult("add other party", "add other party");
@@ -87,7 +87,7 @@ public class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
                 // Add other party event should fail, because the case status does not qualify for ADD_OTHER_PARTY_DATA event
                 var otherParty = buildOtherParty("Mr", "X", "Bean");
 
-                assertThatThrownBy(() -> updateCcdCaseService.updateCaseV2(caseWithState.getId(), ADD_OTHER_PARTY_DATA.getCcdType(), idamService.getIdamTokens(), (cd) -> {
+                assertThatThrownBy(() -> updateCcdCaseService.updateCaseV2(caseWithState.getId(), ADD_OTHER_PARTY_DATA.getCcdType(), getIdamTokens(), (cd) -> {
                     cd.getData().setOtherParties(List.of(new CcdValue<>(otherParty)));
                     cd.getData().getExtendedSscsCaseData().setAwareOfAnyAdditionalOtherParties(YesNo.YES);
                     return new UpdateCcdCaseService.UpdateResult("add other party", "add other party");
@@ -100,7 +100,6 @@ public class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
             });
         }
     }
-
 
     private OtherParty buildOtherParty(String title, String firstName, String lastName) {
         return  OtherParty.builder()

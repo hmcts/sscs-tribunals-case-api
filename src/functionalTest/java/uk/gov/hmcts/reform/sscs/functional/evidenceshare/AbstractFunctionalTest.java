@@ -61,7 +61,7 @@ abstract class AbstractFunctionalTest {
     private final String localInstance = "http://localhost:8008";
     String ccdCaseId;
     @Autowired
-    protected IdamService idamService;
+    private IdamService idamService;
     private IdamTokens idamTokens;
     @Autowired
     private CcdService ccdService;
@@ -203,6 +203,10 @@ abstract class AbstractFunctionalTest {
         return await()
             .atMost(15, SECONDS)
             .pollInterval(2, SECONDS);
+    }
+
+    IdamTokens getIdamTokens() {
+        return idamService.getIdamTokens();
     }
 
     private void updateCaseForDocuments(SscsCaseDetails caseDetails, String json) throws IOException {
