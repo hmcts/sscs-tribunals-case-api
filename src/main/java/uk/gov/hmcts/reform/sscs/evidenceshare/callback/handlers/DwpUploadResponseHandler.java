@@ -223,7 +223,7 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
     }
 
     private void disableReviewFtaResponseTaskInit(Callback<SscsCaseData> callback) {
-        callback.getCaseDetails().getCaseData().getWorkAllocationFields().setFtaResponseReviewRequired(false);
+        callback.getCaseDetails().getCaseData().getWorkAllocationFields().setFtaResponseReviewRequired(YesNo.NO);
     }
 
     @Override

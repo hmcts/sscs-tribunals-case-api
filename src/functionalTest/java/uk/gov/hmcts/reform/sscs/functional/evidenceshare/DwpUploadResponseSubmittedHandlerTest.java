@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
 @RunWith(JUnitParamsRunner.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
@@ -48,6 +49,7 @@ public class DwpUploadResponseSubmittedHandlerTest extends AbstractFunctionalTes
             assertEquals("readyToList", caseDetails.getState());
             assertNotNull(caseDetails.getData());
             assertEquals(DwpState.RESPONSE_SUBMITTED_DWP, caseDetails.getData().getDwpState());
+            assertEquals(YesNo.NO, caseDetails.getData().getWorkAllocationFields().getFtaResponseReviewRequired());
             assertEquals("Yes", caseDetails.getData().getDwpFurtherInfo());
             assertNotNull(caseDetails.getData().getSscsDocument());
             assertEquals("appellantEvidence", caseDetails.getData().getSscsDocument().get(0).getValue().getDocumentType());
