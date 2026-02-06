@@ -65,8 +65,7 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
         + "for an SSCS5 case. This role will be ignored when the event completes.";
     private static final String SSCS2_ROLE_ERROR = "Role is required for the selected case";
     private static final int UUID_SIZE = 36;
-    private static final DateTimeFormatter formatter =
-        DateTimeFormatter.ofPattern("d MMM yyyy, h:mm:ss a", Locale.UK);
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMM yyyy, h:mm:ss a", Locale.UK);
     private final Appeal appeal = Appeal.builder()
         .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build()).build();
     private UpdateOtherPartyAboutToSubmitHandler handler;
@@ -92,8 +91,8 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.UPDATE_OTHER_PARTY_DATA);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        Appeal appeal = Appeal.builder()
-            .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build()).build();
+        Appeal appeal = Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
+            .build();
         sscsCaseData.setAppeal(appeal);
     }
 
@@ -133,8 +132,7 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
     void givenOtherPartiesUcbIsYes_thenUpdateCaseDataOtherPartyUcb() {
         sscsCaseData.setOtherParties(Arrays.asList(buildOtherParty(ID_2), buildOtherParty(ID_1)));
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-            USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getData().getOtherPartyUcb()).isEqualTo(YesNo.YES.getValue());
         assertThat(response.getErrors().size()).isEqualTo(0);
     }
@@ -143,8 +141,7 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
     void givenNewOtherPartyAdded_thenAssignAnId() {
         sscsCaseData.setOtherParties(singletonList(buildOtherPartyWithAppointeeAndRep(null, null, null)));
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-            USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getOtherParties()).hasSize(1).extracting(CcdValue::getValue)
             .anySatisfy((OtherParty otherParty) -> {
@@ -159,11 +156,10 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
 
     @Test
     void givenExistingOtherParties_thenNewOtherPartyAssignedNewId() {
-        sscsCaseData.setOtherParties(Arrays.asList(buildOtherParty(ID_2), buildOtherParty(ID_1),
-            buildOtherPartyWithAppointeeAndRep(null, null, null)));
+        sscsCaseData.setOtherParties(
+            Arrays.asList(buildOtherParty(ID_2), buildOtherParty(ID_1), buildOtherPartyWithAppointeeAndRep(null, null, null)));
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-            USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getOtherParties()).hasSize(3).extracting(CcdValue::getValue)
             .anySatisfy((OtherParty otherParty) -> {
@@ -185,12 +181,10 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
 
     @Test
     void givenExistingOtherPartiesWithAppointeeAndRep_thenNewOtherPartyAssignedNewId() {
-        sscsCaseData.setOtherParties(
-            Arrays.asList(buildOtherParty(ID_2), buildOtherPartyWithAppointeeAndRep(ID_1, ID_3, ID_4),
-                buildOtherPartyWithAppointeeAndRep(null, null, null)));
+        sscsCaseData.setOtherParties(Arrays.asList(buildOtherParty(ID_2), buildOtherPartyWithAppointeeAndRep(ID_1, ID_3, ID_4),
+            buildOtherPartyWithAppointeeAndRep(null, null, null)));
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-            USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         List<CcdValue<OtherParty>> otherParties = response.getData().getOtherParties();
 
@@ -219,8 +213,7 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
         sscsCaseData.setOtherParties(Arrays.asList(buildOtherPartyWithAppointeeAndRep(ID_2, null, null),
             buildOtherPartyWithAppointeeAndRep(ID_1, ID_3, ID_4), buildOtherParty(null)));
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-            USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getOtherParties()).hasSize(3).extracting(CcdValue::getValue)
             .anySatisfy((OtherParty otherParty) -> {
@@ -246,8 +239,7 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
     void givenEmptyOtherParties_thenSetToNullRatherThanEmpty() {
         sscsCaseData.setOtherParties(emptyList());
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-            USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getData().getOtherParties()).isNull();
         assertThat(response.getErrors().size()).isEqualTo(0);
     }
@@ -255,14 +247,11 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
     @Test
     void givenOtherPartyWantsConfidentiality_thenCaseIsConfidential() {
         SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(
-                Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
-                    .build())
-            .otherParties(Arrays.asList(buildConfidentialOtherParty(ID_2, YES), buildConfidentialOtherParty(ID_1, NO)))
-            .build();
+                Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build()).build())
+            .otherParties(Arrays.asList(buildConfidentialOtherParty(ID_2, YES), buildConfidentialOtherParty(ID_1, NO))).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-            USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getData().getIsConfidentialCase()).isEqualTo(YES);
         assertThat(response.getErrors().size()).isEqualTo(0);
     }
@@ -270,14 +259,11 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
     @Test
     void givenNoOtherPartyWantsConfidentiality_thenCaseIsNotConfidential() {
         SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(
-                Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
-                    .build())
-            .otherParties(Arrays.asList(buildConfidentialOtherParty(ID_2, NO), buildConfidentialOtherParty(ID_1, NO)))
-            .build();
+                Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build()).build())
+            .otherParties(Arrays.asList(buildConfidentialOtherParty(ID_2, NO), buildConfidentialOtherParty(ID_1, NO))).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-            USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getData().getIsConfidentialCase()).isEqualTo(null);
         assertThat(response.getErrors().size()).isEqualTo(0);
     }
@@ -287,12 +273,10 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
     void givenSscs5CaseOtherPartyWithRole_thenWarningIsReturned(String benefit) {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefit).build()).build())
-            .otherParties(Arrays.asList(buildSscs5OtherParty(ID_2, "PayingParent"), buildSscs5OtherParty(ID_1, null)))
-            .build();
+            .otherParties(Arrays.asList(buildSscs5OtherParty(ID_2, "PayingParent"), buildSscs5OtherParty(ID_1, null))).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-            USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getWarnings().size()).isEqualTo(1);
         assertThat(response.getWarnings().stream().findFirst().get()).isEqualTo(SSCS5_ROLE_WARNING);
         assertThat(response.getErrors().size()).isEqualTo(0);
@@ -306,8 +290,7 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
             .otherParties(Arrays.asList(buildSscs5OtherParty(ID_2, null), buildSscs5OtherParty(ID_1, null))).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-            USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getWarnings().size()).isEqualTo(0);
         assertThat(response.getErrors().size()).isEqualTo(0);
         assertThat(response.getData().getOtherParties().size()).isEqualTo(2);
@@ -319,13 +302,11 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
     void givenSscs5CaseOtherPartyWithRoleWarningIgnored_thenCaseIsUpdated(String benefit) {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefit).build()).build())
-            .otherParties(Arrays.asList(buildSscs5OtherParty(ID_2, "PayingParent"), buildSscs5OtherParty(ID_1, null)))
-            .build();
+            .otherParties(Arrays.asList(buildSscs5OtherParty(ID_2, "PayingParent"), buildSscs5OtherParty(ID_1, null))).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(callback.isIgnoreWarnings()).thenReturn(true);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-            USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getWarnings().size()).isEqualTo(0);
         assertThat(response.getErrors().size()).isEqualTo(0);
         assertThat(response.getData().getOtherParties().size()).isEqualTo(2);
@@ -335,14 +316,11 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
     @Test
     void givenSscs2CaseOtherPartyWithRoleMissing_thenErrorReturned() {
         SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(
-                Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
-                    .build())
-            .otherParties(Arrays.asList(buildSscs5OtherParty(ID_2, "PayingParent"), buildSscs5OtherParty(ID_1, null)))
-            .build();
+                Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build()).build())
+            .otherParties(Arrays.asList(buildSscs5OtherParty(ID_2, "PayingParent"), buildSscs5OtherParty(ID_1, null))).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-            USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getWarnings().size()).isEqualTo(0);
         assertThat(response.getErrors().size()).isEqualTo(1);
         assertThat(response.getErrors().stream().findFirst().get()).isEqualTo(SSCS2_ROLE_ERROR);
@@ -351,28 +329,23 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
     @Test
     void givenSscs2CaseOtherPartyWithRoleEntered_thenNoError() {
         SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(
-                Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
-                    .build())
-            .otherParties(Arrays.asList(buildSscs5OtherParty(ID_2, "PayingParent"), buildSscs5OtherParty(ID_1, "")))
-            .build();
+                Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build()).build())
+            .otherParties(Arrays.asList(buildSscs5OtherParty(ID_2, "PayingParent"), buildSscs5OtherParty(ID_1, ""))).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-            USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getWarnings().size()).isEqualTo(0);
         assertThat(response.getErrors().size()).isEqualTo(0);
     }
 
     @Test
     void givenSscsIbaCaseOtherPartyWithRoleEntered_thenNoRoleCheck() {
-        SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder()
-                .benefitType(BenefitType.builder().code(Benefit.INFECTED_BLOOD_COMPENSATION.getShortName()).build())
-                .build()).otherParties(Arrays.asList(buildSscs5OtherParty(ID_2, null), buildSscs5OtherParty(ID_1, null)))
-            .build();
+        SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(
+            Appeal.builder().benefitType(BenefitType.builder().code(Benefit.INFECTED_BLOOD_COMPENSATION.getShortName()).build())
+                .build()).otherParties(Arrays.asList(buildSscs5OtherParty(ID_2, null), buildSscs5OtherParty(ID_1, null))).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-            USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size()).isEqualTo(0);
     }
@@ -381,12 +354,10 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
     @ValueSource(strings = {"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection", "childBenefit", "thirtyHoursFreeChildcare", "guaranteedMinimumPension", "nationalInsuranceCredits"})
     void givenNonSscs1PaperCaseOtherPartyWantsToAttendYes_thenCaseIsOralAndWarningShown(String shortName) {
         SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(
-                Appeal.builder().benefitType(BenefitType.builder().code(shortName).build())
-                    .hearingType(HearingType.PAPER.getValue()).build())
-            .otherParties(Arrays.asList(buildOtherParty("No", null), buildOtherParty("Yes", NO))).build();
+            Appeal.builder().benefitType(BenefitType.builder().code(shortName).build()).hearingType(HearingType.PAPER.getValue())
+                .build()).otherParties(Arrays.asList(buildOtherParty("No", null), buildOtherParty("Yes", NO))).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-            USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getWarnings().size()).isEqualTo(1);
         assertThat(response.getWarnings().stream().anyMatch(m -> m.contains(
@@ -404,8 +375,7 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(idamService.getUserDetails(any())).thenReturn(
             UserDetails.builder().roles(List.of("caseworker-sscs-systemupdate")).build());
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-            USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getWarnings().size()).isEqualTo(0);
         assertThat(response.getData().getAppeal().getHearingType()).isEqualTo(HearingType.ORAL.getValue());
@@ -415,12 +385,10 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
     @ValueSource(strings = {"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection", "childBenefit", "thirtyHoursFreeChildcare", "guaranteedMinimumPension", "nationalInsuranceCredits"})
     void givenNonSscs1PaperCaseOtherPartyWantsToAttendNo_thenCaseIsNotChangedAndNoWarningShown(String shortName) {
         SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(
-                Appeal.builder().benefitType(BenefitType.builder().code(shortName).build())
-                    .hearingType(HearingType.PAPER.getValue()).build())
-            .otherParties(Arrays.asList(buildOtherParty("No", null), buildOtherParty("No", NO))).build();
+            Appeal.builder().benefitType(BenefitType.builder().code(shortName).build()).hearingType(HearingType.PAPER.getValue())
+                .build()).otherParties(Arrays.asList(buildOtherParty("No", null), buildOtherParty("No", NO))).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-            USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getWarnings().size()).isEqualTo(0);
         assertThat(response.getData().getAppeal().getHearingType()).isEqualTo(HearingType.PAPER.getValue());
@@ -430,13 +398,11 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
     @CsvSource({"paper,No,Yes", "oral,No,No", "online,Yes,Yes"})
     void givenSscs1CaseOtherPartyWantsToAttendYes_thenHearingTypeNotChangedAndNoWarningShown(String hearingType,
         String wantsToAttend1, String wantsToAttend2) {
-        SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(
-                Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).hearingType(hearingType).build())
-            .otherParties(Arrays.asList(buildOtherParty(wantsToAttend1, null), buildOtherParty(wantsToAttend2, NO)))
-            .build();
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).hearingType(hearingType).build())
+            .otherParties(Arrays.asList(buildOtherParty(wantsToAttend1, null), buildOtherParty(wantsToAttend2, NO))).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-            USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getWarnings().size()).isEqualTo(0);
         assertThat(response.getData().getAppeal().getHearingType()).isEqualTo(hearingType);
@@ -460,8 +426,7 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
             .otherParties(Arrays.asList(otherParty1, otherParty2, otherParty3)).build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-            USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getWarnings().size()).isEqualTo(0);
         assertThat(response.getErrors().size()).isEqualTo(2);
@@ -480,18 +445,16 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
         otherParty.getValue().setRole(Role.builder().name("ReceivingParent").build());
 
         ExcludeDate excludeDate1 = ExcludeDate.builder().value(DateRange.builder().start("").end("").build()).build();
-        ExcludeDate excludeDate2 = ExcludeDate.builder().value(DateRange.builder().start(null).end(null).build())
+        ExcludeDate excludeDate2 = ExcludeDate.builder().value(DateRange.builder().start(null).end(null).build()).build();
+        ExcludeDate excludeDate3 = ExcludeDate.builder().value(DateRange.builder().start("2023-01-01").end("2023-01-02").build())
             .build();
-        ExcludeDate excludeDate3 = ExcludeDate.builder()
-            .value(DateRange.builder().start("2023-01-01").end("2023-01-02").build()).build();
 
         otherParty.getValue().getHearingOptions().setExcludeDates(List.of(excludeDate1, excludeDate2, excludeDate3));
 
         SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(appeal).otherParties(List.of(otherParty)).build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-            USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getWarnings().size()).isEqualTo(0);
         assertThat(response.getErrors().size()).isEqualTo(2);
@@ -509,20 +472,17 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
         otherParty.getValue().getHearingOptions().setScheduleHearing("Yes");
         otherParty.getValue().setRole(Role.builder().name("ReceivingParent").build());
 
-        ExcludeDate excludeDate1 = ExcludeDate.builder().value(DateRange.builder().start("").end("2023-01-01").build())
+        ExcludeDate excludeDate1 = ExcludeDate.builder().value(DateRange.builder().start("").end("2023-01-01").build()).build();
+        ExcludeDate excludeDate2 = ExcludeDate.builder().value(DateRange.builder().start(null).end("2023-02-01").build()).build();
+        ExcludeDate excludeDate3 = ExcludeDate.builder().value(DateRange.builder().start("2023-03-01").end("2023-04-02").build())
             .build();
-        ExcludeDate excludeDate2 = ExcludeDate.builder()
-            .value(DateRange.builder().start(null).end("2023-02-01").build()).build();
-        ExcludeDate excludeDate3 = ExcludeDate.builder()
-            .value(DateRange.builder().start("2023-03-01").end("2023-04-02").build()).build();
 
         otherParty.getValue().getHearingOptions().setExcludeDates(List.of(excludeDate1, excludeDate2, excludeDate3));
 
         SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(appeal).otherParties(List.of(otherParty)).build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-            USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getWarnings().size()).isEqualTo(0);
         assertThat(response.getErrors().size()).isEqualTo(1);
@@ -538,20 +498,17 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
         otherParty.getValue().getHearingOptions().setScheduleHearing("Yes");
         otherParty.getValue().setRole(Role.builder().name("ReceivingParent").build());
 
-        ExcludeDate excludeDate1 = ExcludeDate.builder().value(DateRange.builder().start("2023-01-01").end("").build())
+        ExcludeDate excludeDate1 = ExcludeDate.builder().value(DateRange.builder().start("2023-01-01").end("").build()).build();
+        ExcludeDate excludeDate2 = ExcludeDate.builder().value(DateRange.builder().start("2023-02-01").end(null).build()).build();
+        ExcludeDate excludeDate3 = ExcludeDate.builder().value(DateRange.builder().start("2023-03-01").end("2023-04-02").build())
             .build();
-        ExcludeDate excludeDate2 = ExcludeDate.builder()
-            .value(DateRange.builder().start("2023-02-01").end(null).build()).build();
-        ExcludeDate excludeDate3 = ExcludeDate.builder()
-            .value(DateRange.builder().start("2023-03-01").end("2023-04-02").build()).build();
 
         otherParty.getValue().getHearingOptions().setExcludeDates(List.of(excludeDate1, excludeDate2, excludeDate3));
 
         SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(appeal).otherParties(List.of(otherParty)).build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-            USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getWarnings().size()).isEqualTo(0);
         assertThat(response.getErrors().size()).isEqualTo(1);
@@ -567,20 +524,19 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
         otherParty.getValue().getHearingOptions().setScheduleHearing("Yes");
         otherParty.getValue().setRole(Role.builder().name("ReceivingParent").build());
 
-        ExcludeDate excludeDate1 = ExcludeDate.builder()
-            .value(DateRange.builder().start("2023-01-01").end("2023-01-01").build()).build();
-        ExcludeDate excludeDate2 = ExcludeDate.builder()
-            .value(DateRange.builder().start("2023-01-02").end("2023-01-01").build()).build();
-        ExcludeDate excludeDate3 = ExcludeDate.builder()
-            .value(DateRange.builder().start("2023-03-01").end("2023-04-02").build()).build();
+        ExcludeDate excludeDate1 = ExcludeDate.builder().value(DateRange.builder().start("2023-01-01").end("2023-01-01").build())
+            .build();
+        ExcludeDate excludeDate2 = ExcludeDate.builder().value(DateRange.builder().start("2023-01-02").end("2023-01-01").build())
+            .build();
+        ExcludeDate excludeDate3 = ExcludeDate.builder().value(DateRange.builder().start("2023-03-01").end("2023-04-02").build())
+            .build();
 
         otherParty.getValue().getHearingOptions().setExcludeDates(List.of(excludeDate1, excludeDate2, excludeDate3));
 
         SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(appeal).otherParties(List.of(otherParty)).build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-            USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getWarnings().size()).isEqualTo(0);
         assertThat(response.getErrors().size()).isEqualTo(1);
@@ -604,8 +560,7 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
         when(caseDetailsBefore.getCaseData()).thenReturn(beforeCaseData);
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
 
-        sscsCaseData.setOtherParties(
-            singletonList(buildOtherPartyWithConfidentiality(ID_1, currentConfidentiality, now)));
+        sscsCaseData.setOtherParties(singletonList(buildOtherPartyWithConfidentiality(ID_1, currentConfidentiality, now)));
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         final UpdateOtherPartyAboutToSubmitHandler updateOtherPartyAboutToSubmitHandler = new UpdateOtherPartyAboutToSubmitHandler(
@@ -613,49 +568,45 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
 
         var response = updateOtherPartyAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        var actual = getOtherParty(response).getValue().getConfidentialityRequiredChangedDate();
-        final LocalDateTime actualDate = LocalDateTime.parse(actual, formatter);
-
         if (featureFlag && shouldUpdateDate) {
-            assertThat(actualDate).isAfter(now);
+            assertThat(getOtherParty(response).getValue().getConfidentialityRequiredChangedDate()).isAfter(now);
         } else {
-            assertThat(actualDate).isEqualTo(LocalDateTime.parse(now.format(formatter), formatter));
+            assertThat(getOtherParty(response).getValue().getConfidentialityRequiredChangedDate()).isEqualTo(now);
         }
     }
 
     private static Stream<Arguments> otherPartyConfidentialityCases() {
         return Stream.of(
             Arguments.of("no matching before party -> update date",
-                SscsCaseData.builder().otherParties(singletonList(buildOtherPartyWithConfidentiality(ID_2, YES, now())))
-                    .build(), YES, true, true),
+                SscsCaseData.builder().otherParties(singletonList(buildOtherPartyWithConfidentiality(ID_2, YES, now()))).build(), YES,
+                true, true),
             Arguments.of("matching before party, same confidentiality -> do not update",
-                SscsCaseData.builder().otherParties(singletonList(buildOtherPartyWithConfidentiality(ID_1, YES, now())))
-                    .build(), YES, false, true),
+                SscsCaseData.builder().otherParties(singletonList(buildOtherPartyWithConfidentiality(ID_1, YES, now()))).build(), YES,
+                false, true),
             Arguments.of("matching before party, different confidentiality -> update date",
-                SscsCaseData.builder().otherParties(singletonList(buildOtherPartyWithConfidentiality(ID_1, NO, now())))
-                    .build(), YES, true, true),
-            Arguments.of("null other parties in before case -> update date",
-                SscsCaseData.builder().otherParties(null).build(), YES, true, true),
+                SscsCaseData.builder().otherParties(singletonList(buildOtherPartyWithConfidentiality(ID_1, NO, now()))).build(), YES,
+                true, true),
+            Arguments.of("null other parties in before case -> update date", SscsCaseData.builder().otherParties(null).build(),
+                YES, true, true),
             Arguments.of("feature flag off and confidentiality changes -> do not update date",
-                SscsCaseData.builder().otherParties(singletonList(buildOtherPartyWithConfidentiality(ID_1, NO, now())))
-                    .build(), YES, false, false));
+                SscsCaseData.builder().otherParties(singletonList(buildOtherPartyWithConfidentiality(ID_1, NO, now()))).build(),
+                YES, false, false));
     }
 
     private static CcdValue<OtherParty> getOtherParty(PreSubmitCallbackResponse<SscsCaseData> response) {
-        return response.getData().getOtherParties().stream().filter(op -> Objects.equals(op.getValue().getId(), ID_1))
-            .findFirst().orElseThrow();
+        return response.getData().getOtherParties().stream().filter(op -> Objects.equals(op.getValue().getId(), ID_1)).findFirst()
+            .orElseThrow();
     }
 
     private static CcdValue<OtherParty> buildOtherPartyWithConfidentiality(String id, YesNo yesNo, LocalDateTime now) {
-        return CcdValue.<OtherParty>builder().value(OtherParty.builder().id(id).unacceptableCustomerBehaviour(YesNo.YES)
-            .role(Role.builder().name("PayingParent").build()).confidentialityRequired(yesNo)
-            .confidentialityRequiredChangedDate(now.format(formatter)).build()).build();
+        return CcdValue.<OtherParty>builder().value(
+            OtherParty.builder().id(id).unacceptableCustomerBehaviour(YesNo.YES).role(Role.builder().name("PayingParent").build())
+                .confidentialityRequired(yesNo).confidentialityRequiredChangedDate(now).build()).build();
     }
 
     private CcdValue<OtherParty> buildConfidentialOtherParty(String id, YesNo confidentialityRequired) {
-        return CcdValue.<OtherParty>builder().value(
-            OtherParty.builder().id(id).confidentialityRequired(confidentialityRequired)
-                .role(Role.builder().name("PayingParent").build()).build()).build();
+        return CcdValue.<OtherParty>builder().value(OtherParty.builder().id(id).confidentialityRequired(confidentialityRequired)
+            .role(Role.builder().name("PayingParent").build()).build()).build();
     }
 
     private boolean isSscs5CaseValidated(List<CcdValue<OtherParty>> otherParties) {
@@ -671,8 +622,9 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
     }
 
     private CcdValue<OtherParty> buildOtherParty(String id) {
-        return CcdValue.<OtherParty>builder().value(OtherParty.builder().id(id).unacceptableCustomerBehaviour(YesNo.YES)
-            .role(Role.builder().name("PayingParent").build()).build()).build();
+        return CcdValue.<OtherParty>builder().value(
+            OtherParty.builder().id(id).unacceptableCustomerBehaviour(YesNo.YES).role(Role.builder().name("PayingParent").build())
+                .build()).build();
     }
 
     private CcdValue<OtherParty> buildSscs5OtherParty(String id, String role) {
@@ -682,9 +634,9 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
     }
 
     private CcdValue<OtherParty> buildOtherPartyWithAppointeeAndRep(String id, String appointeeId, String repId) {
-        return CcdValue.<OtherParty>builder().value(OtherParty.builder().id(id).isAppointee(YES.getValue())
-            .appointee(Appointee.builder().id(appointeeId).build())
-            .rep(Representative.builder().id(repId).hasRepresentative(YES.getValue()).build())
-            .role(Role.builder().name("ReceivingParent").build()).build()).build();
+        return CcdValue.<OtherParty>builder().value(
+            OtherParty.builder().id(id).isAppointee(YES.getValue()).appointee(Appointee.builder().id(appointeeId).build())
+                .rep(Representative.builder().id(repId).hasRepresentative(YES.getValue()).build())
+                .role(Role.builder().name("ReceivingParent").build()).build()).build();
     }
 }

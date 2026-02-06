@@ -240,7 +240,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             return;
         }
         currentCaseData.getAppellant()
-            .ifPresent(appellant -> appellant.setConfidentialityRequiredChangedDate(now().format(dateFormatter)));
+            .ifPresent(appellant -> appellant.setConfidentialityRequiredChangedDate(now()));
     }
 
     private OverrideFields updateOverrideFields(SscsCaseData sscsCaseData,

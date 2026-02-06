@@ -149,14 +149,12 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
             })
             .orElseGet(Collections::emptyMap);
 
-        var changedDate = now().format(formatter);
-
         currentOtherParties.forEach(otherParty -> {
             var current = otherParty.getValue();
             var priorConfidentiality = confidentialityBefore.get(current.getId());
             if (priorConfidentiality == null
                 || !Objects.equals(priorConfidentiality, current.getConfidentialityRequired())) {
-                current.setConfidentialityRequiredChangedDate(changedDate);
+                current.setConfidentialityRequiredChangedDate(now());
             }
         });
     }

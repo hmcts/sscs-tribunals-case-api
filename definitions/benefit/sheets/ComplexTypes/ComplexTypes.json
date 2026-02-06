@@ -561,8 +561,8 @@
   {"LiveFrom": "18/03/2025", "ID": "ftaCommunicationRequest", "ListElementCode": "requestMessage", "FieldType": "TextArea", "ElementLabel": "Request", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "29/05/2025", "ID": "overrideFields", "ListElementCode": "updateListingRequirementsInterpreterDurationLabel", "FieldType": "Label", "ElementLabel": "If an interpreter is needed for the next hearing, please add an extra 30 minutes to the duration.", "FieldShowCondition": "updateListingRequirementsInterpreterDurationLabel=\"DUMMY_VALUE_TO_HIDE_FIELD\"" , "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "02/02/2026", "ID": "appellant", "ListElementCode": "confidentialityRequiredChangedDate", "FieldType": "Text", "ElementLabel": "Confidentiality Confirmed", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "02/02/2026", "ID": "confidentialityTabEntry", "ListElementCode": "name", "FieldType": "Text", "ElementLabel": "Name", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "02/02/2026", "ID": "confidentialityTabEntry", "ListElementCode": "role", "FieldType": "Text", "ElementLabel": "Role", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "02/02/2026", "ID": "confidentialityTabEntry", "ListElementCode": "confidentialityRequired", "FieldType": "Text", "ElementLabel": "Confidentiality Status", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "02/02/2026", "ID": "confidentialityTabEntry", "ListElementCode": "confidentialityRequiredChangedDate", "FieldType": "Text", "ElementLabel": "Confidentiality Confirmed", "SecurityClassification": "PUBLIC"}
+  {"LiveFrom": "02/02/2026", "ID": "confidentialitySummaryEntry", "ListElementCode": "name", "FieldType": "Text", "ElementLabel": "Name", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "02/02/2026", "ID": "confidentialitySummaryEntry", "ListElementCode": "role", "FieldType": "Text", "ElementLabel": "Role", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "02/02/2026", "ID": "confidentialitySummaryEntry", "ListElementCode": "confidentialityRequired", "FieldType": "Text", "ElementLabel": "Confidentiality Status", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "02/02/2026", "ID": "confidentialitySummaryEntry", "ListElementCode": "confidentialityRequiredChangedDate", "FieldType": "Text", "ElementLabel": "Confidentiality Confirmed", "SecurityClassification": "PUBLIC"}
 ]
