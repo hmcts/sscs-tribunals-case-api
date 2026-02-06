@@ -1,5 +1,5 @@
 {
-  "caseCreated" : "${json-unit.ignore}",
+  "caseCreated": "${json-unit.ignore}",
   "CaseAccessCategory": "childSupport",
   "caseManagementCategory": {
     "value": {
@@ -14,31 +14,40 @@
     ]
   },
   "caseManagementLocation": {
-    "baseLocation":"698118",
-    "region":"6"
+    "baseLocation": "698118",
+    "region": "6"
   },
   "addedDocuments": null,
   "caseNameHmctsInternal": "Joe Bloggs",
   "caseNameHmctsRestricted": "Joe Bloggs",
   "caseNamePublic": "Joe Bloggs",
+  "confidentialitySummary": [
+    {
+      "value": {
+        "confidentialityRequired": "Undetermined",
+        "name": "Joe Bloggs",
+        "party": "Appellant"
+      }
+    }
+  ],
   "ogdType": "DWP",
-  "benefitCode" : "022",
-  "issueCode" : "DD",
-  "caseCode" : "022DD",
+  "benefitCode": "022",
+  "issueCode": "DD",
+  "caseCode": "022DD",
   "region": "BRADFORD",
   "regionalProcessingCenter": {
-    "name" : "BRADFORD",
-    "address1" : "HM Courts & Tribunals Service",
-    "address2" : "Social Security & Child Support Appeals",
-    "address3" : "Phoenix House",
-    "address4" : "Rushton Avenue",
-    "city" : "BRADFORD",
-    "postcode" : "BD3 7BH",
-    "phoneNumber" : "0300 123 1142",
-    "epimsId" : null,
-    "faxNumber" : "0126 434 7983",
+    "name": "BRADFORD",
+    "address1": "HM Courts & Tribunals Service",
+    "address2": "Social Security & Child Support Appeals",
+    "address3": "Phoenix House",
+    "address4": "Rushton Avenue",
+    "city": "BRADFORD",
+    "postcode": "BD3 7BH",
+    "phoneNumber": "0300 123 1142",
+    "epimsId": null,
+    "faxNumber": "0126 434 7983",
     "email": "SSCS_Bradford@justice.gov.uk",
-    "hearingRoute":null,
+    "hearingRoute": null,
     "epimsId": null
   },
   "appeal": {
@@ -73,7 +82,7 @@
         "nino": "AB877533C"
       },
       "isAppointee": "No",
-      "role":{},
+      "role": {},
       "confidentialityRequired": null,
       "confidentialityRequiredChangedDate": null,
       "isAddressSameAsAppointee": "No",
@@ -206,53 +215,53 @@
     },
     "supporterSubscription": {
       "wantSmsNotifications": null,
-      "tya":null,
+      "tya": null,
       "email": null,
       "mobile": null,
       "subscribeEmail": null,
       "subscribeSms": null,
-      "reason":null,
+      "reason": null,
       "lastLoggedIntoMya": null
     },
     "appointeeSubscription": {
       "wantSmsNotifications": null,
-      "tya":null,
+      "tya": null,
       "email": null,
       "mobile": null,
       "subscribeEmail": null,
       "subscribeSms": null,
-      "reason":null,
+      "reason": null,
       "lastLoggedIntoMya": null
     },
     "representativeSubscription": {
-      "wantSmsNotifications":"Yes",
+      "wantSmsNotifications": "Yes",
       "tya": "${json-unit.ignore}",
-      "email":"harry.potter@wizards.com",
-      "mobile":"+447411999999",
-      "subscribeEmail":"Yes",
-      "subscribeSms":"Yes",
-      "reason":null,
+      "email": "harry.potter@wizards.com",
+      "mobile": "+447411999999",
+      "subscribeEmail": "Yes",
+      "subscribeSms": "Yes",
+      "reason": null,
       "lastLoggedIntoMya": null
     },
     "jointPartySubscription": {
       "wantSmsNotifications": null,
-      "tya":null,
+      "tya": null,
       "email": null,
       "mobile": null,
       "subscribeEmail": null,
       "subscribeSms": null,
-      "reason":null,
+      "reason": null,
       "lastLoggedIntoMya": null
     }
   },
-  "evidencePresent" : "No",
-  "sscsDocument":[],
+  "evidencePresent": "No",
+  "sscsDocument": [],
   "dwpRegionalCentre": "Child Support",
   "pcqId": "12345678",
-  "languagePreferenceWelsh" : "No",
+  "languagePreferenceWelsh": "No",
   "createdInGapsFrom": "readyToList",
   "processingVenue": "Ashford",
-  "isScottishCase" : "No",
+  "isScottishCase": "No",
   "workBasketHearingDate": null,
   "workBasketHearingDateIssued": null,
   "workBasketHearingEpimsId": null,
@@ -277,9 +286,9 @@
   "signedBy": null,
   "signedRole": null,
   "preWorkAllocation": "No",
-  "dwpIsOfficerAttending":  "No",
+  "dwpIsOfficerAttending": "No",
   "poAttendanceConfirmed": "No",
   "tribunalDirectPoToAttend": "No",
-  "hearingRoute":"gaps",
-  "linkedCasesBoolean":"No"
+  "hearingRoute": "gaps",
+  "linkedCasesBoolean": "No"
 }
