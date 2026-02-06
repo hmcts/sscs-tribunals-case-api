@@ -1753,5 +1753,6 @@
   {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "awaitingInfoFromTribunal", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "infoProvidedByTribunal", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "communicationNoActionLabel", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
-  {"LiveFrom": "29/05/2025", "CaseTypeID": "Benefit", "CaseFieldID": "interpreterDurationLabel", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"}
+  {"LiveFrom": "29/05/2025", "CaseTypeID": "Benefit", "CaseFieldID": "interpreterDurationLabel", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "CaseFieldID": "confidentialityTab", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"}
 ]
