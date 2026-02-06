@@ -1,4 +1,3 @@
 [
-  {"LiveFrom": "02/02/2026", "ID": "otherParty", "ListElementCode": "confidentialityRequiredChangedDate", "FieldType": "Text", "ElementLabel": "Confidentiality Confirmed", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "02/02/2026", "ID": "appellant", "ListElementCode": "confidentialityRequiredChangedDate", "FieldType": "Text", "ElementLabel": "Confidentiality Confirmed", "SecurityClassification": "PUBLIC"}
+
 ]

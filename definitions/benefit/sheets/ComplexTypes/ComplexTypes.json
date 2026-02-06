@@ -475,6 +475,7 @@
   {"LiveFrom": "18/06/2019", "ID": "otherParty", "ListElementCode": "otherPartyRepresentativeSubscription", "FieldType": "subscription", "ElementLabel": "Other party representative subscription", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "otherParty", "ListElementCode": "repReasonableAdjustment", "FieldType": "reasonableAdjustmentDetails", "ElementLabel": "Other Party Representative Reasonable Adjustment", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/06/2019", "ID": "otherParty", "ListElementCode": "sendNewOtherPartyNotification", "FieldType": "YesOrNo", "ElementLabel": "Send other party added notification", "FieldShowCondition": "name=\"AnyValueToFailThisCondition\"", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "02/02/2026", "ID": "otherParty", "ListElementCode": "confidentialityRequiredChangedDate", "FieldType": "Text", "ElementLabel": "Confidentiality Confirmed", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/06/2019", "ID": "otherPartyHearingRecordingReqUi", "ListElementCode": "otherPartyName", "FieldType": "Text", "ElementLabel": "Other party name", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/06/2019", "ID": "otherPartyHearingRecordingReqUi", "ListElementCode": "otherPartyId", "FieldType": "Text", "ElementLabel": "Other party id", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "18/06/2019", "ID": "otherPartyHearingRecordingReqUi", "ListElementCode": "requestingParty", "FieldType": "FixedList", "FieldTypeParameter": "FL_parties", "ElementLabel": "Requesting Party", "SecurityClassification": "PUBLIC"},
@@ -562,5 +563,6 @@
   {"LiveFrom": "02/02/2026", "ID": "confidentialitySummaryEntry", "ListElementCode": "name", "FieldType": "Text", "ElementLabel": "Name", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "02/02/2026", "ID": "confidentialitySummaryEntry", "ListElementCode": "role", "FieldType": "Text", "ElementLabel": "Role", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "02/02/2026", "ID": "confidentialitySummaryEntry", "ListElementCode": "confidentialityRequired", "FieldType": "Text", "ElementLabel": "Confidentiality Status", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "02/02/2026", "ID": "confidentialitySummaryEntry", "ListElementCode": "confidentialityRequiredChangedDate", "FieldType": "Text", "ElementLabel": "Confidentiality Confirmed", "SecurityClassification": "PUBLIC"}
+  {"LiveFrom": "02/02/2026", "ID": "confidentialitySummaryEntry", "ListElementCode": "confidentialityRequiredChangedDate", "FieldType": "Text", "ElementLabel": "Confidentiality Confirmed", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "02/02/2026", "ID": "appellant", "ListElementCode": "confidentialityRequiredChangedDate", "FieldType": "Text", "ElementLabel": "Confidentiality Confirmed", "SecurityClassification": "PUBLIC"}
 ]
