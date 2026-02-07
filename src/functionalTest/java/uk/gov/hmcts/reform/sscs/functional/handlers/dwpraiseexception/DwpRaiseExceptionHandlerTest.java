@@ -6,32 +6,33 @@ import static org.hamcrest.Matchers.equalTo;
 
 import io.restassured.http.ContentType;
 import java.io.IOException;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.apache.http.HttpStatus;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 
-
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest
 public class DwpRaiseExceptionHandlerTest {
+
     @Value("${test-url}")
     private String testUrl;
     private IdamTokens idamTokens;
+
     @Autowired
     private IdamService idamService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         baseURI = testUrl;
         useRelaxedHTTPSValidation();
@@ -53,7 +54,7 @@ public class DwpRaiseExceptionHandlerTest {
                 .when()
                 .post("/ccdAboutToSubmit/")
                 .then()
-                .statusCode(HttpStatus.OK.value())
+                .statusCode(HttpStatus.SC_OK)
                 .rootPath("data")
                 .assertThat().body("isProgressingViaGaps", equalTo("Yes"))
                 .assertThat().body("createdInGapsFrom", equalTo("readyToList"));

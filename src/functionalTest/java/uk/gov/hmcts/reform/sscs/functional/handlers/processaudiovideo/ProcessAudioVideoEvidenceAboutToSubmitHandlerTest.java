@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.functional.handlers.actionposteponementrequest;
+package uk.gov.hmcts.reform.sscs.functional.handlers.processaudiovideo;
 
 import static org.hamcrest.Matchers.equalTo;
 
@@ -13,27 +13,27 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
-
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest
-public class ActionPostponementRequestAboutToStartCallbackHandlerTest extends BaseHandler {
+public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest extends BaseHandler {
 
     @Test
-    public void givenAboutToStartCallback_shouldClearActionPostponementRequestSelectedField() throws Exception {
+    public void givenAboutToSubmitCallback_shouldSendSelectedEvidenceToJudge() throws Exception {
 
         String jsonCallbackForTest = BaseHandler.getJsonCallbackForTest(
-                "handlers/actionpostponementrequest/actionPostponementRequestAboutToStartCallback.json");
+                "handlers/processaudiovideo/processAudioVideoEvidenceAboutToSubmitCallback.json");
 
         RestAssured.given()
                 .contentType(ContentType.JSON)
                 .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
                 .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
                 .body(jsonCallbackForTest)
-                .post("/ccdAboutToStart")
+                .post("/ccdAboutToSubmit")
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .log().all(true)
-                .assertThat().body("data.actionPostponementRequestSelected", equalTo(null));
+                .assertThat().body("data.interlocReviewState", equalTo("reviewByJudge"))
+                .assertThat().body("data.audioVideoEvidence[0].value.processedAction", equalTo("sentToJudge"));
     }
 }
