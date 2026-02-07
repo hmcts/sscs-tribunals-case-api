@@ -20,6 +20,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.NOT_LISTABLE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.RESPONSE_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.WITH_DWP;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.function.Consumer;
@@ -132,7 +133,7 @@ public class DwpUploadResponseHandlerTest {
                 .elementsDisputedIsDecisionDisputedByOthers("No").appeal(Appeal.builder()
                         .benefitType(BenefitType.builder().code("PIP").build())
                         .build()).build();
-        sscsCaseData.setWorkAllocationFields(WorkAllocationFields.builder().ftaResponseReviewRequired(true).build());
+        sscsCaseData.setWorkAllocationFields(WorkAllocationFields.builder().ftaResponseReviewRequired(YES).build());
         final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(
                 sscsCaseData, INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE);
 
@@ -150,7 +151,7 @@ public class DwpUploadResponseHandlerTest {
         assertEquals(RESPONSE_SUBMITTED_DWP, sscsCaseData.getDwpState());
         assertEquals(YES, sscsCaseData.getIgnoreCallbackWarnings());
         assertNotNull(sscsCaseData.getWorkAllocationFields());
-        assertFalse(sscsCaseData.getWorkAllocationFields().getFtaResponseReviewRequired());
+        assertEquals(NO, sscsCaseData.getWorkAllocationFields().getFtaResponseReviewRequired());
     }
 
     @Test
@@ -172,7 +173,7 @@ public class DwpUploadResponseHandlerTest {
                 .elementsDisputedIsDecisionDisputedByOthers(null).appeal(Appeal.builder()
                         .benefitType(BenefitType.builder().code("PIP").build())
                         .build()).build();
-        sscsCaseData.setWorkAllocationFields(WorkAllocationFields.builder().ftaResponseReviewRequired(true).build());
+        sscsCaseData.setWorkAllocationFields(WorkAllocationFields.builder().ftaResponseReviewRequired(YES).build());
         final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(
                 sscsCaseData, WITH_DWP, DWP_UPLOAD_RESPONSE);
 
@@ -190,7 +191,7 @@ public class DwpUploadResponseHandlerTest {
         consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
         assertEquals(RESPONSE_SUBMITTED_DWP, sscsCaseData.getDwpState());
         assertNotNull(sscsCaseData.getWorkAllocationFields());
-        assertFalse(sscsCaseData.getWorkAllocationFields().getFtaResponseReviewRequired());
+        assertEquals(NO, sscsCaseData.getWorkAllocationFields().getFtaResponseReviewRequired());
     }
 
     @Test
