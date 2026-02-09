@@ -39,12 +39,18 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Correspondence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorrespondenceDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorrespondenceType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReasonableAdjustmentStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.evidenceshare.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationTestRecipients;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 import uk.gov.service.notify.LetterResponse;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
@@ -79,6 +85,8 @@ public class NotificationSenderTest {
     @Mock
     private SendLetterResponse sendLetterResponse;
     @Mock
+    private BulkPrintService bulkPrintService;
+    @Mock
     private MarkdownTransformationService markdownTransformationService;
     @Mock
     private SaveCorrespondenceAsyncService saveCorrespondenceAsyncService;
@@ -93,6 +101,7 @@ public class NotificationSenderTest {
         notificationSender = new NotificationSender(
                 notificationClient,
                 testNotificationClient,
+                bulkPrintService,
                 blacklist,
                 markdownTransformationService,
                 saveCorrespondenceAsyncService,
@@ -183,9 +192,18 @@ public class NotificationSenderTest {
                 .saveLetter(any(NotificationClient.class), anyString(), any(Correspondence.class), anyString());
         byte[] sampleCoversheet =
                 toByteArray(requireNonNull(getClass().getClassLoader().getResourceAsStream(SAMPLE_COVERSHEET)));
+        NotificationWrapper wrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
+                .notificationEventType(APPEAL_RECEIVED)
+                .newSscsCaseData(SscsCaseData.builder().ccdCaseId(CASE_D)
+                        .appeal(Appeal.builder()
+                                .appellant(Appellant.builder()
+                                        .address(Address.builder().postcode("LN8 4DX").build())
+                                        .build())
+                                .build())
+                        .build())
+                .build());
 
-        notificationSender
-                .sendBundledLetter("LN8 4DX", sampleCoversheet, APPEAL_RECEIVED, "Bob Squires", CASE_D);
+        notificationSender.sendBundledLetter(wrapper, sampleCoversheet, "Bob Squires");
 
         verifyNoInteractions(testNotificationClient);
         verify(notificationClient).sendPrecompiledLetterWithInputStream(any(), any());
@@ -199,9 +217,18 @@ public class NotificationSenderTest {
         when(letterResponse.getNotificationId()).thenReturn(UUID.randomUUID());
         byte[] largeLetter =
                 toByteArray(requireNonNull(getClass().getClassLoader().getResourceAsStream(LARGE_PDF)));
+        NotificationWrapper wrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
+                .notificationEventType(APPEAL_RECEIVED)
+                .newSscsCaseData(SscsCaseData.builder().ccdCaseId(CASE_D)
+                        .appeal(Appeal.builder()
+                                .appellant(Appellant.builder()
+                                        .address(Address.builder().postcode("LN8 4DX").build())
+                                        .build())
+                                .build())
+                        .build())
+                .build());
 
-        notificationSender
-                .sendBundledLetter("LN8 4DX", largeLetter, APPEAL_RECEIVED, "Bob Squires", CASE_D);
+        notificationSender.sendBundledLetter(wrapper, largeLetter, "Bob Squires");
 
         verifyNoInteractions(testNotificationClient);
         verify(notificationClient).sendPrecompiledLetterWithInputStream(any(), any());
@@ -214,9 +241,18 @@ public class NotificationSenderTest {
         when(testNotificationClient.sendPrecompiledLetterWithInputStream(any(), any())).thenReturn(letterResponse);
         when(letterResponse.getNotificationId()).thenReturn(UUID.randomUUID());
         byte[] sampleDirectionCoversheet = "sampleDirectionCoversheet".getBytes();
+        NotificationWrapper wrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
+                .notificationEventType(APPEAL_RECEIVED)
+                .newSscsCaseData(SscsCaseData.builder().ccdCaseId(CASE_D)
+                        .appeal(Appeal.builder()
+                                .appellant(Appellant.builder()
+                                        .address(Address.builder().postcode(postcode).build())
+                                        .build())
+                                .build())
+                        .build())
+                .build());
 
-        notificationSender
-                .sendBundledLetter(postcode, sampleDirectionCoversheet, APPEAL_RECEIVED, "Bob Squires", CASE_D);
+        notificationSender.sendBundledLetter(wrapper, sampleDirectionCoversheet, "Bob Squires");
 
         verifyNoInteractions(notificationClient);
         verify(testNotificationClient).sendPrecompiledLetterWithInputStream(any(), any());
@@ -400,9 +436,19 @@ public class NotificationSenderTest {
         String postcode = "LN8 4DX";
         byte[] sampleDirectionCoversheet =
                 toByteArray(requireNonNull(getClass().getClassLoader().getResourceAsStream(SAMPLE_COVERSHEET)));
+        NotificationWrapper wrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
+                .notificationEventType(APPEAL_RECEIVED)
+                .newSscsCaseData(SscsCaseData.builder().ccdCaseId(CASE_D)
+                        .appeal(Appeal.builder()
+                                .appellant(Appellant.builder()
+                                        .address(Address.builder().postcode(postcode).build())
+                                        .build())
+                                .build())
+                        .build())
+                .build());
 
-        assertThrows(NotificationClientException.class, () -> notificationSender
-                .sendBundledLetter(postcode, sampleDirectionCoversheet, APPEAL_RECEIVED, "Bob Squires", CASE_D));
+        assertThrows(NotificationClientException.class, () ->
+                notificationSender.sendBundledLetter(wrapper, sampleDirectionCoversheet, "Bob Squires"));
     }
 
     @Test
