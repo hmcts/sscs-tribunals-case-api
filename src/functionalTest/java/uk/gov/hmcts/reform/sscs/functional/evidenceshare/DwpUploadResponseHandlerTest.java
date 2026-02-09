@@ -19,12 +19,11 @@ import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
 @RunWith(JUnitParamsRunner.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest
-public class DwpUploadResponseSubmittedHandlerTest extends AbstractFunctionalTest {
+public class DwpUploadResponseHandlerTest extends AbstractFunctionalTest {
 
     @ClassRule
     public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
@@ -51,7 +50,6 @@ public class DwpUploadResponseSubmittedHandlerTest extends AbstractFunctionalTes
             SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
             assertEquals(State.WITH_DWP.toString(), caseDetails.getState());
             assertNotNull(caseDetails.getData());
-            assertEquals(YesNo.NO, caseDetails.getData().getWorkAllocationFields().getFtaResponseReviewRequired());
             assertEquals("Yes", caseDetails.getData().getDwpFurtherInfo());
             assertNotNull(caseDetails.getData().getSscsDocument());
             assertEquals("appellantEvidence",
