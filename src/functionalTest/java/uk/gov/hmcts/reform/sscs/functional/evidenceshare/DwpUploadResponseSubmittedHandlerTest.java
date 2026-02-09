@@ -2,6 +2,9 @@ package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_TEST_CASE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SEND_TO_DWP_OFFLINE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler.getJsonCallbackForTest;
 
 import java.time.LocalDate;
@@ -15,9 +18,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
 @RunWith(JUnitParamsRunner.class)
@@ -33,7 +34,10 @@ public class DwpUploadResponseSubmittedHandlerTest extends AbstractFunctionalTes
 
     @Test
     public void givenSubmittedCallback_shouldTriggerReadyToListAndSetDwpState() throws Exception {
-        createCaseWithState(EventType.CREATE_TEST_CASE, "UC", "Universal Credit", State.WITH_DWP.getId());
+        SscsCaseDetails createdCase =
+                createCaseWithState(CREATE_TEST_CASE, "UC", "Universal Credit", READY_TO_LIST.getId());
+
+        updateCaseEvent(SEND_TO_DWP_OFFLINE, createdCase);
 
         String jsonCallbackForTest = getJsonCallbackForTest("callback/dwpUploadResponse.json");
         jsonCallbackForTest = jsonCallbackForTest.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);

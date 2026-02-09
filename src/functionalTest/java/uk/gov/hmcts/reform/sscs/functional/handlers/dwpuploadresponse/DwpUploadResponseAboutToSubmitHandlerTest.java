@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
 @ExtendWith(SpringExtension.class)
@@ -41,7 +42,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest extends BaseHandler {
                 .body("data.caseCode", equalTo("003CC"))
                 .body("data.sscsDocument.size()", equalTo(2))
                 .body("data.sscsDocument[0].value.documentType", equalTo("appellantEvidence"))
-                .body("data.dwpState", equalTo("RESPONSE_SUBMITTED_DWP"));
+                .body("data.dwpState", equalTo(DwpState.RESPONSE_SUBMITTED_DWP.toString()));
     }
 
     @Test
@@ -67,6 +68,6 @@ public class DwpUploadResponseAboutToSubmitHandlerTest extends BaseHandler {
                 .body("data.caseCode", equalTo("001US"))
                 .body("data.sscsDocument.size()", equalTo(2))
                 .body("data.sscsDocument[1].value.documentType", equalTo("sscs1"))
-                .body("data.dwpState", equalTo("RESPONSE_SUBMITTED_DWP"));
+                .body("data.dwpState", equalTo(DwpState.RESPONSE_SUBMITTED_DWP.toString()));
     }
 }
