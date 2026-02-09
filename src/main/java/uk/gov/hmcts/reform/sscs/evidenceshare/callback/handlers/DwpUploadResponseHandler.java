@@ -5,6 +5,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.RESPONSE_SUBMITTED_DW
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_ADMIN_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.HandlerUtils.isANewJointParty;
 
 import java.util.Optional;
@@ -223,7 +224,7 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
     }
 
     private void disableReviewFtaResponseTaskInit(Callback<SscsCaseData> callback) {
-        callback.getCaseDetails().getCaseData().getWorkAllocationFields().setFtaResponseReviewRequired(YesNo.NO);
+        callback.getCaseDetails().getCaseData().getWorkAllocationFields().setFtaResponseReviewRequired(NO);
     }
 
     @Override

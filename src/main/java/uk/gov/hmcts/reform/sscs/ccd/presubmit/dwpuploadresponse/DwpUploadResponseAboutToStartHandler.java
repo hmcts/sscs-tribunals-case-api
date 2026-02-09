@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +33,8 @@ public class DwpUploadResponseAboutToStartHandler extends ResponseEventsAboutToS
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
+
+        resetReviewFtaResponseTaskInitCondition(callback);
 
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
@@ -72,4 +75,7 @@ public class DwpUploadResponseAboutToStartHandler extends ResponseEventsAboutToS
         sscsCaseData.setDynamicDwpState(new DynamicList(selectedState, dwpStatesExcludingPostHearing));
     }
 
+    private void resetReviewFtaResponseTaskInitCondition(Callback<SscsCaseData> callback) {
+        callback.getCaseDetails().getCaseData().getWorkAllocationFields().setFtaResponseReviewRequired(YES);
+    }
 }
