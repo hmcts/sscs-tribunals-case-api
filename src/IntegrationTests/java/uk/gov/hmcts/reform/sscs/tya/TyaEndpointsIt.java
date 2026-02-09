@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
+import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 
 
 @RunWith(SpringRunner.class)
@@ -66,6 +67,9 @@ public class TyaEndpointsIt {
     @MockitoBean
     AirLookupService airLookupService;
 
+    @MockitoBean
+    AuthorisationService authorisationService;
+
     IdamTokens idamTokens;
 
     @Test
@@ -94,7 +98,8 @@ public class TyaEndpointsIt {
         when(documentDownloadClientApi.downloadBinary("oauth2Token", AUTH_TOKEN,"caseworker,citizen","sscs", URL))
                 .thenReturn(ResponseEntity.of(Optional.of(new ByteArrayResource(PDF.getBytes()))));
 
-        MvcResult mvcResult = mockMvc.perform(get("/document?url=" + DOC_ID))
+        MvcResult mvcResult = mockMvc.perform(get("/document?url=" + DOC_ID)
+                        .header("ServiceAuthorization", AUTH_TOKEN))
                 .andExpect(status().isOk())
                 .andReturn();
 
