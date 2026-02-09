@@ -30,7 +30,7 @@ public class RequestOtherPartyDataHandler implements CallbackHandler<SscsCaseDat
     private final boolean cmOtherPartyConfidentialityEnabled;
 
     public RequestOtherPartyDataHandler(UpdateCcdCaseService updateCcdCaseService, IdamService idamService,
-        @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
+                                        @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
         this.updateCcdCaseService = updateCcdCaseService;
         this.idamService = idamService;
         this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
