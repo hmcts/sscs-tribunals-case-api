@@ -19,6 +19,7 @@ import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
 @RunWith(JUnitParamsRunner.class)
@@ -49,13 +50,14 @@ public class DwpUploadResponseSubmittedHandlerTest extends AbstractFunctionalTes
 
         defaultAwait().untilAsserted(() -> {
             SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
-            assertEquals("readyToList", caseDetails.getState());
+            assertEquals(State.WITH_DWP.toString(), caseDetails.getState());
             assertNotNull(caseDetails.getData());
             assertEquals(DwpState.RESPONSE_SUBMITTED_DWP, caseDetails.getData().getDwpState());
             assertEquals(YesNo.NO, caseDetails.getData().getWorkAllocationFields().getFtaResponseReviewRequired());
             assertEquals("Yes", caseDetails.getData().getDwpFurtherInfo());
             assertNotNull(caseDetails.getData().getSscsDocument());
-            assertEquals("appellantEvidence", caseDetails.getData().getSscsDocument().get(0).getValue().getDocumentType());
+            assertEquals("appellantEvidence",
+                    caseDetails.getData().getSscsDocument().getFirst().getValue().getDocumentType());
         });
     }
 }

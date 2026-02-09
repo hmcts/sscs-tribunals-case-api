@@ -34,7 +34,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest extends BaseHandl
 
     @ParameterizedTest
     @CsvSource({
-        "NON_COMPLIANT, informationReceivedForInterlocJudge, informationReceivedForInterlocJudge, reviewByJudge",
+        "NON_COMPLIANT, informationReceivedForInterlocJudge, interlocutoryReviewState, reviewByJudge",
         "CREATE_WITH_DWP_TEST_CASE, sendToInterlocReviewByJudge, withDwp, reviewByJudge",
         "CREATE_WITH_DWP_TEST_CASE, sendToInterlocReviewByTcw, withDwp, reviewByTcw"
     })
