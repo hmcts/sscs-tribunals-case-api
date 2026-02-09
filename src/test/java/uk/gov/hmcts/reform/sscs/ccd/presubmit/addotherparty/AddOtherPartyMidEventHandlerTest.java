@@ -183,6 +183,21 @@ public class AddOtherPartyMidEventHandlerTest {
             }
 
             @Test
+            public void givenAddOtherPartyEventWithoutOtherPartyData_thenReturnError() {
+                var sscsCaseData = caseDataWithBenefit(CHILD_SUPPORT.getShortName());
+
+                when(callback.getEvent()).thenReturn(EventType.ADD_OTHER_PARTY_DATA);
+                when(callback.getCaseDetails()).thenReturn(caseDetails);
+                when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+                sscsCaseData.setOtherParties(Collections.emptyList());
+
+                var response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+                assertThat(response.getErrors()).contains("Other party data must be added to submit this event.");
+            }
+
+            @Test
             public void givenAddOtherPartyEventWithMultipleOtherParties_thenReturnError() {
                 var sscsCaseData = caseDataWithBenefit(CHILD_SUPPORT.getShortName());
 
@@ -194,7 +209,7 @@ public class AddOtherPartyMidEventHandlerTest {
 
                 var response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-                assertThat(response.getErrors()).contains("Only one other party data can be added using this event!");
+                assertThat(response.getErrors()).contains("Only one other party data can be added using this event.");
             }
         }
 
