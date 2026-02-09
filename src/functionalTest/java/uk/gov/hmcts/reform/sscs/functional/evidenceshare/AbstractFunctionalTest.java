@@ -205,10 +205,6 @@ abstract class AbstractFunctionalTest {
             .pollInterval(2, SECONDS);
     }
 
-    IdamTokens getIdamTokens() {
-        return idamService.getIdamTokens();
-    }
-
     private void updateCaseForDocuments(SscsCaseDetails caseDetails, String json) throws IOException {
         JsonNode root = mapper.readTree(json);
         JsonNode sscsDocument = root.at("/case_details/case_data/sscsDocument");
