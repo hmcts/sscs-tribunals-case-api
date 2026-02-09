@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
 import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
-import static junit.framework.TestCase.assertNull;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DIRECTION_ISSUED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
 
@@ -13,8 +13,8 @@ import io.restassured.http.Header;
 import java.io.IOException;
 import java.time.LocalDate;
 import org.apache.http.HttpStatus;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -25,27 +25,27 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 public class IssueDirectionFunctionalTest extends AbstractFunctionalTest {
 
-    @Autowired
-    private IdamService idamService;
-    private IdamTokens idamTokens;
     private static final String EVIDENCE_DOCUMENT_PDF = "evidence-document.pdf";
     @Value("${test-url}")
     protected String testUrl;
+    @Autowired
+    private IdamService idamService;
+    private IdamTokens idamTokens;
 
 
-    public IssueDirectionFunctionalTest() {
+    IssueDirectionFunctionalTest() {
         super();
     }
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         baseURI = testUrl;
         useRelaxedHTTPSValidation();
     }
 
     // Need tribunals running to pass this functional test
     @Test
-    public void processAnIssueDirectionEvent_shouldUpdateInterlocReviewState() throws IOException {
+    void processAnIssueDirectionEvent_shouldUpdateInterlocReviewState() throws IOException {
 
         createDigitalCaseWithEvent(NON_COMPLIANT);
 
@@ -62,20 +62,21 @@ public class IssueDirectionFunctionalTest extends AbstractFunctionalTest {
     }
 
     @Test
-    public void processAnIssueDirectionEvent_ifPastOrFutureHearingExcludedDatesAreOnCaseDetails() throws IOException {
+    void processAnIssueDirectionEvent_ifPastOrFutureHearingExcludedDatesAreOnCaseDetails() throws IOException {
         idamTokens = idamService.getIdamTokens();
-        String json = BaseHandler.getJsonCallbackForTest("handlers/directionissued/directionIssuedAboutToSubmitCallback.json");
+        String json = BaseHandler.getJsonCallbackForTest(
+            "handlers/directionissued/directionIssuedAboutToSubmitCallback.json");
         json = uploadCaseDocument(EVIDENCE_DOCUMENT_PDF, "EVIDENCE_DOCUMENT", json);
 
         RestAssured.given()
-                .contentType(ContentType.JSON)
-                .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
-                .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
-                .body(json)
-                .post("/ccdAboutToSubmit")
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .log().all(true)
-                .assertThat().body("data.dwpState", equalTo("directionActionRequired"));
+            .contentType(ContentType.JSON)
+            .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
+            .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
+            .body(json)
+            .post("/ccdAboutToSubmit")
+            .then()
+            .statusCode(HttpStatus.SC_OK)
+            .log().all(true)
+            .assertThat().body("data.dwpState", equalTo("directionActionRequired"));
     }
 }
