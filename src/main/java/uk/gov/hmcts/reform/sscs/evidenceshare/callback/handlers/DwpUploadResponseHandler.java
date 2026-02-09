@@ -1,7 +1,10 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.RESPONSE_SUBMITTED_DWP;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.JOINT_PARTY_ADDED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_ADMIN_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
@@ -11,7 +14,6 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.HandlerUt
 import java.util.Optional;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
@@ -43,9 +45,10 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
         return callbackType.equals(CallbackType.SUBMITTED)
             && callback.getEvent() == EventType.DWP_UPLOAD_RESPONSE
             && READY_TO_LIST.getId().equals(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom())
-            && callback.getCaseDetails().getCaseData().getAppeal() != null
-            && callback.getCaseDetails().getCaseData().getAppeal().getBenefitType() != null
-            && !StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().getCode(), Benefit.IIDB.getShortName());
+            && nonNull(callback.getCaseDetails().getCaseData().getAppeal())
+            && nonNull(callback.getCaseDetails().getCaseData().getAppeal().getBenefitType())
+            && !equalsIgnoreCase(callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().getCode(),
+                Benefit.IIDB.getShortName());
     }
 
     @Override
@@ -59,11 +62,11 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
         final BenefitType benefitType = sscsCaseData.getAppeal().getBenefitType();
 
-        if (StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.UC.getShortName())) {
+        if (equalsIgnoreCase(benefitType.getCode(), Benefit.UC.getShortName())) {
             handleUc(callback);
-        } else if (StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.CHILD_SUPPORT.getShortName()) || isBenefitTypeSscs5(callback.getCaseDetails().getCaseData().getBenefitType())) {
+        } else if (equalsIgnoreCase(benefitType.getCode(), Benefit.CHILD_SUPPORT.getShortName()) || isBenefitTypeSscs5(callback.getCaseDetails().getCaseData().getBenefitType())) {
             handleChildSupportAndSscs5Case(callback);
-        } else if (StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.INFECTED_BLOOD_COMPENSATION.getShortName())) {
+        } else if (equalsIgnoreCase(benefitType.getCode(), Benefit.INFECTED_BLOOD_COMPENSATION.getShortName())) {
             handleIbcaCase(callback);
         } else {
             handleNonUc(callback);
@@ -71,7 +74,7 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
     }
 
     private void handleChildSupportAndSscs5Case(Callback<SscsCaseData> callback) {
-        if (StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "Yes")) {
+        if (equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "Yes")) {
             updateEventDetails(callback.getCaseDetails().getId(),
                 EventType.DWP_RESPOND, "Response received", "Update to response received as an Admin has to review the case",
                     sscsCaseDetails -> {
@@ -82,8 +85,8 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
                                 EventType.DWP_RESPOND,
                                 callback.getCaseDetails().getId());
                     });
-        } else if (StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "No")) {
-            if (isBenefitTypeSscs5(callback.getCaseDetails().getCaseData().getBenefitType()) && !StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpEditedEvidenceReason(), "phme")) {
+        } else if (equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "No")) {
+            if (isBenefitTypeSscs5(callback.getCaseDetails().getCaseData().getBenefitType()) && !equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpEditedEvidenceReason(), "phme")) {
                 triggerReadyToListEvent(callback);
             } else {
                 if (isBenefitTypeSscs5(callback.getCaseDetails().getCaseData().getBenefitType())) {
@@ -109,24 +112,22 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
     private void handleNonUc(Callback<SscsCaseData> callback) {
         if ("Yes".equalsIgnoreCase(callback.getCaseDetails().getCaseData().getUrgentCase())) {
             triggerDwpRespondEventForUrgentCase(callback);
-        } else if (StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "no")) {
+        } else if (equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "no")) {
             triggerReadyToListEvent(callback);
         }
     }
 
 
     private void handleUc(Callback<SscsCaseData> callback) {
-        boolean dwpFurtherInfo =
-            StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "yes");
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        boolean dwpFurtherInfo = equalsIgnoreCase(caseData.getDwpFurtherInfo(), "yes");
 
         boolean disputedDecision = false;
-        if (callback.getCaseDetails().getCaseData().getElementsDisputedIsDecisionDisputedByOthers() != null) {
-            disputedDecision = StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getElementsDisputedIsDecisionDisputedByOthers(), "yes");
+        if (caseData.getElementsDisputedIsDecisionDisputedByOthers() != null) {
+            disputedDecision = equalsIgnoreCase(caseData.getElementsDisputedIsDecisionDisputedByOthers(), "yes");
         }
 
-        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-
-        if ("Yes".equalsIgnoreCase(callback.getCaseDetails().getCaseData().getUrgentCase())) {
+        if ("Yes".equalsIgnoreCase(caseData.getUrgentCase())) {
             triggerDwpRespondEventForUrgentCase(callback);
         } else if (!dwpFurtherInfo && !disputedDecision) {
             triggerReadyToListEvent(callback);
@@ -135,14 +136,14 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
         }
 
         if (isANewJointParty(callback, caseData)) {
-            updateEventDetails(callback.getCaseDetails().getId(), EventType.JOINT_PARTY_ADDED, "Joint party added", "A joint party was added to the appeal",
+            updateEventDetails(callback.getCaseDetails().getId(), JOINT_PARTY_ADDED,
+                    "Joint party added", "A joint party was added to the appeal",
                     sscsCaseDetails -> {
                         SscsCaseData sscsCaseData = sscsCaseDetails.getData();
                         sscsCaseData.setJointParty(caseData.getJointParty());
-                        log.info("Updated case v2 with dwp load response event {} for id {}",
-                                EventType.JOINT_PARTY_ADDED,
+                        log.info("Updated case v2 with dwp load response event {} for id {}", JOINT_PARTY_ADDED,
                                 callback.getCaseDetails().getId());
-                    });
+                });
         }
     }
 
@@ -189,7 +190,8 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
     }
 
     private void triggerDwpRespondEventForUrgentCase(Callback<SscsCaseData> callback) {
-        updateEventDetails(callback.getCaseDetails().getId(), EventType.DWP_RESPOND, "Response received", "urgent hearing set to response received event",
+        updateEventDetails(callback.getCaseDetails().getId(), EventType.DWP_RESPOND,
+                "Response received", "urgent hearing set to response received event",
                 sscsCaseDetails -> {
                     SscsCaseData sscsCaseData = sscsCaseDetails.getData();
                     sscsCaseData.setDwpState(RESPONSE_SUBMITTED_DWP);
@@ -201,7 +203,8 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
 
     private void triggerReadyToListEvent(Callback<SscsCaseData> callback) {
         disableReviewFtaResponseTaskInit(callback);
-        updateEventDetails(callback.getCaseDetails().getId(), EventType.READY_TO_LIST, "ready to list", "update to ready to list event as there is no further information to assist the tribunal and no dispute.",
+        updateEventDetails(callback.getCaseDetails().getId(), EventType.READY_TO_LIST, "ready to list",
+                "update to ready to list event as there is no further information to assist the tribunal and no dispute.",
                 sscsCaseDetails -> {
                     SscsCaseData sscsCaseData = sscsCaseDetails.getData();
                     sscsCaseData.setDwpState(RESPONSE_SUBMITTED_DWP);

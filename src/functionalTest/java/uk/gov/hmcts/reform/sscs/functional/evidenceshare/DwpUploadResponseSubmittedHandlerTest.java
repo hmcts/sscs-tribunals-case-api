@@ -17,7 +17,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
@@ -52,7 +51,6 @@ public class DwpUploadResponseSubmittedHandlerTest extends AbstractFunctionalTes
             SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
             assertEquals(State.WITH_DWP.toString(), caseDetails.getState());
             assertNotNull(caseDetails.getData());
-            assertEquals(DwpState.RESPONSE_SUBMITTED_DWP, caseDetails.getData().getDwpState());
             assertEquals(YesNo.NO, caseDetails.getData().getWorkAllocationFields().getFtaResponseReviewRequired());
             assertEquals("Yes", caseDetails.getData().getDwpFurtherInfo());
             assertNotNull(caseDetails.getData().getSscsDocument());
