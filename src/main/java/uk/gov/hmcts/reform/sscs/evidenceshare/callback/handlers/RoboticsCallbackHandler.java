@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
@@ -34,7 +33,7 @@ import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
 @Slf4j
 @Service
-public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
+public class RoboticsCallbackHandler implements EvidenceCallbackHandler<SscsCaseData> {
 
     private final RoboticsService roboticsService;
 

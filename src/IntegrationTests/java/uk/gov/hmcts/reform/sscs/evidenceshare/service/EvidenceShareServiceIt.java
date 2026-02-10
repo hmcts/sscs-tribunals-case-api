@@ -74,7 +74,7 @@ import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
-import uk.gov.hmcts.reform.sscs.service.servicebus.SendCallbackHandler;
+import uk.gov.hmcts.reform.sscs.service.servicebus.EvidenceNotifyCallbackProcessor;
 
 
 @RunWith(JUnitParamsRunner.class)
@@ -138,7 +138,7 @@ public class EvidenceShareServiceIt {
     private RoboticsCallbackHandler roboticsCallbackHandler;
 
     @Autowired
-    private SendCallbackHandler sendCallbackHandler;
+    private EvidenceNotifyCallbackProcessor evidenceNotifyCallbackProcessor;
 
     @Autowired
     private PdfStoreService pdfStoreService;
@@ -193,7 +193,7 @@ public class EvidenceShareServiceIt {
         when(updateCcdCaseService.updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any(), any())).thenReturn(SscsCaseDetails.builder().build());
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(sscsCaseDataCallback);
+        evidenceNotifyCallbackProcessor.handle(sscsCaseDataCallback);
 
         executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
@@ -216,7 +216,7 @@ public class EvidenceShareServiceIt {
         when(updateCcdCaseService.updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any(), any())).thenReturn(SscsCaseDetails.builder().build());
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(sscsCaseDataCallback);
+        evidenceNotifyCallbackProcessor.handle(sscsCaseDataCallback);
 
         executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
@@ -251,7 +251,7 @@ public class EvidenceShareServiceIt {
         when(updateCcdCaseService.updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq(documentList), any(), any())).thenReturn(SscsCaseDetails.builder().build());
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(sscsCaseDataCallback);
+        evidenceNotifyCallbackProcessor.handle(sscsCaseDataCallback);
 
         executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
@@ -296,7 +296,7 @@ public class EvidenceShareServiceIt {
         when(updateCcdCaseService.updateCaseV2(any(), eq(SENT_TO_DWP.getCcdType()), any(), eq(documentList), any(), any())).thenReturn(SscsCaseDetails.builder().build());
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(sscsCaseDataCallback);
+        evidenceNotifyCallbackProcessor.handle(sscsCaseDataCallback);
 
         executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
@@ -327,7 +327,7 @@ public class EvidenceShareServiceIt {
         json = json.replace("CREATED_IN_GAPS_FROM", "readyToList");
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(sscsCaseDataCallback);
+        evidenceNotifyCallbackProcessor.handle(sscsCaseDataCallback);
 
         executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
@@ -345,7 +345,7 @@ public class EvidenceShareServiceIt {
         json = json.replace("CREATED_IN_GAPS_FROM", "validAppeal");
         Callback<SscsCaseData> callback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(callback);
+        evidenceNotifyCallbackProcessor.handle(callback);
 
         executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
@@ -373,7 +373,7 @@ public class EvidenceShareServiceIt {
         json = json.replace("CREATED_IN_GAPS_FROM", "validAppeal");
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(sscsCaseDataCallback);
+        evidenceNotifyCallbackProcessor.handle(sscsCaseDataCallback);
 
         executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
@@ -394,7 +394,7 @@ public class EvidenceShareServiceIt {
         json = json.replace("CREATED_IN_GAPS_FROM", "readyToList");
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(sscsCaseDataCallback);
+        evidenceNotifyCallbackProcessor.handle(sscsCaseDataCallback);
 
         executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 

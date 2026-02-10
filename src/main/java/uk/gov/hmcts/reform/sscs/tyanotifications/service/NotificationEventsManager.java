@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.tyanotifications.service.servicebus;
+package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
@@ -13,19 +13,18 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.tyanotifications.callback.handlers.FilterNotificationsEventsHandler;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 
 @Slf4j
 @Component
 @Lazy(false)
-public class NotificationsMessageProcessor {
+public class NotificationEventsManager {
 
-    private final FilterNotificationsEventsHandler filterNotificationsEventsHandler;
+    private final NotificationsEventsFilter notificationsEventsFilter;
 
-    public NotificationsMessageProcessor(FilterNotificationsEventsHandler filterNotificationsEventsHandler) {
-        this.filterNotificationsEventsHandler = filterNotificationsEventsHandler;
+    public NotificationEventsManager(NotificationsEventsFilter notificationsEventsFilter) {
+        this.notificationsEventsFilter = notificationsEventsFilter;
     }
 
     public void processMessage(Callback<SscsCaseData> callback) {
@@ -52,11 +51,11 @@ public class NotificationsMessageProcessor {
                 sscsCaseDataWrapper.getNewSscsCaseData().getCcdCaseId(),
                 sscsCaseDataWrapper.getNotificationEventType());
 
-            if (filterNotificationsEventsHandler.canHandle(sscsCaseDataWrapper)) {
+            if (notificationsEventsFilter.canHandle(sscsCaseDataWrapper)) {
                 log.info("Handling notifications for Sscs Case CCD callback `{}` for Case ID `{}`",
                     callback.getEvent(),
                     callback.getCaseDetails().getId());
-                filterNotificationsEventsHandler.handle(sscsCaseDataWrapper);
+                notificationsEventsFilter.handle(sscsCaseDataWrapper);
             }
 
             log.info("Sscs Case CCD callback `{}` handled for Case ID `{}`", callback.getEvent(),

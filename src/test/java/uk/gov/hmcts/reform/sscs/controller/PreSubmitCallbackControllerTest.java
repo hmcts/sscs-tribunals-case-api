@@ -36,6 +36,7 @@ import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import uk.gov.hmcts.reform.sscs.callback.controllers.PreSubmitCallbackController;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -47,7 +48,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackDispatcher;
+import uk.gov.hmcts.reform.sscs.callback.PreSubmitCallbackDispatcher;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -55,7 +56,7 @@ import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 
 @SuppressWarnings("unchecked")
 @RunWith(JUnitParamsRunner.class)
-public class CcdCallbackControllerTest {
+public class PreSubmitCallbackControllerTest {
 
     // begin: needed to use spring runner and junitparamsRunner together
     @ClassRule
@@ -89,11 +90,11 @@ public class CcdCallbackControllerTest {
     @MockitoBean
     private IdamService idamService;
 
-    private CcdCallbackController controller;
+    private PreSubmitCallbackController controller;
 
     @Before
     public void setUp() {
-        controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
+        controller = new PreSubmitCallbackController(authorisationService, deserializer, dispatcher);
         mockMvc = standaloneSetup(controller)
             .setMessageConverters(new ByteArrayHttpMessageConverter(), new StringHttpMessageConverter(),
                 new ResourceHttpMessageConverter(false), new SourceHttpMessageConverter<>(),

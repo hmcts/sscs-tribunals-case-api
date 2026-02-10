@@ -13,7 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher;
+import uk.gov.hmcts.reform.sscs.callback.EvidenceCallbackDispatcher;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -26,27 +26,27 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.exception.UnableToContactThirdPart
 import uk.gov.hmcts.reform.sscs.exception.DwpAddressLookupException;
 import uk.gov.hmcts.reform.sscs.exception.NoMrnDetailsException;
 import uk.gov.hmcts.reform.sscs.service.exceptions.ClientAuthorisationException;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.servicebus.NotificationsMessageProcessor;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationEventsManager;
 
 @RunWith(MockitoJUnitRunner.class)
-public class SendCallbackHandlerTest {
+public class EvidenceNotifyCallbackProcessorTest {
 
     private static final Exception EXCEPTION = new RuntimeException("blah");
     private static final int RETRY_THREE_TIMES = 3;
 
     @Mock
-    private CallbackDispatcher<SscsCaseData> dispatcher;
+    private EvidenceCallbackDispatcher<SscsCaseData> dispatcher;
 
     @Mock
-    private NotificationsMessageProcessor notificationsMessageProcessor;
+    private NotificationEventsManager notificationEventsManager;
 
-    private SendCallbackHandler sendCallbackHandler;
+    private EvidenceNotifyCallbackProcessor evidenceNotifyCallbackProcessor;
     private Exception exception;
     private Callback<SscsCaseData> callback;
 
     @Before
     public void setup() {
-        sendCallbackHandler = new SendCallbackHandler(RETRY_THREE_TIMES, dispatcher, notificationsMessageProcessor);
+        evidenceNotifyCallbackProcessor = new EvidenceNotifyCallbackProcessor(RETRY_THREE_TIMES, dispatcher, notificationEventsManager);
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(
             123L,
             "jurisdiction",
@@ -62,21 +62,21 @@ public class SendCallbackHandlerTest {
     public void bulkPrintExceptionWillBeCaught() {
         exception = new BulkPrintException("message", EXCEPTION);
         doThrow(exception).when(dispatcher).handle(any(), any());
-        sendCallbackHandler.handle(callback);
+        evidenceNotifyCallbackProcessor.handle(callback);
         verify(dispatcher, atLeastOnce()).handle(any(), any());
     }
 
     @Test
     public void givenIssueFurtherEvidenceException_shouldNotRetry() {
         doThrow(IssueFurtherEvidenceException.class).when(dispatcher).handle(any(), any());
-        sendCallbackHandler.handle(callback);
+        evidenceNotifyCallbackProcessor.handle(callback);
         verify(dispatcher, times(1)).handle(any(), any());
     }
 
     @Test
     public void givenPostIssueFurtherEvidenceTaskException_shouldNotRetry() {
         doThrow(PostIssueFurtherEvidenceTasksException.class).when(dispatcher).handle(any(), any());
-        sendCallbackHandler.handle(callback);
+        evidenceNotifyCallbackProcessor.handle(callback);
         verify(dispatcher, times(1)).handle(any(), any());
     }
 
@@ -84,7 +84,7 @@ public class SendCallbackHandlerTest {
     public void pdfStoreExceptionWillBeCaught() {
         exception = new PdfStoreException("message", EXCEPTION);
         doThrow(exception).when(dispatcher).handle(any(), any());
-        sendCallbackHandler.handle(callback);
+        evidenceNotifyCallbackProcessor.handle(callback);
         verify(dispatcher, atLeastOnce()).handle(any(), any());
     }
 
@@ -92,7 +92,7 @@ public class SendCallbackHandlerTest {
     public void dwpAddressLookupExceptionWillBeCaught() {
         exception = new DwpAddressLookupException("message");
         doThrow(exception).when(dispatcher).handle(any(), any());
-        sendCallbackHandler.handle(callback);
+        evidenceNotifyCallbackProcessor.handle(callback);
         verify(dispatcher, atLeastOnce()).handle(any(), any());
     }
 
@@ -100,7 +100,7 @@ public class SendCallbackHandlerTest {
     public void noMrnDetailsExceptionWillBeCaught() {
         exception = new NoMrnDetailsException(SscsCaseData.builder().ccdCaseId("123").build());
         doThrow(exception).when(dispatcher).handle(any(), any());
-        sendCallbackHandler.handle(callback);
+        evidenceNotifyCallbackProcessor.handle(callback);
         verify(dispatcher, atLeastOnce()).handle(any(), any());
     }
 
@@ -108,7 +108,7 @@ public class SendCallbackHandlerTest {
     public void unableToContactThirdPartyExceptionWillBeCaught() {
         exception = new UnableToContactThirdPartyException("dm-store", new RuntimeException());
         doThrow(exception).when(dispatcher).handle(any(), any());
-        sendCallbackHandler.handle(callback);
+        evidenceNotifyCallbackProcessor.handle(callback);
         verify(dispatcher, atLeastOnce()).handle(any(), any());
     }
 
@@ -116,7 +116,7 @@ public class SendCallbackHandlerTest {
     public void nullPointerExceptionWillBeCaught() {
         exception = new NullPointerException();
         doThrow(exception).when(dispatcher).handle(any(), any());
-        sendCallbackHandler.handle(callback);
+        evidenceNotifyCallbackProcessor.handle(callback);
         verify(dispatcher, atLeast(RETRY_THREE_TIMES)).handle(any(), any());
     }
 
@@ -124,21 +124,21 @@ public class SendCallbackHandlerTest {
     public void clientAuthorisationExceptionWillBeCaught() {
         exception = new ClientAuthorisationException(EXCEPTION);
         doThrow(exception).when(dispatcher).handle(any(), any());
-        sendCallbackHandler.handle(callback);
+        evidenceNotifyCallbackProcessor.handle(callback);
         verify(dispatcher, atLeast(RETRY_THREE_TIMES)).handle(any(), any());
     }
 
     @Test
     public void handleValidRequest() {
-        sendCallbackHandler.handle(callback);
+        evidenceNotifyCallbackProcessor.handle(callback);
         verify(dispatcher).handle(any(), any());
     }
 
 
     @Test
     public void shouldProcessMessageForNotifications() {
-        sendCallbackHandler = new SendCallbackHandler(RETRY_THREE_TIMES, dispatcher, notificationsMessageProcessor);
-        sendCallbackHandler.handle(callback);
-        verify(notificationsMessageProcessor).processMessage(callback);
+        evidenceNotifyCallbackProcessor = new EvidenceNotifyCallbackProcessor(RETRY_THREE_TIMES, dispatcher, notificationEventsManager);
+        evidenceNotifyCallbackProcessor.handle(callback);
+        verify(notificationEventsManager).processMessage(callback);
     }
 }

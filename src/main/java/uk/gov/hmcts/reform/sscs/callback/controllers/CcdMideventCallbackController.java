@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.controller;
+package uk.gov.hmcts.reform.sscs.callback.controllers;
 
 import static java.util.Objects.isNull;
 import static org.apache.http.HttpHeaders.AUTHORIZATION;

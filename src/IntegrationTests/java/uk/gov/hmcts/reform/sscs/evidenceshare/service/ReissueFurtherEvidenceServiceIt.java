@@ -68,7 +68,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
-import uk.gov.hmcts.reform.sscs.service.servicebus.SendCallbackHandler;
+import uk.gov.hmcts.reform.sscs.service.servicebus.EvidenceNotifyCallbackProcessor;
 
 
 @RunWith(JUnitParamsRunner.class)
@@ -120,7 +120,7 @@ public class ReissueFurtherEvidenceServiceIt {
     private ReissueFurtherEvidenceHandler handler;
 
     @Autowired
-    private SendCallbackHandler sendCallbackHandler;
+    private EvidenceNotifyCallbackProcessor evidenceNotifyCallbackProcessor;
 
     @Autowired
     private SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer;
@@ -208,7 +208,7 @@ public class ReissueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(sscsCaseDataCallback);
+        evidenceNotifyCallbackProcessor.handle(sscsCaseDataCallback);
 
         executor.getThreadPoolExecutor().awaitTermination(3, TimeUnit.SECONDS);
 
@@ -247,7 +247,7 @@ public class ReissueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(sscsCaseDataCallback);
+        evidenceNotifyCallbackProcessor.handle(sscsCaseDataCallback);
 
         executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
@@ -291,7 +291,7 @@ public class ReissueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(sscsCaseDataCallback);
+        evidenceNotifyCallbackProcessor.handle(sscsCaseDataCallback);
 
         executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
@@ -335,7 +335,7 @@ public class ReissueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(sscsCaseDataCallback);
+        evidenceNotifyCallbackProcessor.handle(sscsCaseDataCallback);
 
         executor.getThreadPoolExecutor().awaitTermination(3, TimeUnit.SECONDS);
 
@@ -389,7 +389,7 @@ public class ReissueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(sscsCaseDataCallback);
+        evidenceNotifyCallbackProcessor.handle(sscsCaseDataCallback);
 
         executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
@@ -428,7 +428,7 @@ public class ReissueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(sscsCaseDataCallback);
+        evidenceNotifyCallbackProcessor.handle(sscsCaseDataCallback);
 
         executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 

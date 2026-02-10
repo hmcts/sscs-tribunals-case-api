@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.tyanotifications.controller;
+package uk.gov.hmcts.reform.sscs.callback.controllers;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.getNotificationByCcdEvent;

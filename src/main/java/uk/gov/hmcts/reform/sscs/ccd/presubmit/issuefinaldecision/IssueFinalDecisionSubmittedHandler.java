@@ -18,14 +18,14 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
-import uk.gov.hmcts.reform.sscs.service.servicebus.SendCallbackHandler;
+import uk.gov.hmcts.reform.sscs.service.servicebus.EvidenceNotifyCallbackProcessor;
 
 @Component
 @Slf4j
 @AllArgsConstructor
 public class IssueFinalDecisionSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private final CcdCallbackMapService ccdCallbackMapService;
-    private final SendCallbackHandler sendCallbackHandler;
+    private final EvidenceNotifyCallbackProcessor evidenceNotifyCallbackProcessor;
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
 
@@ -61,7 +61,7 @@ public class IssueFinalDecisionSubmittedHandler implements PreSubmitCallbackHand
             }
         }
         log.info("Publishing message for the event {} for case id: {}", callback.getEvent(), callback.getCaseDetails().getId());
-        sendCallbackHandler.handle(callback);
+        evidenceNotifyCallbackProcessor.handle(callback);
 
         return new PreSubmitCallbackResponse<>(caseData);
     }

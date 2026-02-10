@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher;
+import uk.gov.hmcts.reform.sscs.callback.EvidenceCallbackDispatcher;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.evidenceshare.exception.BulkPrintException;
@@ -18,29 +18,29 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.exception.PostIssueFurtherEvidence
 import uk.gov.hmcts.reform.sscs.evidenceshare.exception.UnableToContactThirdPartyException;
 import uk.gov.hmcts.reform.sscs.exception.DwpAddressLookupException;
 import uk.gov.hmcts.reform.sscs.exception.NoMrnDetailsException;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.servicebus.NotificationsMessageProcessor;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationEventsManager;
 
 @Slf4j
 @Component
-public class SendCallbackHandler {
+public class EvidenceNotifyCallbackProcessor {
 
     private final Integer maxRetryAttempts;
-    private final CallbackDispatcher<SscsCaseData> dispatcher;
-    private final NotificationsMessageProcessor notificationsMessageProcessor;
+    private final EvidenceCallbackDispatcher<SscsCaseData> dispatcher;
+    private final NotificationEventsManager notificationEventsManager;
 
-    public SendCallbackHandler(@Value("${callback.maxRetryAttempts}") Integer maxRetryAttempts,
-                               CallbackDispatcher<SscsCaseData> dispatcher,
-                               NotificationsMessageProcessor notificationsMessageProcessor) {
+    public EvidenceNotifyCallbackProcessor(@Value("${callback.maxRetryAttempts}") Integer maxRetryAttempts,
+                                           EvidenceCallbackDispatcher<SscsCaseData> dispatcher,
+                                           NotificationEventsManager notificationEventsManager) {
         this.maxRetryAttempts = maxRetryAttempts;
         this.dispatcher = dispatcher;
-        this.notificationsMessageProcessor = notificationsMessageProcessor;
+        this.notificationEventsManager = notificationEventsManager;
     }
 
     @Async
     public void handle(Callback<SscsCaseData> callback) {
         log.info("Received message for case ID: {}, event: {}", callback.getCaseDetails().getId(), callback.getEvent());
         processEvidenceShareMessageWithRetry(callback, 1);
-        notificationsMessageProcessor.processMessage(callback);
+        notificationEventsManager.processMessage(callback);
     }
 
     private void processEvidenceShareMessageWithRetry(Callback<SscsCaseData> callback, int retry) {

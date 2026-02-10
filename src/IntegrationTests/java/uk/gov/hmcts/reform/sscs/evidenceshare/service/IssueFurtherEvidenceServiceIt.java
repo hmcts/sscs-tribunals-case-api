@@ -78,7 +78,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
-import uk.gov.hmcts.reform.sscs.service.servicebus.SendCallbackHandler;
+import uk.gov.hmcts.reform.sscs.service.servicebus.EvidenceNotifyCallbackProcessor;
 
 
 @RunWith(JUnitParamsRunner.class)
@@ -128,7 +128,7 @@ public class IssueFurtherEvidenceServiceIt {
     private IssueFurtherEvidenceHandler handler;
 
     @Autowired
-    private SendCallbackHandler sendCallbackHandler;
+    private EvidenceNotifyCallbackProcessor evidenceNotifyCallbackProcessor;
 
     @Autowired
     private SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer;
@@ -217,7 +217,7 @@ public class IssueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(sscsCaseDataCallback);
+        evidenceNotifyCallbackProcessor.handle(sscsCaseDataCallback);
 
         executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
@@ -258,7 +258,7 @@ public class IssueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(sscsCaseDataCallback);
+        evidenceNotifyCallbackProcessor.handle(sscsCaseDataCallback);
 
         executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
@@ -303,7 +303,7 @@ public class IssueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(sscsCaseDataCallback);
+        evidenceNotifyCallbackProcessor.handle(sscsCaseDataCallback);
 
         executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
@@ -348,7 +348,7 @@ public class IssueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(sscsCaseDataCallback);
+        evidenceNotifyCallbackProcessor.handle(sscsCaseDataCallback);
 
         executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
@@ -403,7 +403,7 @@ public class IssueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(sscsCaseDataCallback);
+        evidenceNotifyCallbackProcessor.handle(sscsCaseDataCallback);
 
         executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
@@ -444,7 +444,7 @@ public class IssueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(sscsCaseDataCallback);
+        evidenceNotifyCallbackProcessor.handle(sscsCaseDataCallback);
 
         executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
@@ -490,7 +490,7 @@ public class IssueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(sscsCaseDataCallback);
+        evidenceNotifyCallbackProcessor.handle(sscsCaseDataCallback);
 
         executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
@@ -536,7 +536,7 @@ public class IssueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(sscsCaseDataCallback);
+        evidenceNotifyCallbackProcessor.handle(sscsCaseDataCallback);
 
         executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
@@ -586,7 +586,7 @@ public class IssueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(sscsCaseDataCallback);
+        evidenceNotifyCallbackProcessor.handle(sscsCaseDataCallback);
 
         executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
@@ -671,7 +671,7 @@ public class IssueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(sscsCaseDataCallback);
+        evidenceNotifyCallbackProcessor.handle(sscsCaseDataCallback);
 
         executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
@@ -705,7 +705,7 @@ public class IssueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        sendCallbackHandler.handle(sscsCaseDataCallback);
+        evidenceNotifyCallbackProcessor.handle(sscsCaseDataCallback);
 
         executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 

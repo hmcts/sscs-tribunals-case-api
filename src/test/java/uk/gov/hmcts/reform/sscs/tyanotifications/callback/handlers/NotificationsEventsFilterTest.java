@@ -40,9 +40,10 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceEx
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationExecutionManager;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationProcessingService;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationsEventsFilter;
 
 @RunWith(JUnitParamsRunner.class)
-public class FilterNotificationsEventsHandlerTest {
+public class NotificationsEventsFilterTest {
     @Mock
     private NotificationProcessingService notificationProcessingService;
 
@@ -50,7 +51,7 @@ public class FilterNotificationsEventsHandlerTest {
     private NotificationExecutionManager notificationExecutionManager;
 
     @InjectMocks
-    private FilterNotificationsEventsHandler handler;
+    private NotificationsEventsFilter handler;
 
     private NotificationSscsCaseDataWrapper callback;
     private SscsCaseData newCaseData;

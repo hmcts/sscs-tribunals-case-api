@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
@@ -55,7 +54,7 @@ import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 
 @Slf4j
 @Service
-public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
+public class SendToBulkPrintHandler implements EvidenceCallbackHandler<SscsCaseData> {
 
     private static final String SENT_TO_FTA = "Sent to FTA";
     private final DispatchPriority dispatchPriority;

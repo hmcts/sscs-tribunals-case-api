@@ -35,7 +35,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
-import uk.gov.hmcts.reform.sscs.service.servicebus.SendCallbackHandler;
+import uk.gov.hmcts.reform.sscs.service.servicebus.EvidenceNotifyCallbackProcessor;
 
 @ExtendWith(MockitoExtension.class)
 public class IssueFinalDecisionSubmittedHandlerTest {
@@ -49,7 +49,7 @@ public class IssueFinalDecisionSubmittedHandlerTest {
     @Mock
     private CcdCallbackMapService ccdCallbackMapService;
     @Mock
-    private SendCallbackHandler sendCallbackHandler;
+    private EvidenceNotifyCallbackProcessor evidenceNotifyCallbackProcessor;
     @Captor
     private ArgumentCaptor<Consumer<SscsCaseData>> consumerArgumentCaptor;
 
@@ -65,7 +65,7 @@ public class IssueFinalDecisionSubmittedHandlerTest {
     public void setUp() {
         openMocks(this);
 
-        handler = new IssueFinalDecisionSubmittedHandler(ccdCallbackMapService, sendCallbackHandler, true);
+        handler = new IssueFinalDecisionSubmittedHandler(ccdCallbackMapService, evidenceNotifyCallbackProcessor, true);
 
         when(callback.getEvent()).thenReturn(EventType.ISSUE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -93,17 +93,17 @@ public class IssueFinalDecisionSubmittedHandlerTest {
 
     @Test
     public void givenPostHearingsFlagIsFalse_thenOnlyCallCallback() {
-        handler = new IssueFinalDecisionSubmittedHandler(ccdCallbackMapService, sendCallbackHandler, false);
+        handler = new IssueFinalDecisionSubmittedHandler(ccdCallbackMapService, evidenceNotifyCallbackProcessor, false);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
-        verify(sendCallbackHandler, times(1)).handle(callback);
+        verify(evidenceNotifyCallbackProcessor, times(1)).handle(callback);
         assertThat(response.getErrors()).isEmpty();
     }
 
     @Test
     public void givenCcdCallbackMapV2EnabledAndCorrectionInProgress_thenHandleCallbackMap() {
-        handler = new IssueFinalDecisionSubmittedHandler(ccdCallbackMapService, sendCallbackHandler, true);
+        handler = new IssueFinalDecisionSubmittedHandler(ccdCallbackMapService, evidenceNotifyCallbackProcessor, true);
         sscsCaseData.getPostHearing().getCorrection().setIsCorrectionFinalDecisionInProgress(YES);
 
         when(ccdCallbackMapService.handleCcdCallbackMapV2(eq(CorrectionActions.GRANT), anyLong(), any()))
@@ -111,7 +111,7 @@ public class IssueFinalDecisionSubmittedHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
-        verify(sendCallbackHandler, never())
+        verify(evidenceNotifyCallbackProcessor, never())
                 .handle(callback);
         verify(ccdCallbackMapService)
                 .handleCcdCallbackMapV2(eq(CorrectionActions.GRANT), anyLong(), consumerArgumentCaptor.capture());

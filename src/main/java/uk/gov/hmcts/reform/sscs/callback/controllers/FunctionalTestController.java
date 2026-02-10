@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.controller;
+package uk.gov.hmcts.reform.sscs.callback.controllers;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
@@ -10,18 +10,18 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.service.servicebus.SendCallbackHandler;
+import uk.gov.hmcts.reform.sscs.service.servicebus.EvidenceNotifyCallbackProcessor;
 
 @RestController
 @Slf4j
 @ConditionalOnProperty(prefix = "testing-support", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class FunctionalTestController {
 
-    private final SendCallbackHandler sendCallbackHandler;
+    private final EvidenceNotifyCallbackProcessor evidenceNotifyCallbackProcessor;
     private final SscsCaseCallbackDeserializer mapper;
 
-    public FunctionalTestController(SendCallbackHandler sendCallbackHandler, SscsCaseCallbackDeserializer mapper) {
-        this.sendCallbackHandler = sendCallbackHandler;
+    public FunctionalTestController(EvidenceNotifyCallbackProcessor evidenceNotifyCallbackProcessor, SscsCaseCallbackDeserializer mapper) {
+        this.evidenceNotifyCallbackProcessor = evidenceNotifyCallbackProcessor;
         this.mapper = mapper;
     }
 
@@ -31,6 +31,6 @@ public class FunctionalTestController {
         Callback<SscsCaseData> callback = mapper.deserialize(message);
         log.info("Sending message for event: {} for case id: {}", callback.getEvent(), callback.getCaseDetails().getId());
 
-        sendCallbackHandler.handle(callback);
+        evidenceNotifyCallbackProcessor.handle(callback);
     }
 }
