@@ -1753,5 +1753,9 @@
   {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "awaitingInfoFromTribunal", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "infoProvidedByTribunal", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "13/03/2025", "CaseTypeID": "Benefit", "CaseFieldID": "communicationNoActionLabel", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
-  {"LiveFrom": "29/05/2025", "CaseTypeID": "Benefit", "CaseFieldID": "interpreterDurationLabel", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"}
+  {"LiveFrom": "29/05/2025", "CaseTypeID": "Benefit", "CaseFieldID": "interpreterDurationLabel", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "09/02/2026", "CaseTypeID": "Benefit", "CaseFieldID": "ftaResponseReviewRequired", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "09/02/2026", "CaseTypeID": "Benefit", "CaseFieldID": "ftaResponseReviewRequired", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
+  {"LiveFrom": "09/02/2026", "CaseTypeID": "Benefit", "CaseFieldID": "ftaResponseReviewRequired", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRU"},
+  {"LiveFrom": "09/02/2026", "CaseTypeID": "Benefit", "CaseFieldID": "ftaResponseReviewRequired", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRU"}
 ]
