@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.TemplateService;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)

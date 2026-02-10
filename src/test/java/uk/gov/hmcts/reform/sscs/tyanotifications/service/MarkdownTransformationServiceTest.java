@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.MarkdownTransformationService;
 
 public class MarkdownTransformationServiceTest {
 

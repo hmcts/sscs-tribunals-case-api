@@ -16,9 +16,9 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.POST_HEARING_APP_SOR
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderHelper.buildJointParty;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderHelper.buildOtherParty;
+import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
+import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.PlaceholderHelper.buildJointParty;
+import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.PlaceholderHelper.buildOtherParty;
 
 import java.util.HashMap;
 import java.util.List;
@@ -46,12 +46,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.evidenceshare.config.DocmosisTemplateConfig;
-import uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType;
-import uk.gov.hmcts.reform.sscs.evidenceshare.service.BulkPrintService;
-import uk.gov.hmcts.reform.sscs.evidenceshare.service.CoverLetterService;
-import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants;
-import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.SorPlaceholderService;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.config.DocmosisTemplateConfig;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.domain.FurtherEvidenceLetterType;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.BulkPrintService;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.CoverLetterService;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.PlaceholderConstants;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.SorPlaceholderService;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 
 @ExtendWith(MockitoExtension.class)

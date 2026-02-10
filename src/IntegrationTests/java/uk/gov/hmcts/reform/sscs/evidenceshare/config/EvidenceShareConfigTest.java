@@ -14,6 +14,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 
 @RunWith(JUnitParamsRunner.class)

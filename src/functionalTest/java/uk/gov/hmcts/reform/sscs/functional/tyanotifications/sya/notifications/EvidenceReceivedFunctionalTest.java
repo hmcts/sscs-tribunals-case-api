@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscs.functional.tyanotifications.sya.notifications;
 
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType.ORAL;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType.PAPER;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.EVIDENCE_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.AppealHearingType.ORAL;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.AppealHearingType.PAPER;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.EVIDENCE_RECEIVED;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.functional.tyanotifications.AbstractFunctionalTest;
-import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.AppealHearingType;
 import uk.gov.service.notify.Notification;
 
 public class EvidenceReceivedFunctionalTest extends AbstractFunctionalTest {

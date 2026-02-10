@@ -8,6 +8,8 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.Destination;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.Notification;
 
 @RunWith(JUnitParamsRunner.class)
 public class NotificationTest {

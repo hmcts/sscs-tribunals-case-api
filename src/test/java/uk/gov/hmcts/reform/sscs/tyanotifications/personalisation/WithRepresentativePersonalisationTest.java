@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.personalisation;
 
 import static org.junit.Assert.assertEquals;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.REPRESENTATIVE_NAME;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.PersonalisationMappingConstants.REPRESENTATIVE_NAME;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +13,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.AppConstants;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.personalisation.WithRepresentativePersonalisation;
 
 @RunWith(JUnitParamsRunner.class)
 public class WithRepresentativePersonalisationTest {

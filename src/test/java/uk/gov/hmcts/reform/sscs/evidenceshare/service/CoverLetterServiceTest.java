@@ -10,7 +10,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.times;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
+import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,8 +43,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.docmosis.service.PdfGenerationService;
-import uk.gov.hmcts.reform.sscs.evidenceshare.exception.UnableToContactThirdPartyException;
-import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.FurtherEvidencePlaceholderService;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.UnableToContactThirdPartyException;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.CoverLetterService;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.FurtherEvidencePlaceholderService;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 
 @RunWith(JUnitParamsRunner.class)

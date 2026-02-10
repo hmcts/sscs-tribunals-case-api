@@ -6,7 +6,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.*;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.FUNCTIONAL_RETRY_LIMIT;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
 
 import java.io.IOException;
 import java.util.List;

@@ -9,7 +9,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SYA_APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.SYA_APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationProcessingServiceTest.verifyExpectedLogMessage;
 
 import ch.qos.logback.classic.Level;
@@ -35,14 +35,16 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.jobscheduler.model.Job;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobScheduler;
-import uk.gov.hmcts.reform.sscs.tyanotifications.config.TyanRetryConfig;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
-import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationClientRuntimeException;
-import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
-import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
-import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.reminder.JobGroupGenerator;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.TyanRetryConfig;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.NotificationSscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.exception.NotificationClientRuntimeException;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.exception.NotificationServiceException;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.factory.CcdNotificationWrapper;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.factory.NotificationWrapper;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.NotificationExecutionManager;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.OutOfHoursCalculator;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.reminder.JobGroupGenerator;
 import uk.gov.service.notify.NotificationClientException;
 
 @ExtendWith(MockitoExtension.class)

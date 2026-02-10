@@ -9,8 +9,9 @@ import static org.mockito.Mockito.when;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 import org.junit.Test;
-import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.reminder.ReminderHandler;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.factory.NotificationWrapper;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.ReminderService;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.reminder.ReminderHandler;
 
 public class ReminderServiceTest {
 

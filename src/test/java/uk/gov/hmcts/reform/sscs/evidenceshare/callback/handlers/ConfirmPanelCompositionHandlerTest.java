@@ -32,7 +32,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.evidenceshare.service.ListingStateProcessingService;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.ListingStateProcessingService;
 
 @ExtendWith(MockitoExtension.class)
 class ConfirmPanelCompositionHandlerTest {

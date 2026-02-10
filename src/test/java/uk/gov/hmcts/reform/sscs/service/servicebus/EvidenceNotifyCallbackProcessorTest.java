@@ -18,15 +18,15 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.evidenceshare.exception.BulkPrintException;
-import uk.gov.hmcts.reform.sscs.evidenceshare.exception.IssueFurtherEvidenceException;
-import uk.gov.hmcts.reform.sscs.evidenceshare.exception.PdfStoreException;
-import uk.gov.hmcts.reform.sscs.evidenceshare.exception.PostIssueFurtherEvidenceTasksException;
-import uk.gov.hmcts.reform.sscs.evidenceshare.exception.UnableToContactThirdPartyException;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.BulkPrintException;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.IssueFurtherEvidenceException;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.PdfStoreException;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.PostIssueFurtherEvidenceTasksException;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.UnableToContactThirdPartyException;
 import uk.gov.hmcts.reform.sscs.exception.DwpAddressLookupException;
 import uk.gov.hmcts.reform.sscs.exception.NoMrnDetailsException;
 import uk.gov.hmcts.reform.sscs.service.exceptions.ClientAuthorisationException;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationEventsManager;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.NotificationEventsManager;
 
 @RunWith(MockitoJUnitRunner.class)
 public class EvidenceNotifyCallbackProcessorTest {

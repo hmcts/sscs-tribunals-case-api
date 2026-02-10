@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.evidenceshare.service.ListingStateProcessingService;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.ListingStateProcessingService;
 
 
 @Slf4j

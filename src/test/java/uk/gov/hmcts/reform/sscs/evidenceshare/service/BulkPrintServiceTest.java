@@ -15,7 +15,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.PIP;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
+import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,9 +54,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
-import uk.gov.hmcts.reform.sscs.evidenceshare.exception.BulkPrintException;
-import uk.gov.hmcts.reform.sscs.evidenceshare.exception.NonPdfBulkPrintException;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.BulkPrintException;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.NonPdfBulkPrintException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.BulkPrintService;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.BulkPrintServiceHelper;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.CcdNotificationService;
 
 @ExtendWith(MockitoExtension.class)
 public class BulkPrintServiceTest {

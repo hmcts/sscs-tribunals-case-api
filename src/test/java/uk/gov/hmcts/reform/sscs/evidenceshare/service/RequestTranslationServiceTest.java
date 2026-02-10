@@ -35,6 +35,8 @@ import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
 import uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment;
 import uk.gov.hmcts.reform.sscs.domain.email.RequestTranslationTemplate;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.EmailService;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.RequestTranslationService;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 
 @RunWith(JUnitParamsRunner.class)

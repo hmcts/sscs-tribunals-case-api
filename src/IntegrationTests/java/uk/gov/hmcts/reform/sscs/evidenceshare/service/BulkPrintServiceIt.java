@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 
 

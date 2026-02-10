@@ -38,13 +38,20 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.NotificationDispatchService;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.NotificationExecutionManager;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.NotificationGateway;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.NotificationProcessingService;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.NotificationValidService;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.OutOfHoursCalculator;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.ReminderService;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
-import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType;
-import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationConfig;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
-import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationFactory;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis.PdfLetterService;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.AppealHearingType;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.NotificationConfig;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.NotificationSscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.factory.NotificationFactory;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.docmosis.PdfLetterService;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest

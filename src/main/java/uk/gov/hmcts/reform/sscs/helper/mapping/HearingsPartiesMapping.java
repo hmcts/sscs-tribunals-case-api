@@ -18,9 +18,9 @@ import static uk.gov.hmcts.reform.sscs.model.hmc.reference.EntityRoleCode.REPRES
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.EntityRoleCode.RESPONDENT;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.PartyType.INDIVIDUAL;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.PartyType.ORGANISATION;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DWP_ACRONYM;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.HMRC_ACRONYM;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBCA_ACRONYM;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.AppConstants.DWP_ACRONYM;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.AppConstants.HMRC_ACRONYM;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.AppConstants.IBCA_ACRONYM;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
