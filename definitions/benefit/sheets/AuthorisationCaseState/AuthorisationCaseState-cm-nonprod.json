@@ -1,4 +1,5 @@
 [
   {"LiveFrom": "08/01/2026", "CaseTypeID": "Benefit", "CaseStateID": "awaitOtherPartyData", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
-  {"LiveFrom": "08/01/2026", "CaseTypeID": "Benefit", "CaseStateID": "awaitOtherPartyData", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"}
+  {"LiveFrom": "08/01/2026", "CaseTypeID": "Benefit", "CaseStateID": "awaitOtherPartyData", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"},
+  {"LiveFrom": "08/01/2026", "CaseTypeID": "Benefit", "CaseStateID": "awaitOtherPartyData", "AccessProfile": "caseworker-sscs-dwpresponsewriter", "CRUD": "CRUD"}
 ]
