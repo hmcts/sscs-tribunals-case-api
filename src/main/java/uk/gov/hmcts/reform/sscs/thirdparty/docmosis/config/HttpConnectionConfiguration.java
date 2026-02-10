@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.docmosis.config;
+package uk.gov.hmcts.reform.sscs.thirdparty.docmosis.config;
 
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;

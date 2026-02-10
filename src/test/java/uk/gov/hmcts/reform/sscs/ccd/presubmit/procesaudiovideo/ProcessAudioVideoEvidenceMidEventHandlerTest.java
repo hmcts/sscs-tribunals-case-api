@@ -60,7 +60,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.processaudiovideo.ProcessAudioVideoActionDynamicListItems;
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.processaudiovideo.ProcessAudioVideoEvidenceMidEventHandler;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
-import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
+import uk.gov.hmcts.reform.sscs.thirdparty.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.idam.UserRole;

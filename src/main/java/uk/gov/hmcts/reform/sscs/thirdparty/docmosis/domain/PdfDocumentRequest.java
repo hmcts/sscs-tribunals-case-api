@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.docmosis.domain;
+package uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;

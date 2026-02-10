@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.docassembly;
+package uk.gov.hmcts.reform.sscs.thirdparty.docassembly;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

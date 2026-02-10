@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.document;
+package uk.gov.hmcts.reform.sscs.thirdparty.documentmanagement;
 
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;

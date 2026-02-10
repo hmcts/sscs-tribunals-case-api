@@ -1,12 +1,12 @@
-package uk.gov.hmcts.reform.sscs.docmosis.config;
+package uk.gov.hmcts.reform.sscs.thirdparty.docmosis.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
-import uk.gov.hmcts.reform.sscs.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.service.DocmosisPdfGenerationService;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
 

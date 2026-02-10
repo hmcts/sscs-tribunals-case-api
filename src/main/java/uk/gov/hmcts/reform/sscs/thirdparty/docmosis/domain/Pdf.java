@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.docmosis.domain;
+package uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;

@@ -58,7 +58,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.docmosis.config.PdfDocumentConfig;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.config.PdfDocumentConfig;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.config.ExelaAddressConfig;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.PlaceholderService;
 
