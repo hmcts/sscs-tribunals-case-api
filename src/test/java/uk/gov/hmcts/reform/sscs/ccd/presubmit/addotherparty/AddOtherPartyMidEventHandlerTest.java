@@ -194,7 +194,7 @@ public class AddOtherPartyMidEventHandlerTest {
 
                 var response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-                assertThat(response.getErrors()).contains("Other party data must be added to submit this event.");
+                assertThat(response.getErrors()).contains("Other party must be added to submit this event.");
             }
 
             @Test
@@ -209,7 +209,7 @@ public class AddOtherPartyMidEventHandlerTest {
 
                 var response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-                assertThat(response.getErrors()).contains("Only one other party data can be added using this event.");
+                assertThat(response.getErrors()).contains("Only one other party can be added using this event.");
             }
         }
 

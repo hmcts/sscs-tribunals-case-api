@@ -23,12 +23,16 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 public class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
 
     private static final String POSTCODE = "IG10 3XX";
     private static final String ADDRESS_LINE_1 = "3 XX Road";
     private static final String TOWN = "Lougthon";
+
+    @Autowired
+    private IdamService idamService;
 
     @Autowired
     private UpdateCcdCaseService updateCcdCaseService;
@@ -51,7 +55,7 @@ public class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
                 // add other party
                 var otherParty = buildOtherParty("Miss", "Bella", "Kiki");
 
-                updateCcdCaseService.updateCaseV2(caseWithState.getId(), ADD_OTHER_PARTY_DATA.getCcdType(), getIdamTokens(), (cd) -> {
+                updateCcdCaseService.updateCaseV2(caseWithState.getId(), ADD_OTHER_PARTY_DATA.getCcdType(), idamService.getIdamTokens(), (cd) -> {
                     cd.getData().setOtherParties(List.of(new CcdValue<>(otherParty)));
                     cd.getData().getExtendedSscsCaseData().setAwareOfAnyAdditionalOtherParties(YesNo.YES);
                     return new UpdateCcdCaseService.UpdateResult("add other party", "add other party");
@@ -87,7 +91,7 @@ public class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
                 // Add other party event should fail, because the case status does not qualify for ADD_OTHER_PARTY_DATA event
                 var otherParty = buildOtherParty("Mr", "X", "Bean");
 
-                assertThatThrownBy(() -> updateCcdCaseService.updateCaseV2(caseWithState.getId(), ADD_OTHER_PARTY_DATA.getCcdType(), getIdamTokens(), (cd) -> {
+                assertThatThrownBy(() -> updateCcdCaseService.updateCaseV2(caseWithState.getId(), ADD_OTHER_PARTY_DATA.getCcdType(), idamService.getIdamTokens(), (cd) -> {
                     cd.getData().setOtherParties(List.of(new CcdValue<>(otherParty)));
                     cd.getData().getExtendedSscsCaseData().setAwareOfAnyAdditionalOtherParties(YesNo.YES);
                     return new UpdateCcdCaseService.UpdateResult("add other party", "add other party");

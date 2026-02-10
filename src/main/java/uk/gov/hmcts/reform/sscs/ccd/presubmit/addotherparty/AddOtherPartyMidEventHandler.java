@@ -49,14 +49,14 @@ public class AddOtherPartyMidEventHandler implements PreSubmitCallbackHandler<Ss
         var preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 
         if (caseData.getOtherParties() == null || caseData.getOtherParties().isEmpty()) {
-            log.debug("Other party data must be added to submit this event. ccdCaseId: {}", caseData.getCcdCaseId());
-            preSubmitCallbackResponse.addError("Other party data must be added to submit this event.");
+            log.debug("Other party must be added to submit this event. ccdCaseId: {}", caseData.getCcdCaseId());
+            preSubmitCallbackResponse.addError("Other party must be added to submit this event.");
         }
 
         if (caseData.getOtherParties().size() > 1) {
-            log.debug("Only one other party data can be added using this event. ccdCaseId: {}",
+            log.debug("Only one other party can be added using this event. ccdCaseId: {}",
                 caseData.getCcdCaseId());
-            preSubmitCallbackResponse.addError("Only one other party data can be added using this event.");
+            preSubmitCallbackResponse.addError("Only one other party can be added using this event.");
         }
 
         return preSubmitCallbackResponse;
