@@ -1,0 +1,464 @@
+{
+  "case_details": {
+    "id": 1571697095510400,
+    "jurisdiction": "SSCS",
+    "state": "interlocutoryReviewState",
+    "version": 3,
+    "case_type_id": "Benefit",
+    "created_date": [
+      2019,
+      10,
+      21,
+      22,
+      31,
+      35,
+      553000000
+    ],
+    "last_modified": [
+      2019,
+      10,
+      21,
+      22,
+      48,
+      53,
+      467000000
+    ],
+    "security_classification": "PUBLIC",
+    "case_data": {
+      "caseCode": "093DD",
+      "generatedNino": "JWYBTSNOW",
+      "subscriptions": {
+        "appellantSubscription": {
+          "tya": "vPgM0J1vNe",
+          "email": "sscstest+notify@greencroftconsulting.com",
+          "mobile": "+447398785050",
+          "reason": null,
+          "subscribeSms": "Yes",
+          "subscribeEmail": "Yes",
+          "wantSmsNotifications": "Yes"
+        },
+        "appointeeSubscription": {
+          "tya": null,
+          "email": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeSms": null,
+          "subscribeEmail": null,
+          "wantSmsNotifications": null
+        },
+        "supporterSubscription": {
+          "tya": null,
+          "email": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeSms": null,
+          "subscribeEmail": null,
+          "wantSmsNotifications": null
+        },
+        "representativeSubscription": {
+          "tya": "KblgGN3HD8",
+          "email": "sscstest+notify2@greencroftconsulting.com",
+          "mobile": "+447398785051",
+          "reason": null,
+          "subscribeSms": "Yes",
+          "subscribeEmail": "Yes",
+          "wantSmsNotifications": "Yes"
+        }
+      },
+      "dwpRegionalCentre": "IBCA",
+      "appealNotePad": {
+        "notesCollection": [
+          {
+            "value": {
+              "noteDate": "2019-10-10",
+              "noteDetail": "whatever"
+            },
+            "id": "ebd279d5-96bd-410d-9e2b-1cb6cb1d261a"
+          }
+        ]
+      },
+      "generatedSurname": "Bloggs",
+      "appeal": {
+        "rep": {
+          "name": {
+            "title": "Mr",
+            "lastName": "Potter",
+            "firstName": "Harry"
+          },
+          "address": {
+            "town": "Town",
+            "line1": "123 Hairy Lane",
+            "line2": "Off Hairy Park",
+            "county": "County",
+            "postcode": "CM14 4LQ"
+          },
+          "contact": {
+            "email": "sscstest+notify2@greencroftconsulting.com",
+            "phone": null,
+            "mobile": "07411999999"
+          },
+          "organisation": "HP Ltd",
+          "hasRepresentative": "Yes"
+        },
+        "signer": "Joe Bloggs",
+        "appellant": {
+          "name": {
+            "title": "Mr",
+            "lastName": "Bloggs",
+            "firstName": "Joe"
+          },
+          "address": {
+            "town": "Hairyfield",
+            "line1": "123 Hairy Lane",
+            "line2": "Off Hairy Park",
+            "county": "Kent",
+            "postcode": "TN32 6PL"
+          },
+          "contact": {
+            "email": "sscstest+notify@greencroftconsulting.com",
+            "phone": null,
+            "mobile": "07411222222"
+          },
+          "identity": {
+            "dob": "1990-02-26",
+            "nino": "JWYBTSNOW"
+          },
+          "appointee": {},
+          "isAppointee": "No",
+          "isAddressSameAsAppointee": "No"
+        },
+        "mrnDetails": {
+          "mrnDate": "2018-09-20",
+          "mrnLateReason": null,
+          "dwpIssuingOffice": null,
+          "mrnMissingReason": null
+        },
+        "benefitType": {
+          "code": "infectedBloodCompensation",
+          "description": "Infected Blood Compensation"
+        },
+        "hearingType": "oral",
+        "receivedVia": "Online",
+        "appealReasons": {
+          "reasons": [
+            {
+              "id": "9e6d3ab1-0154-4dad-a3e6-408e1e2bad9e",
+              "value": {
+                "reason": "aaaaaaaaaa",
+                "description": "aaaaaaaaaa"
+              }
+            },
+            {
+              "id": "7495eeb4-9bd3-4961-a6ce-83e8ff81bb69",
+              "value": {
+                "reason": "bbbbbbbbbb",
+                "description": "bbbbbbbbbb"
+              }
+            },
+            {
+              "id": "2c6d41f8-1472-4aba-9496-08c5b1c00a15",
+              "value": {
+                "reason": "cccccccccc",
+                "description": "cccccccccc"
+              }
+            }
+          ],
+          "otherReasons": "Another reason"
+        },
+        "hearingOptions": {
+          "other": "Yes, this...",
+          "languages": "Telugu",
+          "arrangements": [
+            "signLanguageInterpreter",
+            "hearingLoop"
+          ],
+          "excludeDates": [
+            {
+              "id": "89f0736f-8fa7-44e3-9fd5-b293c8afb556",
+              "value": {
+                "end": "2018-04-04",
+                "start": "2018-04-04"
+              }
+            },
+            {
+              "id": "de298856-abbe-4dda-ae55-5dc406529eae",
+              "value": {
+                "end": "2018-04-05",
+                "start": "2018-04-05"
+              }
+            },
+            {
+              "id": "e652d6ed-7fb0-4828-a7b1-676c19748071",
+              "value": {
+                "end": "2018-04-06",
+                "start": "2018-04-06"
+              }
+            }
+          ],
+          "wantsSupport": "Yes",
+          "wantsToAttend": "Yes",
+          "scheduleHearing": "Yes",
+          "signLanguageType": "Sign language",
+          "languageInterpreter": "Yes"
+        }
+      },
+      "benefitCode": "093",
+      "generatedEmail": "sscstest+notify@greencroftconsulting.com",
+      "interlocReferralDate": "2019-10-21",
+      "linkedCasesBoolean": "No",
+      "caseCreated": "2019-10-21",
+      "regionalProcessingCenter": {
+        "city": "BIRMINGHAM",
+        "name": "BIRMINGHAM",
+        "email": "Birmingham-SYA-Receipts@justice.gov.uk",
+        "address1": "HM Courts & Tribunals Service",
+        "address2": "Social Security & Child Support Appeals",
+        "address3": "Administrative Support Centre",
+        "address4": "PO Box 14620",
+        "postcode": "B16 6FR",
+        "faxNumber": "0126 434 7983",
+        "phoneNumber": "0300 123 1142"
+      },
+      "interlocReviewState": "reviewByTcw",
+      "region": "BIRMINGHAM",
+      "generatedDOB": "1990-02-26",
+      "createdInGapsFrom": "readyToList",
+      "issueCode": "DD",
+      "generatedMobile": "07411222222"
+    }
+  },
+  "case_details_before": {
+    "id": 1571697095510400,
+    "jurisdiction": "SSCS",
+    "state": "interlocutoryReviewState",
+    "version": 3,
+    "case_type_id": "Benefit",
+    "created_date": [
+      2019,
+      10,
+      21,
+      22,
+      31,
+      35,
+      553000000
+    ],
+    "last_modified": [
+      2019,
+      10,
+      21,
+      22,
+      44,
+      10,
+      426000000
+    ],
+    "security_classification": "PUBLIC",
+    "case_data": {
+      "caseCode": "093DD",
+      "generatedNino": "JWYBTSNOW",
+      "subscriptions": {
+        "appellantSubscription": {
+          "tya": "vPgM0J1vNe",
+          "email": "sscstest+notify@greencroftconsulting.com",
+          "mobile": "+447398785050",
+          "reason": null,
+          "subscribeSms": "Yes",
+          "subscribeEmail": "Yes",
+          "wantSmsNotifications": "Yes"
+        },
+        "appointeeSubscription": {
+          "tya": null,
+          "email": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeSms": null,
+          "subscribeEmail": null,
+          "wantSmsNotifications": null
+        },
+        "supporterSubscription": {
+          "tya": null,
+          "email": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeSms": null,
+          "subscribeEmail": null,
+          "wantSmsNotifications": null
+        },
+        "representativeSubscription": {
+          "tya": "KblgGN3HD8",
+          "email": "sscstest+notify2@greencroftconsulting.com",
+          "mobile": "+447398785051",
+          "reason": null,
+          "subscribeSms": "Yes",
+          "subscribeEmail": "Yes",
+          "wantSmsNotifications": "Yes"
+        }
+      },
+      "dwpRegionalCentre": "IBCA",
+      "appealNotePad": {
+        "notesCollection": [
+          {
+            "id": "ebd279d5-96bd-410d-9e2b-1cb6cb1d261a",
+            "value": {
+              "noteDate": "2019-10-10",
+              "noteDetail": "whatever"
+            }
+          }
+        ]
+      },
+      "generatedSurname": "Bloggs",
+      "appeal": {
+        "rep": {
+          "name": {
+            "title": "Mr",
+            "lastName": "Potter",
+            "firstName": "Harry"
+          },
+          "address": {
+            "town": "Town",
+            "line1": "123 Hairy Lane",
+            "line2": "Off Hairy Park",
+            "county": "County",
+            "postcode": "CM14 4LQ"
+          },
+          "contact": {
+            "email": "sscstest+notify2@greencroftconsulting.com",
+            "phone": null,
+            "mobile": "07411999999"
+          },
+          "organisation": "HP Ltd",
+          "hasRepresentative": "Yes"
+        },
+        "signer": "Joe Bloggs",
+        "appellant": {
+          "name": {
+            "title": "Mr",
+            "lastName": "Bloggs",
+            "firstName": "Joe"
+          },
+          "address": {
+            "town": "Hairyfield",
+            "line1": "123 Hairy Lane",
+            "line2": "Off Hairy Park",
+            "county": "Kent",
+            "postcode": "TN32 6PL"
+          },
+          "contact": {
+            "email": "sscstest+notify@greencroftconsulting.com",
+            "phone": null,
+            "mobile": "07411222222"
+          },
+          "identity": {
+            "dob": "1990-02-26",
+            "nino": "JWYBTSNOW"
+          },
+          "isAppointee": "No",
+          "isAddressSameAsAppointee": "No"
+        },
+        "mrnDetails": {
+          "mrnDate": "2018-09-20",
+          "mrnLateReason": null,
+          "dwpIssuingOffice": null,
+          "mrnMissingReason": null
+        },
+        "benefitType": {
+          "code": "infectedBloodCompensation",
+          "description": "Infected Blood Compensation"
+        },
+        "hearingType": "oral",
+        "receivedVia": "Online",
+        "appealReasons": {
+          "reasons": [
+            {
+              "id": "9e6d3ab1-0154-4dad-a3e6-408e1e2bad9e",
+              "value": {
+                "reason": "aaaaaaaaaa",
+                "description": "aaaaaaaaaa"
+              }
+            },
+            {
+              "id": "7495eeb4-9bd3-4961-a6ce-83e8ff81bb69",
+              "value": {
+                "reason": "bbbbbbbbbb",
+                "description": "bbbbbbbbbb"
+              }
+            },
+            {
+              "id": "2c6d41f8-1472-4aba-9496-08c5b1c00a15",
+              "value": {
+                "reason": "cccccccccc",
+                "description": "cccccccccc"
+              }
+            }
+          ],
+          "otherReasons": "Another reason"
+        },
+        "hearingOptions": {
+          "other": "Yes, this...",
+          "languages": "Telugu",
+          "arrangements": [
+            "signLanguageInterpreter",
+            "hearingLoop"
+          ],
+          "excludeDates": [
+            {
+              "id": "89f0736f-8fa7-44e3-9fd5-b293c8afb556",
+              "value": {
+                "end": "2018-04-04",
+                "start": "2018-04-04"
+              }
+            },
+            {
+              "id": "de298856-abbe-4dda-ae55-5dc406529eae",
+              "value": {
+                "end": "2018-04-05",
+                "start": "2018-04-05"
+              }
+            },
+            {
+              "id": "e652d6ed-7fb0-4828-a7b1-676c19748071",
+              "value": {
+                "end": "2018-04-06",
+                "start": "2018-04-06"
+              }
+            }
+          ],
+          "wantsSupport": "Yes",
+          "wantsToAttend": "Yes",
+          "scheduleHearing": "Yes",
+          "signLanguageType": "Sign language",
+          "languageInterpreter": "Yes"
+        },
+        "hearingSubtype": {
+          "wantsHearingTypeVideo": "No",
+          "wantsHearingTypeTelephone": "No",
+          "wantsHearingTypeFaceToFace": "Yes"
+        }
+      },
+      "benefitCode": "093",
+      "generatedEmail": "sscstest+notify@greencroftconsulting.com",
+      "interlocReferralDate": "2019-10-21",
+      "linkedCasesBoolean": "No",
+      "caseCreated": "2019-10-21",
+      "regionalProcessingCenter": {
+        "city": "BIRMINGHAM",
+        "name": "BIRMINGHAM",
+        "email": "Birmingham-SYA-Receipts@justice.gov.uk",
+        "address1": "HM Courts & Tribunals Service",
+        "address2": "Social Security & Child Support Appeals",
+        "address3": "Administrative Support Centre",
+        "address4": "PO Box 14620",
+        "postcode": "B16 6FR",
+        "faxNumber": "0126 434 7983",
+        "phoneNumber": "0300 123 1142"
+      },
+      "interlocReviewState": "awaitingAdminAction",
+      "region": "BIRMINGHAM",
+      "generatedDOB": "1990-02-26",
+      "createdInGapsFrom": "readyToList",
+      "issueCode": "DD",
+      "generatedMobile": "07411222222"
+    }
+  },
+  "event_id": "validAppealCreated",
+  "ignore_warning": false
+}

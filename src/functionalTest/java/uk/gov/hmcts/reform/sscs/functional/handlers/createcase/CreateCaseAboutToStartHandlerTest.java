@@ -7,13 +7,13 @@ import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
-@ExtendWith(SpringExtension.class)
+@RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest
 public class CreateCaseAboutToStartHandlerTest extends BaseHandler {
@@ -21,7 +21,7 @@ public class CreateCaseAboutToStartHandlerTest extends BaseHandler {
     public void givenAboutToStartCallback_shouldCreateAppeal() throws Exception {
 
         String jsonCallbackForTest = BaseHandler.getJsonCallbackForTest(
-                "validAppealCreatedCallback.json");
+                "handlers/validappeal/validAppealCreatedCallback.json");
 
         RestAssured.given()
                 .contentType(ContentType.JSON)
@@ -35,7 +35,12 @@ public class CreateCaseAboutToStartHandlerTest extends BaseHandler {
                 .assertThat()
                 .body("data.appeal.benefitType.code", equalTo("PIP"))
                 .body("data.appeal.benefitType.description", equalTo("Personal Independence Payment"))
-                .body("data.appeal.appellant.name.lastName", equalTo("Test"))
-                .body("data.appeal.appellant().address.line1", equalTo("2 Drake Close"));
+                .body("data.appeal.appellant.name.title", equalTo("Mr"))
+                .body("data.appeal.appellant.name.firstName", equalTo("Joe"))
+                .body("data.appeal.appellant.name.lastName", equalTo("Bloggs"))
+                .body("data.appeal.appellant.address.line1", equalTo("123 Hairy Lane"))
+                .body("data.appeal.appellant.address.line2", equalTo("Off Hairy Park"))
+                .body("data.appeal.appellant.address.county", equalTo("Kent"))
+                .body("data.appeal.appellant.address.postcode", equalTo("TN32 6PL"));
     }
 }
