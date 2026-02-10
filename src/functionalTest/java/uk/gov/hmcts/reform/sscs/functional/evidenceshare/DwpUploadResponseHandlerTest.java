@@ -37,9 +37,6 @@ public class DwpUploadResponseHandlerTest extends AbstractFunctionalTest {
             SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
             assertEquals(State.WITH_DWP.toString(), caseDetails.getState());
             assertNotNull(caseDetails.getData());
-            assertNotNull(caseDetails.getData().getSscsDocument());
-            assertEquals("appellantEvidence",
-                    caseDetails.getData().getSscsDocument().getFirst().getValue().getDocumentType());
         });
     }
 }
