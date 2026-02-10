@@ -13,7 +13,6 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
@@ -29,7 +28,7 @@ import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 
 @Slf4j
 @Service
-public class SorWriteHandler implements CallbackHandler<SscsCaseData> {
+public class SorWriteHandler implements EvidenceCallbackHandler<SscsCaseData> {
     public static final String POST_HEARING_APP_SOR_WRITTEN = "postHearingAppSorWritten";
     private String docmosisTemplate;
 

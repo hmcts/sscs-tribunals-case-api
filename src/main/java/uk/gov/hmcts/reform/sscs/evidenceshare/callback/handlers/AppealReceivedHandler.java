@@ -7,7 +7,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
@@ -19,7 +18,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @Slf4j
 @Service
-public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
+public class AppealReceivedHandler implements EvidenceCallbackHandler<SscsCaseData> {
 
     private final DispatchPriority dispatchPriority;
 

@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
-import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
@@ -38,7 +37,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @Service
 @Slf4j
-public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData> {
+public class IssueFurtherEvidenceHandler implements EvidenceCallbackHandler<SscsCaseData> {
 
     private final FurtherEvidenceService furtherEvidenceService;
     private final UpdateCcdCaseService updateCcdCaseService;

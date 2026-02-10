@@ -11,14 +11,15 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseData;
+import uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.EvidenceCallbackHandler;
 
 @Component
 @Slf4j
-public class CallbackDispatcher<T extends CaseData> {
+public class EvidenceCallbackDispatcher<T extends CaseData> {
 
-    private final List<CallbackHandler<T>> callbackHandlers;
+    private final List<EvidenceCallbackHandler<T>> callbackHandlers;
 
-    public CallbackDispatcher(List<CallbackHandler<T>> callbackHandlers) {
+    public EvidenceCallbackDispatcher(List<EvidenceCallbackHandler<T>> callbackHandlers) {
         requireNonNull(callbackHandlers, "callbackHandlers must not be null");
         this.callbackHandlers = callbackHandlers;
     }
@@ -30,14 +31,14 @@ public class CallbackDispatcher<T extends CaseData> {
                 dispatchToHandlers(callbackType, callback, getCallbackHandlersByPriority(dispatchPriority)));
     }
 
-    private List<CallbackHandler<T>> getCallbackHandlersByPriority(DispatchPriority dispatchPriority) {
+    private List<EvidenceCallbackHandler<T>> getCallbackHandlersByPriority(DispatchPriority dispatchPriority) {
         return callbackHandlers.stream()
             .filter(handler -> handler.getPriority() == dispatchPriority)
             .collect(Collectors.toList());
     }
 
     private void dispatchToHandlers(CallbackType callbackType, Callback<T> callback,
-                                    List<CallbackHandler<T>> callbackHandlers) {
+                                    List<EvidenceCallbackHandler<T>> callbackHandlers) {
         log.info("Dispatching callback of type {} to {} handlers for case id {}",
                 callbackType,
                 callbackHandlers.size(),

@@ -18,23 +18,24 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.service.exceptions.ClientAuthorisationException;
-import uk.gov.hmcts.reform.sscs.tyanotifications.callback.handlers.FilterNotificationsEventsHandler;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationsEventsFilter;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationEventsManager;
 
-public class NotificationsMessageProcessorTest {
+public class NotificationEventsManagerTest {
 
     private static final Exception EXCEPTION = new RuntimeException("blah");
 
     @Mock
-    private FilterNotificationsEventsHandler filterNotificationsEventsHandler;
+    private NotificationsEventsFilter notificationsEventsFilter;
 
-    private NotificationsMessageProcessor topicConsumer;
+    private NotificationEventsManager topicConsumer;
     private Exception exception;
     private Callback<SscsCaseData> callback;
 
     @Before
     public void setup() {
         openMocks(this);
-        topicConsumer = new NotificationsMessageProcessor(filterNotificationsEventsHandler);
+        topicConsumer = new NotificationEventsManager(notificationsEventsFilter);
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(
             123L,
             "jurisdiction",
@@ -49,36 +50,36 @@ public class NotificationsMessageProcessorTest {
     @Test
     public void anExceptionWillBeCaught() {
         exception = EXCEPTION;
-        when(filterNotificationsEventsHandler.canHandle(any())).thenReturn(Boolean.TRUE);
-        doThrow(exception).when(filterNotificationsEventsHandler).handle(any());
+        when(notificationsEventsFilter.canHandle(any())).thenReturn(Boolean.TRUE);
+        doThrow(exception).when(notificationsEventsFilter).handle(any());
         topicConsumer.processMessage(callback);
-        verify(filterNotificationsEventsHandler, atLeastOnce()).handle(any());
+        verify(notificationsEventsFilter, atLeastOnce()).handle(any());
     }
 
 
     @Test
     public void nullPointerExceptionWillBeCaught() {
         exception = new NullPointerException();
-        when(filterNotificationsEventsHandler.canHandle(any())).thenReturn(Boolean.TRUE);
-        doThrow(exception).when(filterNotificationsEventsHandler).handle(any());
+        when(notificationsEventsFilter.canHandle(any())).thenReturn(Boolean.TRUE);
+        doThrow(exception).when(notificationsEventsFilter).handle(any());
         topicConsumer.processMessage(callback);
 
-        verify(filterNotificationsEventsHandler, atLeastOnce()).handle(any());
+        verify(notificationsEventsFilter, atLeastOnce()).handle(any());
     }
 
     @Test
     public void clientAuthorisationExceptionWillBeCaught() {
         exception = new ClientAuthorisationException(EXCEPTION);
-        when(filterNotificationsEventsHandler.canHandle(any())).thenReturn(Boolean.TRUE);
-        doThrow(exception).when(filterNotificationsEventsHandler).handle(any());
+        when(notificationsEventsFilter.canHandle(any())).thenReturn(Boolean.TRUE);
+        doThrow(exception).when(notificationsEventsFilter).handle(any());
         topicConsumer.processMessage(callback);
-        verify(filterNotificationsEventsHandler, atLeastOnce()).handle(any());
+        verify(notificationsEventsFilter, atLeastOnce()).handle(any());
     }
 
     @Test
     public void handleValidRequest() {
-        when(filterNotificationsEventsHandler.canHandle(any())).thenReturn(Boolean.TRUE);
+        when(notificationsEventsFilter.canHandle(any())).thenReturn(Boolean.TRUE);
         topicConsumer.processMessage(callback);
-        verify(filterNotificationsEventsHandler).handle(any());
+        verify(notificationsEventsFilter).handle(any());
     }
 }

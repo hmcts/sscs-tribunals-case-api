@@ -47,7 +47,7 @@ import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationConfig;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationTestRecipients;
-import uk.gov.hmcts.reform.sscs.tyanotifications.controller.NotificationController;
+import uk.gov.hmcts.reform.sscs.callback.controllers.NotificationController;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationFactory;
 import uk.gov.hmcts.reform.sscs.tyanotifications.helper.IntegrationTestHelper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.MarkdownTransformationService;

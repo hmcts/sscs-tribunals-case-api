@@ -13,20 +13,21 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.reform.sscs.callback.controllers.EvidenceNotifyCallbackController;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.service.servicebus.SendCallbackHandler;
+import uk.gov.hmcts.reform.sscs.service.servicebus.EvidenceNotifyCallbackProcessor;
 
 
-public class CcdCallbackOrchestratorControllerTest {
+public class EvidenceNotifyCallbackControllerTest {
 
-    private CcdCallbackOrchestratorController controller;
+    private EvidenceNotifyCallbackController controller;
 
     @Mock
-    private SendCallbackHandler callbackHandler;
+    private EvidenceNotifyCallbackProcessor callbackHandler;
 
     @Mock
     private SscsCaseCallbackDeserializer deserializer;
@@ -34,7 +35,7 @@ public class CcdCallbackOrchestratorControllerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        controller = new CcdCallbackOrchestratorController(callbackHandler, deserializer);
+        controller = new EvidenceNotifyCallbackController(callbackHandler, deserializer);
     }
 
     @Test

@@ -8,7 +8,6 @@ import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
@@ -20,7 +19,7 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.service.FurtherEvidenceService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @Service
-public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData> {
+public class ReissueFurtherEvidenceHandler implements EvidenceCallbackHandler<SscsCaseData> {
 
     private final FurtherEvidenceService furtherEvidenceService;
     private final IdamService idamService;

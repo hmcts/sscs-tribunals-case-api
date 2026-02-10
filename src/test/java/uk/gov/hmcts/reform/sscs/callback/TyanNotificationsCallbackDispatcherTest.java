@@ -29,6 +29,7 @@ import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.EvidenceCallbackHandler;
 import uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.IssueFurtherEvidenceHandler;
 import uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.RoboticsCallbackHandler;
 import uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.SendToBulkPrintHandler;
@@ -59,9 +60,9 @@ public class TyanNotificationsCallbackDispatcherTest {
     public void givenHandlers_shouldBeHandledInDispatchPriority(DispatchPriority p1, DispatchPriority p2,
                                                                 DispatchPriority p3) {
         mockHandlers(p1, p2, p3);
-        List<CallbackHandler<SscsCaseData>> handlers = Arrays.asList(
+        List<EvidenceCallbackHandler<SscsCaseData>> handlers = Arrays.asList(
             roboticsHandler, sendToBulkPrintHandler, issueAppellantAppointeeFurtherEvidenceHandler);
-        CallbackDispatcher<SscsCaseData> callbackDispatcher = new CallbackDispatcher<>(handlers);
+        EvidenceCallbackDispatcher<SscsCaseData> callbackDispatcher = new EvidenceCallbackDispatcher<>(handlers);
         callbackDispatcher.handle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().build(), INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
         verifyMethodsAreCalledCorrectNumberOfTimes();
         verifyHandlersAreExecutedInPriorityOrder(handlers);
@@ -74,7 +75,7 @@ public class TyanNotificationsCallbackDispatcherTest {
         then(issueAppellantAppointeeFurtherEvidenceHandler).should(times(DispatchPriority.values().length)).getPriority();
     }
 
-    private void verifyHandlersAreExecutedInPriorityOrder(List<CallbackHandler<SscsCaseData>> handlers) {
+    private void verifyHandlersAreExecutedInPriorityOrder(List<EvidenceCallbackHandler<SscsCaseData>> handlers) {
         InOrder orderVerifier = inOrder(roboticsHandler, sendToBulkPrintHandler, issueAppellantAppointeeFurtherEvidenceHandler);
         verifyPriorityOrder(handlers, orderVerifier, EARLIEST);
         verifyPriorityOrder(handlers, orderVerifier, EARLY);
@@ -82,15 +83,15 @@ public class TyanNotificationsCallbackDispatcherTest {
         verifyPriorityOrder(handlers, orderVerifier, LATEST);
     }
 
-    private void verifyPriorityOrder(List<CallbackHandler<SscsCaseData>> handlers, InOrder orderVerifier,
+    private void verifyPriorityOrder(List<EvidenceCallbackHandler<SscsCaseData>> handlers, InOrder orderVerifier,
                                      DispatchPriority priority) {
-        List<CallbackHandler<SscsCaseData>> handlersForGivenPriority = getHandlerForGivenPriority(handlers, priority);
+        List<EvidenceCallbackHandler<SscsCaseData>> handlersForGivenPriority = getHandlerForGivenPriority(handlers, priority);
         if (handlersForGivenPriority != null) {
             handlersForGivenPriority.forEach(handler -> verifyCalls(orderVerifier, handler));
         }
     }
 
-    private void verifyCalls(InOrder orderVerifier, CallbackHandler<SscsCaseData> handler) {
+    private void verifyCalls(InOrder orderVerifier, EvidenceCallbackHandler<SscsCaseData> handler) {
         orderVerifier.verify(handler, times(1)).canHandle(any(), any());
         orderVerifier.verify(handler, times(1)).handle(any(), any());
         orderVerifier.verify(handler, times(0)).canHandle(any(), any());
@@ -108,8 +109,8 @@ public class TyanNotificationsCallbackDispatcherTest {
         given(issueAppellantAppointeeFurtherEvidenceHandler.canHandle(any(), any())).willReturn(true);
     }
 
-    private List<CallbackHandler<SscsCaseData>> getHandlerForGivenPriority(List<CallbackHandler<SscsCaseData>> handlers,
-                                                                           DispatchPriority priority) {
+    private List<EvidenceCallbackHandler<SscsCaseData>> getHandlerForGivenPriority(List<EvidenceCallbackHandler<SscsCaseData>> handlers,
+                                                                                   DispatchPriority priority) {
         return handlers.stream()
             .filter(handler -> handler.getPriority().equals(priority))
             .collect(Collectors.toList());

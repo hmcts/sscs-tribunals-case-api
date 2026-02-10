@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.controller;
+package uk.gov.hmcts.reform.sscs.callback.controllers;
 
 import static org.apache.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.ResponseEntity.ok;
@@ -20,21 +20,21 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackDispatcher;
+import uk.gov.hmcts.reform.sscs.callback.PreSubmitCallbackDispatcher;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 
 @RestController
 @Slf4j
-public class CcdCallbackController {
+public class PreSubmitCallbackController {
 
     private final AuthorisationService authorisationService;
     private final PreSubmitCallbackDispatcher<SscsCaseData> dispatcher;
     private final SscsCaseCallbackDeserializer deserializer;
 
     @Autowired
-    public CcdCallbackController(AuthorisationService authorisationService,
-                                 SscsCaseCallbackDeserializer deserializer,
-                                 PreSubmitCallbackDispatcher<SscsCaseData> dispatcher) {
+    public PreSubmitCallbackController(AuthorisationService authorisationService,
+                                       SscsCaseCallbackDeserializer deserializer,
+                                       PreSubmitCallbackDispatcher<SscsCaseData> dispatcher) {
         this.authorisationService = authorisationService;
         this.deserializer = deserializer;
         this.dispatcher = dispatcher;

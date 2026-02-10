@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.tyanotifications.callback.handlers;
+package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
@@ -14,17 +14,14 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.tyanotifications.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationExecutionManager;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationProcessingService;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class FilterNotificationsEventsHandler implements CallbackHandler {
+public class NotificationsEventsFilter {
     private final NotificationProcessingService notificationProcessingService;
     private static final int RETRY = 1;
     private final NotificationExecutionManager notificationExecutionManager;
@@ -35,7 +32,6 @@ public class FilterNotificationsEventsHandler implements CallbackHandler {
     @Value("${feature.postHearingsB.enabled}")
     private boolean isPostHearingsBEnabled;
 
-    @Override
     public boolean canHandle(NotificationSscsCaseDataWrapper callback) {
         return nonNull(callback.getNotificationEventType())
             && EVENTS_TO_HANDLE.contains(callback.getNotificationEventType())
@@ -46,7 +42,6 @@ public class FilterNotificationsEventsHandler implements CallbackHandler {
             || shouldHandleForHearingRoute(callback);
     }
 
-    @Override
     public void handle(NotificationSscsCaseDataWrapper callback) {
         if (!canHandle(callback)) {
             IllegalStateException illegalStateException = new IllegalStateException("Cannot handle callback");
@@ -102,7 +97,6 @@ public class FilterNotificationsEventsHandler implements CallbackHandler {
             && GAPS != callback.getNewSscsCaseData().getSchedulingAndListingFields().getHearingRoute();
     }
 
-    @Override
     public DispatchPriority getPriority() {
         return DispatchPriority.LATEST;
     }

@@ -35,7 +35,7 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobExecutor;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
-import uk.gov.hmcts.reform.sscs.tyanotifications.controller.NotificationController;
+import uk.gov.hmcts.reform.sscs.callback.controllers.NotificationController;
 import uk.gov.hmcts.reform.sscs.tyanotifications.helper.IntegrationTestHelper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationProcessingService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.OutOfHoursCalculator;

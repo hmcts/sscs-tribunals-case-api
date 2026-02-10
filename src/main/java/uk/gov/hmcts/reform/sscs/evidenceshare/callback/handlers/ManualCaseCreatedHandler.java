@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
@@ -26,7 +25,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ManualCaseCreatedHandler implements CallbackHandler<SscsCaseData> {
+public class ManualCaseCreatedHandler implements EvidenceCallbackHandler<SscsCaseData> {
 
     private final CcdService ccdService;
     private final IdamService idamService;
