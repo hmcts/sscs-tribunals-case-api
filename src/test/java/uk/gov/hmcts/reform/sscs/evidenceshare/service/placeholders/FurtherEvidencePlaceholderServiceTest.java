@@ -7,9 +7,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.JOINT_PARTY_LETTER;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.REPRESENTATIVE_LETTER;
+import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
+import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.domain.FurtherEvidenceLetterType.JOINT_PARTY_LETTER;
+import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.domain.FurtherEvidenceLetterType.REPRESENTATIVE_LETTER;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -41,7 +41,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.domain.FurtherEvidenceLetterType;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.FurtherEvidencePlaceholderService;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.PlaceholderHelper;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.PlaceholderService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 
 @RunWith(JUnitParamsRunner.class)

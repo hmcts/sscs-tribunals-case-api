@@ -6,7 +6,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.evidenceshare.HandlerUtils.distinctByKey;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,10 +28,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
-import uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType;
-import uk.gov.hmcts.reform.sscs.evidenceshare.exception.IssueFurtherEvidenceException;
-import uk.gov.hmcts.reform.sscs.evidenceshare.exception.PostIssueFurtherEvidenceTasksException;
-import uk.gov.hmcts.reform.sscs.evidenceshare.service.FurtherEvidenceService;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.domain.FurtherEvidenceLetterType;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.IssueFurtherEvidenceException;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.PostIssueFurtherEvidenceTasksException;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.FurtherEvidenceService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 

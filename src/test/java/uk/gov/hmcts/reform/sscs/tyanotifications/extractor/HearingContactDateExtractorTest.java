@@ -6,9 +6,9 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADJOURNED;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_RECEIVED;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DWP_RESPONSE_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.ADJOURNED;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.DWP_RESPONSE_RECEIVED;
 
 import java.time.ZonedDateTime;
 import java.util.Optional;
@@ -19,9 +19,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.extractor.DwpResponseReceivedDateExtractor;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.extractor.HearingContactDateExtractor;
 import uk.gov.hmcts.reform.sscs.tyanotifications.SscsCaseDataUtils;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
-import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.factory.CcdNotificationWrapper;
 
 @RunWith(JUnitParamsRunner.class)
 public class HearingContactDateExtractorTest {

@@ -23,10 +23,11 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.docmosis.service.DocumentManagementService;
-import uk.gov.hmcts.reform.sscs.evidenceshare.exception.PdfStoreException;
-import uk.gov.hmcts.reform.sscs.evidenceshare.exception.UnableToContactThirdPartyException;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.PdfStoreException;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.UnableToContactThirdPartyException;
 import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.DocumentManagementServiceWrapper;
 
 
 public class DocumentManagementServiceWrapperTest {

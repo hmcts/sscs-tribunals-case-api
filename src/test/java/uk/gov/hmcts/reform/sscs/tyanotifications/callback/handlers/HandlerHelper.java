@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.callback.handlers;
 
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.NotificationSscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType;
 
 public class HandlerHelper {
 

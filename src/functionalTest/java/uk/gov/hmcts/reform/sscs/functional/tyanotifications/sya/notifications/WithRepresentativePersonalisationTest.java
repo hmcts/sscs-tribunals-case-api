@@ -1,14 +1,12 @@
 package uk.gov.hmcts.reform.sscs.functional.tyanotifications.sya.notifications;
 
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
-
 import java.lang.reflect.Field;
 import java.util.List;
 import junitparams.Parameters;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.functional.tyanotifications.AbstractFunctionalTest;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType;
 import uk.gov.service.notify.Notification;
 
 public class WithRepresentativePersonalisationTest extends AbstractFunctionalTest {

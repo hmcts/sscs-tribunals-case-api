@@ -18,8 +18,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.service.exceptions.ClientAuthorisationException;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationsEventsFilter;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationEventsManager;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.NotificationsEventsFilter;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.NotificationEventsManager;
 
 public class NotificationEventsManagerTest {
 

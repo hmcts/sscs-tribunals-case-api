@@ -11,8 +11,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.EVIDENCE_REMINDER;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SYA_APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.EVIDENCE_REMINDER;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.SYA_APPEAL_CREATED;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,10 +37,11 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
-import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationExecutionManager;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationProcessingService;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.NotificationSscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.exception.NotificationServiceException;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.NotificationExecutionManager;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.NotificationProcessingService;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.scheduler.CcdActionExecutor;
 import uk.gov.service.notify.NotificationClientException;
 
 @RunWith(JUnitParamsRunner.class)

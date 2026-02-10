@@ -13,6 +13,7 @@ import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 
 @SpringBootTest

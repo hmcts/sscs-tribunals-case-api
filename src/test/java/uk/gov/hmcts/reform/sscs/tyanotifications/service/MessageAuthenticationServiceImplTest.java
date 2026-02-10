@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.MessageAuthenticationServiceImpl;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MessageAuthenticationServiceImplTest {

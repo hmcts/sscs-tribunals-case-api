@@ -17,6 +17,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.featureflag.FeatureFlag;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.FeatureToggleService;
 
 @ExtendWith(MockitoExtension.class)
 class FeatureToggleServiceTest {

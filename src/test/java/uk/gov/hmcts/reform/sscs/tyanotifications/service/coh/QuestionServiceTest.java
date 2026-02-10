@@ -13,6 +13,11 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.coh.CohClient;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.coh.QuestionReferences;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.coh.QuestionRound;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.coh.QuestionRounds;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.coh.QuestionService;
 
 public class QuestionServiceTest {
 

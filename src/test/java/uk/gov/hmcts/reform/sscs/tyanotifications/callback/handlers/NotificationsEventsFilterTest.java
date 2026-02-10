@@ -13,11 +13,11 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ACTION_POSTPONEMENT_REQUEST;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DEATH_OF_APPELLANT;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.HEARING_BOOKED;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PROVIDE_APPOINTEE_DETAILS;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.VALID_APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.ACTION_POSTPONEMENT_REQUEST;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.DEATH_OF_APPELLANT;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.HEARING_BOOKED;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.PROVIDE_APPOINTEE_DETAILS;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.VALID_APPEAL_CREATED;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -34,13 +34,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
-import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
-import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationExecutionManager;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationProcessingService;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationsEventsFilter;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.NotificationSscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.exception.NotificationServiceException;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.factory.CcdNotificationWrapper;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.NotificationExecutionManager;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.NotificationProcessingService;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.NotificationsEventsFilter;
 
 @RunWith(JUnitParamsRunner.class)
 public class NotificationsEventsFilterTest {

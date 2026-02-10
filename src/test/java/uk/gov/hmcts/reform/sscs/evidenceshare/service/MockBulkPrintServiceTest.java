@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
+import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -18,6 +18,8 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.BulkPrintServiceHelper;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.MockBulkPrintService;
 import uk.gov.hmcts.reform.sscs.service.CcdNotificationsPdfService;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 

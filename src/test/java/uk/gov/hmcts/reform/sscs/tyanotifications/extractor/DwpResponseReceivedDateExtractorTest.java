@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DWP_RESPOND;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.APPEAL_RECEIVED;
 
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalTime;
@@ -16,9 +16,10 @@ import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.extractor.DwpResponseReceivedDateExtractor;
 import uk.gov.hmcts.reform.sscs.tyanotifications.SscsCaseDataUtils;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
-import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.factory.CcdNotificationWrapper;
 
 @RunWith(JUnitParamsRunner.class)
 public class DwpResponseReceivedDateExtractorTest {

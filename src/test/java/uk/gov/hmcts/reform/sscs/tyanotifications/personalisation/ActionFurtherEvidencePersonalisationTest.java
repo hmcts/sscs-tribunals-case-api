@@ -6,10 +6,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.PIP;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.DOCUMENT_TYPE_NAME;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.FURTHER_EVIDENCE_ACTION;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.SENDER_NAME;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.APPELLANT;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.PersonalisationMappingConstants.DOCUMENT_TYPE_NAME;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.PersonalisationMappingConstants.FURTHER_EVIDENCE_ACTION;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.PersonalisationMappingConstants.SENDER_NAME;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.SubscriptionType.APPELLANT;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -35,15 +35,17 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
-import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationConfig;
-import uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration;
-import uk.gov.hmcts.reform.sscs.tyanotifications.config.properties.EvidenceProperties;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Link;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
-import uk.gov.hmcts.reform.sscs.tyanotifications.extractor.HearingContactDateExtractor;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.MessageAuthenticationServiceImpl;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.NotificationConfig;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.PersonalisationConfiguration;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.properties.EvidenceProperties;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.NotificationSscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.SubscriptionWithType;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.Link;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.extractor.HearingContactDateExtractor;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.personalisation.ActionFurtherEvidencePersonalisation;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.personalisation.NotificationDateConverterUtil;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.MessageAuthenticationServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
 class ActionFurtherEvidencePersonalisationTest {

@@ -1,20 +1,20 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType.ORAL;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType.PAPER;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists.EVENT_TYPES_FOR_BUNDLED_LETTER;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ACTION_POSTPONEMENT_REQUEST;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ACTION_POSTPONEMENT_REQUEST_WELSH;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADMIN_CORRECTION_HEADER;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.CORRECTION_GRANTED;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.CORRECTION_REFUSED;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DECISION_ISSUED;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DECISION_ISSUED_WELSH;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_ADJOURNMENT_NOTICE;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_ADJOURNMENT_NOTICE_WELSH;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION_WELSH;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.AppealHearingType.ORAL;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.AppealHearingType.PAPER;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.NotificationEventTypeLists.EVENT_TYPES_FOR_BUNDLED_LETTER;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.ACTION_POSTPONEMENT_REQUEST;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.ACTION_POSTPONEMENT_REQUEST_WELSH;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.ADMIN_CORRECTION_HEADER;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.CORRECTION_GRANTED;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.CORRECTION_REFUSED;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.DECISION_ISSUED;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.DECISION_ISSUED_WELSH;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.ISSUE_ADJOURNMENT_NOTICE;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.ISSUE_ADJOURNMENT_NOTICE_WELSH;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION_WELSH;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -25,8 +25,10 @@ import junitparams.Parameters;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Template;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.AppealHearingType;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.SubscriptionType;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.Template;
 
 public class BundledNotificationsConfigTestIt extends AbstractNotificationConfigTest {
     private static final Set<NotificationEventType> BUNDLED_LETTER_EVENT_TYPES_IGNORED = EnumSet.of(

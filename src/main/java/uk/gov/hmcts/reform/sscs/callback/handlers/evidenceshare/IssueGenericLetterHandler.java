@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.sscs.callback.handlers.evidenceshare;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.ADDRESS_NAME;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_NAME;
+import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.PlaceholderConstants.ADDRESS_NAME;
+import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.PlaceholderConstants.LETTER_NAME;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,12 +20,12 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
-import uk.gov.hmcts.reform.sscs.evidenceshare.config.DocmosisTemplateConfig;
-import uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType;
-import uk.gov.hmcts.reform.sscs.evidenceshare.service.BulkPrintService;
-import uk.gov.hmcts.reform.sscs.evidenceshare.service.CoverLetterService;
-import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.GenericLetterPlaceholderService;
-import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.config.DocmosisTemplateConfig;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.domain.FurtherEvidenceLetterType;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.BulkPrintService;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.CoverLetterService;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.GenericLetterPlaceholderService;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.PlaceholderUtility;
 
 @Slf4j
 @Service

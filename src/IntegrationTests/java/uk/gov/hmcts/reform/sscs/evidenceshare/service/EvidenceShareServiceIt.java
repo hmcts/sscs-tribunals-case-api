@@ -70,6 +70,9 @@ import uk.gov.hmcts.reform.sscs.callback.handlers.evidenceshare.RoboticsCallback
 import uk.gov.hmcts.reform.sscs.callback.handlers.evidenceshare.SendToBulkPrintHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.BulkPrintService;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.EmailService;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.RoboticsService;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;

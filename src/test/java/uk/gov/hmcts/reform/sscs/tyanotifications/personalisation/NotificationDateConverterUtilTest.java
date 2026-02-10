@@ -5,6 +5,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.time.LocalDate;
 import org.junit.Test;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.personalisation.NotificationDateConverterUtil;
 
 public class NotificationDateConverterUtilTest {
     @Test

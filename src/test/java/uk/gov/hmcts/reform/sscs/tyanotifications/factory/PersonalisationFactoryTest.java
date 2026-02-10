@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.factory;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.MockitoAnnotations.openMocks;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DO_NOT_SEND;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SUBSCRIPTION_UPDATED;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.DO_NOT_SEND;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.SUBSCRIPTION_UPDATED;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -13,11 +13,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
-import uk.gov.hmcts.reform.sscs.tyanotifications.personalisation.Personalisation;
-import uk.gov.hmcts.reform.sscs.tyanotifications.personalisation.SubscriptionPersonalisation;
-import uk.gov.hmcts.reform.sscs.tyanotifications.personalisation.SyaAppealCreatedAndReceivedPersonalisation;
-import uk.gov.hmcts.reform.sscs.tyanotifications.personalisation.WithRepresentativePersonalisation;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.factory.PersonalisationFactory;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.personalisation.Personalisation;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.personalisation.SubscriptionPersonalisation;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.personalisation.SyaAppealCreatedAndReceivedPersonalisation;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.personalisation.WithRepresentativePersonalisation;
 
 @RunWith(JUnitParamsRunner.class)
 public class PersonalisationFactoryTest {

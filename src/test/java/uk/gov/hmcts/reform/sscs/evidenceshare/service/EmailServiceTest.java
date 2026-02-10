@@ -22,6 +22,8 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import uk.gov.hmcts.reform.sscs.domain.email.Email;
 import uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment;
 import uk.gov.hmcts.reform.sscs.exception.EmailSendFailedException;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.EmailSenderProvider;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.EmailService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class EmailServiceTest {

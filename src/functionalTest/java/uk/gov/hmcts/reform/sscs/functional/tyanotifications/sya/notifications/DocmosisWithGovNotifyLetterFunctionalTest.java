@@ -1,8 +1,7 @@
 package uk.gov.hmcts.reform.sscs.functional.tyanotifications.sya.notifications;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists.DOCMOSIS_LETTERS;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.NotificationEventTypeLists.DOCMOSIS_LETTERS;
 
 import java.io.IOException;
 import java.util.EnumSet;
@@ -15,7 +14,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.functional.tyanotifications.AbstractFunctionalTest;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType;
 import uk.gov.service.notify.Notification;
 import uk.gov.service.notify.NotificationClientException;
 
