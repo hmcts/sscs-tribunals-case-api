@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -21,21 +22,31 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.service.ListingStateProcessingServ
 public class UpdateOtherPartyHandler implements CallbackHandler<SscsCaseData> {
 
     private final ListingStateProcessingService listingStateProcessingService;
+    private final boolean cmOtherPartyConfidentialityEnabled;
 
     @Autowired
-    public UpdateOtherPartyHandler(ListingStateProcessingService listingStateProcessingService) {
+    public UpdateOtherPartyHandler(ListingStateProcessingService listingStateProcessingService,
+        @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
         this.listingStateProcessingService = listingStateProcessingService;
+        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
+
+        // TODO When this feature flag is enabled we can delete this handler because its only purpose is to update state for UPDATE_OTHER_PARTY_DATA
+        if (cmOtherPartyConfidentialityEnabled) {
+            return false;
+        }
+
         requireNonNull(callback, "callback must not be null");
 
         return callbackType.equals(CallbackType.SUBMITTED)
             && callback.getEvent() == EventType.UPDATE_OTHER_PARTY_DATA
             && callback.getCaseDetails().getCaseData().getAppeal() != null
             && callback.getCaseDetails().getCaseData().getAppeal().getBenefitType() != null
-            && StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().getCode(), Benefit.CHILD_SUPPORT.getShortName());
+            && StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().getCode(),
+            Benefit.CHILD_SUPPORT.getShortName());
     }
 
     @Override
