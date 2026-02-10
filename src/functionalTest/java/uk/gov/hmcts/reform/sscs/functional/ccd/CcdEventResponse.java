@@ -4,7 +4,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
-public class CcdEventResponse {
+class CcdEventResponse {
     private SscsCaseData data;
     private Set<String> errors = new LinkedHashSet<>();
     private Set<String> warnings = new LinkedHashSet<>();
