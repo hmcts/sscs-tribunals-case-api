@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_TEST_CASE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SEND_TO_DWP_OFFLINE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
@@ -37,6 +38,7 @@ public class DwpUploadResponseHandlerTest extends AbstractFunctionalTest {
             SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
             assertEquals(State.WITH_DWP.toString(), caseDetails.getState());
             assertNotNull(caseDetails.getData());
+            assertNull(caseDetails.getData().getDwpState());
         });
     }
 }
