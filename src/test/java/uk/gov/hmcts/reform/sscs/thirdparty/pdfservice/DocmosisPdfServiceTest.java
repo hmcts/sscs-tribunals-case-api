@@ -9,7 +9,7 @@ import static org.mockito.Mockito.when;
 import java.util.HashMap;
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.service.DocmosisPdfGenerationService;
 import uk.gov.hmcts.reform.sscs.service.coversheet.PdfCoverSheet;
 
 public class DocmosisPdfServiceTest {

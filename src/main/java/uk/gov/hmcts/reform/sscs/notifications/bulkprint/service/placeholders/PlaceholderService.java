@@ -59,7 +59,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.docmosis.config.PdfDocumentConfig;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.config.PdfDocumentConfig;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.config.ExelaAddressConfig;
 import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
 

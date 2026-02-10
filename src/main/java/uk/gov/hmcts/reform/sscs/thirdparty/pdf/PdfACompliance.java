@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.pdf;
+package uk.gov.hmcts.reform.sscs.thirdparty.pdf;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

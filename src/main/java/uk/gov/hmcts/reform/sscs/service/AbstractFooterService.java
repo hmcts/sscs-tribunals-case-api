@@ -19,8 +19,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.pdf.PdfState;
-import uk.gov.hmcts.reform.sscs.pdf.PdfACompliance;
-import uk.gov.hmcts.reform.sscs.pdf.PdfWatermarker;
+import uk.gov.hmcts.reform.sscs.thirdparty.pdf.PdfACompliance;
+import uk.gov.hmcts.reform.sscs.thirdparty.pdf.PdfWatermarker;
 
 @Component
 @Slf4j

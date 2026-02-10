@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.docmosis.config;
+package uk.gov.hmcts.reform.sscs.thirdparty.docmosis.config;
 
 import lombok.Getter;
 import lombok.Setter;

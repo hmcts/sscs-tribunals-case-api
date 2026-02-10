@@ -26,7 +26,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CorrespondenceDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorrespondenceType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReasonableAdjustmentStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.NotificationTestRecipients;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.SubscriptionType;

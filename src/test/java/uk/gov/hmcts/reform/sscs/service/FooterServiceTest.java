@@ -42,7 +42,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.pdf.PdfState;
-import uk.gov.hmcts.reform.sscs.pdf.PdfWatermarker;
+import uk.gov.hmcts.reform.sscs.thirdparty.pdf.PdfWatermarker;
 
 @RunWith(JUnitParamsRunner.class)
 public class FooterServiceTest {

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.client;
+package uk.gov.hmcts.reform.sscs.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

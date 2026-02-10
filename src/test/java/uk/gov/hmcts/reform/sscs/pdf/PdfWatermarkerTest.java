@@ -16,6 +16,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.Test;
+import uk.gov.hmcts.reform.sscs.thirdparty.pdf.PdfWatermarker;
 
 public class PdfWatermarkerTest {
 

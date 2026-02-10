@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.docmosis.service;
+package uk.gov.hmcts.reform.sscs.thirdparty.docmosis.service;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -8,8 +8,8 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
-import uk.gov.hmcts.reform.sscs.docmosis.domain.PdfDocumentRequest;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.DocumentHolder;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.PdfDocumentRequest;
 import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 
 @Slf4j
