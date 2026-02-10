@@ -11,7 +11,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated.CaseUpdatedSubmittedHandler.isANewJointParty;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.caseupdated.CaseUpdatedSubmittedHandler.isANewJointParty;
 
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +21,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.caseupdated.CaseUpdatedSubmittedHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;

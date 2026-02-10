@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Test;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityAnswer;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.ActivityAnswer;
 
 public class PipDecisionNoticeQuestionServiceTest extends DecisionNoticeQuestionServiceTestBase<PipDecisionNoticeQuestionService> {
 

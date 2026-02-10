@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.PointsCondition;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.PointsCondition;
 
 @Slf4j
 public abstract class DecisionNoticeOutcomeService {

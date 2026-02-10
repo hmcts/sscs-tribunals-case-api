@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip;
 
 import org.junit.Assert;
 import org.junit.Test;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.pip.ComparedToDwpPredicate;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.pip.DailyLivingComparedToDwpCondition;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsPipCaseData;
 

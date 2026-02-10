@@ -5,7 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.LocalDate;
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcTemplateContent;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.uc.UcTemplateContent;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.uc.scenarios.UcScenario;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
 public class UcScenario3Test {

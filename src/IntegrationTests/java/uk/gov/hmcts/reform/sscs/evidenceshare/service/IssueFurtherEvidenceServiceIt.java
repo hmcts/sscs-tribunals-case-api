@@ -72,7 +72,7 @@ import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.PdfDocumentRequest;
-import uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.IssueFurtherEvidenceHandler;
+import uk.gov.hmcts.reform.sscs.callback.handlers.evidenceshare.IssueFurtherEvidenceHandler;
 import uk.gov.hmcts.reform.sscs.evidenceshare.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;

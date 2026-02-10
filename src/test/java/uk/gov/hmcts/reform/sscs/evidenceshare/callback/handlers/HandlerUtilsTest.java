@@ -6,7 +6,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DWP_UPLOAD_RESPONSE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.WITH_DWP;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.HandlerUtils.isANewJointParty;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.evidenceshare.HandlerUtils.isANewJointParty;
 
 import junitparams.JUnitParamsRunner;
 import org.junit.Test;

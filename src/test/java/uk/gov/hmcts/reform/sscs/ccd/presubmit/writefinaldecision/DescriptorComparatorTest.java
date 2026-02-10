@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.DescriptorLexicographicalComparator;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 
 public class DescriptorComparatorTest {

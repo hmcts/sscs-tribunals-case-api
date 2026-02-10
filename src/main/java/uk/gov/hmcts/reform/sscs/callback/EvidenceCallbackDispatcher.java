@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseData;
-import uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.EvidenceCallbackHandler;
+import uk.gov.hmcts.reform.sscs.callback.handlers.EvidenceCallbackHandler;
 
 @Component
 @Slf4j

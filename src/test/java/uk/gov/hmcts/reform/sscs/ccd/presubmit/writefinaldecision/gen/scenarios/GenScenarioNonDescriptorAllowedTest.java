@@ -3,7 +3,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen.scenarios;
 import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen.GenTemplateContent;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.gen.GenTemplateContent;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.gen.scenarios.GenScenario;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
 public class GenScenarioNonDescriptorAllowedTest {

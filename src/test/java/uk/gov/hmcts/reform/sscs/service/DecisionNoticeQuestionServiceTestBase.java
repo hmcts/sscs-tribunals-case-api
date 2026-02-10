@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityAnswer;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.ActivityAnswer;
 
 public abstract class DecisionNoticeQuestionServiceTestBase<S extends DecisionNoticeQuestionService> {
 

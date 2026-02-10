@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.SelectWhoReviewsCase;
 
 @SpringBootTest
 @AutoConfigureMockMvc
