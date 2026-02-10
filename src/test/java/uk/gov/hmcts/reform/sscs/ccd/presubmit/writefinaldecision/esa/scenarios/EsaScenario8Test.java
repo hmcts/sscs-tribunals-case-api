@@ -4,7 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaTemplateContent;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.esa.EsaTemplateContent;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 

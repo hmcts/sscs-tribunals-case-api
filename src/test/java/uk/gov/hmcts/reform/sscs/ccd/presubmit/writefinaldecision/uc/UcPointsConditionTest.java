@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc;
 
 import org.junit.Assert;
 import org.junit.Test;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.uc.UcPointsCondition;
 
 public class UcPointsConditionTest {
 

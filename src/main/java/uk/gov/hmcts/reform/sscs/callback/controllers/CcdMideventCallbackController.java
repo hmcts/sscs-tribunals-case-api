@@ -25,11 +25,11 @@ import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCaseCcdService;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCaseMidEventValidationService;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionBenefitTypeHelper;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.adjourncase.AdjournCaseCcdService;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.adjourncase.AdjournCaseMidEventValidationService;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.adjourncase.AdjournCasePreviewService;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.WriteFinalDecisionBenefitTypeHelper;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.admin.RestoreCasesService2;

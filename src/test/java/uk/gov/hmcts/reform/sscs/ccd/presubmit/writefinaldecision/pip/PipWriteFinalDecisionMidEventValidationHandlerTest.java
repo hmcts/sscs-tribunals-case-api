@@ -13,11 +13,12 @@ import junitparams.Parameters;
 import junitparams.converters.Nullable;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.pip.PipWriteFinalDecisionMidEventValidationHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionMidEventValidationHandlerBase;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.AwardType;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.WriteFinalDecisionMidEventValidationHandlerBase;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionMidEventValidationHandlerTestBase;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 

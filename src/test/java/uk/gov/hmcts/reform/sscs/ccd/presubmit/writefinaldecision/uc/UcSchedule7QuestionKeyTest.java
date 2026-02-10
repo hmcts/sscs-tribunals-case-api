@@ -12,6 +12,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.uc.UcActivityType;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.uc.UcSchedule7QuestionKey;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @RunWith(JUnitParamsRunner.class)

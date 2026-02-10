@@ -5,9 +5,9 @@ import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityQuestionLookup;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipActivityQuestion;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipPointsCondition;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.ActivityQuestionLookup;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.pip.PipActivityQuestion;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.pip.PipPointsCondition;
 
 @Slf4j
 @Service

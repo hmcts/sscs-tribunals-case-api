@@ -8,7 +8,8 @@ import junitparams.Parameters;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipTemplateContent;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.pip.PipTemplateContent;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.pip.scenarios.PipScenario;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 

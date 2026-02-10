@@ -8,8 +8,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.createcase.CreateCaseMidEventHandler.IBCA_REFERENCE_EMPTY_ERROR;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.createcase.CreateCaseMidEventHandler.IBCA_REFERENCE_VALIDATION_ERROR;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.createcase.CreateCaseMidEventHandler.IBCA_REFERENCE_EMPTY_ERROR;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.createcase.CreateCaseMidEventHandler.IBCA_REFERENCE_VALIDATION_ERROR;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 
 import java.util.ArrayList;
@@ -20,6 +20,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.createcase.CreateCaseMidEventHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;

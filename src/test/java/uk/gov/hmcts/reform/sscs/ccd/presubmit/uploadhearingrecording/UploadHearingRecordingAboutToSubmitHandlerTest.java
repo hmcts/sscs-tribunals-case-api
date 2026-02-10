@@ -11,8 +11,8 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadhearingrecording.HearingTypeForRecording.ADJOURNED;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadhearingrecording.HearingTypeForRecording.FINAL;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.uploadhearingrecording.HearingTypeForRecording.ADJOURNED;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.uploadhearingrecording.HearingTypeForRecording.FINAL;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,6 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.uploadhearingrecording.UploadHearingRecordingAboutToSubmitHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;

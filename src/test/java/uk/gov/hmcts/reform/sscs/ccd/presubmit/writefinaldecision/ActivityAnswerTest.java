@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.ActivityAnswer;
 
 public class ActivityAnswerTest {
 
