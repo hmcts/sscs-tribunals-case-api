@@ -84,6 +84,7 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notification;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Template;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis.PdfLetterService;
 import uk.gov.service.notify.NotificationClientException;
 
@@ -460,15 +461,18 @@ public class SendNotificationServiceTest {
     @Test
     @Parameters({"APPEAL_RECEIVED", "DIRECTION_ISSUED", "DIRECTION_ISSUED_WELSH", "DECISION_ISSUED", "DECISION_ISSUED_WELSH", "ISSUE_FINAL_DECISION", "ISSUE_FINAL_DECISION_WELSH", "ISSUE_ADJOURNMENT_NOTICE", "DWP_UPLOAD_RESPONSE", "DWP_RESPONSE_RECEIVED"})
     public void sendLetterForNotificationType(NotificationEventType notificationEventType) {
-        SubscriptionWithType appellantEmptySubscription = new SubscriptionWithType(EMPTY_SUBSCRIPTION, APPELLANT,
+        SubscriptionWithType appellantEmptySub = new SubscriptionWithType(EMPTY_SUBSCRIPTION, APPELLANT,
             null, null);
         when(pdfLetterService.generateLetter(any(), any(), any())).thenReturn("PDF".getBytes());
-        classUnderTest.sendEmailSmsLetterNotification(buildBaseWrapper(APPELLANT_WITH_ADDRESS, notificationEventType, VALID_APPEAL.getId()), DOCMOSIS_LETTER, appellantEmptySubscription, NotificationEventType.APPEAL_RECEIVED);
+        var wrapper = buildBaseWrapper(APPELLANT_WITH_ADDRESS, notificationEventType, VALID_APPEAL.getId());
+
+        classUnderTest.sendEmailSmsLetterNotification(wrapper, DOCMOSIS_LETTER, appellantEmptySub, APPEAL_RECEIVED);
+
         verify(pdfLetterService).generateLetter(any(), any(), any());
         verify(pdfLetterService).buildCoversheet(any(), any());
         verifyNoMoreInteractions(pdfLetterService);
         verify(notificationHandler, atLeastOnce()).sendNotification(any(), any(), eq("Letter"), sender.capture());
-        verifyNotificationIsSent(sender.getValue(), notificationEventType, CASE_ID);
+        verifyNotificationIsSent(sender.getValue(), wrapper);
     }
 
     @Test
@@ -477,12 +481,12 @@ public class SendNotificationServiceTest {
         SubscriptionWithType appellantEmptySubscription = new SubscriptionWithType(EMPTY_SUBSCRIPTION, APPELLANT,
             null, null);
         when(pdfLetterService.generateLetter(any(), any(), any())).thenReturn("PDF".getBytes());
-        classUnderTest.sendEmailSmsLetterNotification(buildBaseWrapper(APPELLANT_WITH_ADDRESS, notificationEventType, REASONABLE_ADJUSTMENTS), DOCMOSIS_LETTER, appellantEmptySubscription, NotificationEventType.APPEAL_RECEIVED);
+        classUnderTest.sendEmailSmsLetterNotification(buildBaseWrapper(APPELLANT_WITH_ADDRESS, notificationEventType, REASONABLE_ADJUSTMENTS), DOCMOSIS_LETTER, appellantEmptySubscription, APPEAL_RECEIVED);
         verify(pdfLetterService).generateLetter(any(), any(), any());
         verify(pdfLetterService).buildCoversheet(any(), any());
         verifyNoMoreInteractions(pdfLetterService);
         verify(notificationHandler, atLeastOnce()).sendNotification(any(), any(), eq("Letter"), sender.capture());
-        verifyNotificationIsSaved(sender.getValue(), notificationEventType, CASE_ID, appellantEmptySubscription.getSubscriptionType());
+        verifyNotificationIsSaved(sender.getValue(), notificationEventType, appellantEmptySubscription.getSubscriptionType());
     }
 
     @Test
@@ -491,12 +495,12 @@ public class SendNotificationServiceTest {
         SubscriptionWithType repEmptySubscription = new SubscriptionWithType(EMPTY_SUBSCRIPTION, REPRESENTATIVE,
             null, null);
         when(pdfLetterService.generateLetter(any(), any(), any())).thenReturn("PDF".getBytes());
-        classUnderTest.sendEmailSmsLetterNotification(buildBaseWrapper(APPELLANT_WITH_ADDRESS, notificationEventType, REASONABLE_ADJUSTMENTS), DOCMOSIS_LETTER, repEmptySubscription, NotificationEventType.APPEAL_RECEIVED);
+        classUnderTest.sendEmailSmsLetterNotification(buildBaseWrapper(APPELLANT_WITH_ADDRESS, notificationEventType, REASONABLE_ADJUSTMENTS), DOCMOSIS_LETTER, repEmptySubscription, APPEAL_RECEIVED);
         verify(pdfLetterService).generateLetter(any(), any(), any());
         verify(pdfLetterService).buildCoversheet(any(), any());
         verifyNoMoreInteractions(pdfLetterService);
         verify(notificationHandler, atLeastOnce()).sendNotification(any(), any(), eq("Letter"), sender.capture());
-        verifyNotificationIsSaved(sender.getValue(), notificationEventType, CASE_ID, repEmptySubscription.getSubscriptionType());
+        verifyNotificationIsSaved(sender.getValue(), notificationEventType, repEmptySubscription.getSubscriptionType());
     }
 
     @Test
@@ -505,12 +509,12 @@ public class SendNotificationServiceTest {
         SubscriptionWithType appointeeEmptySubscription = new SubscriptionWithType(EMPTY_SUBSCRIPTION, APPOINTEE,
             null, null);
         when(pdfLetterService.generateLetter(any(), any(), any())).thenReturn("PDF".getBytes());
-        classUnderTest.sendEmailSmsLetterNotification(buildBaseWrapper(APPELLANT_WITH_ADDRESS_AND_APPOINTEE, notificationEventType, REASONABLE_ADJUSTMENTS), DOCMOSIS_LETTER, appointeeEmptySubscription, NotificationEventType.APPEAL_RECEIVED);
+        classUnderTest.sendEmailSmsLetterNotification(buildBaseWrapper(APPELLANT_WITH_ADDRESS_AND_APPOINTEE, notificationEventType, REASONABLE_ADJUSTMENTS), DOCMOSIS_LETTER, appointeeEmptySubscription, APPEAL_RECEIVED);
         verify(pdfLetterService).generateLetter(any(), any(), any());
         verify(pdfLetterService).buildCoversheet(any(), any());
         verifyNoMoreInteractions(pdfLetterService);
         verify(notificationHandler, atLeastOnce()).sendNotification(any(), any(), eq("Letter"), sender.capture());
-        verifyNotificationIsSaved(sender.getValue(), notificationEventType, CASE_ID, appointeeEmptySubscription.getSubscriptionType());
+        verifyNotificationIsSaved(sender.getValue(), notificationEventType, appointeeEmptySubscription.getSubscriptionType());
     }
 
     @Test
@@ -519,37 +523,37 @@ public class SendNotificationServiceTest {
         SubscriptionWithType jointPartyEmptySubscription = new SubscriptionWithType(EMPTY_SUBSCRIPTION, JOINT_PARTY,
             null, null);
         when(pdfLetterService.generateLetter(any(), any(), any())).thenReturn("PDF".getBytes());
-        classUnderTest.sendEmailSmsLetterNotification(buildBaseWrapper(APPELLANT_WITH_ADDRESS, notificationEventType, REASONABLE_ADJUSTMENTS), DOCMOSIS_LETTER, jointPartyEmptySubscription, NotificationEventType.APPEAL_RECEIVED);
+        classUnderTest.sendEmailSmsLetterNotification(buildBaseWrapper(APPELLANT_WITH_ADDRESS, notificationEventType, REASONABLE_ADJUSTMENTS), DOCMOSIS_LETTER, jointPartyEmptySubscription, APPEAL_RECEIVED);
         verify(pdfLetterService).generateLetter(any(), any(), any());
         verify(pdfLetterService).buildCoversheet(any(), any());
         verifyNoMoreInteractions(pdfLetterService);
         verify(notificationHandler, atLeastOnce()).sendNotification(any(), any(), eq("Letter"), sender.capture());
-        verifyNotificationIsSaved(sender.getValue(), notificationEventType, CASE_ID, jointPartyEmptySubscription.getSubscriptionType());
+        verifyNotificationIsSaved(sender.getValue(), notificationEventType, jointPartyEmptySubscription.getSubscriptionType());
     }
 
     @Test
     public void givenNonDigitalCase_willNotSendAppealLodgedLetters() {
         SubscriptionWithType appellantEmptySubscription = new SubscriptionWithType(EMPTY_SUBSCRIPTION, APPELLANT,
             null, null);
-        classUnderTest.sendEmailSmsLetterNotification(buildBaseWrapper(APPELLANT_WITH_ADDRESS, NotificationEventType.APPEAL_RECEIVED, State.VALID_APPEAL.getId()), LETTER, appellantEmptySubscription, NotificationEventType.APPEAL_RECEIVED);
+        classUnderTest.sendEmailSmsLetterNotification(buildBaseWrapper(APPELLANT_WITH_ADDRESS, APPEAL_RECEIVED, State.VALID_APPEAL.getId()), LETTER, appellantEmptySubscription, APPEAL_RECEIVED);
         verifyNoInteractions(notificationHandler);
     }
 
 
-    private void verifyNotificationIsSaved(NotificationHandler.SendNotification sender, NotificationEventType eventType, String ccdCaseId, SubscriptionType subscriptionType) {
+    private void verifyNotificationIsSaved(NotificationHandler.SendNotification sender, NotificationEventType eventType, SubscriptionType subscriptionType) {
         try {
             sender.send();
-            verify(notificationSender).saveLettersToReasonableAdjustment(any(), eq(eventType), any(), eq(ccdCaseId), eq(subscriptionType));
+            verify(notificationSender).saveLettersToReasonableAdjustment(any(), eq(eventType), any(), eq(CASE_ID), eq(subscriptionType));
         } catch (NotificationClientException e) {
             fail("Not expected exception");
         }
 
     }
 
-    private void verifyNotificationIsSent(NotificationHandler.SendNotification sender, NotificationEventType eventType, String ccdCaseId) {
+    private void verifyNotificationIsSent(NotificationHandler.SendNotification sender, NotificationWrapper wrapper) {
         try {
             sender.send();
-            verify(notificationSender).sendBundledLetter(any(), any(), eq(eventType), any(), eq(ccdCaseId));
+            verify(notificationSender).sendBundledLetter(eq(wrapper), any(), any());
         } catch (NotificationClientException e) {
             fail("Not expected exception");
         }
