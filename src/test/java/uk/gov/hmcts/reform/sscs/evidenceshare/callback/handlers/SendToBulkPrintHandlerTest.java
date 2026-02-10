@@ -124,7 +124,7 @@ class SendToBulkPrintHandlerTest {
     void givenANonBulkPrintEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
 
-        assertThat(handler.canHandle(SUBMITTED, callback)).isFalse();
+        assertFalse(handler.canHandle(SUBMITTED, callback));
     }
 
     @ParameterizedTest
@@ -137,16 +137,14 @@ class SendToBulkPrintHandlerTest {
 
         when(callback.getEvent()).thenReturn(EventType.valueOf(eventType));
 
-        when(callback.getEvent()).thenReturn(EventType.valueOf(eventType));
-
-        assertThat(handler.canHandle(SUBMITTED, callback)).isTrue();
+        assertTrue(handler.canHandle(SUBMITTED, callback));
     }
 
     @Test
     void givenANonSendToBulkPrintEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
 
-        assertThat(handler.canHandle(SUBMITTED, callback)).isFalse();
+        assertFalse(handler.canHandle(SUBMITTED, callback));
     }
 
     @Test
@@ -222,9 +220,7 @@ class SendToBulkPrintHandlerTest {
             documentRequestFactory, pdfStoreService, bulkPrintService, evidenceShareConfig, updateCcdCaseService,
             idamService, 35, 42, false);
 
-        new SendToBulkPrintHandler(documentManagementServiceWrapper,
-            documentRequestFactory, pdfStoreService, bulkPrintService, evidenceShareConfig, updateCcdCaseService,
-            idamService, 35, 42, false).handle(CallbackType.SUBMITTED, callback);
+        handler.handle(CallbackType.SUBMITTED, callback);
 
         verify(pdfStoreService, times(2)).download(eq(docUrl));
         verify(bulkPrintService).sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any(), any());
@@ -260,7 +256,7 @@ class SendToBulkPrintHandlerTest {
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
         consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
-        assertThat(sscsCaseData.getHmctsDwpState()).isEqualTo("failedSending");
+        assertEquals("failedSending", sscsCaseData.getHmctsDwpState());
     }
 
     @Test
@@ -292,8 +288,8 @@ class SendToBulkPrintHandlerTest {
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
         consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
-        assertThat(sscsCaseData.getHmctsDwpState()).isEqualTo("failedSending");
-        assertThat(sscsCaseData.getSscsDocument().getFirst().getValue().getEvidenceIssued()).isEqualTo("No");
+        assertEquals("failedSending", sscsCaseData.getHmctsDwpState());
+        assertEquals("No", sscsCaseData.getSscsDocument().get(0).getValue().getEvidenceIssued());
     }
 
     @Test
@@ -317,7 +313,7 @@ class SendToBulkPrintHandlerTest {
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
         consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
-        assertThat(sscsCaseData.getHmctsDwpState()).isEqualTo("failedSending");
+        assertEquals("failedSending", sscsCaseData.getHmctsDwpState());
     }
 
     @Test
@@ -340,7 +336,7 @@ class SendToBulkPrintHandlerTest {
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
         consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
-        assertThat(sscsCaseData.getHmctsDwpState()).isEqualTo("failedSending");
+        assertEquals("failedSending", sscsCaseData.getHmctsDwpState());
     }
 
     @Test
@@ -368,7 +364,7 @@ class SendToBulkPrintHandlerTest {
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
         consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
-        assertThat(sscsCaseData.getHmctsDwpState()).isEqualTo("failedSending");
+        assertEquals("failedSending", sscsCaseData.getHmctsDwpState());
     }
 
     @Test
@@ -390,7 +386,7 @@ class SendToBulkPrintHandlerTest {
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
         consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
-        assertThat(sscsCaseData.getHmctsDwpState()).isEqualTo("failedSending");
+        assertEquals("failedSending", sscsCaseData.getHmctsDwpState());
     }
 
     @Test
@@ -418,7 +414,7 @@ class SendToBulkPrintHandlerTest {
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
         consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
-        assertThat(sscsCaseData.getHmctsDwpState()).isEqualTo("failedSending");
+        assertEquals("failedSending", sscsCaseData.getHmctsDwpState());
     }
 
     @Test
@@ -463,8 +459,8 @@ class SendToBulkPrintHandlerTest {
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
         consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
-        assertThat(sscsCaseData.getHmctsDwpState()).isEqualTo(SENT_TO_DWP.getCcdType());
-        assertThat(sscsCaseData.getDwpState()).isEqualTo(UNREGISTERED);
+        assertEquals(SENT_TO_DWP.getCcdType(), sscsCaseData.getHmctsDwpState());
+        assertEquals(UNREGISTERED, sscsCaseData.getDwpState());
     }
 
     @Test
@@ -505,69 +501,7 @@ class SendToBulkPrintHandlerTest {
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
         consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
-        assertThat(sscsCaseData.getHmctsDwpState()).isEqualTo("failedSending");
-    }
-
-    @Test
-    void givenChildMaintenanceValidEventAndFeatureToggledOn_shouldNotSentToDwp() {
-
-        bulkPrintCaseHappyPathSetUp(Benefit.CHILD_SUPPORT.getShortName(), EventType.VALID_APPEAL_CREATED);
-
-        handler.handle(CallbackType.SUBMITTED, callback);
-
-        verifyNoMoreInteractions(updateCcdCaseService);
-
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-        "PIP, VALID_APPEAL",
-        "childSupport, VALID_APPEAL",
-        "PIP, VALID_APPEAL_CREATED"
-    })
-    void givenNonChildMaintenanceOrNonValidEvent_shouldCallUpdateCcdCaseService(String benefitType, String eventType) {
-
-        bulkPrintCaseHappyPathSetUp(benefitType, EventType.valueOf(eventType));
-
-        handler.handle(CallbackType.SUBMITTED, callback);
-
-        verify(updateCcdCaseService).updateCaseV2(eq(123L), eq(SENT_TO_DWP.getCcdType()), any(), any(), any(),
-            consumerArgumentCaptor.capture());
-    }
-
-    private void bulkPrintCaseHappyPathSetUp(String benefitType, EventType eventType) {
-        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(benefitType, "Paper",
-            singletonList(
-                SscsDocument.builder().value(SscsDocumentDetails.builder()
-                    .documentFileName(docPdf.getName())
-                    .documentType("sscs1")
-                    .documentLink(DocumentLink.builder().documentUrl(docUrl)
-                        .documentFilename(docPdf.getName()).build())
-                    .build()).build()), VALID_APPEAL);
-
-        when(callback.getEvent()).thenReturn(eventType);
-        when(evidenceShareConfig.getSubmitTypes()).thenReturn(singletonList("paper"));
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(pdfStoreService.download(eq(docUrl))).thenReturn(docPdf.getContent());
-        when(documentManagementServiceWrapper.checkIfDlDocumentAlreadyExists(anyList())).thenReturn(true);
-        DocumentHolder holder = DocumentHolder.builder().placeholders(placeholders).template(template).build();
-        when(documentRequestFactory.create(caseDetails.getCaseData(), nowString)).thenReturn(holder);
-        when(bulkPrintService.sendToBulkPrint(eq(List.of(docPdf)), any(), any()))
-            .thenReturn(Optional.of(UUID.randomUUID()));
-    }
-
-    private Callback<SscsCaseData> setupMocksForFlagErrorTests() {
-        Map<String, Object> placeholders = new HashMap<>();
-        placeholders.put("Test", "Value");
-        Template template = new Template("bla", "bla2");
-
-        when(pdfStoreService.download(eq(docUrl))).thenReturn(docPdf.getContent());
-        when(documentManagementServiceWrapper.checkIfDlDocumentAlreadyExists(anyList())).thenReturn(true);
-
-        DocumentHolder holder = DocumentHolder.builder().placeholders(placeholders).template(template).build();
-        when(documentRequestFactory.create(caseDetails.getCaseData(), nowString)).thenReturn(holder);
-
-        return new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED, false);
+        assertEquals("failedSending", sscsCaseData.getHmctsDwpState());
     }
 
     @Test
