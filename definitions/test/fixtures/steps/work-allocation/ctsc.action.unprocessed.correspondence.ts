@@ -71,13 +71,16 @@ export class CtscActionUnprocessedCorrespondence extends BaseStep {
   }
 
   async completeActionUnprocessedCorrespondenceTask(caseId: string) {
+    let skipAddNewButtonClick:boolean = true
+
     await this.loginPage.goToCase(caseId)
     await this.homePage.navigateToTab('Tasks');
     await this.tasksTab.clickNextStepLink(task.actionFurtherEvidence.link);
     await this.actionFurtherEvidencePage.submitActionFurtherEvidence(
       actionFurtherEvidence.sender, 
       actionFurtherEvidence.otherDocType,
-      actionFurtherEvidence.testfileone
+      actionFurtherEvidence.testfileone,
+      skipAddNewButtonClick
     );
     await this.eventNameAndDescriptionPage.confirmSubmission();
     await this.verifyUnprocessedCorrespondenceTabNotVisible();
