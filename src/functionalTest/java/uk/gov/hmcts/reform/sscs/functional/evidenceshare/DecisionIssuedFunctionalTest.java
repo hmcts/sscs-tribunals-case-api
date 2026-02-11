@@ -12,8 +12,8 @@ import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import java.io.IOException;
 import org.apache.http.HttpStatus;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
@@ -36,35 +36,37 @@ public class DecisionIssuedFunctionalTest extends AbstractFunctionalTest {
     private ObjectMapper mapper;
 
 
-    public DecisionIssuedFunctionalTest() {
+    DecisionIssuedFunctionalTest() {
         super();
     }
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         baseURI = testUrl;
         useRelaxedHTTPSValidation();
     }
 
     @Test
-    public void processAnIssueDecisionEvent() throws IOException {
+    void processAnIssueDecisionEvent() throws IOException {
         idamTokens = idamService.getIdamTokens();
-        String json = BaseHandler.getJsonCallbackForTest("handlers/decisionissued/decisionIssuedAboutToSubmitCallback.json");
+        String json = BaseHandler.getJsonCallbackForTest(
+            "handlers/decisionissued/decisionIssuedAboutToSubmitCallback.json");
         json = uploadCaseDocument(EVIDENCE_DOCUMENT_PDF, "EVIDENCE_DOCUMENT", json);
 
         String response = RestAssured.given()
-                .contentType(ContentType.JSON)
-                .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
-                .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
-                .body(json)
-                .post("/ccdAboutToSubmit")
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .log().all(true)
-                .extract().body().asString();
+            .contentType(ContentType.JSON)
+            .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
+            .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
+            .body(json)
+            .post("/ccdAboutToSubmit")
+            .then()
+            .statusCode(HttpStatus.SC_OK)
+            .log().all(true)
+            .extract().body().asString();
 
         JsonNode root = mapper.readTree(response);
-        SscsCaseData result = mapper.readValue(root.path("data").toPrettyString(), new TypeReference<>(){});
+        SscsCaseData result = mapper.readValue(root.path("data").toPrettyString(), new TypeReference<>() {
+        });
         assertThat(result.getInterlocReferralReason()).isNull();
         assertThat(result.getDirectionDueDate()).isNull();
         assertThat(result.getPostponement().getUnprocessedPostponement()).isNull();

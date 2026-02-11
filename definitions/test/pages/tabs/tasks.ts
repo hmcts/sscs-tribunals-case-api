@@ -14,7 +14,7 @@ export class Tasks {
     webActions = new WebAction(this.page);
   }
 
-  async verifyTaskIsDisplayed(taskName: string) {
+  async  verifyTaskIsDisplayed(taskName: string) {
     let homePage = new HomePage(this.page);
     let taskVisible = false;
 
@@ -23,13 +23,13 @@ export class Tasks {
 
     while (Date.now() - startTime < timeout) {
       taskVisible = await this.page.isVisible(
-        `//exui-case-task[./*[normalize-space()='${taskName}']]`
+        `//exui-case-task[./*[normalize-space()='${taskName}']][1]`
       );
       if (taskVisible) {
         break;
       }
       await homePage.navigateToTab('Summary');
-      await homePage.delay(10000);
+      await homePage.delay(30000);
       await homePage.navigateToTab('Tasks');
       await homePage.delay(timeouts.shortTimeout);
     }
@@ -58,7 +58,7 @@ export class Tasks {
         break;
       }
       await homePage.navigateToTab('Summary');
-      await homePage.delay(1000);
+      await homePage.delay(30000);
       await homePage.navigateToTab('Tasks');
       await homePage.delay(timeouts.shortTimeout);
     }
@@ -76,23 +76,25 @@ export class Tasks {
   }
 
   async clickCancelTask(taskName: string) {
-    await this.page
+    const cancelTaskLocator = this.page
       .locator(
-        `//exui-case-task[./*[normalize-space()='${taskName}']]//a[normalize-space()='${tasksTestData.cancelTask}']`
-      )
-      .click();
+        `//exui-case-task[./*[normalize-space()='${taskName}']][1]//a[normalize-space()='${tasksTestData.cancelTask}']`
+      );
+    await expect(cancelTaskLocator).toBeVisible();
+    await cancelTaskLocator.click();
   }
 
   async clickMarkAsDone(taskName: string) {
-    await this.page
+    const markAsDoneLocator = this.page
       .locator(
-        `//exui-case-task[./*[normalize-space()='${taskName}']]//a[normalize-space()='${tasksTestData.markAsDone}']`
-      )
-      .click();
+        `//exui-case-task[./*[normalize-space()='${taskName}']][1]//a[normalize-space()='${tasksTestData.markAsDone}']`
+      );
+    await expect(markAsDoneLocator).toBeVisible();
+    await markAsDoneLocator.click();
   }
-
+    
   async selfAssignTask(taskName: string) {
-    let selector = `//exui-case-task[./*[normalize-space()='${taskName}']]//a[normalize-space()='${tasksTestData.assignToMe}']`;
+    let selector = `//exui-case-task[./*[normalize-space()='${taskName}']][1]//a[normalize-space()='${tasksTestData.assignToMe}']`;
     await expect(this.page.locator(selector)).toBeVisible();
     await this.page.locator(selector).click();
     await expect(this.page.locator(selector)).toBeHidden();
@@ -101,7 +103,7 @@ export class Tasks {
   async clickAssignTask(taskName: string) {
     await this.page
       .locator(
-        `//exui-case-task[./*[normalize-space()='${taskName}']]//a[normalize-space()='${tasksTestData.assignTask}']`
+        `//exui-case-task[./*[normalize-space()='${taskName}']][1]//a[normalize-space()='${tasksTestData.assignTask}'][1]`
       )
       .click();
   }
@@ -131,6 +133,7 @@ export class Tasks {
       this.page.locator(
         `//exui-case-task[./*[normalize-space()='${taskName}']]//*[normalize-space()='${fieldLabel}']/../dd[normalize-space()="${fieldValue}"]`
       )
+      .first()
     ).toBeVisible();
   }
 
@@ -140,13 +143,14 @@ export class Tasks {
         .locator(
           `//exui-case-task[./*[normalize-space()='${taskName}']]//exui-priority-field`
         )
+        .first()
         .textContent()
     ).trim();
     expect(displayedPriority).toBe(expectedPriority);
   }
 
   async verifyManageOptions(taskName: string, options: string[]) {
-    let selector = `//exui-case-task[./*[normalize-space()='${taskName}']]//div[.//span[normalize-space()='${tasksTestData.manageLabel}']]/dd/a`;
+    let selector = `//exui-case-task[./*[normalize-space()='${taskName}']][1]//div[.//span[normalize-space()='${tasksTestData.manageLabel}']]/dd/a`;
 
     const availableOptions = await this.page.$$eval(selector, (elements) =>
       elements.map((element) => element.textContent.trim())
@@ -176,7 +180,7 @@ export class Tasks {
     let pageTitle = await this.page.locator('h1.govuk-heading-l').textContent();
     expect(pageTitle).toEqual(expectedPageTitle);
 
-    await webActions.clickLink('Cancel');
+    await webActions.clickButtonByRole('Cancel');
     await homePage.navigateToTab('Tasks');
   }
 
@@ -402,5 +406,18 @@ export class Tasks {
     await expect(
       task.getByRole('link', { name: tasksTestData.assignTask })
     ).toBeHidden();
+  }
+
+async markMultipleTasksAsDone(taskName: string) {
+    let task = this.page.locator(
+      `//exui-case-task[./*[normalize-space()='${taskName}']]`
+    );
+    await expect(task.first()).toBeVisible();
+    const taskCount = await task.count();
+    for (let i = 0; i < taskCount; i++) {
+      await expect(task.first()).toBeVisible();
+      await this.selfAssignTask(taskName);
+      await this.markTheTaskAsDone(taskName);
+    }
   }
 }

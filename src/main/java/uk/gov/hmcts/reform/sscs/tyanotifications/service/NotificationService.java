@@ -81,7 +81,7 @@ public class NotificationService {
 
         log.info("Notification event triggered {} for case id {}", notificationType.getId(), caseId);
 
-        if (notificationType.isAllowOutOfHours() || !outOfHoursCalculator.isItOutOfHours()) {
+        if (!outOfHoursCalculator.isItOutOfHours() || notificationType.isAllowOutOfHours()) {
             if (notificationType.isToBeDelayed()
                 && !fromReminderService
                 && !functionalTest(notificationWrapper.getNewSscsCaseData())) {

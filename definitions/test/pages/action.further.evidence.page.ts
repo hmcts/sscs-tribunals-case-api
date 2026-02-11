@@ -62,16 +62,20 @@ export class ActionFurtherEvidencePage {
     await webActions.inputField('#scannedDate-day', '21');
     await webActions.inputField('#scannedDate-month', '1');
     await webActions.inputField('#scannedDate-year', '2021');
-    await this.page.locator('#scannedDate').click();
+    await webActions.inputField('#scannedDate-second', '00');
+    await this.page.locator('#scannedDate').first().click();
     await expect(
       this.page.locator('#scannedDate span.error-message')
     ).toBeHidden();
   }
 
   async selectbundle() {
-    await webActions.clickElementById(
-      "label[for='scannedDocuments_0_includeInBundle_Yes']"
-    );
+    const numberofDocs = await this.page.locator("//span[normalize-space()='Include in bundle? (Optional)']").count();
+    for (let i = 0; i < numberofDocs; i++) {
+      await webActions.clickElementById(
+        `label[for='scannedDocuments_${i}_includeInBundle_Yes']`
+      );
+    }
   }
 
   async confirmSubmission(): Promise<void> {
@@ -90,7 +94,6 @@ export class ActionFurtherEvidencePage {
     await this.verifyPageContent();
     await this.selectFEOption();
     await this.selectSenderOption(senderOption);
-
     await this.clickAddNewButton();
     await this.selectDocType(docType);
     await this.uploadDocs(fileName);

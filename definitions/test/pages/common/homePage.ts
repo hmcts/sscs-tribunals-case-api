@@ -34,6 +34,7 @@ export class HomePage {
   readonly caseRefInputField: string;
   readonly searchResultsField: string;
   readonly elementsAndIssuesTab: Locator;
+  readonly unprocessedCorrespondenceTab: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -63,6 +64,7 @@ export class HomePage {
     this.hearingsTab = page.getByRole('tab').filter({ hasText: /^Hearings$/ });
     this.elementsAndIssuesTab = page.getByRole('tab').filter({ hasText: /^Elements and issues$/ });
     this.tribunalFtaCommunicationsTab = page.getByRole('tab').filter({ hasText: /^Tribunal\/FTA Communications$/ });
+    this.unprocessedCorrespondenceTab = page.getByRole('tab').filter({ hasText: /^Unprocessed Correspondence$/ });
     this.afterTabBtn = page.locator(
       '//html/body/exui-root/exui-case-home/div/exui-case-details-home/exui-case-viewer-container/ccd-case-viewer/div/ccd-case-full-access-view/div[2]/div/mat-tab-group/mat-tab-header/button[2]/div'
     );
@@ -216,6 +218,7 @@ export class HomePage {
       }
       case 'History': {
         try {
+          await this.scrollToStartOfTabs();
           await expect(this.historyTab).toBeVisible();
           await this.historyTab.click();
           await expect(this.page.locator('table.EventLogTable')).toBeVisible({ timeout: 10000 });
@@ -227,6 +230,7 @@ export class HomePage {
       }
       case 'Summary': {
         try {
+          await this.scrollToStartOfTabs();
           await expect(this.summaryTab).toBeVisible();
           await this.summaryTab.click();
           await expect(this.page.locator('#summaryCreatedInGapsFrom')).toBeVisible({ timeout: 10000 });
@@ -237,8 +241,8 @@ export class HomePage {
         break;
       }
       case 'Tasks': {
+        await this.scrollToStartOfTabs();
         await expect(this.tasksTab).toBeVisible();
-        await this.page.getByRole('tablist').evaluate(el => (el.style = 'transform: translateX(0px);'));
         await this.tasksTab.click();
         break;
       }
@@ -253,6 +257,7 @@ export class HomePage {
         break;
       }
       case 'Appeal Details': {
+        await this.scrollToStartOfTabs();
         await expect(this.appealDetailsTab).toBeVisible();
         await this.appealDetailsTab.click();
         break;
@@ -349,5 +354,9 @@ export class HomePage {
     await myWorkLink.waitFor();
     await myWorkLink.click();
     await expect(this.page.locator('h3').filter({ hasText: 'My work' })).toBeVisible();
+  }
+
+  async scrollToStartOfTabs() {
+    await this.page.getByRole('tablist').evaluate(el => (el.style = 'transform: translateX(0px);'));
   }
 }

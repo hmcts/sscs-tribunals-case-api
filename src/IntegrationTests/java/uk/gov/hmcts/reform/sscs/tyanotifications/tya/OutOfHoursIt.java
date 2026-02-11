@@ -39,6 +39,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.evidenceshare.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobScheduler;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
@@ -137,6 +138,8 @@ public class OutOfHoursIt {
 
     @Autowired
     private PdfLetterService pdfLetterService;
+    @Autowired
+    private BulkPrintService bulkPrintService;
 
     @Autowired
     @Qualifier("scheduler")
@@ -158,7 +161,7 @@ public class OutOfHoursIt {
 
         notificationHandler = new NotificationHandler(outOfHoursCalculator, jobScheduler, jobGroupGenerator);
 
-        NotificationSender sender = new NotificationSender(notificationClient, null, notificationTestRecipients, markdownTransformationService, saveCorrespondenceAsyncService, false);
+        NotificationSender sender = new NotificationSender(notificationClient, null, bulkPrintService, notificationTestRecipients, markdownTransformationService, saveCorrespondenceAsyncService, false);
         SendNotificationService sendNotificationService = new SendNotificationService(sender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
         NotificationService service = new NotificationService(factory, reminderService, notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false);
         controller = new NotificationController(service, authorisationService, ccdService, deserializer, idamService);
