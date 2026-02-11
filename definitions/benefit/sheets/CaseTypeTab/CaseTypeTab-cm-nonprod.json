@@ -1,3 +1,4 @@
 [
-  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "confidentiality", "TabLabel": "Confidentiality", "TabDisplayOrder": 3, "CaseFieldID": "confidentialitySummary", "TabFieldDisplayOrder": 1, "DisplayContextParameter": "#TABLE(name,party,confidentialityRequired,confidentialityRequiredChangedDate)"}
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "confidentiality", "TabLabel": "Confidentiality", "TabDisplayOrder": 3, "CaseFieldID": "isConfidentialCaseLabel", "TabFieldDisplayOrder": 1, "FieldShowCondition": "isConfidentialCase =\"Yes\""},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "confidentiality", "TabLabel": "Confidentiality", "TabDisplayOrder": 3, "CaseFieldID": "confidentialitySummary", "TabFieldDisplayOrder": 2, "DisplayContextParameter": "#TABLE(name,party,confidentialityRequired,confidentialityRequiredChangedDate)"}
 ]
