@@ -114,6 +114,8 @@ class SendToBulkPrintHandlerTest {
     void givenAValidAppealCreatedEvent_thenReturnTrue() {
         when(callback.getEvent()).thenReturn(EventType.VALID_APPEAL_CREATED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(callback.getEvent()).thenReturn(EventType.VALID_APPEAL_CREATED);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
         assertThat(handler.canHandle(SUBMITTED, callback)).isTrue();
     }
 
@@ -171,7 +173,7 @@ class SendToBulkPrintHandlerTest {
     @ParameterizedTest
     @CsvSource({"pip, 35", "childSupport, 42"})
     void givenAMessageWhichFindsATemplate_thenConvertToSscsCaseDataAndAddPdfToCaseAndSendToBulkPrint(String benefitType,
-                                                                                                     int expectedResponseDays) {
+        int expectedResponseDays) {
 
         when(evidenceShareConfig.getSubmitTypes()).thenReturn(singletonList("paper"));
 
@@ -213,6 +215,10 @@ class SendToBulkPrintHandlerTest {
 
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED,
             false);
+
+        handler = new SendToBulkPrintHandler(documentManagementServiceWrapper,
+            documentRequestFactory, pdfStoreService, bulkPrintService, evidenceShareConfig, updateCcdCaseService,
+            idamService, 35, 42, false);
 
         new SendToBulkPrintHandler(documentManagementServiceWrapper,
             documentRequestFactory, pdfStoreService, bulkPrintService, evidenceShareConfig, updateCcdCaseService,
@@ -369,7 +375,7 @@ class SendToBulkPrintHandlerTest {
 
         final Callback<SscsCaseData> callback = setupMocksForFlagErrorTests();
         when(evidenceShareConfig.getSubmitTypes()).thenReturn(singletonList("paper"));
-        when(bulkPrintService.sendToBulkPrint(any(), any(), any()))
+        when(bulkPrintService.sendToBulkPrint(anyList(), any(), any()))
             .thenThrow(new NonPdfBulkPrintException(new RuntimeException("error")));
 
         handler.handle(CallbackType.SUBMITTED, callback);
@@ -483,7 +489,7 @@ class SendToBulkPrintHandlerTest {
 
         Optional<UUID> expectedOptionalUuid = Optional.empty();
 
-        when(bulkPrintService.sendToBulkPrint(any(), any(), any())).thenReturn(expectedOptionalUuid);
+        when(bulkPrintService.sendToBulkPrint(anyList(), any(), any())).thenReturn(expectedOptionalUuid);
 
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED,
             false);
@@ -564,7 +570,7 @@ class SendToBulkPrintHandlerTest {
     }
 
     private CaseDetails<SscsCaseData> getCaseDetails(String benefitType, String receivedVia, List<SscsDocument> sscsDocuments,
-                                                     State state) {
+        State state) {
         SscsCaseData caseData = SscsCaseData.builder()
             .ccdCaseId("123")
             .createdInGapsFrom("validAppeal")
