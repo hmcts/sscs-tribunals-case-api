@@ -204,7 +204,6 @@ export class Tasks {
       `//mat-option/span[contains(text(), '${userEmail.toLowerCase()}')]`
     );
     await expect(userOption).toBeVisible();
-    await this.page.waitForTimeout(20000); // Wait for 2 seconds before clicking
     await userOption.click();
     await expect(this.page.locator('//mat-option')).toBeHidden();
     await this.page.getByRole('button', { name: 'Continue' }).click();
