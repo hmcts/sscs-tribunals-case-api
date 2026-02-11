@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.sscs.notifications.gov.notify.personalisation.Persona
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.personalisation.SubscriptionPersonalisation;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.personalisation.SyaAppealCreatedAndReceivedPersonalisation;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.personalisation.WithRepresentativePersonalisation;
-import uk.gov.hmcts.reform.sscs.tyanotifications.personalisation.*;
 
 @Component
 public class PersonalisationFactory implements Function<NotificationEventType, Personalisation> {

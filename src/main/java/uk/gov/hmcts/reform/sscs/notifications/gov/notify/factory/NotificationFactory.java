@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.Notificat
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.Reference;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.Template;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.*;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.personalisation.Personalisation;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 

@@ -69,14 +69,12 @@ import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.scheduler.CohJo
 import uk.gov.hmcts.reform.sscs.service.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.NotificationExecutionManager;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.NotificationProcessingService;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.scheduler.*;
 import uk.gov.service.notify.NotificationClient;
 
 @SpringBootApplication
 @EnableFeignClients(basePackages = {
     "uk.gov.hmcts.reform.authorisation",
     "uk.gov.hmcts.reform.sscs.idam",
-    "uk.gov.hmcts.reform.sscs.document",
     "uk.gov.hmcts.reform.docassembly",
     "uk.gov.hmcts.reform.sscs.thirdparty",
     "uk.gov.hmcts.reform.idam",
