@@ -17,7 +17,7 @@ test.describe('Work Allocation - CTSC - Action Unprocessed Correspondence - Dorm
     await appealDormant.performAppealDormant(caseId);
   });
 
-  test("Assign and complete CTSC - Action Unprocessed Correspondence task", async ({ ctscActionUnprocessedCorrespondenceSteps }) => {
+  test("Assign and complete CTSC - Action Unprocessed Correspondence - Dormant/Post Hearing", async ({ ctscActionUnprocessedCorrespondenceSteps }) => {
     test.slow();
     
     // Create the task
@@ -31,7 +31,7 @@ test.describe('Work Allocation - CTSC - Action Unprocessed Correspondence - Dorm
     await ctscActionUnprocessedCorrespondenceSteps.verifyActionUnprocessedCorrespondenceTaskCompleted(caseId);
   });
 
-   test('As a CTSC Admin when there are multiple CTSC - Action Unprocessed Correspondence tasks, the first is auto-closed on completion and I can manually close the others', async ({ ctscActionUnprocessedCorrespondenceSteps }) => {
+   test('As a CTSC Admin when there are multiple CTSC - Action Unprocessed Correspondence - Dormant/Post Hearing, the first is auto-closed on completion and I can manually close the others', async ({ ctscActionUnprocessedCorrespondenceSteps }) => {
     test.slow();
 
     //Create multiple tasks
