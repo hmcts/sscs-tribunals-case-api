@@ -33,7 +33,6 @@ import uk.gov.hmcts.reform.sendletter.api.model.v3.Document;
 import uk.gov.hmcts.reform.sendletter.api.model.v3.LetterV3;
 import uk.gov.hmcts.reform.sendletter.api.proxy.SendLetterApiProxy;
 
-
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 @ExtendWith(PactConsumerTestExt.class)

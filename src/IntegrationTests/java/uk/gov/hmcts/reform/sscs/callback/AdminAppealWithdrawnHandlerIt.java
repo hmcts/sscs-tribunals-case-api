@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
-
 @SpringBootTest
 @AutoConfigureMockMvc
 public class AdminAppealWithdrawnHandlerIt extends AbstractEventIt {

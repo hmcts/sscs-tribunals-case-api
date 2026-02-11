@@ -8,7 +8,6 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
-
 public class ReissueUtils {
 
     private ReissueUtils() {

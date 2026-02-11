@@ -8,9 +8,9 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.PdfDocumentRequest;
-import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 
 @Slf4j
 public class DocmosisPdfGenerationService implements PdfGenerationService {

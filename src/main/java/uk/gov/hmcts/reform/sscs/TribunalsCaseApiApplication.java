@@ -54,21 +54,21 @@ import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.service.DocmosisPdfGenerationService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.jobscheduler.config.QuartzConfiguration;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.quartz.JobClassMapper;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.quartz.JobClassMapping;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.quartz.JobMapper;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.quartz.JobMapping;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.NotificationExecutionManager;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.NotificationProcessingService;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.scheduler.CcdActionDeserializer;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.scheduler.CcdActionExecutor;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.scheduler.CcdActionSerializer;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.scheduler.CohActionSerializer;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.scheduler.CohJobPayload;
 import uk.gov.hmcts.reform.sscs.service.ScheduledTaskRunner;
-import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.NotificationExecutionManager;
-import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.NotificationProcessingService;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.service.DocmosisPdfGenerationService;
 import uk.gov.service.notify.NotificationClient;
 
 @SpringBootApplication

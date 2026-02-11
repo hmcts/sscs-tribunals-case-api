@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.pip;
 
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.AllowedOrRefusedPredicate.ALLOWED;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.AllowedOrRefusedPredicate.REFUSED;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.YesNoPredicate.FALSE;
@@ -10,6 +9,7 @@ import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldec
 import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.pip.ComparedToDwpPredicate.LOWER;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.pip.ComparedToDwpPredicate.NOT_CONSIDERED;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.pip.ComparedToDwpPredicate.SAME;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +18,6 @@ import java.util.function.Function;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 import org.apache.commons.collections4.CollectionUtils;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.AllowedOrRefusedCondition;
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.AllowedOrRefusedPredicate;
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.AwardTypeCondition;
@@ -28,6 +26,8 @@ import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.F
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.PointsCondition;
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.YesNoFieldCondition;
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.pip.scenarios.PipScenario;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 
 /**

@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.
 
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.AllowedOrRefusedPredicate.ALLOWED;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.AllowedOrRefusedPredicate.REFUSED;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.StringListPredicate.EMPTY;
@@ -13,6 +12,7 @@ import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldec
 import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.YesNoPredicate.UNSPECIFIED;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.esa.EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.esa.EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,8 +23,6 @@ import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.AllowedOrRefusedCondition;
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.AllowedOrRefusedPredicate;
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.FieldCondition;
@@ -34,6 +32,8 @@ import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.S
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.YesNoFieldCondition;
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.YesNoPredicate;
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 

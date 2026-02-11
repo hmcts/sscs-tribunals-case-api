@@ -15,9 +15,9 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.FurtherEvidenceService;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @Service
 public class ReissueFurtherEvidenceHandler implements EvidenceCallbackHandler<SscsCaseData> {

@@ -14,8 +14,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Template;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.TemplateService;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Template;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)

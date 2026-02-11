@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.authorisation.exceptions.InvalidTokenException;
 import uk.gov.hmcts.reform.sscs.bulkscan.exceptions.ForbiddenException;
 import uk.gov.hmcts.reform.sscs.bulkscan.exceptions.UnauthorizedException;
 
-
 @RunWith(MockitoJUnitRunner.class)
 public class AuthorisationServiceTest {
 

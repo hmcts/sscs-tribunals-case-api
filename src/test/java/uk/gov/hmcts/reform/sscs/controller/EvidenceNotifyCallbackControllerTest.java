@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.service.servicebus.EvidenceNotifyCallbackProcessor;
 
-
 public class EvidenceNotifyCallbackControllerTest {
 
     private EvidenceNotifyCallbackController controller;

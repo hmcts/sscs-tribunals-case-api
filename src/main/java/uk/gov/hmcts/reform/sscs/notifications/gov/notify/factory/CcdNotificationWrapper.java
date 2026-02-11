@@ -16,13 +16,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
-import uk.gov.hmcts.reform.sscs.reference.data.model.ConfidentialityPartyMembers;
-import uk.gov.hmcts.reform.sscs.reference.data.model.ConfidentialityType;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.AppealHearingType;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.SubscriptionWithType;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.scheduler.CcdActionSerializer;
+import uk.gov.hmcts.reform.sscs.reference.data.model.ConfidentialityPartyMembers;
+import uk.gov.hmcts.reform.sscs.reference.data.model.ConfidentialityType;
 
 @Slf4j
 public class CcdNotificationWrapper implements NotificationWrapper {

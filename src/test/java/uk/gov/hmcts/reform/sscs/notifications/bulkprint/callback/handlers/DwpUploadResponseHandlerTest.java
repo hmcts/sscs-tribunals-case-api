@@ -50,7 +50,6 @@ import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
-
 @RunWith(JUnitParamsRunner.class)
 public class DwpUploadResponseHandlerTest {
     @Rule

@@ -17,9 +17,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.WelshException;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.RequestTranslationService;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @Slf4j
 @Service

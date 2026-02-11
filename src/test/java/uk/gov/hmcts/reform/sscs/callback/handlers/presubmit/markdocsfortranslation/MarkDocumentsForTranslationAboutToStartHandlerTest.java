@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 
-
 @RunWith(JUnitParamsRunner.class)
 public class MarkDocumentsForTranslationAboutToStartHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";

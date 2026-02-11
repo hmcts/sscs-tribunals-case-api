@@ -48,11 +48,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
-import uk.gov.hmcts.reform.sscs.notifications.gov.notify.factory.CcdNotificationWrapper;
-import uk.gov.hmcts.reform.sscs.notifications.gov.notify.factory.NotificationFactory;
-import uk.gov.hmcts.reform.sscs.notifications.gov.notify.factory.NotificationWrapper;
-import uk.gov.hmcts.reform.sscs.notifications.gov.notify.factory.PersonalisationFactory;
-import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.NotificationConfig;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.SubscriptionType;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.properties.EvidenceProperties;
@@ -64,10 +59,15 @@ import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.Notificat
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.Template;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.extractor.HearingContactDateExtractor;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.factory.CcdNotificationWrapper;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.factory.NotificationFactory;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.factory.NotificationWrapper;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.factory.PersonalisationFactory;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.personalisation.NotificationDateConverterUtil;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.personalisation.SubscriptionPersonalisation;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.personalisation.WithRepresentativePersonalisation;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.MessageAuthenticationServiceImpl;
+import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
 @RunWith(JUnitParamsRunner.class)

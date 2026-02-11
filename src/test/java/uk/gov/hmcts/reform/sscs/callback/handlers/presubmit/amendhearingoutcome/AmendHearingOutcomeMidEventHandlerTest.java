@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOutcomeDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 
-
 @RunWith(JUnitParamsRunner.class)
 public class AmendHearingOutcomeMidEventHandlerTest {
 

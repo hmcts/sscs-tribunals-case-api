@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.esa;
 
 import java.util.function.Function;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.ActivityType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsEsaCaseData;
-import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.ActivityType;
 
 /**
  * Enum to encapsulate binding between an activity question key, and the corresponding getter method on SscsCaseData that yields that answer to that question.

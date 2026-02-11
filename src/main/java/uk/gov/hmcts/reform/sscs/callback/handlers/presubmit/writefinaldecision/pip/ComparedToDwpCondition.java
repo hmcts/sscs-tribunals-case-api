@@ -2,9 +2,9 @@ package uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.
 
 import java.util.Optional;
 import java.util.function.Function;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.FieldConditionBase;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsPipCaseData;
-import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.FieldConditionBase;
 
 public class ComparedToDwpCondition extends FieldConditionBase<String> {
 

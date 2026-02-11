@@ -7,7 +7,6 @@ import uk.gov.service.notify.NotificationClientException;
 import uk.gov.service.notify.Template;
 import uk.gov.service.notify.TemplateList;
 
-
 public final class GetAllTemplatesFromNotify {
 
     public static NotificationClient testNotificationClient() {

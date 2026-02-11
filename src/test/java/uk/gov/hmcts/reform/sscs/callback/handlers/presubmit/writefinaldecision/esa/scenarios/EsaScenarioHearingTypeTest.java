@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.e
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
-
 @RunWith(JUnitParamsRunner.class)
 public class EsaScenarioHearingTypeTest {
 

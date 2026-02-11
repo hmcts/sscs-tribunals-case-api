@@ -27,7 +27,6 @@ import uk.gov.hmcts.reform.sscs.model.tya.SubscriptionRequest;
 import uk.gov.hmcts.reform.sscs.service.MessageAuthenticationService;
 import uk.gov.hmcts.reform.sscs.service.TribunalsService;
 
-
 @RestController
 public class SubscriptionsController {
 

@@ -41,9 +41,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
-import uk.gov.hmcts.reform.sscs.notifications.gov.notify.personalisation.NotificationDateConverterUtil;
-import uk.gov.hmcts.reform.sscs.notifications.gov.notify.personalisation.SubscriptionPersonalisation;
-import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.AppConstants;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.NotificationConfig;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.PersonalisationConfiguration;
@@ -53,7 +50,10 @@ import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.SubscriptionWith
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.Link;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.extractor.HearingContactDateExtractor;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.factory.CcdNotificationWrapper;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.personalisation.NotificationDateConverterUtil;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.personalisation.SubscriptionPersonalisation;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.MessageAuthenticationServiceImpl;
+import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
 public class SubscriptionPersonalisationTest {
 

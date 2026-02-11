@@ -14,14 +14,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.DocumentHolder;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Pdf;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Template;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.service.PdfGenerationService;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.UnableToContactThirdPartyException;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.FurtherEvidencePlaceholderService;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.DocumentHolder;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Pdf;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Template;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.service.PdfGenerationService;
 
 @Service
 @Slf4j

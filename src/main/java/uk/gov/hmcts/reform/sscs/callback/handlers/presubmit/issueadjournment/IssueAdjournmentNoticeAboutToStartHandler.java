@@ -4,6 +4,8 @@ import static java.util.Objects.requireNonNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.callback.handlers.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.adjourncase.AdjournCasePreviewService;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -12,8 +14,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.callback.handlers.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.adjourncase.AdjournCasePreviewService;
 
 @Service
 public class IssueAdjournmentNoticeAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {

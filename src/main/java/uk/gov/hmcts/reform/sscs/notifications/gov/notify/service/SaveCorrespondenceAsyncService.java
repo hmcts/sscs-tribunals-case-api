@@ -14,9 +14,9 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Correspondence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.service.CcdNotificationsPdfService;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.LetterAsyncConfigProperties;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.SubscriptionType;
+import uk.gov.hmcts.reform.sscs.service.CcdNotificationsPdfService;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 

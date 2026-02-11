@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.e
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
-
 public class EsaScenario2Test {
 
     @Test

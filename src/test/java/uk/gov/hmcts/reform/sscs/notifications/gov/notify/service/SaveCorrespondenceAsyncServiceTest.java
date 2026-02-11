@@ -19,9 +19,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CorrespondenceDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorrespondenceType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.model.LetterType;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.SubscriptionType;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.SaveCorrespondenceAsyncService;
 import uk.gov.hmcts.reform.sscs.service.CcdNotificationsPdfService;
-import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.SubscriptionType;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 

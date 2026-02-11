@@ -35,7 +35,6 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.tya.SubscriptionRequest;
 
-
 @RunWith(MockitoJUnitRunner.class)
 public class TribunalsServiceTest {
 

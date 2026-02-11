@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.TAX_CREDIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.GRANT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.REFUSE;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.PlaceholderConstants.APPELLANT_FULL_NAME_LITERAL;
 import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.PlaceholderConstants.BENEFIT_NAME_ACRONYM_LITERAL;
 import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.PlaceholderConstants.BENEFIT_NAME_ACRONYM_LITERAL_WELSH;
@@ -41,7 +42,6 @@ import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placehold
 import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.PlaceholderConstants.WELSH_CASE_CREATED_DATE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.PlaceholderHelper.buildCaseData;
 import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.PlaceholderHelper.buildCaseDataWithoutBenefitType;
-import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -58,9 +58,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.config.PdfDocumentConfig;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.config.ExelaAddressConfig;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.PlaceholderService;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.config.PdfDocumentConfig;
 
 @Service
 @ExtendWith(MockitoExtension.class)

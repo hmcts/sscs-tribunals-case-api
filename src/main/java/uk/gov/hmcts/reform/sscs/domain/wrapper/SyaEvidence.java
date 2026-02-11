@@ -12,7 +12,6 @@ import java.time.LocalDate;
 import lombok.Builder;
 import lombok.Value;
 
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Value
 @Builder

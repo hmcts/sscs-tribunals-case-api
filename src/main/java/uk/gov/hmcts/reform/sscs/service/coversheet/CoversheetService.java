@@ -11,9 +11,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.LetterUtils;
 import uk.gov.hmcts.reform.sscs.service.OnlineHearingService;
 import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.PdfService;
-import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.LetterUtils;
 
 @Service
 public class CoversheetService {

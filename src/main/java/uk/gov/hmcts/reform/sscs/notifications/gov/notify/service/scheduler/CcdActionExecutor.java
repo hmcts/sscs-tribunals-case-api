@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.sscs.notifications.gov.notify.factory.NotificationWra
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.NotificationExecutionManager;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.NotificationProcessingService;
 
-
 public class CcdActionExecutor extends BaseActionExecutor<String> {
 
     public CcdActionExecutor(NotificationProcessingService notificationProcessingService,

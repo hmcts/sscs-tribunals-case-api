@@ -54,7 +54,6 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.idam.UserRole;
 
-
 @RunWith(JUnitParamsRunner.class)
 public class UpdateOtherPartyAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";

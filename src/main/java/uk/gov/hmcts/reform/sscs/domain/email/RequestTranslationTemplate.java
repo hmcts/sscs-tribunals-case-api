@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.FeatureToggleService;
 
-
 @Component
 public class RequestTranslationTemplate {
     private final FeatureToggleService featureToggleService;

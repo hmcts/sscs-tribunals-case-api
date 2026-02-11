@@ -73,7 +73,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.AppConstants;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.NotificationEventTypeLists;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.SubscriptionType;
@@ -83,6 +82,7 @@ import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.Notificat
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.exception.NotificationServiceException;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.factory.NotificationWrapper;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.docmosis.PdfLetterService;
+import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.service.notify.NotificationClientException;
 
 @Service

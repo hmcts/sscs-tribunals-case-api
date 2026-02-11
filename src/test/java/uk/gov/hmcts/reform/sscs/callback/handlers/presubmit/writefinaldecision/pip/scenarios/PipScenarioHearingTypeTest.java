@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.p
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
-
 @RunWith(JUnitParamsRunner.class)
 public class PipScenarioHearingTypeTest {
 

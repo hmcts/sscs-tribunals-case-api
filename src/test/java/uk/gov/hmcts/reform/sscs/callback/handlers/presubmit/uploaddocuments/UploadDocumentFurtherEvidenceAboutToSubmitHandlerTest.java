@@ -5,11 +5,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.uploaddocuments.DocumentType.APPELLANT_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.uploaddocuments.DocumentType.REQUEST_FOR_HEARING_RECORDING;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DOCUMENT_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.uploaddocuments.DocumentType.APPELLANT_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.uploaddocuments.DocumentType.REQUEST_FOR_HEARING_RECORDING;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

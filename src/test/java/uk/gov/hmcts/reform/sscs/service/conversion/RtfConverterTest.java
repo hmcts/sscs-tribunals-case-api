@@ -11,7 +11,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-
 public class RtfConverterTest {
     private RtfConverter rtfConverter;
 

@@ -34,7 +34,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 
-
 @RunWith(JUnitParamsRunner.class)
 public class EditBundleAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";

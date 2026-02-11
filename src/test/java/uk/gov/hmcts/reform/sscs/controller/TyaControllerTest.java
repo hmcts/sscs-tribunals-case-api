@@ -26,8 +26,6 @@ import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 import uk.gov.hmcts.reform.sscs.service.DocumentDownloadService;
 import uk.gov.hmcts.reform.sscs.service.TribunalsService;
 
-
-
 public class TyaControllerTest {
 
     private static final Long CASE_ID = 123456789L;

@@ -36,13 +36,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Pdf;
-import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.BulkPrintException;
-import uk.gov.hmcts.reform.sscs.notifications.bulkprint.model.PdfDocument;
 import uk.gov.hmcts.reform.sscs.exception.UnsupportedDocumentTypeException;
 import uk.gov.hmcts.reform.sscs.helper.PdfHelper;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.BulkPrintException;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.model.PdfDocument;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.SscsDocumentService;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Pdf;
 
 @RunWith(JUnitParamsRunner.class)
 public class SscsDocumentServiceTest {

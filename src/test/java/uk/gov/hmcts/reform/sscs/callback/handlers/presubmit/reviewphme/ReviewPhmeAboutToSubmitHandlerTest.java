@@ -27,7 +27,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
-
 @RunWith(JUnitParamsRunner.class)
 public class ReviewPhmeAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";

@@ -47,9 +47,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.WelshException;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.RequestTranslationService;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @RunWith(JUnitParamsRunner.class)
 public class RequestTranslationCallbackHandlerTest {

@@ -8,7 +8,6 @@ import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.ActivityAnswer;
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.ActivityQuestionLookup;
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.uc.UcActivityQuestion;
@@ -16,6 +15,7 @@ import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.u
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.uc.UcAllowedOrRefusedCondition;
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.uc.UcPointsRegulationsAndSchedule7ActivitiesCondition;
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.uc.UcQuestionKey;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @Slf4j
 @Service

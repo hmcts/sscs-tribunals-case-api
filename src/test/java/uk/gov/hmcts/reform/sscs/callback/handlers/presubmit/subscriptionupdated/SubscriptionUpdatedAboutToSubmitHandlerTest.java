@@ -40,7 +40,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 
-
 @RunWith(JUnitParamsRunner.class)
 public class SubscriptionUpdatedAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";

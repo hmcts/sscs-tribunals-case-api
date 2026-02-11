@@ -48,7 +48,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
-import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.DocmosisPdfService;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.DocmosisTemplatesConfig;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.SubscriptionType;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.properties.EvidenceProperties;
@@ -59,6 +58,7 @@ import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.Template;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.exception.NotificationClientRuntimeException;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.factory.NotificationWrapper;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.NotificationProcessingServiceTest;
+import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.DocmosisPdfService;
 
 @RunWith(JUnitParamsRunner.class)
 public class PdfLetterServiceTest {

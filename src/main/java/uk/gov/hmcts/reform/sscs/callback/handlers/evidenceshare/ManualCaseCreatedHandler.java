@@ -2,10 +2,10 @@ package uk.gov.hmcts.reform.sscs.callback.handlers.evidenceshare;
 
 import static java.util.Collections.singletonMap;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.evidenceshare.helper.CaseAccessManagementFieldsHelper.setCaseAccessManagementFields;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
-import static uk.gov.hmcts.reform.sscs.callback.handlers.evidenceshare.helper.CaseAccessManagementFieldsHelper.setCaseAccessManagementFields;
 
 import java.util.HashMap;
 import java.util.Map;

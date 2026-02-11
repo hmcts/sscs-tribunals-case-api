@@ -34,7 +34,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 
-
 @SpringBootTest
 @AutoConfigureMockMvc
 public class CancelTranslationIt extends AbstractEventIt {

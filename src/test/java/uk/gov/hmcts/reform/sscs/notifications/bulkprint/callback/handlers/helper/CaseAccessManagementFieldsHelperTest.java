@@ -4,13 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.FormType.SSCS1;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.FormType.SSCS5;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.evidenceshare.helper.CaseAccessManagementFieldsHelper.hasAppellantName;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.evidenceshare.helper.CaseAccessManagementFieldsHelper.isHmrcBenefit;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.evidenceshare.helper.CaseAccessManagementFieldsHelper.setCaseNames;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.evidenceshare.helper.CaseAccessManagementFieldsHelper.setCategories;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.evidenceshare.helper.CaseAccessManagementFieldsHelper.setOgdType;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.FormType.SSCS1;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.FormType.SSCS5;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
