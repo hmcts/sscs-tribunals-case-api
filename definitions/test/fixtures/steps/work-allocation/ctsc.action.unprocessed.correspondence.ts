@@ -13,8 +13,12 @@ export class CtscActionUnprocessedCorrespondence extends BaseStep {
     this.page = page;
   }
 
-  async createActionUnprocessedCorrespondenceTask(caseId: string) {
-    await this.loginUserWithCaseId(credentials.amCtscTeamLeaderNwLiverpool, false, caseId);
+  async createActionUnprocessedCorrespondenceTask(caseId: string, isDormant?: boolean) {
+    const loginAction = !isDormant 
+      ? () =>  this.loginUserWithCaseId(credentials.amCtscTeamLeaderNwLiverpool, false, caseId)
+      : () =>  this.loginPage.goToCase(caseId);
+
+    await loginAction();
     await this.homePage.chooseEvent('Upload document FE');
     await this.uploadDocumentFurtherEvidencePage.verifyPageContent();
     await this.uploadDocumentFurtherEvidencePage.clickAddNew();
@@ -26,8 +30,12 @@ export class CtscActionUnprocessedCorrespondence extends BaseStep {
     await this.homePage.signOut();
   }
 
-  async createMultipleActionUnprocessedCorrespondenceTasks(caseId: string, numberOfTasksToBeCreated = 3) {
-    await this.loginUserWithCaseId(credentials.amCtscTeamLeaderNwLiverpool, false, caseId);
+  async createMultipleActionUnprocessedCorrespondenceTasks(caseId: string, numberOfTasksToBeCreated = 3, isDormant?: boolean) {
+    const loginAction = !isDormant 
+      ? () => this.loginUserWithCaseId(credentials.amCtscTeamLeaderNwLiverpool, false, caseId)
+      : () => this.loginPage.goToCase(caseId);
+
+    await loginAction();
     for (let i = 0; i < numberOfTasksToBeCreated; i++) {
       await this.homePage.chooseEvent('Upload document FE');
       await this.uploadDocumentFurtherEvidencePage.verifyPageContent();
@@ -42,6 +50,7 @@ export class CtscActionUnprocessedCorrespondence extends BaseStep {
   }
 
   async verifyCtscAdminWithoutCaseAllocatorRoleCanViewActionUnprocessedCorrespondenceTask(caseId: string) {
+
     await this.loginUserWithCaseId(credentials.amCtscAdminNwLiverpool, true, caseId);
     await this.homePage.navigateToTab('Tasks');
     await this.tasksTab.verifyTaskIsDisplayed(task.name);
@@ -51,6 +60,7 @@ export class CtscActionUnprocessedCorrespondence extends BaseStep {
   }
 
   async assignTaskToSelf(caseId: string) {
+    
     await this.loginUserWithCaseId(credentials.amCtscTeamLeaderNwLiverpool, false, caseId);
     await this.homePage.navigateToTab('Tasks');
     await this.tasksTab.verifyTaskIsDisplayed(task.name);
@@ -80,27 +90,40 @@ export class CtscActionUnprocessedCorrespondence extends BaseStep {
     await this.myWorkPage.verifyNoAssignedTasks();
   }
 
-  async verifyCtscAdminWithCaseAllocatorRoleCanViewAndAssignActionUnprocessedCorrespondence(caseId: string) {
+  async verifyCtscAdminWithCaseAllocatorRoleCanViewAndAssignActionUnprocessedCorrespondence(caseId: string, isDormant?: boolean) {
     await this.loginUserWithCaseId(credentials.amCtscTeamLeaderNwLiverpool, true, caseId);
-    await this.homePage.navigateToTab('Tasks')
-    await this.tasksTab.verifyTaskIsDisplayed(task.name);
-    await this.tasksTab.verifyPriortiy(task.name, task.priority);
-    await this.tasksTab.verifyPageContentByKeyValue(task.name, 'Assigned to', task.assignedToWhenNotAssigned);
-    await this.tasksTab.verifyManageOptions(task.name, task.unassignedManageOptionsForCaseAllocator);
-    await this.tasksTab.assignTaskToCtscUser(task.name, credentials.amCtscAdminNwLiverpool.email);
+    await this.homePage.navigateToTab('Tasks');
+
+    if(!isDormant) {
+      await this.tasksTab.verifyTaskIsDisplayed(task.name);
+      await this.tasksTab.verifyPriortiy(task.name, task.priority);
+      await this.tasksTab.verifyPageContentByKeyValue(task.name, 'Assigned to', task.assignedToWhenNotAssigned);
+      await this.tasksTab.verifyManageOptions(task.name, task.unassignedManageOptionsForCaseAllocator);
+      await this.tasksTab.assignTaskToCtscUser(task.name, credentials.amCtscAdminNwLiverpool.email);
+    } else {
+      await this.tasksTab.verifyTaskIsDisplayed("CTSC - Action Unprocessed Correspondence - Dormant/Post Hearing");
+      await this.tasksTab.verifyPriortiy("CTSC - Action Unprocessed Correspondence - Dormant/Post Hearing", task.priority);
+      await this.tasksTab.verifyPageContentByKeyValue("CTSC - Action Unprocessed Correspondence - Dormant/Post Hearing", 'Assigned to', task.assignedToWhenNotAssigned);
+      await this.tasksTab.verifyManageOptions("CTSC - Action Unprocessed Correspondence - Dormant/Post Hearing", task.unassignedManageOptionsForCaseAllocator);
+      await this.tasksTab.assignTaskToCtscUser("CTSC - Action Unprocessed Correspondence - Dormant/Post Hearing", credentials.amCtscAdminNwLiverpool.email);
+    }
     await this.signOut();
     await this.loginUserWithCaseId(credentials.amCtscAdminNwLiverpool, false, caseId);
     await this.homePage.navigateToMyWork();
-    await this.myWorkPage.verifyTaskAssignedToMe("Joe Bloggs", "Personal Independence Payment", "CARDIFF", "CTSC - Action Unprocessed Correspondence", "high");
+    if(!isDormant) {
+      await this.myWorkPage.verifyTaskAssignedToMe("Joe Bloggs", "Personal Independence Payment", "CARDIFF", "CTSC - Action Unprocessed Correspondence", "high");
+    } else {
+      await this.myWorkPage.verifyTaskAssignedToMe("Joe Bloggs", "Personal Independence Payment", "CARDIFF", "CTSC - Action Unprocessed Correspondence - Dormant/Post Hearing", "high");
+    }
   }
 
   async verifyUnprocessedCorrespondenceTabNotVisible() {
      await expect(this.homePage.unprocessedCorrespondenceTab).toBeHidden();
-      }
+  }
     
-  async markDuplicateUnprocessedCorrespondenceTasksAsDone() {
+  async markDuplicateUnprocessedCorrespondenceTasksAsDone(isDormant?: boolean) {
      await this.homePage.navigateToTab('Tasks');
-     await this.tasksTab.markMultipleTasksAsDone(task.name);
-     await this.tasksTab.verifyTaskIsHidden(task.name);
+     await this.tasksTab.markMultipleTasksAsDone(isDormant ? "CTSC - Action Unprocessed Correspondence - Dormant/Post Hearing" : task.name);
+     await this.tasksTab.verifyTaskIsHidden(isDormant ? "CTSC - Action Unprocessed Correspondence - Dormant/Post Hearing" : task.name);
   }
 }
