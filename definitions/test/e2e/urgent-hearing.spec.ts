@@ -11,7 +11,7 @@ test.describe('Urgent hearing test', async () => {
 
   test(
     'Grant - Urgent hearing request',
-    { tag: ['@preview-regression', '@nightly-pipeline', '@regression-check']  },
+    { tag: ['@preview-regression', '@nightly-pipeline']  },
     async ({ urgentHearingSteps }) => {
       test.slow();
       await urgentHearingSteps.requestAndGrantAnUrgentHearing(caseId);
@@ -20,7 +20,7 @@ test.describe('Urgent hearing test', async () => {
 
   test(
     'Refuse - Urgent hearing request',
-    { tag: ['@preview-regression', '@nightly-pipeline', '@regression-check'] },
+    { tag: ['@preview-regression', '@nightly-pipeline'] },
     async ({ urgentHearingSteps }) => {
       test.slow();
       await urgentHearingSteps.requestAndRefuseAnUrgentHearing(caseId);
@@ -29,7 +29,7 @@ test.describe('Urgent hearing test', async () => {
 
   test(
     'Welsh - Urgent hearing request',
-    { tag: ['@todo-test-not-working', '@nightly-pipeline', '@regression-check'] },
+    { tag: ['@todo-test-not-working', '@nightly-pipeline'] },
     async ({ urgentHearingSteps }) => {
       test.slow();
       await urgentHearingSteps.requestAnUrgentHearingForAWelshCase();
@@ -38,7 +38,7 @@ test.describe('Urgent hearing test', async () => {
 
   test(
     'Error scenario - Upload encrypted/corrupted file in Action further evidence event',
-    { tag: ['@preview-regression', '@nightly-pipeline' , '@regression-check'] },
+    { tag: ['@preview-regression', '@nightly-pipeline'] },
     async ({ urgentHearingSteps }) => {
       test.slow();
       await urgentHearingSteps.uploadEncryptedFiles(caseId);
