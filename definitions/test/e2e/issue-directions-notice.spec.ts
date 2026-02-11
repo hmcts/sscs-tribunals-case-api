@@ -4,7 +4,7 @@ let caseId: string;
 
 test.describe(
   'Issue direction test',
-  { tag: '@nightly-pipeline' },
+  { tag: ['@nightly-pipeline', '@regression-check'] },
   async () => {
     test(
       'Issue Direction Notice - Pre Hearing - Normal Tax Credit Application - Appeal to Proceed',

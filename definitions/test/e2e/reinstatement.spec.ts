@@ -4,7 +4,7 @@ import performAppealDormantOnCase from '../api/client/sscs/appeal.event';
 
 test.describe(
   'Reinstatement request tests',
-  { tag: ['@preview-regression', '@nightly-pipeline'] },
+  { tag: ['@preview-regression', '@nightly-pipeline', '@regression-check'] },
   async () => {
     let caseId: string;
 

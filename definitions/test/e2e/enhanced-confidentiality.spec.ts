@@ -4,7 +4,7 @@ import { request } from '@playwright/test';
 
 let caseId: string;
 
-test.describe('Enhanced confidentiality test', async () => {
+test.describe('Enhanced confidentiality test', {tag:'@regression-check'}, async () => {
   test.beforeEach('Case has to be Created', async () => {
     caseId = await createCaseBasedOnCaseType('UC');
     test.setTimeout(360000);
