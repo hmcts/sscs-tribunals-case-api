@@ -79,6 +79,16 @@ sourceSets {
             runtimeClasspath += main.output + test.output
             srcDir('src/functionalTest/java')
         }
+        useJUnitPlatform()
+        // Run test classes in parallel across available CPU cores
+        maxParallelForks = Math.max(1, Runtime.runtime.availableProcessors() / 2)
+        // Reduce test JVM GC overhead for CI
+        jvmArgs = ['-Xmx1g', '-XX:+UseG1GC']
+        // Reduce Gradle test logging noise
+        testLogging {
+            events "failed", "skipped"
+            showStandardStreams = false
+        }
     }
     contractTest {
         java {
