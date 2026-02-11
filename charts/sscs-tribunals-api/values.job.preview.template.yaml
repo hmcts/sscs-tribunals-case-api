@@ -3,4 +3,5 @@ job:
   image: ${IMAGE_NAME}
   environment:
     TASK_NAME: MigrateCasesTask
+    CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED: true
 
