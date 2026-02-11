@@ -31,8 +31,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.DocumentHolder;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Pdf;
+import uk.gov.hmcts.reform.sscs.factory.DocumentRequestFactory;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.BulkPrintException;
@@ -43,10 +44,9 @@ import uk.gov.hmcts.reform.sscs.notifications.bulkprint.model.BulkPrintInfo;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.DocumentManagementServiceWrapper;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.PrintService;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.PlaceholderUtility;
-import uk.gov.hmcts.reform.sscs.factory.DocumentRequestFactory;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.DocumentHolder;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Pdf;
 
 /*
     This code is deprecated as it is for paper cases and everything is now digital.

@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getHmcHearingType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.sscs.callback.handlers.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -16,7 +17,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InternalCaseDocumentData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.callback.handlers.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 
 @Component

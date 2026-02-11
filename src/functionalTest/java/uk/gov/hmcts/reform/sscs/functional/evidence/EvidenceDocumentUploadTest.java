@@ -31,7 +31,6 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaEvidence;
 import uk.gov.hmcts.reform.sscs.functional.sya.SubmitHelper;
 
-
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest

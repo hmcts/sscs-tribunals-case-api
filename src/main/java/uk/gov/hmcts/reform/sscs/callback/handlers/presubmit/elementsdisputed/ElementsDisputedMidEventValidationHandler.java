@@ -10,14 +10,14 @@ import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.sscs.callback.handlers.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.dwpuploadresponse.ElementsDisputed;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ElementDisputed;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.callback.handlers.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.dwpuploadresponse.ElementsDisputed;
 
 @Component
 @Slf4j

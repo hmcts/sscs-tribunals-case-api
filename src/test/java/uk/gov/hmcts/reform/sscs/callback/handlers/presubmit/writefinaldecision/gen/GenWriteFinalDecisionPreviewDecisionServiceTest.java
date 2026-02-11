@@ -19,6 +19,8 @@ import java.util.Map;
 import junitparams.NamedParameters;
 import junitparams.Parameters;
 import org.junit.Test;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceTestBase;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
@@ -33,16 +35,14 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartyAttendedQuestion;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartyAttendedQuestionDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
-import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceTestBase;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
-import uk.gov.hmcts.reform.sscs.thirdparty.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.service.GenDecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.GenDecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
+import uk.gov.hmcts.reform.sscs.thirdparty.docassembly.GenerateFile;
 
 public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDecisionPreviewDecisionServiceTestBase {
 

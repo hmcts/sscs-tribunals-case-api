@@ -12,14 +12,14 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.SelectWhoReviewsCase.REVIEW_BY_JUDGE;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.SelectWhoReviewsCase.REVIEW_BY_TCW;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.HMCTS_RESPONSE_REVIEWED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.RESPONSE_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.SelectWhoReviewsCase.REVIEW_BY_JUDGE;
-import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.SelectWhoReviewsCase.REVIEW_BY_TCW;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

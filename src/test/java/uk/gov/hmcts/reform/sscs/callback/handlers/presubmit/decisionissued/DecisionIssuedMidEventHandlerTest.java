@@ -42,10 +42,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
-import uk.gov.hmcts.reform.sscs.thirdparty.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
-
+import uk.gov.hmcts.reform.sscs.thirdparty.docassembly.GenerateFile;
 
 @RunWith(JUnitParamsRunner.class)
 public class DecisionIssuedMidEventHandlerTest {

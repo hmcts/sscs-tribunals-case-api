@@ -26,6 +26,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.furtherevidence.reissueartifact.ReissueArtifactHandlerTest;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -39,7 +40,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocumentDetails;
-import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.furtherevidence.reissueartifact.ReissueArtifactHandlerTest;
 
 @RunWith(JUnitParamsRunner.class)
 public class ReissueDocumentAboutToStartHandlerTest extends ReissueArtifactHandlerTest {

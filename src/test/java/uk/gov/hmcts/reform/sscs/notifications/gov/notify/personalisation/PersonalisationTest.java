@@ -189,9 +189,6 @@ import org.mockito.Spy;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
-import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
-import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.NotificationConfig;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.PersonalisationConfiguration;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.PersonalisationMappingConstants;
@@ -205,6 +202,9 @@ import uk.gov.hmcts.reform.sscs.notifications.gov.notify.extractor.HearingContac
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.factory.CcdNotificationWrapper;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.factory.NotificationWrapper;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.MessageAuthenticationServiceImpl;
+import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
+import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
+import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
 
 @Slf4j
 public class PersonalisationTest {

@@ -33,7 +33,6 @@ import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 import uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil;
 
-
 @ExtendWith(MockitoExtension.class)
 class HearingsChannelMappingTest {
 

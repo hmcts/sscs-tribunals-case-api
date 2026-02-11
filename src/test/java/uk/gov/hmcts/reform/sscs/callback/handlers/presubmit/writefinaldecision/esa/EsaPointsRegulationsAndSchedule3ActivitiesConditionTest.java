@@ -18,11 +18,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.esa.EsaAllowedOrRefusedCondition;
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.esa.EsaPointsRegulationsAndSchedule3ActivitiesCondition;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsEsaCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFinalDecisionCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)

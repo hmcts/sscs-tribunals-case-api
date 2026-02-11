@@ -12,13 +12,12 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.AwardType;
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
-import uk.gov.hmcts.reform.sscs.thirdparty.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
@@ -28,6 +27,7 @@ import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
+import uk.gov.hmcts.reform.sscs.thirdparty.docassembly.GenerateFile;
 
 @Slf4j
 @Component

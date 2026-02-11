@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.service.servicebus.EvidenceNotifyCallbackProcessor;
 
-
 @RestController
 @Slf4j
 public class EvidenceNotifyCallbackController {

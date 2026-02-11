@@ -22,9 +22,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.thirdparty.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
-
+import uk.gov.hmcts.reform.sscs.thirdparty.docassembly.GenerateFile;
 
 @RunWith(JUnitParamsRunner.class)
 public abstract class IssueNoticeHandlerTestBase {

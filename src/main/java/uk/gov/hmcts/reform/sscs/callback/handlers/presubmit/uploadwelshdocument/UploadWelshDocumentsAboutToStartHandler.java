@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.sscs.callback.handlers.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.*;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.callback.handlers.PreSubmitCallbackHandler;
 
 @Component
 public class UploadWelshDocumentsAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {

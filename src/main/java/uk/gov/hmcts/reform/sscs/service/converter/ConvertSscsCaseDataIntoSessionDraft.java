@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.sscs.service.DocumentDownloadService;
 import uk.gov.hmcts.reform.sscs.transform.deserialize.HearingOptionArrangements;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
-
 @Service
 public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAIntoBService<SscsCaseData, SessionDraft> {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");

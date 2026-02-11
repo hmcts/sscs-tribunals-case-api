@@ -10,7 +10,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 
-
 @RunWith(JUnitParamsRunner.class)
 public class BenefitTypeIndicatorSscs1UTest {
 

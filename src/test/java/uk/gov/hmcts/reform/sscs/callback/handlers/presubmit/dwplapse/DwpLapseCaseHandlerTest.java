@@ -40,7 +40,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 
-
 @RunWith(JUnitParamsRunner.class)
 public class DwpLapseCaseHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";

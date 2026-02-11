@@ -65,11 +65,11 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.exception.RequiredFieldMissingException;
 import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.IssueFurtherEvidenceException;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.PostIssueFurtherEvidenceTasksException;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.FurtherEvidenceService;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @RunWith(JUnitParamsRunner.class)
 public class IssueFurtherEvidenceHandlerTest {

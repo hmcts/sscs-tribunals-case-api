@@ -10,12 +10,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.DocumentHolder;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.service.DocumentManagementService;
-import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.PdfStoreException;
-import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.UnableToContactThirdPartyException;
 import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.PdfStoreException;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.UnableToContactThirdPartyException;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.DocumentHolder;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.service.DocumentManagementService;
 
 @Slf4j
 @Service

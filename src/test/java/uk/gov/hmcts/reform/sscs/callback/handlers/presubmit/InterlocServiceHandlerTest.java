@@ -39,7 +39,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 
-
 @ExtendWith(MockitoExtension.class)
 public class InterlocServiceHandlerTest {
 

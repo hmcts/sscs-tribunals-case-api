@@ -27,11 +27,11 @@ import uk.gov.hmcts.reform.sendletter.api.SendLetterResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Pdf;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.BulkPrintException;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.NonPdfBulkPrintException;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Pdf;
 
 @Service
 @Slf4j

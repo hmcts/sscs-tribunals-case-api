@@ -36,10 +36,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Venue;
-import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.factory.CcdNotificationWrapper;
+import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
 
 public final class SscsCaseDataUtils {
 

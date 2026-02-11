@@ -55,6 +55,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
+import uk.gov.hmcts.reform.sscs.callback.handlers.evidenceshare.RoboticsCallbackHandler;
+import uk.gov.hmcts.reform.sscs.callback.handlers.evidenceshare.SendToBulkPrintHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
@@ -63,11 +65,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Pdf;
-import uk.gov.hmcts.reform.sscs.thirdparty.documentmanagement.EvidenceDownloadClientApi;
-import uk.gov.hmcts.reform.sscs.thirdparty.documentmanagement.EvidenceMetadataDownloadClientApi;
-import uk.gov.hmcts.reform.sscs.callback.handlers.evidenceshare.RoboticsCallbackHandler;
-import uk.gov.hmcts.reform.sscs.callback.handlers.evidenceshare.SendToBulkPrintHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.BulkPrintService;
@@ -78,7 +75,9 @@ import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.service.servicebus.EvidenceNotifyCallbackProcessor;
-
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Pdf;
+import uk.gov.hmcts.reform.sscs.thirdparty.documentmanagement.EvidenceDownloadClientApi;
+import uk.gov.hmcts.reform.sscs.thirdparty.documentmanagement.EvidenceMetadataDownloadClientApi;
 
 @RunWith(JUnitParamsRunner.class)
 @SpringBootTest

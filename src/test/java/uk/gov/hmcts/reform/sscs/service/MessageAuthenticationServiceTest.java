@@ -13,7 +13,6 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.sscs.exception.InvalidSubscriptionTokenException;
 
-
 @RunWith(MockitoJUnitRunner.class)
 public class MessageAuthenticationServiceTest {
 

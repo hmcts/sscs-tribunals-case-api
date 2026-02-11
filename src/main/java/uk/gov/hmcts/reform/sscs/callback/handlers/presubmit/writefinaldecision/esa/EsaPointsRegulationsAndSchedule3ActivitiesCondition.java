@@ -2,12 +2,12 @@ package uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.
 
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.YesNoPredicate.FALSE;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.YesNoPredicate.NOT_TRUE;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.YesNoPredicate.SPECIFIED;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.YesNoPredicate.TRUE;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.YesNoPredicate.UNSPECIFIED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,8 +18,6 @@ import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.AwardType;
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.FieldCondition;
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.PointsCondition;
@@ -27,6 +25,8 @@ import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.S
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.StringListPredicate;
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.YesNoFieldCondition;
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.YesNoPredicate;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 

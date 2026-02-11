@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.Notificat
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.Template;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.factory.CcdNotificationWrapper;
 
-
 @RunWith(JUnitParamsRunner.class)
 @SpringBootTest
 @TestPropertySource(locations = "classpath:config/application_es_it.properties")

@@ -4,10 +4,10 @@ import static java.util.Arrays.stream;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.managedocuments.UploadDocumentMidEventHandler.getDocumentIdFromUrl;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DocumentTabChoice.INTERNAL;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
-import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.managedocuments.UploadDocumentMidEventHandler.getDocumentIdFromUrl;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.addDocumentToCaseDataDocuments;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.addDocumentToCaseDataInternalDocuments;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.addDocumentToDocumentTabAndBundle;
@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.callback.handlers.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -32,7 +33,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InternalCaseDocumentData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.callback.handlers.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @Slf4j

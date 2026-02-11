@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.furtherevidence.fen
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.callback.handlers.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -11,7 +12,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.callback.handlers.PreSubmitCallbackHandler;
 
 @Service
 public class FeNoActionAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {

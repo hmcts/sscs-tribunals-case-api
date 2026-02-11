@@ -36,7 +36,6 @@ import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.service.HearingOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.HmcHearingApiService;
 
-
 @RunWith(JUnitParamsRunner.class)
 public class AmendHearingOutcomeAboutToStartHandlerTest {
     private AmendHearingOutcomeAboutToStartHandler handler;

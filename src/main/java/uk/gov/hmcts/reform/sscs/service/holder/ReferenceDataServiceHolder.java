@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
 
-
 @Data
 @Component
 public class ReferenceDataServiceHolder {

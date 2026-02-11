@@ -17,10 +17,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.ReasonableAdjustmentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReasonableAdjustments;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.BulkPrintServiceHelper;
 import uk.gov.hmcts.reform.sscs.service.CcdNotificationsPdfService;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Pdf;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BulkPrintServiceHelperTest {

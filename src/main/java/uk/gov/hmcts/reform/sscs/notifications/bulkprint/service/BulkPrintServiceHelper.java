@@ -12,11 +12,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Pdf;
-import uk.gov.hmcts.reform.sscs.notifications.bulkprint.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.model.LetterType;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.service.CcdNotificationsPdfService;
-
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Pdf;
 
 @Slf4j
 @Service

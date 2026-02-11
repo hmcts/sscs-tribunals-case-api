@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.DescriptorTable;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Paragraph;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
-
 public class Scenario8Content extends UcTemplateContent {
 
     public Scenario8Content(WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody) {

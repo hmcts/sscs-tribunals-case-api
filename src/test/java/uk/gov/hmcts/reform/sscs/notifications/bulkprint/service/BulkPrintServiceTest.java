@@ -53,13 +53,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Pdf;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.BulkPrintException;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.NonPdfBulkPrintException;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.BulkPrintServiceHelper;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.CcdNotificationService;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Pdf;
 
 @ExtendWith(MockitoExtension.class)
 public class BulkPrintServiceTest {

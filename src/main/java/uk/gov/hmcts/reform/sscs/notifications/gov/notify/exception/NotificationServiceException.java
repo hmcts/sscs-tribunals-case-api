@@ -5,7 +5,6 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 import uk.gov.service.notify.NotificationClientException;
 
-
 @SuppressWarnings("squid:MaximumInheritanceDepth")
 public class NotificationServiceException extends RuntimeException {
 

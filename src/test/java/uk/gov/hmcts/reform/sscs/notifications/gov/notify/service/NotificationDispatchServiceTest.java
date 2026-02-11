@@ -75,7 +75,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.AppealHearingType;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.SubscriptionType;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.NotificationSscsCaseDataWrapper;
@@ -87,6 +86,7 @@ import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.Template;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.factory.CcdNotificationWrapper;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.factory.NotificationWrapper;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.docmosis.PdfLetterService;
+import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.service.notify.NotificationClientException;
 
 @ExtendWith(MockitoExtension.class)

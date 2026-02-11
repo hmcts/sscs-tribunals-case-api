@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsDetailsMapping.getHearingType;
 import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.PlaceholderConstants.ADDRESS_NAME;
 import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.PlaceholderConstants.APPEAL_REF;
 import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.PlaceholderConstants.APPELLANT_NAME;
@@ -14,7 +15,6 @@ import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placehold
 import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.PlaceholderConstants.PHONE_NUMBER;
 import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.PlaceholderConstants.POSTPONEMENT_REQUEST;
 import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.PlaceholderUtility.getPostponementRequestStatus;
-import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsDetailsMapping.getHearingType;
 import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.LetterUtils.LetterType.DOCMOSIS;
 import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.LetterUtils.getAddressPlaceholders;
 

@@ -61,10 +61,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
-import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.PersonalisationConfiguration;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.SubscriptionWithType;
+import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
 
 @Component
 public class SyaAppealCreatedAndReceivedPersonalisation extends WithRepresentativePersonalisation {

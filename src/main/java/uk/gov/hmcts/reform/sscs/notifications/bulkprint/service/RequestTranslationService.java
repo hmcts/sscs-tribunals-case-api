@@ -12,14 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.DocumentHolder;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Template;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.service.DocmosisPdfGenerationService;
 import uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment;
 import uk.gov.hmcts.reform.sscs.domain.email.RequestTranslationTemplate;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.DocumentHolder;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Template;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.service.DocmosisPdfGenerationService;
 
 @Component
 @Slf4j

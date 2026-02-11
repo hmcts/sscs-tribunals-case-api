@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DatedRequestOutcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
-
 public final class ConfidentialityRequestUtil {
 
     private ConfidentialityRequestUtil() {

@@ -17,7 +17,6 @@ import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
-
 @RunWith(JUnitParamsRunner.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest

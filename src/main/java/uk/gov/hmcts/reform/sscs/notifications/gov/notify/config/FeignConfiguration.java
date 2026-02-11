@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication;
 
-
 @Configuration
 @EnableFeignClients(
     basePackageClasses = TribunalsCaseApiApplication.class

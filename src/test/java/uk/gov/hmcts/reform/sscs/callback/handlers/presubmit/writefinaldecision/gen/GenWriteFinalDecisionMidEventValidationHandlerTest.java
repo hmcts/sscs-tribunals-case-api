@@ -12,6 +12,9 @@ import java.util.List;
 import junitparams.JUnitParamsRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.AwardType;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.WriteFinalDecisionMidEventValidationHandlerBase;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.WriteFinalDecisionMidEventValidationHandlerTestBase;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
@@ -20,11 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.AwardType;
-import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.WriteFinalDecisionMidEventValidationHandlerBase;
-import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.WriteFinalDecisionMidEventValidationHandlerTestBase;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
-
 
 @RunWith(JUnitParamsRunner.class)
 public class GenWriteFinalDecisionMidEventValidationHandlerTest extends WriteFinalDecisionMidEventValidationHandlerTestBase {

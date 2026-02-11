@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision;
 
 import java.util.Optional;
 import java.util.function.Function;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.pip.PipActivityType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 public class AwardTypeCondition extends FieldConditionBase<String> {
 

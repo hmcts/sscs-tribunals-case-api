@@ -28,8 +28,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
-import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.RoboticsService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.RoboticsService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
 @Slf4j

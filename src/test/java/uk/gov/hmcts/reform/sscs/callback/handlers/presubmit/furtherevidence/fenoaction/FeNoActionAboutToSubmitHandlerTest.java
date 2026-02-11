@@ -15,12 +15,12 @@ import org.skyscreamer.jsonassert.Customization;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.skyscreamer.jsonassert.comparator.CustomComparator;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.uploaddocuments.BaseHandlerTest;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.uploaddocuments.BaseHandlerTest;
 
 public class FeNoActionAboutToSubmitHandlerTest extends BaseHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";

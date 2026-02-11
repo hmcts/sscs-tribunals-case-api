@@ -40,13 +40,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.DocumentHolder;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Pdf;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.service.PdfGenerationService;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.UnableToContactThirdPartyException;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.CoverLetterService;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.FurtherEvidencePlaceholderService;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.DocumentHolder;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Pdf;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.service.PdfGenerationService;
 
 @RunWith(JUnitParamsRunner.class)
 public class CoverLetterServiceTest {

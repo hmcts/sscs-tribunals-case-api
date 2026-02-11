@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.NoteDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
-
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest

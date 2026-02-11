@@ -2,11 +2,11 @@ package uk.gov.hmcts.reform.sscs.notifications.bulkprint.callback.handlers;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.evidenceshare.HandlerUtils.isANewJointParty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DWP_UPLOAD_RESPONSE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.WITH_DWP;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.callback.handlers.evidenceshare.HandlerUtils.isANewJointParty;
 
 import junitparams.JUnitParamsRunner;
 import org.junit.Test;
@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-
 
 @RunWith(JUnitParamsRunner.class)
 public class HandlerUtilsTest {

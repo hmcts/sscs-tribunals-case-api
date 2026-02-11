@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
-
 @RunWith(JUnitParamsRunner.class)
 public class SupplementaryResponseMidEventHandlerTest {
 

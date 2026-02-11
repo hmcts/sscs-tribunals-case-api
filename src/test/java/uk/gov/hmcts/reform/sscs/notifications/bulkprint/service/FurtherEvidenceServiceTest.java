@@ -61,7 +61,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocumentDetails;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.model.PdfDocument;
@@ -69,6 +68,7 @@ import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.BulkPrintService
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.CoverLetterService;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.FurtherEvidenceService;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.SscsDocumentService;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Pdf;
 
 @RunWith(JUnitParamsRunner.class)
 public class FurtherEvidenceServiceTest {

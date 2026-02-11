@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.ListingStateProcessingService;
 
-
 @Slf4j
 @Service
 public class UpdateOtherPartyHandler implements EvidenceCallbackHandler<SscsCaseData> {

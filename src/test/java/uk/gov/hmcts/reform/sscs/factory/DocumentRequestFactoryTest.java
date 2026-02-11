@@ -14,11 +14,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.DocumentHolder;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Template;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.TemplateService;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.PlaceholderService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.DocumentHolder;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Template;
 
 public class DocumentRequestFactoryTest {
 

@@ -23,10 +23,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
-
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Pdf;
 
 @RunWith(JUnitParamsRunner.class)
 @SpringBootTest

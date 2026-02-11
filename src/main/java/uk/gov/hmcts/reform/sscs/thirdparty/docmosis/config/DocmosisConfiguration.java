@@ -5,10 +5,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.service.DocmosisPdfGenerationService;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.service.DocmosisPdfGenerationService;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.service.DocumentManagementService;
 
 @Configuration
 @ConditionalOnProperty("service.pdf-service.uri")

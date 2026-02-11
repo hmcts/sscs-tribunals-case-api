@@ -2,10 +2,10 @@ package uk.gov.hmcts.reform.sscs.callback.handlers.evidenceshare;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toMap;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.evidenceshare.HandlerUtils.distinctByKey;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.callback.handlers.evidenceshare.HandlerUtils.distinctByKey;
 import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
 import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.domain.FurtherEvidenceLetterType.JOINT_PARTY_LETTER;
 import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.domain.FurtherEvidenceLetterType.OTHER_PARTY_LETTER;
@@ -33,12 +33,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.IssueFurtherEvidenceException;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.PostIssueFurtherEvidenceTasksException;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.FurtherEvidenceService;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @Service
 @Slf4j

@@ -37,7 +37,6 @@ import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 import uk.gov.hmcts.reform.sscs.service.bundle.BundleAudioVideoPdfService;
 
-
 public class CreateBundleAboutToStartEventHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 

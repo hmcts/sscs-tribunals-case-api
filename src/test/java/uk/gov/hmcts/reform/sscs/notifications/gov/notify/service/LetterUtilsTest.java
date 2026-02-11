@@ -7,6 +7,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.DWP;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.HMCTS;
 import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_1;
 import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_2;
 import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_3;
@@ -17,8 +19,6 @@ import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placehold
 import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_3_LITERAL;
 import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_4_LITERAL;
 import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_5_LITERAL;
-import static uk.gov.hmcts.reform.sscs.model.PartyItemList.DWP;
-import static uk.gov.hmcts.reform.sscs.model.PartyItemList.HMCTS;
 import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.AppConstants.REP_SALUTATION;
 import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.PersonalisationMappingConstants.ADDRESS_LINE_1;
 import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.PersonalisationMappingConstants.ADDRESS_LINE_2;

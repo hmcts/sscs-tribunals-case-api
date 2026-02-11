@@ -208,8 +208,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.exception.BenefitMappingException;
-import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
-import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.NotificationConfig;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.NotificationEventTypeLists;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.PersonalisationConfiguration;
@@ -224,6 +222,8 @@ import uk.gov.hmcts.reform.sscs.notifications.gov.notify.extractor.HearingContac
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.factory.NotificationWrapper;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.LetterUtils;
 import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.MessageAuthenticationServiceImpl;
+import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
+import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
 
 @Component
 @Slf4j

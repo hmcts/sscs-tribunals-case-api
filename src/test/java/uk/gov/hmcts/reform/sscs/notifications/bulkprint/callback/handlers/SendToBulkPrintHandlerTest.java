@@ -56,17 +56,17 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.DocumentHolder;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Pdf;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Template;
+import uk.gov.hmcts.reform.sscs.factory.DocumentRequestFactory;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.exception.NonPdfBulkPrintException;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.DocumentManagementServiceWrapper;
-import uk.gov.hmcts.reform.sscs.factory.DocumentRequestFactory;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.DocumentHolder;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Pdf;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Template;
 
 @ExtendWith(MockitoExtension.class)
 class SendToBulkPrintHandlerTest {

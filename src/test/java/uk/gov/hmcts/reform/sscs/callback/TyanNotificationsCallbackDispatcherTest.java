@@ -26,13 +26,13 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
-import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.callback.handlers.EvidenceCallbackHandler;
 import uk.gov.hmcts.reform.sscs.callback.handlers.evidenceshare.IssueFurtherEvidenceHandler;
 import uk.gov.hmcts.reform.sscs.callback.handlers.evidenceshare.RoboticsCallbackHandler;
 import uk.gov.hmcts.reform.sscs.callback.handlers.evidenceshare.SendToBulkPrintHandler;
+import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @RunWith(JUnitParamsRunner.class)
 public class TyanNotificationsCallbackDispatcherTest {

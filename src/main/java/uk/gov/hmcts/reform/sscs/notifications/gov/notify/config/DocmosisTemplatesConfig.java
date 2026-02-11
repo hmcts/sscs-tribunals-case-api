@@ -7,7 +7,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 
-
 @Component
 @ConfigurationProperties("pdf-service")
 @Getter

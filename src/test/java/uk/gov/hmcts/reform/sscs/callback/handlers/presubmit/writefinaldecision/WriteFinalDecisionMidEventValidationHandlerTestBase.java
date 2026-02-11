@@ -7,8 +7,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.WriteFinalDecisionMidEventValidationHandlerBase.CANT_UPLOAD_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;

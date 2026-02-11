@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.pip;
 
 import java.util.function.Function;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsPipCaseData;
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.ActivityQuestion;
 import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.ActivityType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsPipCaseData;
 
 /**
  * Enum to encapsulate binding between an activity question key, and the corresponding getter method on SscsCaseData that yields that answer to that question.

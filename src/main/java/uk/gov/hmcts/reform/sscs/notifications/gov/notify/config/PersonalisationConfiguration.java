@@ -8,7 +8,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 
-
 @Getter
 @Setter
 @Configuration

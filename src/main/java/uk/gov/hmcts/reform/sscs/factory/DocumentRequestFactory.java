@@ -6,11 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.DocumentHolder;
-import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Template;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.TemplateService;
 import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.placeholders.PlaceholderService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.DocumentHolder;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Template;
 
 @Component
 @Slf4j
