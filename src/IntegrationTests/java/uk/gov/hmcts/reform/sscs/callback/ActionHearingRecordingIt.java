@@ -13,13 +13,13 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ACTION_HEARING_RECORDING_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionhearingrecordingrequest.ActionHearingRecordingRequestAboutToStartHandlerTest.getHearingRecording;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionhearingrecordingrequest.ActionHearingRecordingRequestAboutToSubmitHandlerTest.getOtherPartyHearingRecordingReqUi;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionhearingrecordingrequest.ActionHearingRecordingRequestAboutToSubmitHandlerTest.getProcessHearingRecordingRequest;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionhearingrecordingrequest.ActionHearingRecordingRequestMidEventHandlerTest.HEARING;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionhearingrecordingrequest.ActionHearingRecordingRequestMidEventHandlerTest.buildOtherPartyWithAppointeeAndRep;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionhearingrecordingrequest.ActionHearingRecordingRequestMidEventHandlerTest.getProcessHearingRecordingRequestDetails;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionhearingrecordingrequest.ActionHearingRecordingRequestMidEventHandlerTest.setRefusedHearingsForParty;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.actionhearingrecordingrequest.ActionHearingRecordingRequestAboutToStartHandlerTest.getHearingRecording;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.actionhearingrecordingrequest.ActionHearingRecordingRequestAboutToSubmitHandlerTest.getOtherPartyHearingRecordingReqUi;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.actionhearingrecordingrequest.ActionHearingRecordingRequestAboutToSubmitHandlerTest.getProcessHearingRecordingRequest;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.actionhearingrecordingrequest.ActionHearingRecordingRequestMidEventHandlerTest.HEARING;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.actionhearingrecordingrequest.ActionHearingRecordingRequestMidEventHandlerTest.buildOtherPartyWithAppointeeAndRep;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.actionhearingrecordingrequest.ActionHearingRecordingRequestMidEventHandlerTest.getProcessHearingRecordingRequestDetails;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.actionhearingrecordingrequest.ActionHearingRecordingRequestMidEventHandlerTest.setRefusedHearingsForParty;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.OTHER_PARTY;
 import static uk.gov.hmcts.reform.sscs.model.RequestStatus.GRANTED;
 

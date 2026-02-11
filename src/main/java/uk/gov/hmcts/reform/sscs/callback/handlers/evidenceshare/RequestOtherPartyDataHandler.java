@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
+package uk.gov.hmcts.reform.sscs.callback.handlers.evidenceshare;
 
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
@@ -6,7 +6,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
+import uk.gov.hmcts.reform.sscs.callback.handlers.EvidenceCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @Slf4j
 @Service
-public class RequestOtherPartyDataHandler implements CallbackHandler<SscsCaseData> {
+public class RequestOtherPartyDataHandler implements EvidenceCallbackHandler<SscsCaseData> {
 
     private static final String SUMMARY = "REQUEST_OTHER_PARTY_DATA";
     private static final String DESCRIPTION = "Requesting other party data";
@@ -27,7 +27,8 @@ public class RequestOtherPartyDataHandler implements CallbackHandler<SscsCaseDat
     private final boolean cmOtherPartyConfidentialityEnabled;
 
     public RequestOtherPartyDataHandler(UpdateCcdCaseService updateCcdCaseService, IdamService idamService,
-                                        @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
+                                        @Value("${feature.cm-other-party-confidentiality.enabled}")
+                                        boolean cmOtherPartyConfidentialityEnabled) {
         this.updateCcdCaseService = updateCcdCaseService;
         this.idamService = idamService;
         this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;

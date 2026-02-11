@@ -11,7 +11,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.HandlerHelper.buildTestCallbackForGivenData;
+import static uk.gov.hmcts.reform.sscs.notifications.bulkprint.callback.handlers.HandlerHelper.buildTestCallbackForGivenData;
 
 import java.util.Arrays;
 import java.util.List;

@@ -3,6 +3,19 @@ package uk.gov.hmcts.reform.sscs.functional.tyanotifications.sya.notifications;
 import static org.apache.commons.lang3.StringUtils.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.ADJOURNED;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.APPEAL_DORMANT;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.APPEAL_LAPSED;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.APPEAL_WITHDRAWN;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.DIRECTION_ISSUED;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.DWP_UPLOAD_RESPONSE;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.EVIDENCE_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.EVIDENCE_REMINDER;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.HEARING_BOOKED;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.HEARING_REMINDER;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.POSTPONEMENT;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.REVIEW_CONFIDENTIALITY_REQUEST;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType.STRUCK_OUT;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -134,7 +147,7 @@ public class JointPartyFunctionalTest extends AbstractFunctionalTest {
     @Test
     public void sendsDirectionIssuedProvideInformationLetterToAppellantRepresentativeAndJointParty() throws IOException, NotificationClientException {
 
-        NotificationEventType notificationEventType = NotificationEventType.DIRECTION_ISSUED;
+        NotificationEventType notificationEventType = DIRECTION_ISSUED;
 
         simulateCcdCallback(notificationEventType,
             BASE_PATH_TYAN + notificationEventType.getId() + "ProvideInformationCallback.json");
