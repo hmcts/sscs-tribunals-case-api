@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -16,7 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
 @Slf4j
-public class AddOtherPartyMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+class AddOtherPartyMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final boolean cmOtherPartyConfidentialityEnabled;
 
@@ -48,7 +49,7 @@ public class AddOtherPartyMidEventHandler implements PreSubmitCallbackHandler<Ss
 
         var preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 
-        if (caseData.getOtherParties() == null || caseData.getOtherParties().isEmpty()) {
+        if (CollectionUtils.isEmpty(caseData.getOtherParties())) {
             log.debug("Other party must be added to submit this event. ccdCaseId: {}", caseData.getCcdCaseId());
             preSubmitCallbackResponse.addError("Other party must be added to submit this event.");
         }

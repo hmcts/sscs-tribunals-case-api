@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.TAX_CREDIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtilTest.ID_1;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtilTest.ID_2;
@@ -35,7 +36,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
 @ExtendWith(MockitoExtension.class)
-public class AddOtherPartyMidEventHandlerTest {
+class AddOtherPartyMidEventHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
@@ -54,7 +55,7 @@ public class AddOtherPartyMidEventHandlerTest {
         class CmOtherPartyConfidentialityEnabled {
 
             @BeforeEach
-            public void setUp() {
+            void setUp() {
                 handler = new AddOtherPartyMidEventHandler(true);
             }
 
@@ -78,14 +79,14 @@ public class AddOtherPartyMidEventHandlerTest {
 
             @ParameterizedTest
             @EnumSource(value = EventType.class, mode = EnumSource.Mode.EXCLUDE, names = {"ADD_OTHER_PARTY_DATA"})
-            public void givenNonAddOtherPartyEvent_thenReturnFalse(EventType eventType) {
+            void givenNonAddOtherPartyEvent_thenReturnFalse(EventType eventType) {
                 when(callback.getEvent()).thenReturn(eventType);
 
                 assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
             }
 
             @Test
-            public void givenAddOtherPartyEventAndChildSupportBenefitWithoutOtherPartyData_thenReturnFalse() {
+            void givenAddOtherPartyEventAndChildSupportBenefitWithoutOtherPartyData_thenReturnFalse() {
                 var sscsCaseData = caseDataWithBenefit(CHILD_SUPPORT.getShortName());
 
                 when(callback.getEvent()).thenReturn(EventType.ADD_OTHER_PARTY_DATA);
@@ -96,7 +97,7 @@ public class AddOtherPartyMidEventHandlerTest {
             }
 
             @Test
-            public void givenAddOtherPartyEventAndChildSupportBenefit_thenReturnTrue() {
+            void givenAddOtherPartyEventAndChildSupportBenefit_thenReturnTrue() {
                 var sscsCaseData = caseDataWithBenefit(CHILD_SUPPORT.getShortName());
 
                 when(callback.getEvent()).thenReturn(EventType.ADD_OTHER_PARTY_DATA);
@@ -107,12 +108,25 @@ public class AddOtherPartyMidEventHandlerTest {
 
                 assertThat(handler.canHandle(MID_EVENT, callback)).isTrue();
             }
+
+            @Test
+            void givenAddOtherPartyEventAndNoChildSupportBenefit_thenReturnFalse() {
+                var sscsCaseData = caseDataWithBenefit(TAX_CREDIT.getShortName());
+
+                when(callback.getEvent()).thenReturn(EventType.ADD_OTHER_PARTY_DATA);
+                when(callback.getCaseDetails()).thenReturn(caseDetails);
+                when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+                sscsCaseData.setOtherParties(Collections.singletonList(buildOtherParty(ID_1)));
+
+                assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
+            }
         }
 
         @Nested
         class CmOtherPartyConfidentialityDisabled {
             @BeforeEach
-            public void setUp() {
+            void setUp() {
                 handler = new AddOtherPartyMidEventHandler(false);
             }
 
@@ -130,12 +144,12 @@ public class AddOtherPartyMidEventHandlerTest {
         class CmOtherPartyConfidentialityEnabled {
 
             @BeforeEach
-            public void setUp() {
+            void setUp() {
                 handler = new AddOtherPartyMidEventHandler(true);
             }
 
             @Test
-            public void givenAddOtherPartyEventWithSingleOtherPartyData_thenRunSuccessfully() {
+            void givenAddOtherPartyEventWithSingleOtherPartyData_thenRunSuccessfully() {
                 var sscsCaseData = caseDataWithBenefit(CHILD_SUPPORT.getShortName());
 
                 when(callback.getEvent()).thenReturn(EventType.ADD_OTHER_PARTY_DATA);
@@ -174,7 +188,7 @@ public class AddOtherPartyMidEventHandlerTest {
             }
 
             @Test
-            public void throwsExceptionIfItCannotHandleTheAppeal() {
+            void throwsExceptionIfItCannotHandleTheAppeal() {
                 when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
 
                 assertThatThrownBy(() ->
@@ -183,7 +197,7 @@ public class AddOtherPartyMidEventHandlerTest {
             }
 
             @Test
-            public void givenAddOtherPartyEventWithoutOtherPartyData_thenReturnError() {
+            void givenAddOtherPartyEventWithoutOtherPartyData_thenReturnError() {
                 var sscsCaseData = caseDataWithBenefit(CHILD_SUPPORT.getShortName());
 
                 when(callback.getEvent()).thenReturn(EventType.ADD_OTHER_PARTY_DATA);
@@ -198,7 +212,7 @@ public class AddOtherPartyMidEventHandlerTest {
             }
 
             @Test
-            public void givenAddOtherPartyEventWithMultipleOtherParties_thenReturnError() {
+            void givenAddOtherPartyEventWithMultipleOtherParties_thenReturnError() {
                 var sscsCaseData = caseDataWithBenefit(CHILD_SUPPORT.getShortName());
 
                 when(callback.getEvent()).thenReturn(EventType.ADD_OTHER_PARTY_DATA);
@@ -216,7 +230,7 @@ public class AddOtherPartyMidEventHandlerTest {
         @Nested
         class CmOtherPartyConfidentialityDisabled {
             @BeforeEach
-            public void setUp() {
+            void setUp() {
                 handler = new AddOtherPartyMidEventHandler(false);
             }
 
