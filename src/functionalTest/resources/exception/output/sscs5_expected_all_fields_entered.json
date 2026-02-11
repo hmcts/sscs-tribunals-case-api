@@ -51,7 +51,6 @@
           "isAddressSameAsAppointee": null,
           "isAppointee": "No",
           "confidentialityRequired": "Yes",
-          "confidentialityRequiredChangedDate": null,
           "appointee": null,
           "name": {
             "firstName": "Frederick",

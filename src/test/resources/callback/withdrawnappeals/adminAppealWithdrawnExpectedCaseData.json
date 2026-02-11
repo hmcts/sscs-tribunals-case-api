@@ -36,7 +36,6 @@
       },
       "isAppointee": null,
       "confidentialityRequired": null,
-      "confidentialityRequiredChangedDate": null,
       "role": null,
       "appointee": {
         "id":null,

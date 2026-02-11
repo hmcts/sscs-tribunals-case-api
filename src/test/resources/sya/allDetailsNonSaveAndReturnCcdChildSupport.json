@@ -21,15 +21,6 @@
   "caseNameHmctsInternal": "Joe Bloggs",
   "caseNameHmctsRestricted": "Joe Bloggs",
   "caseNamePublic": "Joe Bloggs",
-  "confidentialitySummary": [
-    {
-      "value": {
-        "confidentialityRequired": "Undetermined",
-        "name": "Joe Bloggs",
-        "party": "Appellant"
-      }
-    }
-  ],
   "ogdType": "DWP",
   "benefitCode": "022",
   "issueCode": "DD",
@@ -84,7 +75,6 @@
       "isAppointee": "No",
       "role": {},
       "confidentialityRequired": null,
-      "confidentialityRequiredChangedDate": null,
       "isAddressSameAsAppointee": "No",
       "appointee": {
         "name": {
@@ -290,5 +280,14 @@
   "poAttendanceConfirmed": "No",
   "tribunalDirectPoToAttend": "No",
   "hearingRoute": "gaps",
-  "linkedCasesBoolean": "No"
+  "linkedCasesBoolean": "No",
+  "confidentialitySummary": [
+    {
+      "value": {
+        "confidentialityRequired": "Undetermined",
+        "name": "Joe Bloggs",
+        "party": "Appellant"
+      }
+    }
+  ]
 }
