@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.confidentiality;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
@@ -11,9 +12,13 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -45,11 +50,13 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
     @BeforeEach
     void setUp() {
         handler = new ConfidentialityTabAboutToSubmitHandler(true);
-        sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build()).build();
+        sscsCaseData = SscsCaseData.builder()
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build()).build()).build();
     }
 
     @Test
     void canHandleReturnsTrue() {
+        primeSscsCaseData();
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isTrue();
     }
 
@@ -72,42 +79,8 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
         sscsCaseData.setAppeal(
             Appeal.builder().benefitType(BenefitType.builder().code(Benefit.PIP.getShortName()).build()).build());
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
+        assertThrows(IllegalStateException.class, () -> handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token"));
 
-        assertThat(response.getData().getExtendedSscsCaseData().getConfidentialityTab()).isNull();
-    }
-
-    @Test
-    void handleSetsConfidentialityTabToNullWhenBenefitTypeMissing() {
-        primeSscsCaseData();
-
-        sscsCaseData.setAppeal(Appeal.builder().benefitType(null).build());
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
-
-        assertThat(response.getData().getExtendedSscsCaseData().getConfidentialityTab()).isNull();
-    }
-
-    @Test
-    void handleSetsConfidentialityTabToNullWhenBenefitTypeCodeMissing() {
-        primeSscsCaseData();
-
-        sscsCaseData.setAppeal(Appeal.builder().benefitType(BenefitType.builder().code(null).build()).build());
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
-
-        assertThat(response.getData().getExtendedSscsCaseData().getConfidentialityTab()).isNull();
-    }
-
-    @Test
-    void handleSetsConfidentialityTabToNullWhenAppealMissing() {
-        primeSscsCaseData();
-
-        sscsCaseData.setAppeal(null);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
-
-        assertThat(response.getData().getExtendedSscsCaseData().getConfidentialityTab()).isNull();
     }
 
     @Test
@@ -135,11 +108,11 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
             Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
                 .appellant(appellant).build());
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
 
         String tab = response.getData().getExtendedSscsCaseData().getConfidentialityTab();
         assertThat(tab).isEqualToNormalizingWhitespace("""
-            Party | Name | Confidentiality Status | Confidentiality Confirmed
+            Party | Name | Confidentiality Status | Confidentiality Status Confirmed
             -|-|-|-
             Appellant | John Smith | Yes | 3 Feb 2020, 4:05:06 pm
             Appointee | Jane Doe | Yes | 3 Feb 2020, 4:05:06 pm
@@ -148,31 +121,14 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
             """);
     }
 
-    @Test
-    void handleDoesNotIncludeAppointeeWhenNotMarkedAsAppointee() {
+    @ParameterizedTest
+    @MethodSource("appointeeNotIncludedTestCases")
+    void handleDoesNotIncludeAppointeeWhenNotMarkedAsAppointee(String isAppointee, Appointee appointee) {
         primeSscsCaseData();
 
         Appellant appellant = Appellant.builder().name(Name.builder().firstName("John").lastName("Smith").build())
-            .confidentialityRequired(YES).isAppointee("No")
-            .appointee(Appointee.builder().name(Name.builder().firstName("Jane").lastName("Doe").build()).build()).build();
-
-        sscsCaseData.setAppeal(
-            Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
-                .appellant(appellant).build());
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
-
-        String tab = response.getData().getExtendedSscsCaseData().getConfidentialityTab();
-        assertThat(tab).contains("Appellant | John Smith | Yes");
-        assertThat(tab).doesNotContain("Appointee |");
-    }
-
-    @Test
-    void handleDoesNotIncludeAppointeeWhenAppointeeMissing() {
-        primeSscsCaseData();
-
-        Appellant appellant = Appellant.builder().name(Name.builder().firstName("John").lastName("Smith").build())
-            .confidentialityRequired(YES).isAppointee("Yes").appointee(null).build();
+            .confidentialityRequired(YES).isAppointee(isAppointee)
+            .appointee(appointee).build();
 
         sscsCaseData.setAppeal(
             Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
@@ -206,7 +162,7 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
     }
 
     @Test
-    void handleUsesNullNamesWhenNameMissing() {
+    void handleUsesEmptyNamesWhenNameMissing() {
         primeSscsCaseData();
 
         Appellant appellant = Appellant.builder().name(null).confidentialityRequired(YES).build();
@@ -221,8 +177,20 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
 
         String tab = response.getData().getExtendedSscsCaseData().getConfidentialityTab();
-        assertThat(tab).contains("Appellant | null | Yes");
-        assertThat(tab).contains("Other Party 1 | null | No");
+        assertThat(tab).isEqualToNormalizingPunctuationAndWhitespace("""
+            Party | Name | Confidentiality Status | Confidentiality Status Confirmed
+            -|-|-|-
+            Appellant |  | Yes |
+            Other Party 1 |  | No |
+            """);
+    }
+
+    private static Stream<Arguments> appointeeNotIncludedTestCases() {
+        return Stream.of(
+            org.junit.jupiter.params.provider.Arguments.of("No",
+                Appointee.builder().name(Name.builder().firstName("Jane").lastName("Doe").build()).build()),
+            org.junit.jupiter.params.provider.Arguments.of("Yes", null)
+        );
     }
 
     private void primeSscsCaseData() {

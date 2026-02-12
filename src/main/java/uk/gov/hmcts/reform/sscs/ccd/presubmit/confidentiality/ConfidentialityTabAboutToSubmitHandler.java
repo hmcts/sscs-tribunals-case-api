@@ -42,12 +42,17 @@ public class ConfidentialityTabAboutToSubmitHandler implements PreSubmitCallback
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         // TODO This will run for every event. Do we want to restrict this to specific events? UPDATE_CASE_ONLY / UPDATE_OTHER_PARTY_DATA / CASE_UPDATED
-        return cmOtherPartyConfidentialityEnabled && callbackType == CallbackType.ABOUT_TO_SUBMIT;
+        return cmOtherPartyConfidentialityEnabled && callbackType == CallbackType.ABOUT_TO_SUBMIT && callback.getCaseDetails()
+            .getCaseData().isBenefitType(Benefit.CHILD_SUPPORT);
     }
 
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
         String userAuthorisation) {
+
+        if (!canHandle(callbackType, callback)) {
+            throw new IllegalStateException("Cannot handle callback");
+        }
 
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         sscsCaseData.getExtendedSscsCaseData().setConfidentialityTab(
@@ -59,9 +64,6 @@ public class ConfidentialityTabAboutToSubmitHandler implements PreSubmitCallback
 
     private static String getConfidentialitySummaryEntries(List<CcdValue<OtherParty>> otherParties, Appeal appeal) {
 
-        if (!isChildSupportBenefit(appeal)) {
-            return null;
-        }
         final List<CcdValue<ConfidentialitySummaryEntry>> results = new ArrayList<>();
 
         addIfNotNull(results, buildAppellantConfidentialityTabEntry(appeal));
@@ -81,7 +83,7 @@ public class ConfidentialityTabAboutToSubmitHandler implements PreSubmitCallback
         });
 
         return """
-            Party | Name | Confidentiality Status | Confidentiality Confirmed
+            Party | Name | Confidentiality Status | Confidentiality Status Confirmed
             -|-|-|-
             %s
             """.formatted(confidentialityMarkdown.toString());
@@ -99,7 +101,7 @@ public class ConfidentialityTabAboutToSubmitHandler implements PreSubmitCallback
     }
 
     private static String extractFullName(Name name) {
-        return name != null ? name.getFullNameNoTitle() : null;
+        return name != null ? name.getFullNameNoTitle() : "";
     }
 
     private static ConfidentialitySummaryEntry buildAppellantConfidentialityTabEntry(Appeal appeal) {
@@ -138,13 +140,6 @@ public class ConfidentialityTabAboutToSubmitHandler implements PreSubmitCallback
             .party("Other Party " + displayIndex)
             .confidentialityRequired(getConfidentialityStatus(otherParty.getConfidentialityRequired()))
             .confidentialityRequiredChangedDate(formatDate(otherParty.getConfidentialityRequiredChangedDate())).build();
-    }
-
-    private static boolean isChildSupportBenefit(Appeal appeal) {
-        if (appeal == null || appeal.getBenefitType() == null || appeal.getBenefitType().getCode() == null) {
-            return false;
-        }
-        return Benefit.CHILD_SUPPORT.getShortName().equalsIgnoreCase(appeal.getBenefitType().getCode());
     }
 
     @Builder
