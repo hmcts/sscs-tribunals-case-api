@@ -49,7 +49,7 @@ public class ConfidentialityTabAboutToSubmitHandler implements PreSubmitCallback
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
         String userAuthorisation) {
 
-        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+        final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         sscsCaseData.getExtendedSscsCaseData().setConfidentialityTab(
             getConfidentialitySummaryEntries(callback.getCaseDetails().getCaseData().getOtherParties(),
                 callback.getCaseDetails().getCaseData().getAppeal()));
@@ -62,7 +62,7 @@ public class ConfidentialityTabAboutToSubmitHandler implements PreSubmitCallback
         if (!isChildSupportBenefit(appeal)) {
             return null;
         }
-        List<CcdValue<ConfidentialitySummaryEntry>> results = new ArrayList<>();
+        final List<CcdValue<ConfidentialitySummaryEntry>> results = new ArrayList<>();
 
         addIfNotNull(results, buildAppellantConfidentialityTabEntry(appeal));
         addIfNotNull(results, buildAppellantAppointeeConfidentialityTabEntry(appeal));
@@ -87,7 +87,6 @@ public class ConfidentialityTabAboutToSubmitHandler implements PreSubmitCallback
             """.formatted(confidentialityMarkdown.toString());
 
     }
-
 
     private static void addIfNotNull(List<CcdValue<ConfidentialitySummaryEntry>> list, ConfidentialitySummaryEntry entry) {
         if (entry != null) {
@@ -131,12 +130,12 @@ public class ConfidentialityTabAboutToSubmitHandler implements PreSubmitCallback
     }
 
     private static String formatDate(final LocalDateTime dateTime) {
-        return dateTime != null ? dateTime.format(FORMATTER) : null;
+        return dateTime != null ? dateTime.format(FORMATTER) : "";
     }
 
     private static ConfidentialitySummaryEntry buildOtherPartyEntry(OtherParty otherParty, int displayIndex) {
         return ConfidentialitySummaryEntry.builder().name(extractFullName(otherParty.getName()))
-            .party("Other Party #" + displayIndex)
+            .party("Other Party " + displayIndex)
             .confidentialityRequired(getConfidentialityStatus(otherParty.getConfidentialityRequired()))
             .confidentialityRequiredChangedDate(formatDate(otherParty.getConfidentialityRequiredChangedDate())).build();
     }

@@ -138,13 +138,13 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
 
         String tab = response.getData().getExtendedSscsCaseData().getConfidentialityTab();
-        assertThat(tab).isEqualToIgnoringNewLines("""
+        assertThat(tab).isEqualToNormalizingWhitespace("""
             Party | Name | Confidentiality Status | Confidentiality Confirmed
             -|-|-|-
             Appellant | John Smith | Yes | 3 Feb 2020, 4:05:06 pm
             Appointee | Jane Doe | Yes | 3 Feb 2020, 4:05:06 pm
-            Other Party #1 | Other One | No | 4 Feb 2020, 9:10:11 am
-            Other Party #2 | Other Two | Undetermined | null
+            Other Party 1 | Other One | No | 4 Feb 2020, 9:10:11 am
+            Other Party 2 | Other Two | Undetermined |
             """);
     }
 
@@ -200,7 +200,7 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
 
         String tab = response.getData().getExtendedSscsCaseData().getConfidentialityTab();
-        assertThat(tab).contains("Other Party #1 | Other Party | Yes");
+        assertThat(tab).contains("Other Party 1 | Other Party | Yes");
         assertThat(tab).doesNotContain("Appellant |");
         assertThat(tab).doesNotContain("Appointee |");
     }
@@ -222,7 +222,7 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
 
         String tab = response.getData().getExtendedSscsCaseData().getConfidentialityTab();
         assertThat(tab).contains("Appellant | null | Yes");
-        assertThat(tab).contains("Other Party #1 | null | No");
+        assertThat(tab).contains("Other Party 1 | null | No");
     }
 
     private void primeSscsCaseData() {
