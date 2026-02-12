@@ -1,3 +1,4 @@
 [
-
+  {"LiveFrom": "12/02/2026", "CaseTypeID": "Benefit", "ID": "confidentialityTab", "Label": "Confidentiality", "FieldType": "Text", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "12/02/2026", "CaseTypeID": "Benefit", "ID": "confidentialityTabLabel", "Label": "${confidentialityTab}", "FieldType": "Label", "SecurityClassification": "PUBLIC"}
 ]
