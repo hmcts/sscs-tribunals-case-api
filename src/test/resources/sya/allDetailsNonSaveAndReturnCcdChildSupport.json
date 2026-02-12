@@ -280,14 +280,5 @@
   "poAttendanceConfirmed": "No",
   "tribunalDirectPoToAttend": "No",
   "hearingRoute": "gaps",
-  "linkedCasesBoolean": "No",
-  "confidentialitySummary": [
-    {
-      "value": {
-        "confidentialityRequired": "Undetermined",
-        "name": "Joe Bloggs",
-        "party": "Appellant"
-      }
-    }
-  ]
+  "linkedCasesBoolean":"No"
 }

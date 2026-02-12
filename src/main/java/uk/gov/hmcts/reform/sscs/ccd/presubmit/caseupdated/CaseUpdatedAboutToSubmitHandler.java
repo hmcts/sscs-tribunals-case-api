@@ -22,11 +22,9 @@ import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleIbcaCase;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.resolvePostCode;
 
 import jakarta.validation.ConstraintValidatorContext;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -85,7 +83,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private static final String REP_ERROR_MESSAGE = "Name/Organisation has not been provided for the Representative";
     private static final String FIRST_NAME = "First Name";
     private static final String LAST_NAME = "Last Name";
-    private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("d MMM yyyy, h:mm:ss a", Locale.UK);
     private static ConstraintValidatorContext context;
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final AssociatedCaseLinkHelper associatedCaseLinkHelper;

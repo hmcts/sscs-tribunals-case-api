@@ -18,12 +18,10 @@ import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.roleAbsentForOthe
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.roleExistsForOtherParties;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.sendNewOtherPartyNotification;
 
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -58,8 +56,6 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
 
     private static final String ERR_ROLE_REQUIRED = "Role is required for the selected case";
 
-    private static final DateTimeFormatter formatter =
-        DateTimeFormatter.ofPattern("d MMM yyyy, h:mm:ss a", Locale.UK);
     private final boolean cmOtherPartyConfidentialityEnabled;
     private IdamService idamService;
 
