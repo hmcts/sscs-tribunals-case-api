@@ -14,12 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 import uk.gov.hmcts.reform.sscs.service.DocumentDownloadService;
 import uk.gov.hmcts.reform.sscs.service.TribunalsService;
-
 
 @RestController
 public class TyaController {
@@ -28,10 +29,16 @@ public class TyaController {
 
     private DocumentDownloadService documentDownloadService;
 
+    private final AuthorisationService authorisationService;
+
+
+    private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
+
     @Autowired
-    public TyaController(TribunalsService tribunalsService, DocumentDownloadService documentDownloadService) {
+    public TyaController(TribunalsService tribunalsService, DocumentDownloadService documentDownloadService, AuthorisationService authorisationService) {
         this.tribunalsService = tribunalsService;
         this.documentDownloadService = documentDownloadService;
+        this.authorisationService = authorisationService;
     }
 
     @Operation(summary = "getAppeal", description = "Returns an appeal given the CCD case id")
@@ -47,7 +54,10 @@ public class TyaController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Document", content = {
         @Content(schema = @Schema(implementation = Resource.class))})})
     @GetMapping(value = "/document", produces = APPLICATION_PDF_VALUE)
-    public ResponseEntity<Resource> getAppealDocument(@RequestParam(value = "url") String url) {
+    public ResponseEntity<Resource> getAppealDocument(@RequestHeader(value = SERVICE_AUTHORIZATION) String serviceAuthorization,
+                                                      @RequestParam(value = "url") String url) {
+        String serviceName = authorisationService.authenticate(serviceAuthorization);
+        authorisationService.assertIsAllowedToHandleCallback(serviceName);
         return documentDownloadService.downloadFile(url);
     }
 }
