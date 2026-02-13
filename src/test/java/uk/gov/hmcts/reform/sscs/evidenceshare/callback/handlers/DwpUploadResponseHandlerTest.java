@@ -13,7 +13,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.RESPONSE_SUBMITTED_DWP;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DWP_UPLOAD_RESPONSE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_ADMIN_ACTION;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.NOT_LISTABLE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
@@ -36,6 +35,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpResponseDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -579,13 +579,12 @@ class DwpUploadResponseHandlerTest {
     }
 
     @Test
-    void givenADwpUploadResponseEventTaxCreditFurtherInfoNoEditedEvidencePhme_setsReviewByJudge() {
+    void givenADwpUploadResponseEventTaxCreditFurtherInfoNoEditedEvidencePhme_triggersResponseReceivedEvent() {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("1")
             .createdInGapsFrom(READY_TO_LIST.getId())
             .dwpFurtherInfo("No")
             .dwpEditedEvidenceReason("phme")
-            .benefitCode(Benefit.TAX_CREDIT.getShortName())
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("taxCredit").build()).build())
             .build();
         final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(
@@ -604,7 +603,65 @@ class DwpUploadResponseHandlerTest {
 
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
         consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
-        assertThat(sscsCaseData.getInterlocReviewState()).isEqualTo(REVIEW_BY_JUDGE);
+        assertThat(sscsCaseData.getDwpState()).isEqualTo(RESPONSE_SUBMITTED_DWP);
+    }
+
+    @Test
+    void givenDwpEditedEvidenceReasonPhme_triggersResponseReceivedEvent() {
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+            .ccdCaseId("1")
+            .createdInGapsFrom(READY_TO_LIST.getId())
+            .dwpFurtherInfo("No")
+            .dwpEditedEvidenceReason("phme")
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).build())
+            .build();
+        final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(
+            sscsCaseData, WITH_DWP, DWP_UPLOAD_RESPONSE);
+
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+        when(updateCcdCaseService.updateCaseV2(any(), any(), any(), any(), any(), any())).thenReturn(
+            SscsCaseDetails.builder().id(1L)
+                .data(callback.getCaseDetails().getCaseData()).build());
+
+        handler.handle(CallbackType.SUBMITTED, callback);
+
+        verify(idamService).getIdamTokens();
+        verify(updateCcdCaseService).updateCaseV2(
+            eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+            eq(EventType.DWP_RESPOND.getCcdType()),
+            eq("Response received"),
+            eq("Update to response received as an Admin has to review the case"),
+            any(),
+            consumerArgumentCaptor.capture());
+    }
+
+    @Test
+    void givenDwpEditedEvidenceBudle_triggersResponseReceivedEvent() {
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+            .ccdCaseId("1")
+            .createdInGapsFrom(READY_TO_LIST.getId())
+            .dwpFurtherInfo("No")
+            .dwpEditedEvidenceBundleDocument(DwpResponseDocument.builder().build())
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).build())
+            .build();
+        final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(
+            sscsCaseData, WITH_DWP, DWP_UPLOAD_RESPONSE);
+
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+        when(updateCcdCaseService.updateCaseV2(any(), any(), any(), any(), any(), any())).thenReturn(
+            SscsCaseDetails.builder().id(1L)
+                .data(callback.getCaseDetails().getCaseData()).build());
+
+        handler.handle(CallbackType.SUBMITTED, callback);
+
+        verify(idamService).getIdamTokens();
+        verify(updateCcdCaseService).updateCaseV2(
+            eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+            eq(EventType.DWP_RESPOND.getCcdType()),
+            eq("Response received"),
+            eq("Update to response received as an Admin has to review the case"),
+            any(),
+            consumerArgumentCaptor.capture());
     }
 
     @Test
