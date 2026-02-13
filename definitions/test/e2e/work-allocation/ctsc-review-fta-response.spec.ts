@@ -33,9 +33,7 @@ test.describe('Work Allocation - CTSC - Review FTA response Task when PIP has an
       await uploadResponseSteps.uploadResponseWithoutFurtherInfoAsDwpCaseWorkerAndMarkCaseAsUrgent(caseId);
     });
     
-    test('As a CSTC Admin with case allocator role, view Review FTA response CTSC task', 
-      {tag:'@work-allocation-wip'}, 
-      async ({ ctscReviewFtaResponseSteps }) => {
+    test('As a CSTC Admin with case allocator role, view Review FTA response CTSC task', async ({ ctscReviewFtaResponseSteps }) => {
         test.slow();
         await ctscReviewFtaResponseSteps.verifyCtscAdminWithCaseAllocatorRoleCanViewReviewFTAResponseTask(caseId);
     });
