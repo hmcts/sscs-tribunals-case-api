@@ -207,6 +207,29 @@ class DwpUploadResponseHandlerTest {
 
             verifyNoInteractions(updateCcdCaseService);
         }
+
+        @Test
+        void givenDwpEditedEvidenceReasonPhme_triggersResponseReceivedEvent() {
+            SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(READY_TO_LIST.getId())
+                .dwpFurtherInfo("No").dwpEditedEvidenceReason("phme")
+                .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).build()).build();
+            final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(sscsCaseData, WITH_DWP,
+                DWP_UPLOAD_RESPONSE);
+
+            when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+            when(updateCcdCaseService.updateCaseV2(any(), any(), any(), any(), any(), any())).thenReturn(
+                SscsCaseDetails.builder().id(1L).data(callback.getCaseDetails().getCaseData()).build());
+
+            handler.handle(CallbackType.SUBMITTED, callback);
+
+            verify(idamService).getIdamTokens();
+            verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+                eq(EventType.DWP_RESPOND.getCcdType()), eq("Response received"),
+                eq("Update to response received as an Admin has to review the case"), any(), consumerArgumentCaptor.capture());
+
+            SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+            acceptAndAssertLog(EventType.DWP_RESPOND, sscsCaseDetails, callback.getCaseDetails().getId());
+        }
     }
 
     @Nested
@@ -259,30 +282,6 @@ class DwpUploadResponseHandlerTest {
         }
 
         @Test
-        void givenADwpUploadResponseEventUcWithBothNo_runResponseReceivedEvent() {
-            SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(READY_TO_LIST.getId())
-                .dwpFurtherInfo("No").elementsDisputedIsDecisionDisputedByOthers("No")
-                .appeal(Appeal.builder().benefitType(BenefitType.builder().code("UC").build()).build()).build();
-            final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(sscsCaseData, WITH_DWP,
-                DWP_UPLOAD_RESPONSE);
-
-            when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
-            when(updateCcdCaseService.updateCaseV2(any(), any(), any(), any(), any(), any())).thenReturn(
-                SscsCaseDetails.builder().id(1L).data(callback.getCaseDetails().getCaseData()).build());
-
-            handler.handle(CallbackType.SUBMITTED, callback);
-
-            verify(idamService).getIdamTokens();
-            verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
-                eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
-
-            SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
-            acceptAndAssertLog(EventType.READY_TO_LIST, sscsCaseDetails, callback.getCaseDetails().getId());
-            assertThat(sscsCaseData.getDwpState()).isEqualTo(RESPONSE_SUBMITTED_DWP);
-            assertThat(sscsCaseData.getIgnoreCallbackWarnings()).isEqualTo(YES);
-        }
-
-        @Test
         void givenADwpUploadResponseUcEventWithDisputeIsNoUrgentCaseFlagOnAndUrgentCaseYes_runResponseReceivedEvent() {
             handler = new DwpUploadResponseHandler(updateCcdCaseService, idamService);
             SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(READY_TO_LIST.getId())
@@ -305,6 +304,120 @@ class DwpUploadResponseHandlerTest {
             SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
             acceptAndAssertLog(EventType.DWP_RESPOND, sscsCaseDetails, callback.getCaseDetails().getId());
             assertThat(sscsCaseData.getDwpState()).isEqualTo(RESPONSE_SUBMITTED_DWP);
+        }
+
+        @Test
+        void givenADwpUploadResponseUcEventWithFurtherInfoOnly_runResponseReceivedEventWithFurtherInfoDescription() {
+            SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(READY_TO_LIST.getId())
+                .dwpFurtherInfo("Yes").elementsDisputedIsDecisionDisputedByOthers("No")
+                .appeal(Appeal.builder().benefitType(BenefitType.builder().code("UC").build()).build()).build();
+            final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(sscsCaseData, WITH_DWP,
+                DWP_UPLOAD_RESPONSE);
+
+            when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+            when(updateCcdCaseService.updateCaseV2(any(), any(), any(), any(), any(), any())).thenReturn(
+                SscsCaseDetails.builder().id(1L).data(callback.getCaseDetails().getCaseData()).build());
+
+            handler.handle(CallbackType.SUBMITTED, callback);
+
+            verify(idamService).getIdamTokens();
+            verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+                eq(EventType.DWP_RESPOND.getCcdType()), eq("Response received"),
+                eq("update to response received event as there is further information to assist the tribunal."), any(),
+                consumerArgumentCaptor.capture());
+
+            SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+            acceptAndAssertLog(EventType.DWP_RESPOND, sscsCaseDetails, callback.getCaseDetails().getId());
+            assertThat(sscsCaseData.getDwpState()).isEqualTo(RESPONSE_SUBMITTED_DWP);
+        }
+
+        @Test
+        void givenADwpUploadResponseUcEventWithFurtherInfoAndDispute_runResponseReceivedEventWithCombinedDescription() {
+            SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(READY_TO_LIST.getId())
+                .dwpFurtherInfo("Yes").elementsDisputedIsDecisionDisputedByOthers("Yes")
+                .appeal(Appeal.builder().benefitType(BenefitType.builder().code("UC").build()).build()).build();
+            final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(sscsCaseData, WITH_DWP,
+                DWP_UPLOAD_RESPONSE);
+
+            when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+            when(updateCcdCaseService.updateCaseV2(any(), any(), any(), any(), any(), any())).thenReturn(
+                SscsCaseDetails.builder().id(1L).data(callback.getCaseDetails().getCaseData()).build());
+
+            handler.handle(CallbackType.SUBMITTED, callback);
+
+            verify(idamService).getIdamTokens();
+            verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+                eq(EventType.DWP_RESPOND.getCcdType()), eq("Response received"),
+                eq("update to response received event as there is further information to assist the tribunal and there is a dispute."),
+                any(), consumerArgumentCaptor.capture());
+
+            SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+            acceptAndAssertLog(EventType.DWP_RESPOND, sscsCaseDetails, callback.getCaseDetails().getId());
+        }
+
+        @Test
+        void givenUcBenefitAndDisputeFlagPresent_shouldEvaluateDisputeFlag() {
+            SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(READY_TO_LIST.getId())
+                .benefitCode(Benefit.UC.getShortName()).dwpFurtherInfo("No").elementsDisputedIsDecisionDisputedByOthers("Yes")
+                .appeal(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build())
+                .build();
+            final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(sscsCaseData, WITH_DWP,
+                DWP_UPLOAD_RESPONSE);
+
+            when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+            when(updateCcdCaseService.updateCaseV2(any(), any(), any(), any(), any(), any())).thenReturn(
+                SscsCaseDetails.builder().id(1L).data(callback.getCaseDetails().getCaseData()).build());
+
+            handler.handle(CallbackType.SUBMITTED, callback);
+
+            verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+                eq(EventType.DWP_RESPOND.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
+        }
+
+        @Test
+        void givenUcDisputeFlagPresent_triggersResponseReceivedEventForDispute() {
+            SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(READY_TO_LIST.getId())
+                .dwpFurtherInfo("No").elementsDisputedIsDecisionDisputedByOthers("Yes")
+                .appeal(Appeal.builder().benefitType(BenefitType.builder().code("UC").build()).build()).build();
+            final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(sscsCaseData, WITH_DWP,
+                DWP_UPLOAD_RESPONSE);
+
+            when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+            when(updateCcdCaseService.updateCaseV2(any(), any(), any(), any(), any(), any())).thenReturn(
+                SscsCaseDetails.builder().id(1L).data(callback.getCaseDetails().getCaseData()).build());
+
+            handler.handle(CallbackType.SUBMITTED, callback);
+
+            verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+                eq(EventType.DWP_RESPOND.getCcdType()), eq("Response received"),
+                eq("update to response received event as there is a dispute."), any(), consumerArgumentCaptor.capture());
+
+            SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+            acceptAndAssertLog(EventType.DWP_RESPOND, sscsCaseDetails, callback.getCaseDetails().getId());
+        }
+
+        @Test
+        void givenADwpUploadResponseEventUcWithBothNo_runResponseReceivedEvent() {
+            SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(READY_TO_LIST.getId())
+                .dwpFurtherInfo("No").elementsDisputedIsDecisionDisputedByOthers("No")
+                .appeal(Appeal.builder().benefitType(BenefitType.builder().code("UC").build()).build()).build();
+            final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(sscsCaseData, WITH_DWP,
+                DWP_UPLOAD_RESPONSE);
+
+            when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+            when(updateCcdCaseService.updateCaseV2(any(), any(), any(), any(), any(), any())).thenReturn(
+                SscsCaseDetails.builder().id(1L).data(callback.getCaseDetails().getCaseData()).build());
+
+            handler.handle(CallbackType.SUBMITTED, callback);
+
+            verify(idamService).getIdamTokens();
+            verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+                eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
+
+            SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+            acceptAndAssertLog(EventType.READY_TO_LIST, sscsCaseDetails, callback.getCaseDetails().getId());
+            assertThat(sscsCaseData.getDwpState()).isEqualTo(RESPONSE_SUBMITTED_DWP);
+            assertThat(sscsCaseData.getIgnoreCallbackWarnings()).isEqualTo(YES);
         }
 
         @Test
@@ -363,77 +476,6 @@ class DwpUploadResponseHandlerTest {
         }
 
         @Test
-        void givenADwpUploadResponseUcEventWithFurtherInfoOnly_runResponseReceivedEventWithFurtherInfoDescription() {
-            SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(READY_TO_LIST.getId())
-                .dwpFurtherInfo("Yes").elementsDisputedIsDecisionDisputedByOthers("No")
-                .appeal(Appeal.builder().benefitType(BenefitType.builder().code("UC").build()).build()).build();
-            final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(sscsCaseData, WITH_DWP,
-                DWP_UPLOAD_RESPONSE);
-
-            when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
-            when(updateCcdCaseService.updateCaseV2(any(), any(), any(), any(), any(), any())).thenReturn(
-                SscsCaseDetails.builder().id(1L).data(callback.getCaseDetails().getCaseData()).build());
-
-            handler.handle(CallbackType.SUBMITTED, callback);
-
-            verify(idamService).getIdamTokens();
-            verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
-                eq(EventType.DWP_RESPOND.getCcdType()), eq("Response received"),
-                eq("update to response received event as there is further information to assist the tribunal."), any(),
-                consumerArgumentCaptor.capture());
-
-            SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
-            acceptAndAssertLog(EventType.DWP_RESPOND, sscsCaseDetails, callback.getCaseDetails().getId());
-            assertThat(sscsCaseData.getDwpState()).isEqualTo(RESPONSE_SUBMITTED_DWP);
-        }
-
-        @Test
-        void givenADwpUploadResponseUcEventWithFurtherInfoAndDispute_runResponseReceivedEventWithCombinedDescription() {
-            SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(READY_TO_LIST.getId())
-                .dwpFurtherInfo("Yes").elementsDisputedIsDecisionDisputedByOthers("Yes")
-                .appeal(Appeal.builder().benefitType(BenefitType.builder().code("UC").build()).build()).build();
-            final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(sscsCaseData, WITH_DWP,
-                DWP_UPLOAD_RESPONSE);
-
-            when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
-            when(updateCcdCaseService.updateCaseV2(any(), any(), any(), any(), any(), any())).thenReturn(
-                SscsCaseDetails.builder().id(1L).data(callback.getCaseDetails().getCaseData()).build());
-
-            handler.handle(CallbackType.SUBMITTED, callback);
-
-            verify(idamService).getIdamTokens();
-            verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
-                eq(EventType.DWP_RESPOND.getCcdType()), eq("Response received"),
-                eq("update to response received event as there is further information to assist the tribunal and there is a dispute."),
-                any(), consumerArgumentCaptor.capture());
-
-            SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
-            acceptAndAssertLog(EventType.DWP_RESPOND, sscsCaseDetails, callback.getCaseDetails().getId());
-        }
-
-        @Test
-        void givenUcDisputeFlagPresent_triggersResponseReceivedEventForDispute() {
-            SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(READY_TO_LIST.getId())
-                .dwpFurtherInfo("No").elementsDisputedIsDecisionDisputedByOthers("Yes")
-                .appeal(Appeal.builder().benefitType(BenefitType.builder().code("UC").build()).build()).build();
-            final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(sscsCaseData, WITH_DWP,
-                DWP_UPLOAD_RESPONSE);
-
-            when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
-            when(updateCcdCaseService.updateCaseV2(any(), any(), any(), any(), any(), any())).thenReturn(
-                SscsCaseDetails.builder().id(1L).data(callback.getCaseDetails().getCaseData()).build());
-
-            handler.handle(CallbackType.SUBMITTED, callback);
-
-            verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
-                eq(EventType.DWP_RESPOND.getCcdType()), eq("Response received"),
-                eq("update to response received event as there is a dispute."), any(), consumerArgumentCaptor.capture());
-
-            SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
-            acceptAndAssertLog(EventType.DWP_RESPOND, sscsCaseDetails, callback.getCaseDetails().getId());
-        }
-
-        @Test
         void givenUcDisputeFlagNotSet_triggersResponseReceivedEventForDispute() {
             SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(READY_TO_LIST.getId())
                 .dwpFurtherInfo("No").elementsDisputedIsDecisionDisputedByOthers(null)
@@ -475,25 +517,6 @@ class DwpUploadResponseHandlerTest {
 
             SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
             acceptAndAssertLog(EventType.READY_TO_LIST, sscsCaseDetails, callback.getCaseDetails().getId());
-        }
-
-        @Test
-        void givenUcBenefitAndDisputeFlagPresent_shouldEvaluateDisputeFlag() {
-            SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(READY_TO_LIST.getId())
-                .benefitCode(Benefit.UC.getShortName()).dwpFurtherInfo("No").elementsDisputedIsDecisionDisputedByOthers("Yes")
-                .appeal(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build())
-                .build();
-            final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(sscsCaseData, WITH_DWP,
-                DWP_UPLOAD_RESPONSE);
-
-            when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
-            when(updateCcdCaseService.updateCaseV2(any(), any(), any(), any(), any(), any())).thenReturn(
-                SscsCaseDetails.builder().id(1L).data(callback.getCaseDetails().getCaseData()).build());
-
-            handler.handle(CallbackType.SUBMITTED, callback);
-
-            verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
-                eq(EventType.DWP_RESPOND.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
         }
 
 
@@ -821,28 +844,6 @@ class DwpUploadResponseHandlerTest {
             assertThat(sscsCaseData.getDwpState()).isEqualTo(RESPONSE_SUBMITTED_DWP);
         }
 
-        @Test
-        void givenDwpEditedEvidenceReasonPhme_triggersResponseReceivedEvent() {
-            SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(READY_TO_LIST.getId())
-                .dwpFurtherInfo("No").dwpEditedEvidenceReason("phme")
-                .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).build()).build();
-            final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(sscsCaseData, WITH_DWP,
-                DWP_UPLOAD_RESPONSE);
-
-            when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
-            when(updateCcdCaseService.updateCaseV2(any(), any(), any(), any(), any(), any())).thenReturn(
-                SscsCaseDetails.builder().id(1L).data(callback.getCaseDetails().getCaseData()).build());
-
-            handler.handle(CallbackType.SUBMITTED, callback);
-
-            verify(idamService).getIdamTokens();
-            verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
-                eq(EventType.DWP_RESPOND.getCcdType()), eq("Response received"),
-                eq("Update to response received as an Admin has to review the case"), any(), consumerArgumentCaptor.capture());
-
-            SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
-            acceptAndAssertLog(EventType.DWP_RESPOND, sscsCaseDetails, callback.getCaseDetails().getId());
-        }
     }
 
     @Nested
