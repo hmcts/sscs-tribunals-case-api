@@ -421,6 +421,30 @@ export class UploadResponse extends BaseStep {
     await this.checkYourAnswersPage.confirmSubmission();
   }
 
+  async uploadResponseWithoutFurtherInfoAsDwpCaseWorkerAndMarkCaseAsUrgent(caseId: string) {
+    
+    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
+    await this.stepsHelper.setCaseAsUrgentHelper();
+
+    // As DWP caseworker upload response with further info
+    await this.loginUserWithCaseId(
+      credentials.dwpResponseWriter,
+      false,
+      caseId
+    );
+    await this.stepsHelper.uploadResponseHelper(
+      uploadResponseTestdata.pipIssueCode,
+      'No'
+    );
+
+    await this.checkYourAnswersPage.verifyCYAPageContent(
+      'Upload response',
+      uploadResponseTestdata.pipBenefitCode,
+      uploadResponseTestdata.pipIssueCode
+    );
+    await this.checkYourAnswersPage.confirmSubmission();
+  }
+
   async checkHmcEnvironment(request: APIRequestContext) {
     if (environment.name == 'aat') {
       console.log('Checking HMC AAT is up before attempting test...');
