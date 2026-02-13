@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
+import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_EVIDENCE_BUNDLE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.RESPONSE_SUBMITTED_DWP;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DWP_RESPOND;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_ADMIN_ACTION;
@@ -33,8 +35,6 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 @Service
 public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
 
-    private static final String DWP_LOG = "Updated case v2 with dwp load response event {} for id {}";
-    private static final String PHME = "phme";
     private final IdamService idamService;
     private final UpdateCcdCaseService updateCcdCaseService;
 
@@ -69,7 +69,8 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
         final BenefitType benefitType = sscsCaseData.getAppeal().getBenefitType();
 
         if (isPotentiallyHarmfulEvidenceOrHasEditedEvidenceBundle(sscsCaseData)) {
-            triggerDwpResponseReceived(callback.getCaseDetails().getId(), "Response received", "Update to response received as an Admin has to review the case");
+            triggerDwpResponseReceived(callback.getCaseDetails().getId(), "Response received",
+                "Update to response received as an Admin has to review the case");
         } else if (equalsIgnoreCase(benefitType.getCode(), Benefit.UC.getShortName())) {
             handleUc(callback);
         } else if (equalsIgnoreCase(benefitType.getCode(), Benefit.CHILD_SUPPORT.getShortName()) || isBenefitTypeSscs5(
@@ -88,8 +89,9 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
     }
 
     private static boolean isPotentiallyHarmfulEvidenceOrHasEditedEvidenceBundle(SscsCaseData sscsCaseData) {
-        return equalsIgnoreCase(sscsCaseData.getDwpEditedEvidenceReason(), PHME)
-            || sscsCaseData.getDwpEditedEvidenceBundleDocument() != null;
+        return equalsIgnoreCase(sscsCaseData.getDwpEditedEvidenceReason(), "phme") || Optional.ofNullable(
+                sscsCaseData.getDwpDocuments()).orElse(emptyList()).stream()
+            .anyMatch(d -> DWP_EVIDENCE_BUNDLE.getValue().equals(d.getValue().getDocumentType()));
     }
 
     private void handleChildSupportAndSscs5Case(Callback<SscsCaseData> callback) {
@@ -212,6 +214,6 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
     }
 
     private void logResponse(long caseId, EventType eventType) {
-        log.info(DWP_LOG, eventType, caseId);
+        log.info("Updated case v2 with dwp load response event {} for id {}", eventType, caseId);
     }
 }
