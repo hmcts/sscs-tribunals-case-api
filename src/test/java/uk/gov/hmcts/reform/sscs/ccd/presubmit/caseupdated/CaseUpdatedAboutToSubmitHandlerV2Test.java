@@ -24,11 +24,9 @@ import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -100,7 +98,6 @@ import uk.gov.hmcts.reform.sscs.service.VenueService;
 class CaseUpdatedAboutToSubmitHandlerV2Test {
 
     private static final String USER_AUTHORISATION = "Bearer token";
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMM yyyy, h:mm:ss a", Locale.UK);
     @Captor
     private ArgumentCaptor<Consumer<SscsCaseDetails>> caseDetailsCaptor;
     private Callback<SscsCaseData> callback;
@@ -197,7 +194,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
     void givenACaseUpdatedEvent_thenSetCaseCode() {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat("002DD").isEqualTo(response.getData().getCaseCode());
+        assertThat(response.getData().getCaseCode()).isEqualTo("002DD");
     }
 
     @Test
@@ -209,7 +206,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat("002DD").isEqualTo(response.getData().getCaseCode());
+        assertThat(response.getData().getCaseCode()).isEqualTo("002DD");
     }
 
     @Test
@@ -219,7 +216,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
         callback.getCaseDetails().getCaseData().setCaseCode("002DD");
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat("002DD").isEqualTo(response.getData().getCaseCode());
+        assertThat(response.getData().getCaseCode()).isEqualTo("002DD");
     }
 
     @Test
@@ -517,8 +514,8 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat("Line1").isEqualTo(response.getData().getRegionalProcessingCenter().getAddress1());
-        assertThat("Region1").isEqualTo(response.getData().getRegion());
+        assertThat(response.getData().getRegionalProcessingCenter().getAddress1()).isEqualTo("Line1");
+        assertThat(response.getData().getRegion()).isEqualTo("Region1");
     }
 
     @Test
@@ -556,10 +553,10 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(2).isEqualTo(response.getData().getAssociatedCase().size());
-        assertThat("Yes").isEqualTo(response.getData().getLinkedCasesBoolean());
-        assertThat("12345678").isEqualTo(response.getData().getAssociatedCase().getFirst().getValue().getCaseReference());
-        assertThat("56765676").isEqualTo(response.getData().getAssociatedCase().getLast().getValue().getCaseReference());
+        assertThat(response.getData().getAssociatedCase().size()).isEqualTo(2);
+        assertThat(response.getData().getLinkedCasesBoolean()).isEqualTo("Yes");
+        assertThat(response.getData().getAssociatedCase().getFirst().getValue().getCaseReference()).isEqualTo("12345678");
+        assertThat(response.getData().getAssociatedCase().getLast().getValue().getCaseReference()).isEqualTo("56765676");
     }
 
     @ParameterizedTest
@@ -572,7 +569,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         handler.maybeChangeIsScottish(oldRpc, newRpc, caseData);
 
-        assertThat(expected).isEqualTo(caseData.getIsScottishCase());
+        assertThat(caseData.getIsScottishCase()).isEqualTo(expected);
     }
 
     @ParameterizedTest
@@ -586,7 +583,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         handler.maybeChangeIsScottish(oldRpc, newRpc, caseData);
 
-        assertThat(expected).isEqualTo(caseData.getIsScottishCase());
+        assertThat(caseData.getIsScottishCase()).isEqualTo(expected);
     }
 
     @ParameterizedTest
@@ -597,8 +594,8 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(newRpcName).isEqualTo(response.getData().getRegionalProcessingCenter().getName());
-        assertThat(expectedIsScottish).isEqualTo(response.getData().getIsScottishCase());
+        assertThat(response.getData().getRegionalProcessingCenter().getName()).isEqualTo(newRpcName);
+        assertThat(response.getData().getIsScottishCase()).isEqualTo(expectedIsScottish);
     }
 
     @Test
@@ -621,10 +618,10 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(venueB).isEqualTo(response.getData().getProcessingVenue());
+        assertThat(response.getData().getProcessingVenue()).isEqualTo(venueB);
         assertThat(response.getData().getCaseManagementLocation()).isNotNull();
-        assertThat("rpcEpimsId").isEqualTo(response.getData().getCaseManagementLocation().getBaseLocation());
-        assertThat("regionId").isEqualTo(response.getData().getCaseManagementLocation().getRegion());
+        assertThat(response.getData().getCaseManagementLocation().getBaseLocation()).isEqualTo("rpcEpimsId");
+        assertThat(response.getData().getCaseManagementLocation().getRegion()).isEqualTo("regionId");
     }
 
     @Test
@@ -652,9 +649,9 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(venueA).isEqualTo(response.getData().getProcessingVenue());
+        assertThat(response.getData().getProcessingVenue()).isEqualTo(venueA);
         assertThat(response.getData().getCaseManagementLocation()).isNotNull();
-        assertThat("regionId").isEqualTo(response.getData().getCaseManagementLocation().getRegion());
+        assertThat(response.getData().getCaseManagementLocation().getRegion()).isEqualTo("regionId");
     }
 
     @Test
@@ -680,7 +677,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(venueB).isEqualTo(response.getData().getProcessingVenue());
+        assertThat(response.getData().getProcessingVenue()).isEqualTo(venueB);
         assertThat(response.getData().getCaseManagementLocation()).isNotNull();
     }
 
@@ -706,7 +703,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(venueA).isEqualTo(response.getData().getProcessingVenue());
+        assertThat(response.getData().getProcessingVenue()).isEqualTo(venueA);
     }
 
     @Test
@@ -732,10 +729,10 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(venueB).isEqualTo(response.getData().getProcessingVenue());
+        assertThat(response.getData().getProcessingVenue()).isEqualTo(venueB);
         assertThat(response.getData().getCaseManagementLocation()).isNotNull();
-        assertThat("rpcEpimsId").isEqualTo(response.getData().getCaseManagementLocation().getBaseLocation());
-        assertThat("regionId").isEqualTo(response.getData().getCaseManagementLocation().getRegion());
+        assertThat(response.getData().getCaseManagementLocation().getBaseLocation()).isEqualTo("rpcEpimsId");
+        assertThat(response.getData().getCaseManagementLocation().getRegion()).isEqualTo("regionId");
     }
 
     @ParameterizedTest
@@ -754,11 +751,11 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verifyNoInteractions(airLookupService);
-        assertThat("VenueA").isEqualTo(response.getData().getProcessingVenue());
-        assertThat("rpc1").isEqualTo(response.getData().getRegionalProcessingCenter().getName());
+        assertThat(response.getData().getProcessingVenue()).isEqualTo("VenueA");
+        assertThat(response.getData().getRegionalProcessingCenter().getName()).isEqualTo("rpc1");
         assertThat(response.getData().getCaseManagementLocation()).isNotNull();
-        assertThat("base").isEqualTo(response.getData().getCaseManagementLocation().getBaseLocation());
-        assertThat("region").isEqualTo(response.getData().getCaseManagementLocation().getRegion());
+        assertThat(response.getData().getCaseManagementLocation().getBaseLocation()).isEqualTo("base");
+        assertThat(response.getData().getCaseManagementLocation().getRegion()).isEqualTo("region");
     }
 
     @ParameterizedTest
@@ -788,10 +785,10 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(venueB).isEqualTo(response.getData().getProcessingVenue());
+        assertThat(response.getData().getProcessingVenue()).isEqualTo(venueB);
         assertThat(response.getData().getCaseManagementLocation()).isNotNull();
-        assertThat("rpcEpimsId").isEqualTo(response.getData().getCaseManagementLocation().getBaseLocation());
-        assertThat("regionId").isEqualTo(response.getData().getCaseManagementLocation().getRegion());
+        assertThat(response.getData().getCaseManagementLocation().getBaseLocation()).isEqualTo("rpcEpimsId");
+        assertThat(response.getData().getCaseManagementLocation().getRegion()).isEqualTo("regionId");
     }
 
     @Test
@@ -808,7 +805,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat("AppointeeVenue").isEqualTo(response.getData().getRegionalProcessingCenter().getName());
+        assertThat(response.getData().getRegionalProcessingCenter().getName()).isEqualTo("AppointeeVenue");
     }
 
     @Test
@@ -825,7 +822,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat("AppellantVenue").isEqualTo(response.getData().getRegionalProcessingCenter().getName());
+        assertThat(response.getData().getRegionalProcessingCenter().getName()).isEqualTo("AppellantVenue");
     }
 
     @Disabled("commented out as case loader is failing on this validation checks, we need to do another data exercise to clean the data")
@@ -841,7 +838,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         long numberOfExpectedError = getNumberOfExpectedError(response);
-        assertThat(1).isEqualTo(numberOfExpectedError);
+        assertThat(numberOfExpectedError).isEqualTo(1);
     }
 
     @Disabled("commented out as case loader is failing on this validation checks, we need to do another data exercise to clean the data")
@@ -857,7 +854,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         long numberOfExpectedError = getNumberOfExpectedError(response);
-        assertThat(1).isEqualTo(numberOfExpectedError);
+        assertThat(numberOfExpectedError).isEqualTo(1);
     }
 
     @Disabled("commented out as case loader is failing on this validation checks, we need to do another data exercise to clean the data")
@@ -870,7 +867,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         long numberOfExpectedError = getNumberOfExpectedError(response);
-        assertThat(1).isEqualTo(numberOfExpectedError);
+        assertThat(numberOfExpectedError).isEqualTo(1);
     }
 
     @Disabled("commented out as case loader is failing on this validation checks, we need to do another data exercise to clean the data")
@@ -882,7 +879,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         long numberOfExpectedError = getNumberOfExpectedError(response);
-        assertThat(1).isEqualTo(numberOfExpectedError);
+        assertThat(numberOfExpectedError).isEqualTo(1);
     }
 
     @ParameterizedTest
@@ -893,24 +890,24 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setAddress(address);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         long numberOfExpectedError = getNumberOfExpectedError(response);
-        assertThat(0).isEqualTo(numberOfExpectedError);
+        assertThat(numberOfExpectedError).isEqualTo(0);
 
         Representative representative = Representative.builder().address(address).build();
         callback.getCaseDetails().getCaseData().getAppeal().toBuilder().rep(representative).build();
         response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         numberOfExpectedError = getNumberOfExpectedError(response);
-        assertThat(0).isEqualTo(numberOfExpectedError);
+        assertThat(numberOfExpectedError).isEqualTo(0);
 
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setAppointee(
             Appointee.builder().name(Name.builder().build()).identity(Identity.builder().build()).address(address).build());
         response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         numberOfExpectedError = getNumberOfExpectedError(response);
-        assertThat(0).isEqualTo(numberOfExpectedError);
+        assertThat(numberOfExpectedError).isEqualTo(0);
 
         callback.getCaseDetails().getCaseData().getJointParty().setAddress(address);
         response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         numberOfExpectedError = getNumberOfExpectedError(response);
-        assertThat(0).isEqualTo(numberOfExpectedError);
+        assertThat(numberOfExpectedError).isEqualTo(0);
     }
 
     @Test
@@ -978,7 +975,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(2).isEqualTo(response.getWarnings().size());
+        assertThat(response.getWarnings().size()).isEqualTo(2);
         assertThat(response.getWarnings()).contains("Benefit type code is empty", "FTA issuing office is empty");
     }
 
@@ -992,7 +989,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
         callback.getCaseDetails().getCaseData().setRegionalProcessingCenter(RegionalProcessingCenter.builder().build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(1).isEqualTo(response.getWarnings().size());
+        assertThat(response.getWarnings().size()).isEqualTo(1);
         assertThat(response.getWarnings()).contains(
             "IBCA Reference Number has not been provided for the Appellant, do you want to ignore this warning and proceed?");
     }
@@ -1004,8 +1001,8 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(1).isEqualTo(response.getWarnings().size());
-        assertThat(1).isEqualTo(response.getErrors().size());
+        assertThat(response.getWarnings().size()).isEqualTo(1);
+        assertThat(response.getErrors().size()).isEqualTo(1);
 
         assertThat(response.getWarnings()).contains("FTA issuing office is empty");
         assertThat(response.getErrors()).contains(
@@ -1022,7 +1019,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(1).isEqualTo(response.getErrors().size());
+        assertThat(response.getErrors().size()).isEqualTo(1);
         assertThat(response.getErrors()).contains(
             "Benefit type code is invalid, should be one of: ESA, JSA, PIP, DLA, UC, carersAllowance, attendanceAllowance, "
                 + "bereavementBenefit, industrialInjuriesDisablement, maternityAllowance, socialFund, incomeSupport, bereavementSupportPaymentScheme, "
@@ -1056,7 +1053,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(1).isEqualTo(response.getWarnings().size());
+        assertThat(response.getWarnings().size()).isEqualTo(1);
         assertThat(response.getWarnings()).contains(warning);
     }
 
@@ -1070,8 +1067,8 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(0).isEqualTo(response.getWarnings().size());
-        assertThat(regionalCenter).isEqualTo(response.getData().getDwpRegionalCentre());
+        assertThat(response.getWarnings().size()).isEqualTo(0);
+        assertThat(response.getData().getDwpRegionalCentre()).isEqualTo(regionalCenter);
     }
 
     @ParameterizedTest
@@ -1084,7 +1081,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(warnings).isEqualTo(response.getWarnings().size());
+        assertThat(response.getWarnings().size()).isEqualTo(warnings);
         if (warnings > 0) {
             assertThat(response.getWarnings()).contains(
                 "There is a mismatch between the hearing type and the wants to attend field, "
@@ -1177,7 +1174,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefitDescription);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(YES).isEqualTo(response.getData().getIsConfidentialCase());
+        assertThat(response.getData().getIsConfidentialCase()).isEqualTo(YES);
     }
 
     @ParameterizedTest
@@ -1204,7 +1201,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
         callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(YES).isEqualTo(response.getData().getIsConfidentialCase());
+        assertThat(response.getData().getIsConfidentialCase()).isEqualTo(YES);
     }
 
     @ParameterizedTest
@@ -1219,7 +1216,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
         callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(YES).isEqualTo(response.getData().getIsConfidentialCase());
+        assertThat(response.getData().getIsConfidentialCase()).isEqualTo(YES);
     }
 
     @ParameterizedTest
@@ -1252,7 +1249,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
         callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(YES).isEqualTo(response.getData().getIsConfidentialCase());
+        assertThat(response.getData().getIsConfidentialCase()).isEqualTo(YES);
     }
 
     @Test
@@ -1329,9 +1326,9 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat("New Name").isEqualTo(response.getData().getCaseAccessManagementFields().getCaseNameHmctsInternal());
-        assertThat("New Name").isEqualTo(response.getData().getCaseAccessManagementFields().getCaseNameHmctsRestricted());
-        assertThat("New Name").isEqualTo(response.getData().getCaseAccessManagementFields().getCaseNamePublic());
+        assertThat(response.getData().getCaseAccessManagementFields().getCaseNameHmctsInternal()).isEqualTo("New Name");
+        assertThat(response.getData().getCaseAccessManagementFields().getCaseNameHmctsRestricted()).isEqualTo("New Name");
+        assertThat(response.getData().getCaseAccessManagementFields().getCaseNamePublic()).isEqualTo("New Name");
     }
 
     @Test
@@ -1376,11 +1373,12 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
         sscsCaseData.getCaseAccessManagementFields().setCategories(Benefit.ESA);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertThat("universalCredit").isEqualTo(response.getData().getCaseAccessManagementFields().getCaseAccessCategory());
-        assertThat("Universal Credit").isEqualTo(
-            response.getData().getCaseAccessManagementFields().getCaseManagementCategory().getValue().getLabel());
-        assertThat("UC").isEqualTo(
-            response.getData().getCaseAccessManagementFields().getCaseManagementCategory().getValue().getCode());
+        assertThat(response.getData().getCaseAccessManagementFields().getCaseAccessCategory()).isEqualTo("universalCredit");
+        assertThat(
+            response.getData().getCaseAccessManagementFields().getCaseManagementCategory().getValue().getLabel()).isEqualTo(
+            "Universal Credit");
+        assertThat(response.getData().getCaseAccessManagementFields().getCaseManagementCategory().getValue().getCode()).isEqualTo(
+            "UC");
     }
 
     @Test
@@ -1404,7 +1402,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
             .thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertThat(1).isEqualTo(response.getErrors().size());
+        assertThat(response.getErrors().size()).isEqualTo(1);
     }
 
     @Test
@@ -1422,7 +1420,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
         appeal.getAppellant().setIdentity(new Identity("1", "Nino"));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertThat(1).isEqualTo(response.getWarnings().size());
+        assertThat(response.getWarnings().size()).isEqualTo(1);
     }
 
     @Test
@@ -1434,12 +1432,13 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIdentity(new Identity("1", "Nino"));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat("personalIndependencePayment").isEqualTo(
-            response.getData().getCaseAccessManagementFields().getCaseAccessCategory());
-        assertThat("Personal Independence Payment").isEqualTo(
-            response.getData().getCaseAccessManagementFields().getCaseManagementCategory().getValue().getLabel());
-        assertThat("PIP").isEqualTo(
-            response.getData().getCaseAccessManagementFields().getCaseManagementCategory().getValue().getCode());
+        assertThat(response.getData().getCaseAccessManagementFields().getCaseAccessCategory()).isEqualTo(
+            "personalIndependencePayment");
+        assertThat(
+            response.getData().getCaseAccessManagementFields().getCaseManagementCategory().getValue().getLabel()).isEqualTo(
+            "Personal Independence Payment");
+        assertThat(
+            response.getData().getCaseAccessManagementFields().getCaseManagementCategory().getValue().getCode()).isEqualTo("PIP");
     }
 
     @Test
@@ -1454,7 +1453,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
         appeal.getAppellant().setIdentity(new Identity("1", "Nino"));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(1).isEqualTo(response.getErrors().size());
+        assertThat(response.getErrors().size()).isEqualTo(1);
     }
 
     @ParameterizedTest
@@ -1472,11 +1471,11 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(1).isEqualTo(response.getWarnings().size());
+        assertThat(response.getWarnings().size()).isEqualTo(1);
         assertThat(response.getWarnings().stream().anyMatch(m -> m.contains(
             "The hearing type will be changed from Paper to Oral as at least one of the"
                 + " parties to the case would like to attend the hearing")));
-        assertThat(HearingType.ORAL.getValue()).isEqualTo(response.getData().getAppeal().getHearingType());
+        assertThat(response.getData().getAppeal().getHearingType()).isEqualTo(HearingType.ORAL.getValue());
     }
 
     @Test
@@ -1494,8 +1493,8 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(0).isEqualTo(response.getWarnings().size());
-        assertThat(HearingType.ORAL.getValue()).isEqualTo(response.getData().getAppeal().getHearingType());
+        assertThat(response.getWarnings().size()).isEqualTo(0);
+        assertThat(response.getData().getAppeal().getHearingType()).isEqualTo(HearingType.ORAL.getValue());
     }
 
     @ParameterizedTest
@@ -1510,8 +1509,8 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(0).isEqualTo(response.getWarnings().size());
-        assertThat(HearingType.PAPER.getValue()).isEqualTo(response.getData().getAppeal().getHearingType());
+        assertThat(response.getWarnings().size()).isEqualTo(0);
+        assertThat(response.getData().getAppeal().getHearingType()).isEqualTo(HearingType.PAPER.getValue());
     }
 
     @ParameterizedTest
@@ -1525,8 +1524,8 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(0).isEqualTo(response.getWarnings().size());
-        assertThat(hearingType).isEqualTo(response.getData().getAppeal().getHearingType());
+        assertThat(response.getWarnings().size()).isEqualTo(0);
+        assertThat(response.getData().getAppeal().getHearingType()).isEqualTo(hearingType);
     }
 
     @ParameterizedTest
@@ -1556,8 +1555,9 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         assertThat(response.getErrors().size()).isEqualTo(1);
         assertThat(response.getWarnings().size()).isEqualTo(0);
-        assertThat("Benefit code cannot be changed to the selected code").isEqualTo(
-            response.getErrors().stream().findFirst().orElse(""));
+        assertThat(
+            response.getErrors().stream().findFirst().orElse("")).isEqualTo(
+            "Benefit code cannot be changed to the selected code");
     }
 
     @ParameterizedTest
@@ -1574,8 +1574,8 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         assertThat(response.getErrors().size()).isEqualTo(0);
         assertThat(response.getWarnings().size()).isEqualTo(1);
-        assertThat("Benefit code cannot be changed to the selected code").isEqualTo(
-            response.getWarnings().stream().findFirst().orElse(""));
+        assertThat(response.getWarnings().stream().findFirst().orElse("")).isEqualTo(
+            "Benefit code cannot be changed to the selected code");
     }
 
     @ParameterizedTest
@@ -1591,8 +1591,9 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         assertThat(response.getErrors().size()).isEqualTo(1);
         assertThat(response.getWarnings().size()).isEqualTo(0);
-        assertThat("Benefit code cannot be changed to the selected code").isEqualTo(
-            response.getErrors().stream().findFirst().orElse(""));
+        assertThat(
+            response.getErrors().stream().findFirst().orElse("")).isEqualTo(
+            "Benefit code cannot be changed to the selected code");
     }
 
     @ParameterizedTest
@@ -1608,8 +1609,9 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         assertThat(response.getErrors().size()).isEqualTo(0);
         assertThat(response.getWarnings().size()).isEqualTo(1);
-        assertThat("Benefit code cannot be changed to the selected code").isEqualTo(
-            response.getWarnings().stream().findFirst().orElse(""));
+        assertThat(
+            response.getWarnings().stream().findFirst().orElse("")).isEqualTo(
+            "Benefit code cannot be changed to the selected code");
     }
 
     @ParameterizedTest
@@ -1663,7 +1665,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(0).isEqualTo(response.getWarnings().size());
+        assertThat(response.getWarnings().size()).isEqualTo(0);
         assertThat(appeal.getHearingOptions().getLanguages()).isNull();
     }
 
@@ -1676,9 +1678,9 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().isEmpty()).isTrue();
         SscsCaseData caseData = response.getData();
-        assertThat("088").isEqualTo(caseData.getBenefitCode());
-        assertThat("DD").isEqualTo(caseData.getIssueCode());
-        assertThat("088DD").isEqualTo(caseData.getCaseCode());
+        assertThat(caseData.getBenefitCode()).isEqualTo("088");
+        assertThat(caseData.getIssueCode()).isEqualTo("DD");
+        assertThat(caseData.getCaseCode()).isEqualTo("088DD");
     }
 
     @Test
@@ -1717,7 +1719,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         String language = sscsCaseData.getAppeal().getHearingOptions().getLanguages();
 
-        assertThat(language).isEqualTo(item.getLabel());
+        assertThat(item.getLabel()).isEqualTo(language);
     }
 
     @Test
@@ -1807,9 +1809,9 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size()).isEqualTo(0);
-        assertThat(HearingRoute.LIST_ASSIST).isEqualTo(response.getData().getRegionalProcessingCenter().getHearingRoute());
-        assertThat(HearingRoute.LIST_ASSIST).isEqualTo(response.getData().getSchedulingAndListingFields().getHearingRoute());
-        assertThat(HearingRoute.LIST_ASSIST).isEqualTo(response.getData().getAppeal().getHearingOptions().getHearingRoute());
+        assertThat(response.getData().getRegionalProcessingCenter().getHearingRoute()).isEqualTo(HearingRoute.LIST_ASSIST);
+        assertThat(response.getData().getSchedulingAndListingFields().getHearingRoute()).isEqualTo(HearingRoute.LIST_ASSIST);
+        assertThat(response.getData().getAppeal().getHearingOptions().getHearingRoute()).isEqualTo(HearingRoute.LIST_ASSIST);
     }
 
     @Test
