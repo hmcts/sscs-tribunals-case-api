@@ -23,5 +23,21 @@ test.describe('Work Allocation - CTSC - Review FTA response Task',{tag: [ '@work
           test.slow();
           await ctscReviewFtaResponseSteps.verifyReviewFTAResponseTaskIsCancelledAutomaticallyWhenTheCaseIsVoid(caseId);
     });
-  }
-);
+});
+
+test.describe('Work Allocation - CTSC - Review FTA response Task when PIP has an Urgent flag & with further info set to No', {tag:'@work-allocation-wip'}, async () => {
+    let caseId: string;
+
+    test.beforeEach('Case has to be Created', async ({ uploadResponseSteps }) => {
+      caseId = await createCaseBasedOnCaseType('PIP');
+      await uploadResponseSteps.uploadResponseWithoutFurtherInfoAsDwpCaseWorkerAndMarkCaseAsUrgent(caseId);
+    });
+    
+    test('As a CSTC Admin with case allocator role, view Review FTA response CTSC task', 
+      {tag:'@work-allocation-wip'}, 
+      async ({ ctscReviewFtaResponseSteps }) => {
+        test.slow();
+        await ctscReviewFtaResponseSteps.verifyCtscAdminWithCaseAllocatorRoleCanViewReviewFTAResponseTask(caseId);
+    });
+
+});
