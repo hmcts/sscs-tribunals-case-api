@@ -4,6 +4,7 @@ import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,12 +16,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
 class DwpUploadFunctionalTest extends AbstractFunctionalTest {
+
     private static final String EVIDENCE_DOCUMENT_PDF = "evidence-document.pdf";
+
     @Autowired
     private EvidenceManagementService evidenceManagementService;
 
@@ -33,7 +35,7 @@ class DwpUploadFunctionalTest extends AbstractFunctionalTest {
     void dwpUploadResponseEventSendsToReadyToList() throws IOException {
 
         SscsCaseDetails createdCase = createCaseWithState(CREATE_TEST_CASE, "UC", "Universal Credit",
-            State.READY_TO_LIST.getId());
+            READY_TO_LIST.getId());
 
         //Get case into correct state without triggering any callbacks that cause race conditions
         updateCaseEvent(SEND_TO_DWP_OFFLINE, createdCase);
