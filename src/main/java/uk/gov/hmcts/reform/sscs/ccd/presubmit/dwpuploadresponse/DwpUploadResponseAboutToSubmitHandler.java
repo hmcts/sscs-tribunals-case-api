@@ -230,9 +230,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
         sscsCaseData.setDwpUploadAudioVideoEvidence(null);
 
-        if (StringUtils.equalsIgnoreCase(sscsCaseData.getDwpEditedEvidenceReason(), "phme")) {
-            sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE);
-        } else {
+        if (!StringUtils.equalsIgnoreCase(sscsCaseData.getDwpEditedEvidenceReason(), "phme")) {
             if (REVIEW_BY_JUDGE != sscsCaseData.getInterlocReviewState()) {
                 sscsCaseData.setInterlocReviewState(REVIEW_BY_TCW);
             }
@@ -342,8 +340,6 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         if (sscsCaseData.getDwpEditedEvidenceBundleDocument() != null
                 && sscsCaseData.getDwpEditedResponseDocument() != null
                 && sscsCaseData.getDwpEditedResponseDocument().getDocumentLink() != null) {
-
-            sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE);
 
             if (StringUtils.equalsIgnoreCase(sscsCaseData.getDwpEditedEvidenceReason(), "phme")) {
                 sscsCaseData.setInterlocReferralReason(PHE_REQUEST);
