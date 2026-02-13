@@ -25,7 +25,7 @@ test.describe('Work Allocation - CTSC - Review FTA response Task',{tag: [ '@work
     });
 });
 
-test.describe('Work Allocation - CTSC - Review FTA response Task when PIP has an Urgent flag & with further info set to No', {tag:'@work-allocation-wip'}, async () => {
+test.describe('Work Allocation - CTSC - Review FTA response Task when PIP has an Urgent flag & with further info set to No', {tag:'@work-allocation'}, async () => {
     let caseId: string;
 
     test.beforeEach('Case has to be Created', async ({ uploadResponseSteps }) => {
