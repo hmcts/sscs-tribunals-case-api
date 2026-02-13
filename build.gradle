@@ -4,14 +4,14 @@ import java.nio.charset.StandardCharsets
 plugins {
     id 'application'
     id 'pmd'
-    id 'org.sonarqube' version '6.2.0.5505'
+    id 'org.sonarqube' version '6.3.1.5724'
     id 'jacoco'
     id 'org.springframework.boot' version '3.5.6'
     id 'uk.gov.hmcts.java' version '0.12.67'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'com.gorylenko.gradle-git-properties' version '2.5.0'
     id 'com.github.ben-manes.versions' version '0.52.0'
-    id 'org.owasp.dependencycheck' version '12.1.3'
+    id 'org.owasp.dependencycheck' version '12.2.0'
     id 'au.com.dius.pact' version '4.6.17'
     id 'com.github.hmcts.rse-cft-lib' version '0.19.1856'
     id 'info.solidsoft.pitest' version '1.15.0'
@@ -157,7 +157,7 @@ tasks.register('fortifyScan', JavaExec) {
 }
 
 jacoco {
-    toolVersion = "0.8.13"
+    toolVersion = "0.8.14"
 }
 
 jacocoTestReport {
@@ -466,7 +466,7 @@ dependencies {
 
     testImplementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: pitest.pitestVersion.get()
     testImplementation group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: '0.5'
-    testImplementation group: 'org.pitest', name: 'pitest', version: '1.20.1'
+    testImplementation group: 'org.pitest', name: 'pitest', version: '1.22.1'
     testImplementation group: 'com.typesafe', name: 'config', version: '1.4.3'
 
     testImplementation group: 'com.h2database', name: 'h2', version: '2.3.232'
