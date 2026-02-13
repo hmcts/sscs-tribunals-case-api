@@ -25,6 +25,9 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.RESPONSE_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.WITH_DWP;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import java.util.Optional;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,6 +40,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
@@ -67,9 +71,26 @@ class DwpUploadResponseHandlerTest {
     @Captor
     private ArgumentCaptor<Consumer<SscsCaseDetails>> consumerArgumentCaptor;
 
+    private ListAppender<ILoggingEvent> listAppender;
+
     @BeforeEach
     void setup() {
+        Logger logger = (Logger) LoggerFactory.getLogger(DwpUploadResponseHandler.class);
+        listAppender = new ListAppender<>();
+        listAppender.start();
+        logger.addAppender(listAppender);
         handler = new DwpUploadResponseHandler(updateCcdCaseService, idamService);
+    }
+
+    private void assertLogWritten(EventType eventType, long caseId) {
+        String message = "Updated case v2 with dwp load response event " + eventType + " for id " + caseId;
+        assertThat(listAppender.list.stream().map(ILoggingEvent::getFormattedMessage).toList())
+            .contains(message);
+    }
+
+    private void acceptAndAssertLog(EventType eventType, SscsCaseDetails sscsCaseDetails, long caseId) {
+        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+        assertLogWritten(eventType, caseId);
     }
 
     @Nested
@@ -95,17 +116,15 @@ class DwpUploadResponseHandlerTest {
                     eventType))).isInstanceOf(IllegalStateException.class);
         }
 
-        @ParameterizedTest
-        @EnumSource(value = EventType.class, names = {"REISSUE_FURTHER_EVIDENCE", "EVIDENCE_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
-        void givenAppealIsNullEvidence_willThrowAnException(EventType eventType) {
+        @Test
+        void givenAppealIsNullEvidence_willThrowAnException() {
             assertThatThrownBy(() -> handler.handle(CallbackType.SUBMITTED, HandlerHelper.buildTestCallbackForGivenData(
                 SscsCaseData.builder().createdInGapsFrom(State.READY_TO_LIST.getId()).appeal(null).build(),
                 INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE))).isInstanceOf(IllegalStateException.class);
         }
 
-        @ParameterizedTest
-        @EnumSource(value = EventType.class, names = {"REISSUE_FURTHER_EVIDENCE", "EVIDENCE_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
-        void givenBenefitCodeIsNullEvidence_willThrowAnException(EventType eventType) {
+        @Test
+        void givenBenefitCodeIsNullEvidence_willThrowAnException() {
             Callback<SscsCaseData> sscsCaseData = HandlerHelper.buildTestCallbackForGivenData(
                 SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("No")
                     .elementsDisputedIsDecisionDisputedByOthers("No").appeal(Appeal.builder().benefitType(null).build()).build(),
@@ -167,6 +186,9 @@ class DwpUploadResponseHandlerTest {
 
             verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
                 eq(EventType.DWP_RESPOND.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
+
+            SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+            acceptAndAssertLog(EventType.DWP_RESPOND, sscsCaseDetails, callback.getCaseDetails().getId());
         }
 
         @Test
@@ -209,7 +231,7 @@ class DwpUploadResponseHandlerTest {
                 eq(EventType.DWP_RESPOND.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
 
             SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
-            consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+            acceptAndAssertLog(EventType.DWP_RESPOND, sscsCaseDetails, callback.getCaseDetails().getId());
             assertThat(sscsCaseData.getDwpState()).isEqualTo(RESPONSE_SUBMITTED_DWP);
         }
 
@@ -232,7 +254,7 @@ class DwpUploadResponseHandlerTest {
                 eq(EventType.DWP_RESPOND.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
 
             SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
-            consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+            acceptAndAssertLog(EventType.DWP_RESPOND, sscsCaseDetails, callback.getCaseDetails().getId());
             assertThat(sscsCaseData.getDwpState()).isEqualTo(RESPONSE_SUBMITTED_DWP);
         }
 
@@ -255,7 +277,7 @@ class DwpUploadResponseHandlerTest {
                 eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
 
             SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
-            consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+            acceptAndAssertLog(EventType.READY_TO_LIST, sscsCaseDetails, callback.getCaseDetails().getId());
             assertThat(sscsCaseData.getDwpState()).isEqualTo(RESPONSE_SUBMITTED_DWP);
             assertThat(sscsCaseData.getIgnoreCallbackWarnings()).isEqualTo(YES);
         }
@@ -281,7 +303,7 @@ class DwpUploadResponseHandlerTest {
                 eq(EventType.DWP_RESPOND.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
 
             SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
-            consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+            acceptAndAssertLog(EventType.DWP_RESPOND, sscsCaseDetails, callback.getCaseDetails().getId());
             assertThat(sscsCaseData.getDwpState()).isEqualTo(RESPONSE_SUBMITTED_DWP);
         }
 
@@ -306,7 +328,7 @@ class DwpUploadResponseHandlerTest {
                 eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
 
             SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
-            consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+            acceptAndAssertLog(EventType.READY_TO_LIST, sscsCaseDetails, callback.getCaseDetails().getId());
             assertThat(sscsCaseData.getDwpState()).isEqualTo(RESPONSE_SUBMITTED_DWP);
         }
 
@@ -330,13 +352,13 @@ class DwpUploadResponseHandlerTest {
                 eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
 
             SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
-            consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+            acceptAndAssertLog(EventType.READY_TO_LIST, sscsCaseDetails, callback.getCaseDetails().getId());
             assertThat(sscsCaseData.getDwpState()).isEqualTo(RESPONSE_SUBMITTED_DWP);
 
             verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
                 eq(EventType.JOINT_PARTY_ADDED.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
 
-            consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+            acceptAndAssertLog(EventType.JOINT_PARTY_ADDED, sscsCaseDetails, callback.getCaseDetails().getId());
             assertThat(sscsCaseData.getJointParty()).isEqualTo(jointParty);
         }
 
@@ -361,7 +383,7 @@ class DwpUploadResponseHandlerTest {
                 consumerArgumentCaptor.capture());
 
             SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
-            consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+            acceptAndAssertLog(EventType.DWP_RESPOND, sscsCaseDetails, callback.getCaseDetails().getId());
             assertThat(sscsCaseData.getDwpState()).isEqualTo(RESPONSE_SUBMITTED_DWP);
         }
 
@@ -384,6 +406,9 @@ class DwpUploadResponseHandlerTest {
                 eq(EventType.DWP_RESPOND.getCcdType()), eq("Response received"),
                 eq("update to response received event as there is further information to assist the tribunal and there is a dispute."),
                 any(), consumerArgumentCaptor.capture());
+
+            SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+            acceptAndAssertLog(EventType.DWP_RESPOND, sscsCaseDetails, callback.getCaseDetails().getId());
         }
 
         @Test
@@ -403,6 +428,9 @@ class DwpUploadResponseHandlerTest {
             verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
                 eq(EventType.DWP_RESPOND.getCcdType()), eq("Response received"),
                 eq("update to response received event as there is a dispute."), any(), consumerArgumentCaptor.capture());
+
+            SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+            acceptAndAssertLog(EventType.DWP_RESPOND, sscsCaseDetails, callback.getCaseDetails().getId());
         }
 
         @Test
@@ -423,6 +451,9 @@ class DwpUploadResponseHandlerTest {
                 eq(EventType.READY_TO_LIST.getCcdType()), eq("ready to list"),
                 eq("update to ready to list event as there is no further information to assist the tribunal and no dispute."),
                 any(), consumerArgumentCaptor.capture());
+
+            SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+            acceptAndAssertLog(EventType.READY_TO_LIST, sscsCaseDetails, callback.getCaseDetails().getId());
         }
 
         @Test
@@ -441,6 +472,9 @@ class DwpUploadResponseHandlerTest {
 
             verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
                 eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
+
+            SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+            acceptAndAssertLog(EventType.READY_TO_LIST, sscsCaseDetails, callback.getCaseDetails().getId());
         }
 
         @Test
@@ -486,7 +520,7 @@ class DwpUploadResponseHandlerTest {
                 eq(EventType.DWP_RESPOND.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
 
             SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
-            consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+            acceptAndAssertLog(EventType.DWP_RESPOND, sscsCaseDetails, callback.getCaseDetails().getId());
 
             assertThat(sscsCaseData.getDwpState()).isEqualTo(RESPONSE_SUBMITTED_DWP);
             assertThat(sscsCaseData.getInterlocReviewState()).isEqualTo(AWAITING_ADMIN_ACTION);
@@ -556,7 +590,7 @@ class DwpUploadResponseHandlerTest {
                 eq(EventType.DWP_RESPOND.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
 
             SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
-            consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+            acceptAndAssertLog(EventType.DWP_RESPOND, sscsCaseDetails, callback.getCaseDetails().getId());
             assertThat(sscsCaseData.getDwpState()).isEqualTo(RESPONSE_SUBMITTED_DWP);
         }
 
@@ -579,7 +613,7 @@ class DwpUploadResponseHandlerTest {
                 eq(EventType.DWP_RESPOND.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
 
             SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
-            consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+            acceptAndAssertLog(EventType.DWP_RESPOND, sscsCaseDetails, callback.getCaseDetails().getId());
             assertThat(sscsCaseData.getDwpState()).isEqualTo(RESPONSE_SUBMITTED_DWP);
         }
 
@@ -622,7 +656,7 @@ class DwpUploadResponseHandlerTest {
                 eq(EventType.DWP_RESPOND.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
 
             SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
-            consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+            acceptAndAssertLog(EventType.DWP_RESPOND, sscsCaseDetails, callback.getCaseDetails().getId());
             assertThat(sscsCaseData.getInterlocReviewState()).isEqualTo(REVIEW_BY_JUDGE);
             assertThat(sscsCaseData.getDwpState()).isEqualTo(RESPONSE_SUBMITTED_DWP);
         }
@@ -647,7 +681,7 @@ class DwpUploadResponseHandlerTest {
                 eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
 
             SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
-            consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+            acceptAndAssertLog(EventType.READY_TO_LIST, sscsCaseDetails, callback.getCaseDetails().getId());
             assertThat(sscsCaseData.getDwpState()).isEqualTo(RESPONSE_SUBMITTED_DWP);
         }
     }
@@ -673,7 +707,7 @@ class DwpUploadResponseHandlerTest {
                 eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
             SscsCaseData targetCaseData = SscsCaseData.builder().build();
             SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(targetCaseData).build();
-            consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+            acceptAndAssertLog(EventType.READY_TO_LIST, sscsCaseDetails, callback.getCaseDetails().getId());
             assertThat(targetCaseData.getDwpState()).isEqualTo(RESPONSE_SUBMITTED_DWP);
             assertThat(sscsCaseData.getIgnoreCallbackWarnings()).isNull();
         }
@@ -711,7 +745,7 @@ class DwpUploadResponseHandlerTest {
                 eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
 
             SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
-            consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+            acceptAndAssertLog(EventType.READY_TO_LIST, sscsCaseDetails, callback.getCaseDetails().getId());
             assertThat(sscsCaseData.getDwpState()).isEqualTo(RESPONSE_SUBMITTED_DWP);
         }
 
@@ -735,7 +769,7 @@ class DwpUploadResponseHandlerTest {
                 eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
 
             SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
-            consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+            acceptAndAssertLog(EventType.READY_TO_LIST, sscsCaseDetails, callback.getCaseDetails().getId());
             assertThat(sscsCaseData.getDwpState()).isEqualTo(RESPONSE_SUBMITTED_DWP);
         }
 
@@ -758,7 +792,7 @@ class DwpUploadResponseHandlerTest {
             verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
                 eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
             SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
-            consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+            acceptAndAssertLog(EventType.READY_TO_LIST, sscsCaseDetails, callback.getCaseDetails().getId());
             assertThat(sscsCaseData.getDwpState()).isEqualTo(RESPONSE_SUBMITTED_DWP);
         }
 
@@ -783,7 +817,7 @@ class DwpUploadResponseHandlerTest {
                 eq(EventType.DWP_RESPOND.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
 
             SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
-            consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+            acceptAndAssertLog(EventType.DWP_RESPOND, sscsCaseDetails, callback.getCaseDetails().getId());
             assertThat(sscsCaseData.getDwpState()).isEqualTo(RESPONSE_SUBMITTED_DWP);
         }
 
@@ -805,6 +839,9 @@ class DwpUploadResponseHandlerTest {
             verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
                 eq(EventType.DWP_RESPOND.getCcdType()), eq("Response received"),
                 eq("Update to response received as an Admin has to review the case"), any(), consumerArgumentCaptor.capture());
+
+            SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+            acceptAndAssertLog(EventType.DWP_RESPOND, sscsCaseDetails, callback.getCaseDetails().getId());
         }
     }
 
@@ -844,7 +881,7 @@ class DwpUploadResponseHandlerTest {
                 eq(tokens), consumerArgumentCaptor.capture());
 
             SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
-            consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+            acceptAndAssertLog(EventType.DWP_RESPOND, sscsCaseDetails, callback.getCaseDetails().getId());
             assertThat(sscsCaseData.getDwpState()).isEqualTo(RESPONSE_SUBMITTED_DWP);
         }
     }
