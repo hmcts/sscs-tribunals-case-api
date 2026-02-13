@@ -1,0 +1,4 @@
+[
+  {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "CaseFieldID": "confidentialityTab", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "CaseFieldID": "confidentialityTabLabel", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"}
+]

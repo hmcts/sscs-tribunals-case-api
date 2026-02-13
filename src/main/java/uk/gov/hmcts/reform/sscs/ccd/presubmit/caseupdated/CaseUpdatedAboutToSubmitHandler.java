@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
+import static java.time.LocalDateTime.now;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
@@ -28,6 +29,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -76,6 +78,12 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 @Slf4j
 public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit implements PreSubmitCallbackHandler<SscsCaseData> {
 
+    private static final String WARNING_MESSAGE = "%s has not been provided for the %s, do you want to ignore this warning and proceed?";
+    private static final String ERROR_MESSAGE = "%s has not been provided for the %s";
+    private static final String REP_ERROR_MESSAGE = "Name/Organisation has not been provided for the Representative";
+    private static final String FIRST_NAME = "First Name";
+    private static final String LAST_NAME = "Last Name";
+    private static ConstraintValidatorContext context;
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final AssociatedCaseLinkHelper associatedCaseLinkHelper;
     private final AirLookupService airLookupService;
@@ -83,32 +91,19 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final IdamService idamService;
     private final RefDataService refDataService;
     private final VenueService venueService;
+    private final boolean cmOtherPartyConfidentialityEnabled;
     private final HearingDurationsService hearingDurationsService;
     private final PanelCompositionService panelCompositionService;
     private final PostcodeValidator postcodeValidator = new PostcodeValidator();
 
-    private static ConstraintValidatorContext context;
-    private static final String WARNING_MESSAGE = "%s has not been provided for the %s, do you want to ignore this warning and proceed?";
-
-    private static final String ERROR_MESSAGE = "%s has not been provided for the %s";
-
-    private static final String REP_ERROR_MESSAGE = "Name/Organisation has not been provided for the Representative";
-
-    private static final String FIRST_NAME = "First Name";
-
-    private static final String LAST_NAME = "Last Name";
-
 
     @SuppressWarnings("squid:S107")
     CaseUpdatedAboutToSubmitHandler(RegionalProcessingCenterService regionalProcessingCenterService,
-                                    AssociatedCaseLinkHelper associatedCaseLinkHelper,
-                                    AirLookupService airLookupService,
-                                    DwpAddressLookupService dwpAddressLookupService,
-                                    IdamService idamService,
-                                    RefDataService refDataService,
-                                    VenueService venueService,
-                                    HearingDurationsService hearingDurationsService,
-                                    PanelCompositionService panelCompositionService) {
+        AssociatedCaseLinkHelper associatedCaseLinkHelper, AirLookupService airLookupService,
+        DwpAddressLookupService dwpAddressLookupService, IdamService idamService, RefDataService refDataService,
+        VenueService venueService, HearingDurationsService hearingDurationsService,
+        PanelCompositionService panelCompositionService,
+        @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.associatedCaseLinkHelper = associatedCaseLinkHelper;
         this.airLookupService = airLookupService;
@@ -118,6 +113,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         this.hearingDurationsService = hearingDurationsService;
         this.panelCompositionService = panelCompositionService;
         this.venueService = venueService;
+        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
 
     @Override
@@ -125,22 +121,22 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbackType must not be null");
 
-        return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && callback.getEvent() == EventType.CASE_UPDATED;
+        return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT) && callback.getEvent() == EventType.CASE_UPDATED;
     }
 
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
-                                                          String userAuthorisation) {
+        String userAuthorisation) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
 
+
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final Optional<CaseDetails<SscsCaseData>> caseDetailsBefore = callback.getCaseDetailsBefore();
-        final SscsCaseData sscsCaseData = !IBCA_BENEFIT_CODE.equals(caseDetails.getCaseData().getBenefitCode())
-                ? associatedCaseLinkHelper.linkCaseByNino(caseDetails.getCaseData(), caseDetailsBefore)
-                : caseDetails.getCaseData();
+        final SscsCaseData sscsCaseData = !IBCA_BENEFIT_CODE.equals(
+            caseDetails.getCaseData().getBenefitCode()) ? associatedCaseLinkHelper.linkCaseByNino(caseDetails.getCaseData(),
+            caseDetailsBefore) : caseDetails.getCaseData();
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
@@ -163,10 +159,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
 
         Appellant appellant = sscsCaseData.getAppeal().getAppellant();
-        if (appellant != null
-            && appellant.getAddress() != null
-            && (isNotBlank(appellant.getAddress().getPostcode())
-                || isNotBlank(appellant.getAddress().getPortOfEntry()))) {
+        if (appellant != null && appellant.getAddress() != null && (isNotBlank(appellant.getAddress().getPostcode())
+            || isNotBlank(appellant.getAddress().getPortOfEntry()))) {
 
             String postCode = resolvePostCode(sscsCaseData);
             RegionalProcessingCenter newRpc = regionalProcessingCenterService.getByPostcode(postCode, sscsCaseData.isIbcCase());
@@ -182,6 +176,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
 
         sscsCaseData.setIsConfidentialCase(isConfidential(sscsCaseData));
+        if (cmOtherPartyConfidentialityEnabled) {
+            updateConfidentialityRequiredChangedDate(callback);
+        }
         updateCaseName(callback, sscsCaseData);
         updateCaseCategoriesIfBenefitTypeUpdated(callback, sscsCaseData, preSubmitCallbackResponse);
         updateLanguage(sscsCaseData);
@@ -199,7 +196,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             sscsCaseData.setJointParty(null);
         }
 
-        //validate benefit type and dwp issuing office for updateCaseData event triggered by user, which is not by CaseLoader
+        // validate benefit type and dwp issuing office for updateCaseData event triggered by user, which is not by CaseLoader
         if (!hasSystemUserRole) {
             validateAndUpdateDwpHandlingOffice(sscsCaseData, preSubmitCallbackResponse);
             validateHearingOptions(sscsCaseData, preSubmitCallbackResponse);
@@ -216,21 +213,44 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (!updatedOverrideFields.isAllNull()) {
             sscsCaseData.getSchedulingAndListingFields().setOverrideFields(updatedOverrideFields);
         }
-        sscsCaseData.setPanelMemberComposition(panelCompositionService
-                .resetPanelCompositionIfStale(sscsCaseData, caseDetailsBefore));
+        sscsCaseData.setPanelMemberComposition(
+            panelCompositionService.resetPanelCompositionIfStale(sscsCaseData, caseDetailsBefore));
+
         return preSubmitCallbackResponse;
     }
 
-    private OverrideFields updateOverrideFields(SscsCaseData sscsCaseData, Optional<CaseDetails<SscsCaseData>> caseDetailsBefore) {
-        OverrideFields overrideFields = ofNullable(sscsCaseData.getSchedulingAndListingFields().getOverrideFields())
-                .orElse(OverrideFields.builder().build());
+    public void maybeChangeIsScottish(RegionalProcessingCenter oldRpc, RegionalProcessingCenter newRpc, SscsCaseData caseData) {
+        if (oldRpc != newRpc) {
+            String isScottishCase = isScottishCase(newRpc);
+            caseData.setIsScottishCase(isScottishCase);
+        }
+    }
+
+    private static void updateConfidentialityRequiredChangedDate(Callback<SscsCaseData> callback) {
+        final Optional<YesNo> confidentialityRequiredBefore =
+            callback.getCaseDetailsBefore().map(CaseDetails::getCaseData)
+                .flatMap(SscsCaseData::getAppellantConfidentialityRequired);
+        final SscsCaseData currentCaseData = callback.getCaseDetails().getCaseData();
+        final Optional<YesNo> confidentialityRequired =
+            currentCaseData.getAppellantConfidentialityRequired();
+        if (confidentialityRequiredBefore.isPresent() && Objects.equals(confidentialityRequiredBefore, confidentialityRequired)) {
+            return;
+        }
+        currentCaseData.getAppellant()
+            .ifPresent(appellant -> appellant.setConfidentialityRequiredChangedDate(now()));
+    }
+
+    private OverrideFields updateOverrideFields(SscsCaseData sscsCaseData,
+        Optional<CaseDetails<SscsCaseData>> caseDetailsBefore) {
+        OverrideFields overrideFields = ofNullable(sscsCaseData.getSchedulingAndListingFields().getOverrideFields()).orElse(
+            OverrideFields.builder().build());
         if (isNull(sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues()) || caseDetailsBefore.isEmpty()) {
             return overrideFields;
         }
         HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
         if (nonNull(hearingOptions)) {
-            HearingOptions hearingOptionsBefore = ofNullable(caseDetailsBefore.get().getCaseData().getAppeal().getHearingOptions())
-                    .orElse(HearingOptions.builder().build());
+            HearingOptions hearingOptionsBefore = ofNullable(
+                caseDetailsBefore.get().getCaseData().getAppeal().getHearingOptions()).orElse(HearingOptions.builder().build());
             if (hasInterpreterChanged(sscsCaseData, hearingOptionsBefore)) {
                 updateOverrideInterpreter(hearingOptions, overrideFields);
                 updateOverrideDuration(sscsCaseData, overrideFields);
@@ -261,8 +281,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             overrideLanguageList = new DynamicList(languageList.getValue(), languageList.getListItems());
         }
         HearingInterpreter hearingInterpreter = HearingInterpreter.builder()
-                .isInterpreterWanted(YesNo.valueOf(languageInterpreter.toUpperCase()))
-                .interpreterLanguage(overrideLanguageList).build();
+            .isInterpreterWanted(YesNo.valueOf(languageInterpreter.toUpperCase())).interpreterLanguage(overrideLanguageList)
+            .build();
         overrideFields.setAppellantInterpreter(hearingInterpreter);
     }
 
@@ -299,8 +319,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     private void validatingPartyAddresses(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
-        if (!IBCA_BENEFIT_CODE.equals(sscsCaseData.getBenefitCode())
-                || YES.equals(sscsCaseData.getAppeal().getAppellant().getAddress().getInMainlandUk())) {
+        if (!IBCA_BENEFIT_CODE.equals(sscsCaseData.getBenefitCode()) || YES.equals(
+            sscsCaseData.getAppeal().getAppellant().getAddress().getInMainlandUk())) {
             validateAddressAndPostcode(response, sscsCaseData.getAppeal().getAppellant(), "appellant");
         }
 
@@ -342,39 +362,35 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private void validateAndUpdateDwpHandlingOffice(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         MrnDetails mrnDetails = sscsCaseData.getAppeal().getMrnDetails();
         BenefitType benefitType = sscsCaseData.getAppeal().getBenefitType();
-        boolean validBenefitType = validateBenefitType(benefitType,response);
+        boolean validBenefitType = validateBenefitType(benefitType, response);
         boolean validDwpIssuingOffice = validateDwpIssuingOffice(mrnDetails, benefitType, response);
 
         if (validBenefitType && validDwpIssuingOffice) {
-            String regionalCenter = dwpAddressLookupService.getDwpRegionalCenterByBenefitTypeAndOffice(benefitType.getCode(), mrnDetails.getDwpIssuingOffice());
+            String regionalCenter = dwpAddressLookupService.getDwpRegionalCenterByBenefitTypeAndOffice(benefitType.getCode(),
+                mrnDetails.getDwpIssuingOffice());
             sscsCaseData.setDwpRegionalCentre(regionalCenter);
         }
     }
 
     private boolean hasValidHearingOptionsAndWantsToExcludeDates(HearingOptions hearingOptions) {
-        return hearingOptions != null
-            && isYes(hearingOptions.getWantsToAttend())
-            && isYes(hearingOptions.getScheduleHearing());
+        return hearingOptions != null && isYes(hearingOptions.getWantsToAttend()) && isYes(hearingOptions.getScheduleHearing());
     }
 
     private void validateHearingOptions(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
-        if (hearingOptions != null
-            && sscsCaseData.getAppeal().getHearingType() != null
-            && HearingType.ORAL.getValue().equals(sscsCaseData.getAppeal().getHearingType())
-            && Boolean.FALSE.equals(hearingOptions.isWantsToAttendHearing())) {
+        if (hearingOptions != null && sscsCaseData.getAppeal().getHearingType() != null && HearingType.ORAL.getValue()
+            .equals(sscsCaseData.getAppeal().getHearingType()) && Boolean.FALSE.equals(hearingOptions.isWantsToAttendHearing())) {
             response.addWarning("There is a mismatch between the hearing type and the wants to attend field, "
                 + "all hearing options will be cleared please check if this is correct");
         }
 
         if (hasValidHearingOptionsAndWantsToExcludeDates(hearingOptions)) {
-            response.addErrors(
-                    validateHearingOptionsAndExcludeDates(hearingOptions.getExcludeDates())
-            );
+            response.addErrors(validateHearingOptionsAndExcludeDates(hearingOptions.getExcludeDates()));
         }
     }
 
-    private void updateHearingTypeForNonSscs1Case(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response, boolean hasSystemUserRole) {
+    private void updateHearingTypeForNonSscs1Case(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response,
+        boolean hasSystemUserRole) {
         if (sscsCaseData.getAppeal().getHearingType() != null
             && sscsCaseData.getAppeal().getHearingOptions() != null
             && HearingType.PAPER.getValue().equals(sscsCaseData.getAppeal().getHearingType())
@@ -390,11 +406,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     private boolean isBenefitTypeValidForHearingTypeValidation(Optional<Benefit> benefitType) {
-        return benefitType.filter(benefit ->
-                SscsType.SSCS2.equals(benefit.getSscsType())
-                        || SscsType.SSCS5.equals(benefit.getSscsType())
-                        || SscsType.SSCS8.equals(benefit.getSscsType()))
-                .isPresent();
+        return benefitType.filter(benefit -> SscsType.SSCS2.equals(benefit.getSscsType())
+            || SscsType.SSCS5.equals(benefit.getSscsType())
+            || SscsType.SSCS8.equals(benefit.getSscsType())).isPresent();
     }
 
     private boolean validateBenefitType(BenefitType benefitType, PreSubmitCallbackResponse<SscsCaseData> response) {
@@ -407,7 +421,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         return true;
     }
 
-    private boolean validateDwpIssuingOffice(MrnDetails mrnDetails, BenefitType benefitType, PreSubmitCallbackResponse<SscsCaseData> response) {
+    private boolean validateDwpIssuingOffice(MrnDetails mrnDetails, BenefitType benefitType,
+        PreSubmitCallbackResponse<SscsCaseData> response) {
         if (mrnDetails != null) {
             if (isEmpty(mrnDetails.getDwpIssuingOffice())) {
                 response.addWarning("FTA issuing office is empty");
@@ -415,7 +430,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             } else if (Benefit.findBenefitByShortName(benefitType.getCode()).isPresent()) {
                 if (!dwpAddressLookupService.validateIssuingOffice(benefitType.getCode(), mrnDetails.getDwpIssuingOffice())) {
                     OfficeMapping[] officeMappings = dwpAddressLookupService.getDwpOfficeMappings(benefitType.getCode());
-                    String validOffice = Arrays.stream(officeMappings).map(OfficeMapping::getCode).collect(Collectors.joining(", "));
+                    String validOffice = Arrays.stream(officeMappings).map(OfficeMapping::getCode)
+                        .collect(Collectors.joining(", "));
                     response.addWarning("DWP issuing office is invalid, should one of: " + validOffice);
                     return false;
                 }
@@ -423,13 +439,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             }
         }
         return false;
-    }
-
-    public void maybeChangeIsScottish(RegionalProcessingCenter oldRpc, RegionalProcessingCenter newRpc, SscsCaseData caseData) {
-        if (oldRpc != newRpc) {
-            String isScottishCase = isScottishCase(newRpc);
-            caseData.setIsScottishCase(isScottishCase);
-        }
     }
 
     private void updateProcessingVenueIfRequired(CaseDetails<SscsCaseData> caseDetails, String rpcEpimsId) {
@@ -443,15 +452,15 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             String venueEpimsId = venueService.getEpimsIdForVenue(venue);
             VenueDetails newVenue = venueService.getVenueDetailsForActiveVenueByEpimsId(venueEpimsId);
             if (nonNull(newVenue)) {
-                if (isEmpty(newVenue.getLegacyVenue()) || !Objects.equals(newVenue.getLegacyVenue(), sscsCaseData.getProcessingVenue())) {
+                if (isEmpty(newVenue.getLegacyVenue()) || !Objects.equals(newVenue.getLegacyVenue(),
+                    sscsCaseData.getProcessingVenue())) {
                     log.info("Processing venue requires updating for case {}: setting venue name to {} from {}",
-                            caseDetails.getId(), venue, sscsCaseData.getProcessingVenue());
+                        caseDetails.getId(), venue, sscsCaseData.getProcessingVenue());
                     sscsCaseData.setProcessingVenue(venue);
                 } else {
                     venue = sscsCaseData.getProcessingVenue();
                     venueEpimsId = venueService.getEpimsIdForVenue(venue);
-                    log.info("Legacy venue {} has not been updated for case {}",
-                            venue, caseDetails.getId());
+                    log.info("Legacy venue {} has not been updated for case {}", venue, caseDetails.getId());
                 }
 
             }
@@ -459,17 +468,16 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             if (isNotEmpty(venue)) {
                 CourtVenue courtVenue = refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId);
 
-                sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
-                    .baseLocation(rpcEpimsId)
-                    .region(courtVenue.getRegionId()).build());
+                sscsCaseData.setCaseManagementLocation(
+                    CaseManagementLocation.builder().baseLocation(rpcEpimsId).region(courtVenue.getRegionId()).build());
 
                 log.info("Successfully updated case management location details for case {}. Processing venue {}, epimsId {}",
                     caseDetails.getId(), venue, venueEpimsId);
 
             }
         } else {
-            log.info("Processing venue has not changed or is null, skipping update for case {}, venue: {}",
-                caseDetails.getId(), venue);
+            log.info("Processing venue has not changed or is null, skipping update for case {}, venue: {}", caseDetails.getId(),
+                venue);
         }
     }
 
@@ -586,16 +594,14 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     private String getCaseName(Appellant appellant) {
-        if (appellant != null
-            && appellant.getName() != null) {
+        if (appellant != null && appellant.getName() != null) {
             return appellant.getName().getFullNameNoTitle();
         }
         return null;
     }
 
-    private void updateCaseCategoriesIfBenefitTypeUpdated(Callback<SscsCaseData> callback,
-                                                          SscsCaseData sscsCaseData,
-                                                          PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+    private void updateCaseCategoriesIfBenefitTypeUpdated(Callback<SscsCaseData> callback, SscsCaseData sscsCaseData,
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         Optional<Benefit> benefit = sscsCaseData.getBenefitType();
 
         CaseDetails<SscsCaseData> oldCaseDetails = callback.getCaseDetailsBefore().orElse(null);
@@ -605,8 +611,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             sscsCaseData.getCaseAccessManagementFields().setCategories(benefit.get());
 
         } else if (benefitCodeHasValue(sscsCaseData.getAppeal())) {
-            String validBenefitTypes = Arrays.stream(Benefit.values())
-                .map(Benefit::getShortName)
+            String validBenefitTypes = Arrays.stream(Benefit.values()).map(Benefit::getShortName)
                 .collect(Collectors.joining(", "));
             preSubmitCallbackResponse.addError("Benefit type code is invalid, should be one of: " + validBenefitTypes);
 
@@ -616,15 +621,13 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     private boolean benefitCodeHasValue(Appeal appeal) {
-        return appeal != null
-                && appeal.getBenefitType() != null
-                && appeal.getBenefitType().getCode() != null
-                && !isEmpty(appeal.getBenefitType().getCode());
+        return appeal != null && appeal.getBenefitType() != null && appeal.getBenefitType().getCode() != null && !isEmpty(
+            appeal.getBenefitType().getCode());
     }
 
     private Optional<Benefit> getOldBenefitCode(CaseDetails<SscsCaseData> oldCaseDetails) {
-        if (oldCaseDetails == null || oldCaseDetails.getCaseData() == null
-                || oldCaseDetails.getCaseData().getBenefitType().isEmpty()) {
+        if (oldCaseDetails == null || oldCaseDetails.getCaseData() == null || oldCaseDetails.getCaseData().getBenefitType()
+            .isEmpty()) {
             return Optional.empty();
         } else {
             return oldCaseDetails.getCaseData().getBenefitType();
