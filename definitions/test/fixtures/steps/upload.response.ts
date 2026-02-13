@@ -458,6 +458,4 @@ export class UploadResponse extends BaseStep {
   async navigateToHearingsTab() {
     await this.homePage.navigateToTab('Hearings');
   }
-
-  async 
 }
