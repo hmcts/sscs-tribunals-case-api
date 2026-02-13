@@ -174,7 +174,7 @@ class SendToBulkPrintHandlerTest {
     @ParameterizedTest
     @CsvSource({"pip, 35", "childSupport, 42"})
     void givenAMessageWhichFindsATemplate_thenConvertToSscsCaseDataAndAddPdfToCaseAndSendToBulkPrint(String benefitType,
-        int expectedResponseDays) {
+                                                                                                     int expectedResponseDays) {
         when(evidenceShareConfig.getSubmitTypes()).thenReturn(singletonList("paper"));
 
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(benefitType, "Paper", Arrays.asList(
@@ -567,7 +567,7 @@ class SendToBulkPrintHandlerTest {
     }
 
     private CaseDetails<SscsCaseData> getCaseDetails(String benefitType, String receivedVia, List<SscsDocument> sscsDocuments,
-        State state) {
+                                                     State state) {
         SscsCaseData caseData = SscsCaseData.builder()
             .ccdCaseId("123")
             .createdInGapsFrom("validAppeal")
