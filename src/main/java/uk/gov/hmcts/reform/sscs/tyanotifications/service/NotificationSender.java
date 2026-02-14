@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -217,9 +216,10 @@ public class NotificationSender {
             NotificationClient client = null;
             var caseData = wrapper.getNewSscsCaseData();
 
-            if (wrapper.getNotificationType().equals(ISSUE_FINAL_DECISION) && pageLimitExceeded) {
-                bulkPrintService
-                        .sendToBulkPrint(List.of(new Pdf(content, ISSUE_FINAL_DECISION.name())), caseData, recipient);
+            if (pageLimitExceeded) {
+                bulkPrintService.sendToBulkPrint(
+                        List.of(new Pdf(content, wrapper.getNotificationType().name())), caseData, recipient
+                );
                 log.info("Sending {} Letter for case id : {} via BulkPrint because it exceeds 10 pages",
                         wrapper.getNotificationType(), wrapper.getCaseId());
             } else {

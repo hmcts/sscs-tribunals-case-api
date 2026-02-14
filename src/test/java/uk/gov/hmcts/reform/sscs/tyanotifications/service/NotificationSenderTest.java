@@ -8,6 +8,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.argThat;
@@ -26,12 +27,14 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -48,6 +51,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationTestRecipients;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 import uk.gov.service.notify.LetterResponse;
@@ -209,17 +213,20 @@ public class NotificationSenderTest {
                 .saveLetter(eq(notificationClient), anyString(), any(Correspondence.class), eq(CASE_D));
     }
 
-    @Test
-    public void sendLargeBundledLetterToSender() throws IOException, NotificationClientException {
-        when(notificationClient.sendPrecompiledLetterWithInputStream(any(), any())).thenReturn(letterResponse);
-        when(letterResponse.getNotificationId()).thenReturn(UUID.randomUUID());
+    @ParameterizedTest
+    @EnumSource(names = {"CORRECTION_GRANTED", "ISSUE_FINAL_DECISION", "PERMISSION_TO_APPEAL_REFUSED", "DIRECTION_ISSUED", "ISSUE_ADJOURNMENT_NOTICE"})
+    public void sendLargeBundledLetterToSender(NotificationEventType notificationType)
+            throws IOException, NotificationClientException {
+        wrapper.setNotificationType(notificationType);
+        when(bulkPrintService.sendToBulkPrint(anyList(), eq(wrapper.getNewSscsCaseData()), eq("Bob Squires")))
+                .thenReturn(Optional.of(UUID.randomUUID()));
         byte[] largeLetter =
                 toByteArray(requireNonNull(getClass().getClassLoader().getResourceAsStream(LARGE_PDF)));
 
         notificationSender.sendBundledLetter(wrapper, largeLetter, "Bob Squires");
 
         verifyNoInteractions(testNotificationClient);
-        verify(notificationClient).sendPrecompiledLetterWithInputStream(any(), any());
+        verify(bulkPrintService).sendToBulkPrint(anyList(), eq(wrapper.getNewSscsCaseData()), eq("Bob Squires"));
     }
 
     @Test
