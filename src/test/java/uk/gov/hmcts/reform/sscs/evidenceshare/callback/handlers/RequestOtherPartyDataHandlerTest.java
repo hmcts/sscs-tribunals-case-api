@@ -105,7 +105,7 @@ class RequestOtherPartyDataHandlerTest {
         handler.handle(SUBMITTED, callback);
 
         verify(updateCcdCaseService).updateCaseV2(eq(CCD_CASE_ID), eq("requestOtherPartyData"),
-            eq("REQUEST_OTHER_PARTY_DATA"), eq("Requesting other party data"), eq(tokens), any());
+            eq("Request Other Party Data"), eq("Requesting other party data"), eq(tokens), any());
     }
 
     @ParameterizedTest(name = "unsupported: benefit={0}, event={1}, callbackType={2} => does not update CCD")

@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 @Service
 public class RequestOtherPartyDataHandler implements CallbackHandler<SscsCaseData> {
 
-    private static final String SUMMARY = "REQUEST_OTHER_PARTY_DATA";
+    private static final String SUMMARY = "Request Other Party Data";
     private static final String DESCRIPTION = "Requesting other party data";
 
     private final UpdateCcdCaseService updateCcdCaseService;
