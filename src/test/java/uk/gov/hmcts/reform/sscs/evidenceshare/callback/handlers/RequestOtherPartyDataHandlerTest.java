@@ -8,8 +8,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATEST;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_TO_PROCEED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 
@@ -30,7 +31,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
-import uk.gov.hmcts.reform.sscs.evidenceshare.service.FeatureToggleService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
@@ -48,45 +48,49 @@ class RequestOtherPartyDataHandlerTest {
     private IdamService idamService;
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     private RequestOtherPartyDataHandler handler;
 
     @BeforeEach
     void setUp() {
-        handler = new RequestOtherPartyDataHandler(updateCcdCaseService, idamService, true);
+        handler = new RequestOtherPartyDataHandler(updateCcdCaseService,
+            idamService,
+            true);
     }
 
-    @Test
-    void canHandle_shouldReturnTrue_forSubmittedValidAppealChildSupport() {
+    @ParameterizedTest(name = "event={0} => can handle")
+    @MethodSource("supportedEvents")
+    void canHandle_shouldReturnTrue_forSubmittedValidAppealChildSupport(EventType eventType) {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(callback.getEvent()).thenReturn(VALID_APPEAL_CREATED);
+        when(callback.getEvent()).thenReturn(eventType);
         when(caseDetails.getCaseData()).thenReturn(caseDataWithBenefit(CHILD_SUPPORT));
 
-        assertThat(handler.canHandle(SUBMITTED, callback)).isTrue();
+        assertThat(handler.canHandle(SUBMITTED,
+            callback)).isTrue();
     }
 
     @ParameterizedTest(name = "benefit={0}, event={1}, callbackType={2} => cannot handle")
     @MethodSource("unsupportedScenarios")
-    void canHandle_shouldReturnFalse_forUnsupportedScenarios(String benefitCode, EventType eventType,
-                                                             CallbackType callbackType) {
+    void canHandle_shouldReturnFalse_forUnsupportedScenarios(String benefitCode, EventType eventType, CallbackType callbackType) {
 
         if (callbackType == SUBMITTED) {
             when(callback.getEvent()).thenReturn(eventType);
         }
 
-        if (callbackType == SUBMITTED && eventType == VALID_APPEAL_CREATED) {
+        if (callbackType == SUBMITTED && (eventType == VALID_APPEAL
+            || eventType == VALID_APPEAL_CREATED
+            || eventType == APPEAL_TO_PROCEED)) {
             when(callback.getCaseDetails()).thenReturn(caseDetails);
             when(caseDetails.getCaseData()).thenReturn(caseDataWithBenefit(benefitCode));
         }
 
-        assertThat(handler.canHandle(callbackType, callback)).isFalse();
+        assertThat(handler.canHandle(callbackType,
+            callback)).isFalse();
     }
 
     @Test
     void getPriority_shouldBeLatest() {
-        assertThat(handler.getPriority()).isEqualTo(LATEST);
+        assertThat(handler.getPriority()).isEqualTo(LATE);
     }
 
     @Test
@@ -94,24 +98,26 @@ class RequestOtherPartyDataHandlerTest {
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(callback.getEvent()).thenReturn(VALID_APPEAL_CREATED);
-        var caseData = SscsCaseData.builder()
-            .ccdCaseId(String.valueOf(CCD_CASE_ID))
-            .appeal(Appeal.builder().benefitType(BenefitType.builder().code(CHILD_SUPPORT).build()).build())
-            .build();
+        var caseData = SscsCaseData.builder().ccdCaseId(String.valueOf(CCD_CASE_ID))
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code(CHILD_SUPPORT).build()).build()).build();
         when(caseDetails.getCaseData()).thenReturn(caseData);
         var tokens = IdamTokens.builder().userId("user-id").email("test@example.com").build();
         when(idamService.getIdamTokens()).thenReturn(tokens);
 
-        handler.handle(SUBMITTED, callback);
+        handler.handle(SUBMITTED,
+            callback);
 
-        verify(updateCcdCaseService).updateCaseV2(eq(CCD_CASE_ID), eq("requestOtherPartyData"),
-            eq("REQUEST_OTHER_PARTY_DATA"), eq("Requesting other party data"), eq(tokens), any());
+        verify(updateCcdCaseService).updateCaseV2(eq(CCD_CASE_ID),
+            eq("requestOtherPartyData"),
+            eq("REQUEST_OTHER_PARTY_DATA"),
+            eq("Requesting other party data"),
+            eq(tokens),
+            any());
     }
 
     @ParameterizedTest(name = "unsupported: benefit={0}, event={1}, callbackType={2} => does not update CCD")
     @MethodSource("unsupportedScenarios")
-    void handle_shouldNotUpdateCcd_forUnsupportedScenarios(String benefitCode, EventType eventType,
-                                                           CallbackType callbackType) {
+    void handle_shouldNotUpdateCcd_forUnsupportedScenarios(String benefitCode, EventType eventType, CallbackType callbackType) {
 
         if (eventType != VALID_APPEAL) {
             when(callback.getEvent()).thenReturn(eventType);
@@ -122,32 +128,60 @@ class RequestOtherPartyDataHandlerTest {
             when(caseDetails.getCaseData()).thenReturn(caseDataWithBenefit(benefitCode));
         }
 
-        handler.handle(callbackType, callback);
+        handler.handle(callbackType,
+            callback);
 
-        verify(updateCcdCaseService, never()).updateCaseV2(any(), any(), any(), any(), any(), any());
+        verify(updateCcdCaseService,
+            never()).updateCaseV2(any(),
+            any(),
+            any(),
+            any(),
+            any(),
+            any());
     }
 
     @Test
     void handle_shouldNotUpdateCcd_whenToggledOff() {
 
-        boolean canHandle = new RequestOtherPartyDataHandler(updateCcdCaseService, idamService, false).canHandle(SUBMITTED,
+        boolean canHandle = new RequestOtherPartyDataHandler(updateCcdCaseService,
+            idamService,
+            false).canHandle(SUBMITTED,
             callback);
 
         assertThat(canHandle).isFalse();
 
-        verify(updateCcdCaseService, never()).updateCaseV2(any(), any(), any(), any(), any(), any());
+        verify(updateCcdCaseService,
+            never()).updateCaseV2(any(),
+            any(),
+            any(),
+            any(),
+            any(),
+            any());
+    }
+
+    private static Stream<Arguments> supportedEvents() {
+        return Stream.of(Arguments.of(VALID_APPEAL_CREATED),
+            Arguments.of(VALID_APPEAL), Arguments.of(APPEAL_TO_PROCEED));
     }
 
     private static Stream<Arguments> unsupportedScenarios() {
-        return Stream.of(Arguments.of("PIP", VALID_APPEAL, SUBMITTED),
-            Arguments.of(CHILD_SUPPORT, APPEAL_RECEIVED, SUBMITTED),
-            Arguments.of(CHILD_SUPPORT, VALID_APPEAL, MID_EVENT), Arguments.of("PIP", VALID_APPEAL_CREATED, SUBMITTED));
+        return Stream.of(Arguments.of("PIP",
+                VALID_APPEAL,
+                SUBMITTED),
+            Arguments.of(CHILD_SUPPORT,
+                APPEAL_RECEIVED,
+                SUBMITTED),
+            Arguments.of(CHILD_SUPPORT,
+                VALID_APPEAL,
+                MID_EVENT),
+            Arguments.of("PIP",
+                VALID_APPEAL_CREATED,
+                SUBMITTED));
     }
 
     private static SscsCaseData caseDataWithBenefit(String benefitCode) {
         return SscsCaseData.builder()
-            .appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefitCode).build()).build())
-            .build();
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefitCode).build()).build()).build();
     }
 
 }

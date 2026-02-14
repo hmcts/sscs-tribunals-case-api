@@ -1,7 +1,10 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATEST;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_TO_PROCEED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,14 +38,21 @@ public class RequestOtherPartyDataHandler implements CallbackHandler<SscsCaseDat
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-
-        if (!cmOtherPartyConfidentialityEnabled
-            || callbackType != CallbackType.SUBMITTED
-            || callback.getEvent() != EventType.VALID_APPEAL_CREATED) {
+        if (!cmOtherPartyConfidentialityEnabled) {
             return false;
         }
 
-        return callback.getCaseDetails().getCaseData().isBenefitType(CHILD_SUPPORT);
+        if (callbackType != CallbackType.SUBMITTED) {
+            return false;
+        }
+
+        final EventType event = callback.getEvent();
+        if (event != VALID_APPEAL_CREATED && event != VALID_APPEAL && event != APPEAL_TO_PROCEED) {
+            return false;
+        }
+
+        final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        return caseData.isBenefitType(CHILD_SUPPORT);
     }
 
     @Override
@@ -60,6 +70,6 @@ public class RequestOtherPartyDataHandler implements CallbackHandler<SscsCaseDat
 
     @Override
     public DispatchPriority getPriority() {
-        return LATEST;
+        return LATE;
     }
 }
