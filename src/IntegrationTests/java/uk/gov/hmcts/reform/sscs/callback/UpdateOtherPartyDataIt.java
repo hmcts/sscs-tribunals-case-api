@@ -26,7 +26,6 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 
-
 @SpringBootTest
 @AutoConfigureMockMvc
 public class UpdateOtherPartyDataIt extends AbstractEventIt {

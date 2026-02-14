@@ -43,18 +43,18 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.AppealHearingType;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.DocmosisTemplatesConfig;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.SubscriptionType;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.properties.EvidenceProperties;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.NotificationSscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.SubscriptionWithType;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.docmosis.PdfCoverSheet;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.domain.notify.NotificationEventType;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.factory.CcdNotificationWrapper;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.factory.NotificationWrapper;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.docmosis.PdfLetterService;
 import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.DocmosisPdfService;
-import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType;
-import uk.gov.hmcts.reform.sscs.tyanotifications.config.DocmosisTemplatesConfig;
-import uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType;
-import uk.gov.hmcts.reform.sscs.tyanotifications.config.properties.EvidenceProperties;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.docmosis.PdfCoverSheet;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
-import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
-import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
-
 
 @RunWith(SpringRunner.class)
 @SpringBootTest

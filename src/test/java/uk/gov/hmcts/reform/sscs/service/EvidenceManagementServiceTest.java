@@ -27,9 +27,9 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
-import uk.gov.hmcts.reform.sscs.document.EvidenceDownloadClientApi;
-import uk.gov.hmcts.reform.sscs.document.EvidenceMetadataDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.exception.UnsupportedDocumentTypeException;
+import uk.gov.hmcts.reform.sscs.thirdparty.documentmanagement.EvidenceDownloadClientApi;
+import uk.gov.hmcts.reform.sscs.thirdparty.documentmanagement.EvidenceMetadataDownloadClientApi;
 
 public class EvidenceManagementServiceTest {
 

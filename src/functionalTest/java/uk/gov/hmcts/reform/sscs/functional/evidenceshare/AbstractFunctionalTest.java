@@ -59,7 +59,9 @@ abstract class AbstractFunctionalTest {
     private static final String EXISTING_DOCUMENT_TYPE = "EXISTING_DOCUMENT";
     private final String tcaInstance = System.getenv("TEST_URL");
     private final String localInstance = "http://localhost:8008";
+
     String ccdCaseId;
+
     @Autowired
     private IdamService idamService;
     private IdamTokens idamTokens;

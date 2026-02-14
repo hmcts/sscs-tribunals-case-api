@@ -36,7 +36,6 @@ import uk.gov.hmcts.reform.sscs.model.draft.Draft;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealServiceBase;
 
-
 @RestController
 @Slf4j
 public class SyaController {

@@ -27,17 +27,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import uk.gov.hmcts.reform.sscs.callback.controllers.PreSubmitCallbackController;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ProcessedAction;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.controller.CcdCallbackController;
-import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
+import uk.gov.hmcts.reform.sscs.thirdparty.docassembly.GenerateFile;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -68,7 +68,7 @@ public class ProcessAudioVideoIt extends AbstractEventIt {
 
         when(userDetailsService.buildLoggedInUserName(any())).thenReturn("Logged in user");
 
-        CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
+        PreSubmitCallbackController controller = new PreSubmitCallbackController(authorisationService, deserializer, dispatcher);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         mapper.findAndRegisterModules();
 

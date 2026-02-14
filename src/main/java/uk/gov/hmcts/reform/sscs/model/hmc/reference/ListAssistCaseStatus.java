@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 
-
 @Getter
 @RequiredArgsConstructor
 public enum ListAssistCaseStatus {

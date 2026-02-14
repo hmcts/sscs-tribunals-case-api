@@ -1,0 +1,126 @@
+package uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.uc.scenarios;
+
+import static java.util.Collections.singletonList;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.uc.UcTemplateContent;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.uc.scenarios.UcScenario;
+import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
+import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
+
+public class UcScenario7Test {
+
+    @Test
+    public void testScenario7() {
+
+        List<Descriptor> schedule6Descriptors = singletonList(
+            Descriptor.builder().activityQuestionValue("Mobilising Unaided").activityAnswerValue("1").activityAnswerLetter("c").activityAnswerPoints(9).build());
+
+        WriteFinalDecisionTemplateBody body = WriteFinalDecisionTemplateBody.builder()
+            .hearingType("faceToFace")
+            .attendedHearing(true)
+            .presentingOfficerAttended(true)
+            .isAllowed(true)
+            .isSetAside(true)
+            .dateOfDecision("2020-09-20")
+            .ucNumberOfPoints(9)
+            .pageNumber("A1")
+            .appellantName("Felix Sydney")
+            .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
+            .anythingElse("Something else")
+            .schedule8Paragraph4Applicable(true)
+            .ucCapabilityAssessmentStartDate(LocalDate.of(2025, 11, 18))
+            .ucSchedule6Descriptors(schedule6Descriptors)
+            .build();
+
+        UcTemplateContent content = UcScenario.SCENARIO_7.getContent(body);
+
+        String expectedContent = """
+            The appeal is allowed.
+            
+            The decision made by the Secretary of State on 20/09/2020 is set aside.
+            
+            Felix Sydney is to be treated as having limited capability for work from 18/11/2025.
+            
+            This is because insufficient points were scored to meet the threshold for the Work Capability Assessment, but Schedule 8, paragraph 4 of the Universal Credit (UC) Regulations 2013 applied.
+            
+            Mobilising Unaided\tc.1\t9
+            
+            
+            The tribunal applied Schedule 8, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work.
+            
+            Felix Sydney does not have limited capability for work-related activity because no descriptor from Schedule 7 of the UC Regulations applied. Schedule 9, paragraph 4 did not apply.
+            
+            My first reasons
+            
+            My second reasons
+            
+            Something else
+            
+            This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.
+            
+            """;
+
+        assertThat(content.getComponents()).hasSize(11);
+
+        assertThat(content.toString()).isEqualTo(expectedContent);
+
+    }
+
+    @Test
+    public void testScenario7WhenNoSchedule6() {
+
+        List<Descriptor> schedule6Descriptors = List.of();
+
+        WriteFinalDecisionTemplateBody body = WriteFinalDecisionTemplateBody.builder()
+            .hearingType("faceToFace")
+            .attendedHearing(true)
+            .presentingOfficerAttended(true)
+            .isAllowed(true)
+            .isSetAside(true)
+            .dateOfDecision("2020-09-20")
+            .ucNumberOfPoints(0)
+            .pageNumber("A1")
+            .appellantName("Felix Sydney")
+            .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
+            .anythingElse("Something else")
+            .schedule8Paragraph4Applicable(true)
+            .ucCapabilityAssessmentStartDate(LocalDate.of(2025, 11, 18))
+            .ucSchedule6Descriptors(schedule6Descriptors)
+            .build();
+
+        UcTemplateContent content = UcScenario.SCENARIO_7.getContent(body);
+
+        String expectedContent = """
+            The appeal is allowed.
+            
+            The decision made by the Secretary of State on 20/09/2020 is set aside.
+            
+            Felix Sydney is to be treated as having limited capability for work from 18/11/2025.
+            
+            This is because insufficient points were scored to meet the threshold for the Work Capability Assessment, but Schedule 8, paragraph 4 of the Universal Credit (UC) Regulations 2013 applied.
+            
+            The tribunal applied Schedule 8, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work.
+            
+            Felix Sydney does not have limited capability for work-related activity because no descriptor from Schedule 7 of the UC Regulations applied. Schedule 9, paragraph 4 did not apply.
+            
+            My first reasons
+            
+            My second reasons
+            
+            Something else
+            
+            This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.
+            
+            """;
+
+        assertThat(content.getComponents()).hasSize(10);
+
+        assertThat(content.toString()).isEqualTo(expectedContent);
+
+    }
+}

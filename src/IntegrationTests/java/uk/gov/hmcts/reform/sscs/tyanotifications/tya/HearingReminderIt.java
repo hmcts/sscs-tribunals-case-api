@@ -30,16 +30,16 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import uk.gov.hmcts.reform.sscs.callback.controllers.NotificationController;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobExecutor;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.NotificationProcessingService;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.OutOfHoursCalculator;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.docmosis.PdfLetterService;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
-import uk.gov.hmcts.reform.sscs.tyanotifications.controller.NotificationController;
 import uk.gov.hmcts.reform.sscs.tyanotifications.helper.IntegrationTestHelper;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationService;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.OutOfHoursCalculator;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis.PdfLetterService;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 import uk.gov.service.notify.SendEmailResponse;
@@ -57,7 +57,7 @@ public class HearingReminderIt {
     NotificationController controller;
 
     @Autowired
-    NotificationService notificationService;
+    NotificationProcessingService notificationProcessingService;
 
     @MockitoBean
     private AuthorisationService authorisationService;
@@ -98,7 +98,7 @@ public class HearingReminderIt {
 
     @Before
     public void setup() throws NotificationClientException {
-        controller = new NotificationController(notificationService, authorisationService, ccdService, deserializer, idamService);
+        controller = new NotificationController(notificationProcessingService, authorisationService, ccdService, deserializer, idamService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
         when(client.sendEmail(any(), any(), any(), any()))
@@ -127,7 +127,7 @@ public class HearingReminderIt {
     @Test
     public void shouldScheduleHearingReminderThenRemoveWhenPostponed() throws Exception {
 
-        ReflectionTestUtils.setField(notificationService, "covid19Feature", false);
+        ReflectionTestUtils.setField(notificationProcessingService, "covid19Feature", false);
 
         try {
             quartzScheduler.clear();

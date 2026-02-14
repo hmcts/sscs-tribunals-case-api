@@ -8,9 +8,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPELLANT_NAME;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.NAME;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.REPRESENTATIVE_NAME;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.PersonalisationMappingConstants.APPELLANT_NAME;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.PersonalisationMappingConstants.NAME;
+import static uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.PersonalisationMappingConstants.REPRESENTATIVE_NAME;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -40,28 +40,28 @@ import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import uk.gov.hmcts.reform.sscs.callback.controllers.NotificationController;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
-import uk.gov.hmcts.reform.sscs.evidenceshare.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.notifications.bulkprint.service.BulkPrintService;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.NotificationConfig;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.config.NotificationTestRecipients;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.factory.NotificationFactory;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.MarkdownTransformationService;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.NotificationDispatchService;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.NotificationExecutionManager;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.NotificationGateway;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.NotificationProcessingService;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.NotificationValidService;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.OutOfHoursCalculator;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.ReminderService;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.SaveCorrespondenceAsyncService;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.docmosis.PdfLetterService;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.service.DocmosisPdfGenerationService;
 import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.DocmosisPdfService;
-import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationConfig;
-import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationTestRecipients;
-import uk.gov.hmcts.reform.sscs.tyanotifications.controller.NotificationController;
-import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationFactory;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.MarkdownTransformationService;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationHandler;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationSender;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationService;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationValidService;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.OutOfHoursCalculator;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.ReminderService;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.SaveCorrespondenceAsyncService;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.SendNotificationService;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis.PdfLetterService;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 import uk.gov.service.notify.SendEmailResponse;
@@ -121,7 +121,7 @@ public class NotificationsItBase {
     protected String json;
 
     @Autowired
-    private NotificationHandler notificationHandler;
+    private NotificationExecutionManager notificationExecutionManager;
 
     @MockitoBean
     private OutOfHoursCalculator outOfHoursCalculator;
@@ -161,15 +161,15 @@ public class NotificationsItBase {
     @Qualifier("scheduler")
     protected Scheduler quartzScheduler;
 
-    protected NotificationService service;
+    protected NotificationProcessingService service;
 
     @Before
     public void setup() throws Exception {
-        NotificationSender sender = new NotificationSender(notificationClient, null, bulkPrintService, notificationTestRecipients, markdownTransformationService, saveCorrespondenceAsyncService, saveCorrespondence);
+        NotificationGateway sender = new NotificationGateway(notificationClient, null, bulkPrintService, notificationTestRecipients, markdownTransformationService, saveCorrespondenceAsyncService, saveCorrespondence);
 
-        SendNotificationService sendNotificationService = new SendNotificationService(sender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
+        NotificationDispatchService notificationDispatchService = new NotificationDispatchService(sender, notificationExecutionManager, notificationValidService, pdfLetterService, pdfStoreService);
 
-        setupNotificationService(sendNotificationService);
+        setupNotificationService(notificationDispatchService);
 
         NotificationController controller = new NotificationController(service, authorisationService, ccdService, deserializer, idamService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
@@ -197,15 +197,15 @@ public class NotificationsItBase {
         when(docmosisPdfGenerationService.generatePdf(any())).thenReturn(pdfbytes);
     }
 
-    private void setupNotificationService(SendNotificationService sendNotificationService) {
-        service = new NotificationService(factory, reminderService, notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false);
+    private void setupNotificationService(NotificationDispatchService notificationDispatchService) {
+        service = new NotificationProcessingService(factory, reminderService, notificationValidService, notificationExecutionManager, outOfHoursCalculator, notificationConfig, notificationDispatchService, false);
     }
 
-    protected NotificationService getNotificationService() {
+    protected NotificationProcessingService getNotificationService() {
         return service;
     }
 
-    protected void setupReminderController(NotificationService service) {
+    protected void setupReminderController(NotificationProcessingService service) {
         ReminderTestController reminderTestController = new ReminderTestController(service, authorisationService, ccdService, deserializer, idamService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(reminderTestController).build();
 

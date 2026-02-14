@@ -12,13 +12,13 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
-import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
-import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
-import uk.gov.hmcts.reform.sscs.docmosis.service.DocumentManagementService;
-import uk.gov.hmcts.reform.sscs.docmosis.service.PdfGenerationService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.DocumentHolder;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Pdf;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.domain.Template;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.service.PdfGenerationService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DocumentManagementServiceTest {

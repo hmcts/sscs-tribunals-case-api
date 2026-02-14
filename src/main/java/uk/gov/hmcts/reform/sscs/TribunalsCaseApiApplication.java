@@ -54,24 +54,27 @@ import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
-import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.jobscheduler.config.QuartzConfiguration;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.quartz.JobClassMapper;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.quartz.JobClassMapping;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.quartz.JobMapper;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.quartz.JobMapping;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.NotificationExecutionManager;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.NotificationProcessingService;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.scheduler.CcdActionDeserializer;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.scheduler.CcdActionExecutor;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.scheduler.CcdActionSerializer;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.scheduler.CohActionSerializer;
+import uk.gov.hmcts.reform.sscs.notifications.gov.notify.service.scheduler.CohJobPayload;
 import uk.gov.hmcts.reform.sscs.service.ScheduledTaskRunner;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationService;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.RetryNotificationService;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.scheduler.*;
+import uk.gov.hmcts.reform.sscs.thirdparty.docmosis.service.DocmosisPdfGenerationService;
 import uk.gov.service.notify.NotificationClient;
 
 @SpringBootApplication
 @EnableFeignClients(basePackages = {
     "uk.gov.hmcts.reform.authorisation",
     "uk.gov.hmcts.reform.sscs.idam",
-    "uk.gov.hmcts.reform.sscs.document",
     "uk.gov.hmcts.reform.docassembly",
     "uk.gov.hmcts.reform.sscs.thirdparty",
     "uk.gov.hmcts.reform.idam",
@@ -256,14 +259,14 @@ public class TribunalsCaseApiApplication implements CommandLineRunner {
 
     @Bean
     public JobMapper getJobMapper(CcdActionDeserializer ccdActionDeserializer,
-                                  NotificationService notificationService,
-                                  RetryNotificationService retryNotificationService,
+                                  NotificationProcessingService notificationProcessingService,
+                                  NotificationExecutionManager notificationExecutionManager,
                                   CcdService ccdService,
                                   UpdateCcdCaseService updateCcdCaseService,
                                   IdamService idamService,
                                   SscsCaseCallbackDeserializer deserializer) {
-        // Had to wire these up like this Spring will not wire up CcdActionExecutor otherwise.
-        CcdActionExecutor ccdActionExecutor = new CcdActionExecutor(notificationService, retryNotificationService, ccdService, updateCcdCaseService, idamService, deserializer);
+        CcdActionExecutor ccdActionExecutor = new CcdActionExecutor(notificationProcessingService,
+                notificationExecutionManager, ccdService, updateCcdCaseService, idamService, deserializer);
         return new JobMapper(List.of(
             new JobMapping<>(payload -> !payload.contains("onlineHearingId"), ccdActionDeserializer, ccdActionExecutor)
         ));

@@ -6,12 +6,12 @@ import java.io.IOException;
 import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Test;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.ActivityAnswer;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.uc.UcActivityQuestion;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.uc.UcActivityQuestionKey;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.uc.UcActivityType;
+import uk.gov.hmcts.reform.sscs.callback.handlers.presubmit.writefinaldecision.uc.UcSchedule7QuestionKey;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityAnswer;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcActivityQuestion;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcActivityQuestionKey;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcActivityType;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcSchedule7QuestionKey;
 
 public class UcDecisionNoticeQuestionServiceTest extends DecisionNoticeQuestionServiceTestBase<UcDecisionNoticeQuestionService> {
 

@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AppellantRole;
 
-
 @Getter
 public enum AppellantRoleIndicator {
     PAYING_PARENT(IS_PAYING_PARENT, AppellantRole.PAYING_PARENT),
