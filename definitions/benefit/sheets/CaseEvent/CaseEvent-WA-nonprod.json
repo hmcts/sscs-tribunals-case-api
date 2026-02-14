@@ -26,18 +26,6 @@
   {
     "LiveFrom": "01/01/2018",
     "CaseTypeID": "Benefit",
-    "ID": "hearingToday",
-    "Name": "Hearing Today",
-    "Description": "System event triggered on the day of a hearing",
-    "DisplayOrder": 9992,
-    "PreConditionState(s)": "*",
-    "PostConditionState": "*",
-    "SecurityClassification": "Public",
-    "Publish": "${CCD_DEF_PUBLISH}"
-  },
-  {
-    "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
     "ID": "prepareForHearing",
     "Name": "Prepare for Hearing",
     "Description": "System event triggered 14 days before a hearing date",

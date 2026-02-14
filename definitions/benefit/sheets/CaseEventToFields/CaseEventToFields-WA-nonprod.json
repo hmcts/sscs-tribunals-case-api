@@ -51,7 +51,7 @@
     "PageID": "1.0",
     "PageLabel": "Upload Welsh documents",
     "FieldShowCondition": "[STATE]=\"DoNotShow\"",
-    "Publish": "${CCD_DEF_PUBLISH}",
+    "Publish": "N",
     "PublishAs": "scannedDocumentTypes"
   },
   {
