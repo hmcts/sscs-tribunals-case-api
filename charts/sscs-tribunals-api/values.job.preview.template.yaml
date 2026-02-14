@@ -3,4 +3,3 @@ job:
   image: ${IMAGE_NAME}
   environment:
     TASK_NAME: MigrateCasesTask
-
