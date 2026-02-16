@@ -56,7 +56,6 @@ export class StepsHelper {
 
   async setCaseAsUrgentHelper() {
 
-    // await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
     await this.homePage.chooseEvent(actionFurtherEvidenceTestdata.eventName);
     await this.actionFurtherEvidencePage.submitActionFurtherEvidence(
       actionFurtherEvidenceTestdata.sender,
