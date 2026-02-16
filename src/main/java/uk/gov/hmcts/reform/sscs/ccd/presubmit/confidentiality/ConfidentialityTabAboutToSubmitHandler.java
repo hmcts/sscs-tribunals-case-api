@@ -41,7 +41,7 @@ public class ConfidentialityTabAboutToSubmitHandler implements PreSubmitCallback
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        // TODO This will run for every event. Do we want to restrict this to specific events? UPDATE_CASE_ONLY / UPDATE_OTHER_PARTY_DATA / CASE_UPDATED
+        // Runs for every event type to ensure that any changes to data are reflected in the tab and also to future-proof against other new or modified events that may update confidentiality data
         return cmOtherPartyConfidentialityEnabled && callbackType == CallbackType.ABOUT_TO_SUBMIT && callback.getCaseDetails()
             .getCaseData().isBenefitType(Benefit.CHILD_SUPPORT);
     }

@@ -21,6 +21,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
@@ -35,6 +37,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class ConfidentialityTabAboutToSubmitHandlerTest {
 
     private ConfidentialityTabAboutToSubmitHandler handler;
@@ -52,11 +55,12 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
         handler = new ConfidentialityTabAboutToSubmitHandler(true);
         sscsCaseData = SscsCaseData.builder()
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build()).build()).build();
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
 
     @Test
     void canHandleReturnsTrue() {
-        primeSscsCaseData();
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isTrue();
     }
 
@@ -74,8 +78,6 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
 
     @Test
     void handleSetsConfidentialityTabToNullWhenNotChildSupport() {
-        primeSscsCaseData();
-
         sscsCaseData.setAppeal(
             Appeal.builder().benefitType(BenefitType.builder().code(Benefit.PIP.getShortName()).build()).build());
 
@@ -85,8 +87,6 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
 
     @Test
     void handleBuildsConfidentialityTabForChildSupportWithAppellantAppointeeAndOtherParties() {
-        primeSscsCaseData();
-
         LocalDateTime appellantDate = LocalDateTime.of(2020, 2, 3, 16, 5, 6);
         LocalDateTime otherPartyDate = LocalDateTime.of(2020, 2, 4, 9, 10, 11);
 
@@ -124,11 +124,8 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
     @ParameterizedTest
     @MethodSource("appointeeNotIncludedTestCases")
     void handleDoesNotIncludeAppointeeWhenNotMarkedAsAppointee(String isAppointee, Appointee appointee) {
-        primeSscsCaseData();
-
         Appellant appellant = Appellant.builder().name(Name.builder().firstName("John").lastName("Smith").build())
-            .confidentialityRequired(YES).isAppointee(isAppointee)
-            .appointee(appointee).build();
+            .confidentialityRequired(YES).isAppointee(isAppointee).appointee(appointee).build();
 
         sscsCaseData.setAppeal(
             Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
@@ -143,8 +140,6 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
 
     @Test
     void handleDoesNotIncludeAppellantOrAppointeeWhenAppellantMissing() {
-        primeSscsCaseData();
-
         OtherParty otherParty = OtherParty.builder().name(Name.builder().firstName("Other").lastName("Party").build())
             .confidentialityRequired(YES).build();
 
@@ -163,8 +158,6 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
 
     @Test
     void handleUsesEmptyNamesWhenNameMissing() {
-        primeSscsCaseData();
-
         Appellant appellant = Appellant.builder().name(null).confidentialityRequired(YES).build();
 
         OtherParty otherParty = OtherParty.builder().name(null).confidentialityRequired(NO).build();
@@ -186,15 +179,9 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
     }
 
     private static Stream<Arguments> appointeeNotIncludedTestCases() {
-        return Stream.of(
-            org.junit.jupiter.params.provider.Arguments.of("No",
+        return Stream.of(org.junit.jupiter.params.provider.Arguments.of("No",
                 Appointee.builder().name(Name.builder().firstName("Jane").lastName("Doe").build()).build()),
-            org.junit.jupiter.params.provider.Arguments.of("Yes", null)
-        );
+            org.junit.jupiter.params.provider.Arguments.of("Yes", null));
     }
 
-    private void primeSscsCaseData() {
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-    }
 }
