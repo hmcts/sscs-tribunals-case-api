@@ -7,7 +7,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_EVIDENCE
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.RESPONSE_SUBMITTED_DWP;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DWP_RESPOND;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_ADMIN_ACTION;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.HandlerUtils.isANewJointParty;
 
@@ -69,14 +68,14 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
         final BenefitType benefitType = sscsCaseData.getAppeal().getBenefitType();
 
-        if (isPotentiallyHarmfulEvidenceOrHasEditedEvidenceBundle(sscsCaseData)) {
+        if (Benefit.CHILD_SUPPORT.getShortName().equals(benefitType.getCode())
+            || isPotentiallyHarmfulEvidenceOrHasEditedEvidenceBundle(sscsCaseData)) {
             triggerDwpResponseReceived(callback.getCaseDetails().getId(), "Response received",
                 "Update to response received as an Admin has to review the case");
         } else if (equalsIgnoreCase(benefitType.getCode(), Benefit.UC.getShortName())) {
             handleUc(callback);
-        } else if (StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.CHILD_SUPPORT.getShortName())
-            || isBenefitTypeSscs5(callback.getCaseDetails().getCaseData().getBenefitType())) {
-            handleChildSupportAndSscs5Case(callback);
+        } else if (isBenefitTypeSscs5(callback.getCaseDetails().getCaseData().getBenefitType())) {
+            handleSscs5Case(callback);
         } else if (StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.INFECTED_BLOOD_COMPENSATION.getShortName())) {
             handleIbcaCase(callback);
         } else {
@@ -95,7 +94,7 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
             .anyMatch(d -> DWP_EVIDENCE_BUNDLE.getValue().equals(d.getValue().getDocumentType()));
     }
 
-    private void handleChildSupportAndSscs5Case(Callback<SscsCaseData> callback) {
+    private void handleSscs5Case(Callback<SscsCaseData> callback) {
         if (StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "Yes")) {
             updateEventDetails(callback.getCaseDetails().getId(), EventType.DWP_RESPOND, "Response received",
                 "Update to response received as an Admin has to review the case", sscsCaseDetails -> {
@@ -106,21 +105,7 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
                         callback.getCaseDetails().getId());
                 });
         } else if (StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "No")) {
-            if (isBenefitTypeSscs5(callback.getCaseDetails().getCaseData().getBenefitType()) && !StringUtils.equalsIgnoreCase(
-                callback.getCaseDetails().getCaseData().getDwpEditedEvidenceReason(), "phme")) {
-                triggerReadyToListEvent(callback);
-            } else {
-                if (isBenefitTypeSscs5(callback.getCaseDetails().getCaseData().getBenefitType())) {
-                    updateEventDetails(callback.getCaseDetails().getId(), EventType.DWP_RESPOND, "Response received",
-                        "Update to response received as an Admin has to review the case", sscsCaseDetails -> {
-                            SscsCaseData sscsCaseData = sscsCaseDetails.getData();
-                            sscsCaseData.setDwpState(RESPONSE_SUBMITTED_DWP);
-                            sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE);
-                            log.info("Updated case v2 with dwp load response event {} for id {}", EventType.DWP_RESPOND,
-                                callback.getCaseDetails().getId());
-                        });
-                }
-            }
+            triggerReadyToListEvent(callback);
         }
     }
 
