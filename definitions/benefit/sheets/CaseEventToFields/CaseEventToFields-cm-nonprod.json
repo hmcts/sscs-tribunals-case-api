@@ -1,10 +1,21 @@
 [
   {
+    "LiveFrom": "15/01/2026",
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "addOtherPartyGuidanceLabel",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "PageDisplayOrder": 0,
+    "PageFieldDisplayOrder": 0,
+    "PageID": "1.0",
+    "Publish": "N"
+  },
+  {
+    "LiveFrom": "15/01/2026",
     "CaseEventID": "addOtherPartyData",
     "CaseFieldID": "otherParties",
     "CaseTypeID": "Benefit",
     "DisplayContext": "COMPLEX",
-    "LiveFrom": "15/01/2026",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
     "PageID": "1.0",
