@@ -29,14 +29,14 @@ public class DirectionNoticeDocmosisConfigTestIt extends AbstractNotificationCon
 
     @Test
     @Parameters({
-        "APPEAL_TO_PROCEED, TB-SCS-GNO-ENG-00551-v2.docx, TB-SCS-GNO-ENG-00551-v2.docx, TB-SCS-GNO-ENG-00551-v2.docx",
-        "PROVIDE_INFORMATION, TB-SCS-GNO-ENG-00067-v2.docx, TB-SCS-GNO-ENG-00089.docx, TB-SCS-GNO-ENG-00067-v2.docx",
-        "ISSUE_AND_SEND_TO_ADMIN, TB-SCS-GNO-ENG-00067-v2.docx, TB-SCS-GNO-ENG-00089.docx, TB-SCS-GNO-ENG-00067-v2.docx",
-        "GRANT_EXTENSION, TB-SCS-GNO-ENG-00556-v2.docx, TB-SCS-GNO-ENG-00556-v2.docx, TB-SCS-GNO-ENG-00556-v2.docx",
-        "REFUSE_EXTENSION, TB-SCS-GNO-ENG-00557-v2.docx, TB-SCS-GNO-ENG-00557-v2.docx, TB-SCS-GNO-ENG-00557-v2.docx",
-        "GRANT_REINSTATEMENT, TB-SCS-GNO-ENG-00584-v2.docx, TB-SCS-GNO-ENG-00584-v2.docx, null",
-        "REFUSE_REINSTATEMENT, TB-SCS-GNO-ENG-00585-v2.docx, TB-SCS-GNO-ENG-00585-v2.docx, null",
-        "REFUSE_HEARING_RECORDING_REQUEST, TB-SCS-GNO-ENG-00067-v2.docx, TB-SCS-GNO-ENG-00089.docx, TB-SCS-GNO-ENG-00067-v2.docx"
+        "APPEAL_TO_PROCEED, TB-SCS-GNO-ENG-00551-v3.docx, TB-SCS-GNO-ENG-00551-v3.docx, TB-SCS-GNO-ENG-00551-v3.docx",
+        "PROVIDE_INFORMATION, TB-SCS-GNO-ENG-00067-v2.docx, TB-SCS-GNO-ENG-00089-v2.docx, TB-SCS-GNO-ENG-00067-v2.docx",
+        "ISSUE_AND_SEND_TO_ADMIN, TB-SCS-GNO-ENG-00067-v2.docx, TB-SCS-GNO-ENG-00089-v2.docx, TB-SCS-GNO-ENG-00067-v2.docx",
+        "GRANT_EXTENSION, TB-SCS-GNO-ENG-00556-v3.docx, TB-SCS-GNO-ENG-00556-v3.docx, TB-SCS-GNO-ENG-00556-v3.docx",
+        "REFUSE_EXTENSION, TB-SCS-GNO-ENG-00557-v3.docx, TB-SCS-GNO-ENG-00557-v3.docx, TB-SCS-GNO-ENG-00557-v3.docx",
+        "GRANT_REINSTATEMENT, TB-SCS-GNO-ENG-00584-v3.docx, TB-SCS-GNO-ENG-00584-v3.docx, null",
+        "REFUSE_REINSTATEMENT, TB-SCS-GNO-ENG-00585-v3.docx, TB-SCS-GNO-ENG-00585-v3.docx, null",
+        "REFUSE_HEARING_RECORDING_REQUEST, TB-SCS-GNO-ENG-00067-v2.docx, TB-SCS-GNO-ENG-00089-v2.docx, TB-SCS-GNO-ENG-00067-v2.docx"
     })
     public void shouldGiveCorrectDocmosisIdForDirectionIssued(DirectionType directionType,
                                                               String configAppellantOrAppointee,
@@ -77,14 +77,14 @@ public class DirectionNoticeDocmosisConfigTestIt extends AbstractNotificationCon
 
     @Test
     @Parameters({
-        "GRANT_EXTENSION, TB-SCS-GNO-WEL-00591.docx, TB-SCS-GNO-WEL-00591.docx, TB-SCS-GNO-WEL-00591.docx",
-        "REFUSE_EXTENSION, TB-SCS-GNO-WEL-00592.docx, TB-SCS-GNO-WEL-00592.docx, TB-SCS-GNO-WEL-00592.docx",
-        "APPEAL_TO_PROCEED, TB-SCS-GNO-WEL-00590-v2.docx, TB-SCS-GNO-WEL-00590-v2.docx, TB-SCS-GNO-WEL-00590-v2.docx",
-        "PROVIDE_INFORMATION, TB-SCS-GNO-WEL-00468-v2.docx, TB-SCS-GNO-WEL-00472.docx, TB-SCS-GNO-WEL-00468-v2.docx",
-        "ISSUE_AND_SEND_TO_ADMIN, TB-SCS-GNO-WEL-00468-v2.docx, TB-SCS-GNO-WEL-00472.docx, TB-SCS-GNO-WEL-00468-v2.docx",
-        "GRANT_REINSTATEMENT, TB-SCS-GNO-WEL-00586-v2.docx, TB-SCS-GNO-WEL-00586-v2.docx, null",
-        "REFUSE_REINSTATEMENT, TB-SCS-GNO-WEL-00587-v2.docx, TB-SCS-GNO-WEL-00587-v2.docx, null",
-        "REFUSE_HEARING_RECORDING_REQUEST, TB-SCS-GNO-WEL-00468-v2.docx, TB-SCS-GNO-WEL-00472.docx, TB-SCS-GNO-WEL-00468-v2.docx"
+        "GRANT_EXTENSION, TB-SCS-GNO-WEL-00591-v2.docx, TB-SCS-GNO-WEL-00591-v2.docx, TB-SCS-GNO-WEL-00591-v2.docx",
+        "REFUSE_EXTENSION, TB-SCS-GNO-WEL-00592-v2.docx, TB-SCS-GNO-WEL-00592-v2.docx, TB-SCS-GNO-WEL-00592-v2.docx",
+        "APPEAL_TO_PROCEED, TB-SCS-GNO-WEL-00590-v3.docx, TB-SCS-GNO-WEL-00590-v3.docx, TB-SCS-GNO-WEL-00590-v3.docx",
+        "PROVIDE_INFORMATION, TB-SCS-GNO-WEL-00468-v2.docx, TB-SCS-GNO-WEL-00472-v2.docx, TB-SCS-GNO-WEL-00468-v2.docx",
+        "ISSUE_AND_SEND_TO_ADMIN, TB-SCS-GNO-WEL-00468-v2.docx, TB-SCS-GNO-WEL-00472-v2.docx, TB-SCS-GNO-WEL-00468-v2.docx",
+        "GRANT_REINSTATEMENT, TB-SCS-GNO-WEL-00586-v3.docx, TB-SCS-GNO-WEL-00586-v3.docx, null",
+        "REFUSE_REINSTATEMENT, TB-SCS-GNO-WEL-00587-v3.docx, TB-SCS-GNO-WEL-00587-v3.docx, null",
+        "REFUSE_HEARING_RECORDING_REQUEST, TB-SCS-GNO-WEL-00468-v2.docx, TB-SCS-GNO-WEL-00472-v2.docx, TB-SCS-GNO-WEL-00468-v2.docx"
     })
     public void shouldGiveCorrectDocmosisIdForDirectionIssuedWelsh(DirectionType directionType,
                                                                    String configAppellantOrAppointee,
