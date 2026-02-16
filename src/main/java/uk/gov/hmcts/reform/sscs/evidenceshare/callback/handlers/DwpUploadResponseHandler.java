@@ -68,7 +68,7 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
         final BenefitType benefitType = sscsCaseData.getAppeal().getBenefitType();
 
-        if (Benefit.CHILD_SUPPORT.getShortName().equals(benefitType.getCode())
+        if (equalsIgnoreCase(benefitType.getCode(), Benefit.CHILD_SUPPORT.getShortName())
             || isPotentiallyHarmfulEvidenceOrHasEditedEvidenceBundle(sscsCaseData)) {
             triggerDwpResponseReceived(callback.getCaseDetails().getId(), "Response received",
                 "Update to response received as an Admin has to review the case");
