@@ -251,7 +251,7 @@ def setPreviewEnvVars() {
     env.CCD_GW_API = "http://sscs-tribunals-api-pr-${CHANGE_ID}-ccd-api-gw"
     env.CASE_DOCUMENT_AM_URL = "https://ccd-case-document-am-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.EM_STITCHING_API_URL = "https://em-stitching-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.ENVIRONMENT = "pr",
+    env.ENVIRONMENT = "pr"
     env.CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED = true
 }
 
