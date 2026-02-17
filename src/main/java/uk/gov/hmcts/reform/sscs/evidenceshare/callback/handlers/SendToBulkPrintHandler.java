@@ -163,13 +163,18 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
         );
     }
 
-    private void updateCaseToSentToDwp(Callback<SscsCaseData> callback, SscsCaseData caseData, BulkPrintInfo bulkPrintInfo) {
-        boolean isNotChildSupport = !caseData.isBenefitType(Benefit.CHILD_SUPPORT);
-        boolean isNotValidAppealCreatedEvent = EventType.VALID_APPEAL_CREATED != callback.getEvent();
-
-        if (isNotChildSupport || isNotValidAppealCreatedEvent) {
-            updateCaseToSentToDwp(caseData, bulkPrintInfo);
+    private void updateCaseToSentToDwp(
+        Callback<SscsCaseData> callback,
+        SscsCaseData caseData,
+        BulkPrintInfo bulkPrintInfo
+    ) {
+        EventType event = callback.getEvent();
+        boolean isChildSupport = caseData.isBenefitType(Benefit.CHILD_SUPPORT);
+        boolean isAppealEvent = event == EventType.VALID_APPEAL_CREATED || event == EventType.VALID_APPEAL || event == EventType.APPEAL_TO_PROCEED;
+        if (isChildSupport && isAppealEvent) {
+            return;
         }
+        updateCaseToSentToDwp(caseData, bulkPrintInfo);
     }
 
     private void updateCaseToSentToDwp(SscsCaseData caseData,
