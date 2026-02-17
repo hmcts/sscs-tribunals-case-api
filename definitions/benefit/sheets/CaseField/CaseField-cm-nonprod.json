@@ -1,3 +1,5 @@
 [
   {"LiveFrom": "15/01/2026", "CaseTypeID": "Benefit", "ID": "awareOfAnyAdditionalOtherParties", "Label": "Are you aware of any additional Other Parties?", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "15/01/2026", "CaseTypeID": "Benefit", "ID": "addOtherPartyGuidanceLabel", "Label": "Only add the other party details, use the communicate with tribunal event to inform HMCTS for all additional other parties.", "FieldType": "Label", "SecurityClassification": "PUBLIC"}]
+  {"LiveFrom": "15/01/2026", "CaseTypeID": "Benefit", "ID": "addOtherPartyDetailsLabel", "Label": "Please add details of the other party.", "FieldType": "Label", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "15/01/2026", "CaseTypeID": "Benefit", "ID": "addOtherPartyCommunicationLabel", "Label": "If yes, please use the Communicate with Tribunal event to provide their details.", "FieldType": "Label", "SecurityClassification": "PUBLIC"}
+]

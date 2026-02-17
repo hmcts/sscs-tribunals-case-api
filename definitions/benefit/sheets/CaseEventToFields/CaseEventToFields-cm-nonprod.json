@@ -2,7 +2,7 @@
   {
     "LiveFrom": "15/01/2026",
     "CaseEventID": "addOtherPartyData",
-    "CaseFieldID": "addOtherPartyGuidanceLabel",
+    "CaseFieldID": "addOtherPartyDetailsLabel",
     "CaseTypeID": "Benefit",
     "DisplayContext": "READONLY",
     "PageDisplayOrder": 0,
@@ -30,6 +30,17 @@
     "DisplayContext": "MANDATORY",
     "PageDisplayOrder": 2,
     "PageFieldDisplayOrder": 2,
+    "PageID": "1.0",
+    "Publish": "N"
+  },
+  {
+    "LiveFrom": "15/01/2026",
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "addOtherPartyCommunicationLabel",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 3,
     "PageID": "1.0",
     "Publish": "N"
   }
