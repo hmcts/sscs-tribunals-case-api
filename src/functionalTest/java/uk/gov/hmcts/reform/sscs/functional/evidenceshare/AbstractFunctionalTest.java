@@ -218,7 +218,7 @@ abstract class AbstractFunctionalTest {
         updateCaseEvent(UPLOAD_DOCUMENT, caseDetails);
     }
 
-    private UploadResponse uploadDocToDocMgmtStore(String name) throws IOException {
+    UploadResponse uploadDocToDocMgmtStore(String name) throws IOException {
         Path evidencePath = new File(Objects.requireNonNull(
             getClass().getClassLoader().getResource(name)).getFile()).toPath();
 
