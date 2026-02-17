@@ -1,1 +1,4 @@
-[]
+[
+  {"LiveFrom": "11/12/2025", "ID": "FL_interlocReferralReason", "ListElementCode": "confidentiality", "ListElement": "Confidentiality"},
+  {"LiveFrom": "01/01/2018", "ID": "FL_interlocReferralReason", "ListElementCode": "reviewConfidentialityRequest", "ListElement": "UC JP ONLY - Review confidentiality request"}
+]

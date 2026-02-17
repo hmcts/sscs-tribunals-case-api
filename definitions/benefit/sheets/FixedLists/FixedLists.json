@@ -562,7 +562,6 @@
   {"LiveFrom": "01/01/2018", "ID": "FL_interlocReferralReason", "ListElementCode": "reviewPermissionToAppealApplication", "ListElement": "Review permission to appeal application"},
   {"LiveFrom": "01/01/2018", "ID": "FL_interlocReferralReason", "ListElementCode": "reviewLibertyToApplyApplication", "ListElement": "Review liberty to apply application"},
   {"LiveFrom": "01/01/2018", "ID": "FL_interlocReferralReason", "ListElementCode": "reviewUpperTribunalDecision", "ListElement": "Review upper tribunal decision"},
-  {"LiveFrom": "11/12/2025", "ID": "FL_interlocReferralReason", "ListElementCode": "confidentiality", "ListElement": "Confidentiality"},
   {"LiveFrom": "01/01/2018", "ID": "FL_decisionTypes", "ListElementCode": "strikeOut", "ListElement": "Strike out"},
   {"LiveFrom": "01/01/2018", "ID": "FL_dwpRegionalCentre", "ListElementCode": "Winter Fuel Payment", "ListElement": "Winter Fuel Payment"},
   {"LiveFrom": "01/01/2018", "ID": "FL_dwpRegionalCentre", "ListElementCode": "SSMG", "ListElement": "SSMG"},
