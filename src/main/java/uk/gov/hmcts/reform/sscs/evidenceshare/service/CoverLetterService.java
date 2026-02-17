@@ -121,7 +121,7 @@ public class CoverLetterService {
 
         for (CcdValue<DocumentSelectionDetails> d : sscsCaseData.getDocumentSelection()) {
             var documentLink = findDocumentByFileName(d.getValue().getDocumentsList().getValue().getCode(), sscsCaseData);
-            byte[] document = null;
+            byte[] document;
 
             if (documentLink != null) {
                 document = pdfStoreService.download(documentLink.getDocumentUrl());
