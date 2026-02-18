@@ -904,7 +904,7 @@ notification:
                     emailId: 5abc83d8-f6b8-4385-805b-ffbb0f64b84b
                     smsId: b2d187cd-089b-4fe1-b460-a310c0af46fe
             dwpUploadResponse:
-                docmosisId: TB-SCS-LET-ENG-Response-Received-AppellantRep.docx
+                docmosisId: TB-SCS-LET-ENG-Response-Received-AppellantRep-v2.docx
                 appellant:
                     emailId: 06d059b9-3d83-43fa-b600-6d5258443f5f
                     smsId: 5e5cfe8d-b893-4f87-817f-9d05d22d657a
@@ -987,7 +987,7 @@ notification:
                     smsId: 9fe3a4f1-b8e2-4aed-aafb-6360d6ba2874
                     letterId: 419beb1c-4f26-45e7-8db3-69bfe5e9224d
             dwpUploadResponse:
-                docmosisId: TB-SCS-LET-ENG-Response-Received-AppellantRep.docx
+                docmosisId: TB-SCS-LET-ENG-Response-Received-AppellantRep-v2.docx
                 appellant:
                     emailId: 793b3785-88d6-4994-ba8b-7c2fdc67d88d
                     smsId: f0444380-a8a4-4805-b9c2-563d1bd199cd
