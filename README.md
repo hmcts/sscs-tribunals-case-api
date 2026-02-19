@@ -209,7 +209,7 @@ Examples:
 ./bin/create-xlsx.sh benefit dev local
 ```
 ```bash
-# Generate CCD config for demo with WA enabled
+# Generate CCD config for demo with WA enabled 
 ./bin/create-xlsx.sh benefit dev demo true
 ```
 ```bash
