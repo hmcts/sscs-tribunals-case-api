@@ -209,7 +209,7 @@ Examples:
 ./bin/create-xlsx.sh benefit dev local
 ```
 ```bash
-# Generate CCD config for demo with WA enabled 
+# Generate CCD config for demo with WA enabled
 ./bin/create-xlsx.sh benefit dev demo true
 ```
 ```bash
@@ -252,4 +252,5 @@ This avoids re-triggering the pipeline build and saves time.
 
 ### Local DM Store Not Healthy (DOWN or UNKNOWN)
 If this is the first time that the container has been created then it may need to be restarted multiple times in order for it to come up successfully!
+
 
