@@ -6,18 +6,17 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import org.apache.http.HttpStatus;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
-
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest
-public class RequestHearingRecordingAboutToStartHandlerFunctionalTest extends BaseHandler {
+public class RequestHearingRecordingAboutToSubmitHandlerTest extends BaseHandler {
 
     @Test
     public void givenAboutToSubmitCallbackForEvent_shouldSetFields() throws Exception {
@@ -27,8 +26,8 @@ public class RequestHearingRecordingAboutToStartHandlerFunctionalTest extends Ba
             .contentType(ContentType.JSON)
             .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
             .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
-            .body(getJsonCallbackForTest("handlers/requesthearingrecording/requestHearingRecordingStartCallback.json"))
-            .post("/ccdAboutToStart")
+            .body(getJsonCallbackForTest("handlers/requesthearingrecording/requestHearingRecordingAboutToSubmitCallback.json"))
+            .post("/ccdAboutToSubmit")
             .then()
             .statusCode(HttpStatus.SC_OK)
             .rootPath("data")
@@ -39,7 +38,12 @@ public class RequestHearingRecordingAboutToStartHandlerFunctionalTest extends Ba
             .assertThat()
             .body("requestableHearingDetails.list_items[1].label", equalTo("Prudential House 23:00 06 Jun 2021"))
             .assertThat()
-            .body("requestedHearings[0].value.sscsHearingRecording.hearingId", equalTo("11445566"));
+            .body("requestedHearings[0].value.sscsHearingRecording.hearingId", equalTo("11445566"))
+            .assertThat()
+            .body("requestedHearings[1].value.sscsHearingRecording.hearingId", equalTo("33445566"))
+            .assertThat()
+            .body("hearingRecordingRequestOutstanding", equalTo("Yes"));
+
 
 
     }
