@@ -90,8 +90,7 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
 
     private static boolean isPotentiallyHarmfulEvidenceOrHasEditedEvidenceBundle(SscsCaseData sscsCaseData) {
         return equalsIgnoreCase(sscsCaseData.getDwpEditedEvidenceReason(), "phme") || Optional.ofNullable(
-                sscsCaseData.getDwpDocuments()).orElse(emptyList()).stream()
-            .anyMatch(d -> DWP_EVIDENCE_BUNDLE.getValue().equals(d.getValue().getDocumentType()));
+            sscsCaseData.getDwpDocuments()).orElse(emptyList()).stream().anyMatch(d -> DWP_EVIDENCE_BUNDLE.getValue().equals(d.getValue().getDocumentType()) && d.getValue().getDwpEditedEvidenceReason() != null);
     }
 
     private void handleSscs5Case(Callback<SscsCaseData> callback) {

@@ -189,12 +189,32 @@ class DwpUploadResponseHandlerTest {
                 eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
         }
 
+        @Test
+        void givenEvidenceBundleWithoutEditedReason_shouldTriggerReadyToListEvent() {
+            SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(READY_TO_LIST.getId())
+                .dwpFurtherInfo("No")
+                .appeal(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build())
+                .dwpDocuments(singletonList(
+                    DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).build())
+                        .build()))
+                .build();
+            final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(sscsCaseData, WITH_DWP,
+                DWP_UPLOAD_RESPONSE);
+
+            handler.handle(CallbackType.SUBMITTED, callback);
+
+            verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+                eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
+        }
+
         private static Stream<Arguments> provideDwpResponseReceivedScenarios() {
             return Stream.of(Arguments.of(SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(READY_TO_LIST.getId())
                     .benefitCode(Benefit.UC.getShortName()).dwpFurtherInfo("No")
                     .appeal(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build())
                     .dwpDocuments(singletonList(
-                        DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).build())
+                        DwpDocument.builder().value(
+                                DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).dwpEditedEvidenceReason("any")
+                                    .build())
                             .build())).build()), Arguments.of(
                     SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(READY_TO_LIST.getId()).dwpFurtherInfo("No")
                         .dwpEditedEvidenceReason("phme")
