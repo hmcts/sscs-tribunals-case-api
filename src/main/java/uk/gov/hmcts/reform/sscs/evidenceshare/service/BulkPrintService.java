@@ -129,6 +129,33 @@ public class BulkPrintService implements PrintService {
         return letter;
     }
 
+    public Optional<byte[]> buildBundledLetter(List<byte[]> documents) {
+        if (documents == null || documents.isEmpty()) {
+            return Optional.empty();
+        }
+
+        if (documents.size() == 1) {
+            return Optional.of(documents.getFirst());
+        }
+
+        try (PDDocument bundledLetter = Loader.loadPDF(documents.getFirst())) {
+            PDFMergerUtility merger = new PDFMergerUtility();
+            for (int i = 1; i < documents.size(); i++) {
+                if (documents.get(i) != null) {
+                    try (PDDocument loadDoc = Loader.loadPDF(documents.get(i))) {
+                        merger.appendDocument(bundledLetter, loadDoc);
+                    }
+                }
+            }
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bundledLetter.save(baos);
+            return Optional.of(baos.toByteArray());
+        } catch (IOException e) {
+            log.info("Failed to merge documents with exception {}", e.getMessage());
+            return Optional.empty();
+        }
+    }
+
     private Optional<UUID> sendLetterWithRetry(String authToken, SscsCaseData sscsCaseData, List<String> encodedData,
                                                Integer reTryNumber, String recipient) {
         try {

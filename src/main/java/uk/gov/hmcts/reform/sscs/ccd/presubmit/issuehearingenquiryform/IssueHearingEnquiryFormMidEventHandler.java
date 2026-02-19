@@ -59,14 +59,12 @@ public class IssueHearingEnquiryFormMidEventHandler implements PreSubmitCallback
             if (hasDuplicateOtherPartySelections) {
                 response.addError("Other parties cannot be selected more than once");
             }
-
         }
     }
 
     private void checkDocumentsContainsNoDuplicates(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
 
         if (CollectionUtils.isNotEmpty(sscsCaseData.getDocumentSelection())) {
-
 
             List<String> list = sscsCaseData.getDocumentSelection().stream().map(CcdValue::getValue)
                 .map(DocumentSelectionDetails::getDocumentsList).map(DynamicList::getValue).map(DynamicListItem::getCode)

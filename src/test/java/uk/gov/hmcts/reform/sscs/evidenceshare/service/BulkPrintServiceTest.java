@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
 import static java.util.Collections.singletonList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -17,12 +18,16 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -347,5 +352,71 @@ public class BulkPrintServiceTest {
                 Arguments.of(INFECTED_BLOOD_COMPENSATION, "true"),
                 Arguments.of(PIP, "false")
         );
+    }
+
+    @Test
+    void buildBundledLetter_nullList_returnsEmptyOptional() {
+        var result = bulkPrintService.buildBundledLetter((List<byte[]>) null);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void buildBundledLetter_emptyList_returnsEmptyOptional() {
+        var result = bulkPrintService.buildBundledLetter(new ArrayList<>());
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void buildBundledLetter_singleDocument_returnsSameDocument() throws IOException {
+        byte[] singleDocument = createSinglePagePdf();
+
+        var result = bulkPrintService.buildBundledLetter(List.of(singleDocument));
+
+        assertThat(result).contains(singleDocument);
+    }
+
+    @Test
+    void buildBundledLetter_multipleDocuments_mergesIntoSinglePdf() throws IOException {
+        byte[] firstDocument = createSinglePagePdf();
+        byte[] secondDocument = createSinglePagePdf();
+
+        var bundledLetter = bulkPrintService.buildBundledLetter(List.of(firstDocument, secondDocument));
+
+        assertThat(bundledLetter).isPresent();
+    }
+
+    @Test
+    void buildBundledLetter_listWithNullSubsequentDocument_skipNullAndMergesRest() throws IOException {
+        byte[] firstDocument = createSinglePagePdf();
+        byte[] thirdDocument = createSinglePagePdf();
+        List<byte[]> documents = new ArrayList<>();
+        documents.add(firstDocument);
+        documents.add(null);
+        documents.add(thirdDocument);
+
+        var result = bulkPrintService.buildBundledLetter(documents);
+
+        assertThat(result).isPresent();
+    }
+
+    @Test
+    void buildBundledLetter_invalidPdf_returnsEmptyOptional() {
+        byte[] firstDocument = "not a pdf".getBytes();
+        byte[] secondDocument = "also not a pdf".getBytes();
+
+        var result = bulkPrintService.buildBundledLetter(List.of(firstDocument, secondDocument));
+
+        assertThat(result).isEmpty();
+    }
+
+    private byte[] createSinglePagePdf() throws IOException {
+        try (PDDocument document = new PDDocument();
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            document.addPage(new PDPage());
+            document.save(outputStream);
+            return outputStream.toByteArray();
+        }
     }
 }

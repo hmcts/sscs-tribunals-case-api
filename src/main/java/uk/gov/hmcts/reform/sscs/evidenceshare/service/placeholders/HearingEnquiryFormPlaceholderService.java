@@ -60,19 +60,23 @@ public class HearingEnquiryFormPlaceholderService {
 
     public Map<String, Object> populatePlaceholders(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String partyId) {
 
+        var partyIdWithoutPrefix = (partyId != null && partyId.startsWith("otherParty")) ? partyId.replaceFirst("otherParty",
+            "") : partyId;
+
         final Address address = PlaceholderUtility.getAddress(caseData, letterType, partyId);
         final Map<String, Object> placeholders = new HashMap<>(getAddressPlaceholders(address, true, DOCMOSIS));
 
         placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL, getBenefitAcronym(caseData));
-        // TODO use getAppellant to avoid NPE
-        if (letterType == FurtherEvidenceLetterType.APPELLANT_LETTER) {
-            placeholders.put("address_name", caseData.getAppeal().getAppellant().getName().getAbbreviatedFullName());
-        } else if (letterType == FurtherEvidenceLetterType.OTHER_PARTY_LETTER) {
 
-            caseData.getOtherParties().stream().filter(a -> a.getValue().getId().equals(partyId)).findFirst()
-                .ifPresent(a -> placeholders.put("address_name", a.getValue().getName().getAbbreviatedFullName()));
-
-        }
+        caseData.getOtherParties().stream().filter(
+            a -> a.getValue().getId().equals(partyIdWithoutPrefix) || a.getValue().getAppointee().getId()
+                .equals(partyIdWithoutPrefix)).findFirst().ifPresent(a -> {
+                    if (a.getValue().getId().equals(partyIdWithoutPrefix)) {
+                        placeholders.put("address_name", a.getValue().getName().getAbbreviatedFullName());
+                    } else if (a.getValue().getAppointee().getId().equals(partyIdWithoutPrefix)) {
+                        placeholders.put("address_name", a.getValue().getAppointee().getName().getAbbreviatedFullName());
+                    }
+                });
 
         placeholders.put(SSCS_URL_LITERAL, SSCS_URL);
         placeholders.put(GENERATED_DATE_LITERAL, LocalDateTime.now().toLocalDate().toString());
