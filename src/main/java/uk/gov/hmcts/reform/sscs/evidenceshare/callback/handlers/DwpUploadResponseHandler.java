@@ -97,9 +97,7 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
                                 callback.getCaseDetails().getId());
                     });
         } else if (equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "No")) {
-            if (isBenefitTypeSscs5(callback.getCaseDetails().getCaseData().getBenefitType())) {
-                triggerReadyToListEvent(callback);
-            }
+            triggerReadyToListEvent(callback);
         }
     }
 
