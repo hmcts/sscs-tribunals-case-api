@@ -2,18 +2,20 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPresent;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.IN_CHAMBERS;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getLastValidHearing;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -23,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder;
+import uk.gov.hmcts.reform.sscs.model.docassembly.Respondent;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody.WriteFinalDecisionTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
@@ -165,16 +168,16 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         }
 
         writeFinalDecisionBuilder.presentingOfficerAttended("yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPresentingOfficerAttendedQuestion()));
-        if (isOtherPartyPresent(caseData) && CollectionUtils.isNotEmpty(caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions())) {
-            writeFinalDecisionBuilder.otherPartyNamesAttendedHearing(caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions().stream()
-                .filter(aq -> YesNo.YES.equals(aq.getValue().getAttendedOtherParty()))
-                .map(aq -> aq.getValue().getOtherPartyName())
-                .collect(Collectors.joining(", ")));
+
+        if (isOtherPartyPresent(caseData)) {
+            writeFinalDecisionBuilder.otherPartyNamesNotAttendHearing(populateOtherPartyNamesV2(caseData, NO));
+            writeFinalDecisionBuilder.otherPartyNamesAttendedHearing(populateOtherPartyNamesV2(caseData, YES));
         }
 
         SscsType sscsFormType = Optional.ofNullable(caseData.getBenefitType())
             .flatMap(benefit -> benefit.map(Benefit::getSscsType))
             .orElse(null);
+
         writeFinalDecisionBuilder.isHmrc(SscsType.SSCS5.equals(sscsFormType));
         writeFinalDecisionBuilder.isIbca(caseData.isIbcCase() || SscsType.SSCS8.equals(sscsFormType));
 
@@ -196,6 +199,75 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
         return builder.build();
 
+    }
+
+    private String populateOtherPartyNames(SscsCaseData caseData, YesNo populateAttendedParties) {
+        record RespondentRecord(String name, String referredAs) {
+        }
+
+        List<RespondentRecord> names = new ArrayList<>();
+
+        List<CcdValue<OtherParty>> otherParties = caseData.getOtherParties();
+        if (otherParties != null) {
+
+            for (int i = 0; i < otherParties.size(); i++) {
+                var otherParty = otherParties.get(i).getValue();
+
+                var matched = caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions().stream()
+                    .filter(op -> op.getValue().getOtherPartyName().equals(otherParty.getName().getFullNameNoTitle()))
+                    .anyMatch(cd -> cd.getValue().getAttendedOtherParty() == populateAttendedParties);
+
+                if (matched) {
+                    var respondent = new RespondentRecord(otherParty.getName().getFullNameNoTitle(),
+                        Respondent.labelPrefixes[i].toLowerCase());
+
+                    names.add(respondent);
+                }
+            }
+        }
+
+        if (names.isEmpty()) {
+            return "";
+        }
+
+        if (names.size() < 10) {
+            return names.stream()
+                .map(n -> String.format("%s the %s respondent", n.name(), n.referredAs()))
+                .collect(Collectors.joining(", "));
+        } else {
+            return names.stream()
+                .map(RespondentRecord::name)
+                .collect(Collectors.joining(", ")) + ", respondents";
+        }
+    }
+
+    private String populateOtherPartyNamesV2(SscsCaseData caseData, YesNo populateAttendedParties) {
+        record RespondentRecord(String name, String referredAs) {
+        }
+
+        List<RespondentRecord> names = new ArrayList<>();
+
+        for (int i = 0; i < caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions().size(); i++) {
+            var other = caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions().get(i);
+            if (other.getValue().getAttendedOtherParty() == populateAttendedParties) {
+                var respondent = new RespondentRecord(other.getValue().getOtherPartyName(),  Respondent.labelPrefixes[i].toLowerCase());
+                names.add(respondent);
+            }
+        }
+
+        if (names.isEmpty()) {
+            return "";
+        }
+
+        if (names.size() < 10) {
+            return names.stream()
+                .map(n -> String.format("%s the %s respondent", n.name(), n.referredAs()))
+                .collect(Collectors.joining(", "));
+        } else {
+            return names.stream()
+                .map(RespondentRecord::name)
+                .collect(Collectors.joining(", ")) + ", respondents";
+        }
     }
 
     protected boolean isSetAside(SscsCaseData sscsCaseData, Outcome outcome) {
