@@ -76,9 +76,9 @@ public class IssueHearingEnquiryFormHandler implements CallbackHandler<SscsCaseD
             log.info("Cannot handle this event for case id: {}", callback.getCaseDetails().getId());
             throw new IllegalStateException("Cannot handle callback");
         }
-        CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
+        final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
 
-        List<Pdf> documents = new ArrayList<>();
+        final List<Pdf> documents = new ArrayList<>();
         final SscsCaseData caseData = caseDetails.getCaseData();
         if (YesNo.isYes(caseData.getAddDocuments())) {
             documents.addAll(coverLetterService.getSelectedDocuments(caseData));
@@ -112,12 +112,15 @@ public class IssueHearingEnquiryFormHandler implements CallbackHandler<SscsCaseD
 
         if (nonNull(selectedOtherParties)) {
             for (var party : selectedOtherParties) {
-                String entityId = party.getValue().getOtherPartiesList().getValue().getCode();
-                String recipient = PlaceholderUtility.getName(caseData, FurtherEvidenceLetterType.OTHER_PARTY_LETTER, entityId);
-                List<Pdf> letter = getLetterPdfs(caseData, documents, FurtherEvidenceLetterType.OTHER_PARTY_LETTER, entityId);
-                if (letter.isEmpty()) {
+                if (party.getValue() == null
+                    || party.getValue().getOtherPartiesList() == null
+                    || party.getValue().getOtherPartiesList().getValue() == null) {
+                    log.warn("Skipping party with incomplete selection data for case id: {}", caseId);
                     continue;
                 }
+                final String entityId = party.getValue().getOtherPartiesList().getValue().getCode();
+                final String recipient = PlaceholderUtility.getName(caseData, FurtherEvidenceLetterType.OTHER_PARTY_LETTER, entityId);
+                final List<Pdf> letter = getLetterPdfs(caseData, documents, FurtherEvidenceLetterType.OTHER_PARTY_LETTER, entityId);
                 bulkPrintService.sendToBulkPrint(caseId, caseData, letter, EventType.ISSUE_HEARING_ENQUIRY_FORM, recipient);
             }
         }
@@ -127,17 +130,17 @@ public class IssueHearingEnquiryFormHandler implements CallbackHandler<SscsCaseD
         String entityId) {
         var placeholders = hearingEnquiryFormPlaceholderService.populatePlaceholders(caseData, letterType, entityId);
 
-        String letterName = getLetterName(placeholders);
+        final String letterName = getLetterName(placeholders);
 
-        var hefLetter = coverLetterService.generateCoverLetterRetry(letterType, getCoverLetterTemplateName(caseData), letterName,
+        var coverLetter = coverLetterService.generateCoverLetterRetry(letterType, getCoverLetterTemplateName(caseData), letterName,
             placeholders, 1);
 
-        var coverLetter = coverLetterService.generateCoverLetterRetry(letterType, getHefTemplateName(caseData), letterName,
+        var hefForm = coverLetterService.generateCoverLetterRetry(letterType, getHefTemplateName(caseData), letterName,
             placeholders, 1);
 
         var coverSheet = coverLetterService.generateCoverSheet(getCoverSheetTemplateName(caseData), "coversheet", placeholders);
 
-        Optional<byte[]> bundledLetterOpt = bulkPrintService.buildBundledLetter(List.of(coverLetter, hefLetter, coverSheet));
+        final Optional<byte[]> bundledLetterOpt = bulkPrintService.buildBundledLetter(List.of(coverLetter, hefForm, coverSheet));
         if (bundledLetterOpt.isEmpty()) {
             log.error("Failed to bundle documents for hearing enquiry form, case id: {}", caseData.getCcdCaseId());
             throw new BulkPrintException(

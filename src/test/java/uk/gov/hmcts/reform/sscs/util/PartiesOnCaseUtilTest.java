@@ -1,12 +1,19 @@
 package uk.gov.hmcts.reform.sscs.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.addOtherPartiesToListOptions;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
@@ -36,7 +43,7 @@ public class PartiesOnCaseUtilTest {
         List<DynamicListItem> response = PartiesOnCaseUtil.getPartiesOnCase(sscsCaseData);
 
         assertEquals(1, response.size());
-        assertEquals("appellant", response.get(0).getCode());
+        assertEquals("appellant", response.getFirst().getCode());
     }
 
     @Test
@@ -140,6 +147,39 @@ public class PartiesOnCaseUtilTest {
         assertEquals(PartyItemList.OTHER_PARTY_REPRESENTATIVE.getCode() + "5", response.get(4).getCode());
         assertEquals("Other party 2 - Representative - Peter Rep", response.get(4).getLabel());
 
+    }
+
+    @ParameterizedTest
+    @MethodSource("includeRepresentativesScenarios")
+    public void shouldRespectIncludeRepresentativesFlagWhenAddingOtherPartiesToListOptions(
+            boolean includeRepresentatives, int expectedSize, boolean expectsRep) {
+        final OtherParty otherParty = OtherParty.builder()
+                .id("1")
+                .name(Name.builder().firstName("Bo").lastName("Surname").build())
+                .rep(Representative.builder()
+                        .id("2")
+                        .hasRepresentative(YES.getValue())
+                        .name(Name.builder().firstName("Harry").lastName("Rep").build())
+                        .build())
+                .build();
+        final SscsCaseData caseData = SscsCaseData.builder()
+                .otherParties(List.of(new CcdValue<>(otherParty)))
+                .build();
+        final List<DynamicListItem> listOptions = new ArrayList<>();
+
+        addOtherPartiesToListOptions(caseData, listOptions, includeRepresentatives);
+
+        assertThat(listOptions).hasSize(expectedSize);
+        assertThat(listOptions.getFirst().getCode()).isEqualTo(PartyItemList.OTHER_PARTY.getCode() + "1");
+        assertThat(listOptions.stream().anyMatch(item -> item.getCode().startsWith(PartyItemList.OTHER_PARTY_REPRESENTATIVE.getCode())))
+                .isEqualTo(expectsRep);
+    }
+
+    private static Stream<Arguments> includeRepresentativesScenarios() {
+        return Stream.of(
+                Arguments.of(true, 2, true),
+                Arguments.of(false, 1, false)
+        );
     }
 
     private void setupOtherParties() {

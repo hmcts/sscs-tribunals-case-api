@@ -44,7 +44,7 @@ public class IssueHearingEnquiryFormAboutToStart implements PreSubmitCallbackHan
         }
 
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
-        SscsCaseData sscsCaseData = caseDetails.getCaseData();
+        final SscsCaseData sscsCaseData = caseDetails.getCaseData();
         sscsCaseData.clearNotificationFields();
         setPartiesToSendLetter(sscsCaseData);
         setDocuments(sscsCaseData);

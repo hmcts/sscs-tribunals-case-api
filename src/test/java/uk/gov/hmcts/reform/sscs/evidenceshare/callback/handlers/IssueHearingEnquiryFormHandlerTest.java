@@ -48,6 +48,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.evidenceshare.config.DocmosisTemplateConfig;
+import uk.gov.hmcts.reform.sscs.evidenceshare.exception.BulkPrintException;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.CoverLetterService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.HearingEnquiryFormPlaceholderService;
@@ -201,7 +202,7 @@ class IssueHearingEnquiryFormHandlerTest {
     }
 
     @Test
-    void shouldNotSendWhenBundlingFails() {
+    void shouldThrowExceptionWhenBundlingFails() {
         SscsCaseData caseData = baseCaseData();
         caseData.setAddDocuments(YesNo.NO);
         Map<String, Object> placeholders = Map.of("address_name", "Other Party");
@@ -214,9 +215,10 @@ class IssueHearingEnquiryFormHandlerTest {
 
         Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
             ISSUE_HEARING_ENQUIRY_FORM);
-        handler.handle(SUBMITTED, callback);
 
-        verify(bulkPrintService, never()).sendToBulkPrint(anyLong(), any(), any(), any(), anyString());
+        assertThatThrownBy(() -> handler.handle(SUBMITTED, callback))
+            .isInstanceOf(BulkPrintException.class)
+            .hasMessageContaining("case id: 1");
     }
 
     private static Stream<Arguments> canHandleScenarios() {

@@ -48,7 +48,7 @@ public class IssueHearingEnquiryFormMidEventHandler implements PreSubmitCallback
 
     private static void checkOtherPartiesSelectionContainsNoDuplicates(SscsCaseData sscsCaseData,
         PreSubmitCallbackResponse<SscsCaseData> response) {
-        if (sscsCaseData.getSendToOtherParties() == YES) {
+        if (sscsCaseData.getSendToOtherParties() == YES && CollectionUtils.isNotEmpty(sscsCaseData.getOtherPartySelection())) {
             List<String> selectedOtherPartyIds = sscsCaseData.getOtherPartySelection().stream().map(CcdValue::getValue)
                 .map(OtherPartySelectionDetails::getOtherPartiesList).map(DynamicList::getValue).map(DynamicListItem::getCode)
                 .toList();
@@ -70,10 +70,10 @@ public class IssueHearingEnquiryFormMidEventHandler implements PreSubmitCallback
                 .map(DocumentSelectionDetails::getDocumentsList).map(DynamicList::getValue).map(DynamicListItem::getCode)
                 .toList();
 
-            boolean hasDuplicateOtherPartySelections = list.size() != new HashSet<>(
+            boolean hasDuplicateDocumentSelections = list.size() != new HashSet<>(
                 list).size();
 
-            if (hasDuplicateOtherPartySelections) {
+            if (hasDuplicateDocumentSelections) {
                 response.addError("The same document cannot be selected more than once");
             }
         }

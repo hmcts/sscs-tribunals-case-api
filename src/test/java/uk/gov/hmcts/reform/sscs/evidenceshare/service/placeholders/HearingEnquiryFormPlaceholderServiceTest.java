@@ -67,8 +67,7 @@ class HearingEnquiryFormPlaceholderServiceTest {
 
         Map<String, Object> placeholders = service.populatePlaceholders(caseData, OTHER_PARTY_LETTER, "otherParty111");
 
-        assertThat(placeholders.get(ADDRESS_NAME)).isEqualTo(
-            caseData.getOtherParties().getFirst().getValue().getName().getAbbreviatedFullName());
+        assertThat(placeholders.get(ADDRESS_NAME)).isEqualTo("Other Party");
         assertThat(placeholders.get(APPELLANT_NAME)).isEqualTo("Appellant Person");
         assertThat(placeholders.get(BENEFIT_NAME_ACRONYM_LITERAL)).isEqualTo(Benefit.PIP.getShortName());
         assertThat(placeholders.get(SSCS_URL_LITERAL)).isEqualTo(SSCS_URL);
@@ -87,8 +86,7 @@ class HearingEnquiryFormPlaceholderServiceTest {
 
         Map<String, Object> placeholders = service.populatePlaceholders(caseData, OTHER_PARTY_LETTER, "otherParty222");
 
-        assertThat(placeholders.get(ADDRESS_NAME)).isEqualTo(
-            caseData.getOtherParties().getFirst().getValue().getAppointee().getName().getAbbreviatedFullName());
+        assertThat(placeholders.get(ADDRESS_NAME)).isEqualTo("Appointee Person");
     }
 
     @ParameterizedTest
