@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuehearingenquiryform;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import java.util.HashSet;
 import java.util.List;
-import org.apache.commons.collections4.CollectionUtils;
+import java.util.Objects;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -38,7 +38,7 @@ public class IssueHearingEnquiryFormMidEventHandler implements PreSubmitCallback
         }
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
+        final PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         checkOtherPartiesSelectionContainsNoDuplicates(sscsCaseData, response);
         checkDocumentsContainsNoDuplicates(sscsCaseData, response);
@@ -48,32 +48,36 @@ public class IssueHearingEnquiryFormMidEventHandler implements PreSubmitCallback
 
     private static void checkOtherPartiesSelectionContainsNoDuplicates(SscsCaseData sscsCaseData,
         PreSubmitCallbackResponse<SscsCaseData> response) {
-        if (sscsCaseData.getSendToOtherParties() == YES && CollectionUtils.isNotEmpty(sscsCaseData.getOtherPartySelection())) {
-            List<String> selectedOtherPartyIds = sscsCaseData.getOtherPartySelection().stream().map(CcdValue::getValue)
-                .map(OtherPartySelectionDetails::getOtherPartiesList).map(DynamicList::getValue).map(DynamicListItem::getCode)
+
+        if (isNotEmpty(sscsCaseData.getOtherPartySelection())) {
+            final List<String> selectedOtherPartyIds = sscsCaseData.getOtherPartySelection().stream()
+                .map(CcdValue::getValue)
+                .map(OtherPartySelectionDetails::getOtherPartiesList)
+                .filter(Objects::nonNull)
+                .map(DynamicList::getValue)
+                .filter(Objects::nonNull)
+                .map(DynamicListItem::getCode)
                 .toList();
 
-            boolean hasDuplicateOtherPartySelections = selectedOtherPartyIds.size() != new HashSet<>(
-                selectedOtherPartyIds).size();
-
-            if (hasDuplicateOtherPartySelections) {
+            if (selectedOtherPartyIds.size() != new HashSet<>(selectedOtherPartyIds).size()) {
                 response.addError("Other parties cannot be selected more than once");
             }
         }
     }
 
-    private void checkDocumentsContainsNoDuplicates(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
+    private static void checkDocumentsContainsNoDuplicates(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
 
-        if (CollectionUtils.isNotEmpty(sscsCaseData.getDocumentSelection())) {
-
-            List<String> list = sscsCaseData.getDocumentSelection().stream().map(CcdValue::getValue)
-                .map(DocumentSelectionDetails::getDocumentsList).map(DynamicList::getValue).map(DynamicListItem::getCode)
+        if (isNotEmpty(sscsCaseData.getDocumentSelection())) {
+            final List<String> documentCodes = sscsCaseData.getDocumentSelection().stream()
+                .map(CcdValue::getValue)
+                .map(DocumentSelectionDetails::getDocumentsList)
+                .filter(Objects::nonNull)
+                .map(DynamicList::getValue)
+                .filter(Objects::nonNull)
+                .map(DynamicListItem::getCode)
                 .toList();
 
-            boolean hasDuplicateDocumentSelections = list.size() != new HashSet<>(
-                list).size();
-
-            if (hasDuplicateDocumentSelections) {
+            if (documentCodes.size() != new HashSet<>(documentCodes).size()) {
                 response.addError("The same document cannot be selected more than once");
             }
         }

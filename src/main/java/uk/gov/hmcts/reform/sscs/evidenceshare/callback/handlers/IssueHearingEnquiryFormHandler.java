@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
-import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_HEARING_ENQUIRY_FORM;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.OTHER_PARTY_LETTER;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.ADDRESS_NAME;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_NAME;
 
@@ -19,12 +21,10 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.evidenceshare.config.DocmosisTemplateConfig;
-import uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.evidenceshare.exception.BulkPrintException;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.CoverLetterService;
@@ -56,13 +56,13 @@ public class IssueHearingEnquiryFormHandler implements CallbackHandler<SscsCaseD
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        log.info("IssueHearingEnquiryFormHandler canHandle method called for caseId {} and callbackType {} and event {}",
-            callback.getCaseDetails().getId(), callbackType, callback.getEvent());
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbackType must not be null");
+        log.info("IssueHearingEnquiryFormHandler canHandle method called for caseId {} and callbackType {} and event {}",
+            callback.getCaseDetails().getId(), callbackType, callback.getEvent());
 
         return cmOtherPartyConfidentialityEnabled && callbackType.equals(CallbackType.SUBMITTED) && (callback.getEvent()
-            == EventType.ISSUE_HEARING_ENQUIRY_FORM);
+            == ISSUE_HEARING_ENQUIRY_FORM);
     }
 
     @Override
@@ -83,34 +83,36 @@ public class IssueHearingEnquiryFormHandler implements CallbackHandler<SscsCaseD
         if (YesNo.isYes(caseData.getAddDocuments())) {
             documents.addAll(coverLetterService.getSelectedDocuments(caseData));
         }
-
         sendToOtherParties(caseDetails.getId(), caseData, documents);
-
     }
 
     private static String getLetterName(Map<String, Object> placeholders) {
         return String.format(LETTER_NAME, placeholders.get(ADDRESS_NAME), LocalDateTime.now());
     }
 
+    private Map<String, String> getHearingEnquiryFormTemplates(SscsCaseData caseData) {
+        final Map<String, Map<String, String>> languageTemplates = docmosisTemplateConfig.getTemplate()
+            .get(caseData.getLanguagePreference());
+        return languageTemplates.get("hearing-enquiry-form");
+    }
+
     private String getCoverLetterTemplateName(SscsCaseData caseData) {
-        return docmosisTemplateConfig.getTemplate().get(caseData.getLanguagePreference()).get("hearing-enquiry-form").get("name");
+        return getHearingEnquiryFormTemplates(caseData).get("name");
     }
 
     private String getHefTemplateName(SscsCaseData caseData) {
-        return docmosisTemplateConfig.getTemplate().get(caseData.getLanguagePreference()).get("hearing-enquiry-form")
-            .get("form");
+        return getHearingEnquiryFormTemplates(caseData).get("form");
     }
 
     private String getCoverSheetTemplateName(SscsCaseData caseData) {
-        return docmosisTemplateConfig.getTemplate().get(caseData.getLanguagePreference()).get("hearing-enquiry-form")
-            .get("cover");
+        return getHearingEnquiryFormTemplates(caseData).get("cover");
     }
 
     private void sendToOtherParties(long caseId, SscsCaseData caseData, List<Pdf> documents) {
-        log.info("Sending letter to other party");
-        var selectedOtherParties = caseData.getOtherPartySelection();
+        log.info("Sending HEF letter to other parties for case id: {}", caseId);
+        final var selectedOtherParties = caseData.getOtherPartySelection();
 
-        if (nonNull(selectedOtherParties)) {
+        if (isNotEmpty(selectedOtherParties)) {
             for (var party : selectedOtherParties) {
                 if (party.getValue() == null
                     || party.getValue().getOtherPartiesList() == null
@@ -119,24 +121,25 @@ public class IssueHearingEnquiryFormHandler implements CallbackHandler<SscsCaseD
                     continue;
                 }
                 final String entityId = party.getValue().getOtherPartiesList().getValue().getCode();
-                final String recipient = PlaceholderUtility.getName(caseData, FurtherEvidenceLetterType.OTHER_PARTY_LETTER, entityId);
-                final List<Pdf> letter = getLetterPdfs(caseData, documents, FurtherEvidenceLetterType.OTHER_PARTY_LETTER, entityId);
-                bulkPrintService.sendToBulkPrint(caseId, caseData, letter, EventType.ISSUE_HEARING_ENQUIRY_FORM, recipient);
+                final String recipient = PlaceholderUtility.getName(caseData, OTHER_PARTY_LETTER,
+                    entityId);
+                final List<Pdf> letter = getLetterPdfs(caseData, documents, entityId);
+                bulkPrintService.sendToBulkPrint(caseId, caseData, letter, ISSUE_HEARING_ENQUIRY_FORM, recipient);
             }
         }
     }
 
-    private List<Pdf> getLetterPdfs(SscsCaseData caseData, List<Pdf> documents, FurtherEvidenceLetterType letterType,
-        String entityId) {
-        var placeholders = hearingEnquiryFormPlaceholderService.populatePlaceholders(caseData, letterType, entityId);
+    private List<Pdf> getLetterPdfs(SscsCaseData caseData, List<Pdf> documents, String entityId) {
+        var placeholders = hearingEnquiryFormPlaceholderService.populatePlaceholders(caseData,
+            OTHER_PARTY_LETTER, entityId);
 
         final String letterName = getLetterName(placeholders);
 
-        var coverLetter = coverLetterService.generateCoverLetterRetry(letterType, getCoverLetterTemplateName(caseData), letterName,
-            placeholders, 1);
+        var coverLetter = coverLetterService.generateCoverLetterRetry(OTHER_PARTY_LETTER,
+            getCoverLetterTemplateName(caseData), letterName, placeholders, 1);
 
-        var hefForm = coverLetterService.generateCoverLetterRetry(letterType, getHefTemplateName(caseData), letterName,
-            placeholders, 1);
+        var hefForm = coverLetterService.generateCoverLetterRetry(OTHER_PARTY_LETTER,
+            getHefTemplateName(caseData), letterName, placeholders, 1);
 
         var coverSheet = coverLetterService.generateCoverSheet(getCoverSheetTemplateName(caseData), "coversheet", placeholders);
 
@@ -147,8 +150,8 @@ public class IssueHearingEnquiryFormHandler implements CallbackHandler<SscsCaseD
                 "Failed to bundle documents for hearing enquiry form, case id: %s".formatted(caseData.getCcdCaseId()));
         }
 
-        Pdf pdf = new Pdf(bundledLetterOpt.get(), letterName);
-        List<Pdf> letter = new ArrayList<>();
+        final Pdf pdf = new Pdf(bundledLetterOpt.get(), letterName);
+        final List<Pdf> letter = new ArrayList<>();
         letter.add(pdf);
         letter.addAll(documents);
 

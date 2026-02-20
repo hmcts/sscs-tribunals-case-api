@@ -15,6 +15,7 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.GENERATED_DATE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.HMCTS2;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.HMCTS_IMG;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.NAME;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.OTHER_PARTIES_NAMES;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.PHONE_NUMBER;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.SSCS_URL;
@@ -67,7 +68,9 @@ public class HearingEnquiryFormPlaceholderService {
         final Address address = PlaceholderUtility.getAddress(caseData, letterType, partyId);
         final Map<String, Object> placeholders = new HashMap<>(getAddressPlaceholders(address, true, DOCMOSIS));
         placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL, getBenefitAcronym(caseData));
-        placeholders.put(ADDRESS_NAME, PlaceholderUtility.getName(caseData, OTHER_PARTY_REP_LETTER, partyId));
+        String name = PlaceholderUtility.getName(caseData, OTHER_PARTY_REP_LETTER, partyId);
+        placeholders.put(NAME, name);
+        placeholders.put(ADDRESS_NAME, name);
         placeholders.put(SSCS_URL_LITERAL, SSCS_URL);
         placeholders.put(GENERATED_DATE_LITERAL, LocalDateTime.now().toLocalDate().toString());
         final String appellantName = Optional.ofNullable(caseData.getAppeal()).map(Appeal::getAppellant).map(Entity::getName)

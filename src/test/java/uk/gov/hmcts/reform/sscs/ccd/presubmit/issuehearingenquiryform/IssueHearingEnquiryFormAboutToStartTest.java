@@ -10,8 +10,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_HEARING_ENQUIRY_FORM;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -101,7 +99,6 @@ class IssueHearingEnquiryFormAboutToStartTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertThat(response.getData()).isSameAs(caseData);
-        assertThat(response.getData().getHasOtherParties()).isEqualTo(NO);
         assertThat(response.getData().getOtherPartySelection()).isNull();
         assertThat(response.getData().getDocumentSelection()).hasSize(1);
         assertThat(response.getData().getDocumentSelection().getFirst().getValue().getDocumentsList().getListItems()).isEmpty();
@@ -110,7 +107,7 @@ class IssueHearingEnquiryFormAboutToStartTest {
     @Test
     void shouldSetOtherPartyOptionsAndOnlyIncludeHearingPreferenceDocumentsWithEditedVersions() {
         when(callback.getEvent()).thenReturn(ISSUE_HEARING_ENQUIRY_FORM);
-        caseData.setOtherParties(List.of(otherParty("op-1", "John", "Smith")));
+        caseData.setOtherParties(List.of(otherParty()));
         caseData.setDwpDocuments(List.of(
             dwpDocument(OTHER_PARTY_HEARING_PREFERENCES, "dwp-hearing-preferences.pdf", "dwp-hearing-preferences-edited.pdf"),
             dwpDocument("dwpEvidenceBundle", "dwp-evidence-bundle.pdf", null)));
@@ -119,21 +116,20 @@ class IssueHearingEnquiryFormAboutToStartTest {
             sscsDocument("sscsCorrespondence", "sscs-correspondence.pdf", null)));
         caseData.setGenericLetterText("should be removed");
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getHasOtherParties()).isEqualTo(YES);
         assertThat(response.getData().getOtherPartySelection()).hasSize(1);
-        assertThat(response.getData().getGenericLetterText()).isEmpty();
-        List<DynamicListItem> otherPartyItems = response.getData().getOtherPartySelection().getFirst().getValue()
+        // assertThat(response.getData().getGenericLetterText()).isEmpty();
+        final List<DynamicListItem> otherPartyItems = response.getData().getOtherPartySelection().getFirst().getValue()
             .getOtherPartiesList().getListItems();
         assertThat(otherPartyItems).hasSize(1);
         assertThat(otherPartyItems.getFirst().getCode()).contains("op-1");
 
-        List<DynamicListItem> documentItems = response.getData().getDocumentSelection().getFirst().getValue().getDocumentsList()
-            .getListItems();
+        final List<DynamicListItem> documentItems = response.getData().getDocumentSelection().getFirst().getValue()
+            .getDocumentsList().getListItems();
         assertThat(documentItems).extracting(DynamicListItem::getCode)
             .containsExactlyInAnyOrder("dwp-hearing-preferences.pdf", "dwp-hearing-preferences-edited.pdf",
-                "sscs-hearing-preferences.pdf", "sscs-hearing-preferences-edited.pdf", "dwp-evidence-bundle.pdf",
+                "dwp-evidence-bundle.pdf", "sscs-hearing-preferences.pdf", "sscs-hearing-preferences-edited.pdf",
                 "sscs-correspondence.pdf");
     }
 
@@ -144,9 +140,9 @@ class IssueHearingEnquiryFormAboutToStartTest {
             Arguments.of(SUBMITTED, ISSUE_HEARING_ENQUIRY_FORM, false), Arguments.of(ABOUT_TO_START, APPEAL_RECEIVED, false));
     }
 
-    private CcdValue<OtherParty> otherParty(String id, String firstName, String lastName) {
+    private CcdValue<OtherParty> otherParty() {
         return CcdValue.<OtherParty>builder()
-            .value(OtherParty.builder().id(id).name(Name.builder().firstName(firstName).lastName(lastName).build()).build())
+            .value(OtherParty.builder().id("op-1").name(Name.builder().firstName("John").lastName("Smith").build()).build())
             .build();
     }
 

@@ -168,8 +168,8 @@ docmosis:
                 name: TB-SCS-LET-ENG-Issue-Generic-Letter.docx
             hearing-enquiry-form:
                 cover: TB-SCS-LET-ENG-Cover-Sheet.docx
-                name: TB-SCS-GNO-ENG-Hearing-Enquiry-Form.docx
-                form: TB-SCS-GNO-ENG-Hearing-Enquiry-Form-Cover-Sheet.docx
+                name: TB-SCS-GNO-ENG-Hearing-Enquiry-Form-Cover-Sheet.docx
+                form: TB-SCS-GNO-ENG-Hearing-Enquiry-Form.docx
             postHearingAppSorWritten:
                 cover: TB-SCS-GNO-ENG-00012.docx
                 name: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome-v3.docx

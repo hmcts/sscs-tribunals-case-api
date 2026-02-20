@@ -9,8 +9,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_GENERIC_LETTER;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_HEARING_ENQUIRY_FORM;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -20,6 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -35,7 +34,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartySelectionDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -94,7 +92,6 @@ class IssueHearingEnquiryFormMidEventHandlerTest {
     @Test
     void shouldReturnResponseWithoutErrorsWhenNoDuplicateSelectionsPresent() {
         lenient().when(callback.getEvent()).thenReturn(ISSUE_HEARING_ENQUIRY_FORM);
-        caseData.setSendToOtherParties(YES);
         caseData.setOtherPartySelection(List.of(otherPartySelection("other-party-1"), otherPartySelection("other-party-2")));
         caseData.setDocumentSelection(List.of(documentSelection("doc-1"), documentSelection("doc-2")));
 
@@ -107,7 +104,6 @@ class IssueHearingEnquiryFormMidEventHandlerTest {
     @Test
     void shouldAddErrorWhenDuplicateOtherPartiesAreSelected() {
         lenient().when(callback.getEvent()).thenReturn(ISSUE_HEARING_ENQUIRY_FORM);
-        caseData.setSendToOtherParties(YES);
         caseData.setOtherPartySelection(
             List.of(otherPartySelection("same-other-party"), otherPartySelection("same-other-party")));
 
@@ -117,12 +113,11 @@ class IssueHearingEnquiryFormMidEventHandlerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("nonYesValues")
-    void shouldNotAddOtherPartyDuplicateErrorWhenSendToOtherPartiesIsNotYes(YesNo sendToOtherParties) {
+    @NullAndEmptySource
+    void shouldNotAddOtherPartyDuplicateErrorWhenOtherPartySelectionIsEmptyOrNull(
+        List<CcdValue<OtherPartySelectionDetails>> otherPartySelection) {
         lenient().when(callback.getEvent()).thenReturn(ISSUE_HEARING_ENQUIRY_FORM);
-        caseData.setSendToOtherParties(sendToOtherParties);
-        caseData.setOtherPartySelection(
-            List.of(otherPartySelection("same-other-party"), otherPartySelection("same-other-party")));
+        caseData.setOtherPartySelection(otherPartySelection);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -140,7 +135,7 @@ class IssueHearingEnquiryFormMidEventHandlerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("emptyOrNullDocumentSelection")
+    @NullAndEmptySource
     void shouldNotAddDocumentDuplicateErrorWhenDocumentSelectionIsEmptyOrNull(
         List<CcdValue<DocumentSelectionDetails>> documentSelection) {
         lenient().when(callback.getEvent()).thenReturn(ISSUE_HEARING_ENQUIRY_FORM);
@@ -154,7 +149,6 @@ class IssueHearingEnquiryFormMidEventHandlerTest {
     @Test
     void shouldAddBothErrorsWhenBothOtherPartiesAndDocumentsContainDuplicates() {
         lenient().when(callback.getEvent()).thenReturn(ISSUE_HEARING_ENQUIRY_FORM);
-        caseData.setSendToOtherParties(YES);
         caseData.setOtherPartySelection(
             List.of(otherPartySelection("same-other-party"), otherPartySelection("same-other-party")));
         caseData.setDocumentSelection(List.of(documentSelection("same-doc"), documentSelection("same-doc")));
@@ -167,16 +161,7 @@ class IssueHearingEnquiryFormMidEventHandlerTest {
     private static Stream<Arguments> canHandleScenarios() {
         return Stream.of(Arguments.of(MID_EVENT, ISSUE_HEARING_ENQUIRY_FORM, true),
             Arguments.of(ABOUT_TO_START, ISSUE_HEARING_ENQUIRY_FORM, false),
-            Arguments.of(SUBMITTED, ISSUE_HEARING_ENQUIRY_FORM, false),
-            Arguments.of(MID_EVENT, ISSUE_GENERIC_LETTER, false));
-    }
-
-    private static Stream<YesNo> nonYesValues() {
-        return Stream.of(NO, null);
-    }
-
-    private static Stream<List<CcdValue<DocumentSelectionDetails>>> emptyOrNullDocumentSelection() {
-        return Stream.of(List.of(), null);
+            Arguments.of(SUBMITTED, ISSUE_HEARING_ENQUIRY_FORM, false), Arguments.of(MID_EVENT, ISSUE_GENERIC_LETTER, false));
     }
 
     private CcdValue<OtherPartySelectionDetails> otherPartySelection(String code) {

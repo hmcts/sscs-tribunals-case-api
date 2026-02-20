@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentSelectionDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
@@ -22,7 +21,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartySelectionDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
@@ -43,25 +41,21 @@ public class IssueHearingEnquiryFormAboutToStart implements PreSubmitCallbackHan
             throw new IllegalStateException("Cannot handle callback.");
         }
 
-        final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
-        final SscsCaseData sscsCaseData = caseDetails.getCaseData();
+        final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         sscsCaseData.clearNotificationFields();
-        setPartiesToSendLetter(sscsCaseData);
+        setParties(sscsCaseData);
         setDocuments(sscsCaseData);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
-    private void setPartiesToSendLetter(SscsCaseData sscsCaseData) {
+    private void setParties(SscsCaseData sscsCaseData) {
         if (isNotEmpty(sscsCaseData.getOtherParties())) {
-            sscsCaseData.setHasOtherParties(YesNo.YES);
             List<DynamicListItem> listOptions = new ArrayList<>();
             addOtherPartiesToListOptions(sscsCaseData, listOptions, false);
             var list = new ArrayList<CcdValue<OtherPartySelectionDetails>>();
             list.add(new CcdValue<>(new OtherPartySelectionDetails(new DynamicList(null, listOptions))));
             sscsCaseData.setOtherPartySelection(list);
-        } else {
-            sscsCaseData.setHasOtherParties(YesNo.NO);
         }
     }
 
