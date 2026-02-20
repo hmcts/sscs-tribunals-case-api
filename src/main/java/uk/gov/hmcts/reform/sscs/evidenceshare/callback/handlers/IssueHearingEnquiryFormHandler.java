@@ -90,22 +90,18 @@ public class IssueHearingEnquiryFormHandler implements CallbackHandler<SscsCaseD
         return String.format(LETTER_NAME, placeholders.get(ADDRESS_NAME), LocalDateTime.now());
     }
 
-    private Map<String, String> getHearingEnquiryFormTemplates(SscsCaseData caseData) {
-        final Map<String, Map<String, String>> languageTemplates = docmosisTemplateConfig.getTemplate()
-            .get(caseData.getLanguagePreference());
-        return languageTemplates.get("hearing-enquiry-form");
-    }
-
     private String getCoverLetterTemplateName(SscsCaseData caseData) {
-        return getHearingEnquiryFormTemplates(caseData).get("name");
+        return docmosisTemplateConfig.getTemplate().get(caseData.getLanguagePreference()).get("hearing-enquiry-form").get("name");
     }
 
     private String getHefTemplateName(SscsCaseData caseData) {
-        return getHearingEnquiryFormTemplates(caseData).get("form");
+        return docmosisTemplateConfig.getTemplate().get(caseData.getLanguagePreference()).get("hearing-enquiry-form")
+            .get("form");
     }
 
     private String getCoverSheetTemplateName(SscsCaseData caseData) {
-        return getHearingEnquiryFormTemplates(caseData).get("cover");
+        return docmosisTemplateConfig.getTemplate().get(caseData.getLanguagePreference()).get("hearing-enquiry-form")
+            .get("cover");
     }
 
     private void sendToOtherParties(long caseId, SscsCaseData caseData, List<Pdf> documents) {

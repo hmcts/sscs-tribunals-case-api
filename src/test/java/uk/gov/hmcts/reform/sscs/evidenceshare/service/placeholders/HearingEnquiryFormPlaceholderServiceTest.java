@@ -5,13 +5,13 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.OTHER_PARTY_LETTER;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.ADDRESS_NAME;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.APPEAL_REF;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.APPELLANT_NAME;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.BENEFIT_NAME_ACRONYM_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.CASE_ID_LITERAL;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.FIRST_TIER_AGENCY_ACRONYM;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.GENERATED_DATE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.HMCTS2;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.HMCTS_IMG;
@@ -19,10 +19,8 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.PHONE_NUMBER;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.SSCS_URL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.SSCS_URL_LITERAL;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DWP_ACRONYM;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.HMRC_ACRONYM;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBCA_ACRONYM;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -53,6 +51,8 @@ class HearingEnquiryFormPlaceholderServiceTest {
 
     @Mock
     private PlaceholderService placeholderService;
+    @Mock
+    private CcdValue<OtherParty> otherPartyCcd;
 
     private HearingEnquiryFormPlaceholderService service;
 
@@ -63,13 +63,13 @@ class HearingEnquiryFormPlaceholderServiceTest {
 
     @Test
     void shouldPopulatePlaceholdersForOtherPartyIdWithPrefix() {
-        SscsCaseData caseData = buildCaseData(Benefit.PIP.getShortName());
+        final SscsCaseData caseData = buildCaseData(Benefit.CHILD_SUPPORT.getShortName());
 
-        Map<String, Object> placeholders = service.populatePlaceholders(caseData, OTHER_PARTY_LETTER, "otherParty111");
+        final Map<String, Object> placeholders = service.populatePlaceholders(caseData, OTHER_PARTY_LETTER, "otherParty111");
 
         assertThat(placeholders.get(ADDRESS_NAME)).isEqualTo("Other Party");
         assertThat(placeholders.get(APPELLANT_NAME)).isEqualTo("Appellant Person");
-        assertThat(placeholders.get(BENEFIT_NAME_ACRONYM_LITERAL)).isEqualTo(Benefit.PIP.getShortName());
+        assertThat(placeholders.get(BENEFIT_NAME_ACRONYM_LITERAL)).isEqualTo(Benefit.CHILD_SUPPORT.getDescription());
         assertThat(placeholders.get(SSCS_URL_LITERAL)).isEqualTo(SSCS_URL);
         assertThat(placeholders.get(HMCTS2)).isEqualTo(HMCTS_IMG);
         assertThat(placeholders.get(CASE_ID_LITERAL)).isEqualTo("1234567890");
@@ -82,9 +82,9 @@ class HearingEnquiryFormPlaceholderServiceTest {
 
     @Test
     void shouldPopulateAddressNameFromAppointeeWhenPartyIdMatchesAppointee() {
-        SscsCaseData caseData = buildCaseData(Benefit.PIP.getShortName());
+        final SscsCaseData caseData = buildCaseData(Benefit.CHILD_SUPPORT.getShortName());
 
-        Map<String, Object> placeholders = service.populatePlaceholders(caseData, OTHER_PARTY_LETTER, "otherParty222");
+        final Map<String, Object> placeholders = service.populatePlaceholders(caseData, OTHER_PARTY_LETTER, "otherParty222");
 
         assertThat(placeholders.get(ADDRESS_NAME)).isEqualTo("Appointee Person");
     }
@@ -92,50 +92,57 @@ class HearingEnquiryFormPlaceholderServiceTest {
     @ParameterizedTest
     @MethodSource("phoneScenarios")
     void shouldUseExpectedHelplineNumber(String isScottishCase, String expectedPhone) {
-        SscsCaseData caseData = buildCaseData(Benefit.PIP.getShortName());
+        final SscsCaseData caseData = buildCaseData(Benefit.CHILD_SUPPORT.getShortName());
         caseData.setIsScottishCase(isScottishCase);
 
-        Map<String, Object> placeholders = service.populatePlaceholders(caseData, OTHER_PARTY_LETTER, "otherParty111");
+        final Map<String, Object> placeholders = service.populatePlaceholders(caseData, OTHER_PARTY_LETTER, "otherParty111");
 
         assertThat(placeholders.get(PHONE_NUMBER)).isEqualTo(expectedPhone);
     }
 
     @Test
     void shouldUseCcdCaseIdAsAppealRefWhenCaseReferenceIsBlank() {
-        SscsCaseData caseData = buildCaseData(Benefit.PIP.getShortName());
+        final SscsCaseData caseData = buildCaseData(Benefit.CHILD_SUPPORT.getShortName());
         caseData.setCaseReference(" ");
 
-        Map<String, Object> placeholders = service.populatePlaceholders(caseData, OTHER_PARTY_LETTER, "otherParty111");
+        final Map<String, Object> placeholders = service.populatePlaceholders(caseData, OTHER_PARTY_LETTER, "otherParty111");
 
         assertThat(placeholders.get(APPEAL_REF)).isEqualTo("1234567890");
     }
 
     @Test
     void shouldUseCcdCaseIdAsAppealRefWhenCreatedInGapsFromReadyToList() {
-        SscsCaseData caseData = buildCaseData(Benefit.PIP.getShortName());
+        final SscsCaseData caseData = buildCaseData(Benefit.CHILD_SUPPORT.getShortName());
         caseData.setCreatedInGapsFrom("readyToList");
 
-        Map<String, Object> placeholders = service.populatePlaceholders(caseData, OTHER_PARTY_LETTER, "otherParty111");
+        final Map<String, Object> placeholders = service.populatePlaceholders(caseData, OTHER_PARTY_LETTER, "otherParty111");
 
         assertThat(placeholders.get(APPEAL_REF)).isEqualTo("1234567890");
     }
 
-    @ParameterizedTest
-    @MethodSource("firstTierAgencyScenarios")
-    void shouldSetFirstTierAgencyAcronymBasedOnBenefitCode(String benefitCode, String expectedAcronym) {
-        SscsCaseData caseData = buildCaseData(benefitCode);
+    @Test
+    void shouldOmitOtherPartyWithNullNameFromOtherPartyNames() {
+        final SscsCaseData caseData = buildCaseData(Benefit.CHILD_SUPPORT.getShortName());
+        final List<CcdValue<OtherParty>> parties = new ArrayList<>(caseData.getOtherParties());
+        parties.add(new CcdValue<>(OtherParty.builder().id("555").build()));
+        caseData.setOtherParties(parties);
+
+        final Map<String, Object> placeholders = service.populatePlaceholders(caseData, OTHER_PARTY_LETTER, "otherParty111");
+
+        assertThat(placeholders.get(OTHER_PARTIES_NAMES)).isEqualTo("Other Party, Second Party");
+    }
+
+    @Test
+    void shouldOmitNullCcdValueFromOtherPartyNames() {
+        SscsCaseData caseData = buildCaseData(Benefit.CHILD_SUPPORT.getShortName());
+        when(otherPartyCcd.getValue()).thenReturn(null);
+        final List<CcdValue<OtherParty>> parties = new ArrayList<>(caseData.getOtherParties());
+        parties.add(otherPartyCcd);
+        caseData.setOtherParties(parties);
 
         Map<String, Object> placeholders = service.populatePlaceholders(caseData, OTHER_PARTY_LETTER, "otherParty111");
 
-        assertThat(placeholders.get(FIRST_TIER_AGENCY_ACRONYM)).isEqualTo(expectedAcronym);
-    }
-
-    private static Stream<Arguments> firstTierAgencyScenarios() {
-        return Stream.of(
-            Arguments.of(Benefit.PIP.getShortName(), DWP_ACRONYM),
-            Arguments.of(Benefit.TAX_CREDIT.getShortName(), HMRC_ACRONYM),
-            Arguments.of(Benefit.INFECTED_BLOOD_COMPENSATION.getShortName(), IBCA_ACRONYM)
-        );
+        assertThat(placeholders.get(OTHER_PARTIES_NAMES)).isEqualTo("Other Party, Second Party");
     }
 
     private static Stream<Arguments> phoneScenarios() {
