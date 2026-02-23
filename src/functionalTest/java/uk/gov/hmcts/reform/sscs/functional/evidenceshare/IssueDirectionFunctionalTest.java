@@ -26,8 +26,10 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 public class IssueDirectionFunctionalTest extends AbstractFunctionalTest {
 
     private static final String EVIDENCE_DOCUMENT_PDF = "evidence-document.pdf";
+
     @Value("${test-url}")
     protected String testUrl;
+
     @Autowired
     private IdamService idamService;
     private IdamTokens idamTokens;

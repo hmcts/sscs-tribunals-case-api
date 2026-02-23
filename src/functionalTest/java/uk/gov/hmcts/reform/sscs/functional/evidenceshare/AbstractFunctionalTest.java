@@ -59,7 +59,9 @@ abstract class AbstractFunctionalTest {
     private static final String EXISTING_DOCUMENT_TYPE = "EXISTING_DOCUMENT";
     private final String tcaInstance = System.getenv("TEST_URL");
     private final String localInstance = "http://localhost:8008";
+
     String ccdCaseId;
+
     @Autowired
     private IdamService idamService;
     private IdamTokens idamTokens;
@@ -218,7 +220,7 @@ abstract class AbstractFunctionalTest {
         updateCaseEvent(UPLOAD_DOCUMENT, caseDetails);
     }
 
-    private UploadResponse uploadDocToDocMgmtStore(String name) throws IOException {
+    UploadResponse uploadDocToDocMgmtStore(String name) throws IOException {
         Path evidencePath = new File(Objects.requireNonNull(
             getClass().getClassLoader().getResource(name)).getFile()).toPath();
 
