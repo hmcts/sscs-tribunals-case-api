@@ -10,19 +10,18 @@ import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import java.io.IOException;
 import org.apache.http.HttpStatus;
-import org.junit.Test;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest
 public class SendToFirstTierSubmittedHandlerTest extends BaseHandler {
@@ -30,7 +29,6 @@ public class SendToFirstTierSubmittedHandlerTest extends BaseHandler {
     @Autowired
     private ObjectMapper mapper;
 
-    @DisplayName("Given about to submit callback for send to first tier event, should set fields")
     @Test
     public void testSendToFirstTierSubmitted() throws IOException {
         String jsonCallback = getJsonCallbackForTest("callback/sendToFirstTierRequest.json");

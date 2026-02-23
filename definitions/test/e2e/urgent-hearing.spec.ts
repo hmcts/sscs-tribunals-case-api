@@ -11,7 +11,7 @@ test.describe('Urgent hearing test', async () => {
 
   test(
     'Grant - Urgent hearing request',
-    { tag: ['@preview-regression', '@nightly-pipeline'] },
+    { tag: ['@preview-regression', '@nightly-pipeline']  },
     async ({ urgentHearingSteps }) => {
       test.slow();
       await urgentHearingSteps.requestAndGrantAnUrgentHearing(caseId);

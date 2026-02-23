@@ -89,12 +89,13 @@ export class ActionFurtherEvidencePage {
   async submitActionFurtherEvidence(
     senderOption: string,
     docType: string,
-    fileName: string
+    fileName: string,
+    skipAddNewButtonClick?: boolean | null
   ): Promise<void> {
     await this.verifyPageContent();
     await this.selectFEOption();
     await this.selectSenderOption(senderOption);
-    await this.clickAddNewButton();
+    if (!skipAddNewButtonClick || skipAddNewButtonClick === null) await this.clickAddNewButton();
     await this.selectDocType(docType);
     await this.uploadDocs(fileName);
     await this.enterFileName();
