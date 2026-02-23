@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -201,72 +200,36 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
     }
 
-    private String populateOtherPartyNames(SscsCaseData caseData, YesNo populateAttendedParties) {
+    private List<String> populateOtherPartyNamesV2(SscsCaseData caseData, YesNo attended) {
         record RespondentRecord(String name, String referredAs) {
         }
 
-        List<RespondentRecord> names = new ArrayList<>();
+        List<RespondentRecord> respondents = new ArrayList<>();
 
-        List<CcdValue<OtherParty>> otherParties = caseData.getOtherParties();
-        if (otherParties != null) {
+        var otherPartyAttendedQuestions = caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions();
 
-            for (int i = 0; i < otherParties.size(); i++) {
-                var otherParty = otherParties.get(i).getValue();
-
-                var matched = caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions().stream()
-                    .filter(op -> op.getValue().getOtherPartyName().equals(otherParty.getName().getFullNameNoTitle()))
-                    .anyMatch(cd -> cd.getValue().getAttendedOtherParty() == populateAttendedParties);
-
-                if (matched) {
-                    var respondent = new RespondentRecord(otherParty.getName().getFullNameNoTitle(),
-                        Respondent.labelPrefixes[i].toLowerCase());
-
-                    names.add(respondent);
-                }
+        for (int i = 0; i < otherPartyAttendedQuestions.size(); i++) {
+            OtherPartyAttendedQuestionDetails other = otherPartyAttendedQuestions.get(i).getValue();
+            if (other.getAttendedOtherParty() == attended) {
+                var respondent = new RespondentRecord(other.getOtherPartyName(),
+                    Respondent.labelPrefixes[i].toLowerCase());
+                respondents.add(respondent);
             }
         }
 
-        if (names.isEmpty()) {
-            return "";
-        }
-
-        if (names.size() < 10) {
-            return names.stream()
-                .map(n -> String.format("%s the %s respondent", n.name(), n.referredAs()))
-                .collect(Collectors.joining(", "));
+        if (respondents.size() < 10) {
+            return respondents.stream()
+                .map(respondent ->
+                    String.format("%s the %s respondent", respondent.name(), respondent.referredAs()))
+                .toList();
         } else {
-            return names.stream()
-                .map(RespondentRecord::name)
-                .collect(Collectors.joining(", ")) + ", respondents";
-        }
-    }
-
-    private String populateOtherPartyNamesV2(SscsCaseData caseData, YesNo populateAttendedParties) {
-        record RespondentRecord(String name, String referredAs) {
-        }
-
-        List<RespondentRecord> names = new ArrayList<>();
-
-        for (int i = 0; i < caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions().size(); i++) {
-            var other = caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions().get(i);
-            if (other.getValue().getAttendedOtherParty() == populateAttendedParties) {
-                var respondent = new RespondentRecord(other.getValue().getOtherPartyName(),  Respondent.labelPrefixes[i].toLowerCase());
-                names.add(respondent);
+            List<String> lst = new ArrayList<>();
+            for (int i = 0; i < respondents.size() - 1; i++) {
+                lst.add(respondents.get(i).name());
             }
-        }
+            lst.add(respondents.getLast().name() + " respondents");
 
-        if (names.isEmpty()) {
-            return "";
-        }
-
-        if (names.size() < 10) {
-            return names.stream()
-                .map(n -> String.format("%s the %s respondent", n.name(), n.referredAs()))
-                .collect(Collectors.joining(", "));
-        } else {
-            return names.stream()
-                .map(RespondentRecord::name)
-                .collect(Collectors.joining(", ")) + ", respondents";
+            return lst;
         }
     }
 

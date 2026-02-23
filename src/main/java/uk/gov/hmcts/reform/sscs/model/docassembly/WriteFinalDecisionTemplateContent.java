@@ -186,15 +186,15 @@ public abstract class WriteFinalDecisionTemplateContent {
                                                       String appointeeName,
                                                       boolean presentingOfficerAttended,
                                                       String bundlePage,
-                                                      String otherPartyNamesAttended,
-                                                      String otherPartyNamesNotAttend) {
+                                                      List<String> otherPartyNamesAttended,
+                                                      List<String> otherPartyNamesNotAttend) {
 
         List<String> sentences = new ArrayList<>();
 
-        var attendedText = getParticipantsAttended(appellantAttended, appellantName, appointeeAttended,
+        var attendedText = getRespondentsAttended(appellantAttended, appellantName, appointeeAttended,
             appointeeName, presentingOfficerAttended, otherPartyNamesAttended);
 
-        var notAttendedText = getParticipantsNotAttend(appellantAttended, appellantName, presentingOfficerAttended, otherPartyNamesNotAttend);
+        var notAttendedText = getRespondentsNotAttend(appellantAttended, appellantName, presentingOfficerAttended, otherPartyNamesNotAttend);
 
         if (StringUtils.isNotEmpty(attendedText)) {
             sentences.add("The following people attended: %s".formatted(attendedText));
@@ -211,56 +211,72 @@ public abstract class WriteFinalDecisionTemplateContent {
         return String.join(". ", sentences);
     }
 
-    private String getParticipantsAttended(boolean appellantAttended,
-                                           String appellantName,
-                                           boolean appointeeAttended,
-                                           String appointeeName,
-                                           boolean presentingOfficerAttended,
-                                           String otherPartyNamesAttended) {
+    private String getRespondentsAttended(boolean appellantAttended,
+                                          String appellantName,
+                                          boolean appointeeAttended,
+                                          String appointeeName,
+                                          boolean presentingOfficerAttended,
+                                          List<String> otherPartyNamesAttended) {
 
-        List<String> participants = new ArrayList<>();
+        List<String> respondents = new ArrayList<>();
 
         if (appellantAttended) {
-            participants.add(String.format("%s the appellant", appellantName));
+            respondents.add(String.format("%s the appellant", appellantName));
         } else if (appointeeAttended) {
-            participants.add(String.format("%s the appointee", appointeeName));
+            respondents.add(String.format("%s the appointee", appointeeName));
         }
 
-        if (StringUtils.isNotEmpty(otherPartyNamesAttended)) {
-            participants.add(otherPartyNamesAttended);
+        if (!otherPartyNamesAttended.isEmpty()) {
+            respondents.addAll(otherPartyNamesAttended);
         }
 
         if (presentingOfficerAttended) {
-            participants.add(presentingOfficerText(!participants.isEmpty()));
+            respondents.add(presentingOfficerText(!respondents.isEmpty()));
         }
 
-        return String.join(", ", participants);
+        return joinRespondentsNameAsStr(respondents);
     }
 
-    private String getParticipantsNotAttend(boolean appellantAttended,
-                                            String appellantName,
-                                            boolean presentingOfficerAttended,
-                                            String otherPartyNamesNotAttend) {
+    private String getRespondentsNotAttend(boolean appellantAttended,
+                                           String appellantName,
+                                           boolean presentingOfficerAttended,
+                                           List<String> otherPartyNamesNotAttend) {
 
-        List<String> participants = new ArrayList<>();
+        List<String> respondents = new ArrayList<>();
 
         if (!appellantAttended) {
-            participants.add(String.format("%s the appellant", appellantName));
+            respondents.add(String.format("%s the appellant", appellantName));
         }
-        
-        if (StringUtils.isNotEmpty(otherPartyNamesNotAttend)) {
-            participants.add(otherPartyNamesNotAttend);
+
+        if (!otherPartyNamesNotAttend.isEmpty()) {
+            respondents.addAll(otherPartyNamesNotAttend);
         }
 
         if (!presentingOfficerAttended) {
-            participants.add(presentingOfficerText(!participants.isEmpty()));
+            respondents.add(presentingOfficerText(!respondents.isEmpty()));
         }
 
-        return String.join(", ", participants);
+        return joinRespondentsNameAsStr(respondents);
+    }
+
+    private String joinRespondentsNameAsStr(List<String> respondents) {
+        if (respondents.isEmpty()) {
+            return "";
+        }
+
+        if (respondents.size() == 1) {
+            return respondents.getFirst();
+        }
+
+        var lastRespondent = respondents.getLast();
+
+        respondents.removeLast();
+
+        return String.join(", ", respondents) + " and " + lastRespondent;
     }
 
     private String presentingOfficerText(boolean anyOneElseBesideOfficer) {
-        return anyOneElseBesideOfficer ? "and a representative from the First Tier Agency"
+        return anyOneElseBesideOfficer ? "a representative from the First Tier Agency"
             : "A representative from the First Tier Agency";
     }
 
@@ -280,7 +296,8 @@ public abstract class WriteFinalDecisionTemplateContent {
                                                                          String appointeeName, String bundlePage,
                                                                          boolean appellantAttended, boolean appointeeAttended,
                                                                          boolean isAppointeeOnCase, boolean presentingOfficerAttended,
-                                                                         String otherPartyNamesAttended, String otherPartyNamesNotAttend) {
+                                                                         List<String> otherPartyNamesAttended,
+                                                                         List<String> otherPartyNamesNotAttend) {
 
         if (isAppointeeOnCase && appointeeAttended) {
             return getSentenceAppointeeOnCaseAppointeeAttended(hearingType, appellantName, appointeeName,
@@ -307,8 +324,8 @@ public abstract class WriteFinalDecisionTemplateContent {
                                                                      String appointeeName,
                                                                      boolean presentingOfficerAttended,
                                                                      String bundlePage,
-                                                                     String otherPartyNamesAttended,
-                                                                     String otherPartyNamesNotAttend) {
+                                                                     List<String> otherPartyNamesAttended,
+                                                                     List<String> otherPartyNamesNotAttend) {
         if (equalsIgnoreCase(FACETOFACE, hearingType)) {
             return singletonList(
                 getFaceToFaceTypeSentences()
@@ -358,8 +375,8 @@ public abstract class WriteFinalDecisionTemplateContent {
                                                                         String appellantName, String appointeeName,
                                                                         boolean presentingOfficerAttended,
                                                                         String bundlePage,
-                                                                        String otherPartyNamesAttended,
-                                                                        String otherPartyNamesNotAttendHearing) {
+                                                                        List<String> otherPartyNamesAttended,
+                                                                        List<String> otherPartyNamesNotAttendHearing) {
         if (equalsIgnoreCase(FACETOFACE, hearingType)) {
             return singletonList(
                 getFaceToFaceTypeSentences()
@@ -390,8 +407,9 @@ public abstract class WriteFinalDecisionTemplateContent {
     private List<String> getSentenceAppointeeNotOnCaseAppellantNotAttended(String hearingType,
                                                                            String appellantName, String appointeeName,
                                                                            boolean presentingOfficerAttended,
-                                                                           String bundlePage, String otherPartyNamesAttended,
-                                                                           String otherPartyNamesNotAttend) {
+                                                                           String bundlePage,
+                                                                           List<String> otherPartyNamesAttended,
+                                                                           List<String> otherPartyNamesNotAttend) {
         if (equalsIgnoreCase(FACETOFACE, hearingType)) {
             return asList(
                 getFaceToFaceTypeSentences()

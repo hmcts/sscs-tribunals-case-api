@@ -70,9 +70,9 @@ public class WriteFinalDecisionTemplateBody {
     @JsonProperty("appointee_on_case")
     private boolean appointeeOnCase;
     @JsonProperty("other_party_names_attended_hearing")
-    private String otherPartyNamesAttendedHearing;
+    private List<String> otherPartyNamesAttendedHearing;
     @JsonProperty("other_party_names_not_attend_hearing")
-    private String otherPartyNamesNotAttendHearing;
+    private List<String> otherPartyNamesNotAttendHearing;
     @JsonProperty("presenting_officer_attended")
     private boolean presentingOfficerAttended;
     @JsonProperty("is_descriptor_flow")
