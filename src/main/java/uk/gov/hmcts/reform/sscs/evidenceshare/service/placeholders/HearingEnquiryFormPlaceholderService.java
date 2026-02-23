@@ -75,7 +75,7 @@ public class HearingEnquiryFormPlaceholderService {
         placeholders.put(FIRST_TIER_AGENCY_ACRONYM, DWP_ACRONYM);
         placeholders.put(PHONE_NUMBER,
             Objects.equals(caseData.getIsScottishCase(), YesNo.YES.getValue()) ? helplineTelephoneScotland : helplineTelephone);
-        placeholders.put(OTHER_PARTIES_NAMES, getOtherPartyNames(caseData.getOtherParties()));
+        placeholders.put(OTHER_PARTIES_NAMES, getOtherPartyNames(partyId, caseData.getOtherParties()));
         placeholderService.buildExcelaAddress(false, caseData.getIsScottishCase(), placeholders);
         placeholders.put(HMCTS2, HMCTS_IMG);
         placeholders.put(CASE_ID_LITERAL, caseData.getCcdCaseId());
@@ -88,12 +88,13 @@ public class HearingEnquiryFormPlaceholderService {
         return benefit.isHasAcronym() ? benefit.getShortName() : benefit.getDescription();
     }
 
-    private String getOtherPartyNames(List<CcdValue<OtherParty>> otherParties) {
+    private String getOtherPartyNames(String partyId, List<CcdValue<OtherParty>> otherParties) {
         return Optional.ofNullable(otherParties).orElse(emptyList()).stream()
             .map(CcdValue::getValue)
             .filter(Objects::nonNull)
+            .filter(otherParty -> otherParty.getId() != null && otherParty.getName() != null)
+            .filter(otherParty -> !partyId.contains(otherParty.getId()))
             .map(OtherParty::getName)
-            .filter(Objects::nonNull)
             .map(Name::getFullNameNoTitle)
             .collect(Collectors.joining(", "));
     }
@@ -103,6 +104,5 @@ public class HearingEnquiryFormPlaceholderService {
         return isBlank(caseReference) || (caseData.getCreatedInGapsFrom() != null && caseData.getCreatedInGapsFrom()
             .equals(READY_TO_LIST.getCcdType())) ? caseData.getCcdCaseId() : caseReference;
     }
-
 
 }
