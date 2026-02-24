@@ -1,24 +1,36 @@
 package uk.gov.hmcts.reform.sscs.util;
 
 
+import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyUcb;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.sendNewOtherPartyNotification;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.updateConfidentialityChangedDate;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.updateConfidentialityRequiredChangedDate;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
@@ -324,6 +336,145 @@ public class OtherPartyDataUtilTest {
         SscsCaseData sscsCaseData = SscsCaseData.builder().otherParties(otherParties).build();
         String otherPartyName = OtherPartyDataUtil.getOtherPartyName(sscsCaseData, otherPartyId);
         assertThat(otherPartyName).isEqualTo(expectedName);
+    }
+
+    @Test
+    public void updateConfidentialityChangedDate_whenCurrentPartiesEmpty_doesNothing() {
+        updateConfidentialityChangedDate(Collections.emptyList(), null);
+        // no assertion needed — verifies no exception is thrown
+    }
+
+    @Test
+    public void updateConfidentialityChangedDate_whenNoPreviousParties_updatesDateForAllCurrentParties() {
+        final LocalDateTime originalDate = now().minusHours(1);
+        final List<CcdValue<OtherParty>> current = List.of(buildOtherPartyWithConfidentiality(ID_1, YES, originalDate));
+
+        updateConfidentialityChangedDate(current, null);
+
+        assertThat(current.getFirst().getValue().getConfidentialityRequiredChangedDate()).isAfter(originalDate);
+    }
+
+    @Test
+    public void updateConfidentialityChangedDate_whenNoMatchingPreviousPartyById_updatesDate() {
+        final LocalDateTime originalDate = now().minusHours(1);
+        final List<CcdValue<OtherParty>> previous = List.of(buildOtherPartyWithConfidentiality(ID_2, YES, originalDate));
+        final List<CcdValue<OtherParty>> current = List.of(buildOtherPartyWithConfidentiality(ID_1, YES, originalDate));
+
+        updateConfidentialityChangedDate(current, previous);
+
+        assertThat(current.getFirst().getValue().getConfidentialityRequiredChangedDate()).isAfter(originalDate);
+    }
+
+    @Test
+    public void updateConfidentialityChangedDate_whenConfidentialityUnchanged_doesNotUpdateDate() {
+        final LocalDateTime originalDate = now().minusHours(1);
+        final List<CcdValue<OtherParty>> previous = List.of(buildOtherPartyWithConfidentiality(ID_1, YES, originalDate));
+        final List<CcdValue<OtherParty>> current = List.of(buildOtherPartyWithConfidentiality(ID_1, YES, originalDate));
+
+        updateConfidentialityChangedDate(current, previous);
+
+        assertThat(current.getFirst().getValue().getConfidentialityRequiredChangedDate()).isEqualTo(originalDate);
+    }
+
+    @Test
+    public void updateConfidentialityChangedDate_whenConfidentialityChanged_updatesDate() {
+        final LocalDateTime originalDate = now().minusHours(1);
+        final List<CcdValue<OtherParty>> previous = List.of(buildOtherPartyWithConfidentiality(ID_1, NO, originalDate));
+        final List<CcdValue<OtherParty>> current = List.of(buildOtherPartyWithConfidentiality(ID_1, YES, originalDate));
+
+        updateConfidentialityChangedDate(current, previous);
+
+        assertThat(current.getFirst().getValue().getConfidentialityRequiredChangedDate()).isAfter(originalDate);
+    }
+
+    private static CcdValue<OtherParty> buildOtherPartyWithConfidentiality(final String id, final YesNo confidentiality,
+                                                                            final LocalDateTime changedDate) {
+        return CcdValue.<OtherParty>builder().value(
+            OtherParty.builder().id(id).confidentialityRequired(confidentiality)
+                .confidentialityRequiredChangedDate(changedDate).build()).build();
+    }
+
+    @Test
+    public void updateConfidentialityRequiredChangedDate_whenNoPreviousCaseData_updatesAppellantDate() {
+        final LocalDateTime originalDate = now().minusHours(1);
+        final Appellant appellant = Appellant.builder()
+            .confidentialityRequired(YES)
+            .confidentialityRequiredChangedDate(originalDate)
+            .build();
+        final SscsCaseData currentCaseData = SscsCaseData.builder()
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build())
+                .appellant(appellant).build())
+            .build();
+
+        final Callback<SscsCaseData> callback = buildCallback(currentCaseData, Optional.empty());
+
+        updateConfidentialityRequiredChangedDate(callback);
+
+        assertThat(appellant.getConfidentialityRequiredChangedDate()).isAfter(originalDate);
+    }
+
+    @Test
+    public void updateConfidentialityRequiredChangedDate_whenConfidentialityChanges_updatesAppellantDate() {
+        final LocalDateTime originalDate = now().minusHours(1);
+        final Appellant appellantBefore = Appellant.builder().confidentialityRequired(NO).build();
+        final SscsCaseData beforeCaseData = SscsCaseData.builder()
+            .appeal(Appeal.builder().appellant(appellantBefore).build())
+            .build();
+        final Appellant appellant = Appellant.builder()
+            .confidentialityRequired(YES)
+            .confidentialityRequiredChangedDate(originalDate)
+            .build();
+        final SscsCaseData currentCaseData = SscsCaseData.builder()
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build())
+                .appellant(appellant).build())
+            .build();
+
+        final Callback<SscsCaseData> callback = buildCallback(currentCaseData, Optional.of(beforeCaseData));
+
+        updateConfidentialityRequiredChangedDate(callback);
+
+        assertThat(appellant.getConfidentialityRequiredChangedDate()).isAfter(originalDate);
+    }
+
+    @Test
+    public void updateConfidentialityRequiredChangedDate_whenConfidentialityUnchanged_doesNotUpdateAppellantDate() {
+        final LocalDateTime originalDate = now().minusHours(1);
+        final Appellant appellantBefore = Appellant.builder().confidentialityRequired(YES).build();
+        final SscsCaseData beforeCaseData = SscsCaseData.builder()
+            .appeal(Appeal.builder().appellant(appellantBefore).build())
+            .build();
+        final Appellant appellant = Appellant.builder()
+            .confidentialityRequired(YES)
+            .confidentialityRequiredChangedDate(originalDate)
+            .build();
+        final SscsCaseData currentCaseData = SscsCaseData.builder()
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build())
+                .appellant(appellant).build())
+            .build();
+
+        final Callback<SscsCaseData> callback = buildCallback(currentCaseData, Optional.of(beforeCaseData));
+
+        updateConfidentialityRequiredChangedDate(callback);
+
+        assertThat(appellant.getConfidentialityRequiredChangedDate()).isEqualTo(originalDate);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Callback<SscsCaseData> buildCallback(final SscsCaseData currentCaseData,
+                                                         final Optional<SscsCaseData> previousCaseData) {
+        final Callback<SscsCaseData> callback = mock(Callback.class);
+        final CaseDetails<SscsCaseData> caseDetails = mock(CaseDetails.class);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(currentCaseData);
+
+        if (previousCaseData.isPresent()) {
+            final CaseDetails<SscsCaseData> caseDetailsBefore = mock(CaseDetails.class);
+            when(caseDetailsBefore.getCaseData()).thenReturn(previousCaseData.get());
+            when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+        } else {
+            when(callback.getCaseDetailsBefore()).thenReturn(Optional.empty());
+        }
+        return callback;
     }
 
 }

@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.confidentiality;
 
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.updateConfidentialityChangedDate;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.updateConfidentialityRequiredChangedDate;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -21,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
@@ -54,10 +57,15 @@ public class ConfidentialityTabAboutToSubmitHandler implements PreSubmitCallback
             throw new IllegalStateException("Cannot handle callback");
         }
 
+        updateConfidentialityRequiredChangedDate(callback);
+
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-        sscsCaseData.getExtendedSscsCaseData().setConfidentialityTab(
-            getConfidentialitySummaryEntries(callback.getCaseDetails().getCaseData().getOtherParties(),
-                callback.getCaseDetails().getCaseData().getAppeal()));
+        final List<CcdValue<OtherParty>> previousOtherParties = callback.getCaseDetailsBefore().map(CaseDetails::getCaseData)
+            .map(SscsCaseData::getOtherParties).orElse(null);
+        updateConfidentialityChangedDate(sscsCaseData.getOtherParties(), previousOtherParties);
+
+        sscsCaseData.getExtendedSscsCaseData()
+            .setConfidentialityTab(getConfidentialitySummaryEntries(sscsCaseData.getOtherParties(), sscsCaseData.getAppeal()));
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
