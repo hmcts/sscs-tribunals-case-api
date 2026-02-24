@@ -9,6 +9,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DWP_UPLOAD_RESPONSE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.WITH_DWP;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,8 +53,10 @@ public class DwpUploadResponseAboutToStartHandlerTest {
 
     @Test
     public void givenSetToReadyForList_NoError() {
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToStartHandler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        assertEquals(0, response.getErrors().size());
+        callback.getCaseDetails().getCaseData().getWorkAllocationFields().setFtaResponseReviewRequired(NO);
+        var response = dwpUploadResponseAboutToStartHandler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        assertTrue(response.getErrors().isEmpty());
+        assertEquals(YES, response.getData().getWorkAllocationFields().getFtaResponseReviewRequired());
     }
 
     @Test
