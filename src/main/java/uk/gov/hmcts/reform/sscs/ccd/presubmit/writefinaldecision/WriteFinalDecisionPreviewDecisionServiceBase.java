@@ -169,8 +169,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         writeFinalDecisionBuilder.presentingOfficerAttended("yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPresentingOfficerAttendedQuestion()));
 
         if (isOtherPartyPresent(caseData)) {
-            writeFinalDecisionBuilder.otherPartyNamesNotAttendHearing(populateOtherPartyNamesV2(caseData, NO));
-            writeFinalDecisionBuilder.otherPartyNamesAttendedHearing(populateOtherPartyNamesV2(caseData, YES));
+            writeFinalDecisionBuilder.otherPartyNamesNotAttendHearing(populateOtherPartyNames(caseData, NO));
+            writeFinalDecisionBuilder.otherPartyNamesAttendedHearing(populateOtherPartyNames(caseData, YES));
         }
 
         SscsType sscsFormType = Optional.ofNullable(caseData.getBenefitType())
@@ -200,7 +200,18 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
     }
 
-    private List<String> populateOtherPartyNamesV2(SscsCaseData caseData, YesNo attended) {
+    /**
+     * Populate other party names with reference who did or didn't attend. <br>
+     *<p>
+     * if number of people < 10, returns list of names with their reference, ['John Brown the first respondent', ...] <br>
+     * if number of people >= 10, returns list of names and the last item as reference ' respondents' e.g. ['John Brown', ..., ' respondents'] <br>
+     *</p>
+     * @param caseData case data
+     * @param attended Yes: attended, No: did not attend
+     * @return list of other party names with their reference
+     */
+    private List<String> populateOtherPartyNames(SscsCaseData caseData, YesNo attended) {
+        int maxNumOfRespondent = 10;
         record RespondentRecord(String name, String referredAs) {
         }
 
@@ -208,16 +219,19 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
         var otherPartyAttendedQuestions = caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions();
 
+        // populate respondents
         for (int i = 0; i < otherPartyAttendedQuestions.size(); i++) {
             OtherPartyAttendedQuestionDetails other = otherPartyAttendedQuestions.get(i).getValue();
+            var referredAs = (respondents.size() < maxNumOfRespondent) ? Respondent.labelPrefixes[i].toLowerCase() : "";
+
             if (other.getAttendedOtherParty() == attended) {
-                var respondent = new RespondentRecord(other.getOtherPartyName(),
-                    Respondent.labelPrefixes[i].toLowerCase());
+                var respondent = new RespondentRecord(other.getOtherPartyName(), referredAs);
                 respondents.add(respondent);
             }
         }
 
-        if (respondents.size() < 10) {
+        // join names with reference if other  number less than MAX_OTHER_PARTY
+        if (respondents.size() < maxNumOfRespondent) {
             return respondents.stream()
                 .map(respondent ->
                     String.format("%s the %s respondent", respondent.name(), respondent.referredAs()))

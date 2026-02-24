@@ -8,35 +8,23 @@ import static uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler.getJsonCa
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import junitparams.JUnitParamsRunner;
 import org.apache.http.HttpResponse;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.functional.mya.BaseFunctionTest;
 
-@RunWith(JUnitParamsRunner.class)
+
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 public class WriteFinalDecisionNoticeFunctionalTest extends BaseFunctionTest {
 
-    @ClassRule
-    public static final SpringClassRule scr = new SpringClassRule();
-
-    @Rule
-    public final SpringMethodRule smr = new SpringMethodRule();
-
     @Autowired
-    protected ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
     @Test
     public void shouldGenerateExpectedDecisionTextWithOtherPartiesIncluded() throws IOException {
