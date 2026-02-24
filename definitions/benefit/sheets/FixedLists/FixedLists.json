@@ -211,6 +211,7 @@
   {"LiveFrom": "01/01/2018", "ID": "FL_dwpStates", "ListElementCode": "Registered", "ListElement": "Appeal registered (FTA)"},
   {"LiveFrom": "01/01/2018", "ID": "FL_dwpStates", "ListElementCode": "appealAbated", "ListElement": "Appeal abated"},
   {"LiveFrom": "01/01/2018", "ID": "FL_dwpStates", "ListElementCode": "adjournmentNoticeIssued", "ListElement": "Adjournment notice issued"},
+  {"LiveFrom": "24/02/2026", "ID": "FL_dwpStates", "ListElementCode": "awaitOtherPartyData", "ListElement": "Await other party data"},
   {"LiveFrom": "01/01/2018", "ID": "FL_dwpFurtherEvidenceStates", "ListElementCode": "furtherEvidenceReceived", "ListElement": "Further evidence received"},
   {"LiveFrom": "01/01/2018", "ID": "FL_dwpFurtherEvidenceStates", "ListElementCode": "noAction", "ListElement": "No action"},
   {"LiveFrom": "01/01/2018", "ID": "FL_dwpFurtherEvidenceStates", "ListElementCode": "supplementarySubmission", "ListElement": "Supplementary submission"},
