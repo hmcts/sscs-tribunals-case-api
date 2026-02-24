@@ -150,6 +150,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.CASE_UPDATED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DIRECTION_ISSUED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DIRECTION_ISSUED_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DWP_UPLOAD_RESPONSE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.EVIDENCE_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.JUDGE_DECISION_APPEAL_TO_PROCEED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PERMISSION_TO_APPEAL_REFUSED;
@@ -869,7 +870,8 @@ public class Personalisation<E extends NotificationWrapper> {
 
         if (nonNull(directionType)
             && (DIRECTION_ISSUED.equals(notificationEventType)
-            || DIRECTION_ISSUED_WELSH.equals(notificationEventType))) {
+            || DIRECTION_ISSUED_WELSH.equals(notificationEventType)
+            || DWP_UPLOAD_RESPONSE.equals(notificationEventType))) {
             return getSubscriptionTemplateNameWithDirection(notificationEventType, directionType, subscriptionType);
         }
 
@@ -884,6 +886,7 @@ public class Personalisation<E extends NotificationWrapper> {
                                          NotificationEventType notificationEventType) {
         if (nonNull(subscriptionType)
             && NotificationEventTypeLists.EVENT_TYPES_FOR_NOTIFY_LETTERS.contains(notificationEventType)) {
+            //here gemma
             return getSubscriptionTemplateName(notificationEventType, subscriptionType);
         }
         return notificationEventType.getId();
