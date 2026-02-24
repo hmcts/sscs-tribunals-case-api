@@ -260,9 +260,9 @@ abstract class AbstractFunctionalTest {
             () -> assertThat(findCaseById(Long.toString(caseId)).getState()).isEqualTo(state));
     }
 
-    void assertThatPdfTextIsCorrect(Resource hearingEnquiryFormDocument, String expectedContent) {
+    void assertThatPdfTextIsCorrect(Resource documentResource, String expectedContent) {
         try {
-            try (PDDocument document = Loader.loadPDF(hearingEnquiryFormDocument.getContentAsByteArray())) {
+            try (PDDocument document = Loader.loadPDF(documentResource.getContentAsByteArray())) {
                 final String pdfText = new PDFTextStripper().getText(document);
                 assertThat(normalizeTrailingWhitespace(pdfText)).isEqualTo(normalizeTrailingWhitespace(expectedContent));
             }

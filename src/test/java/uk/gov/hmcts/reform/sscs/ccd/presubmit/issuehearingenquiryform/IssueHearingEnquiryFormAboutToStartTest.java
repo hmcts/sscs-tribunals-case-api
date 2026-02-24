@@ -119,7 +119,6 @@ class IssueHearingEnquiryFormAboutToStartTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getOtherPartySelection()).hasSize(1);
-        // assertThat(response.getData().getGenericLetterText()).isEmpty();
         final List<DynamicListItem> otherPartyItems = response.getData().getOtherPartySelection().getFirst().getValue()
             .getOtherPartiesList().getListItems();
         assertThat(otherPartyItems).hasSize(1);

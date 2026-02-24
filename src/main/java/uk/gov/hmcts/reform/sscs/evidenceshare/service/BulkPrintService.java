@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
 import static java.lang.String.format;
 import static java.util.Base64.getEncoder;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 
 import java.io.ByteArrayOutputStream;
@@ -130,7 +131,7 @@ public class BulkPrintService implements PrintService {
     }
 
     public Optional<byte[]> buildBundledLetter(List<byte[]> documents) {
-        if (documents == null || documents.isEmpty()) {
+        if (isEmpty(documents)) {
             return Optional.empty();
         }
 
@@ -139,7 +140,7 @@ public class BulkPrintService implements PrintService {
         }
 
         try (PDDocument bundledLetter = Loader.loadPDF(documents.getFirst())) {
-            PDFMergerUtility merger = new PDFMergerUtility();
+            final PDFMergerUtility merger = new PDFMergerUtility();
             for (int i = 1; i < documents.size(); i++) {
                 if (documents.get(i) != null) {
                     try (PDDocument loadDoc = Loader.loadPDF(documents.get(i))) {
@@ -147,7 +148,7 @@ public class BulkPrintService implements PrintService {
                     }
                 }
             }
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
             bundledLetter.save(baos);
             return Optional.of(baos.toByteArray());
         } catch (IOException e) {
