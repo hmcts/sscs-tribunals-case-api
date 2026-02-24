@@ -1,5 +1,50 @@
 [
   {
+    "LiveFrom": "15/01/2026",
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "addOtherPartyDetailsLabel",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "PageDisplayOrder": 0,
+    "PageFieldDisplayOrder": 0,
+    "PageID": "1.0",
+    "Publish": "N"
+  },
+  {
+    "LiveFrom": "15/01/2026",
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "COMPLEX",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "PageLabel": "Add other party data",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=addOtherPartyData1.0"
+  },
+  {
+    "LiveFrom": "15/01/2026",
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "awareOfAnyAdditionalOtherParties",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "1.0",
+    "Publish": "N"
+  },
+  {
+    "LiveFrom": "15/01/2026",
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "addOtherPartyCommunicationLabel",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 3,
+    "PageID": "1.0",
+    "Publish": "N"
+  },
+  {
     "CaseEventID": "issueHearingEnquiryForm",
     "CaseFieldID": "otherPartySelection",
     "CaseTypeID": "Benefit",
