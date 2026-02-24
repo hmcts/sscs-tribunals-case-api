@@ -498,10 +498,10 @@ public class PersonalisationTest {
         );
     }
 
-    @Disabled
     @ParameterizedTest
     @MethodSource("generateNotificationTypeAndSubscriptionsScenarios")
     public void givenSubscriptionType_shouldGenerateEmailAndSmsAndLetterTemplateNamesPerSubscription(
+//            this one here gemma
         NotificationEventType notificationEventType, SubscriptionType subscriptionType, HearingType hearingType,
         boolean hasEmailTemplate, boolean hasSmsTemplate, boolean hasLetterTemplate, boolean hasDocmosisTemplate) {
         NotificationWrapper notificationWrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
@@ -593,11 +593,11 @@ public class PersonalisationTest {
             new Object[]{DWP_RESPONSE_RECEIVED, REPRESENTATIVE, ONLINE, true, true, true, false},
             new Object[]{DWP_RESPONSE_RECEIVED, REPRESENTATIVE, PAPER, true, true, true, false},
             new Object[]{DWP_UPLOAD_RESPONSE, APPELLANT, ONLINE, true, true, true, false},
-            new Object[]{DWP_UPLOAD_RESPONSE, APPELLANT, PAPER, true, true, true, false},
+            new Object[]{DWP_UPLOAD_RESPONSE, APPELLANT, PAPER, true, true, false, true},
             new Object[]{DWP_UPLOAD_RESPONSE, APPOINTEE, ONLINE, true, true, true, false},
-            new Object[]{DWP_UPLOAD_RESPONSE, APPOINTEE, PAPER, true, true, true, false},
+            new Object[]{DWP_UPLOAD_RESPONSE, APPOINTEE, PAPER, true, true, false, true},
             new Object[]{DWP_UPLOAD_RESPONSE, REPRESENTATIVE, ONLINE, true, true, true, false},
-            new Object[]{DWP_UPLOAD_RESPONSE, REPRESENTATIVE, PAPER, true, true, true, false},
+            new Object[]{DWP_UPLOAD_RESPONSE, REPRESENTATIVE, PAPER, true, true, false, true},
             new Object[]{EVIDENCE_RECEIVED, APPELLANT, ONLINE, true, true, true, false},
             new Object[]{EVIDENCE_RECEIVED, APPELLANT, PAPER, true, true, true, false},
             new Object[]{EVIDENCE_RECEIVED, APPELLANT, REGULAR, true, true, true, false},
