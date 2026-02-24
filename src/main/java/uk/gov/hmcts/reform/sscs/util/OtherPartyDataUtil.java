@@ -264,20 +264,24 @@ public class OtherPartyDataUtil {
             .isPresent();
     }
 
-    public static void updateConfidentialityChangedDate(final List<CcdValue<OtherParty>> currentOtherParties,
+    public static void updateOtherPartiesConfidentialityChangedDate(final List<CcdValue<OtherParty>> currentOtherParties,
                                                         final List<CcdValue<OtherParty>> previousOtherParties) {
         if (isEmpty(currentOtherParties)) {
             return;
         }
         final Map<String, YesNo> confidentialityBefore = buildConfidentialityMap(previousOtherParties);
-        currentOtherParties.forEach(otherParty -> {
-            final OtherParty current = otherParty.getValue();
-            final YesNo priorConfidentiality = confidentialityBefore.get(current.getId());
-            if (priorConfidentiality == null
-                || !Objects.equals(priorConfidentiality, current.getConfidentialityRequired())) {
-                current.setConfidentialityRequiredChangedDate(now());
-            }
-        });
+        currentOtherParties.stream()
+            .filter(Objects::nonNull)
+            .map(CcdValue::getValue)
+            .filter(Objects::nonNull)
+            .forEach(current -> {
+                final YesNo priorConfidentiality = confidentialityBefore.get(current.getId());
+                if (nonNull(current.getConfidentialityRequired())
+                    && (priorConfidentiality == null
+                        || !Objects.equals(priorConfidentiality, current.getConfidentialityRequired()))) {
+                    current.setConfidentialityRequiredChangedDate(now());
+                }
+            });
     }
 
     private static Map<String, YesNo> buildConfidentialityMap(final List<CcdValue<OtherParty>> otherParties) {
@@ -285,23 +289,24 @@ public class OtherPartyDataUtil {
             return Collections.emptyMap();
         }
         final Map<String, YesNo> byId = new HashMap<>();
-        otherParties.forEach(op -> {
-            final OtherParty prior = op.getValue();
-            byId.put(prior.getId(), prior.getConfidentialityRequired());
-        });
+        otherParties.stream()
+            .filter(Objects::nonNull)
+            .map(CcdValue::getValue)
+            .filter(Objects::nonNull)
+            .forEach(prior -> byId.put(prior.getId(), prior.getConfidentialityRequired()));
         return byId;
     }
 
-    public static void updateConfidentialityRequiredChangedDate(final Callback<SscsCaseData> callback) {
-        final Optional<YesNo> confidentialityRequiredBefore =
-            callback.getCaseDetailsBefore().map(CaseDetails::getCaseData)
-                .flatMap(SscsCaseData::getAppellantConfidentialityRequired);
+    public static void updateAppellantConfidentialityRequiredChangedDate(final Callback<SscsCaseData> callback) {
+        final YesNo confidentialityRequiredBefore = callback.getCaseDetailsBefore()
+            .map(CaseDetails::getCaseData)
+            .flatMap(SscsCaseData::getAppellantConfidentialityRequired)
+            .orElse(null);
         final SscsCaseData currentCaseData = callback.getCaseDetails().getCaseData();
-        final Optional<YesNo> confidentialityRequired = currentCaseData.getAppellantConfidentialityRequired();
-        if (confidentialityRequiredBefore.isPresent() && Objects.equals(confidentialityRequiredBefore, confidentialityRequired)) {
-            return;
+        final YesNo confidentialityRequired = currentCaseData.getAppellantConfidentialityRequired().orElse(null);
+        if (nonNull(confidentialityRequired) && (confidentialityRequiredBefore == null || !Objects.equals(confidentialityRequiredBefore, confidentialityRequired))) {
+            currentCaseData.getAppellant()
+                .ifPresent(appellant -> appellant.setConfidentialityRequiredChangedDate(now()));
         }
-        currentCaseData.getAppellant()
-            .ifPresent(appellant -> appellant.setConfidentialityRequiredChangedDate(now()));
     }
 }

@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.confidentiality;
 
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.updateConfidentialityChangedDate;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.updateConfidentialityRequiredChangedDate;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.updateAppellantConfidentialityRequiredChangedDate;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.updateOtherPartiesConfidentialityChangedDate;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -57,13 +57,9 @@ public class ConfidentialityTabAboutToSubmitHandler implements PreSubmitCallback
             throw new IllegalStateException("Cannot handle callback");
         }
 
-        updateConfidentialityRequiredChangedDate(callback);
-
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-        final List<CcdValue<OtherParty>> previousOtherParties = callback.getCaseDetailsBefore().map(CaseDetails::getCaseData)
-            .map(SscsCaseData::getOtherParties).orElse(null);
-        updateConfidentialityChangedDate(sscsCaseData.getOtherParties(), previousOtherParties);
-
+        updateAppellantConfidentialityRequiredChangedDate(callback);
+        updateOtherPartiesConfidentialityRequiredChangedDate(callback);
         sscsCaseData.getExtendedSscsCaseData()
             .setConfidentialityTab(getConfidentialitySummaryEntries(sscsCaseData.getOtherParties(), sscsCaseData.getAppeal()));
 
@@ -157,5 +153,11 @@ public class ConfidentialityTabAboutToSubmitHandler implements PreSubmitCallback
         private String name;
         private String confidentialityRequired;
         private String confidentialityRequiredChangedDate;
+    }
+
+    private void updateOtherPartiesConfidentialityRequiredChangedDate(Callback<SscsCaseData> callback) {
+        final List<CcdValue<OtherParty>> previousOtherParties = callback.getCaseDetailsBefore().map(CaseDetails::getCaseData)
+            .map(SscsCaseData::getOtherParties).orElse(null);
+        updateOtherPartiesConfidentialityChangedDate(callback.getCaseDetails().getCaseData().getOtherParties(), previousOtherParties);
     }
 }

@@ -111,13 +111,10 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
             Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
                 .appellant(appellant).build());
 
-        // Set before data with same confidentiality so the changed dates are not updated during this test.
-        // otherParty2 has null confidentiality so its date is always updated; only check its row prefix.
         final OtherParty beforeOtherParty1 = OtherParty.builder().id("op1").confidentialityRequired(NO).build();
         final SscsCaseData beforeCaseData = SscsCaseData.builder()
             .appeal(Appeal.builder().appellant(Appellant.builder().confidentialityRequired(YES).build()).build())
-            .otherParties(singletonList(CcdValue.<OtherParty>builder().value(beforeOtherParty1).build()))
-            .build();
+            .otherParties(singletonList(CcdValue.<OtherParty>builder().value(beforeOtherParty1).build())).build();
         final CaseDetails<SscsCaseData> caseDetailsBefore = mock(CaseDetails.class);
         when(caseDetailsBefore.getCaseData()).thenReturn(beforeCaseData);
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
@@ -125,11 +122,14 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
 
         final String tab = response.getData().getExtendedSscsCaseData().getConfidentialityTab();
-        assertThat(tab).contains("Party | Name | Confidentiality Status | Confidentiality Status Confirmed");
-        assertThat(tab).contains("Appellant | John Smith | Yes | 3 Feb 2020, 4:05:06 pm");
-        assertThat(tab).contains("Appointee | Jane Doe | Yes | 3 Feb 2020, 4:05:06 pm");
-        assertThat(tab).contains("Other Party 1 | Other One | No | 4 Feb 2020, 9:10:11 am");
-        assertThat(tab).contains("Other Party 2 | Other Two | Undetermined |");
+        assertThat(tab).isEqualToNormalizingWhitespace("""
+            Party | Name | Confidentiality Status | Confidentiality Status Confirmed
+            -|-|-|-
+            Appellant | John Smith | Yes | 3 Feb 2020, 4:05:06 pm
+            Appointee | Jane Doe | Yes | 3 Feb 2020, 4:05:06 pm
+            Other Party 1 | Other One | No | 4 Feb 2020, 9:10:11 am
+            Other Party 2 | Other Two | Undetermined |
+            """);
     }
 
     @ParameterizedTest
@@ -178,12 +178,10 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
             Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
                 .appellant(appellant).build());
 
-        // Set before data with same confidentiality so the changed dates remain null and are shown as empty in the tab
         final OtherParty beforeOtherParty = OtherParty.builder().id("op1").confidentialityRequired(NO).build();
         final SscsCaseData beforeCaseData = SscsCaseData.builder()
             .appeal(Appeal.builder().appellant(Appellant.builder().confidentialityRequired(YES).build()).build())
-            .otherParties(singletonList(CcdValue.<OtherParty>builder().value(beforeOtherParty).build()))
-            .build();
+            .otherParties(singletonList(CcdValue.<OtherParty>builder().value(beforeOtherParty).build())).build();
         final CaseDetails<SscsCaseData> caseDetailsBefore = mock(CaseDetails.class);
         when(caseDetailsBefore.getCaseData()).thenReturn(beforeCaseData);
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
@@ -199,19 +197,11 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
             """);
     }
 
-    private static Stream<Arguments> appointeeNotIncludedTestCases() {
-        return Stream.of(org.junit.jupiter.params.provider.Arguments.of("No",
-                Appointee.builder().name(Name.builder().firstName("Jane").lastName("Doe").build()).build()),
-            org.junit.jupiter.params.provider.Arguments.of("Yes", null));
-    }
-
     @Test
     void handleUpdatesAppellantConfidentialityRequiredChangedDateWhenConfidentialityChanges() {
         final LocalDateTime originalDate = LocalDateTime.now().minusHours(1);
-        final Appellant appellant = Appellant.builder()
-            .confidentialityRequired(YES)
-            .confidentialityRequiredChangedDate(originalDate)
-            .build();
+        final Appellant appellant = Appellant.builder().confidentialityRequired(YES)
+            .confidentialityRequiredChangedDate(originalDate).build();
         sscsCaseData.setAppeal(
             Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
                 .appellant(appellant).build());
@@ -224,17 +214,14 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
 
-        assertThat(response.getData().getAppeal().getAppellant().getConfidentialityRequiredChangedDate())
-            .isAfter(originalDate);
+        assertThat(response.getData().getAppeal().getAppellant().getConfidentialityRequiredChangedDate()).isAfter(originalDate);
     }
 
     @Test
     void handleDoesNotUpdateAppellantConfidentialityRequiredChangedDateWhenConfidentialityUnchanged() {
         final LocalDateTime originalDate = LocalDateTime.now().minusHours(1);
-        final Appellant appellant = Appellant.builder()
-            .confidentialityRequired(YES)
-            .confidentialityRequiredChangedDate(originalDate)
-            .build();
+        final Appellant appellant = Appellant.builder().confidentialityRequired(YES)
+            .confidentialityRequiredChangedDate(originalDate).build();
         sscsCaseData.setAppeal(
             Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
                 .appellant(appellant).build());
@@ -247,17 +234,14 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
 
-        assertThat(response.getData().getAppeal().getAppellant().getConfidentialityRequiredChangedDate())
-            .isEqualTo(originalDate);
+        assertThat(response.getData().getAppeal().getAppellant().getConfidentialityRequiredChangedDate()).isEqualTo(originalDate);
     }
 
     @Test
     void handleUpdatesOtherPartyConfidentialityRequiredChangedDateWhenConfidentialityChanges() {
         final LocalDateTime originalDate = LocalDateTime.now().minusHours(1);
-        final OtherParty otherParty = OtherParty.builder().id("op1")
-            .confidentialityRequired(NO)
-            .confidentialityRequiredChangedDate(originalDate)
-            .build();
+        final OtherParty otherParty = OtherParty.builder().id("op1").confidentialityRequired(NO)
+            .confidentialityRequiredChangedDate(originalDate).build();
         sscsCaseData.setOtherParties(singletonList(CcdValue.<OtherParty>builder().value(otherParty).build()));
         sscsCaseData.setAppeal(
             Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build()).build());
@@ -277,10 +261,8 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
     @Test
     void handleDoesNotUpdateOtherPartyConfidentialityRequiredChangedDateWhenConfidentialityUnchanged() {
         final LocalDateTime originalDate = LocalDateTime.now().minusHours(1);
-        final OtherParty otherParty = OtherParty.builder().id("op1")
-            .confidentialityRequired(YES)
-            .confidentialityRequiredChangedDate(originalDate)
-            .build();
+        final OtherParty otherParty = OtherParty.builder().id("op1").confidentialityRequired(YES)
+            .confidentialityRequiredChangedDate(originalDate).build();
         sscsCaseData.setOtherParties(singletonList(CcdValue.<OtherParty>builder().value(otherParty).build()));
         sscsCaseData.setAppeal(
             Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build()).build());
@@ -295,6 +277,55 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
         handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
 
         assertThat(otherParty.getConfidentialityRequiredChangedDate()).isEqualTo(originalDate);
+    }
+
+    @Test
+    void handleDoesNotUpdateAppellantConfidentialityRequiredChangedDateWhenCurrentDateIsNull() {
+        final Appellant appellant = Appellant.builder()
+            .confidentialityRequired(YES)
+            .confidentialityRequiredChangedDate(null)
+            .build();
+        sscsCaseData.setAppeal(
+            Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
+                .appellant(appellant).build());
+
+        final SscsCaseData beforeCaseData = SscsCaseData.builder()
+            .appeal(Appeal.builder().appellant(Appellant.builder().confidentialityRequired(NO).build()).build()).build();
+        final CaseDetails<SscsCaseData> caseDetailsBefore = mock(CaseDetails.class);
+        when(caseDetailsBefore.getCaseData()).thenReturn(beforeCaseData);
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
+
+        assertThat(appellant.getConfidentialityRequiredChangedDate()).isNull();
+    }
+
+    @Test
+    void handleDoesNotUpdateOtherPartyConfidentialityRequiredChangedDateWhenCurrentDateIsNull() {
+        final OtherParty otherParty = OtherParty.builder().id("op1")
+            .confidentialityRequired(YES)
+            .confidentialityRequiredChangedDate(null)
+            .build();
+        sscsCaseData.setOtherParties(singletonList(CcdValue.<OtherParty>builder().value(otherParty).build()));
+        sscsCaseData.setAppeal(
+            Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build()).build());
+
+        final OtherParty beforeOtherParty = OtherParty.builder().id("op1").confidentialityRequired(NO).build();
+        final SscsCaseData beforeCaseData = SscsCaseData.builder()
+            .otherParties(singletonList(CcdValue.<OtherParty>builder().value(beforeOtherParty).build())).build();
+        final CaseDetails<SscsCaseData> caseDetailsBefore = mock(CaseDetails.class);
+        when(caseDetailsBefore.getCaseData()).thenReturn(beforeCaseData);
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
+
+        assertThat(otherParty.getConfidentialityRequiredChangedDate()).isNull();
+    }
+
+    private static Stream<Arguments> appointeeNotIncludedTestCases() {
+        return Stream.of(org.junit.jupiter.params.provider.Arguments.of("No",
+                Appointee.builder().name(Name.builder().firstName("Jane").lastName("Doe").build()).build()),
+            org.junit.jupiter.params.provider.Arguments.of("Yes", null));
     }
 
 }
