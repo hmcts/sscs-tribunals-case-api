@@ -1770,7 +1770,7 @@ reminder:
 
 outOfHours:
     startHour: ${HOURS_START_TIME:6}
-    endHour: ${HOURS_END_TIME:22}
+    endHour: ${HOURS_END_TIME:19}
 
 feign:
     httpclient:
