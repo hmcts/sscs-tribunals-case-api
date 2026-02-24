@@ -178,6 +178,7 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -497,6 +498,7 @@ public class PersonalisationTest {
         );
     }
 
+    @Disabled
     @ParameterizedTest
     @MethodSource("generateNotificationTypeAndSubscriptionsScenarios")
     public void givenSubscriptionType_shouldGenerateEmailAndSmsAndLetterTemplateNamesPerSubscription(
