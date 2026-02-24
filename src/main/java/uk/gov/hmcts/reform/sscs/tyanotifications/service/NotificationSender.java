@@ -1,10 +1,15 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.Loader;
@@ -15,10 +20,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Correspondence;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CorrespondenceDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CorrespondenceType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ReasonableAdjustmentStatus;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
+import uk.gov.hmcts.reform.sscs.evidenceshare.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationTestRecipients;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
+import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 import uk.gov.service.notify.*;
 
 @Component
@@ -34,11 +47,13 @@ public class NotificationSender {
     private final NotificationTestRecipients notificationTestRecipients;
     private final MarkdownTransformationService markdownTransformationService;
     private final SaveCorrespondenceAsyncService saveCorrespondenceAsyncService;
+    private final BulkPrintService bulkPrintService;
     private final Boolean saveCorrespondence;
 
     @Autowired
     public NotificationSender(@Qualifier("notificationClient") NotificationClient notificationClient,
                               @Qualifier("testNotificationClient") NotificationClient testNotificationClient,
+                              BulkPrintService bulkPrintService,
                               NotificationTestRecipients notificationTestRecipients,
                               MarkdownTransformationService markdownTransformationService,
                               SaveCorrespondenceAsyncService saveCorrespondenceAsyncService,
@@ -48,6 +63,7 @@ public class NotificationSender {
         this.testNotificationClient = testNotificationClient;
         this.notificationTestRecipients = notificationTestRecipients;
         this.markdownTransformationService = markdownTransformationService;
+        this.bulkPrintService = bulkPrintService;
         this.saveCorrespondence = saveCorrespondence;
         this.saveCorrespondenceAsyncService = saveCorrespondenceAsyncService;
     }
@@ -66,10 +82,12 @@ public class NotificationSender {
             client = notificationClient;
         }
 
-        final SendEmailResponse sendEmailResponse = getSendEmailResponse(templateId, emailAddress, personalisation, reference, client);
+        final SendEmailResponse sendEmailResponse =
+                getSendEmailResponse(templateId, emailAddress, personalisation, reference, client);
 
         if (saveCorrespondence && sendEmailResponse != null) {
-            final Correspondence correspondence = getEmailCorrespondence(sendEmailResponse, emailAddress, notificationEventType);
+            final Correspondence correspondence =
+                    getEmailCorrespondence(sendEmailResponse, emailAddress, notificationEventType);
             saveCorrespondenceAsyncService.saveEmailOrSms(correspondence, sscsCaseData);
             log.info("Uploaded correspondence email into ccd for case id {}.", sscsCaseData.getCcdCaseId());
         }
@@ -79,7 +97,9 @@ public class NotificationSender {
     }
 
     @Retryable
-    private SendEmailResponse getSendEmailResponse(String templateId, String emailAddress, Map<String, Object> personalisation, String reference, NotificationClient client) throws NotificationClientException {
+    private SendEmailResponse getSendEmailResponse(String templateId, String emailAddress,
+                                                   Map<String, Object> personalisation, String reference,
+                                                   NotificationClient client) throws NotificationClientException {
         final SendEmailResponse sendEmailResponse;
         try {
             sendEmailResponse = client.sendEmail(templateId, emailAddress, personalisation, reference);
@@ -110,10 +130,12 @@ public class NotificationSender {
             client = notificationClient;
         }
 
-        final SendSmsResponse sendSmsResponse = getSendSmsResponse(templateId, phoneNumber, personalisation, reference, smsSender, client);
+        final SendSmsResponse sendSmsResponse =
+                getSendSmsResponse(templateId, phoneNumber, personalisation, reference, smsSender, client);
 
         if (saveCorrespondence && sendSmsResponse != null) {
-            final Correspondence correspondence = getSmsCorrespondence(sendSmsResponse, phoneNumber, notificationEventType);
+            final Correspondence correspondence =
+                    getSmsCorrespondence(sendSmsResponse, phoneNumber, notificationEventType);
             saveCorrespondenceAsyncService.saveEmailOrSms(correspondence, sscsCaseData);
             log.info("Uploaded correspondence sms into ccd for case id {}.", sscsCaseData.getCcdCaseId());
         }
@@ -123,7 +145,9 @@ public class NotificationSender {
     }
 
     @Retryable
-    private SendSmsResponse getSendSmsResponse(String templateId, String phoneNumber, Map<String, Object> personalisation, String reference, String smsSender, NotificationClient client) throws NotificationClientException {
+    private SendSmsResponse getSendSmsResponse(String templateId, String phoneNumber,
+                                               Map<String, Object> personalisation, String reference, String smsSender,
+                                               NotificationClient client) throws NotificationClientException {
         final SendSmsResponse sendSmsResponse;
         try {
             sendSmsResponse = client.sendSms(
@@ -147,18 +171,23 @@ public class NotificationSender {
 
         NotificationClient client = getLetterNotificationClient(address.getPostcode());
 
-        final SendLetterResponse sendLetterResponse = sendLetterViaGovNotify(templateId, personalisation, ccdCaseId, client);
+        final SendLetterResponse sendLetterResponse =
+                sendLetterViaGovNotify(templateId, personalisation, ccdCaseId, client);
 
         if (saveCorrespondence) {
-            final Correspondence correspondence = getLetterCorrespondence(notificationEventType, name);
-            saveCorrespondenceAsyncService.saveLetter(client, sendLetterResponse.getNotificationId().toString(), correspondence, ccdCaseId);
+            final Correspondence correspondence = getLetterCorrespondence(notificationEventType, name, null);
+            saveCorrespondenceAsyncService.saveLetter(
+                    client, sendLetterResponse.getNotificationId().toString(), correspondence, ccdCaseId);
         }
 
-        log.info("Letter Notification send for case id : {}, Gov notify id: {} ", ccdCaseId, (sendLetterResponse != null) ? sendLetterResponse.getNotificationId() : null);
+        log.info("Letter Notification send for case id : {}, Gov notify id: {} ",
+                ccdCaseId, (sendLetterResponse != null) ? sendLetterResponse.getNotificationId() : null);
     }
 
     @Retryable
-    private SendLetterResponse sendLetterViaGovNotify(String templateId, Map<String, Object> personalisation, String ccdCaseId, NotificationClient client) throws NotificationClientException {
+    private SendLetterResponse sendLetterViaGovNotify(String templateId, Map<String, Object> personalisation,
+                                                      String ccdCaseId, NotificationClient client)
+            throws NotificationClientException {
         final SendLetterResponse sendLetterResponse;
         try {
             sendLetterResponse = client.sendLetter(templateId, personalisation, ccdCaseId);
@@ -170,33 +199,53 @@ public class NotificationSender {
         return sendLetterResponse;
     }
 
-    public void sendBundledLetter(String appellantPostcode, byte[] directionText, NotificationEventType notificationEventType, String name, String ccdCaseId) throws NotificationClientException {
-        if (directionText != null) {
-            try (PDDocument letterPdf = Loader.loadPDF(directionText)) {
-                var numberOfPages = letterPdf.getNumberOfPages();
-                if (numberOfPages > 10) {
-                    log.error("{} letter exceeds Gov.Notify 10-page limit for precompiled letters [{}]",
-                            notificationEventType, numberOfPages);
-                }
+    public void sendBundledLetter(NotificationWrapper wrapper, byte[] content, String recipient)
+            throws NotificationClientException {
+        if (content != null) {
+            boolean pageLimitExceeded = false;
+
+            try (PDDocument pdfDoc = Loader.loadPDF(content)) {
+                pageLimitExceeded = pdfDoc.getNumberOfPages() > 10;
+                log.info(pageLimitExceeded ? "{} letter exceeds Gov.Notify 10-page limit for precompiled letters [{}]"
+                                : "Sending {} precompiled letter of [{}] pages",
+                        wrapper.getNotificationType(), pdfDoc.getNumberOfPages());
             } catch (IOException e) {
                 log.info("Failed to calculate the number of pages contained in the letter {}", e.getMessage());
             }
 
-            NotificationClient client = getLetterNotificationClient(appellantPostcode);
-            ByteArrayInputStream bis = new ByteArrayInputStream(directionText);
-            final LetterResponse sendLetterResponse = sendBundledLetter(ccdCaseId, client, bis);
+            String govNotifyId = null;
+            NotificationClient client = null;
+            var caseData = wrapper.getNewSscsCaseData();
 
-            if (saveCorrespondence) {
-                final Correspondence correspondence = getLetterCorrespondence(notificationEventType, name);
-                saveCorrespondenceAsyncService.saveLetter(client, sendLetterResponse.getNotificationId().toString(), correspondence, ccdCaseId);
+            if (wrapper.getNotificationType().equals(ISSUE_FINAL_DECISION) && pageLimitExceeded) {
+                bulkPrintService
+                        .sendToBulkPrint(List.of(new Pdf(content, ISSUE_FINAL_DECISION.name())), caseData, recipient);
+                log.info("Sending {} Letter for case id : {} via BulkPrint because it exceeds 10 pages",
+                        wrapper.getNotificationType(), wrapper.getCaseId());
+            } else {
+                client = getLetterNotificationClient(caseData.getAppeal().getAppellant().getAddress().getPostcode());
+                ByteArrayInputStream inputStream = new ByteArrayInputStream(content);
+                final LetterResponse notifyResponse = sendBundledLetter(wrapper.getCaseId(), client, inputStream);
+                govNotifyId = nonNull(notifyResponse) ? notifyResponse.getNotificationId().toString() : null;
+
+                log.info("Letter Notification send for case id : {}, Gov notify id: {} ",
+                        wrapper.getCaseId(), govNotifyId);
             }
 
-            log.info("Letter Notification send for case id : {}, Gov notify id: {} ", ccdCaseId, (sendLetterResponse != null) ? sendLetterResponse.getNotificationId() : null);
+            if (saveCorrespondence) {
+                final var correspondence = getLetterCorrespondence(wrapper.getNotificationType(), recipient, null);
+                if (isNull(govNotifyId)) {
+                    saveCorrespondenceAsyncService.saveLetter(content, correspondence, wrapper.getCaseId());
+                } else {
+                    saveCorrespondenceAsyncService.saveLetter(client, govNotifyId, correspondence, wrapper.getCaseId());
+                }
+            }
         }
     }
 
     @Retryable
-    private LetterResponse sendBundledLetter(String ccdCaseId, NotificationClient client, ByteArrayInputStream bis) throws NotificationClientException {
+    private LetterResponse sendBundledLetter(String ccdCaseId, NotificationClient client, ByteArrayInputStream bis)
+            throws NotificationClientException {
         final LetterResponse sendLetterResponse;
         try {
             sendLetterResponse = client.sendPrecompiledLetterWithInputStream(ccdCaseId, bis);
@@ -208,16 +257,19 @@ public class NotificationSender {
         return sendLetterResponse;
     }
 
-    public void saveLettersToReasonableAdjustment(byte[] pdfForLetter, NotificationEventType notificationEventType, String name, String ccdCaseId, SubscriptionType subscriptionType) {
+    public void saveLettersToReasonableAdjustment(byte[] pdfForLetter, NotificationEventType notificationEventType,
+                                                  String name, String ccdCaseId, SubscriptionType subscriptionType) {
         if (pdfForLetter != null) {
-            final Correspondence correspondence = getLetterCorrespondence(notificationEventType, name, ReasonableAdjustmentStatus.REQUIRED);
-            saveCorrespondenceAsyncService.saveLetter(pdfForLetter, correspondence, ccdCaseId, subscriptionType);
+            final Correspondence correspondence =
+                    getLetterCorrespondence(notificationEventType, name, ReasonableAdjustmentStatus.REQUIRED);
+            saveCorrespondenceAsyncService.saveLettersToReasonableAdjustment(pdfForLetter, correspondence, ccdCaseId, subscriptionType);
 
             log.info("Letter Notification saved for case id : {}", ccdCaseId);
         }
     }
 
-    private Correspondence getEmailCorrespondence(final SendEmailResponse sendEmailResponse, final String emailAddress, final NotificationEventType notificationEventType) {
+    private Correspondence getEmailCorrespondence(final SendEmailResponse sendEmailResponse, final String emailAddress,
+                                                  final NotificationEventType notificationEventType) {
         return Correspondence.builder().value(
             CorrespondenceDetails.builder()
                 .body(markdownTransformationService.toHtml(sendEmailResponse.getBody()))
@@ -231,7 +283,8 @@ public class NotificationSender {
         ).build();
     }
 
-    private Correspondence getSmsCorrespondence(final SendSmsResponse sendSmsResponse, final String phoneNumber, final NotificationEventType notificationEventType) {
+    private Correspondence getSmsCorrespondence(final SendSmsResponse sendSmsResponse, final String phoneNumber,
+                                                final NotificationEventType notificationEventType) {
         return Correspondence.builder().value(
             CorrespondenceDetails.builder()
                 .body(markdownTransformationService.toHtml(sendSmsResponse.getBody()))
@@ -245,11 +298,8 @@ public class NotificationSender {
         ).build();
     }
 
-    private Correspondence getLetterCorrespondence(NotificationEventType notificationEventType, String name) {
-        return getLetterCorrespondence(notificationEventType, name, null);
-    }
-
-    private Correspondence getLetterCorrespondence(NotificationEventType notificationEventType, String name, ReasonableAdjustmentStatus status) {
+    private Correspondence getLetterCorrespondence(NotificationEventType notificationEventType, String name,
+                                                   ReasonableAdjustmentStatus status) {
         return Correspondence.builder().value(
             CorrespondenceDetails.builder()
                 .eventType(notificationEventType.getId())
