@@ -23,10 +23,12 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
@@ -56,12 +58,13 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 
 @Slf4j
+@ExtendWith(SpringExtension.class)
 public class BaseHandler {
 
     protected static final String CREATED_BY_FUNCTIONAL_TEST = "created by functional test";
     private static final List<String> DWP_DOCUMENT_TYPES = Arrays.stream(DwpDocumentType.values())
         .map(DwpDocumentType::getValue)
-        .collect(Collectors.toList());
+        .toList();
     @Autowired
     protected CcdService ccdService;
 
@@ -85,7 +88,7 @@ public class BaseHandler {
     @Value("${test-url}")
     protected String testUrl;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         baseURI = testUrl;
         useRelaxedHTTPSValidation();

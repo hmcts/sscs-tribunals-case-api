@@ -10,18 +10,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpStatus;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -29,30 +25,26 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(SpringExtension.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest
 public class ActionFurtherEvidenceSubmittedCallbackHandlerTest extends BaseHandler {
 
-    @ClassRule
-    public static final SpringClassRule scr = new SpringClassRule();
     protected static final String CASE_ID_TO_BE_REPLACED = "12345678";
 
-    @Rule
-    public final SpringMethodRule smr = new SpringMethodRule();
-
-    @Test
-    @Parameters({
+    @ParameterizedTest
+    @CsvSource({
         "NON_COMPLIANT, informationReceivedForInterlocJudge, interlocutoryReviewState, reviewByJudge",
         "CREATE_WITH_DWP_TEST_CASE, sendToInterlocReviewByJudge, withDwp, reviewByJudge",
         "CREATE_WITH_DWP_TEST_CASE, sendToInterlocReviewByTcw, withDwp, reviewByTcw"
     })
     public void givenSubmittedCallbackForActionFurtherEvidence_shouldUpdateFieldAndTriggerEvent(
-        EventType eventType,
+        String eventTypeName,
         String furtherEvidenceActionSelectedOption,
         String expectedState,
         String expectedReviewedBy) throws Exception {
 
+        EventType eventType = EventType.valueOf(eventTypeName);
         Callback<SscsCaseData> callback = getSscsCaseDataCallback(furtherEvidenceActionSelectedOption);
         Long caseId = createCaseTriggeringGivenEvent(eventType, callback.getCaseDetails().getCaseData()).getId();
         callback = addCaseIdtoCallback(callback, caseId.toString());
@@ -93,4 +85,3 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest extends BaseHandl
         return deserializer.deserialize(jsonCallback);
     }
 }
-
