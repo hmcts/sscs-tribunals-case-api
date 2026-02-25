@@ -1,4 +1,4 @@
-#Pull request needs to have the pr-values:wa label to deploy this stack.
+#Pull request needs to have the pr-values:ccd label to deploy this stack.
 tags:
   sscs-ccd-idam-pr: true
 
