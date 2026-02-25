@@ -12,7 +12,6 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.APPELLANT_NAME;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.BENEFIT_NAME_ACRONYM_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.CASE_ID_LITERAL;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.GENERATED_DATE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.HMCTS2;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.HMCTS_IMG;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.OTHER_PARTIES_NAMES;
@@ -67,16 +66,11 @@ class HearingEnquiryFormPlaceholderServiceTest {
 
         final Map<String, Object> placeholders = service.populatePlaceholders(caseData, OTHER_PARTY_LETTER, "otherParty111");
 
-        assertThat(placeholders.get(ADDRESS_NAME)).isEqualTo("Other Party");
-        assertThat(placeholders.get(APPELLANT_NAME)).isEqualTo("Appellant Person");
-        assertThat(placeholders.get(BENEFIT_NAME_ACRONYM_LITERAL)).isEqualTo(Benefit.CHILD_SUPPORT.getDescription());
-        assertThat(placeholders.get(SSCS_URL_LITERAL)).isEqualTo(SSCS_URL);
-        assertThat(placeholders.get(HMCTS2)).isEqualTo(HMCTS_IMG);
-        assertThat(placeholders.get(CASE_ID_LITERAL)).isEqualTo("1234567890");
-        assertThat(placeholders.get(APPEAL_REF)).isEqualTo("ref-123");
-        assertThat(placeholders.get(PHONE_NUMBER)).isEqualTo(HELPLINE_PHONE);
-        assertThat(placeholders.get(GENERATED_DATE_LITERAL)).isNotNull();
-        assertThat(placeholders.get(OTHER_PARTIES_NAMES)).isEqualTo("Second Party");
+        assertThat(placeholders).containsEntry(ADDRESS_NAME, "Other Party").containsEntry(APPELLANT_NAME, "Appellant Person")
+            .containsEntry(BENEFIT_NAME_ACRONYM_LITERAL, Benefit.CHILD_SUPPORT.getDescription())
+            .containsEntry(SSCS_URL_LITERAL, SSCS_URL).containsEntry(HMCTS2, HMCTS_IMG)
+            .containsEntry(CASE_ID_LITERAL, "1234567890").containsEntry(APPEAL_REF, "ref-123")
+            .containsEntry(PHONE_NUMBER, HELPLINE_PHONE).isNotNull().containsEntry(OTHER_PARTIES_NAMES, "Second Party");
         verify(placeholderService).buildExcelaAddress(anyBoolean(), eq("No"), anyMap());
     }
 
@@ -86,7 +80,7 @@ class HearingEnquiryFormPlaceholderServiceTest {
 
         final Map<String, Object> placeholders = service.populatePlaceholders(caseData, OTHER_PARTY_LETTER, "otherParty222");
 
-        assertThat(placeholders.get(ADDRESS_NAME)).isEqualTo("Appointee Person");
+        assertThat(placeholders).containsEntry(ADDRESS_NAME, "Appointee Person");
     }
 
     @ParameterizedTest
@@ -97,7 +91,7 @@ class HearingEnquiryFormPlaceholderServiceTest {
 
         final Map<String, Object> placeholders = service.populatePlaceholders(caseData, OTHER_PARTY_LETTER, "otherParty111");
 
-        assertThat(placeholders.get(PHONE_NUMBER)).isEqualTo(expectedPhone);
+        assertThat(placeholders).containsEntry(PHONE_NUMBER, expectedPhone);
     }
 
     @Test
@@ -107,7 +101,7 @@ class HearingEnquiryFormPlaceholderServiceTest {
 
         final Map<String, Object> placeholders = service.populatePlaceholders(caseData, OTHER_PARTY_LETTER, "otherParty111");
 
-        assertThat(placeholders.get(APPEAL_REF)).isEqualTo("1234567890");
+        assertThat(placeholders).containsEntry(APPEAL_REF, "1234567890");
     }
 
     @Test
@@ -117,7 +111,7 @@ class HearingEnquiryFormPlaceholderServiceTest {
 
         final Map<String, Object> placeholders = service.populatePlaceholders(caseData, OTHER_PARTY_LETTER, "otherParty111");
 
-        assertThat(placeholders.get(APPEAL_REF)).isEqualTo("1234567890");
+        assertThat(placeholders).containsEntry(APPEAL_REF, "1234567890");
     }
 
     @Test
@@ -129,7 +123,7 @@ class HearingEnquiryFormPlaceholderServiceTest {
 
         final Map<String, Object> placeholders = service.populatePlaceholders(caseData, OTHER_PARTY_LETTER, "otherParty111");
 
-        assertThat(placeholders.get(OTHER_PARTIES_NAMES)).isEqualTo("Second Party");
+        assertThat(placeholders).containsEntry(OTHER_PARTIES_NAMES, "Second Party");
     }
 
     @Test
@@ -142,7 +136,7 @@ class HearingEnquiryFormPlaceholderServiceTest {
 
         Map<String, Object> placeholders = service.populatePlaceholders(caseData, OTHER_PARTY_LETTER, "otherParty111");
 
-        assertThat(placeholders.get(OTHER_PARTIES_NAMES)).isEqualTo("Second Party");
+        assertThat(placeholders).containsEntry(OTHER_PARTIES_NAMES, "Second Party");
     }
 
     private static Stream<Arguments> phoneScenarios() {

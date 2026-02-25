@@ -107,9 +107,9 @@ class BulkPrintServiceTest {
                 .thenReturn(new SendLetterResponse(LETTER_ID));
         Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, null);
         assertThat(letterIdOptional).isEqualTo(Optional.of(LETTER_ID));
-        assertThat(captor.getValue().getAdditionalData().get("letterType")).isEqualTo("sscs-data-pack");
-        assertThat(captor.getValue().getAdditionalData().get("appellantName")).isEqualTo("Appellant LastName");
-        assertThat(captor.getValue().getAdditionalData().get("caseIdentifier")).isEqualTo("234");
+        assertThat(captor.getValue().getAdditionalData()).containsEntry("letterType", "sscs-data-pack");
+        assertThat(captor.getValue().getAdditionalData()).containsEntry("appellantName", "Appellant LastName");
+        assertThat(captor.getValue().getAdditionalData()).containsEntry("caseIdentifier", "234");
     }
 
     @Test
@@ -213,7 +213,7 @@ class BulkPrintServiceTest {
 
         List<String> parties = new ArrayList<>();
         parties.add("Appellant LastName");
-        assertThat(captor.getValue().getAdditionalData().get("recipients")).isEqualTo(parties);
+        assertThat(captor.getValue().getAdditionalData()).containsEntry("recipients", parties);
     }
 
     @Test
@@ -319,7 +319,7 @@ class BulkPrintServiceTest {
         Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(PDF_LIST, sscsCaseDataUK, null);
 
         assertThat(letterIdOptional).isEqualTo(Optional.of(LETTER_ID));
-        assertThat(captor.getValue().getAdditionalData().get("isInternational")).isEqualTo("true");
+        assertThat(captor.getValue().getAdditionalData()).containsEntry("isInternational", "true");
     }
 
     @ParameterizedTest
@@ -342,7 +342,7 @@ class BulkPrintServiceTest {
         Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(PDF_LIST, sscsCaseDataUK, null);
 
         assertThat(letterIdOptional).isEqualTo(Optional.of(LETTER_ID));
-        assertThat(captor.getValue().getAdditionalData().get("isIbca")).isEqualTo(isIbca);
+        assertThat(captor.getValue().getAdditionalData()).containsEntry("isIbca", isIbca);
     }
 
     static Stream<Arguments> benefitParameters() {
