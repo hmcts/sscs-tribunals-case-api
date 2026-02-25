@@ -301,7 +301,7 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNull(body.getDailyLivingDescriptors());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertEquals("otherPartyFirstName1 otherPartyLastName1", payload.getWriteFinalDecisionTemplateBody().getOtherPartyNamesAttendedHearing());
+        assertEquals("otherPartyFirstName1 otherPartyLastName1 the second respondent", payload.getWriteFinalDecisionTemplateBody().getOtherPartyNamesAttendedHearing().getFirst());
     }
 
     @Test

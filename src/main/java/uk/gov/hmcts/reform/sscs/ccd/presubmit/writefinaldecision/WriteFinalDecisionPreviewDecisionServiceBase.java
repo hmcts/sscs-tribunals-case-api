@@ -36,6 +36,8 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 @Slf4j
 public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends IssueNoticeHandler {
 
+    private static final int MAX_NUM_OF_RESPONDENT = 10;
+
     protected final DecisionNoticeQuestionService decisionNoticeQuestionService;
     protected final DecisionNoticeOutcomeService decisionNoticeOutcomeService;
     protected final VenueDataLoader venueDataLoader;
@@ -211,7 +213,6 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
      * @return list of other party names with their reference
      */
     private List<String> populateOtherPartyNames(SscsCaseData caseData, YesNo attended) {
-        int maxNumOfRespondent = 10;
         record RespondentRecord(String name, String referredAs) {
         }
 
@@ -222,7 +223,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         // populate respondents
         for (int i = 0; i < otherPartyAttendedQuestions.size(); i++) {
             OtherPartyAttendedQuestionDetails other = otherPartyAttendedQuestions.get(i).getValue();
-            var referredAs = (respondents.size() < maxNumOfRespondent) ? Respondent.labelPrefixes[i].toLowerCase() : "";
+            var referredAs = (respondents.size() < MAX_NUM_OF_RESPONDENT) ? Respondent.labelPrefixes[i].toLowerCase() : "";
 
             if (other.getAttendedOtherParty() == attended) {
                 var respondent = new RespondentRecord(other.getOtherPartyName(), referredAs);
@@ -231,7 +232,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         }
 
         // join names with reference if other  number less than MAX_OTHER_PARTY
-        if (respondents.size() < maxNumOfRespondent) {
+        if (respondents.size() < MAX_NUM_OF_RESPONDENT) {
             return respondents.stream()
                 .map(respondent ->
                     String.format("%s the %s respondent", respondent.name(), respondent.referredAs()))

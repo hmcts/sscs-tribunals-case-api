@@ -205,10 +205,10 @@ public abstract class WriteFinalDecisionTemplateContent {
         }
 
         if (StringUtils.isNotEmpty(bundlePage)) {
-            sentences.add(String.format("The Tribunal considered the appeal bundle to page %s.", bundlePage));
+            sentences.add(String.format("The Tribunal considered the appeal bundle to page %s", bundlePage));
         }
 
-        return String.join(". ", sentences);
+        return String.join(". ", sentences) + ".";
     }
 
     private String getRespondentsAttended(boolean appellantAttended,
@@ -226,7 +226,7 @@ public abstract class WriteFinalDecisionTemplateContent {
             respondents.add(String.format("%s the appointee", appointeeName));
         }
 
-        if (!otherPartyNamesAttended.isEmpty()) {
+        if (otherPartyNamesAttended != null && !otherPartyNamesAttended.isEmpty()) {
             respondents.addAll(otherPartyNamesAttended);
         }
 
@@ -248,7 +248,7 @@ public abstract class WriteFinalDecisionTemplateContent {
             respondents.add(String.format("%s the appellant", appellantName));
         }
 
-        if (!otherPartyNamesNotAttend.isEmpty()) {
+        if (otherPartyNamesNotAttend != null && !otherPartyNamesNotAttend.isEmpty()) {
             respondents.addAll(otherPartyNamesNotAttend);
         }
 
@@ -270,9 +270,7 @@ public abstract class WriteFinalDecisionTemplateContent {
 
         var lastRespondent = respondents.getLast();
 
-        respondents.removeLast();
-
-        return String.join(", ", respondents) + " and " + lastRespondent;
+        return String.join(", ", respondents.subList(0, respondents.size() - 1)) + " and " + lastRespondent;
     }
 
     private String presentingOfficerText(boolean anyOneElseBesideOfficer) {
