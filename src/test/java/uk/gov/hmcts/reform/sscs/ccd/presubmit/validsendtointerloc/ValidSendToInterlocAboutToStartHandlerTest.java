@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
@@ -52,7 +53,7 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
 
     @BeforeEach
     public void setUp() {
-        handler = new ValidSendToInterlocAboutToStartHandler(false, false);
+        handler = new ValidSendToInterlocAboutToStartHandler(false, false, false);
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
     }
 
@@ -166,5 +167,16 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
         expectedList.add(expectedListItem3);
 
         assertEquals(new DynamicList(expectedListItem1, expectedList), response.getData().getOriginalSender());
+    }
+
+    @Test
+    public void givenCmInterlocConfidentialityFlagEnabledForChildSupport_thenOriginalSenderHasNoDefaultSelection() {
+        handler = new ValidSendToInterlocAboutToStartHandler(false, false, true);
+        setupCallback();
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertEquals("", response.getData().getOriginalSender().getValue().getCode());
     }
 }

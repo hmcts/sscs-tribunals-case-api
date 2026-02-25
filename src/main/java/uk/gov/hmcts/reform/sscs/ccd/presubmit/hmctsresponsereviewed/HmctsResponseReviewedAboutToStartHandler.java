@@ -9,6 +9,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_RESPONSE
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.UCB;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_TCW;
+import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getPartiesOnCase;
+import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.isChildSupportAppeal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -33,6 +36,8 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
 
     private final DwpAddressLookupService service;
     private final HearingsService hearingsService;
+    @Value("${feature.cm-interloc-confidentiality-party.enabled}")
+    private boolean cmInterlocConfidentialityPartyEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -56,6 +61,7 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
         setDefaultFieldValues(sscsCaseData);
         setDwpDocuments(sscsCaseData);
         setSelectWhoReviewsCase(sscsCaseData);
+        setOriginalSenderDropdown(sscsCaseData);
 
         if (sscsCaseData.isIbcCase()) {
             final String benefitCode = sscsCaseData.getBenefitCode();
@@ -149,6 +155,14 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
         listOptions.add(new DynamicListItem(REVIEW_BY_JUDGE.getId(), REVIEW_BY_JUDGE.getLabel()));
 
         sscsCaseData.setSelectWhoReviewsCase(new DynamicList(new DynamicListItem("", ""), listOptions));
+    }
+
+    private void setOriginalSenderDropdown(SscsCaseData sscsCaseData) {
+        List<DynamicListItem> listOptions = getPartiesOnCase(sscsCaseData);
+        DynamicListItem selectedParty = cmInterlocConfidentialityPartyEnabled && isChildSupportAppeal(sscsCaseData)
+                ? new DynamicListItem("", "")
+                : listOptions.get(0);
+        sscsCaseData.setOriginalSender(new DynamicList(selectedParty, listOptions));
     }
 
 }

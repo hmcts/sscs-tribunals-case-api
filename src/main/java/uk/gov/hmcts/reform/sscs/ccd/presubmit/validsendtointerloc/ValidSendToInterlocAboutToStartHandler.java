@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.*;
 import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getPartiesOnCase;
+import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.isChildSupportAppeal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,11 +22,14 @@ public class ValidSendToInterlocAboutToStartHandler implements PreSubmitCallback
 
     private final boolean postponementsFeature;
     private final boolean postHearingsB;
+    private final boolean cmInterlocConfidentialityPartyEnabled;
 
     public ValidSendToInterlocAboutToStartHandler(@Value("${feature.postponements.enabled}")  boolean postponementsFeature,
-                                                  @Value("${feature.postHearingsB.enabled}")  boolean postHearingsB) {
+                                                  @Value("${feature.postHearingsB.enabled}")  boolean postHearingsB,
+                                                  @Value("${feature.cm-interloc-confidentiality-party.enabled}") boolean cmInterlocConfidentialityPartyEnabled) {
         this.postponementsFeature = postponementsFeature;
         this.postHearingsB = postHearingsB;
+        this.cmInterlocConfidentialityPartyEnabled = cmInterlocConfidentialityPartyEnabled;
     }
 
     @Override
@@ -71,7 +75,9 @@ public class ValidSendToInterlocAboutToStartHandler implements PreSubmitCallback
 
     private void setOriginalSenderDropdown(SscsCaseData sscsCaseData) {
         List<DynamicListItem> listOptions = getPartiesOnCase(sscsCaseData);
-
-        sscsCaseData.setOriginalSender(new DynamicList(listOptions.get(0), listOptions));
+        DynamicListItem selectedParty = cmInterlocConfidentialityPartyEnabled && isChildSupportAppeal(sscsCaseData)
+                ? new DynamicListItem("", "")
+                : listOptions.get(0);
+        sscsCaseData.setOriginalSender(new DynamicList(selectedParty, listOptions));
     }
 }

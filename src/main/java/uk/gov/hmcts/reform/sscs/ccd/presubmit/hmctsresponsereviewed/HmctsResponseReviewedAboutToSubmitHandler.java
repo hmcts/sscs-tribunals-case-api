@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -43,14 +44,17 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
     private final DwpDocumentService dwpDocumentService;
     private final PanelCompositionService panelCompositionService;
     private final AddNoteService addNoteService;
+    private final boolean cmInterlocConfidentialityPartyEnabled;
 
     @Autowired
     public HmctsResponseReviewedAboutToSubmitHandler(DwpDocumentService dwpDocumentService,
                                                      PanelCompositionService panelCompositionService,
-                                                     AddNoteService addNoteService) {
+                                                     AddNoteService addNoteService,
+                                                     @Value("${feature.cm-interloc-confidentiality-party.enabled}") boolean cmInterlocConfidentialityPartyEnabled) {
         this.dwpDocumentService = dwpDocumentService;
         this.panelCompositionService = panelCompositionService;
         this.addNoteService = addNoteService;
+        this.cmInterlocConfidentialityPartyEnabled = cmInterlocConfidentialityPartyEnabled;
     }
 
     @Override
