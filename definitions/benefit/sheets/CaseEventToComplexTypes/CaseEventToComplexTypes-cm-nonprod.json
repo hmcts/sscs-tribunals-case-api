@@ -1,0 +1,141 @@
+[
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "name.title",
+    "ID": "otherPartyTitle",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "15/01/2026",
+    "FieldDisplayOrder": 1,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "name.firstName",
+    "ID": "otherPartyFirstName",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "15/01/2026",
+    "FieldDisplayOrder": 2,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "name.lastName",
+    "ID": "otherPartyLastName",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "15/01/2026",
+    "FieldDisplayOrder": 3,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "address.line1",
+    "ID": "otherPartyAddressLine1",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "15/01/2026",
+    "FieldDisplayOrder": 4,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "address.line2",
+    "ID": "otherPartyAddressLine2",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "15/01/2026",
+    "FieldDisplayOrder": 5,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "address.town",
+    "ID": "otherPartyAddressTown",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "15/01/2026",
+    "FieldDisplayOrder": 6,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "address.county",
+    "ID": "otherPartyAddressCounty",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "15/01/2026",
+    "FieldDisplayOrder": 7,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "address.postcode",
+    "ID": "otherPartyAddressPostcode",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "15/01/2026",
+    "FieldDisplayOrder": 8,
+    "PageID": "1.0",
+    "EventElementLabel": "Postcode/Zip code"
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "contact.phone",
+    "ID": "otherPartyPhone",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "15/01/2026",
+    "FieldDisplayOrder": 9,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "contact.mobile",
+    "ID": "otherPartyMobile",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "15/01/2026",
+    "FieldDisplayOrder": 10,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "contact.email",
+    "ID": "otherPartyEmail",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "15/01/2026",
+    "FieldDisplayOrder": 11,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "unacceptableCustomerBehaviour",
+    "ID": "otherPartyUnacceptableCustomerBehaviour",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "15/01/2026",
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "role.name",
+    "ID": "otherPartyRoleName",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "15/01/2026",
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "role.description",
+    "ID": "otherPartyRoleDescription",
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "otherParties.role.name=\"Other\"",
+    "LiveFrom": "15/01/2026",
+    "PageID": "1.0"
+  }
+]
