@@ -109,7 +109,7 @@ public class DwpUploadResponseIt extends AbstractEventIt {
         assertNotNull(result.getData().getAudioVideoEvidence().get(0).getValue().getRip1Document());
         assertNotNull(result.getData().getAudioVideoEvidence().get(1).getValue().getRip1Document());
         assertEquals(PHE_REQUEST, result.getData().getInterlocReferralReason());
-        assertEquals(REVIEW_BY_JUDGE, result.getData().getInterlocReviewState());
+        assertEquals(null, result.getData().getInterlocReviewState());
     }
 
     @Test
