@@ -117,8 +117,7 @@ class EsaScenario1Test {
     @Test
     void testScenario1NoSchedule2() {
 
-        List<Descriptor> schedule2Descriptors =
-            List.of();
+        List<Descriptor> schedule2Descriptors = List.of();
 
         WriteFinalDecisionTemplateBody body =
             WriteFinalDecisionTemplateBody.builder()

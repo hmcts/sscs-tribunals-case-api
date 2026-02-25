@@ -157,7 +157,7 @@ public abstract class WriteFinalDecisionTemplateContent {
                     writeFinalDecisionTemplateBody.isAppointeeOnCase(),
                     writeFinalDecisionTemplateBody.isPresentingOfficerAttended(),
                     writeFinalDecisionTemplateBody.getOtherPartyNamesAttendedHearing(),
-                    writeFinalDecisionTemplateBody.getOtherPartyNamesNotAttendHearing());
+                    writeFinalDecisionTemplateBody.getOtherPartyNamesDidNotAttendHearing());
         }
     }
 

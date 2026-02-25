@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getLastValidHearing;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -171,7 +172,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         writeFinalDecisionBuilder.presentingOfficerAttended("yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPresentingOfficerAttendedQuestion()));
 
         if (isOtherPartyPresent(caseData)) {
-            writeFinalDecisionBuilder.otherPartyNamesNotAttendHearing(populateOtherPartyNames(caseData, NO));
+            writeFinalDecisionBuilder.otherPartyNamesDidNotAttendHearing(populateOtherPartyNames(caseData, NO));
             writeFinalDecisionBuilder.otherPartyNamesAttendedHearing(populateOtherPartyNames(caseData, YES));
         }
 
@@ -202,50 +203,43 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
     }
 
-    /**
-     * Populate other party names with reference who did or didn't attend. <br>
-     *<p>
-     * if number of people < 10, returns list of names with their reference, ['John Brown the first respondent', ...] <br>
-     * if number of people >= 10, returns list of names and the last item as reference ' respondents' e.g. ['John Brown', ..., ' respondents'] <br>
-     *</p>
-     * @param caseData case data
-     * @param attended Yes: attended, No: did not attend
-     * @return list of other party names with their reference
-     */
     private List<String> populateOtherPartyNames(SscsCaseData caseData, YesNo attended) {
-        record RespondentRecord(String name, String referredAs) {
-        }
+        List<String> names = new ArrayList<>();
+        List<String> respondents = new ArrayList<>();
 
-        List<RespondentRecord> respondents = new ArrayList<>();
+        if (caseData.getSscsFinalDecisionCaseData() == null
+            || caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions() == null) {
+            return Collections.emptyList();
+        }
 
         var otherPartyAttendedQuestions = caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions();
 
+        int count = 0;
+
         // populate respondents
         for (int i = 0; i < otherPartyAttendedQuestions.size(); i++) {
-            OtherPartyAttendedQuestionDetails other = otherPartyAttendedQuestions.get(i).getValue();
-            var referredAs = (respondents.size() < MAX_NUM_OF_RESPONDENT) ? Respondent.labelPrefixes[i].toLowerCase() : "";
+            var otherParty = otherPartyAttendedQuestions.get(i).getValue();
+            var respondent = (i < MAX_NUM_OF_RESPONDENT) ? Respondent.labelPrefixes[i].toLowerCase() : "";
 
-            if (other.getAttendedOtherParty() == attended) {
-                var respondent = new RespondentRecord(other.getOtherPartyName(), referredAs);
+            if (otherParty.getAttendedOtherParty() == attended) {
+                count++;
                 respondents.add(respondent);
+                names.add(otherParty.getOtherPartyName());
             }
         }
 
-        // join names with reference if other  number less than MAX_OTHER_PARTY
-        if (respondents.size() < MAX_NUM_OF_RESPONDENT) {
-            return respondents.stream()
-                .map(respondent ->
-                    String.format("%s the %s respondent", respondent.name(), respondent.referredAs()))
-                .toList();
-        } else {
-            List<String> lst = new ArrayList<>();
-            for (int i = 0; i < respondents.size() - 1; i++) {
-                lst.add(respondents.get(i).name());
-            }
-            lst.add(respondents.getLast().name() + " respondents");
+        var otherParties = new ArrayList<String>();
 
-            return lst;
+        for (int i = 0; i < names.size(); i++) {
+            if (count < MAX_NUM_OF_RESPONDENT) {
+                otherParties.add(String.format("%s the %s respondent", names.get(i), respondents.get(i)));
+            } else {
+                var name = (i == count) ? names.get(i) + " respondents" : names.get(i);
+                otherParties.add(name);
+            }
         }
+
+        return otherParties;
     }
 
     protected boolean isSetAside(SscsCaseData sscsCaseData, Outcome outcome) {
