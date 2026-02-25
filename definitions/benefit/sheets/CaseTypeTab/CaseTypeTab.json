@@ -53,6 +53,7 @@
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "summary_sscs", "TabLabel": "Summary", "TabDisplayOrder": 1, "CaseFieldID": "caseCode", "TabFieldDisplayOrder": 43},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "summary_sscs", "TabLabel": "Summary", "TabDisplayOrder": 1, "CaseFieldID": "processingVenue", "TabFieldDisplayOrder": 44},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "summary_sscs", "TabLabel": "Summary", "TabDisplayOrder": 1, "CaseFieldID": "summaryInterlocReferralReason", "TabFieldDisplayOrder": 45, "FieldShowCondition": "interlocReferralReason!=\"\""},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "summary_sscs", "TabLabel": "Summary", "TabDisplayOrder": 1, "CaseFieldID": "originalSender", "TabFieldDisplayOrder": 145, "FieldShowCondition": "interlocReferralReason=\"confidentiality\""},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "summary_sscs", "TabLabel": "Summary", "TabDisplayOrder": 1, "CaseFieldID": "interlocReferralDate", "TabFieldDisplayOrder": 46},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "summary_sscs", "TabLabel": "Summary", "TabDisplayOrder": 1, "CaseFieldID": "outcome", "TabFieldDisplayOrder": 47},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "summary_sscs", "TabLabel": "Summary", "TabDisplayOrder": 1, "CaseFieldID": "directionDueDate", "TabFieldDisplayOrder": 48},

@@ -95,7 +95,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
                 new CaseDetails<>(1234L, "SSCS", RESPONSE_RECEIVED, sscsCaseDataBefore, now(), "Benefit");
         callback = new Callback<>(caseDetails, Optional.of(caseDetailsBefore), HMCTS_RESPONSE_REVIEWED, false);
 
-        handler = new HmctsResponseReviewedAboutToSubmitHandler(dwpDocumentService, panelCompService, addNoteService);
+        handler = new HmctsResponseReviewedAboutToSubmitHandler(dwpDocumentService, panelCompService, addNoteService, false);
     }
 
     @Test
@@ -433,7 +433,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
     @Test
     public void shouldResetPanelComposition() {
-        handler = new HmctsResponseReviewedAboutToSubmitHandler(dwpDocumentService, panelCompService, addNoteService);
+        handler = new HmctsResponseReviewedAboutToSubmitHandler(dwpDocumentService, panelCompService, addNoteService, false);
         var panelComposition = new PanelMemberComposition(List.of("84"));
         when(panelCompService.resetPanelCompositionIfStale(sscsCaseData, Optional.of(caseDetailsBefore)))
                 .thenReturn(panelComposition);

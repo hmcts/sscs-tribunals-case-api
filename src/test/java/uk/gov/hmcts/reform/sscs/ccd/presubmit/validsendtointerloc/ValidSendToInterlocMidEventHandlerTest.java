@@ -79,7 +79,7 @@ public class ValidSendToInterlocMidEventHandlerTest {
     @BeforeEach
     public void setUp() {
         openMocks(this);
-        handler = new ValidSendToInterlocMidEventHandler(generateFile, templateId);
+        handler = new ValidSendToInterlocMidEventHandler(generateFile, templateId, false);
 
         Venue venue = Venue.builder().name("venue name").build();
         HearingDetails hearingDetails = HearingDetails.builder()
