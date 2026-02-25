@@ -71,7 +71,7 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
         caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
         callback = new Callback<>(caseDetails, Optional.of(caseDetails), VALID_SEND_TO_INTERLOC, false);
 
-        handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService);
+        handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService, false);
     }
 
     @ParameterizedTest

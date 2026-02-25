@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -32,13 +33,16 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
 
     private final PostponementRequestService postponementRequestService;
     private final AddNoteService addNoteService;
+    private final boolean cmInterlocConfidentialityPartyEnabled;
 
 
     @Autowired
     public ValidSendToInterlocAboutToSubmitHandler(PostponementRequestService postponementRequestService,
-                                                   AddNoteService addNoteService) {
+                                                   AddNoteService addNoteService,
+                                                   @Value("${feature.cm-interloc-confidentiality-party.enabled}") boolean cmInterlocConfidentialityPartyEnabled) {
         this.postponementRequestService = postponementRequestService;
         this.addNoteService = addNoteService;
+        this.cmInterlocConfidentialityPartyEnabled = cmInterlocConfidentialityPartyEnabled;
     }
 
     @Override
