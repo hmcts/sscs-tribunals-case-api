@@ -56,8 +56,7 @@ class UcScenario1Test {
             
             Something else
             
-            This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. \
-            First Tier Agency representative attended on behalf of the Respondent.
+            This has been an oral (face to face) hearing. The following people attended: Felix Sydney the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page A1.
             
             """;
 
@@ -106,8 +105,7 @@ class UcScenario1Test {
             
             My second reasons
             
-            This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. \
-            First Tier Agency representative attended on behalf of the Respondent.
+            This has been an oral (face to face) hearing. The following people attended: Felix Sydney the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page A1.
             
             """;
 
@@ -150,8 +148,7 @@ class UcScenario1Test {
             
             Something else
             
-            This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. \
-            First Tier Agency representative attended on behalf of the Respondent.
+            This has been an oral (face to face) hearing. The following people attended: Felix Sydney the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page A1.
             
             """;
 
@@ -203,8 +200,112 @@ class UcScenario1Test {
             
             Something else
             
-            This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. \
-            First Tier Agency representative attended on behalf of the Respondent.
+            This has been an oral (face to face) hearing. The following people attended: Felix Sydney the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page A1.
+            
+            """;
+
+        assertThat(content.getComponents()).hasSize(9);
+        assertThat(content.toString()).isEqualTo(expectedContent);
+    }
+
+    @Test
+    void testScenario1WhenAllOtherPartiesAttended() {
+        List<Descriptor> schedule6Descriptors = singletonList(Descriptor.builder()
+            .activityQuestionValue("Mobilising Unaided")
+            .activityAnswerValue("1")
+            .activityAnswerLetter("c")
+            .activityAnswerPoints(9)
+            .build());
+
+        WriteFinalDecisionTemplateBody body = WriteFinalDecisionTemplateBody.builder()
+            .hearingType("faceToFace")
+            .attendedHearing(true)
+            .presentingOfficerAttended(true)
+            .dateOfDecision("2020-09-20")
+            .ucNumberOfPoints(9)
+            .pageNumber("A1")
+            .appellantName("Felix Sydney")
+            .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
+            .anythingElse("Something else")
+            .ucSchedule6Descriptors(schedule6Descriptors)
+            .otherPartyNamesAttendedHearing(List.of("John Lennon the second respondent", "Paul McCartney the third respondent", "George Harrison the forth respondent", "Ringo Starr the fifth respondent"))
+            .build();
+
+        UcTemplateContent content = UcScenario.SCENARIO_1.getContent(body);
+
+        String expectedContent = """
+            The appeal is refused.
+            
+            The decision made by the Secretary of State on 20/09/2020 is confirmed.
+            
+            Felix Sydney does not have limited capability for work and cannot be treated as having limited capability for work.
+            
+            In applying the Work Capability Assessment 9 points were scored from the activities and descriptors in Schedule 6 of the Universal Credit (UC) Regulations 2013. This is \
+            insufficient to meet the threshold for the test. Schedule 8, paragraph 4 of the UC Regulations did not apply.
+            
+            Mobilising Unaided\tc.1\t9
+            
+            
+            My first reasons
+            
+            My second reasons
+            
+            Something else
+            
+            This has been an oral (face to face) hearing. The following people attended: Felix Sydney the appellant, John Lennon the second respondent, Paul McCartney the third respondent, George Harrison the forth respondent, Ringo Starr the fifth respondent and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page A1.
+            
+            """;
+
+        assertThat(content.getComponents()).hasSize(9);
+        assertThat(content.toString()).isEqualTo(expectedContent);
+    }
+
+    @Test
+    void testScenario1WhenSomeOfOtherPartiesAttendedAndSomeDidNotAttend() {
+        List<Descriptor> schedule6Descriptors = singletonList(Descriptor.builder()
+            .activityQuestionValue("Mobilising Unaided")
+            .activityAnswerValue("1")
+            .activityAnswerLetter("c")
+            .activityAnswerPoints(9)
+            .build());
+
+        WriteFinalDecisionTemplateBody body = WriteFinalDecisionTemplateBody.builder()
+            .hearingType("faceToFace")
+            .attendedHearing(true)
+            .presentingOfficerAttended(true)
+            .dateOfDecision("2020-09-20")
+            .ucNumberOfPoints(9)
+            .pageNumber("A1")
+            .appellantName("Felix Sydney")
+            .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
+            .anythingElse("Something else")
+            .ucSchedule6Descriptors(schedule6Descriptors)
+            .otherPartyNamesAttendedHearing(List.of("John Lennon the second respondent", "Paul McCartney the third respondent", "George Harrison the forth respondent", "Ringo Starr the fifth respondent"))
+            .otherPartyNamesDidNotAttendHearing(List.of("Pete Best the sixth respondent", "Stuart Sutcliffe the ninth respondent"))
+            .build();
+
+        UcTemplateContent content = UcScenario.SCENARIO_1.getContent(body);
+
+        String expectedContent = """
+            The appeal is refused.
+            
+            The decision made by the Secretary of State on 20/09/2020 is confirmed.
+            
+            Felix Sydney does not have limited capability for work and cannot be treated as having limited capability for work.
+            
+            In applying the Work Capability Assessment 9 points were scored from the activities and descriptors in Schedule 6 of the Universal Credit (UC) Regulations 2013. This is \
+            insufficient to meet the threshold for the test. Schedule 8, paragraph 4 of the UC Regulations did not apply.
+            
+            Mobilising Unaided\tc.1\t9
+            
+            
+            My first reasons
+            
+            My second reasons
+            
+            Something else
+            
+            This has been an oral (face to face) hearing. The following people attended: Felix Sydney the appellant, John Lennon the second respondent, Paul McCartney the third respondent, George Harrison the forth respondent, Ringo Starr the fifth respondent and a representative from the First Tier Agency. Pete Best the sixth respondent and Stuart Sutcliffe the ninth respondent did not attend. The Tribunal considered the appeal bundle to page A1.
             
             """;
 
