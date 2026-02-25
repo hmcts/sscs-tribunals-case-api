@@ -1,0 +1,4 @@
+[
+  {"LiveFrom": "08/01/2026", "CaseTypeID": "Benefit", "CaseEventID": "addOtherPartyDataUC", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
+  {"LiveFrom": "08/01/2026", "CaseTypeID": "Benefit", "CaseEventID": "addOtherPartyDataUC", "AccessProfile": "caseworker-sscs-dwpresponsewriter", "CRUD": "CRUD"}
+]
