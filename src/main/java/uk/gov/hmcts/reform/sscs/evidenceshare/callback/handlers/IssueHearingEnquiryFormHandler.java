@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUt
 @Service
 public class IssueHearingEnquiryFormHandler implements CallbackHandler<SscsCaseData> {
 
+    private static final String HEARING_ENQUIRY_FORM = "hearing-enquiry-form";
     private final HearingEnquiryFormPlaceholderService hearingEnquiryFormPlaceholderService;
     private final BulkPrintService bulkPrintService;
     private final CoverLetterService coverLetterService;
@@ -91,16 +92,16 @@ public class IssueHearingEnquiryFormHandler implements CallbackHandler<SscsCaseD
     }
 
     private String getCoverLetterTemplateName(SscsCaseData caseData) {
-        return docmosisTemplateConfig.getTemplate().get(caseData.getLanguagePreference()).get("hearing-enquiry-form").get("name");
+        return docmosisTemplateConfig.getTemplate().get(caseData.getLanguagePreference()).get(HEARING_ENQUIRY_FORM).get("name");
     }
 
     private String getHefTemplateName(SscsCaseData caseData) {
-        return docmosisTemplateConfig.getTemplate().get(caseData.getLanguagePreference()).get("hearing-enquiry-form")
+        return docmosisTemplateConfig.getTemplate().get(caseData.getLanguagePreference()).get(HEARING_ENQUIRY_FORM)
             .get("form");
     }
 
     private String getCoverSheetTemplateName(SscsCaseData caseData) {
-        return docmosisTemplateConfig.getTemplate().get(caseData.getLanguagePreference()).get("hearing-enquiry-form")
+        return docmosisTemplateConfig.getTemplate().get(caseData.getLanguagePreference()).get(HEARING_ENQUIRY_FORM)
             .get("cover");
     }
 

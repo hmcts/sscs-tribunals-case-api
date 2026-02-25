@@ -22,6 +22,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.HandlerHelper.buildTestCallbackForGivenData;
 
 import ch.qos.logback.classic.Level;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -160,7 +161,7 @@ class IssueHearingEnquiryFormHandlerTest {
         verify(coverLetterService, never()).getSelectedDocuments(caseData);
         verify(coverLetterService, times(2)).generateCoverLetterRetry(any(), templateNameCaptor.capture(),
             letterNameCaptor.capture(), eq(placeholders), eq(1));
-        verify(coverLetterService).generateCoverSheet(eq("hearing-enquiry-form-cover.docx"), eq("coversheet"), eq(placeholders));
+        verify(coverLetterService).generateCoverSheet("hearing-enquiry-form-cover.docx", "coversheet", placeholders);
         verify(bulkPrintService).sendToBulkPrint(anyLong(), eq(caseData), sentPdfsCaptor.capture(),
             eq(ISSUE_HEARING_ENQUIRY_FORM), eq("Other Person"));
 
@@ -297,7 +298,7 @@ class IssueHearingEnquiryFormHandlerTest {
         final Map<String, Map<String, String>> languageTemplates = new HashMap<>();
         languageTemplates.put("hearing-enquiry-form", hearingEnquiryFormTemplates);
 
-        final Map<LanguagePreference, Map<String, Map<String, String>>> templates = new HashMap<>();
+        final Map<LanguagePreference, Map<String, Map<String, String>>> templates = new EnumMap<>(LanguagePreference.class);
         templates.put(LanguagePreference.ENGLISH, languageTemplates);
 
         final DocmosisTemplateConfig config = new DocmosisTemplateConfig();
