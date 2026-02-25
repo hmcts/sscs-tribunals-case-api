@@ -121,7 +121,7 @@ class IssueHearingEnquiryFormMidEventHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getErrors()).doesNotContain(DUPLICATE_OTHER_PARTY_ERROR);
+        assertThat(response.getErrors()).isEmpty();
     }
 
     @Test
@@ -131,7 +131,7 @@ class IssueHearingEnquiryFormMidEventHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getErrors()).containsExactly(DUPLICATE_DOCUMENT_ERROR);
+        assertThat(response.getErrors()).isNotEmpty().containsExactly(DUPLICATE_DOCUMENT_ERROR);
     }
 
     @ParameterizedTest
@@ -143,7 +143,7 @@ class IssueHearingEnquiryFormMidEventHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getErrors()).doesNotContain(DUPLICATE_DOCUMENT_ERROR);
+        assertThat(response.getErrors()).isEmpty();
     }
 
     @Test
