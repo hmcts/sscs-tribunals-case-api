@@ -200,11 +200,11 @@ export class Tasks {
     await expect(
       this.page.locator('div.mat-autocomplete-panel.mat-autocomplete-visible')
     ).toBeVisible();
-    await this.page
-      .locator(
-        `//mat-option/span[contains(text(), '${userEmail.toLowerCase()}')]`
-      )
-      .click();
+    const userOption = this.page.locator(
+      `//mat-option/span[contains(text(), '${userEmail.toLowerCase()}')]`
+    );
+    await expect(userOption).toBeVisible();
+    await userOption.click();
     await expect(this.page.locator('//mat-option')).toBeHidden();
     await this.page.getByRole('button', { name: 'Continue' }).click();
     await expect(

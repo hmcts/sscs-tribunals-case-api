@@ -68,7 +68,7 @@ test.describe(
       }
     )
 
-    test('As a caseworker review PHE response submitted without any further info #executeTearDown', async ({
+    test('As a caseworker review PHE response submitted without any further info', async ({
       uploadResponseSteps,
       reviewPHESteps
     }) => {
