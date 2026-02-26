@@ -3,17 +3,19 @@ package uk.gov.hmcts.reform.sscs.controller;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -27,7 +29,7 @@ import uk.gov.hmcts.reform.sscs.service.DocumentDownloadService;
 import uk.gov.hmcts.reform.sscs.service.TribunalsService;
 
 
-
+@ExtendWith(MockitoExtension.class)
 public class TyaControllerTest {
 
     private static final Long CASE_ID = 123456789L;
@@ -46,9 +48,8 @@ public class TyaControllerTest {
 
     private TyaController controller;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        openMocks(this);
         controller = new TyaController(tribunalsService, documentDownloadService, authorisationService);
     }
 
@@ -57,13 +58,16 @@ public class TyaControllerTest {
         ObjectNode node = JsonNodeFactory.instance.objectNode();
         //Given
         when(tribunalsService.findAppeal(CASE_ID, false)).thenReturn(node);
+        when(authorisationService.authenticate(SERVICE_AUTH)).thenReturn(SERVICE_NAME);
 
         //When
-        ResponseEntity<String> receivedAppeal = controller.getAppealByCaseId(CASE_ID, false);
+        ResponseEntity<String> receivedAppeal = controller.getAppealByCaseId(SERVICE_AUTH, CASE_ID, false);
 
         //Then
         assertThat(receivedAppeal.getStatusCode(), equalTo(HttpStatus.OK));
         assertThat(receivedAppeal.getBody(), equalTo(node.toString()));
+        verify(authorisationService).authenticate(SERVICE_AUTH);
+        verify(authorisationService).allowOnlySscs(SERVICE_NAME);
     }
 
     @Test
@@ -71,23 +75,29 @@ public class TyaControllerTest {
         ObjectNode node = JsonNodeFactory.instance.objectNode();
         //Given
         when(tribunalsService.findAppeal(CASE_ID, true)).thenReturn(node);
+        when(authorisationService.authenticate(SERVICE_AUTH)).thenReturn(SERVICE_NAME);
 
         //When
-        ResponseEntity<String> receivedAppeal = controller.getAppealByCaseId(CASE_ID, true);
+        ResponseEntity<String> receivedAppeal = controller.getAppealByCaseId(SERVICE_AUTH, CASE_ID, true);
 
         //Then
         assertThat(receivedAppeal.getStatusCode(), equalTo(HttpStatus.OK));
         assertThat(receivedAppeal.getBody(), equalTo(node.toString()));
+        verify(authorisationService).authenticate(SERVICE_AUTH);
+        verify(authorisationService).allowOnlySscs(SERVICE_NAME);
     }
 
-    @Test(expected = AppealNotFoundException.class)
+    @Test
     public void testToThrowAppealNotFoundExceptionIfAppealNotFound() throws CcdException {
         //Given
         when(tribunalsService.findAppeal(CASE_ID, true)).thenThrow(
             new AppealNotFoundException(CASE_ID));
+        when(authorisationService.authenticate(SERVICE_AUTH)).thenReturn(SERVICE_NAME);
 
         //When
-        controller.getAppealByCaseId(CASE_ID, true);
+        assertThrows(AppealNotFoundException.class, () -> controller.getAppealByCaseId(SERVICE_AUTH, CASE_ID, true));
+        verify(authorisationService).authenticate(SERVICE_AUTH);
+        verify(authorisationService).allowOnlySscs(SERVICE_NAME);
     }
 
     @Test
@@ -107,26 +117,38 @@ public class TyaControllerTest {
         assertThat(receivedDocument.getBody(), instanceOf(ByteArrayResource.class));
     }
 
-    @Test(expected = DocumentNotFoundException.class)
+    @Test
     public void testToThrowDocumentNotFoundExceptionIfError() throws CcdException {
         //Given
         when(documentDownloadService.downloadFile(URL)).thenThrow(
                 new DocumentNotFoundException());
 
         //When
-        controller.getAppealDocument(SERVICE_AUTH, URL);
+        assertThrows(DocumentNotFoundException.class, () -> controller.getAppealDocument(SERVICE_AUTH, URL));
     }
 
-    @Test(expected = ForbiddenException.class)
-    public void testToThrowForbiddenExceptionForUnauthorizedService() throws CcdException {
+    @Test
+    public void testToThrowForbiddenExceptionForUnauthorizedServiceForDocumentEndpoint() throws CcdException {
         //Given
         String serviceAuth = "unauthorized-service-auth";
         String serviceName = "unauthorized-service";
         when(authorisationService.authenticate(serviceAuth)).thenReturn(serviceName);
-        doThrow(new ForbiddenException("Service " + serviceName + " does not have permissions to request case creation")).when(authorisationService).assertIsAllowedToHandleCallback(serviceName);
+        doThrow(new ForbiddenException("Service " + serviceName + " does not have permissions to request case creation"))
+                .when(authorisationService).assertIsAllowedToHandleCallback(serviceName);
 
         //When
-        controller.getAppealDocument(serviceAuth, URL);
+        assertThrows(ForbiddenException.class, () -> controller.getAppealDocument(serviceAuth, URL));
+    }
+
+    @Test
+    public void testToThrowForbiddenExceptionForUnauthorizedServiceForAppealsEndpoint() throws CcdException {
+        String serviceAuth = "unauthorized-service-auth";
+        String serviceName = "unauthorized-service";
+        when(authorisationService.authenticate(serviceAuth)).thenReturn(serviceName);
+        doThrow(new ForbiddenException("Service " + serviceName + " is not authorized for this action"))
+                .when(authorisationService).allowOnlySscs(serviceName);
+
+        assertThrows(ForbiddenException.class, () -> controller.getAppealByCaseId(serviceAuth, CASE_ID, false));
     }
 
 }

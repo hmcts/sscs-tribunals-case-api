@@ -45,8 +45,12 @@ public class TyaController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Appeal", content = {
         @Content(schema = @Schema(implementation = String.class))})})
     @RequestMapping(value = "/appeals", method = GET, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getAppealByCaseId(@RequestParam(value = "caseId") Long caseId,
+    public ResponseEntity<String> getAppealByCaseId(
+            @RequestHeader(value = SERVICE_AUTHORIZATION) String serviceAuthorization,
+            @RequestParam(value = "caseId") Long caseId,
             @RequestParam(value = "mya", required = false, defaultValue = "false") boolean mya) {
+        String serviceName = authorisationService.authenticate(serviceAuthorization);
+        authorisationService.allowOnlySscs(serviceName);
         return ok(tribunalsService.findAppeal(caseId, mya).toString());
     }
 
