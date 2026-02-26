@@ -59,13 +59,16 @@ public class TyaControllerTest {
         ObjectNode node = JsonNodeFactory.instance.objectNode();
         //Given
         when(tribunalsService.findAppeal(CASE_ID, false)).thenReturn(node);
+        when(authorisationService.authenticate(SERVICE_AUTH)).thenReturn(SERVICE_NAME);
 
         //When
-        ResponseEntity<String> receivedAppeal = controller.getAppealByCaseId(CASE_ID, false);
+        ResponseEntity<String> receivedAppeal = controller.getAppealByCaseId(SERVICE_AUTH, CASE_ID, false);
 
         //Then
         assertThat(receivedAppeal.getStatusCode(), equalTo(HttpStatus.OK));
         assertThat(receivedAppeal.getBody(), equalTo(node.toString()));
+        verify(authorisationService).authenticate(SERVICE_AUTH);
+        verify(authorisationService).allowOnlySscs(SERVICE_NAME);
     }
 
     @Test
@@ -73,13 +76,16 @@ public class TyaControllerTest {
         ObjectNode node = JsonNodeFactory.instance.objectNode();
         //Given
         when(tribunalsService.findAppeal(CASE_ID, true)).thenReturn(node);
+        when(authorisationService.authenticate(SERVICE_AUTH)).thenReturn(SERVICE_NAME);
 
         //When
-        ResponseEntity<String> receivedAppeal = controller.getAppealByCaseId(CASE_ID, true);
+        ResponseEntity<String> receivedAppeal = controller.getAppealByCaseId(SERVICE_AUTH, CASE_ID, true);
 
         //Then
         assertThat(receivedAppeal.getStatusCode(), equalTo(HttpStatus.OK));
         assertThat(receivedAppeal.getBody(), equalTo(node.toString()));
+        verify(authorisationService).authenticate(SERVICE_AUTH);
+        verify(authorisationService).allowOnlySscs(SERVICE_NAME);
     }
 
     @Test
@@ -87,9 +93,12 @@ public class TyaControllerTest {
         //Given
         when(tribunalsService.findAppeal(CASE_ID, true)).thenThrow(
             new AppealNotFoundException(CASE_ID));
+        when(authorisationService.authenticate(SERVICE_AUTH)).thenReturn(SERVICE_NAME);
 
         //When / Then
-        assertThrows(AppealNotFoundException.class, () -> controller.getAppealByCaseId(CASE_ID, true));
+        assertThrows(AppealNotFoundException.class, () -> controller.getAppealByCaseId(SERVICE_AUTH, CASE_ID, true));
+        verify(authorisationService).authenticate(SERVICE_AUTH);
+        verify(authorisationService).allowOnlySscs(SERVICE_NAME);
     }
 
     @Test
@@ -121,6 +130,8 @@ public class TyaControllerTest {
 
     @Test
     public void testToThrowForbiddenExceptionForUnauthorizedService() throws CcdException {
+    @Test
+    public void testToThrowForbiddenExceptionForUnauthorizedServiceForDocumentEndpoint() throws CcdException {
         //Given
         String serviceAuth = "unauthorized-service-auth";
         String serviceName = "unauthorized-service";
@@ -130,6 +141,17 @@ public class TyaControllerTest {
 
         //When / Then
         assertThrows(ForbiddenException.class, () -> controller.getAppealDocument(serviceAuth, URL));
+    }
+
+    @Test
+    public void testToThrowForbiddenExceptionForUnauthorizedServiceForAppealsEndpoint() throws CcdException {
+        String serviceAuth = "unauthorized-service-auth";
+        String serviceName = "unauthorized-service";
+        when(authorisationService.authenticate(serviceAuth)).thenReturn(serviceName);
+        doThrow(new ForbiddenException("Service " + serviceName + " is not authorized for this action"))
+                .when(authorisationService).allowOnlySscs(serviceName);
+
+        assertThrows(ForbiddenException.class, () -> controller.getAppealByCaseId(serviceAuth, CASE_ID, false));
     }
 
 }
