@@ -63,4 +63,12 @@ public class AuthorisationService {
             );
         }
     }
+
+    public void allowOnlySscs(String serviceName) {
+        if (!serviceName.equalsIgnoreCase("sscs")) {
+            throw new ForbiddenException(
+                    "Service " + serviceName + " is not authorized for this action"
+            );
+        }
+    }
 }
