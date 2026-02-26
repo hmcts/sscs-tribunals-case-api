@@ -67,6 +67,8 @@ public class IssueHearingEnquiryFormAboutToStart implements PreSubmitCallbackHan
             var list = new ArrayList<CcdValue<OtherPartySelectionDetails>>();
             list.add(new CcdValue<>(new OtherPartySelectionDetails(new DynamicList(null, listOptions))));
             sscsCaseData.setOtherPartySelection(list);
+        } else {
+            log.warn("Other parties not set for hearing enquiry form for case id {}", sscsCaseData.getCcdCaseId());
         }
     }
 
