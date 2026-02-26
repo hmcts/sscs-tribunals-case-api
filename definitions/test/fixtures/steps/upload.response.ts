@@ -100,7 +100,7 @@ export class UploadResponse extends BaseStep {
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
 
     await this.homePage.navigateToTab('Summary');
-    await this.summaryTab.verifyPresenceOfText('Ready to list');
+    await this.summaryTab.verifyPresenceOfText('Response received');
     await this.summaryTab.verifyPresenceOfTitle(
       'PHE on this case: Under Review'
     );
@@ -402,6 +402,30 @@ export class UploadResponse extends BaseStep {
   }
 
   async uploadResponseWithoutFurtherInfoAsDwpCaseWorker(caseId: string) {
+    // As DWP caseworker upload response with further info
+    await this.loginUserWithCaseId(
+      credentials.dwpResponseWriter,
+      false,
+      caseId
+    );
+    await this.stepsHelper.uploadResponseHelper(
+      uploadResponseTestdata.pipIssueCode,
+      'No'
+    );
+
+    await this.checkYourAnswersPage.verifyCYAPageContent(
+      'Upload response',
+      uploadResponseTestdata.pipBenefitCode,
+      uploadResponseTestdata.pipIssueCode
+    );
+    await this.checkYourAnswersPage.confirmSubmission();
+  }
+
+  async uploadResponseWithoutFurtherInfoAsDwpCaseWorkerAndMarkCaseAsUrgent(caseId: string) {
+    
+    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
+    await this.stepsHelper.setCaseAsUrgentHelper();
+
     // As DWP caseworker upload response with further info
     await this.loginUserWithCaseId(
       credentials.dwpResponseWriter,

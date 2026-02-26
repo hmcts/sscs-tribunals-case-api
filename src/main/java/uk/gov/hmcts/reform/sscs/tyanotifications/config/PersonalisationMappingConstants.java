@@ -56,6 +56,7 @@ public final class PersonalisationMappingConstants {
     public static final String FIRST_TIER_AGENCY_GROUP_TITLE = "first_tier_agency_group_title";
     public static final String FIRST_TIER_AGENCY_GROUP_WELSH = "welsh_first_tier_agency_group";
     public static final String FIRST_TIER_AGENCY_OFFICE = "fta_office";
+    public static final String FORM_TYPE = "form_type";
     public static final String HEARING = "hearing";
     public static final String HEARING_ARRANGEMENT_DETAILS_LITERAL = "hearing_arrangement_details";
     public static final String HEARING_ARRANGEMENT_DETAILS_LITERAL_WELSH = "welsh_hearing_arrangement_details";
