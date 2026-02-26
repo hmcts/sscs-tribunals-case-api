@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.PHE_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_TCW;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
@@ -109,7 +108,7 @@ public class DwpUploadResponseIt extends AbstractEventIt {
         assertNotNull(result.getData().getAudioVideoEvidence().get(0).getValue().getRip1Document());
         assertNotNull(result.getData().getAudioVideoEvidence().get(1).getValue().getRip1Document());
         assertEquals(PHE_REQUEST, result.getData().getInterlocReferralReason());
-        assertEquals(REVIEW_BY_JUDGE, result.getData().getInterlocReviewState());
+        assertEquals(null, result.getData().getInterlocReviewState());
     }
 
     @Test
