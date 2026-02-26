@@ -109,7 +109,7 @@ class RequestOtherPartyDataHandlerTest {
 
         verify(updateCcdCaseService).updateCaseV2(eq(CCD_CASE_ID),
             eq("requestOtherPartyData"),
-            eq("REQUEST_OTHER_PARTY_DATA"),
+            eq("Request Other Party Data"),
             eq("Requesting other party data"),
             eq(tokens),
             any());
