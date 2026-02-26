@@ -20,6 +20,7 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.SSCS_URL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.SSCS_URL_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.getAddress;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.getName;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DWP_ACRONYM;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.LetterType.DOCMOSIS;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getAddressPlaceholders;
@@ -62,7 +63,7 @@ public class HearingEnquiryFormPlaceholderService {
     public Map<String, Object> populatePlaceholders(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String partyId) {
         final Map<String, Object> placeholders = new HashMap<>(
             getAddressPlaceholders(getAddress(caseData, letterType, partyId), true, DOCMOSIS));
-        final String name = PlaceholderUtility.getName(caseData, letterType, partyId);
+        final String name = getName(caseData, letterType, partyId);
         final String appellantName = Optional.ofNullable(caseData.getAppeal()).map(Appeal::getAppellant).map(Entity::getName)
             .map(Name::getFullNameNoTitle).orElse("");
         placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL, getBenefitAcronym(caseData));

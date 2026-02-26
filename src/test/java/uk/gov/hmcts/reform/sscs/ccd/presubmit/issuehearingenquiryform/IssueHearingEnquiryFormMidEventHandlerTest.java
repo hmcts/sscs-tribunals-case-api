@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuehearingenquiryform;
 
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.lenient;
@@ -54,7 +55,7 @@ class IssueHearingEnquiryFormMidEventHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new IssueHearingEnquiryFormMidEventHandler();
+        handler = new IssueHearingEnquiryFormMidEventHandler(true);
         caseData = SscsCaseData.builder().build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -79,6 +80,13 @@ class IssueHearingEnquiryFormMidEventHandlerTest {
     void shouldThrowExceptionWhenCanHandleCalledWithNullCallbackType() {
         assertThatThrownBy(() -> handler.canHandle(null, callback)).isInstanceOf(NullPointerException.class)
             .hasMessage("callbacktype must not be null");
+    }
+
+    @Test
+    void shouldNotHandleWhenCmOtherPartyConfidentialityIsDisabled() {
+        final IssueHearingEnquiryFormMidEventHandler disabledHandler = new IssueHearingEnquiryFormMidEventHandler(false);
+
+        assertThat(disabledHandler.canHandle(ABOUT_TO_START, callback)).isFalse();
     }
 
     @Test
@@ -118,6 +126,7 @@ class IssueHearingEnquiryFormMidEventHandlerTest {
         List<CcdValue<OtherPartySelectionDetails>> otherPartySelection) {
         lenient().when(callback.getEvent()).thenReturn(ISSUE_HEARING_ENQUIRY_FORM);
         caseData.setOtherPartySelection(otherPartySelection);
+        caseData.setOtherPartySelection(emptyList());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -128,6 +137,7 @@ class IssueHearingEnquiryFormMidEventHandlerTest {
     void shouldAddErrorWhenDuplicateDocumentsAreSelected() {
         lenient().when(callback.getEvent()).thenReturn(ISSUE_HEARING_ENQUIRY_FORM);
         caseData.setDocumentSelection(List.of(documentSelection("same-doc"), documentSelection("same-doc")));
+        caseData.setOtherPartySelection(emptyList());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -140,6 +150,7 @@ class IssueHearingEnquiryFormMidEventHandlerTest {
         List<CcdValue<DocumentSelectionDetails>> documentSelection) {
         lenient().when(callback.getEvent()).thenReturn(ISSUE_HEARING_ENQUIRY_FORM);
         caseData.setDocumentSelection(documentSelection);
+        caseData.setOtherPartySelection(emptyList());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 

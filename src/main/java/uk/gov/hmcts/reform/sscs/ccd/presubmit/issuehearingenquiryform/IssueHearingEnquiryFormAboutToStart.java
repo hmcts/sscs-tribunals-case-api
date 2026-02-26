@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -26,12 +27,22 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Service
 @Slf4j
 public class IssueHearingEnquiryFormAboutToStart implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    private final boolean cmOtherPartyConfidentialityEnabled;
+
+    public IssueHearingEnquiryFormAboutToStart(
+        @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
+        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
+    }
+
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
 
-        return callbackType.equals(CallbackType.ABOUT_TO_START) && callback.getEvent() == EventType.ISSUE_HEARING_ENQUIRY_FORM;
+        return cmOtherPartyConfidentialityEnabled
+            && callbackType.equals(CallbackType.ABOUT_TO_START)
+            && callback.getEvent() == EventType.ISSUE_HEARING_ENQUIRY_FORM;
     }
 
     @Override

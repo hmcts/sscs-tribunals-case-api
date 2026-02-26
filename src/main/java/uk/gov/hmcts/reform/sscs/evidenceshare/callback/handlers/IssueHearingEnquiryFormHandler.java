@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
@@ -43,7 +42,6 @@ public class IssueHearingEnquiryFormHandler implements CallbackHandler<SscsCaseD
     private final DocmosisTemplateConfig docmosisTemplateConfig;
 
 
-    @Autowired
     public IssueHearingEnquiryFormHandler(BulkPrintService bulkPrintService,
         HearingEnquiryFormPlaceholderService hearingEnquiryFormPlaceholderService, CoverLetterService coverLetterService,
         DocmosisTemplateConfig docmosisTemplateConfig,
