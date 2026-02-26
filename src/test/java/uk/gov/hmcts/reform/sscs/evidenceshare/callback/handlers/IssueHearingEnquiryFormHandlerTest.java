@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
-import static ch.qos.logback.classic.Level.ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -26,7 +25,6 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Named;
@@ -152,7 +150,7 @@ class IssueHearingEnquiryFormHandlerTest {
         when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(
             COVER_LETTER);
         when(coverLetterService.generateCoverSheet(anyString(), anyString(), any())).thenReturn(COVER_SHEET);
-        when(bulkPrintService.buildBundledLetter(anyList())).thenReturn(Optional.of(BUNDLED_LETTER));
+        when(bulkPrintService.buildBundledLetter(anyList())).thenReturn(BUNDLED_LETTER);
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(caseData, READY_TO_LIST,
             ISSUE_HEARING_ENQUIRY_FORM);
 
@@ -191,7 +189,7 @@ class IssueHearingEnquiryFormHandlerTest {
         when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(
             COVER_LETTER);
         when(coverLetterService.generateCoverSheet(anyString(), anyString(), any())).thenReturn(COVER_SHEET);
-        when(bulkPrintService.buildBundledLetter(anyList())).thenReturn(Optional.of(BUNDLED_LETTER));
+        when(bulkPrintService.buildBundledLetter(anyList())).thenReturn(BUNDLED_LETTER);
 
         Callback<SscsCaseData> callback = buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_HEARING_ENQUIRY_FORM);
         handler.handle(SUBMITTED, callback);
@@ -247,13 +245,11 @@ class IssueHearingEnquiryFormHandlerTest {
         when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(
             COVER_LETTER);
         when(coverLetterService.generateCoverSheet(anyString(), anyString(), any())).thenReturn(COVER_SHEET);
-        when(bulkPrintService.buildBundledLetter(anyList())).thenReturn(Optional.empty());
+        when(bulkPrintService.buildBundledLetter(anyList())).thenThrow(new BulkPrintException("Failed to merge documents"));
 
         Callback<SscsCaseData> callback = buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_HEARING_ENQUIRY_FORM);
 
-        assertThatThrownBy(() -> handler.handle(SUBMITTED, callback)).isInstanceOf(BulkPrintException.class)
-            .hasMessageContaining("case id: 1");
-        logCapture.assertLogContains("Failed to bundle documents for hearing enquiry form, case id: 1", ERROR);
+        assertThatThrownBy(() -> handler.handle(SUBMITTED, callback)).isInstanceOf(BulkPrintException.class);
     }
 
     @SuppressWarnings("unchecked")

@@ -130,13 +130,14 @@ public class BulkPrintService implements PrintService {
         return letter;
     }
 
-    public Optional<byte[]> buildBundledLetter(List<byte[]> documents) {
+    public byte[] buildBundledLetter(List<byte[]> documents) {
         if (isEmpty(documents)) {
-            return Optional.empty();
+            log.error("Failed to merge documents: document list is empty");
+            throw new BulkPrintException("Failed to merge documents: document list is empty");
         }
 
         if (documents.size() == 1) {
-            return Optional.of(documents.getFirst());
+            return documents.getFirst();
         }
 
         try (PDDocument bundledLetter = Loader.loadPDF(documents.getFirst())) {
@@ -150,10 +151,10 @@ public class BulkPrintService implements PrintService {
             }
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
             bundledLetter.save(baos);
-            return Optional.of(baos.toByteArray());
+            return baos.toByteArray();
         } catch (IOException e) {
-            log.info("Failed to merge documents with exception {}", e.getMessage());
-            return Optional.empty();
+            log.error("Failed to merge documents with exception {}", e.getMessage());
+            throw new BulkPrintException("Failed to merge documents with exception " + e.getMessage(), e);
         }
     }
 

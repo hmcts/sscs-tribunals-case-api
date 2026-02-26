@@ -354,69 +354,66 @@ class BulkPrintServiceTest {
 
     @ParameterizedTest
     @NullAndEmptySource
-    void buildBundledLetter_nullList_returnsEmptyOptional(List<byte[]> documents) {
-        var result = bulkPrintService.buildBundledLetter(documents);
-
-        assertThat(result).isEmpty();
+    void buildBundledLetter_nullList_throwsBulkPrintException(List<byte[]> documents) {
+        assertThatThrownBy(() -> bulkPrintService.buildBundledLetter(documents))
+            .isInstanceOf(BulkPrintException.class);
     }
 
     @Test
     void buildBundledLetter_singleDocument_returnsSameDocument() throws IOException {
-        byte[] singleDocument = createSinglePagePdf();
+        final byte[] singleDocument = createSinglePagePdf();
 
-        var result = bulkPrintService.buildBundledLetter(List.of(singleDocument));
+        final byte[] result = bulkPrintService.buildBundledLetter(List.of(singleDocument));
 
-        assertThat(result).contains(singleDocument);
+        assertThat(result).isEqualTo(singleDocument);
     }
 
     @Test
     void buildBundledLetter_multipleDocuments_mergesIntoSinglePdf() throws IOException {
-        byte[] firstDocument = createSinglePagePdf();
-        byte[] secondDocument = createSinglePagePdf();
+        final byte[] firstDocument = createSinglePagePdf();
+        final byte[] secondDocument = createSinglePagePdf();
 
-        var result = bulkPrintService.buildBundledLetter(List.of(firstDocument, secondDocument));
+        final byte[] result = bulkPrintService.buildBundledLetter(List.of(firstDocument, secondDocument));
 
-        assertThat(result).isPresent();
-        try (PDDocument merged = Loader.loadPDF(result.get())) {
+        assertThat(result).isNotNull();
+        try (PDDocument merged = Loader.loadPDF(result)) {
             assertThat(merged.getNumberOfPages()).isEqualTo(2);
         }
     }
 
     @Test
     void buildBundledLetter_listWithNullSubsequentDocument_skipNullAndMergesRest() throws IOException {
-        byte[] firstDocument = createSinglePagePdf();
-        byte[] thirdDocument = createSinglePagePdf();
+        final byte[] firstDocument = createSinglePagePdf();
+        final byte[] thirdDocument = createSinglePagePdf();
         List<byte[]> documents = new ArrayList<>();
         documents.add(firstDocument);
         documents.add(null);
         documents.add(thirdDocument);
 
-        var result = bulkPrintService.buildBundledLetter(documents);
+        final byte[] result = bulkPrintService.buildBundledLetter(documents);
 
-        assertThat(result).isPresent();
-        try (PDDocument merged = Loader.loadPDF(result.get())) {
+        assertThat(result).isNotNull();
+        try (PDDocument merged = Loader.loadPDF(result)) {
             assertThat(merged.getNumberOfPages()).isEqualTo(2);
         }
     }
 
     @Test
-    void buildBundledLetter_invalidFirstDocument_returnsEmptyOptional() {
-        byte[] firstDocument = "not a pdf".getBytes();
-        byte[] secondDocument = "also not a pdf".getBytes();
+    void buildBundledLetter_invalidFirstDocument_throwsBulkPrintException() {
+        final byte[] firstDocument = "not a pdf".getBytes();
+        final byte[] secondDocument = "also not a pdf".getBytes();
 
-        var result = bulkPrintService.buildBundledLetter(List.of(firstDocument, secondDocument));
-
-        assertThat(result).isEmpty();
+        assertThatThrownBy(() -> bulkPrintService.buildBundledLetter(List.of(firstDocument, secondDocument)))
+            .isInstanceOf(BulkPrintException.class);
     }
 
     @Test
-    void buildBundledLetter_validFirstDocumentWithInvalidSubsequentDocument_returnsEmptyOptional() throws IOException {
-        byte[] validFirst = createSinglePagePdf();
-        byte[] invalidSecond = "not a pdf".getBytes();
+    void buildBundledLetter_validFirstDocumentWithInvalidSubsequentDocument_throwsBulkPrintException() throws IOException {
+        final byte[] validFirst = createSinglePagePdf();
+        final byte[] invalidSecond = "not a pdf".getBytes();
 
-        var result = bulkPrintService.buildBundledLetter(List.of(validFirst, invalidSecond));
-
-        assertThat(result).isEmpty();
+        assertThatThrownBy(() -> bulkPrintService.buildBundledLetter(List.of(validFirst, invalidSecond)))
+            .isInstanceOf(BulkPrintException.class);
     }
 
     private byte[] createSinglePagePdf() throws IOException {

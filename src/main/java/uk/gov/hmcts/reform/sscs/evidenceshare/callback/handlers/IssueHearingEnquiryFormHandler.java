@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,7 +23,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.evidenceshare.config.DocmosisTemplateConfig;
-import uk.gov.hmcts.reform.sscs.evidenceshare.exception.BulkPrintException;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.CoverLetterService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.HearingEnquiryFormPlaceholderService;
@@ -138,14 +136,9 @@ public class IssueHearingEnquiryFormHandler implements CallbackHandler<SscsCaseD
 
         var coverSheet = coverLetterService.generateCoverSheet(getCoverSheetTemplateName(caseData), "coversheet", placeholders);
 
-        final Optional<byte[]> bundledLetterOpt = bulkPrintService.buildBundledLetter(List.of(coverLetter, hefForm, coverSheet));
-        if (bundledLetterOpt.isEmpty()) {
-            log.error("Failed to bundle documents for hearing enquiry form, case id: {}", caseData.getCcdCaseId());
-            throw new BulkPrintException(
-                "Failed to bundle documents for hearing enquiry form, case id: %s".formatted(caseData.getCcdCaseId()));
-        }
+        final byte[] bundledLetter = bulkPrintService.buildBundledLetter(List.of(coverLetter, hefForm, coverSheet));
 
-        final Pdf pdf = new Pdf(bundledLetterOpt.get(), letterName);
+        final Pdf pdf = new Pdf(bundledLetter, letterName);
         final List<Pdf> letter = new ArrayList<>();
         letter.add(pdf);
         letter.addAll(documents);
