@@ -116,4 +116,16 @@ public class AuthorisationServiceTest {
             .isInstanceOf(ForbiddenException.class)
             .hasMessage("Service test_service does not have permissions to request case creation");
     }
+
+    @Test
+    public void should_not_throw_any_exception_when_service_is_sscs() {
+        assertThatCode(() -> authorisationService.allowOnlySscs("SSCS")).doesNotThrowAnyException();
+    }
+
+    @Test
+    public void should_throw_unauthorized_exception_when_service_is_not_sscs() {
+        assertThatCode(() -> authorisationService.allowOnlySscs(CCD_DATA))
+                .isInstanceOf(ForbiddenException.class)
+                .hasMessage("Service " + CCD_DATA + " is not authorized for this action");
+    }
 }
