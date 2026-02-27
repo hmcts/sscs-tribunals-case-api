@@ -100,7 +100,7 @@ export class UploadResponse extends BaseStep {
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
 
     await this.homePage.navigateToTab('Summary');
-    await this.summaryTab.verifyPresenceOfText('Ready to list');
+    await this.summaryTab.verifyPresenceOfText('Response received');
     await this.summaryTab.verifyPresenceOfTitle(
       'PHE on this case: Under Review'
     );
