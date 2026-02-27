@@ -230,13 +230,13 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
         var otherParties = new ArrayList<String>();
 
-        for (int i = 0; i < names.size(); i++) {
-            if (count < MAX_NUM_OF_RESPONDENT) {
+        if (count < MAX_NUM_OF_RESPONDENT) {
+            for (int i = 0; i < names.size(); i++) {
                 otherParties.add(String.format("%s the %s respondent", names.get(i), respondents.get(i)));
-            } else {
-                var name = (i == count) ? names.get(i) + " respondents" : names.get(i);
-                otherParties.add(name);
             }
+        } else {
+            otherParties.addAll(names.subList(0, names.size() - 1));
+            otherParties.add(names.getLast() + " respondents");
         }
 
         return otherParties;

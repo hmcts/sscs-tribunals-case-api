@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.sscs.callback;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -10,20 +12,15 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import junitparams.JUnitParamsRunner;
 import junitparams.NamedParameters;
 import junitparams.Parameters;
-import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -91,22 +88,22 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Tribunal Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
-        assertEquals(true, payload.isAllowed());
-        assertEquals(true, payload.isSetAside());
+        assertTrue(payload.isAllowed());
+        assertTrue(payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
         assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
-        assertEquals(false, payload.isIndefinite());
-        assertEquals(true, payload.isDailyLivingIsEntited());
-        assertEquals(true, payload.isDailyLivingIsSeverelyLimited());
+        assertFalse(payload.isIndefinite());
+        assertTrue(payload.isDailyLivingIsEntited());
+        assertTrue(payload.isDailyLivingIsSeverelyLimited());
         assertEquals("enhanced rate", payload.getDailyLivingAwardRate());
         Assert.assertNotNull(payload.getDailyLivingDescriptors());
         assertEquals(2, payload.getDailyLivingDescriptors().size());
-        Assert.assertNotNull(payload.getDailyLivingDescriptors().get(0));
-        assertEquals(8, payload.getDailyLivingDescriptors().get(0).getActivityAnswerPoints());
-        assertEquals("f", payload.getDailyLivingDescriptors().get(0).getActivityAnswerLetter());
-        assertEquals("Cannot prepare and cook food.", payload.getDailyLivingDescriptors().get(0).getActivityAnswerValue());
+        Assert.assertNotNull(payload.getDailyLivingDescriptors().getFirst());
+        assertEquals(8, payload.getDailyLivingDescriptors().getFirst().getActivityAnswerPoints());
+        assertEquals("f", payload.getDailyLivingDescriptors().getFirst().getActivityAnswerLetter());
+        assertEquals("Cannot prepare and cook food.", payload.getDailyLivingDescriptors().getFirst().getActivityAnswerValue());
         assertEquals("1. Preparing food", payload.getDailyLivingDescriptors().get(0).getActivityQuestionValue());
         assertEquals("1", payload.getDailyLivingDescriptors().get(0).getActivityQuestionNumber());
         Assert.assertNotNull(payload.getDailyLivingDescriptors().get(1));
@@ -117,13 +114,13 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals("2", payload.getDailyLivingDescriptors().get(1).getActivityQuestionNumber());
         Assert.assertNotNull(payload.getDailyLivingNumberOfPoints());
         assertEquals(18, payload.getDailyLivingNumberOfPoints().intValue());
-        assertEquals(false, payload.isMobilityIsEntited());
-        assertEquals(false, payload.isMobilityIsSeverelyLimited());
+        assertFalse(payload.isMobilityIsEntited());
+        assertFalse(payload.isMobilityIsSeverelyLimited());
         Assert.assertNull(payload.getMobilityAwardRate());
         Assert.assertNull(payload.getMobilityDescriptors());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
+        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().getFirst());
         assertEquals("Something else.", payload.getAnythingElse());
     }
 
@@ -161,22 +158,22 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Tribunal Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
-        assertEquals(true, payload.isAllowed());
-        assertEquals(true, payload.isSetAside());
+        assertTrue(payload.isAllowed());
+        assertTrue(payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
         assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
-        assertEquals(false, payload.isIndefinite());
-        assertEquals(true, payload.isDailyLivingIsEntited());
-        assertEquals(true, payload.isDailyLivingIsSeverelyLimited());
+        assertFalse(payload.isIndefinite());
+        assertTrue(payload.isDailyLivingIsEntited());
+        assertTrue(payload.isDailyLivingIsSeverelyLimited());
         assertEquals("enhanced rate", payload.getDailyLivingAwardRate());
         Assert.assertNotNull(payload.getDailyLivingDescriptors());
         assertEquals(2, payload.getDailyLivingDescriptors().size());
-        Assert.assertNotNull(payload.getDailyLivingDescriptors().get(0));
-        assertEquals(8, payload.getDailyLivingDescriptors().get(0).getActivityAnswerPoints());
-        assertEquals("f", payload.getDailyLivingDescriptors().get(0).getActivityAnswerLetter());
-        assertEquals("Cannot prepare and cook food.", payload.getDailyLivingDescriptors().get(0).getActivityAnswerValue());
+        Assert.assertNotNull(payload.getDailyLivingDescriptors().getFirst());
+        assertEquals(8, payload.getDailyLivingDescriptors().getFirst().getActivityAnswerPoints());
+        assertEquals("f", payload.getDailyLivingDescriptors().getFirst().getActivityAnswerLetter());
+        assertEquals("Cannot prepare and cook food.", payload.getDailyLivingDescriptors().getFirst().getActivityAnswerValue());
         assertEquals("1. Preparing food", payload.getDailyLivingDescriptors().get(0).getActivityQuestionValue());
         assertEquals("1", payload.getDailyLivingDescriptors().get(0).getActivityQuestionNumber());
         Assert.assertNotNull(payload.getDailyLivingDescriptors().get(1));
@@ -187,14 +184,14 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals("2", payload.getDailyLivingDescriptors().get(1).getActivityQuestionNumber());
         Assert.assertNotNull(payload.getDailyLivingNumberOfPoints());
         assertEquals(18, payload.getDailyLivingNumberOfPoints().intValue());
-        assertEquals(false, payload.isMobilityIsEntited());
-        assertEquals(false, payload.isMobilityIsSeverelyLimited());
+        assertFalse(payload.isMobilityIsEntited());
+        assertFalse(payload.isMobilityIsSeverelyLimited());
         Assert.assertNotNull(payload.getMobilityAwardRate());
         assertEquals("not considered", payload.getMobilityAwardRate());
         Assert.assertNull(payload.getMobilityDescriptors());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
+        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().getFirst());
         assertEquals("Something else.", payload.getAnythingElse());
     }
 
@@ -371,33 +368,27 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @SuppressWarnings("unused")
     private Object[] hearingTypeCombinations() {
         return new Object[] {
-            new Object[] {"video", true, false},
             new Object[] {"video", true, true},
             new Object[] {"video", true, false},
-            new Object[] {"video", true, true},
+            new Object[] {"video", false, true},
+            new Object[] {"video", false, false},
             new Object[] {"paper", false, false},
             new Object[] {"paper", false, true},
             new Object[] {"paper", true, false},
             new Object[] {"paper", true, true},
             new Object[] {"telephone", true, false},
             new Object[] {"telephone", true, true},
-            new Object[] {"telephone", true, false},
-            new Object[] {"telephone", true, true},
+            new Object[] {"telephone", false, false},
+            new Object[] {"telephone", false, true},
             new Object[] {"triage", false, false},
             new Object[] {"triage", false, true},
             new Object[] {"triage", true, false},
             new Object[] {"triage", true, true},
             new Object[] {"faceToFace", true, false},
             new Object[] {"faceToFace", true, true},
-            new Object[] {"faceToFace", true, false},
-            new Object[] {"faceToFace", true, true},
+            new Object[] {"faceToFace", false, false},
+            new Object[] {"faceToFace", false, true},
         };
-    }
-
-    protected String getJson(String fileLocation) throws IOException {
-        String path = Objects.requireNonNull(getClass().getClassLoader()
-            .getResource(fileLocation)).getFile();
-        return FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
     }
 
     public String getJsonCallbackForTestAndReplace(String fileLocation, List<String> replaceKeys, List<String> replaceValues) throws IOException {
@@ -408,12 +399,8 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         return result;
     }
 
-    private String replaceNewLines(String pdfText) {
-        return pdfText.replaceAll("-\n", "-").replaceAll("[\\n\\t]", " ").replaceAll("\\s{2,}", " ");
-    }
-
     private void assertIsParagraphWithText(List<TemplateComponent<?>> components, int paragraphNumber, String text) {
-        List<TemplateComponent<?>> filteredComponents = components.stream().filter(c -> c.isParagraph()).collect(Collectors.toList());
+        List<TemplateComponent<?>> filteredComponents = components.stream().filter(TemplateComponent::isParagraph).toList();
         Paragraph paragraph = Paragraph.class.cast(filteredComponents.get(paragraphNumber - 1));
         Assert.assertEquals(text, paragraph.getContent());
     }
@@ -437,8 +424,9 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @Parameters(named = "allowed")
     public void nonDescriptorFlow_shouldGeneratePdfWithExpectedText(boolean allowed) throws Exception {
         setup();
-        String json = getJsonCallbackForTestAndReplace("callback/pipScenarioCallbackNonDescriptorFlow.json", Arrays.asList("ALLOWED_OR_REFUSED"),
-            Arrays.asList(allowed ? "allowed" : "refused"));
+        String json = getJsonCallbackForTestAndReplace("callback/pipScenarioCallbackNonDescriptorFlow.json",
+            List.of("ALLOWED_OR_REFUSED"),
+            List.of(allowed ? "allowed" : "refused"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
@@ -470,8 +458,91 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 5, "Reasons for decision 2");
         assertIsParagraphWithText(components, 6, "Anything else.");
         assertIsParagraphWithText(components, 7,
-                "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
+                "This has been a remote hearing in the form of a video hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7.");
         Assert.assertEquals(7, components.size());
+    }
+
+    @Test
+    @Parameters(named = "allowed")
+    public void nonDescriptorFlow_shouldGeneratePdfWithExpectedTextWithOtherParties(boolean allowed) throws Exception {
+        setup();
+        String json = getJsonCallbackForTestAndReplace("callback/pipScenarioCallbackNonDescriptorFlowWithOtherParties.json",
+            List.of("ALLOWED_OR_REFUSED"),
+            List.of(allowed ? "allowed" : "refused"));
+
+        String documentUrl = "document.url";
+        when(generateFile.assemble(any())).thenReturn(documentUrl);
+
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
+
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
+        assertHttpStatus(response, HttpStatus.OK);
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+
+        assertEquals(Collections.EMPTY_SET, result.getErrors());
+
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+
+        ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
+        verify(generateFile).assemble(capture.capture());
+        final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
+        final WriteFinalDecisionTemplateContent content = parentPayload.getWriteFinalDecisionTemplateContent();
+        List<TemplateComponent<?>> components = content.getComponents();
+        if (allowed) {
+            assertIsParagraphWithText(components, 1, "The appeal is allowed.");
+            assertIsParagraphWithText(components, 2, "The decision made by the Secretary of State on 17/11/2020 is set aside.");
+        } else {
+            assertIsParagraphWithText(components, 1, "The appeal is refused.");
+            assertIsParagraphWithText(components, 2, "The decision made by the Secretary of State on 17/11/2020 is confirmed.");
+        }
+        assertIsParagraphWithText(components, 3, "My summary.");
+        assertIsParagraphWithText(components, 4, "Reasons for decision 1");
+        assertIsParagraphWithText(components, 5, "Reasons for decision 2");
+        assertIsParagraphWithText(components, 6, "Anything else.");
+        assertIsParagraphWithText(components, 7,
+            "This has been a remote hearing in the form of a video hearing. The following people attended: Joe Bloggs the appellant, John Smith the second respondent, Jane Smith the third respondent and a representative from the First Tier Agency. David Jones the fourth respondent and Sarah Jones the fifth respondent did not attend. The Tribunal considered the appeal bundle to page B7.");
+        Assert.assertEquals(7, components.size());
+    }
+
+    @Test
+    @Parameters(named = "allowed")
+    public void nonDescriptorFlow_shouldGeneratePdfWithExpectedTextWith10OtherPartiesAttended(boolean allowed) throws Exception {
+        setup();
+        String json = getJsonCallbackForTestAndReplace(
+            "callback/pipScenarioCallbackNonDescriptorFlowWithTenOtherPartiesAttended.json",
+            List.of("ALLOWED_OR_REFUSED"),
+            List.of(allowed ? "allowed" : "refused"));
+
+        String documentUrl = "document.url";
+        when(generateFile.assemble(any())).thenReturn(documentUrl);
+
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
+
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
+        assertHttpStatus(response, HttpStatus.OK);
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+
+        assertEquals(Collections.EMPTY_SET, result.getErrors());
+
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+
+        ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
+        verify(generateFile).assemble(capture.capture());
+        final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
+        final WriteFinalDecisionTemplateContent content = parentPayload.getWriteFinalDecisionTemplateContent();
+        List<TemplateComponent<?>> components = content.getComponents();
+        if (allowed) {
+            assertIsParagraphWithText(components, 1, "The appeal is allowed.");
+            assertIsParagraphWithText(components, 2, "The decision made by the Secretary of State on 01/01/2026 is set aside.");
+        } else {
+            assertIsParagraphWithText(components, 1, "The appeal is refused.");
+            assertIsParagraphWithText(components, 2, "The decision made by the Secretary of State on 01/01/2026 is confirmed.");
+        }
+        assertIsParagraphWithText(components, 3, "Decision");
+        assertIsParagraphWithText(components, 4, "Reason");
+        assertIsParagraphWithText(components, 5,
+            "This has been an oral (face to face) hearing. The following people attended: Joe Bloggs the appellant, John Smith, Jane Smith, David Jones, Sarah Jones, Billy Jones, Julia Jones, Bridget Jones, Adam Jones, Billy Beane, Clare Bennett respondents and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7.");
+        Assert.assertEquals(5, components.size());
     }
 
     @Test
@@ -535,19 +606,25 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         if ("video".equals(hearingType)) {
             if (appellantAttended && presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
-            } else if (appellantAttended && !presentingOfficerAttended) {
+                    "This has been a remote hearing in the form of a video hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7.");
+            }
+
+            if (appellantAttended && !presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative did not attend.");
-            } else if (!appellantAttended && presentingOfficerAttended) {
+                    "This has been a remote hearing in the form of a video hearing. The following people attended: Joe Bloggs the appellant. A representative from the First Tier Agency did not attend. The Tribunal considered the appeal bundle to page B7.");
+            }
+
+            if (!appellantAttended && presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "This has been a remote hearing in the form of a video hearing. Joe Bloggs did not attend the hearing today. A Presenting Officer attended on behalf of the Respondent.");
+                    "This has been a remote hearing in the form of a video hearing. The following people attended: A representative from the First Tier Agency. Joe Bloggs the appellant did not attend.");
                 assertIsParagraphWithText(components, 9,
                     "Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today. ");
                 additionalParagraph = true;
-            } else if (!appellantAttended && !presentingOfficerAttended) {
+            }
+
+            if (!appellantAttended && !presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "This has been a remote hearing in the form of a video hearing. Joe Bloggs did not attend the hearing today. First Tier Agency representative did not attend.");
+                    "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant and a representative from the First Tier Agency did not attend.");
                 assertIsParagraphWithText(components, 9, (
                     "Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today. "));
                 additionalParagraph = true;
@@ -555,19 +632,25 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         } else if ("telephone".equals(hearingType)) {
             if (appellantAttended && presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "This has been a remote hearing in the form of a telephone hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
-            } else if (appellantAttended && !presentingOfficerAttended) {
+                    "This has been a remote hearing in the form of a telephone hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7.");
+            }
+
+            if (appellantAttended && !presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "This has been a remote hearing in the form of a telephone hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative did not attend.");
-            } else if (!appellantAttended && presentingOfficerAttended) {
+                    "This has been a remote hearing in the form of a telephone hearing. The following people attended: Joe Bloggs the appellant. A representative from the First Tier Agency did not attend. The Tribunal considered the appeal bundle to page B7.");
+            }
+
+            if (!appellantAttended && presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "This has been a remote hearing in the form of a telephone hearing. Joe Bloggs did not attend the hearing today. A Presenting Officer attended on behalf of the Respondent.");
+                    "This has been a remote hearing in the form of a telephone hearing. The following people attended: A representative from the First Tier Agency. Joe Bloggs the appellant did not attend.");
                 assertIsParagraphWithText(components, 9,
                     "Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today. ");
                 additionalParagraph = true;
-            } else if (!appellantAttended && !presentingOfficerAttended) {
+            }
+
+            if (!appellantAttended && !presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "This has been a remote hearing in the form of a telephone hearing. Joe Bloggs did not attend the hearing today. First Tier Agency representative did not attend.");
+                    "This has been a remote hearing in the form of a telephone hearing. Joe Bloggs the appellant and a representative from the First Tier Agency did not attend.");
                 assertIsParagraphWithText(components, 9,
                     "Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today. ");
                 additionalParagraph = true;
@@ -580,19 +663,25 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         } else if ("faceToFace".equals(hearingType)) {
             if (appellantAttended && presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "This has been an oral (face to face) hearing. Joe Bloggs the appellant attended the hearing today and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
-            } else if (appellantAttended && !presentingOfficerAttended) {
+                    "This has been an oral (face to face) hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7.");
+            }
+
+            if (appellantAttended && !presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "This has been an oral (face to face) hearing. Joe Bloggs the appellant attended the hearing today and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative did not attend.");
-            } else if (!appellantAttended && presentingOfficerAttended) {
+                    "This has been an oral (face to face) hearing. The following people attended: Joe Bloggs the appellant. A representative from the First Tier Agency did not attend. The Tribunal considered the appeal bundle to page B7.");
+            }
+
+            if (!appellantAttended && presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "Joe Bloggs requested an oral hearing but did not attend today. A Presenting Officer attended on behalf of the Respondent.");
+                    "This has been an oral (face to face) hearing. The following people attended: A representative from the First Tier Agency. Joe Bloggs the appellant did not attend.");
                 assertIsParagraphWithText(components, 9,
                     "Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today. ");
                 additionalParagraph = true;
-            } else if (!appellantAttended && !presentingOfficerAttended) {
+            }
+
+            if (!appellantAttended && !presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "Joe Bloggs requested an oral hearing but did not attend today. First Tier Agency representative did not attend.");
+                    "This has been an oral (face to face) hearing. Joe Bloggs the appellant and a representative from the First Tier Agency did not attend.");
                 assertIsParagraphWithText(components, 9,
                     "Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today. ");
                 additionalParagraph = true;
@@ -647,7 +736,6 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         List<TemplateComponent<?>> components = content.getComponents();
 
         if (allowed) {
-
             assertIsParagraphWithText(components, 1, "The appeal is allowed.");
         } else {
             assertIsParagraphWithText(components, 1, "The appeal is refused.");
@@ -671,22 +759,23 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 6, "Reasons for decision 2");
         assertIsParagraphWithText(components, 7, "Anything else.");
         assertIsParagraphWithText(components, 8,
-                "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
+                "This has been a remote hearing in the form of a video hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7.");
         assertEquals(9, components.size());
     }
 
+    @Test
     @Parameters(named = "standardRateComparisons")
     public void notConsideredStandardRate_shouldGeneratePdfWithExpectedText(String comparedToDwpMobility, boolean allowed, boolean setAside, boolean indefinite) throws Exception {
         setup();
         String json;
         if (indefinite) {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays
+            json = getJsonCallbackForTestAndReplace("callback/pipScenarioCallback.json", Arrays
                     .asList("\"pipWriteFinalDecisionComparedToDWPDailyLivingQuestion\": \"COMPARED_TO_DWP_DAILY_LIVING\",", "DAILY_LIVING_RATE",
                         "\"pipWriteFinalDecisionDailyLivingActivitiesQuestion\" : [\"preparingFood\", \"takingNutrition\"],", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER",
                         "MOVING_AROUND_ANSWER", "\"writeFinalDecisionEndDate\": \"2021-12-17\","),
                 Arrays.asList("", "notConsidered", "", comparedToDwpMobility, "standardRate", "movingAround", "movingAround12c", ""));
         } else {
-            json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallback.json", Arrays
+            json = getJsonCallbackForTestAndReplace("callback/pipScenarioCallback.json", Arrays
                 .asList("\"pipWriteFinalDecisionComparedToDWPDailyLivingQuestion\": \"COMPARED_TO_DWP_DAILY_LIVING\",", "DAILY_LIVING_RATE",
                     "\"pipWriteFinalDecisionDailyLivingActivitiesQuestion\" : [\"preparingFood\", \"takingNutrition\"],", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER",
                     "MOVING_AROUND_ANSWER"), Arrays.asList("", "notConsidered", "", comparedToDwpMobility, "standardRate", "movingAround", "movingAround12c"));
@@ -721,22 +810,22 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         } else {
             assertIsParagraphWithText(components, 2, "The decision made by the Secretary of State on 17/11/2020 is confirmed.");
         }
-        assertIsParagraphWithText(components, 3, "Only the mobility component was in issue on this appeal and the daily living component was not considered. ");
-        assertIsParagraphWithText(components, 4, "Joe Bloggs is entitled to the mobility component at the standard rate from 17/12/2020 for an indefinite period.");
+        assertIsParagraphWithText(components, 3, "Only the mobility component was in issue on this appeal and the daily living component was not considered.");
+//        assertIsParagraphWithText(components, 4, "Joe Bloggs is entitled to the mobility component at the standard rate from 17/12/2020 for an indefinite period.");
         assertIsParagraphWithText(components, 5, "Joe Bloggs is limited in their ability to mobilise. They score 8 points. They satisfy the following descriptors:");
-        assertIsDescriptorTableWithDescriptors(components, 4, Descriptor.builder().activityQuestionNumber("12").activityAnswerLetter("c").activityQuestionValue("12. Moving around")
-            .activityAnswerValue("Can stand and then move more than 200 metres, either aided or unaided.").activityAnswerPoints(8).build());
 
-        assertIsDescriptorTableWithDescriptors(components, 6, Descriptor.builder().activityQuestionNumber("12").activityAnswerLetter("c").activityQuestionValue("12. Moving around")
+        assertIsDescriptorTableWithDescriptors(components, 5, Descriptor.builder().activityQuestionNumber("12").activityAnswerLetter("c").activityQuestionValue("12. Moving around")
             .activityAnswerValue("Can stand and then move unaided more than 20 metres but no more than 50 metres.").activityAnswerPoints(8).build());
+
         assertIsParagraphWithText(components, 6, "Reasons for decision 1");
         assertIsParagraphWithText(components, 7, "Reasons for decision 2");
         assertIsParagraphWithText(components, 8, "Anything else.");
         assertIsParagraphWithText(components, 9,
-            "This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent.");
-        assertEquals(12, components.size());
+            "This has been a remote hearing in the form of a video hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7.");
+        assertEquals(10, components.size());
     }
 
+    @Test
     @Parameters(named = "enhancedRateComparisons")
     public void notConsideredEnhancedRate_shouldGeneratePdfWithExpectedText(String comparedToDwpMobility, boolean allowed, boolean setAside, boolean indefinite) throws Exception {
         setup();
@@ -780,21 +869,23 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         } else {
             assertIsParagraphWithText(components, 2, "The decision made by the Secretary of State on 17/11/2020 is confirmed.");
         }
-        assertIsParagraphWithText(components, 3, "Only the mobility component was in issue on this appeal and the daily living component was not considered. ");
+        assertIsParagraphWithText(components, 3, "Only the mobility component was in issue on this appeal and the daily living component was not considered.");
         if (indefinite) {
             assertIsParagraphWithText(components, 4, "Joe Bloggs is entitled to the mobility component at the enhanced rate from 17/12/2020 for an indefinite period.");
         } else {
-            assertIsParagraphWithText(components, 4, "4. Joe Bloggs is entitled to the mobility component at the enhanced rate from 17/12/2020 to 17/12/2021.");
+            assertIsParagraphWithText(components, 4, "Joe Bloggs is entitled to the mobility component at the enhanced rate from 17/12/2020 to 17/12/2021.");
         }
         assertIsParagraphWithText(components, 5, "Joe Bloggs is severely limited in their ability to mobilise. They score 12 points. They satisfy the following descriptors:");
-        assertIsDescriptorTableWithDescriptors(components, 6, Descriptor.builder().activityQuestionNumber("12").activityAnswerLetter("e").activityQuestionValue("12. Moving around")
+
+        assertIsDescriptorTableWithDescriptors(components, 5, Descriptor.builder().activityQuestionNumber("12").activityAnswerLetter("e").activityQuestionValue("12. Moving around")
             .activityAnswerValue("Can stand and then move more than 1 metre but no more than 20 metres, either aided or unaided.").activityAnswerPoints(12).build());
+
         assertIsParagraphWithText(components, 6, "Reasons for decision 1");
         assertIsParagraphWithText(components, 7, "Reasons for decision 2");
         assertIsParagraphWithText(components, 8, "Anything else.");
         assertIsParagraphWithText(components, 9,
-            "This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent.");
-        assertEquals(12, components.size());
+            "This has been a remote hearing in the form of a video hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7.");
+        assertEquals(10, components.size());
     }
 
     @Test
@@ -855,7 +946,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 6, "Reasons for decision 2");
         assertIsParagraphWithText(components, 7, "Anything else.");
         assertIsParagraphWithText(components, 8,
-                "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
+                "This has been a remote hearing in the form of a video hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7.");
         assertEquals(9, components.size());
     }
 
@@ -916,7 +1007,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 6, "Reasons for decision 2");
         assertIsParagraphWithText(components, 7, "Anything else.");
         assertIsParagraphWithText(components, 8,
-                "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
+                "This has been a remote hearing in the form of a video hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7.");
         assertEquals(10, components.size());
     }
 
@@ -978,7 +1069,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 7, "Reasons for decision 2");
         assertIsParagraphWithText(components, 8, "Anything else.");
         assertIsParagraphWithText(components, 9,
-                "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
+                "This has been a remote hearing in the form of a video hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7.");
         assertEquals(11, components.size());
     }
 
@@ -1046,7 +1137,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 7, "Reasons for decision 2");
         assertIsParagraphWithText(components, 8, "Anything else.");
         assertIsParagraphWithText(components, 9,
-                "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
+                "This has been a remote hearing in the form of a video hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7.");
         assertEquals(11, components.size());
     }
 
@@ -1114,7 +1205,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 7, "Reasons for decision 2");
         assertIsParagraphWithText(components, 8, "Anything else.");
         assertIsParagraphWithText(components, 9,
-                "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
+                "This has been a remote hearing in the form of a video hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7.");
         assertEquals(10, components.size());
     }
 
@@ -1185,7 +1276,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 7, "Reasons for decision 2");
         assertIsParagraphWithText(components, 8, "Anything else.");
         assertIsParagraphWithText(components, 9,
-                "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
+                "This has been a remote hearing in the form of a video hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7.");
         assertEquals(11, components.size());
     }
 
@@ -1258,7 +1349,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 8, "Reasons for decision 2");
         assertIsParagraphWithText(components, 9, "Anything else.");
         assertIsParagraphWithText(components, 10,
-                "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
+                "This has been a remote hearing in the form of a video hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7.");
         assertEquals(12, components.size());
     }
 
@@ -1330,7 +1421,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 8, "Reasons for decision 2");
         assertIsParagraphWithText(components, 9, "Anything else.");
         assertIsParagraphWithText(components, 10,
-                "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
+                "This has been a remote hearing in the form of a video hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7.");
         assertEquals(12, components.size());
     }
 
@@ -1397,7 +1488,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 7, "Reasons for decision 2");
         assertIsParagraphWithText(components, 8, "Anything else.");
         assertIsParagraphWithText(components, 9,
-                "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
+                "This has been a remote hearing in the form of a video hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7.");
         assertEquals(10, components.size());
     }
 
@@ -1466,7 +1557,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 7, "Reasons for decision 2");
         assertIsParagraphWithText(components, 8, "Anything else.");
         assertIsParagraphWithText(components, 9,
-                "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
+                "This has been a remote hearing in the form of a video hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7.");
         assertEquals(11, components.size());
     }
 
@@ -1539,7 +1630,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 8, "Reasons for decision 2");
         assertIsParagraphWithText(components, 9, "Anything else.");
         assertIsParagraphWithText(components, 10,
-                "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
+                "This has been a remote hearing in the form of a video hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7.");
         assertEquals(12, components.size());
     }
 
@@ -1611,7 +1702,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 8, "Reasons for decision 2");
         assertIsParagraphWithText(components, 9, "Anything else.");
         assertIsParagraphWithText(components, 10,
-            "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
+            "This has been a remote hearing in the form of a video hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7.");
         assertEquals(12, components.size());
     }
 

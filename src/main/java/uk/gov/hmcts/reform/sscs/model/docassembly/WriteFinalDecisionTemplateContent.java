@@ -174,9 +174,9 @@ public abstract class WriteFinalDecisionTemplateContent {
         }
     }
 
-    public void addDescriptorTableIfPopulated(DescriptorTable desciptorTable) {
-        if (desciptorTable.getContent() != null && !desciptorTable.getContent().isEmpty()) {
-            this.components.add(desciptorTable);
+    public void addDescriptorTableIfPopulated(DescriptorTable descriptorTable) {
+        if (descriptorTable.getContent() != null && !descriptorTable.getContent().isEmpty()) {
+            this.components.add(descriptorTable);
         }
     }
 
@@ -278,10 +278,6 @@ public abstract class WriteFinalDecisionTemplateContent {
             : "A representative from the First Tier Agency";
     }
 
-    private static String getPresentingOfficerAttendance(boolean presentingOfficerAttended) {
-        return presentingOfficerAttended ? "First Tier Agency representative attended on behalf of the Respondent." : "First Tier Agency representative did not attend.";
-    }
-
     protected String getConsideredParagraph(String bundlePage, String appointeName) {
         return "Having considered the appeal bundle to page " + bundlePage + " and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify " + appointeName + " of the hearing and that it is in the interests of justice to proceed today. ";
     }
@@ -303,8 +299,8 @@ public abstract class WriteFinalDecisionTemplateContent {
         }
 
         if (isAppointeeOnCase) {
-            return getSentenceAppointeeOnCaseAppointeeNotAttended(hearingType, appointeeName, presentingOfficerAttended,
-                bundlePage);
+            return getSentenceAppointeeOnCaseAppointeeNotAttended(hearingType, appellantName, appointeeName, presentingOfficerAttended,
+                bundlePage, otherPartyNamesAttended, otherPartyNamesNotAttend);
         }
 
         if (appellantAttended) {
@@ -351,26 +347,42 @@ public abstract class WriteFinalDecisionTemplateContent {
     }
 
     private List<String> getSentenceAppointeeOnCaseAppointeeNotAttended(String hearingType,
+                                                                        String appellantName,
                                                                         String appointeeName,
                                                                         boolean presentingOfficerAttended,
-                                                                        String bundlePage) {
+                                                                        String bundlePage,
+                                                                        List<String> otherPartyNamesAttended,
+                                                                        List<String> otherPartyNamesNotAttend) {
         if (equalsIgnoreCase(FACETOFACE, hearingType)) {
             return asList(
                 getFaceToFaceTypeSentences()
-                    + getPresentingOfficerAttendance(presentingOfficerAttended),
+                    + getAppellantAndOtherPartySentences(
+                    true,
+                    false,
+                    appellantName,
+                    appointeeName,
+                    presentingOfficerAttended,
+                    bundlePage, otherPartyNamesAttended, otherPartyNamesNotAttend),
                 getConsideredParagraph(bundlePage, appointeeName));
         } else if (equalsIgnoreCase(TRIAGE, hearingType)) {
             return singletonList(getTriageConsideredParagraph(bundlePage));
         } else {
             return asList(
                 getNonFaceToFaceTypeSentences(hearingType)
-                    + getPresentingOfficerAttendance(presentingOfficerAttended),
+                    + getAppellantAndOtherPartySentences(
+                    true,
+                    false,
+                    appellantName,
+                    appointeeName,
+                    presentingOfficerAttended,
+                    bundlePage, otherPartyNamesAttended, otherPartyNamesNotAttend),
                 getConsideredParagraph(bundlePage, appointeeName));
         }
     }
 
     private List<String> getSentenceAppointeeNotOnCaseAppellantAttended(String hearingType,
-                                                                        String appellantName, String appointeeName,
+                                                                        String appellantName,
+                                                                        String appointeeName,
                                                                         boolean presentingOfficerAttended,
                                                                         String bundlePage,
                                                                         List<String> otherPartyNamesAttended,

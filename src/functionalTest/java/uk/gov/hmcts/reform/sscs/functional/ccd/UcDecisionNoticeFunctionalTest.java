@@ -262,7 +262,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("4. Reasons for decision 1"));
             assertThat(pdfTextWithoutNewLines, containsString("5. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("6. Anything else."));
-            assertThat(pdfTextWithoutNewLines, containsString("7. This has been a remote hearing in the form of a telephone hearing. The following people attended: Joe Bloggs the appellant, and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7."));
+            assertThat(pdfTextWithoutNewLines, containsString("7. This has been a remote hearing in the form of a telephone hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7."));
             assertThat(pdfTextWithoutNewLines, not(containsString("8.")));
         }
     }
@@ -280,7 +280,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("4. Reasons for decision 1"));
             assertThat(pdfTextWithoutNewLines, containsString("5. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("6. Anything else."));
-            assertThat(pdfTextWithoutNewLines, containsString("7. This has been a remote hearing in the form of a telephone hearing. The following people attended: Joe Bloggs the appellant, and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7."));
+            assertThat(pdfTextWithoutNewLines, containsString("7. This has been a remote hearing in the form of a telephone hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7."));
             assertThat(pdfTextWithoutNewLines, not(containsString("8.")));
         }
     }
