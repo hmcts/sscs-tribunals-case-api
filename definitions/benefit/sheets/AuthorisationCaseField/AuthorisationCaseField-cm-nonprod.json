@@ -6,5 +6,7 @@
   {"LiveFrom": "15/01/2026", "CaseTypeID": "Benefit", "CaseFieldID": "addOtherPartyCommunicationLabel", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
   {"LiveFrom": "15/01/2026", "CaseTypeID": "Benefit", "CaseFieldID": "addOtherPartyCommunicationLabel", "AccessProfile": "caseworker-sscs-dwpresponsewriter", "CRUD": "CRUD"},
   {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "CaseFieldID": "confidentialityTab", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
-  {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "CaseFieldID": "confidentialityTabLabel", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"}
+  {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "CaseFieldID": "confidentialityTabLabel", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "CaseFieldID": "enableAddOtherPartyData", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
+  {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "CaseFieldID": "enableAddOtherPartyData", "AccessProfile": "caseworker-sscs-dwpresponsewriter", "CRUD": "CRUD"}
 ]

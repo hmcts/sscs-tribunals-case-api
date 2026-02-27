@@ -6,6 +6,7 @@
     "Name": "Request other party data",
     "PreConditionState(s)": "validAppeal",
     "PostConditionState": "awaitOtherPartyData",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "SecurityClassification": "Public",
     "EventEnablingCondition": "appeal.benefitType.code=\"childSupport\"",
     "Publish": "N"
@@ -16,11 +17,12 @@
     "ID": "addOtherPartyData",
     "Name": "Add other party data",
     "Description": "Add other party data",
-    "DisplayOrder": 1645,
-    "PreConditionState(s)": "awaitOtherPartyData",
+    "DisplayOrder": 130,
+    "PreConditionState(s)": "*",
     "PostConditionState": "awaitConfidentialityRequirements",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "SecurityClassification": "Public",
-    "EventEnablingCondition": "appeal.benefitType.code=\"childSupport\"",
+    "EventEnablingCondition": "enableAddOtherPartyData=\"Yes\"",
     "Publish": "N"
   }
 ]
