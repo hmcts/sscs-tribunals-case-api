@@ -280,7 +280,7 @@ feature:
     cm-other-party-confidentiality:
         enabled: ${CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED:false}
     uc-other-party-confidentiality:
-      enabled: ${UC_OTHER_PARTY_CONFIDENTIALITY_ENABLED:false}
+        enabled: ${UC_OTHER_PARTY_CONFIDENTIALITY_ENABLED:false}
 
 idam:
     api:
