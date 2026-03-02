@@ -42,9 +42,6 @@ public class CcdGetCaseCallbackController {
 
         authorisationService.authorise(serviceAuthHeader);
 
-        log.info("Submitted event callback for`{}` event and Case ID `{}`", callback.getEvent(),
-            callback.getCaseDetails().getId());
-
         return ok(getCaseCallbackService.buildResponse(callback));
     }
 }

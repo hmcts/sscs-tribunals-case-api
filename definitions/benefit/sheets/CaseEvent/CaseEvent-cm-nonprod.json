@@ -20,7 +20,7 @@
     "PreConditionState(s)": "*",
     "PostConditionState": "awaitConfidentialityRequirements",
     "SecurityClassification": "Public",
-    "EventEnablingCondition": "[INJECTED_DATA.ENABLE_ADD_OTHER_PARTY_DATA] = \"y\"",
+    "EventEnablingCondition": "[INJECTED_DATA.ENABLE_ADD_OTHER_PARTY_DATA] = \"Yes\"",
     "Publish": "N"
   }
 ]
