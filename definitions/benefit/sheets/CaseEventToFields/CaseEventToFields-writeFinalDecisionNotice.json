@@ -321,6 +321,18 @@
     "FieldShowCondition" : "wcaAppeal=\"Yes\"",
     "ShowSummaryChangeOption": "Y",
     "RetainHiddenValue": "Yes"
+  },  {
+    "CaseEventID": "writeFinalDecision",
+    "CaseFieldID": "writeFinalDecisionSevereYesNo",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "02/03/2026",
+    "PageDisplayOrder": 8,
+    "PageFieldDisplayOrder": 4,
+    "PageID": "workCapabilityAssessment",
+    "FieldShowCondition" : "appeal.benefitType.code=\"ESA\" OR appeal.benefitType.code=\"UC\"  AND wcaAppeal=\"Yes\"",
+    "ShowSummaryChangeOption": "Y",
+    "RetainHiddenValue": "Yes"
   },
   {
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=workCapabilityAssessment",
