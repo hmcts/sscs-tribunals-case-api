@@ -805,13 +805,21 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         } else {
             assertIsParagraphWithText(components, 1, "The appeal is refused.");
         }
+
         if (setAside) {
             assertIsParagraphWithText(components, 2, "The decision made by the Secretary of State on 17/11/2020 is set aside.");
         } else {
             assertIsParagraphWithText(components, 2, "The decision made by the Secretary of State on 17/11/2020 is confirmed.");
         }
+
         assertIsParagraphWithText(components, 3, "Only the mobility component was in issue on this appeal and the daily living component was not considered.");
-//        assertIsParagraphWithText(components, 4, "Joe Bloggs is entitled to the mobility component at the standard rate from 17/12/2020 for an indefinite period.");
+
+        if (indefinite) {
+            assertIsParagraphWithText(components, 4, "Joe Bloggs is entitled to the mobility component at the standard rate from 17/12/2020 for an indefinite period.");
+        } else {
+            assertIsParagraphWithText(components, 4, "Joe Bloggs is entitled to the mobility component at the standard rate from 17/12/2020 to 17/12/2021.");
+        }
+
         assertIsParagraphWithText(components, 5, "Joe Bloggs is limited in their ability to mobilise. They score 8 points. They satisfy the following descriptors:");
 
         assertIsDescriptorTableWithDescriptors(components, 5, Descriptor.builder().activityQuestionNumber("12").activityAnswerLetter("c").activityQuestionValue("12. Moving around")
