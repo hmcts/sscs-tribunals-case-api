@@ -506,7 +506,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
     @Test
     @Parameters(named = "allowed")
-    public void nonDescriptorFlow_shouldGeneratePdfWithExpectedTextWith10OtherPartiesAttended(boolean allowed) throws Exception {
+    public void nonDescriptorFlow_shouldGeneratePdfWithExpectedTextWithTenOtherPartiesAttended(boolean allowed) throws Exception {
         setup();
         String json = getJsonCallbackForTestAndReplace(
             "callback/pipScenarioCallbackNonDescriptorFlowWithTenOtherPartiesAttended.json",
@@ -542,6 +542,47 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 4, "Reason");
         assertIsParagraphWithText(components, 5,
             "This has been an oral (face to face) hearing. The following people attended: Joe Bloggs the appellant, John Smith, Jane Smith, David Jones, Sarah Jones, Billy Jones, Julia Jones, Bridget Jones, Adam Jones, Billy Beane, Clare Bennett respondents and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7.");
+        Assert.assertEquals(5, components.size());
+    }
+
+    @Test
+    @Parameters(named = "allowed")
+    public void nonDescriptorFlow_shouldGeneratePdfWithExpectedTextWithTenOtherPartiesDidNotAttend(boolean allowed) throws Exception {
+        setup();
+        String json = getJsonCallbackForTestAndReplace(
+            "callback/pipScenarioCallbackNonDescriptorFlowWithTenOtherPartiesDidNotAttend.json",
+            List.of("ALLOWED_OR_REFUSED"),
+            List.of(allowed ? "allowed" : "refused"));
+
+        String documentUrl = "document.url";
+        when(generateFile.assemble(any())).thenReturn(documentUrl);
+
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
+
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
+        assertHttpStatus(response, HttpStatus.OK);
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+
+        assertEquals(Collections.EMPTY_SET, result.getErrors());
+
+        assertEquals(documentUrl, result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+
+        ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
+        verify(generateFile).assemble(capture.capture());
+        final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
+        final WriteFinalDecisionTemplateContent content = parentPayload.getWriteFinalDecisionTemplateContent();
+        List<TemplateComponent<?>> components = content.getComponents();
+        if (allowed) {
+            assertIsParagraphWithText(components, 1, "The appeal is allowed.");
+            assertIsParagraphWithText(components, 2, "The decision made by the Secretary of State on 01/01/2026 is set aside.");
+        } else {
+            assertIsParagraphWithText(components, 1, "The appeal is refused.");
+            assertIsParagraphWithText(components, 2, "The decision made by the Secretary of State on 01/01/2026 is confirmed.");
+        }
+        assertIsParagraphWithText(components, 3, "Decision");
+        assertIsParagraphWithText(components, 4, "Reason");
+        assertIsParagraphWithText(components, 5,
+            "This has been an oral (face to face) hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. John Smith, Jane Smith, David Jones, Sarah Jones, Billy Jones, Julia Jones, Bridget Jones, Adam Jones, Billy Beane and Clare Bennett respondents did not attend. The Tribunal considered the appeal bundle to page B7.");
         Assert.assertEquals(5, components.size());
     }
 
