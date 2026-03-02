@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.functional.ccd;
 import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.PIP;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.WITH_DWP;
 import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTHORISATION_HEADER;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -66,6 +68,7 @@ class CcdGetCaseCallbackControllerFunctionalTest {
     }
 
     @Test
+    @EnabledIfEnvironmentVariable(named = "UC_OTHER_PARTY_CONFIDENTIALITY_ENABLED", matches = "true")
     void shouldReturn200WithMetadataFieldInjectedWhenCaseIsUcInWithDwpState() {
         RestAssured.given().contentType(ContentType.JSON)
             .header(SERVICE_AUTHORISATION_HEADER, idamTokens.getServiceAuthorization()).body(buildCallbackJson(UC.getShortName()))
@@ -76,7 +79,7 @@ class CcdGetCaseCallbackControllerFunctionalTest {
 
     @Test
     void shouldReturn400WhenServiceAuthHeaderIsMissing() {
-        RestAssured.given().contentType(ContentType.JSON).body(buildCallbackJson("PIP")).when().post(GET_CASE_PATH).then()
+        RestAssured.given().contentType(ContentType.JSON).body(buildCallbackJson(PIP.getShortName())).when().post(GET_CASE_PATH).then()
             .statusCode(HttpStatus.BAD_REQUEST.value());
     }
 
@@ -91,7 +94,7 @@ class CcdGetCaseCallbackControllerFunctionalTest {
     private String buildCallbackJson(final String benefitCode) {
         final SscsCaseData caseData = SscsCaseData.builder()
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefitCode).build()).build()).build();
-        final CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(1234L, "SSCS", State.WITH_DWP, caseData,
+        final CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(1234L, "SSCS", WITH_DWP, caseData,
             LocalDateTime.now(), "Benefit");
         final Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.ACTION_FURTHER_EVIDENCE,
             false);
