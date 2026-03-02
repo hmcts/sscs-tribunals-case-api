@@ -2269,7 +2269,6 @@
     "DisplayOrder": 1500,
     "PreConditionState(s)": "*",
     "PostConditionState": "withDwp",
-    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
     "Publish": "${CCD_DEF_PUBLISH}"
@@ -2987,7 +2986,6 @@
     "Description": "Create a test case in withDwp state",
     "DisplayOrder": 9970,
     "PostConditionState": "withDwp",
-    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
     "Publish": "N"

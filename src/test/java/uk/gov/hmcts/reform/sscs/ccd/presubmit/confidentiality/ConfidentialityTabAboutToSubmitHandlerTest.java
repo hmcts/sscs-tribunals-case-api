@@ -37,13 +37,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.awaitotherpartydata.AwaitOtherPartyDataAboutToSubmitHandler;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-class AwaitOtherPartyDataAboutToSubmitHandlerTest {
+class ConfidentialityTabAboutToSubmitHandlerTest {
 
-    private AwaitOtherPartyDataAboutToSubmitHandler handler;
+    private ConfidentialityTabAboutToSubmitHandler handler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -55,7 +54,7 @@ class AwaitOtherPartyDataAboutToSubmitHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new AwaitOtherPartyDataAboutToSubmitHandler(true);
+        handler = new ConfidentialityTabAboutToSubmitHandler(true);
         sscsCaseData = SscsCaseData.builder()
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build()).build()).build();
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -75,7 +74,7 @@ class AwaitOtherPartyDataAboutToSubmitHandlerTest {
 
     @Test
     void canHandleReturnsFalseWhenFeatureDisabled() {
-        AwaitOtherPartyDataAboutToSubmitHandler disabledHandler = new AwaitOtherPartyDataAboutToSubmitHandler(false);
+        ConfidentialityTabAboutToSubmitHandler disabledHandler = new ConfidentialityTabAboutToSubmitHandler(false);
 
         assertThat(disabledHandler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
