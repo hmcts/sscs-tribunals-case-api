@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -101,8 +102,6 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
 
     private ArgumentCaptor<GenerateFileParams> capture;
 
-    private DecisionNoticeService decisionNoticeService;
-
     @Before
     public void setUp() throws IOException {
         openMocks(this);
@@ -110,7 +109,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
         when(previewDecisionService.getBenefitType()).thenReturn("ESA");
         when(esaDecisionNoticeOutcomeService.getBenefitType()).thenReturn("ESA");
 
-        decisionNoticeService =
+        DecisionNoticeService decisionNoticeService =
             new DecisionNoticeService(List.of(), List.of(esaDecisionNoticeOutcomeService), List.of(previewDecisionService));
 
         handler = new IssueFinalDecisionAboutToStartHandler(decisionNoticeService, false, false);
@@ -272,11 +271,6 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
 
         when(esaDecisionNoticeOutcomeService.getBenefitType()).thenReturn("ESA");
 
-        EsaDecisionNoticeQuestionService esaDecisionNoticeQuestionService = new EsaDecisionNoticeQuestionService();
-
-        final EsaWriteFinalDecisionPreviewDecisionService previewDecisionService = new EsaWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
-            esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
-
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(List.of("mobilisingUnaided"));
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
@@ -298,6 +292,11 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
 
         when(generateFile.assemble(any())).thenReturn(URL);
 
+        var esaDecisionNoticeQuestionService = new EsaDecisionNoticeQuestionService();
+
+        var previewDecisionService = new EsaWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
+            esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
+
         final PreSubmitCallbackResponse<SscsCaseData> previewResponse = previewDecisionService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true);
 
         // CHeck that the document has the correct (updated) issued date.
@@ -308,7 +307,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
             .documentUrl(URL)
             .build(), previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10", true, true, false,
+        var payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10", true, true, false,
             true, true);
 
         // Check that the generated date has not been updated
@@ -321,14 +320,9 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenAboutToStartRequestDescriptorFlow_willGeneratePreviewWithTenOtherPartyAttended() throws IOException {
+    public void givenAboutToStartRequestDescriptorFlow_willGeneratePreviewWithOtherPartiesButNoneOfThemQuestioned() throws IOException {
 
         when(esaDecisionNoticeOutcomeService.getBenefitType()).thenReturn("ESA");
-
-        EsaDecisionNoticeQuestionService esaDecisionNoticeQuestionService = new EsaDecisionNoticeQuestionService();
-
-        final EsaWriteFinalDecisionPreviewDecisionService previewDecisionService = new EsaWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
-            esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
 
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(List.of("mobilisingUnaided"));
@@ -338,6 +332,61 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(NO);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
+
+        var otherPart1 = buildOtherParty("Mr", "Benny", "Estii");
+        var otherPart2 = buildOtherParty("Mrs", "Lili", "Estii");
+
+        sscsCaseData.setOtherParties(List.of(otherPart1, otherPart2));
+        sscsCaseData.getSscsFinalDecisionCaseData().setOtherPartyAttendedQuestions(Collections.emptyList());
+
+        when(esaDecisionNoticeOutcomeService.determineOutcome(sscsCaseData)).thenReturn(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        when(generateFile.assemble(any())).thenReturn(URL);
+
+        var esaDecisionNoticeQuestionService = new EsaDecisionNoticeQuestionService();
+
+        var previewDecisionService = new EsaWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
+            esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
+
+        final PreSubmitCallbackResponse<SscsCaseData> previewResponse = previewDecisionService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true);
+
+        // CHeck that the document has the correct (updated) issued date.
+        assertNotNull(previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
+        assertEquals(DocumentLink.builder()
+            .documentFilename(String.format("Final Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
+            .documentBinaryUrl(URL + "/binary")
+            .documentUrl(URL)
+            .build(), previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
+
+        var payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10", true, true, false,
+            true, true);
+
+        // Check that the generated date has not been updated
+        Assert.assertNotNull(payload.getGeneratedDate());
+        Assert.assertEquals(LocalDate.parse("2018-01-01"), payload.getGeneratedDate());
+        Assert.assertNotNull(payload.getWriteFinalDecisionTemplateContent());
+        assertNotNull(payload.getWriteFinalDecisionTemplateBody().getOtherPartyNamesAttendedHearing());
+        Assert.assertTrue(payload.getWriteFinalDecisionTemplateBody().getOtherPartyNamesAttendedHearing().isEmpty());
+        Assert.assertTrue(payload.getWriteFinalDecisionTemplateBody().getOtherPartyNamesDidNotAttendHearing().isEmpty());
+    }
+
+    @Test
+    @Parameters({"B7", "B8"})
+    public void givenAboutToStartRequestDescriptorFlow_willGeneratePreviewWhenMoreThanTenOtherPartyAttended(String bundlePage) throws IOException {
+
+        when(esaDecisionNoticeOutcomeService.getBenefitType()).thenReturn("ESA");
+
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(List.of("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
+        sscsCaseData.setWcaAppeal(YES);
+        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(NO);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAppellantAttendedQuestion("yes");
 
         List<CcdValue<OtherParty>> otherPartiesAttended = new ArrayList<>();
         otherPartiesAttended.add(buildOtherParty("Mr", "Benny", "Estii"));
@@ -350,16 +399,23 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
         otherPartiesAttended.add(buildOtherParty("Mrs", "Many", "Ford"));
         otherPartiesAttended.add(buildOtherParty("Lord", "Oly", "Amany"));
         otherPartiesAttended.add(buildOtherParty("Ms", "Betsy", "Gleason"));
+        otherPartiesAttended.add(buildOtherParty("Master", "Jr", "Gleason"));
 
         sscsCaseData.setOtherParties(otherPartiesAttended);
 
         sscsCaseData.getSscsFinalDecisionCaseData().setOtherPartyAttendedQuestions(otherPartiesAttended.stream().map(o -> buildOtherPartAttendedQuestion(o, YES)).toList());
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPageSectionReference(bundlePage);
 
         when(esaDecisionNoticeOutcomeService.determineOutcome(sscsCaseData)).thenReturn(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         when(generateFile.assemble(any())).thenReturn(URL);
+
+        var esaDecisionNoticeQuestionService = new EsaDecisionNoticeQuestionService();
+
+        var previewDecisionService = new EsaWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
+            esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
 
         final PreSubmitCallbackResponse<SscsCaseData> previewResponse = previewDecisionService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true);
 
@@ -371,20 +427,72 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
             .documentUrl(URL)
             .build(), previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10", true, true, false,
+        var payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10", true, true, false,
+            true, true);
+
+        // Check that the generated date has not been updated
+        Assert.assertNotNull(payload.getGeneratedDate());
+        Assert.assertEquals(bundlePage, payload.getWriteFinalDecisionTemplateBody().getPageNumber());
+        Assert.assertEquals(LocalDate.parse("2018-01-01"), payload.getGeneratedDate());
+        Assert.assertNotNull(payload.getWriteFinalDecisionTemplateContent());
+        assertNotNull(payload.getWriteFinalDecisionTemplateBody().getOtherPartyNamesAttendedHearing());
+        Assert.assertEquals(List.of("Benny Estii", "Lili Estii", "Tony Desty", "Jenny Desty", "Dany Kesty", "Fany Kesty", "Hary Ford", "Many Ford", "Oly Amany", "Betsy Gleason", "Jr Gleason respondents"), payload.getWriteFinalDecisionTemplateBody().getOtherPartyNamesAttendedHearing());
+        Assert.assertTrue(payload.getWriteFinalDecisionTemplateBody().getOtherPartyNamesDidNotAttendHearing().isEmpty());
+    }
+
+    @Test
+    @Parameters({"null", "emptyList"})
+    public void givenAboutToStartRequestDescriptorFlow_willGeneratePreview_whenThereIsNoOtherParty(String emptyOrNull) throws IOException {
+
+        when(esaDecisionNoticeOutcomeService.getBenefitType()).thenReturn("ESA");
+
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(List.of("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
+        sscsCaseData.setWcaAppeal(YES);
+        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(NO);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
+
+        sscsCaseData.setOtherParties(List.of(buildOtherParty("Mr", "X", "Bean")));
+        sscsCaseData.getSscsFinalDecisionCaseData().setOtherPartyAttendedQuestions("emptyList".equals(emptyOrNull) ? Collections.emptyList() : null);
+
+        when(esaDecisionNoticeOutcomeService.determineOutcome(sscsCaseData)).thenReturn(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        when(generateFile.assemble(any())).thenReturn(URL);
+
+
+        var esaDecisionNoticeQuestionService = new EsaDecisionNoticeQuestionService();
+
+        var previewDecisionService = new EsaWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
+            esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
+
+        var previewResponse = previewDecisionService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true);
+
+        // CHeck that the document has the correct (updated) issued date.
+        assertNotNull(previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
+        assertEquals(DocumentLink.builder()
+            .documentFilename(String.format("Final Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
+            .documentBinaryUrl(URL + "/binary")
+            .documentUrl(URL)
+            .build(), previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
+
+        var payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10", true, true, false,
             true, true);
 
         // Check that the generated date has not been updated
         Assert.assertNotNull(payload.getGeneratedDate());
         Assert.assertEquals(LocalDate.parse("2018-01-01"), payload.getGeneratedDate());
         Assert.assertNotNull(payload.getWriteFinalDecisionTemplateContent());
-        assertNotNull(payload.getWriteFinalDecisionTemplateBody().getOtherPartyNamesAttendedHearing());
-        Assert.assertEquals(List.of("Benny Estii", "Lili Estii", "Tony Desty", "Jenny Desty", "Dany Kesty", "Fany Kesty", "Hary Ford", "Many Ford", "Oly Amany", "Betsy Gleason respondents"), payload.getWriteFinalDecisionTemplateBody().getOtherPartyNamesAttendedHearing());
+        Assert.assertTrue(payload.getWriteFinalDecisionTemplateBody().getOtherPartyNamesAttendedHearing().isEmpty());
         Assert.assertTrue(payload.getWriteFinalDecisionTemplateBody().getOtherPartyNamesDidNotAttendHearing().isEmpty());
     }
 
     private OtherPartyAttendedQuestion buildOtherPartAttendedQuestion(CcdValue<OtherParty> otherPart, YesNo attended) {
-        OtherPartyAttendedQuestionDetails details = OtherPartyAttendedQuestionDetails.builder()
+        var details = OtherPartyAttendedQuestionDetails.builder()
             .attendedOtherParty(attended)
             .otherPartyName(otherPart.getValue().getName().getFullNameNoTitle())
             .build();
@@ -393,7 +501,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
     }
 
     private CcdValue<OtherParty> buildOtherParty(String title, String firstName, String lastNme) {
-        OtherParty other1 = OtherParty.builder().name(Name.builder().title(title).firstName(firstName).lastName(lastNme).build()).build();
+        var other1 = OtherParty.builder().name(Name.builder().title(title).firstName(firstName).lastName(lastNme).build()).build();
         return CcdValue.<OtherParty>builder().value(other1).build();
     }
 
