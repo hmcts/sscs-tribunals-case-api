@@ -13,6 +13,7 @@ import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -21,7 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
-import uk.gov.hmcts.reform.sscs.service.BusinessDaysCalculatorService;
+import uk.gov.hmcts.reform.sscs.utility.calendar.BusinessDaysCalculatorService;
 
 @Service
 @Slf4j
@@ -29,12 +30,16 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
 
     private final IdamService idamService;
     private final BusinessDaysCalculatorService businessDaysCalculatorService;
+    private final boolean isWorkAllocationEnabled;
 
     @Autowired
     public TribunalCommunicationAboutToSubmitHandler(IdamService idamService,
-                                                     BusinessDaysCalculatorService businessDaysCalculatorService) {
+                                                     BusinessDaysCalculatorService businessDaysCalculatorService,
+                                                     @Value("${feature.work-allocation.enabled}") boolean isWorkAllocationEnabled
+    ) {
         this.idamService = idamService;
         this.businessDaysCalculatorService = businessDaysCalculatorService;
+        this.isWorkAllocationEnabled = isWorkAllocationEnabled;
     }
 
     @Override
@@ -67,7 +72,7 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
                 .orElse(new ArrayList<>());
 
             try {
-                addCommunicationRequest(businessDaysCalculatorService, tribunalComms, topic, question, userDetails);
+                addCommunicationRequest(businessDaysCalculatorService, tribunalComms, topic, question, userDetails, false);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -101,17 +106,23 @@ public class TribunalCommunicationAboutToSubmitHandler implements PreSubmitCallb
             .build();
         communicationRequest.getValue().setRequestReply(reply);
         communicationRequest.getValue().setRequestResponseDueDate(null);
+        if (isWorkAllocationEnabled) {
+            communicationFields.setWaTaskFtaCommunicationId(chosenTribunalRequestId);
+            communicationRequest.getValue().setTaskCreatedForRequest("Not Required");
+        }
     }
 
     private void clearFields(FtaCommunicationFields communicationFields) {
         communicationFields.setCommRequestQuestion(null);
         communicationFields.setCommRequestTopic(null);
-        communicationFields.setTribunalRequestType(null);
         communicationFields.setTribunalRequestNoResponseQuery(null);
         communicationFields.setCommRequestResponseTextArea(null);
         communicationFields.setFtaRequestsDl(null);
         communicationFields.setCommRequestResponseNoAction(null);
         communicationFields.setFtaRequestsToReviewDl(null);
+        if (!isWorkAllocationEnabled) {
+            communicationFields.setTribunalRequestType(null);
+        }
     }
 
     private void handleReviewTribunalReply(FtaCommunicationFields ftaCommunicationFields) {

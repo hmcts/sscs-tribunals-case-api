@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.tribunalcommunication;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -33,7 +34,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.idam.UserRole;
-import uk.gov.hmcts.reform.sscs.service.BusinessDaysCalculatorService;
+import uk.gov.hmcts.reform.sscs.utility.calendar.BusinessDaysCalculatorService;
 
 class TribunalCommunicationAboutToSubmitHandlerTest {
 
@@ -58,7 +59,7 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
     void setUp() {
         openMocks(this);
 
-        handler = new TribunalCommunicationAboutToSubmitHandler(idamService, businessDaysCalculatorService);
+        handler = new TribunalCommunicationAboutToSubmitHandler(idamService, businessDaysCalculatorService, false);
 
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").build();
 
@@ -278,6 +279,7 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         assertNotNull(request.getRequestReply().getReplyDateTime());
         assertNull(request.getRequestResponseDueDate());
         assertEquals(LocalDate.now(), response.getData().getCommunicationFields().getFtaResponseProvidedDate());
+        assertNull(response.getData().getCommunicationFields().getWaTaskFtaCommunicationId());
     }
 
     @Test
@@ -383,6 +385,7 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         assertNull(communicationRequest.getValue().getRequestResponseDueDate());
         assertNull(response.getData().getCommunicationFields().getFtaResponseDueDate());
         assertNull(response.getData().getCommunicationFields().getTribunalResponseProvidedDate());
+        assertThat(request.getTaskCreatedForRequest()).isNull();
     }
 
     @Test
@@ -550,5 +553,36 @@ class TribunalCommunicationAboutToSubmitHandlerTest {
         assertEquals(YesNo.NO, resultComs.get(1).getValue().getRequestReply().getReplyHasBeenActionedByFta());
         assertEquals(YesNo.YES, resultComs.getLast().getValue().getRequestReply().getReplyHasBeenActionedByFta());
         assertEquals(LocalDate.now(), response.getData().getCommunicationFields().getTribunalResponseProvidedDate());
+    }
+
+    @Test
+    void givenWorkAllocationEnabled_thenForReplyShouldSetWaTaskFtaCommunicationId_andShouldNotClearTribunalRequestType() {
+
+        String replyText = "Reply text";
+
+        CommunicationRequest communicationRequest = buildCommRequest();
+        CommunicationRequest communicationRequest2 = buildCommRequestNotActionedResponseDateOffset(1, true);
+        DynamicListItem chosenTribunalRequest = new DynamicListItem(communicationRequest.getId(), "item");
+        DynamicList ftaRequestsDl = new DynamicList(chosenTribunalRequest, Collections.singletonList(chosenTribunalRequest));
+        FtaCommunicationFields ftaCommunicationFields = FtaCommunicationFields.builder()
+                .tribunalRequestsDl(ftaRequestsDl)
+                .ftaCommunications(List.of(communicationRequest, communicationRequest2))
+                .commRequestResponseTextArea(replyText)
+                .commRequestResponseNoAction(Collections.emptyList())
+                .tribunalRequestType(TribunalRequestType.REPLY_TO_TRIBUNAL_QUERY)
+                .build();
+        sscsCaseData.setCommunicationFields(ftaCommunicationFields);
+
+        String userName = "Test User";
+        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
+                .name(userName).roles(List.of(UserRole.CTSC_CLERK.getValue())).build());
+
+        handler = new TribunalCommunicationAboutToSubmitHandler(idamService, businessDaysCalculatorService, true);
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getCommunicationFields().getWaTaskFtaCommunicationId()).isEqualTo(communicationRequest.getId());
+        assertThat(response.getData().getCommunicationFields().getTribunalRequestType()).isEqualTo(TribunalRequestType.REPLY_TO_TRIBUNAL_QUERY);
+        assertThat(response.getData().getCommunicationFields().getFtaCommunications().getFirst().getValue().getTaskCreatedForRequest()).isEqualTo("Not Required");
     }
 }

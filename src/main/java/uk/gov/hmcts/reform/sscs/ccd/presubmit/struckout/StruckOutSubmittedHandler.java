@@ -1,0 +1,59 @@
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.struckout;
+
+import static java.util.Objects.requireNonNull;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.service.TaskManagementApiService;
+import uk.gov.hmcts.reform.sscs.service.servicebus.SendCallbackHandler;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class StruckOutSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    private final TaskManagementApiService taskManagementApiService;
+    private final SendCallbackHandler sendCallbackHandler;
+
+    @Value("${feature.work-allocation.enabled}")
+    private final boolean isWorkAllocationEnabled;
+
+    @Override
+    public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
+        requireNonNull(callback, "callback must not be null");
+        requireNonNull(callbackType, "callbacktype must not be null");
+
+        return callbackType.equals(CallbackType.SUBMITTED)
+                && callback.getEvent() == EventType.STRUCK_OUT;
+    }
+
+    @Override
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType,
+                                                          Callback<SscsCaseData> callback,
+                                                          String userAuthorisation) {
+
+        if (!canHandle(callbackType, callback)) {
+            throw new IllegalStateException("Cannot handle callback.");
+        }
+
+        final String caseId = String.valueOf(callback.getCaseDetails().getId());
+        log.info("Handling Struck Out Case Submitted callback for case id: {}", caseId);
+
+        log.info("Publishing message for case id: {} for event: {}", caseId, callback.getEvent().getCcdType());
+        sendCallbackHandler.handle(callback);
+
+        if (isWorkAllocationEnabled) {
+            taskManagementApiService.cancelTasksByTaskProperties(caseId, "ftaCommunicationId");
+        }
+
+        return new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
+    }
+}
