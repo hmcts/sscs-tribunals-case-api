@@ -15,6 +15,19 @@
   },
   {
     "CaseEventID": "writeFinalDecision",
+    "CaseFieldID": "issueCode",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "typeOfAppeal",
+    "PageLabel": "Type of appeal",
+    "FieldShowCondition": "writeFinalDecisionGenerateNotice=\"DoNotUse\"",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseEventID": "writeFinalDecision",
     "CaseFieldID": "writeFinalDecisionIsDescriptorFlow",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
@@ -330,7 +343,7 @@
     "PageDisplayOrder": 8,
     "PageFieldDisplayOrder": 4,
     "PageID": "workCapabilityAssessment",
-    "FieldShowCondition" : "appeal.benefitType.code=\"ESA\" OR appeal.benefitType.code=\"UC\"  AND wcaAppeal=\"Yes\"",
+    "FieldShowCondition" : "(appeal.benefitType.code=\"ESA\" OR appeal.benefitType.code=\"UC\")  AND (issueCode=\"SV\" AND wcaAppeal=\"Yes\")",
     "ShowSummaryChangeOption": "Y",
     "RetainHiddenValue": "Yes"
   },
@@ -373,7 +386,7 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "schedule6",
     "PageLabel": "Select Schedule 6 activities",
-    "PageShowCondition": "appeal.benefitType.code=\"UC\" AND wcaAppeal = \"Yes\" AND supportGroupOnlyAppeal=\"No\" AND writeFinalDecisionGenerateNotice = \"Yes\"",
+    "PageShowCondition": "appeal.benefitType.code=\"UC\" AND wcaAppeal = \"Yes\" AND supportGroupOnlyAppeal=\"No\" AND writeFinalDecisionGenerateNotice = \"Yes\" AND writeFinalDecisionSevereYesNo != \"Yes\"",
     "ShowSummaryChangeOption": "Y"
   },
   {
@@ -399,7 +412,7 @@
     "PageFieldDisplayOrder": 2,
     "PageID": "esaDecisionNoticeOptions",
     "PageLabel": "Select Schedule 2 activities",
-    "PageShowCondition": "appeal.benefitType.code=\"ESA\" AND wcaAppeal = \"Yes\" AND writeFinalDecisionGenerateNotice = \"Yes\" AND supportGroupOnlyAppeal != \"Yes\"",
+    "PageShowCondition": "appeal.benefitType.code=\"ESA\" AND wcaAppeal = \"Yes\" AND writeFinalDecisionGenerateNotice = \"Yes\" AND supportGroupOnlyAppeal != \"Yes\" AND writeFinalDecisionSevereYesNo != \"Yes\"",
     "ShowSummaryChangeOption": "Y"
   },
   {
