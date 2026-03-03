@@ -205,7 +205,7 @@ class UcScenario1Test {
             """;
 
         assertThat(content.getComponents()).hasSize(9);
-        assertThat(content.toString()).isEqualTo(expectedContent);
+        assertThat(content.toString()).hasToString(expectedContent);
     }
 
     @Test
@@ -257,7 +257,7 @@ class UcScenario1Test {
             """;
 
         assertThat(content.getComponents()).hasSize(9);
-        assertThat(content.toString()).isEqualTo(expectedContent);
+        assertThat(content.toString()).hasToString(expectedContent);
     }
 
     @Test
@@ -310,6 +310,6 @@ class UcScenario1Test {
             """;
 
         assertThat(content.getComponents()).hasSize(9);
-        assertThat(content.toString()).isEqualTo(expectedContent);
+        assertThat(content.toString()).hasToString(expectedContent);
     }
 }

@@ -292,9 +292,9 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
 
         when(generateFile.assemble(any())).thenReturn(URL);
 
-        var esaDecisionNoticeQuestionService = new EsaDecisionNoticeQuestionService();
+        EsaDecisionNoticeQuestionService esaDecisionNoticeQuestionService = new EsaDecisionNoticeQuestionService();
 
-        var previewDecisionService = new EsaWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
+        final EsaWriteFinalDecisionPreviewDecisionService previewDecisionService = new EsaWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
             esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
 
         final PreSubmitCallbackResponse<SscsCaseData> previewResponse = previewDecisionService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true);
@@ -345,9 +345,9 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
 
         when(generateFile.assemble(any())).thenReturn(URL);
 
-        var esaDecisionNoticeQuestionService = new EsaDecisionNoticeQuestionService();
+        EsaDecisionNoticeQuestionService esaDecisionNoticeQuestionService = new EsaDecisionNoticeQuestionService();
 
-        var previewDecisionService = new EsaWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
+        final EsaWriteFinalDecisionPreviewDecisionService previewDecisionService = new EsaWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
             esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
 
         final PreSubmitCallbackResponse<SscsCaseData> previewResponse = previewDecisionService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true);
@@ -412,9 +412,9 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
 
         when(generateFile.assemble(any())).thenReturn(URL);
 
-        var esaDecisionNoticeQuestionService = new EsaDecisionNoticeQuestionService();
+        EsaDecisionNoticeQuestionService esaDecisionNoticeQuestionService = new EsaDecisionNoticeQuestionService();
 
-        var previewDecisionService = new EsaWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
+        final EsaWriteFinalDecisionPreviewDecisionService previewDecisionService = new EsaWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
             esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
 
         final PreSubmitCallbackResponse<SscsCaseData> previewResponse = previewDecisionService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true);
@@ -465,12 +465,12 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
         when(generateFile.assemble(any())).thenReturn(URL);
 
 
-        var esaDecisionNoticeQuestionService = new EsaDecisionNoticeQuestionService();
+        EsaDecisionNoticeQuestionService esaDecisionNoticeQuestionService = new EsaDecisionNoticeQuestionService();
 
-        var previewDecisionService = new EsaWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
+        final EsaWriteFinalDecisionPreviewDecisionService  previewDecisionService = new EsaWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
             esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
 
-        var previewResponse = previewDecisionService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true);
+        final PreSubmitCallbackResponse<SscsCaseData> previewResponse = previewDecisionService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true);
 
         // CHeck that the document has the correct (updated) issued date.
         assertNotNull(previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());

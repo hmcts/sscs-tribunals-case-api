@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody
 class PipScenarioStandardRateEnhancedRateTest {
 
     @Test
-    public void testScenario() {
+    void testScenario() {
 
         List<Descriptor> dailyLivingDescriptors =
             Arrays.asList(Descriptor.builder()
