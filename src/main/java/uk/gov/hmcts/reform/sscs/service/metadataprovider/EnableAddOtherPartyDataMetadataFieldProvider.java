@@ -19,25 +19,27 @@ public class EnableAddOtherPartyDataMetadataFieldProvider implements MetadataFie
 
     private static final String FIELD_ID = "[INJECTED_DATA.ENABLE_ADD_OTHER_PARTY_DATA]";
 
-    private final boolean enabled;
+    private final boolean cmConfidentialityEnabled;
+    private final boolean ucConfidentialityEnabled;
 
     public EnableAddOtherPartyDataMetadataFieldProvider(
-        @Value("${feature.uc-other-party-confidentiality.enabled}") final boolean enabled) {
-        this.enabled = enabled;
+        @Value("${feature.cm-other-party-confidentiality.enabled}") final boolean cmConfidentialityEnabled,
+        @Value("${feature.uc-other-party-confidentiality.enabled}") final boolean ucConfidentialityEnabled) {
+        this.ucConfidentialityEnabled = ucConfidentialityEnabled;
+        this.cmConfidentialityEnabled = cmConfidentialityEnabled;
     }
 
     @Override
     public Optional<CaseViewField> provide(final Callback<SscsCaseData> callback) {
-        if (!enabled) {
-            return Optional.empty();
-        }
         final YesNo value = isApplicable(callback) ? YesNo.YES : YesNo.NO;
         return Optional.of(MetadataFieldProvider.createTextField(FIELD_ID, value));
     }
 
     private boolean isApplicable(final Callback<SscsCaseData> callback) {
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
-        return (caseDetails.getCaseData().isBenefitType(CHILD_SUPPORT) && caseDetails.getState() == AWAIT_OTHER_PARTY_DATA)
-            || (caseDetails.getCaseData().isBenefitType(UC) && caseDetails.getState() == WITH_DWP);
+        return (cmConfidentialityEnabled
+            && caseDetails.getCaseData().isBenefitType(CHILD_SUPPORT)
+            && caseDetails.getState() == AWAIT_OTHER_PARTY_DATA) || (ucConfidentialityEnabled && caseDetails.getCaseData()
+            .isBenefitType(UC) && caseDetails.getState() == WITH_DWP);
     }
 }
