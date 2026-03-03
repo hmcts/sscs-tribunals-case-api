@@ -34,7 +34,7 @@ class GetCaseCallbackServiceTest {
         final GetCaseCallbackResponse response = service.buildResponse(callback);
 
         assertThat(response).isNotNull();
-        assertThat(response.getMetadataFields()).isNull();
+        assertThat(response.getMetadataFields()).isEmpty();
     }
 
     @Test
@@ -45,7 +45,7 @@ class GetCaseCallbackServiceTest {
 
         final GetCaseCallbackResponse response = service.buildResponse(callback);
 
-        assertThat(response.getMetadataFields()).isNull();
+        assertThat(response.getMetadataFields()).isEmpty();
     }
 
     @Test

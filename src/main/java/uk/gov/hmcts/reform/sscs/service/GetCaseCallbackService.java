@@ -20,14 +20,9 @@ public class GetCaseCallbackService {
 
     public GetCaseCallbackResponse buildResponse(final Callback<SscsCaseData> callback) {
         final GetCaseCallbackResponse response = new GetCaseCallbackResponse();
-        final List<CaseViewField> fields = metadataFieldProviders.stream()
-            .map(provider -> provider.provide(callback))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .toList();
-        if (!fields.isEmpty()) {
-            response.setMetadataFields(fields);
-        }
+        final List<CaseViewField> fields = metadataFieldProviders.stream().map(provider -> provider.provide(callback))
+            .filter(Optional::isPresent).map(Optional::get).toList();
+        response.setMetadataFields(fields);
         return response;
     }
 }
