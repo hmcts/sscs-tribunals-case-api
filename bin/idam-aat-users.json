@@ -1,0 +1,33 @@
+[
+  {
+    "user": {
+      "id": "ef293c8e-0cb9-4735-be49-1cf13d866d42",
+      "forename": "sscs-senior-cw",
+      "surname": "midlands-bradford",
+      "displayName": "sscs-senior-cw",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-SSCS-registrar",
+        "caseworker-SSCS-clerk",
+        "caseworker-SSCS-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "5249c715-408f-43f6-aff3-cb4240b81751",
+      "forename": "sscs-senior-cw",
+      "surname": "wales-cardiff",
+      "displayName": "sscs-senior-cw",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-SSCS-registrar",
+        "caseworker-SSCS-clerk",
+        "caseworker-SSCS-superuser"
+      ]
+    }
+  }
+]
+
