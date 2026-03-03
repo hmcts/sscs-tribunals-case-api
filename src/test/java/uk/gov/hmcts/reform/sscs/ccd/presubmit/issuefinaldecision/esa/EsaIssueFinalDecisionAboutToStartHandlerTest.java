@@ -209,7 +209,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
             .build(), previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10", true, true, false,
-            true, true);
+            true);
 
         // Check that the generated date has not been updated
         Assert.assertNotNull(payload.getGeneratedDate());
@@ -246,7 +246,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
             .build(), previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10", true, true, false,
-            false, true);
+            false);
 
         // Check that the generated date has not been updated
         Assert.assertNotNull(payload.getGeneratedDate());
@@ -308,7 +308,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
             .build(), previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         var payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10", true, true, false,
-            true, true);
+            true);
 
         // Check that the generated date has not been updated
         Assert.assertNotNull(payload.getGeneratedDate());
@@ -361,7 +361,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
             .build(), previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         var payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10", true, true, false,
-            true, true);
+            true);
 
         // Check that the generated date has not been updated
         Assert.assertNotNull(payload.getGeneratedDate());
@@ -428,7 +428,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
             .build(), previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         var payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10", true, true, false,
-            true, true);
+            true);
 
         // Check that the generated date has not been updated
         Assert.assertNotNull(payload.getGeneratedDate());
@@ -481,7 +481,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
             .build(), previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         var payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10", true, true, false,
-            true, true);
+            true);
 
         // Check that the generated date has not been updated
         Assert.assertNotNull(payload.getGeneratedDate());
@@ -515,7 +515,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
     }
 
     private NoticeIssuedTemplateBody verifyTemplateBody(String image, String expectedName, String expectedAppointeeName, String dateOfDecision, boolean allowed, boolean isSetAside, boolean isDraft,
-        boolean isDescriptorFlow, boolean isGenerateFile) {
+        boolean isDescriptorFlow) {
         verify(generateFile, atLeastOnce()).assemble(capture.capture());
 
         when(esaDecisionNoticeOutcomeService.getBenefitType()).thenReturn("ESA");
