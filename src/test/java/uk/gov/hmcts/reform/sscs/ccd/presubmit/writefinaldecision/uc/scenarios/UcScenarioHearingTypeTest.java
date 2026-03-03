@@ -8,7 +8,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcTemplateContent;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
-public class UcScenarioHearingTypeTest {
+class UcScenarioHearingTypeTest {
 
     private static Object[] allNextHearingTypeParameters() {
         return new Object[]{new Object[]{"triage", false, false, "The tribunal considered the appeal bundle to page A1.\n"},
@@ -58,7 +58,7 @@ public class UcScenarioHearingTypeTest {
 
     @ParameterizedTest
     @MethodSource("allNextHearingTypeParameters")
-    public void testScenario3(String hearingType, boolean appellantAttended, boolean presentingOfficerAttended, String expectedHearingType) {
+    void testScenario3(String hearingType, boolean appellantAttended, boolean presentingOfficerAttended, String expectedHearingType) {
         WriteFinalDecisionTemplateBody body = WriteFinalDecisionTemplateBody.builder()
             .hearingType(hearingType)
             .attendedHearing(appellantAttended)
