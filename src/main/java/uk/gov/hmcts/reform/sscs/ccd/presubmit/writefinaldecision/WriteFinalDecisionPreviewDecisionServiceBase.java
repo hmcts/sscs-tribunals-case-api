@@ -207,8 +207,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         List<String> names = new ArrayList<>();
         List<String> respondents = new ArrayList<>();
 
-        if (caseData.getSscsFinalDecisionCaseData() == null
-            || caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions() == null
+        if (caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions() == null
             || caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions().isEmpty()) {
             return Collections.emptyList();
         }
