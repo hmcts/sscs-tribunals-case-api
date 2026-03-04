@@ -1143,7 +1143,7 @@
     "PageFieldDisplayOrder": 2,
     "PageID": "schedule3Activities",
     "PageLabel": "Select Schedule 3 activities",
-    "PageShowCondition": "showSchedule3ActivitiesPage=\"Yes\" AND wcaAppeal = \"Yes\"",
+    "PageShowCondition": "showSchedule3ActivitiesPage=\"Yes\" AND wcaAppeal = \"Yes\" AND writeFinalDecisionSevereYesNo != \"Yes\"",
     "ShowSummaryChangeOption": "Y"
   },
   {
