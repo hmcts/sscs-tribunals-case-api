@@ -4,8 +4,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.springframework.http.ResponseEntity.ok;
 import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTHORISATION_HEADER;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,13 +17,11 @@ import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 import uk.gov.hmcts.reform.sscs.service.GetCaseCallbackService;
 
 @RestController
-@Slf4j
 public class CcdGetCaseCallbackController {
 
     private final AuthorisationService authorisationService;
     private final GetCaseCallbackService getCaseCallbackService;
 
-    @Autowired
     public CcdGetCaseCallbackController(final AuthorisationService authorisationService,
         final GetCaseCallbackService getCaseCallbackService) {
         this.authorisationService = authorisationService;

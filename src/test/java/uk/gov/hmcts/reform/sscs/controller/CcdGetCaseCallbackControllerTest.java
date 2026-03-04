@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -27,6 +28,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 import uk.gov.hmcts.reform.sscs.service.GetCaseCallbackService;
+import uk.gov.hmcts.reform.sscs.service.exceptions.ClientAuthorisationException;
 
 @ExtendWith(MockitoExtension.class)
 class CcdGetCaseCallbackControllerTest {
@@ -71,6 +73,19 @@ class CcdGetCaseCallbackControllerTest {
             .isInstanceOf(NullPointerException.class);
 
         verifyNoInteractions(authorisationService);
+        verifyNoInteractions(getCaseCallbackService);
+    }
+
+    @Test
+    void shouldPropagateExceptionWhenAuthorisationServiceThrows() {
+        final Callback<SscsCaseData> callback = buildCallback();
+        final ClientAuthorisationException exception = new ClientAuthorisationException(new Exception("Unauthorised"));
+        doThrow(exception).when(authorisationService).authorise("s2s-token");
+
+        assertThatThrownBy(() -> controller.ccdGetCase("s2s-token", callback))
+            .isInstanceOf(ClientAuthorisationException.class);
+
+        verify(authorisationService).authorise("s2s-token");
         verifyNoInteractions(getCaseCallbackService);
     }
 
