@@ -1115,7 +1115,7 @@
     "PageFieldDisplayOrder": 2,
     "PageID": "regulation29",
     "PageLabel": "Regulation 29",
-    "PageShowCondition": "appeal.benefitType.code=\"ESA\" AND wcaAppeal = \"Yes\" AND showRegulation29Page=\"Yes\"",
+    "PageShowCondition": "appeal.benefitType.code=\"ESA\" AND wcaAppeal = \"Yes\" AND showRegulation29Page=\"Yes\" AND writeFinalDecisionSevereYesNo != \"Yes\"",
     "ShowSummaryChangeOption": "Y"
   },
   {
