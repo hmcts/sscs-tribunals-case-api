@@ -57,7 +57,7 @@ public class TyaController {
     public ResponseEntity<Resource> getAppealDocument(@RequestHeader(value = SERVICE_AUTHORIZATION) String serviceAuthorization,
                                                       @RequestParam(value = "url") String url) {
         String serviceName = authorisationService.authenticate(serviceAuthorization);
-        authorisationService.assertIsAllowedToHandleCallback(serviceName);
+        authorisationService.allowOnlySscs(serviceName);
         return documentDownloadService.downloadFile(url);
     }
 }
