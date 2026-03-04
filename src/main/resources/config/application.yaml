@@ -1565,23 +1565,23 @@ notification:
                 appellant:
                     emailId: ee82ff0c-5b0d-44c7-973c-aec52b944a5d
                     smsId: 7257266e-b02f-4091-a360-70e4b231124f
-                    docmosisId: TB-SCS-LET-WEL-Response-Received-AppellantRep-v2.docx
+                    docmosisId: TB-SCS-LET-WEL-Response-Received-AppellantJoint-v2.docx
                 appointee:
                     emailId: ee82ff0c-5b0d-44c7-973c-aec52b944a5d
                     smsId: 7257266e-b02f-4091-a360-70e4b231124f
-                    docmosisId: TB-SCS-LET-WEL-Response-Received-AppellantRep-v2.docx
+                    docmosisId: TB-SCS-LET-WEL-Response-Received-AppellantJoint-v2.docx
                 representative:
                     emailId: d2c5c869-4272-4b9d-ae93-8dde28ac6c36
                     smsId: cca7c565-c907-405f-b778-735b31947b85
-                    docmosisId: TB-SCS-LET-WEL-Response-Received-AppellantRep-v2.docx
+                    docmosisId: TB-SCS-LET-WEL-Response-Received-RepOther-v2.docx
                 other_party:
                     emailId: d2c5c869-4272-4b9d-ae93-8dde28ac6c36
                     smsId: cca7c565-c907-405f-b778-735b31947b85
-                    docmosisId: TB-SCS-LET-WEL-Response-Received-AppellantRep-v2.docx
+                    docmosisId: TB-SCS-LET-WEL-Response-Received-RepOther-v2.docx
                 joint_party:
                     emailId: bdcb0718-dbf2-4f9d-8eca-a735f7682ecf
                     smsId: 71f667c7-561e-4c06-befd-2a3246f10dcc
-                    docmosisId: TB-SCS-LET-WEL-Response-Received-AppellantRep-v2.docx
+                    docmosisId: TB-SCS-LET-WEL-Response-Received-AppellantJoint-v2.docx
             appealDormant:
                 appellant:
                     emailId: fd852f77-19e4-4513-be21-3eada4d90bcb
@@ -1652,23 +1652,23 @@ notification:
                 appellant:
                     emailId: c35a367c-ad53-4c6a-899b-554763945894
                     smsId: 4cd7a59c-fd8f-464a-86a5-0c2a701b88f0
-                    docmosisId: TB-SCS-LET-WEL-Response-Received-AppellantRep-v2.docx
+                    docmosisId: TB-SCS-LET-WEL-Response-Received-AppellantJoint-v2.docx
                 appointee:
                     emailId: c35a367c-ad53-4c6a-899b-554763945894
                     smsId: 4cd7a59c-fd8f-464a-86a5-0c2a701b88f0
-                    docmosisId: TB-SCS-LET-WEL-Response-Received-AppellantRep-v2.docx
+                    docmosisId: TB-SCS-LET-WEL-Response-Received-AppellantJoint-v2.docx
                 representative:
                     emailId: 95351d56-4af3-4d54-9941-ab2987d66bf3
                     smsId: 0f3f501a-8f7b-427a-af61-f2f4ca301a0b
-                    docmosisId: TB-SCS-LET-WEL-Response-Received-AppellantRep-v2.docx
+                    docmosisId: TB-SCS-LET-WEL-Response-Received-RepOther-v2.docx
                 other_party:
                     emailId: 95351d56-4af3-4d54-9941-ab2987d66bf3
                     smsId: 0f3f501a-8f7b-427a-af61-f2f4ca301a0b
-                    docmosisId: TB-SCS-LET-WEL-Response-Received-AppellantRep-v2.docx
+                    docmosisId: TB-SCS-LET-WEL-Response-Received-RepOther-v2.docx
                 joint_party:
                     emailId: 265d1671-ddf1-418f-bc8d-8bb9c758a6b6
                     smsId: 36f94562-df64-420d-93ce-3bb1d4f1de4a
-                    docmosisId: TB-SCS-LET-WEL-Response-Received-AppellantRep-v2.docx
+                    docmosisId: TB-SCS-LET-WEL-Response-Received-AppellantJoint-v2.docx
             evidenceReminder:
                 appellant:
                     emailId: d1a0ccb4-7051-4e3c-b7af-b1dbeeacc921
