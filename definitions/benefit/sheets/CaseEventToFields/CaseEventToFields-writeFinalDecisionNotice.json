@@ -1199,7 +1199,7 @@
     "PageFieldDisplayOrder": 2,
     "PageID": "schedule8Paragraph4",
     "PageLabel": "Schedule 8 Paragraph 4",
-    "PageShowCondition": "appeal.benefitType.code=\"UC\" AND wcaAppeal = \"Yes\" AND showSchedule8Paragraph4Page=\"Yes\"",
+    "PageShowCondition": "appeal.benefitType.code=\"UC\" AND wcaAppeal = \"Yes\" AND showSchedule8Paragraph4Page=\"Yes\" AND writeFinalDecisionSevereYesNo != \"Yes\"",
     "ShowSummaryChangeOption": "Y"
   },
   {
@@ -1227,7 +1227,7 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "schedule7Activities",
     "PageLabel": "Select Schedule 7 activities",
-    "PageShowCondition": "showSchedule7ActivitiesPage=\"Yes\" AND wcaAppeal = \"Yes\"",
+    "PageShowCondition": "showSchedule7ActivitiesPage=\"Yes\" AND wcaAppeal = \"Yes\" AND writeFinalDecisionSevereYesNo != \"Yes\"",
     "ShowSummaryChangeOption": "Y"
   },
   {
