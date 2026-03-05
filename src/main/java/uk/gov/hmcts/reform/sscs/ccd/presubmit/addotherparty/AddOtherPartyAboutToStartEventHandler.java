@@ -30,11 +30,13 @@ class AddOtherPartyAboutToStartEventHandler implements PreSubmitCallbackHandler<
         requireNonNull(callbackType, "callbackType must not be null");
         requireNonNull(callback, "callback must not be null");
 
-        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        return callbackType == CallbackType.ABOUT_TO_START
+        return cmConfidentialityEnabled
+            && callbackType == CallbackType.ABOUT_TO_START
             && callback.getEvent() == EventType.ADD_OTHER_PARTY_DATA
-            && cmConfidentialityEnabled
-            && (caseData.isBenefitType(CHILD_SUPPORT) || caseData.isBenefitType(UC));
+            && callback.getCaseDetails() != null
+            && callback.getCaseDetails().getCaseData() != null
+            && (callback.getCaseDetails().getCaseData().isBenefitType(CHILD_SUPPORT)
+                || callback.getCaseDetails().getCaseData().isBenefitType(UC));
     }
 
     @Override

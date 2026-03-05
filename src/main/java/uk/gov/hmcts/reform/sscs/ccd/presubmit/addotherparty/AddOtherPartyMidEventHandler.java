@@ -32,12 +32,16 @@ class AddOtherPartyMidEventHandler implements PreSubmitCallbackHandler<SscsCaseD
         requireNonNull(callbackType, "callbackType must not be null");
         requireNonNull(callback, "callback must not be null");
 
-        if (callbackType != CallbackType.MID_EVENT || callback.getEvent() != EventType.ADD_OTHER_PARTY_DATA || isNull(
+        if (!cmOtherPartyConfidentialityEnabled
+            || callbackType != CallbackType.MID_EVENT
+            || callback.getEvent() != EventType.ADD_OTHER_PARTY_DATA
+            || isNull(
             callback.getCaseDetails().getCaseData().getOtherParties())) {
             return false;
         }
 
-        return cmOtherPartyConfidentialityEnabled && (callback.getCaseDetails().getCaseData().isBenefitType(CHILD_SUPPORT) || callback.getCaseDetails().getCaseData().isBenefitType(UC));
+        return callback.getCaseDetails().getCaseData().isBenefitType(CHILD_SUPPORT) || callback.getCaseDetails().getCaseData()
+            .isBenefitType(UC);
     }
 
     @Override

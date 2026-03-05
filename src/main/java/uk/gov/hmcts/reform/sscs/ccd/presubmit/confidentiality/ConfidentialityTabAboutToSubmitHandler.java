@@ -47,9 +47,9 @@ public class ConfidentialityTabAboutToSubmitHandler implements PreSubmitCallback
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         // Runs for every event type to ensure that any changes to data are reflected in the tab and also to future-proof against other new or modified events that may update confidentiality data
-        return callbackType == CallbackType.ABOUT_TO_SUBMIT && (cmOtherPartyConfidentialityEnabled && (callback.getCaseDetails()
-            .getCaseData().isBenefitType(Benefit.CHILD_SUPPORT) || callback.getCaseDetails()
-            .getCaseData().isBenefitType(Benefit.UC)));
+        return cmOtherPartyConfidentialityEnabled && callbackType == CallbackType.ABOUT_TO_SUBMIT && (callback.getCaseDetails()
+            .getCaseData().isBenefitType(Benefit.CHILD_SUPPORT) || callback.getCaseDetails().getCaseData()
+            .isBenefitType(Benefit.UC));
     }
 
     @Override
@@ -66,8 +66,8 @@ public class ConfidentialityTabAboutToSubmitHandler implements PreSubmitCallback
         sscsCaseData.getExtendedSscsCaseData()
             .setConfidentialityTab(getConfidentialitySummaryEntries(sscsCaseData.getOtherParties(), sscsCaseData.getAppeal()));
 
-        if (sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT)
-            || (sscsCaseData.isBenefitType(Benefit.UC)) && isNotEmpty(sscsCaseData.getOtherParties())) {
+        if (sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT) || (sscsCaseData.isBenefitType(Benefit.UC)) && isNotEmpty(
+            sscsCaseData.getOtherParties())) {
             sscsCaseData.getExtendedSscsCaseData().setShowConfidentialityTab(YES);
         }
 

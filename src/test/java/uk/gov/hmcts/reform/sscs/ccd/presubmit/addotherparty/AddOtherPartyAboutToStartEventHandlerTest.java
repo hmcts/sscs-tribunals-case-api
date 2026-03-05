@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 
@@ -72,9 +73,6 @@ class AddOtherPartyAboutToStartEventHandlerTest {
 
         @Test
         void shouldReturnFalseIfCallbackTypeIsNotAboutToStart() {
-            when(callback.getCaseDetails()).thenReturn(caseDetails);
-            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
             handler = new AddOtherPartyAboutToStartEventHandler(true);
 
             assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
@@ -82,10 +80,28 @@ class AddOtherPartyAboutToStartEventHandlerTest {
 
         @Test
         void shouldReturnFalseIfEventTypeIsNotAddOtherPartyData() {
+            when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
+
+            handler = new AddOtherPartyAboutToStartEventHandler(true);
+
+            assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalseIfCaseDetailsIsNull() {
+            when(callback.getEvent()).thenReturn(ADD_OTHER_PARTY_DATA);
+            when(callback.getCaseDetails()).thenReturn(null);
+
+            handler = new AddOtherPartyAboutToStartEventHandler(true);
+
+            assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalseIfCaseDataIsNull() {
             when(callback.getEvent()).thenReturn(ADD_OTHER_PARTY_DATA);
             when(callback.getCaseDetails()).thenReturn(caseDetails);
-            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-            when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
+            when(caseDetails.getCaseData()).thenReturn(null);
 
             handler = new AddOtherPartyAboutToStartEventHandler(true);
 
@@ -94,23 +110,24 @@ class AddOtherPartyAboutToStartEventHandlerTest {
 
         @ParameterizedTest
         @MethodSource("canHandleTestParameters")
-        void shouldReturnExpectedResultForCanHandle(boolean cmEnabled, String benefitCode, boolean expected) {
+        void shouldReturnExpectedResultForCanHandle(boolean cmEnabled, EventType eventType, String benefitCode, boolean expected) {
             handler = new AddOtherPartyAboutToStartEventHandler(cmEnabled);
             sscsCaseData.getAppeal().getBenefitType().setCode(benefitCode);
-            when(callback.getEvent()).thenReturn(ADD_OTHER_PARTY_DATA);
-            when(callback.getCaseDetails()).thenReturn(caseDetails);
-            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+            lenient().when(callback.getEvent()).thenReturn(eventType);
+            lenient().when(callback.getCaseDetails()).thenReturn(caseDetails);
+            lenient().when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
             assertThat(handler.canHandle(ABOUT_TO_START, callback)).isEqualTo(expected);
         }
 
         private static Stream<Arguments> canHandleTestParameters() {
             return Stream.of(
-                Arguments.of(true, CHILD_SUPPORT.getShortName(), true),
-                Arguments.of(true, UC.getShortName(), true),
-                Arguments.of(false, CHILD_SUPPORT.getShortName(), false),
-                Arguments.of(false, UC.getShortName(), false),
-                Arguments.of(true, "ESA", false));
+                Arguments.of(true, ADD_OTHER_PARTY_DATA, CHILD_SUPPORT.getShortName(), true),
+                Arguments.of(true, ADD_OTHER_PARTY_DATA, UC.getShortName(), true),
+                Arguments.of(false, ADD_OTHER_PARTY_DATA, CHILD_SUPPORT.getShortName(), false),
+                Arguments.of(false, ADD_OTHER_PARTY_DATA, UC.getShortName(), false),
+                Arguments.of(true, ADD_OTHER_PARTY_DATA, "ESA", false),
+                Arguments.of(true, APPEAL_RECEIVED, CHILD_SUPPORT.getShortName(), false));
         }
     }
 
@@ -158,16 +175,24 @@ class AddOtherPartyAboutToStartEventHandlerTest {
         }
 
         @Test
-        void shouldReturnErrorsWhenFlagsAreTrueButStatesAreWrongForBothTypes() {
-            handler = new AddOtherPartyAboutToStartEventHandler(true);
+        void shouldAddErrorWhenBenefitTypeIsChildSupportAndStateIsNotAwaitOtherPartyData() {
             sscsCaseData.getAppeal().getBenefitType().setCode(CHILD_SUPPORT.getShortName());
             configureCallback(READY_TO_LIST);
 
             var response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-            assertThat(response.getErrors()).contains(
+            assertThat(response.getErrors()).containsExactly(
                 "The case must be at state \"Await Other Party Data\" in order to add another party");
-            assertThat(response.getErrors()).doesNotContain(
+        }
+
+        @Test
+        void shouldAddErrorWhenBenefitTypeIsUcAndStateIsNotWithFta() {
+            sscsCaseData.getAppeal().getBenefitType().setCode(UC.getShortName());
+            configureCallback(READY_TO_LIST);
+
+            var response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+            assertThat(response.getErrors()).containsExactly(
                 "The case must be at state \"With FTA\" in order to add another party");
         }
 
