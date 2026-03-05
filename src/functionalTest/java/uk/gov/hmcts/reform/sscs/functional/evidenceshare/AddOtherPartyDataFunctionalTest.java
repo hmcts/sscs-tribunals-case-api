@@ -41,43 +41,39 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
     @EnabledIfEnvironmentVariable(named = "CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED", matches = "true")
     class CmToggleOn {
 
-    @Test
-    @SneakyThrows
-    void shouldTransitionToCorrectStateWhenOtherPartyDataAddedToCase() {
+        @Test
+        @SneakyThrows
+        void shouldTransitionToCorrectStateWhenOtherPartyDataAddedToCase() {
 
-        final SscsCaseDetails caseWithState = createCaseFromEvent(Benefit.CHILD_SUPPORT,
-            VALID_APPEAL_CREATED);
+            final SscsCaseDetails caseWithState = createCaseFromEvent(Benefit.CHILD_SUPPORT,
+                VALID_APPEAL_CREATED);
 
-        await().atMost(30, SECONDS).untilAsserted(() -> {
-            var caseDetails = findCaseById(ccdCaseId);
-            assertThat(caseDetails.getState()).isEqualTo(State.AWAIT_OTHER_PARTY_DATA.toString());
-        });
-        // add other party
+            await().atMost(30, SECONDS).untilAsserted(() -> {
+                var caseDetails = findCaseById(ccdCaseId);
+                assertThat(caseDetails.getState()).isEqualTo(State.AWAIT_OTHER_PARTY_DATA.toString());
+            });
+            // add other party
             var otherParty = buildOtherParty("Miss", "Bella", "Kiki");
 
-        updateCcdCaseService.updateCaseV2(caseWithState.getId(), ADD_OTHER_PARTY_DATA.getCcdType(),
-            idamService.getIdamTokens(), (cd) -> {
+            updateCcdCaseService.updateCaseV2(caseWithState.getId(), ADD_OTHER_PARTY_DATA.getCcdType(), idamService.getIdamTokens(), (cd) -> {
                 cd.getData().setOtherParties(List.of(new CcdValue<>(otherParty)));
                 cd.getData().getExtendedSscsCaseData().setAwareOfAnyAdditionalOtherParties(YesNo.YES);
                 return new UpdateCcdCaseService.UpdateResult("add other party", "add other party");
             });
 
-        await().atMost(30, SECONDS).untilAsserted(() -> {
-            var cdAfterEvent = findCaseById(ccdCaseId);
+            await().atMost(30, SECONDS).untilAsserted(() -> {
+                var cdAfterEvent = findCaseById(ccdCaseId);
 
-            assertThat(cdAfterEvent.getState()).isEqualTo(State.AWAIT_CONFIDENTIALITY_REQUIREMENTS.toString());
-            assertThat(cdAfterEvent.getData().getExtendedSscsCaseData().getAwareOfAnyAdditionalOtherParties()).isEqualTo(
-                YesNo.YES);
+                assertThat(cdAfterEvent.getState()).isEqualTo(State.AWAIT_CONFIDENTIALITY_REQUIREMENTS.toString());
+                assertThat(cdAfterEvent.getData().getExtendedSscsCaseData().getAwareOfAnyAdditionalOtherParties()).isEqualTo(YesNo.YES);
                 assertThat(cdAfterEvent.getData().getOtherParties().getFirst().getValue().getName().getTitle()).isEqualTo("Miss");
                 assertThat(cdAfterEvent.getData().getOtherParties().getFirst().getValue().getName().getFirstName()).isEqualTo("Bella");
                 assertThat(cdAfterEvent.getData().getOtherParties().getFirst().getValue().getName().getLastName()).isEqualTo("Kiki");
-            assertThat(cdAfterEvent.getData().getOtherParties().getFirst().getValue().getAddress().getPostcode()).isEqualTo(
-                POSTCODE);
-            assertThat(cdAfterEvent.getData().getOtherParties().getFirst().getValue().getAddress().getTown()).isEqualTo(TOWN);
-            assertThat(cdAfterEvent.getData().getOtherParties().getFirst().getValue().getAddress().getLine1()).isEqualTo(
-                ADDRESS_LINE_1);
-        });
-    }
+                assertThat(cdAfterEvent.getData().getOtherParties().getFirst().getValue().getAddress().getPostcode()).isEqualTo(POSTCODE);
+                assertThat(cdAfterEvent.getData().getOtherParties().getFirst().getValue().getAddress().getTown()).isEqualTo(TOWN);
+                assertThat(cdAfterEvent.getData().getOtherParties().getFirst().getValue().getAddress().getLine1()).isEqualTo(ADDRESS_LINE_1);
+            });
+        }
     }
 
     @Nested
@@ -113,7 +109,7 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
     }
 
     private OtherParty buildOtherParty(String title, String firstName, String lastName) {
-        return OtherParty.builder()
+        return  OtherParty.builder()
             .name(Name.builder().title(title).firstName(firstName)
                 .lastName(lastName)
                 .build())
@@ -124,5 +120,4 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
                 .build())
             .build();
     }
-
 }
