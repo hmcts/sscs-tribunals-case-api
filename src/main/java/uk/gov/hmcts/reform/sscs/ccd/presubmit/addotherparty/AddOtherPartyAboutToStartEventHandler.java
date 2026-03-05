@@ -1,12 +1,11 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.addotherparty;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
-import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.AWAIT_OTHER_PARTY_DATA;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.WITH_DWP;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -17,14 +16,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
-@Slf4j
-class AddOtherPartyMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+class AddOtherPartyAboutToStartEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private final boolean cmOtherPartyConfidentialityEnabled;
+    private final boolean cmConfidentialityEnabled;
 
-    public AddOtherPartyMidEventHandler(
-        @Value("${feature.cm-other-party-confidentiality.enabled}") final boolean cmOtherPartyConfidentialityEnabled) {
-        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
+    public AddOtherPartyAboutToStartEventHandler(
+        @Value("${feature.cm-other-party-confidentiality.enabled}") final boolean cmConfidentialityEnabled) {
+        this.cmConfidentialityEnabled = cmConfidentialityEnabled;
     }
 
     @Override
@@ -32,12 +30,11 @@ class AddOtherPartyMidEventHandler implements PreSubmitCallbackHandler<SscsCaseD
         requireNonNull(callbackType, "callbackType must not be null");
         requireNonNull(callback, "callback must not be null");
 
-        if (callbackType != CallbackType.MID_EVENT || callback.getEvent() != EventType.ADD_OTHER_PARTY_DATA || isNull(
-            callback.getCaseDetails().getCaseData().getOtherParties())) {
-            return false;
-        }
-
-        return cmOtherPartyConfidentialityEnabled && (callback.getCaseDetails().getCaseData().isBenefitType(CHILD_SUPPORT) || callback.getCaseDetails().getCaseData().isBenefitType(UC));
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        return callbackType == CallbackType.ABOUT_TO_START
+            && callback.getEvent() == EventType.ADD_OTHER_PARTY_DATA
+            && cmConfidentialityEnabled
+            && (caseData.isBenefitType(CHILD_SUPPORT) || caseData.isBenefitType(UC));
     }
 
     @Override
@@ -48,17 +45,15 @@ class AddOtherPartyMidEventHandler implements PreSubmitCallbackHandler<SscsCaseD
         }
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-
         var preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 
-        if (isEmpty(caseData.getOtherParties())) {
-            log.warn("Other party must be added to submit this event. ccdCaseId: {}", caseData.getCcdCaseId());
-            preSubmitCallbackResponse.addError("Other party must be added to submit this event.");
+        if (caseData.isBenefitType(CHILD_SUPPORT) && callback.getCaseDetails().getState() != AWAIT_OTHER_PARTY_DATA) {
+            preSubmitCallbackResponse.addError(
+                "The case must be at state \"Await Other Party Data\" in order to add another party");
         }
 
-        if (caseData.getOtherParties().size() > 1) {
-            log.warn("Only one other party can be added using this event. ccdCaseId: {}", caseData.getCcdCaseId());
-            preSubmitCallbackResponse.addError("Only one other party can be added using this event.");
+        if (caseData.isBenefitType(UC) && callback.getCaseDetails().getState() != WITH_DWP) {
+            preSubmitCallbackResponse.addError("The case must be at state \"With FTA\" in order to add another party");
         }
 
         return preSubmitCallbackResponse;
