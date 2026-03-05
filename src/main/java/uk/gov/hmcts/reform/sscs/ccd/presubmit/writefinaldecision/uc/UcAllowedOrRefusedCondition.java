@@ -202,11 +202,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
         } else if (NON_WCA_APPEAL_ALLOWED == this || NON_WCA_APPEAL_REFUSED == this) {
             return UcScenario.SCENARIO_10;
         }  else if (SEVERE_CONDITIONS_ALLOWED == this || SEVERE_CONDITIONS_REFUSED == this) {
-            if (YesNo.isYes(caseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo())) {
-                return UcScenario.SCENARIO_13;
-            } else {
-                return UcScenario.SCENARIO_14;
-            }
+            return YesNo.isYes(caseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply()) ? UcScenario.SCENARIO_13 : UcScenario.SCENARIO_14;
         } else {
             throw new IllegalStateException("No scenario applicable");
         }
