@@ -66,7 +66,7 @@ public class ConfidentialityTabAboutToSubmitHandler implements PreSubmitCallback
         sscsCaseData.getExtendedSscsCaseData()
             .setConfidentialityTab(getConfidentialitySummaryEntries(sscsCaseData.getOtherParties(), sscsCaseData.getAppeal()));
 
-        if (sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT) || (sscsCaseData.isBenefitType(Benefit.UC)) && isNotEmpty(
+        if (sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT) || isNotEmpty(
             sscsCaseData.getOtherParties())) {
             sscsCaseData.getExtendedSscsCaseData().setShowConfidentialityTab(YES);
         }
