@@ -1,9 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 
 import static java.time.LocalDateTime.now;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT_SEND_TO_INTERLOC;
 
@@ -38,15 +37,15 @@ class NonCompliantSendToInterlocAboutToStartHandlerTest {
 
     @Test
     void canHandleOnlyAboutToStartForNonCompliantSendToInterloc() {
-        assertEquals(true, handler.canHandle(ABOUT_TO_START, callback));
-        assertFalse(handler.canHandle(CallbackType.ABOUT_TO_SUBMIT, callback));
+        assertThat(handler.canHandle(ABOUT_TO_START, callback)).isTrue();
+        assertThat(handler.canHandle(CallbackType.ABOUT_TO_SUBMIT, callback)).isFalse();
     }
 
     @Test
     void setsFirstPartyAsDefaultWhenFlagOff() {
         var response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         DynamicList originalSender = response.getData().getOriginalSender();
-        assertEquals("appellant", originalSender.getValue().getCode());
+        assertThat(originalSender.getValue().getCode()).isEqualTo("appellant");
     }
 
     @Test
@@ -56,14 +55,14 @@ class NonCompliantSendToInterlocAboutToStartHandlerTest {
 
         var response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         DynamicListItem selectedValue = response.getData().getOriginalSender().getValue();
-        assertEquals("", selectedValue.getCode());
+        assertThat(selectedValue.getCode()).isEmpty();
     }
 
     @Test
     void throwsIfCannotHandle() {
         Callback<SscsCaseData> wrongCallback =
                 new Callback<>(callback.getCaseDetails(), Optional.of(callback.getCaseDetails()), EventType.APPEAL_RECEIVED, false);
-        assertThrows(IllegalStateException.class,
-                () -> handler.handle(ABOUT_TO_START, wrongCallback, USER_AUTHORISATION));
+        assertThatThrownBy(() -> handler.handle(ABOUT_TO_START, wrongCallback, USER_AUTHORISATION))
+                .isInstanceOf(IllegalStateException.class);
     }
 }

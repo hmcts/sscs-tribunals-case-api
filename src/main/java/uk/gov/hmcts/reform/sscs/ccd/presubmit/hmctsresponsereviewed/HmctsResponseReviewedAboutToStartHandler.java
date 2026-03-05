@@ -9,8 +9,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_RESPONSE
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.UCB;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_TCW;
-import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getPartiesOnCase;
-import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.isChildSupportAppeal;
+import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,8 +35,8 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
 
     private final DwpAddressLookupService service;
     private final HearingsService hearingsService;
-    @Value("${feature.cm-interloc-confidentiality-party.enabled}")
-    private boolean cmInterlocConfidentialityPartyEnabled;
+    @Value("${feature.cm-other-party-confidentiality.enabled}")
+    private boolean cmOtherPartyConfidentialityEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -61,7 +60,7 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
         setDefaultFieldValues(sscsCaseData);
         setDwpDocuments(sscsCaseData);
         setSelectWhoReviewsCase(sscsCaseData);
-        setOriginalSenderDropdown(sscsCaseData);
+        setSelectedConfidentialityPartyDropdown(sscsCaseData);
 
         if (sscsCaseData.isIbcCase()) {
             final String benefitCode = sscsCaseData.getBenefitCode();
@@ -157,12 +156,9 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
         sscsCaseData.setSelectWhoReviewsCase(new DynamicList(new DynamicListItem("", ""), listOptions));
     }
 
-    private void setOriginalSenderDropdown(SscsCaseData sscsCaseData) {
-        List<DynamicListItem> listOptions = getPartiesOnCase(sscsCaseData);
-        DynamicListItem selectedParty = cmInterlocConfidentialityPartyEnabled && isChildSupportAppeal(sscsCaseData)
-                ? new DynamicListItem("", "")
-                : listOptions.get(0);
-        sscsCaseData.setOriginalSender(new DynamicList(selectedParty, listOptions));
+    private void setSelectedConfidentialityPartyDropdown(SscsCaseData sscsCaseData) {
+        sscsCaseData.setSelectedConfidentialityParty(
+                getSelectedConfidentialityPartyDropdown(sscsCaseData, cmOtherPartyConfidentialityEnabled));
     }
 
 }
