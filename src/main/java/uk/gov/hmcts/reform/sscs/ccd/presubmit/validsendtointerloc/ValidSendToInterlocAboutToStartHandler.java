@@ -2,10 +2,11 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.*;
-import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getPartiesOnCase;
+import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -21,11 +22,14 @@ public class ValidSendToInterlocAboutToStartHandler implements PreSubmitCallback
 
     private final boolean postponementsFeature;
     private final boolean postHearingsB;
+    private final boolean cmOtherPartyConfidentialityEnabled;
 
     public ValidSendToInterlocAboutToStartHandler(@Value("${feature.postponements.enabled}")  boolean postponementsFeature,
-                                                  @Value("${feature.postHearingsB.enabled}")  boolean postHearingsB) {
+                                                  @Value("${feature.postHearingsB.enabled}")  boolean postHearingsB,
+                                                  @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
         this.postponementsFeature = postponementsFeature;
         this.postHearingsB = postHearingsB;
+        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
 
     @Override
@@ -48,7 +52,7 @@ public class ValidSendToInterlocAboutToStartHandler implements PreSubmitCallback
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
         setSelectWhoReviewsCase(sscsCaseData);
-        setOriginalSenderDropdown(sscsCaseData);
+        setSelectedConfidentialityPartyDropdown(sscsCaseData);
 
         if (postHearingsB) {
             sscsCaseData.setPrePostHearing(null);
@@ -69,9 +73,24 @@ public class ValidSendToInterlocAboutToStartHandler implements PreSubmitCallback
         sscsCaseData.setSelectWhoReviewsCase(new DynamicList(new DynamicListItem("", ""), listOptions));
     }
 
-    private void setOriginalSenderDropdown(SscsCaseData sscsCaseData) {
-        List<DynamicListItem> listOptions = getPartiesOnCase(sscsCaseData);
+    private void setSelectedConfidentialityPartyDropdown(SscsCaseData sscsCaseData) {
+        DynamicList dropdown = getSelectedConfidentialityPartyDropdown(sscsCaseData, cmOtherPartyConfidentialityEnabled);
+        sscsCaseData.setSelectedConfidentialityParty(dropdown);
+        log.info("CONF_PARTY_DEBUG ABOUT_TO_START caseId={} selectedCode={} selectedLabel={} listSize={} listCodes={} reason={}",
+                sscsCaseData.getCcdCaseId(),
+                dropdown != null && dropdown.getValue() != null ? dropdown.getValue().getCode() : null,
+                dropdown != null && dropdown.getValue() != null ? dropdown.getValue().getLabel() : null,
+                dropdown != null && dropdown.getListItems() != null ? dropdown.getListItems().size() : 0,
+                getListCodes(dropdown),
+                sscsCaseData.getInterlocReferralReason() != null ? sscsCaseData.getInterlocReferralReason().getDescription() : null);
+    }
 
-        sscsCaseData.setOriginalSender(new DynamicList(listOptions.get(0), listOptions));
+    private String getListCodes(DynamicList dropdown) {
+        if (dropdown == null || dropdown.getListItems() == null) {
+            return "[]";
+        }
+        return dropdown.getListItems().stream()
+                .map(item -> item.getCode() + ":" + item.getLabel())
+                .collect(Collectors.joining(", ", "[", "]"));
     }
 }

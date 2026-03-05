@@ -10,6 +10,7 @@ import static uk.gov.hmcts.reform.sscs.model.PartyItemList.REPRESENTATIVE;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -70,6 +71,19 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
     private PreSubmitCallbackResponse<SscsCaseData> processSendToInterloc(Callback<SscsCaseData> callback,
                                                                           SscsCaseData sscsCaseData, String userAuth) {
         var preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+        DynamicList selectedConfidentialityParty = sscsCaseData.getSelectedConfidentialityParty();
+        log.info("CONF_PARTY_DEBUG ABOUT_TO_SUBMIT caseId={} selectedCode={} selectedLabel={} listSize={} listCodes={} reason={} selectWhoReviews={}",
+                sscsCaseData.getCcdCaseId(),
+                selectedConfidentialityParty != null && selectedConfidentialityParty.getValue() != null
+                        ? selectedConfidentialityParty.getValue().getCode() : null,
+                selectedConfidentialityParty != null && selectedConfidentialityParty.getValue() != null
+                        ? selectedConfidentialityParty.getValue().getLabel() : null,
+                selectedConfidentialityParty != null && selectedConfidentialityParty.getListItems() != null
+                        ? selectedConfidentialityParty.getListItems().size() : 0,
+                getListCodes(selectedConfidentialityParty),
+                sscsCaseData.getInterlocReferralReason() != null ? sscsCaseData.getInterlocReferralReason().getDescription() : null,
+                sscsCaseData.getSelectWhoReviewsCase() != null && sscsCaseData.getSelectWhoReviewsCase().getValue() != null
+                        ? sscsCaseData.getSelectWhoReviewsCase().getValue().getCode() : null);
         if (isPostponementRequestInterlocSendToTcw(sscsCaseData)) {
             if (isDynamicListEmpty(sscsCaseData.getOriginalSender())) {
                 preSubmitCallbackResponse.addError("Must select original sender");
@@ -82,6 +96,10 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
             UploadParty uploadParty = getUploadParty(sscsCaseData.getOriginalSender());
             postponementRequestService.processPostponementRequest(sscsCaseData, uploadParty, Optional.empty());
         } else {
+            if (isConfidentialityReferral(sscsCaseData) && isDynamicListEmpty(sscsCaseData.getSelectedConfidentialityParty())) {
+                preSubmitCallbackResponse.addError("Must select party");
+                return preSubmitCallbackResponse;
+            }
             InterlocReviewState interlocState = Arrays.stream(InterlocReviewState.values())
                 .filter(x -> x.getCcdDefinition().equals(sscsCaseData.getSelectWhoReviewsCase().getValue().getCode()))
                 .findFirst()
@@ -101,15 +119,29 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
                 .equals(sscsCaseData.getSelectWhoReviewsCase().getValue().getCode());
     }
 
-    private UploadParty getUploadParty(DynamicList originalSender) {
-        return REPRESENTATIVE.getCode().equals(originalSender.getValue().getCode())
-                ? REP : UploadParty.fromValue(originalSender.getValue().getCode());
+    private boolean isConfidentialityReferral(SscsCaseData sscsCaseData) {
+        return sscsCaseData.getInterlocReferralReason() != null
+                && "Confidentiality".equalsIgnoreCase(sscsCaseData.getInterlocReferralReason().getDescription());
     }
 
-    private boolean isDynamicListEmpty(DynamicList originalSender) {
-        return originalSender == null
-                || originalSender.getValue() == null
-                || originalSender.getValue().getCode() == null;
+    private UploadParty getUploadParty(DynamicList selectedParty) {
+        return REPRESENTATIVE.getCode().equals(selectedParty.getValue().getCode())
+                ? REP : UploadParty.fromValue(selectedParty.getValue().getCode());
+    }
+
+    private boolean isDynamicListEmpty(DynamicList selectedParty) {
+        return selectedParty == null
+                || selectedParty.getValue() == null
+                || selectedParty.getValue().getCode() == null;
+    }
+
+    private String getListCodes(DynamicList dropdown) {
+        if (dropdown == null || dropdown.getListItems() == null) {
+            return "[]";
+        }
+        return dropdown.getListItems().stream()
+                .map(item -> item.getCode() + ":" + item.getLabel())
+                .collect(Collectors.joining(", ", "[", "]"));
     }
 
 }
