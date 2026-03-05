@@ -65,7 +65,7 @@ public class HmctsResponseReviewedSubmittedHandler implements PreSubmitCallbackH
                     sscsCaseDetails -> {
                         SscsCaseData caseData = sscsCaseDetails.getData();
                         caseData.setSelectWhoReviewsCase(sscsCaseData.getSelectWhoReviewsCase());
-                        caseData.setOriginalSender(sscsCaseData.getOriginalSender());
+                        caseData.setSelectedConfidentialityParty(sscsCaseData.getSelectedConfidentialityParty());
                     });
         } else {
             updateCase(

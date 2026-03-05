@@ -19,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -169,14 +170,22 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
         assertEquals(new DynamicList(expectedListItem1, expectedList), response.getData().getOriginalSender());
     }
 
-    @Test
-    public void givenCmInterlocConfidentialityFlagEnabledForChildSupport_thenOriginalSenderHasNoDefaultSelection() {
-        handler = new ValidSendToInterlocAboutToStartHandler(false, false, true);
+    @ParameterizedTest
+    @CsvSource({
+        "true,childSupport,''",
+        "false,childSupport,appellant",
+        "true,PIP,appellant",
+        "false,PIP,appellant"
+    })
+    public void givenFlagAndBenefitType_thenOriginalSenderHasExpectedDefaultSelection(boolean featureFlag,
+                                                                                       String benefitType,
+                                                                                       String expectedDefault) {
+        handler = new ValidSendToInterlocAboutToStartHandler(false, false, featureFlag);
         setupCallback();
-        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(benefitType).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals("", response.getData().getOriginalSender().getValue().getCode());
+        assertEquals(expectedDefault, response.getData().getOriginalSender().getValue().getCode());
     }
 }
