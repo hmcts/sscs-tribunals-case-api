@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.util;
 
+import static java.time.LocalDateTime.now;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
@@ -11,7 +12,10 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -20,8 +24,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Entity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
@@ -256,5 +262,51 @@ public class OtherPartyDataUtil {
             .filter(b -> Benefit.findBenefitByShortName(b)
             .filter(benefit -> benefit.getSscsType().equals(SscsType.SSCS2)).isPresent())
             .isPresent();
+    }
+
+    public static void updateOtherPartiesConfidentialityChangedDate(final List<CcdValue<OtherParty>> currentOtherParties,
+                                                        final List<CcdValue<OtherParty>> previousOtherParties) {
+        if (isEmpty(currentOtherParties)) {
+            return;
+        }
+        final Map<String, YesNo> confidentialityBefore = buildConfidentialityMap(previousOtherParties);
+        currentOtherParties.stream()
+            .filter(Objects::nonNull)
+            .map(CcdValue::getValue)
+            .filter(Objects::nonNull)
+            .forEach(current -> {
+                final YesNo priorConfidentiality = confidentialityBefore.get(current.getId());
+                if (nonNull(current.getConfidentialityRequired())
+                    && (priorConfidentiality == null
+                        || !Objects.equals(priorConfidentiality, current.getConfidentialityRequired()))) {
+                    current.setConfidentialityRequiredChangedDate(now());
+                }
+            });
+    }
+
+    private static Map<String, YesNo> buildConfidentialityMap(final List<CcdValue<OtherParty>> otherParties) {
+        if (isEmpty(otherParties)) {
+            return Collections.emptyMap();
+        }
+        final Map<String, YesNo> byId = new HashMap<>();
+        otherParties.stream()
+            .filter(Objects::nonNull)
+            .map(CcdValue::getValue)
+            .filter(Objects::nonNull)
+            .forEach(prior -> byId.put(prior.getId(), prior.getConfidentialityRequired()));
+        return byId;
+    }
+
+    public static void updateAppellantConfidentialityRequiredChangedDate(final Callback<SscsCaseData> callback) {
+        final YesNo confidentialityRequiredBefore = callback.getCaseDetailsBefore()
+            .map(CaseDetails::getCaseData)
+            .flatMap(SscsCaseData::getAppellantConfidentialityRequired)
+            .orElse(null);
+        final SscsCaseData currentCaseData = callback.getCaseDetails().getCaseData();
+        final YesNo confidentialityRequired = currentCaseData.getAppellantConfidentialityRequired().orElse(null);
+        if (nonNull(confidentialityRequired) && (confidentialityRequiredBefore == null || !Objects.equals(confidentialityRequiredBefore, confidentialityRequired))) {
+            currentCaseData.getAppellant()
+                .ifPresent(appellant -> appellant.setConfidentialityRequiredChangedDate(now()));
+        }
     }
 }
