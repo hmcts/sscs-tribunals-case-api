@@ -28,8 +28,6 @@ import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 import uk.gov.hmcts.reform.sscs.service.DocumentDownloadService;
 import uk.gov.hmcts.reform.sscs.service.TribunalsService;
 
-
-
 @ExtendWith(MockitoExtension.class)
 public class TyaControllerTest {
 
@@ -128,8 +126,6 @@ public class TyaControllerTest {
         assertThrows(DocumentNotFoundException.class, () -> controller.getAppealDocument(SERVICE_AUTH, URL));
     }
 
-    @Test
-    public void testToThrowForbiddenExceptionForUnauthorizedService() throws CcdException {
     @Test
     public void testToThrowForbiddenExceptionForUnauthorizedServiceForDocumentEndpoint() throws CcdException {
         //Given
