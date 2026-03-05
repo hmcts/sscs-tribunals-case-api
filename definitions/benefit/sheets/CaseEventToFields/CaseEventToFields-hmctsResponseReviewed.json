@@ -273,19 +273,6 @@
   },
   {
     "CaseEventID": "hmctsResponseReviewed",
-    "CaseFieldID": "originalSender",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
-    "FieldShowCondition": "isInterlocRequired=\"Yes\" AND interlocReferralReason=\"confidentiality\"",
-    "LiveFrom": "19/02/2026",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 30,
-    "CaseEventFieldLabel": "Select Party",
-    "PageID": "1.0",
-    "ShowSummaryChangeOption": "Y"
-  },
-  {
-    "CaseEventID": "hmctsResponseReviewed",
     "CaseFieldID": "tempNoteDetail",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
