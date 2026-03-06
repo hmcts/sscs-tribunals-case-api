@@ -5,12 +5,11 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
-import static uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler.getJsonCallbackForTest;
 import static uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler.getJsonCallbackForTestAndReplace;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.NamedParameters;
 import junitparams.Parameters;
@@ -55,8 +54,9 @@ public class GenDecisionNoticeFunctionalTest extends BaseFunctionTest {
     @Ignore //Ignore this test until we support additional benefit types
     public void nonDescriptorFlow_shouldGeneratePdfWithExpectedText(boolean allowed) throws IOException {
 
-        String json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/dlaScenarioCallbackNonDescriptorFlow.json", Arrays.asList("ALLOWED_OR_REFUSED"),
-            Arrays.asList(allowed ? "allowed" : "refused"));
+        String json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/dlaScenarioCallbackNonDescriptorFlow.json",
+            List.of("ALLOWED_OR_REFUSED"),
+            List.of(allowed ? "allowed" : "refused"));
 
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = Loader.loadPDF(bytes)) {
@@ -80,9 +80,12 @@ public class GenDecisionNoticeFunctionalTest extends BaseFunctionTest {
     }
 
     @Test
-    public void shouldGenerateExpectedDecisionTextWithOtherPartiesIncluded() throws IOException {
+    @Parameters({"Yes", "No"})
+    public void shouldGenerateExpectedDecisionTextWithOtherPartiesIncluded(String isAppointeeOnCase) throws IOException {
 
-        String json = getJsonCallbackForTest("handlers/writefinaldecision/writeFinalDecisionWithOtherParties.json");
+        String json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/writeFinalDecisionWithOtherParties.json",
+            List.of("IS_APPOINTEE_ON_CASE"),
+            List.of(isAppointeeOnCase));
 
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = Loader.loadPDF(bytes)) {
@@ -94,13 +97,26 @@ public class GenDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("3. Decision"));
             assertThat(pdfTextWithoutNewLines, containsString("4. Reason"));
 
-            assertThat(pdfTextWithoutNewLines, containsString("5. This has been an oral (face to face) hearing. "
-                + "The following people attended: Joe Bloggs the appellant, John Smith the second respondent, "
-                + "Jane Smith the third respondent and a representative from the First Tier Agency. "
-                + "David Jones the fourth respondent and Sarah Jones the fifth respondent did not attend. "
-                + "The Tribunal considered the appeal bundle to page B7."));
+            if ("Yes".equalsIgnoreCase(isAppointeeOnCase)) {
+                assertThat(pdfTextWithoutNewLines, containsString("5. This has been an oral (face to face) hearing. "
+                    + "The following people attended: John Smith the second respondent, "
+                    + "Jane Smith the third respondent and a representative from the First Tier Agency. "
+                    + "Mary Bloggs the appointee, David Jones the fourth respondent and Sarah Jones the fifth respondent did not attend. "
+                    + "The Tribunal considered the appeal bundle to page B7."));
 
-            assertThat(pdfTextWithoutNewLines, not(containsString("6.")));
+                assertThat(pdfTextWithoutNewLines, (containsString("6. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Mary Bloggs of the hearing and that it is in the interests of justice to proceed today. Tribunal Judge: A User Date: 20/02/2026 Issued to the parties on: 20/02/2026 Corrected decision signed by: Service Account Date of correction: 06/03/2026 Corrected notice issued to parties on")));
+            } else {
+
+                assertThat(pdfTextWithoutNewLines, containsString("5. This has been an oral (face to face) hearing. "
+                    + "The following people attended: Joe Bloggs the appellant, John Smith the second respondent, "
+                    + "Jane Smith the third respondent and a representative from the First Tier Agency. "
+                    + "David Jones the fourth respondent and Sarah Jones the fifth respondent did not attend. "
+                    + "The Tribunal considered the appeal bundle to page B7."));
+
+                assertThat(pdfTextWithoutNewLines, not(containsString("6.")));
+            }
+
+
         }
     }
 

@@ -214,15 +214,12 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
         var otherPartyAttendedQuestions = caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions();
 
-        int count = 0;
-
         // populate respondents
         for (int i = 0; i < otherPartyAttendedQuestions.size(); i++) {
             var otherParty = otherPartyAttendedQuestions.get(i).getValue();
             var respondent = (i < MAX_NUM_OF_RESPONDENT) ? Respondent.labelPrefixes[i].toLowerCase() : "";
 
             if (otherParty.getAttendedOtherParty() == attended) {
-                count++;
                 respondents.add(respondent);
                 names.add(otherParty.getOtherPartyName());
             }
@@ -230,7 +227,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
         var otherParties = new ArrayList<String>();
 
-        if (count < MAX_NUM_OF_RESPONDENT) {
+        if (names.size() < MAX_NUM_OF_RESPONDENT) {
             for (int i = 0; i < names.size(); i++) {
                 otherParties.add(String.format("%s the %s respondent", names.get(i), respondents.get(i)));
             }

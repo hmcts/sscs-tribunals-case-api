@@ -304,7 +304,7 @@
             "mobile": null
           },
           "organisation": null,
-          "isAppointee": "No",
+          "isAppointee": "IS_APPOINTEE_ON_CASE",
           "appointee": {
             "id": "ee10883b-2f93-4a0c-ab55-488438b55c28",
             "identity": {

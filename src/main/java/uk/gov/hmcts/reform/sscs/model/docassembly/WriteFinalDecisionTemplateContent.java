@@ -94,16 +94,16 @@ public abstract class WriteFinalDecisionTemplateContent {
     }
 
     public String getConfirmedOrSetAsideSentence(boolean setAside, String decisionDate, boolean isHmrc, boolean isIbca) {
-        String madeBy;
         if (isHmrc) {
-            madeBy = "HM Revenue and Customs";
+            return "The decision made by HM Revenue and Customs on " + DATEFORMATTER.format(LocalDate.parse(decisionDate)) + " is "
+                + (!setAside ? "confirmed." : "set aside.");
         } else if (isIbca) {
-            madeBy = "the Infected Blood Compensation Authority";
+            return "The decision made by the Infected Blood Compensation Authority on " + DATEFORMATTER.format(LocalDate.parse(decisionDate)) + " is "
+                + (!setAside ? "confirmed." : "set aside.");
         } else {
-            madeBy = "the Secretary of State";
+            return "The decision made by the Secretary of State on " + DATEFORMATTER.format(LocalDate.parse(decisionDate)) + " is "
+                    + (!setAside ? "confirmed." : "set aside.");
         }
-
-        return String.format("The decision made by %s on %s is %s.", madeBy, DATEFORMATTER.format(LocalDate.parse(decisionDate)), !setAside ? "confirmed" : "set aside");
     }
 
     public String getRecommendationSentence(String code, String appellantName) {
@@ -173,8 +173,9 @@ public abstract class WriteFinalDecisionTemplateContent {
         }
     }
 
-    private String getAppellantAndOtherPartySentences(boolean appellantAttended,
+    private String getAppellantAndOtherPartySentences(boolean isAppointeeOnCase,
                                                       boolean appointeeAttended,
+                                                      boolean appellantAttended,
                                                       String appellantName,
                                                       String appointeeName,
                                                       boolean presentingOfficerAttended,
@@ -184,10 +185,11 @@ public abstract class WriteFinalDecisionTemplateContent {
 
         List<String> sentences = new ArrayList<>();
 
-        var attendedText = getRespondentsAttended(appellantAttended, appellantName, appointeeAttended,
+        var attendedText = getRespondentsAttended(isAppointeeOnCase, appellantAttended, appellantName, appointeeAttended,
             appointeeName, presentingOfficerAttended, otherPartyNamesAttended);
 
-        var notAttendedText = getRespondentsNotAttend(appellantAttended, appellantName, presentingOfficerAttended,
+        var notAttendedText = getRespondentsNotAttend(isAppointeeOnCase, appellantAttended, appellantName, appointeeAttended,
+            appointeeName, presentingOfficerAttended,
             otherPartyNamesDidNotAttend);
 
         if (StringUtils.isNotEmpty(attendedText)) {
@@ -205,7 +207,8 @@ public abstract class WriteFinalDecisionTemplateContent {
         return sentences.isEmpty() ? "" : String.join(". ", sentences) + ".";
     }
 
-    private String getRespondentsAttended(boolean appellantAttended,
+    private String getRespondentsAttended(boolean isAppointeeOnCase,
+                                          boolean appellantAttended,
                                           String appellantName,
                                           boolean appointeeAttended,
                                           String appointeeName,
@@ -214,10 +217,12 @@ public abstract class WriteFinalDecisionTemplateContent {
 
         List<String> respondents = new ArrayList<>();
 
-        if (appellantAttended) {
-            respondents.add(String.format("%s the appellant", appellantName));
-        } else if (appointeeAttended) {
+        if (isAppointeeOnCase & appointeeAttended) {
             respondents.add(String.format("%s the appointee", appointeeName));
+        }
+
+        if (!isAppointeeOnCase && appellantAttended) {
+            respondents.add(String.format("%s the appellant", appellantName));
         }
 
         if (otherPartyNamesAttended != null && !otherPartyNamesAttended.isEmpty()) {
@@ -231,14 +236,21 @@ public abstract class WriteFinalDecisionTemplateContent {
         return joinRespondentsNameAsStr(respondents);
     }
 
-    private String getRespondentsNotAttend(boolean appellantAttended,
+    private String getRespondentsNotAttend(boolean isAppointeeOnCase,
+                                           boolean appellantAttended,
                                            String appellantName,
+                                           boolean appointeeAttended,
+                                           String appointeeName,
                                            boolean presentingOfficerAttended,
                                            List<String> otherPartyNamesDidNotAttend) {
 
         List<String> respondents = new ArrayList<>();
 
-        if (!appellantAttended) {
+        if (isAppointeeOnCase && !appointeeAttended) {
+            respondents.add(String.format("%s the appointee", appointeeName));
+        }
+
+        if (!isAppointeeOnCase && !appellantAttended) {
             respondents.add(String.format("%s the appellant", appellantName));
         }
 
@@ -292,12 +304,12 @@ public abstract class WriteFinalDecisionTemplateContent {
                                                                          List<String> otherPartyNamesDidNotAttend) {
 
         if (isAppointeeOnCase && appointeeAttended) {
-            return getSentenceAppointeeOnCaseAppointeeAttended(hearingType, appellantName, appointeeName,
+            return getSentenceAppointeeOnCaseAppointeeAttended(hearingType, appellantAttended, appellantName, appointeeName,
                 presentingOfficerAttended, bundlePage, otherPartyNamesAttended, otherPartyNamesDidNotAttend);
         }
 
         if (isAppointeeOnCase) {
-            return getSentenceAppointeeOnCaseAppointeeNotAttended(hearingType, appellantName, appointeeName, presentingOfficerAttended,
+            return getSentenceAppointeeOnCaseAppointeeNotAttended(hearingType, appellantAttended, appellantName, appointeeName, presentingOfficerAttended,
                 bundlePage, otherPartyNamesAttended, otherPartyNamesDidNotAttend);
         }
 
@@ -307,11 +319,12 @@ public abstract class WriteFinalDecisionTemplateContent {
                 otherPartyNamesAttended, otherPartyNamesDidNotAttend);
         }
 
-        return getSentenceAppointeeNotOnCaseAppellantNotAttended(hearingType, appellantName,
+        return getSentenceAppointeeNotOnCaseAppellantNotAttended(hearingType, appointeeAttended, appellantName,
             appointeeName, presentingOfficerAttended, bundlePage, otherPartyNamesAttended, otherPartyNamesDidNotAttend);
     }
 
     private List<String> getSentenceAppointeeOnCaseAppointeeAttended(String hearingType,
+                                                                     boolean appellantAttended,
                                                                      String appellantName,
                                                                      String appointeeName,
                                                                      boolean presentingOfficerAttended,
@@ -322,8 +335,9 @@ public abstract class WriteFinalDecisionTemplateContent {
             return singletonList(
                 getFaceToFaceTypeSentences()
                     + getAppellantAndOtherPartySentences(
-                    false,
+                        true,
                     true,
+                    appellantAttended,
                     appellantName,
                     appointeeName,
                     presentingOfficerAttended,
@@ -334,17 +348,20 @@ public abstract class WriteFinalDecisionTemplateContent {
             return singletonList(
                 getNonFaceToFaceTypeSentences(hearingType)
                     + getAppellantAndOtherPartySentences(
-                    false,
+                        true,
                     true,
+                    appellantAttended,
                     appellantName,
                     appointeeName,
                     presentingOfficerAttended,
                     bundlePage,
-                    otherPartyNamesAttended, otherPartyNamesDidNotAttend));
+                    otherPartyNamesAttended,
+                    otherPartyNamesDidNotAttend));
         }
     }
 
     private List<String> getSentenceAppointeeOnCaseAppointeeNotAttended(String hearingType,
+                                                                        boolean appellantAttended,
                                                                         String appellantName,
                                                                         String appointeeName,
                                                                         boolean presentingOfficerAttended,
@@ -355,8 +372,9 @@ public abstract class WriteFinalDecisionTemplateContent {
             return asList(
                 getFaceToFaceTypeSentences()
                     + getAppellantAndOtherPartySentences(
-                    true,
+                        true,
                     false,
+                    appellantAttended,
                     appellantName,
                     appointeeName,
                     presentingOfficerAttended,
@@ -368,8 +386,9 @@ public abstract class WriteFinalDecisionTemplateContent {
             return asList(
                 getNonFaceToFaceTypeSentences(hearingType)
                     + getAppellantAndOtherPartySentences(
-                    true,
+                        true,
                     false,
+                    appellantAttended,
                     appellantName,
                     appointeeName,
                     presentingOfficerAttended,
@@ -384,35 +403,40 @@ public abstract class WriteFinalDecisionTemplateContent {
                                                                         boolean presentingOfficerAttended,
                                                                         String bundlePage,
                                                                         List<String> otherPartyNamesAttended,
-                                                                        List<String> otherPartyNamesDidNotAttendHearing) {
+                                                                        List<String> otherPartyNamesDidNotAttend) {
         if (equalsIgnoreCase(FACETOFACE, hearingType)) {
             return singletonList(
                 getFaceToFaceTypeSentences()
                     + getAppellantAndOtherPartySentences(
-                    true,
+                        false,
                     false,
+                    true,
                     appellantName,
                     appointeeName,
                     presentingOfficerAttended,
                     bundlePage,
-                    otherPartyNamesAttended, otherPartyNamesDidNotAttendHearing));
+                    otherPartyNamesAttended,
+                    otherPartyNamesDidNotAttend));
         } else if (equalsIgnoreCase(TRIAGE, hearingType)) {
             return singletonList(getTriageConsideredParagraph(bundlePage));
         } else {
             return singletonList(
                 getNonFaceToFaceTypeSentences(hearingType)
                     + getAppellantAndOtherPartySentences(
-                    true,
+                        false,
                     false,
+                    true,
                     appellantName,
                     appointeeName,
                     presentingOfficerAttended,
                     bundlePage,
-                    otherPartyNamesAttended, otherPartyNamesDidNotAttendHearing));
+                    otherPartyNamesAttended,
+                    otherPartyNamesDidNotAttend));
         }
     }
 
     private List<String> getSentenceAppointeeNotOnCaseAppellantNotAttended(String hearingType,
+                                                                           boolean appointeeAttended,
                                                                            String appellantName, String appointeeName,
                                                                            boolean presentingOfficerAttended,
                                                                            String bundlePage,
@@ -421,7 +445,7 @@ public abstract class WriteFinalDecisionTemplateContent {
         if (equalsIgnoreCase(FACETOFACE, hearingType)) {
             return asList(
                 getFaceToFaceTypeSentences()
-                    + getAppellantAndOtherPartySentences(false, false, appellantName, appointeeName,
+                    + getAppellantAndOtherPartySentences(false, appointeeAttended, false, appellantName, appointeeName,
                     presentingOfficerAttended, null, otherPartyNamesAttended,
                     otherPartyNamesDidNotAttend),
                 getConsideredParagraph(bundlePage, appellantName));
@@ -430,7 +454,7 @@ public abstract class WriteFinalDecisionTemplateContent {
         } else {
             return asList(
                 getNonFaceToFaceTypeSentences(hearingType)
-                    + getAppellantAndOtherPartySentences(false, false, appellantName, appointeeName,
+                    + getAppellantAndOtherPartySentences(false, appointeeAttended, false, appellantName, appointeeName,
                     presentingOfficerAttended, null, otherPartyNamesAttended,
                     otherPartyNamesDidNotAttend),
                 getConsideredParagraph(bundlePage, appellantName));
