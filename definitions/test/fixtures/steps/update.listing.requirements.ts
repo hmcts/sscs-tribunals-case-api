@@ -31,7 +31,7 @@ export class UpdateListingRequirement extends BaseStep {
 
     await this.homePage.navigateToTab('Hearings');
 
-    let maxReloads = 10;
+    let maxReloads = 5;
     let statusResponse: string | undefined;
 
     for(let attempt = 0; attempt < maxReloads; attempt++) {  
