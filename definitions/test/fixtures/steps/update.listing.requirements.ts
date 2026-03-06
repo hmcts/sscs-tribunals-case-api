@@ -24,6 +24,41 @@ export class UpdateListingRequirement extends BaseStep {
       'No'
     );
     await this.checkYourAnswersPage.confirmSubmission();
+    await this.waitForHearingStatus();
+  }
+
+  async waitForHearingStatus() {
+
+    await this.homePage.navigateToTab('Hearings');
+
+    let maxReloads = 10;
+    let statusResponse: string | undefined;
+
+    for(let attempt = 0; attempt < maxReloads; attempt++) {  
+      
+      try {
+        const respPromise = this.page.waitForResponse(
+          response => response.url().includes('/api/hearings/getHearings') && response.status() === 200,
+          { timeout: 60000 }
+        );
+        await this.homePage.reloadPage();
+        const response = await respPromise;
+        const responseBody = await response.json();
+
+        statusResponse = responseBody.caseHearings?.[0]?.hmcStatus;
+        if (statusResponse === 'AWAITING_LISTING') { 
+          break; 
+        } else {
+          console.log(`HMC status is: ${statusResponse} and is not AWAITING_LISTING, retrying... Attempt ${attempt + 1}/${maxReloads}`);
+          if (attempt < maxReloads - 1) {
+            await this.page.waitForTimeout(5000); // Wait 5 seconds before retrying
+          }
+        }
+      } catch (error) {
+        console.error(`Attempt ${attempt + 1}: Failed to get hearings response - ${error.message}`);
+        throw error;
+      }
+    }
   }
 
   async updateAndVerifyJoHTiers() {
