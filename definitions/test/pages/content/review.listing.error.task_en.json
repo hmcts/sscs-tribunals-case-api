@@ -1,8 +1,8 @@
 {
-  "name": "Review Listing Error - CTSC",
+  "name": "CTSC - Review Listing Error",
   "priority": "high",
   "assignedToWhenNotAssigned": "Unassigned",
-  "assignedTo": "SSCS ctscadmin",
+  "assignedTo": "sscs-ctscdmin nw-liverpool",
   "unassignedManageOptions": ["Assign to me"],
   "assignedManageOptions": ["Reassign task", "Unassign task"],
   "unassignedManageOptionsForCaseAllocator": [
@@ -10,13 +10,9 @@
     "Cancel task",
     "Assign to me"
   ],
-  "nextStepsOptions": ["Update Listing Requirements", "Ready to list"],
+  "nextStepsOptions": ["Update Listing Requirements"],
   "updateListingRequirements": {
     "link": "Update Listing Requirements",
     "eventTitle": "Update Listing Requirements"
-  },
-  "readyToList": {
-    "link": "Ready to list",
-    "eventTitle": "Ready to list"
   }
 }

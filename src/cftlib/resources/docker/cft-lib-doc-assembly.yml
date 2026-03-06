@@ -1,8 +1,6 @@
 ---
 version: '3.5'
-
 name: cft-lib-doc-assembly
-
 services:
   rpa-dg-docassembly-api:
     image: hmctspublic.azurecr.io/dg/docassembly:latest
@@ -18,6 +16,7 @@ services:
       - DOCMOSIS_ACCESS_KEY=${DOCMOSIS_ACCESS_KEY}
       - DOCMOSIS_TEMPLATES_ENDPOINT_AUTH=${DOCMOSIS_TEMPLATES_ENDPOINT_AUTH}
       - SERVER_PORT=8079
+      - CDAM_URL=http://host.docker.internal:4455
     ports:
       - 4631:8079
     extra_hosts:
@@ -25,7 +24,6 @@ services:
       - "host.docker.internal:host-gateway"
     networks:
       - cftlib_default
-
 networks:
   cftlib_default:
     external: true

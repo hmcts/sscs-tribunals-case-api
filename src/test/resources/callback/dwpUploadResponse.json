@@ -24,6 +24,7 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
+      "dwpFurtherInfo": "Yes",
       "elementsDisputedList": [
         "testElement"
       ],
@@ -56,13 +57,13 @@
       ],
       "dynamicDwpState" : {
         "value" : {
-          "code": "withdrawalReceived",
-          "label": "Withdrawal received"
+          "code": "responseSubmittedDwp",
+          "label": "Response submitted (FTA)"
         },
         "list_items" : [
           {
-            "code": "withdrawalReceived",
-            "label": "Withdrawal received"
+            "code": "responseSubmittedDwp",
+            "label": "Response submitted (FTA)"
           }
         ]
       },

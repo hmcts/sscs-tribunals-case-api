@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InternalCaseDocumentData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
@@ -244,12 +245,30 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenAWriteFinalDecisionEventWithDraftDocumentOnWithPostHearingsNotEnabled_thenDeleteData() {
+    public void givenAWriteFinalDecisionEventWithDraftDocumentOnWithPostHearingsNotEnabled_thenRetainData() {
         sscsCaseData.setSscsDocument(List.of(SscsDocument.builder()
                 .value(SscsDocumentDetails.builder()
                         .documentType(DRAFT_DECISION_NOTICE.getValue())
                         .build())
                 .build()));
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
+        sscsCaseData.setState(State.VALID_APPEAL);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertDataRetained(response);
+    }
+
+    @Test
+    public void givenAWriteFinalDecisionEventWithDraftDocumentInInternalDocuments_thenRetainData() {
+        sscsCaseData.setInternalCaseDocumentData(InternalCaseDocumentData.builder().sscsInternalDocument(
+                List.of(SscsDocument.builder()
+                        .value(SscsDocumentDetails.builder()
+                                .documentType(DRAFT_DECISION_NOTICE.getValue())
+                                .build())
+                        .build())
+        ).build());
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);

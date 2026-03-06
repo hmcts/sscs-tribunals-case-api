@@ -43,6 +43,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
+import uk.gov.hmcts.reform.sscs.evidenceshare.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
@@ -149,8 +150,10 @@ public class NotificationsItBase {
     private final Boolean saveCorrespondence = false;
 
     @Mock
-    private MarkdownTransformationService markdownTransformationService;
+    private BulkPrintService bulkPrintService;
 
+    @Mock
+    private MarkdownTransformationService markdownTransformationService;
     @Mock
     private SaveCorrespondenceAsyncService saveCorrespondenceAsyncService;
 
@@ -162,7 +165,7 @@ public class NotificationsItBase {
 
     @Before
     public void setup() throws Exception {
-        NotificationSender sender = new NotificationSender(notificationClient, null, notificationTestRecipients, markdownTransformationService, saveCorrespondenceAsyncService, saveCorrespondence);
+        NotificationSender sender = new NotificationSender(notificationClient, null, bulkPrintService, notificationTestRecipients, markdownTransformationService, saveCorrespondenceAsyncService, saveCorrespondence);
 
         SendNotificationService sendNotificationService = new SendNotificationService(sender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
 

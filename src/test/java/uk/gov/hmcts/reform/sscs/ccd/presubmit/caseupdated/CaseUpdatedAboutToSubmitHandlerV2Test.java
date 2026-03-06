@@ -91,6 +91,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
+import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
@@ -733,6 +734,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         String venueB = "VenueB";
         String venueEpimsId = "12345";
         when(venueService.getEpimsIdForVenue(venueB)).thenReturn(venueEpimsId);
+        when(venueService.getVenueDetailsForActiveVenueByEpimsId(venueEpimsId)).thenReturn(VenueDetails.builder().build());
         when(airLookupService.lookupAirVenueNameByPostCode("AB12 00B", sscsCaseData.getAppeal().getBenefitType())).thenReturn(
                 venueB);
 
@@ -749,6 +751,95 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     }
 
     @Test
+    void givenAnAppealHasLegacyVenue_thenDoNotUpdateVenue() {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIsAppointee("No");
+
+        when(regionalProcessingCenterService.getByPostcode(eq("AB12 00B"), anyBoolean())).thenReturn(
+                RegionalProcessingCenter.builder()
+                        .name("rpcName")
+                        .postcode("rpcPostcode")
+                        .epimsId("rpcEpimsId")
+                        .build());
+        String venueA = "VenueA";
+        String venueB = "VenueB";
+        String venueBEpimsId = "12345";
+        String venueAEpimsId = "12346";
+        callback.getCaseDetails().getCaseData().setProcessingVenue(venueA);
+        when(venueService.getEpimsIdForVenue(venueB)).thenReturn(venueBEpimsId);
+        when(venueService.getEpimsIdForVenue(venueA)).thenReturn(venueAEpimsId);
+        when(venueService.getVenueDetailsForActiveVenueByEpimsId(venueBEpimsId)).thenReturn(VenueDetails.builder().venName(venueB).legacyVenue(venueA).build());
+        when(airLookupService.lookupAirVenueNameByPostCode("AB12 00B", sscsCaseData.getAppeal().getBenefitType())).thenReturn(
+                venueB);
+
+        when(refDataService.getCourtVenueRefDataByEpimsId(venueAEpimsId)).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("regionId").build());
+
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("AB12 00B");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(venueA, response.getData().getProcessingVenue());
+        assertNotNull(response.getData().getCaseManagementLocation());
+        assertEquals("regionId", response.getData().getCaseManagementLocation().getRegion());
+    }
+
+    @Test
+    void givenAnAppealWithNewProcessingVenue_thenUpdateIfNoLegacyVenue() {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIsAppointee("No");
+
+        when(regionalProcessingCenterService.getByPostcode(eq("AB12 00B"), anyBoolean())).thenReturn(
+                RegionalProcessingCenter.builder()
+                        .name("rpcName")
+                        .postcode("rpcPostcode")
+                        .epimsId("rpcEpimsId")
+                        .build());
+        String venueA = "VenueA";
+        String venueB = "VenueB";
+        String venueEpimsId = "12345";
+        callback.getCaseDetails().getCaseData().setProcessingVenue(venueA);
+        when(venueService.getEpimsIdForVenue(venueB)).thenReturn(venueEpimsId);
+        when(venueService.getVenueDetailsForActiveVenueByEpimsId(venueEpimsId)).thenReturn(VenueDetails.builder().venName(venueB).build());
+        when(airLookupService.lookupAirVenueNameByPostCode("AB12 00B", sscsCaseData.getAppeal().getBenefitType())).thenReturn(
+                venueB);
+
+        when(refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId)).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("regionId").build());
+
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("AB12 00B");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(venueB, response.getData().getProcessingVenue());
+        assertNotNull(response.getData().getCaseManagementLocation());
+    }
+
+    @Test
+    void givenAnAppealWithProcessingVenue_thenDoNotUpdateIfNoNewVenue() {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIsAppointee("No");
+
+        when(regionalProcessingCenterService.getByPostcode(eq("AB12 00B"), anyBoolean())).thenReturn(
+                RegionalProcessingCenter.builder()
+                        .name("rpcName")
+                        .postcode("rpcPostcode")
+                        .epimsId("rpcEpimsId")
+                        .build());
+        String venueA = "VenueA";
+        String venueB = "VenueB";
+        String venueEpimsId = "12345";
+        callback.getCaseDetails().getCaseData().setProcessingVenue(venueA);
+        when(venueService.getEpimsIdForVenue(venueB)).thenReturn(venueEpimsId);
+        when(venueService.getVenueDetailsForActiveVenueByEpimsId(venueEpimsId)).thenReturn(null);
+        when(airLookupService.lookupAirVenueNameByPostCode("AB12 00B", sscsCaseData.getAppeal().getBenefitType())).thenReturn(
+                venueB);
+
+        when(refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId)).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("regionId").build());
+
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("AB12 00B");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(venueA, response.getData().getProcessingVenue());
+    }
+
+    @Test
     void givenAnAppealWithNewAppointeePostcode_thenUpdateProcessingVenueWithAppointeeVenue() {
         when(regionalProcessingCenterService.getByPostcode(eq("AB12 00B"), anyBoolean())).thenReturn(
                 RegionalProcessingCenter.builder()
@@ -761,6 +852,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         String venueEpimsId = "12345";
 
         when(venueService.getEpimsIdForVenue(venueB)).thenReturn(venueEpimsId);
+        when(venueService.getVenueDetailsForActiveVenueByEpimsId(venueEpimsId)).thenReturn(VenueDetails.builder().build());
         when(airLookupService.lookupAirVenueNameByPostCode("AB12 00B", sscsCaseData.getAppeal().getBenefitType())).thenReturn(venueB);
         when(refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId)).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("regionId").build());
 
@@ -814,6 +906,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         String venueEpimsId = "12345";
 
         when(venueService.getEpimsIdForVenue(venueB)).thenReturn(venueEpimsId);
+        when(venueService.getVenueDetailsForActiveVenueByEpimsId(venueEpimsId)).thenReturn(VenueDetails.builder().build());
         when(airLookupService.lookupAirVenueNameByPostCode("AB12 00B", sscsCaseData.getAppeal().getBenefitType()))
                 .thenReturn(venueB);
         when(refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId)).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("regionId").build());

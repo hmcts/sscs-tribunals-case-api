@@ -16,7 +16,7 @@ export class ListingError extends BaseStep {
     loginRequired: boolean = true
   ): Promise<void> {
     if (loginRequired) {
-      await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
+      await this.loginUserWithCaseId(credentials.amCtscAdminNwLiverpool, false, caseId);
     }
     await this.homePage.chooseEvent('Listing Error');
 

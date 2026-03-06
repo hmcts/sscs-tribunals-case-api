@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -19,12 +18,9 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.RESPONSE_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist.ReadyToListAboutToSubmitHandler.EXISTING_HEARING_WARNING;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist.ReadyToListAboutToSubmitHandler.GAPS_CASE_WARNING;
 
-import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,20 +36,17 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Venue;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.exception.GetCaseException;
 import uk.gov.hmcts.reform.sscs.exception.TribunalsEventProcessingException;
 import uk.gov.hmcts.reform.sscs.exception.UpdateCaseException;
 import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
+import uk.gov.hmcts.reform.sscs.service.HearingsService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingRequestHandler;
 
@@ -67,6 +60,8 @@ public class ReadyToListAboutToSubmitHandlerTest {
     private RegionalProcessingCenterService regionalProcessingCenterService;
     @Mock
     private HearingRequestHandler hearingRequestHandler;
+    @Mock
+    private HearingsService hearingsService;
 
     private SscsCaseData caseData;
     private ReadyToListAboutToSubmitHandler handler;
@@ -127,40 +122,6 @@ public class ReadyToListAboutToSubmitHandlerTest {
 
         assertEquals(0, response.getErrors().size());
         assertEquals(0, response.getWarnings().size());
-    }
-
-    @ParameterizedTest
-    @CsvSource({"YES", "NO"})
-    public void givenAListAssistCaseIfAHearingExistsInTheFutureThenReturnWarning(YesNo ignoreCallbackWarnings) {
-        Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
-                .hearingDate(LocalDate.now().minusDays(10).toString())
-                .start(now().minusDays(10))
-                .hearingId(String.valueOf(1))
-                .venue(Venue.builder().name("Venue 1").build())
-                .time("12:00")
-                .build()).build();
-
-        Hearing hearing2 = Hearing.builder().value(HearingDetails.builder()
-                .hearingDate(LocalDate.now().plusDays(5).toString())
-                .start(now().plusDays(5))
-                .hearingId(String.valueOf(1))
-                .venue(Venue.builder().name("Venue 1").build())
-                .time("12:00")
-                .build()).build();
-
-        caseData.setHearings(List.of(hearing1, hearing2));
-        caseData.setRegion("TEST");
-        caseData.setIgnoreCallbackWarnings(ignoreCallbackWarnings);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertEquals(0, response.getErrors().size());
-        if (ignoreCallbackWarnings == NO) {
-            assertEquals(1, response.getWarnings().size());
-            assertTrue(response.getWarnings().contains(EXISTING_HEARING_WARNING));
-        } else {
-            assertEquals(0, response.getWarnings().size());
-        }
     }
 
     @Test
@@ -252,21 +213,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
 
     @Test
     public void givenAListAssistCaseIfAHearingExistsInTheFutureAndUserProceedsThenSendAHearingRequestMessage() {
-        Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
-                .hearingDate(LocalDate.now().minusDays(10).toString())
-                .start(now().minusDays(10))
-                .hearingId(String.valueOf(1))
-                .venue(Venue.builder().name("Venue 1").build())
-                .time("12:00")
-                .build()).build();
-        Hearing hearing2 = Hearing.builder().value(HearingDetails.builder()
-                .hearingDate(LocalDate.now().plusDays(5).toString())
-                .start(now().plusDays(5))
-                .hearingId(String.valueOf(1))
-                .venue(Venue.builder().name("Venue 1").build())
-                .time("12:00")
-                .build()).build();
-        caseData.setHearings(List.of(hearing1, hearing2));
+        caseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
         callback = new Callback<>(caseDetails, empty(), READY_TO_LIST, true);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -330,5 +277,21 @@ public class ReadyToListAboutToSubmitHandlerTest {
                 .name("TEST")
                 .build());
         when(regionalProcessingCenterService.getRegionalProcessingCenterMap()).thenReturn(rpcMap);
+    }
+
+    @Test
+    public void givenListAssistCase_thenSetIgnoreWarningsToNull() {
+        caseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
+        caseData.setIgnoreCallbackWarnings(YES);
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertNull(response.getData().getIgnoreCallbackWarnings());
+    }
+
+    @Test
+    public void givenGapsCase_thenSetIgnoreWarningsIsNotSet() {
+        caseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.GAPS);
+        caseData.setIgnoreCallbackWarnings(NO);
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(NO).isEqualTo(response.getData().getIgnoreCallbackWarnings());
     }
 }

@@ -10,10 +10,10 @@ jobs:
   buildBranch:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           path: build/branch
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: branch
           path: build/branch/definitions/benefit/sheets/*
@@ -21,11 +21,11 @@ jobs:
   buildMaster:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: master
           path: build/master
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: master
           path: build/master/definitions/benefit/sheets/*
@@ -34,34 +34,29 @@ jobs:
     runs-on: ubuntu-latest
     needs: [buildBranch, buildMaster]
     steps:
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: 16
-      - uses: actions/download-artifact@v4
+          node-version: 24
+      - uses: actions/download-artifact@v5
         with:
           name: branch
           path: build/branch
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: master
           path: build/master
       - name: Generate report
         id: ccd-diff
         run: |
-          REPORT="$(npx -q @hmcts/ccd-diff build/master build/branch)"
-          REPORT="${REPORT//'%'/'%25'}"
-          REPORT="${REPORT//$'\n'/'%0A'}"
-          REPORT="${REPORT//$'\r'/'%0D'}"
-          echo $REPORT
-          echo "::set-output name=content::$REPORT"
+          echo "# CCD diff report" > report.txt
+          echo "" >> report.txt
+          npx -q @hmcts/ccd-diff build/master build/branch >> report.txt
       - name: Display
         run: |
-          echo "${{ steps.ccd-diff.outputs.content }}"
+          cat report.txt
       - name: Add report
         uses: thollander/actions-comment-pull-request@v3
         with:
-          message: |
-            # CCD diff report
-            ${{ steps.ccd-diff.outputs.content }}
+          file-path: report.txt
           comment-tag: CCD_diff_report
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

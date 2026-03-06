@@ -46,6 +46,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
@@ -55,6 +56,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingWindow;
@@ -62,12 +64,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
-import uk.gov.hmcts.reform.sscs.exception.GetHearingException;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.exception.UnhandleableHearingStateException;
 import uk.gov.hmcts.reform.sscs.exception.UpdateCaseException;
@@ -296,29 +298,28 @@ class HearingsServiceTest {
             .isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
     }
 
-    @DisplayName("When create Hearing is given and there is already a hearing requested/awaiting listing addHearingResponse should run without error")
-    @Test
-    void processHearingWrapperCreateExistingHearing() throws GetHearingException {
-        var details = uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDetails.builder().build();
-        RequestDetails requestDetails = RequestDetails.builder().versionNumber(2L).build();
-        HearingGetResponse hearingGetResponse = HearingGetResponse.builder()
-            .hearingDetails(details)
-            .requestDetails(requestDetails)
-            .caseDetails(CaseDetails.builder().build())
-            .partyDetails(List.of())
-            .hearingResponse(HearingResponse.builder().build())
-            .build();
-        given(hmcHearingApiService.getHearingRequest(anyString())).willReturn(hearingGetResponse);
+    @DisplayName("When create Hearing is given and there is already a hearing requested/awaiting listing addHearingResponse should"
+            + "run without error")
+    @ParameterizedTest
+    @CsvSource({"AWAITING_LISTING", "UPDATE_REQUESTED", "UPDATE_SUBMITTED", "HEARING_REQUESTED"})
+    void processHearingWrapperCreateExistingRequestedOrAwaitingListingHearing(HmcStatus hmcStatus) throws ListingException {
         HearingsGetResponse hearingsGetResponse = HearingsGetResponse.builder()
             .caseHearings(List.of(CaseHearing.builder()
                 .hearingId(HEARING_REQUEST_ID)
-                .hmcStatus(HmcStatus.HEARING_REQUESTED)
+                .hmcStatus(hmcStatus)
                 .requestVersion(1L)
                 .build()))
             .build();
 
         given(hmcHearingApiService.getHearingsRequest(anyString(),eq(null)))
             .willReturn(hearingsGetResponse);
+        given(hmcHearingApiService.sendCreateHearingRequest(any(HearingRequestPayload.class)))
+                .willReturn(HmcUpdateResponse.builder().build());
+        var hearingPayload = HearingRequestPayload.builder()
+                .hearingDetails(uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDetails.builder()
+                        .panelRequirements(PanelRequirements.builder().roleTypes(List.of("58"))
+                                .build()).build()).build();
+        when(hearingsMapping.buildHearingPayload(any(), any())).thenReturn(hearingPayload);
 
         wrapper.setHearingState(CREATE_HEARING);
 
@@ -326,19 +327,27 @@ class HearingsServiceTest {
             .isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
     }
 
-    @Test
-    void processHearingWrapperCreateExistingHearingWhenHearingDoesntExists() throws GetHearingException {
-        given(hmcHearingApiService.getHearingRequest(anyString())).willThrow(new GetHearingException(""));
+    @ParameterizedTest
+    @CsvSource({"LISTED", "CANCELLED", "CANCELLATION_REQUESTED", "CANCELLATION_SUBMITTED", "ADJOURNED", "AWAITING_ACTUALS", "COMPLETED"})
+    void processHearingWrapperCreateExistingHearingWhenHearingIsNotRequestedOrAwaitingListing(HmcStatus hmcStatus) throws ListingException {
         HearingsGetResponse hearingsGetResponse = HearingsGetResponse.builder()
             .caseHearings(List.of(CaseHearing.builder()
                                       .hearingId(HEARING_REQUEST_ID)
-                                      .hmcStatus(HmcStatus.HEARING_REQUESTED)
+                                      .hmcStatus(hmcStatus)
                                       .requestVersion(1L)
                                       .build()))
             .build();
 
+        given(hmcHearingApiService.sendCreateHearingRequest(any(HearingRequestPayload.class)))
+                .willReturn(HmcUpdateResponse.builder().build());
         given(hmcHearingApiService.getHearingsRequest(anyString(),eq(null)))
             .willReturn(hearingsGetResponse);
+
+        var hearingPayload = HearingRequestPayload.builder()
+                .hearingDetails(uk.gov.hmcts.reform.sscs.model.single.hearing.HearingDetails.builder()
+                        .panelRequirements(PanelRequirements.builder().roleTypes(List.of("58"))
+                                .build()).build()).build();
+        when(hearingsMapping.buildHearingPayload(any(), any())).thenReturn(hearingPayload);
 
         wrapper.setHearingState(CREATE_HEARING);
 
@@ -346,7 +355,7 @@ class HearingsServiceTest {
             .isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
     }
 
-    @DisplayName("When wrapper with a valid create Hearing State is given addHearingResponse should run without error")
+    @DisplayName("When wrapper with a valid update Hearing State is given addHearingResponse should run without error")
     @Test
     void processHearingWrapperUpdate() throws ListingException {
         willAnswer(invocation -> {
@@ -464,7 +473,6 @@ class HearingsServiceTest {
         assertThatNoException().isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
     }
 
-
     @DisplayName("When wrapper has a hearing request version different to the hmc request version then updateHearing should sync request version")
     @ParameterizedTest
     @EnumSource(
@@ -506,5 +514,89 @@ class HearingsServiceTest {
         wrapper.getCaseData().getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().duration(Integer.valueOf("30")).build());
         assertThatNoException().isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
         assertThat(wrapper.getCaseData().getHearings().getFirst().getValue().getVersionNumber()).isEqualTo(1L);
+    }
+
+    @Test
+    void shouldAddErrorWhenListAssistAndListedHearingsExist() {
+        SscsCaseData caseData = SscsCaseData.builder()
+                .ccdCaseId("1234")
+                .schedulingAndListingFields(
+                        SchedulingAndListingFields.builder()
+                                .hearingRoute(HearingRoute.LIST_ASSIST)
+                                .build())
+                .build();
+
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+        given(hmcHearingApiService.getHearingsRequest(eq("1234"), any()))
+                .willReturn(HearingsGetResponse.builder()
+                        .caseHearings(List.of(CaseHearing.builder().hearingId(1L).hmcStatus(HmcStatus.LISTED).build()))
+                        .build());
+
+        hearingsService.validationCheckForListedOrExceptionHearings(caseData, response);
+
+        assertThat(response.getWarnings()).isEmpty();
+        assertThat(1).isEqualTo(response.getErrors().size());
+        assertThat(response.getErrors()).contains(HearingsService.EXISTING_HEARING_ERROR);
+    }
+
+    @Test
+    void shouldAddWarningWhenListAssistAndHearingExceptionExist() {
+        SscsCaseData caseData = SscsCaseData.builder()
+                .ccdCaseId("1234")
+                .schedulingAndListingFields(
+                        SchedulingAndListingFields.builder()
+                                .hearingRoute(HearingRoute.LIST_ASSIST)
+                                .build())
+                .build();
+
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+        given(hmcHearingApiService.getHearingsRequest(eq("1234"), any()))
+                .willReturn(HearingsGetResponse.builder()
+                        .caseHearings(List.of(CaseHearing.builder().hearingId(1L).hmcStatus(HmcStatus.EXCEPTION).build()))
+                        .build());
+
+        hearingsService.validationCheckForListedOrExceptionHearings(caseData, response);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(1).isEqualTo(response.getWarnings().size());
+        assertThat(response.getWarnings()).contains(HearingsService.REQUEST_FAILURE_WARNING);
+    }
+
+    @Test
+    void shouldNotAddErrorOrWarningWhenListAssistAndNoListedOrExceptionHearings() {
+        SscsCaseData caseData = SscsCaseData.builder()
+                .ccdCaseId("1234")
+                .schedulingAndListingFields(
+                        SchedulingAndListingFields.builder()
+                                .hearingRoute(HearingRoute.LIST_ASSIST)
+                                .build())
+                .build();
+        given(hmcHearingApiService.getHearingsRequest(eq("1234"), any()))
+                .willReturn(HearingsGetResponse.builder().caseHearings(Collections.emptyList()).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+
+        hearingsService.validationCheckForListedOrExceptionHearings(caseData, response);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getWarnings()).isEmpty();
+    }
+
+    @Test
+    void shouldNotAddErrorWhenNotListAssist() {
+        SscsCaseData caseData = SscsCaseData.builder()
+                .ccdCaseId("1234")
+                .schedulingAndListingFields(
+                        SchedulingAndListingFields.builder()
+                                .hearingRoute(HearingRoute.GAPS)
+                                .build())
+                .build();
+
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+
+        hearingsService.validationCheckForListedOrExceptionHearings(caseData, response);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getWarnings()).isEmpty();
     }
 }

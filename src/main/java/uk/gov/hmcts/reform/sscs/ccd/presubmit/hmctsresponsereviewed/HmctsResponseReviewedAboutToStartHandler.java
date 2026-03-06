@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -25,16 +25,14 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
+import uk.gov.hmcts.reform.sscs.service.HearingsService;
 
 @Service
+@RequiredArgsConstructor
 public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final DwpAddressLookupService service;
-
-    @Autowired
-    public HmctsResponseReviewedAboutToStartHandler(DwpAddressLookupService service) {
-        this.service = service;
-    }
+    private final HearingsService hearingsService;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -71,6 +69,8 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
         if (sscsCaseData.getCreatedInGapsFrom() == null || !sscsCaseData.getCreatedInGapsFrom().equals("readyToList")) {
             preSubmitCallbackResponse.addError("This event cannot be run for cases created in GAPS at valid appeal");
         }
+
+        hearingsService.validationCheckForListedOrExceptionHearings(sscsCaseData, preSubmitCallbackResponse);
 
         return preSubmitCallbackResponse;
     }

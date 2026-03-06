@@ -1,8 +1,8 @@
 {
-  "name": "Review Admin Action - CTSC",
+  "name": "CTSC - Review Admin Action",
   "priority": "high",
   "assignedToWhenNotAssigned": "Unassigned",
-  "assignedTo": "SSCS ctscadmin",
+  "assignedTo": "sscs-ctscdmin nw-liverpool",
   "unassignedManageOptions": ["Assign to me"],
   "assignedManageOptions": ["Reassign task", "Unassign task"],
   "unassignedManageOptionsForCaseAllocator": [
@@ -11,16 +11,16 @@
     "Assign to me"
   ],
   "nextStepsOptions": [
-    "Send to interloc",
-    "Send case to TCW",
-    "Information received"
+    "Send to Judge",
+    "Send to TCW",
+    "Interloc Information received"
   ],
-  "sendToInterloc": {
-    "link": "Send to Interloc",
+  "sendToJudge": {
+    "link": "Send to Judge",
     "eventTitle": "Send to interloc"
   },
   "sendCaseToTcw": {
-    "link": "Send case to TCW",
+    "link": "Send to TCW",
     "eventTitle": "Log case progress"
   },
   "informationReceived": {

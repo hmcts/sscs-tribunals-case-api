@@ -100,13 +100,9 @@ public class SendNotificationService {
     private final PdfStoreService pdfStoreService;
 
     @Autowired
-    public SendNotificationService(
-        NotificationSender notificationSender,
-        NotificationHandler notificationHandler,
-        NotificationValidService notificationValidService,
-        PdfLetterService pdfLetterService,
-        PdfStoreService pdfStoreService
-    ) {
+    public SendNotificationService(NotificationSender notificationSender, NotificationHandler notificationHandler,
+                                   NotificationValidService notificationValidService, PdfLetterService pdfLetterService,
+                                   PdfStoreService pdfStoreService) {
         this.notificationSender = notificationSender;
         this.notificationHandler = notificationHandler;
         this.notificationValidService = notificationValidService;
@@ -114,11 +110,9 @@ public class SendNotificationService {
         this.pdfStoreService = pdfStoreService;
     }
 
-    boolean sendEmailSmsLetterNotification(
-        NotificationWrapper wrapper,
-        Notification notification,
-        SubscriptionWithType subscriptionWithType,
-        NotificationEventType eventType) {
+    boolean sendEmailSmsLetterNotification(NotificationWrapper wrapper, Notification notification,
+                                           SubscriptionWithType subscriptionWithType, NotificationEventType eventType) {
+
         boolean emailSent = sendEmailNotification(wrapper, subscriptionWithType.getSubscription(), notification);
         notificationSuccessLog(wrapper, "Email", notification, notification.getEmailTemplate(), emailSent);
 
@@ -310,7 +304,10 @@ public class SendNotificationService {
             && (YesNo.NO.equals(addressToUse.getInMainlandUk()) || isNotBlank(addressToUse.getPostcode()));
     }
 
-    private boolean sendBundledAndDocmosisLetterNotification(NotificationWrapper wrapper, Notification notification, String nameToUse, SubscriptionWithType subscriptionWithType) {
+    private boolean sendBundledAndDocmosisLetterNotification(NotificationWrapper wrapper,
+                                                             Notification notification,
+                                                             String nameToUse,
+                                                             SubscriptionWithType subscriptionWithType) {
         try {
             byte[] bundledLetter;
             if (isNotBlank(notification.getDocmosisLetterTemplate())) {
@@ -333,14 +330,10 @@ public class SendNotificationService {
                     nameToUse,
                     wrapper.getCaseId(),
                     subscriptionWithType.getSubscriptionType())
-                    : () -> notificationSender.sendBundledLetter(
-                    wrapper.getNewSscsCaseData().getAppeal().getAppellant().getAddress().getPostcode(),   // Used for whitelisting only
-                    bundledLetter,
-                    wrapper.getNotificationType(),
-                    nameToUse,
-                    wrapper.getCaseId());
+                    : () -> notificationSender.sendBundledLetter(wrapper,bundledLetter, nameToUse);
 
-                log.info("In sendBundledAndDocmosisLetterNotification method notificationSender is available {} ", notificationSender != null);
+                log.info("In sendBundledAndDocmosisLetterNotification method notificationSender is available {} ",
+                        notificationSender != null);
 
                 notificationLog(notification, "Docmosis Letter", nameToUse, wrapper);
 

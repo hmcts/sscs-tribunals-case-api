@@ -77,7 +77,7 @@ class DateUtilsComponent {
     return false;
   }
 
-  static async getCurrentDate() {
+  static async getTomorrowDate() {
     const tomorrow = new Date();
     tomorrow.setDate(new Date().getDate() + 1);
     return tomorrow.getDate();

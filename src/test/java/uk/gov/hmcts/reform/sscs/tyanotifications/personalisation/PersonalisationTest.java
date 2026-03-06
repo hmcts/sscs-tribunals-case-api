@@ -44,6 +44,8 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBCA
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBCA_FULL_NAME_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.JOINT_TEXT_WITH_A_SPACE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.JOINT_TEXT_WITH_A_SPACE_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.MAX_DWP_RESPONSE_DAYS;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.MAX_DWP_RESPONSE_DAYS_CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.RESPONSE_DATE_FORMAT;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.THE_STRING;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.THE_STRING_WELSH;
@@ -83,6 +85,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMa
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.FIRST_TIER_AGENCY_FULL_NAME_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.FIRST_TIER_AGENCY_GROUP;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.FIRST_TIER_AGENCY_GROUP_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.FORM_TYPE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HEARING;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HEARING_ARRANGEMENT_DETAILS_LITERAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HEARING_ARRANGEMENT_DETAILS_LITERAL_WELSH;
@@ -171,10 +174,13 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
@@ -262,10 +268,11 @@ public class PersonalisationTest {
     private final String evidenceAddressTelephoneWelsh = PHONE_WELSH;
     private final String evidenceAddressTelephoneIbc = PHONE_IBC;
     private final EvidenceProperties.EvidenceAddress evidenceAddress = new EvidenceProperties.EvidenceAddress();
+    private AutoCloseable autoCloseable;
 
     @BeforeEach
     public void setup() {
-        openMocks(this);
+        autoCloseable = openMocks(this);
         when(config.getTrackAppealLink()).thenReturn(Link.builder().linkUrl("http://tyalink.com/appeal_id").build());
         when(config.getMyaLink()).thenReturn(Link.builder().linkUrl("http://myalink.com/appeal_id").build());
         when(config.getMyaClaimingExpensesLink()).thenReturn(Link.builder().linkUrl("http://myalink.com/claimingExpenses").build());
@@ -326,6 +333,11 @@ public class PersonalisationTest {
         personalisations.put(LanguagePreference.ENGLISH, englishMap);
         personalisations.put(LanguagePreference.WELSH, welshMap);
         personalisationConfiguration.setPersonalisation(personalisations);
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        autoCloseable.close();
     }
 
     private static Map<String, String> getWelshMap() {
@@ -652,15 +664,15 @@ public class PersonalisationTest {
 
     @ParameterizedTest
     @CsvSource({
-        "PIP,'judge, doctor and disability expert', Personal Independence Payment, Taliad Annibyniaeth Personol, 'barnwr, meddyg ac arbenigwr anableddau', PIP, PIP",
-        "ESA,judge and a doctor, Employment and Support Allowance, Lwfans Cyflogaeth a Chymorth, barnwr a meddyg, ESA, ESA",
-        "UC,'judge, doctor and disability expert (if applicable)', Universal Credit, Credyd Cynhwysol, 'barnwr, meddyg ac arbenigwr anabledd (os yw’n berthnasol)', UC, UC",
-        "DLA,'judge, doctor and disability expert', Disability Living Allowance, Lwfans Byw i’r Anabl, 'barnwr, meddyg ac arbenigwr anableddau', DLA,DLA",
-        "carersAllowance,judge, Carer's Allowance, Lwfans Gofalwr, barnwr, Carer's Allowance, Lwfans Gofalwr",
-        "attendanceAllowance,'judge, doctor and disability expert', Attendance Allowance, Lwfans Gweini, 'barnwr, meddyg ac arbenigwr anableddau', Attendance Allowance, Lwfans Gweini",
-        "bereavementBenefit,judge, Bereavement Benefit, Budd-dal Profedigaeth, barnwr, Bereavement Benefit, Budd-dal Profedigaeth",
-        "taxCredit, judge and Financially Qualified Panel Member (if applicable), Tax Credit, Credyd Treth, Barnwr ac Aelod Panel sydd â chymhwyster i ddelio gyda materion Ariannol (os yw’n berthnasol), Tax Credit, Credyd Treth",
-        "infectedBloodCompensation,judge and if applicable a medical member and/or a financially qualified tribunal member, Infected Blood Compensation, Iawndal Gwaed Heintiedig, barnwr ac os yw’n berthnasol aelod meddygol a/neu aelod o’r tribiwnlys sy’n gymwys mewn materion ariannol, IBC, IGH"
+        "PIP,'judge, doctor and disability expert', Personal Independence Payment, Taliad Annibyniaeth Personol, 'barnwr, meddyg ac arbenigwr anableddau', PIP, PIP, sscs1",
+        "ESA,judge and a doctor, Employment and Support Allowance, Lwfans Cyflogaeth a Chymorth, barnwr a meddyg, ESA, ESA, sscs1",
+        "UC,'judge and doctor (if applicable)', Universal Credit, Credyd Cynhwysol, 'barnwr a meddyg (os yw’n berthnasol)', UC, UC, sscs1",
+        "DLA,'judge, doctor and disability expert', Disability Living Allowance, Lwfans Byw i’r Anabl, 'barnwr, meddyg ac arbenigwr anableddau', DLA,DLA, sscs1",
+        "carersAllowance,judge, Carer's Allowance, Lwfans Gofalwr, barnwr, Carer's Allowance, Lwfans Gofalwr, sscs1",
+        "attendanceAllowance,'judge, doctor and disability expert', Attendance Allowance, Lwfans Gweini, 'barnwr, meddyg ac arbenigwr anableddau', Attendance Allowance, Lwfans Gweini, sscs1",
+        "bereavementBenefit,judge, Bereavement Benefit, Budd-dal Profedigaeth, barnwr, Bereavement Benefit, Budd-dal Profedigaeth, sscs1",
+        "taxCredit, judge and Financially Qualified Panel Member (if applicable), Tax Credit, Credyd Treth, Barnwr ac Aelod Panel sydd â chymhwyster i ddelio gyda materion Ariannol (os yw’n berthnasol), Tax Credit, Credyd Treth, sscs5",
+        "infectedBloodCompensation,judge and if applicable a medical member and/or a financially qualified tribunal member, Infected Blood Compensation, Iawndal Gwaed Heintiedig, barnwr ac os yw’n berthnasol aelod meddygol a/neu aelod o’r tribiwnlys sy’n gymwys mewn materion ariannol, IBC, IGH, sscs8"
     })
     public void customisePersonalisation(String benefitType,
                                          String expectedPanelComposition,
@@ -668,7 +680,8 @@ public class PersonalisationTest {
                                          String welshExpectedBenefitDesc,
                                          String welshExpectedPanelComposition,
                                          String expectedAcronym,
-                                         String expectedWelshAcronym) {
+                                         String expectedWelshAcronym,
+                                         String formType) {
         List<Event> events = new ArrayList<>();
         events.add(Event.builder().value(EventDetails.builder().date(DATE).type(EventType.APPEAL_RECEIVED.getCcdType()).build()).build());
 
@@ -698,6 +711,7 @@ public class PersonalisationTest {
         assertEquals(expectedWelshAcronym, result.get(BENEFIT_NAME_ACRONYM_LITERAL_WELSH));
         assertEquals(expectedBenefitDesc, result.get(BENEFIT_FULL_NAME_LITERAL));
         assertEquals(welshExpectedBenefitDesc, result.get(BENEFIT_FULL_NAME_LITERAL_WELSH));
+        assertEquals(formType, result.get(FORM_TYPE));
         assertEquals(getLongBenefitNameDescriptionWithOptionalAcronym(benefitType, true), result.get(BENEFIT_NAME_AND_OPTIONAL_ACRONYM));
         assertEquals(getLongBenefitNameDescriptionWithOptionalAcronym(benefitType, false), result.get(BENEFIT_NAME_AND_OPTIONAL_ACRONYM_WELSH));
         assertEquals("SC/1234/5", result.get(APPEAL_REF));
@@ -748,7 +762,7 @@ public class PersonalisationTest {
         assertNull(result.get(EVIDENCE_RECEIVED_DATE_LITERAL));
         assertEquals(EMPTY, result.get(JOINT));
         assertEquals(EMPTY, result.get(JOINT_WELSH));
-        assertNull(result.get(JOINT_PARTY));
+        assertNull(result.get(JOINT_PARTY.name()));
 
         assertEquals(ADDRESS1, result.get(REGIONAL_OFFICE_NAME_LITERAL));
         assertEquals(ADDRESS2, result.get(SUPPORT_CENTRE_NAME_LITERAL));
@@ -1178,17 +1192,36 @@ public class PersonalisationTest {
         assertEquals("12 August 2018", result.get(APPEAL_RESPOND_DATE));
     }
 
-    @Test
-    public void givenDigitalCaseWithNoDateSentToDwp_thenUseTodaysDateForAppealRespondDate() {
+    @ParameterizedTest
+    @MethodSource("appealResponseDate")
+    public void givenDigitalCaseWithNoDateSentToDwp_thenUseTodaysDateForAppealRespondDate(
+        Appeal appeal, int responsePeriod) {
+
         SscsCaseData response = SscsCaseData.builder()
-            .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
-            .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).build())
+            .ccdCaseId(CASE_ID)
+            .caseReference("SC/1234/5")
+            .appeal(appeal)
             .createdInGapsFrom("readyToList")
             .build();
 
         Map<String, Object> result = personalisation.setEventData(new HashMap<>(), response, APPEAL_RECEIVED);
 
-        assertEquals(LocalDate.now().plusDays(personalisation.calculateMaxDwpResponseDays(response.getBenefitCode())).format(DateTimeFormatter.ofPattern(RESPONSE_DATE_FORMAT)), result.get(APPEAL_RESPOND_DATE));
+        assertThat(result.get(APPEAL_RESPOND_DATE))
+            .isEqualTo(LocalDate.now()
+                .plusDays(responsePeriod)
+                .format(DateTimeFormatter.ofPattern(RESPONSE_DATE_FORMAT)));
+    }
+
+    private static Stream<Arguments> appealResponseDate() {
+        return Stream.of(
+            Arguments.of(Appeal.builder()
+                .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
+                .build(), MAX_DWP_RESPONSE_DAYS_CHILD_SUPPORT),
+            Arguments.of(null, MAX_DWP_RESPONSE_DAYS),
+            Arguments.of(Appeal.builder().build(), MAX_DWP_RESPONSE_DAYS),
+            Arguments.of(Appeal.builder().benefitType(BenefitType.builder().build()).build(), MAX_DWP_RESPONSE_DAYS),
+            Arguments.of(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.ESA.getShortName()).build()).build(), MAX_DWP_RESPONSE_DAYS)
+        );
     }
 
     @Test
@@ -1962,7 +1995,7 @@ public class PersonalisationTest {
                 .build())
             .build();
 
-        OtherParty otherParty = sscsCaseData.getOtherParties().get(0).getValue();
+        OtherParty otherParty = sscsCaseData.getOtherParties().getFirst().getValue();
         Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper.builder()
                 .newSscsCaseData(sscsCaseData)
                 .notificationEventType(SUBSCRIPTION_CREATED)

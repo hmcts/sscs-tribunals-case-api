@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 
@@ -60,6 +61,7 @@ public class DwpUploadResponseMidEventHandler implements PreSubmitCallbackHandle
         validatePostponementRequests(sscsCaseData, response);
         forceToAddOtherPartyOnSscs2Case(sscsCaseData, response);
         validateBenefitCode(sscsCaseData, response);
+        validateDwpFurtherInfo(sscsCaseData, response);
 
         return response;
     }
@@ -103,5 +105,11 @@ public class DwpUploadResponseMidEventHandler implements PreSubmitCallbackHandle
                     caseData.getBenefitCode() + caseData.getIssueCode(), caseData.getCcdCaseId());
         }
         return errors;
+    }
+
+    private static void validateDwpFurtherInfo(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
+        if (YesNo.YES.getValue().equals(sscsCaseData.getDwpFurtherInfo())) {
+            response.addWarning("Are you sure you want HMCTS to review the case?");
+        }
     }
 }

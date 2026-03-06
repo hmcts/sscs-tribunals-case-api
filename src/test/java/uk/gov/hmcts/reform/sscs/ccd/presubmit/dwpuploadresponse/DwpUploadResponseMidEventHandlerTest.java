@@ -180,4 +180,23 @@ public class DwpUploadResponseMidEventHandlerTest {
         assertEquals(1, response.getErrors().size());
         assertTrue(response.getErrors().contains("Incorrect benefit/issue code combination"));
     }
+
+    @Test
+    void shouldReturnWarningWhenFtaUploadsResponseAndSelectsWantsFurtherInfo() {
+        callback.getCaseDetails().getCaseData().setDwpFurtherInfo("Yes");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getWarnings().size());
+        assertTrue(response.getWarnings().contains("Are you sure you want HMCTS to review the case?"));
+    }
+
+    @Test
+    void shouldNotReturnWarningWhenFtaUploadsResponseAndDoesNotSelectsWantsFurtherInfo() {
+        callback.getCaseDetails().getCaseData().setDwpFurtherInfo("No");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getWarnings().isEmpty());
+    }
 }

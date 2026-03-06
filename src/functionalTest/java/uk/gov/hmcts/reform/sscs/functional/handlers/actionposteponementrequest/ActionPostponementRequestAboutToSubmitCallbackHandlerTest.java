@@ -11,19 +11,19 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import org.apache.http.HttpStatus;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Note;
 import uk.gov.hmcts.reform.sscs.ccd.domain.NoteDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest
 public class ActionPostponementRequestAboutToSubmitCallbackHandlerTest extends BaseHandler {
@@ -35,16 +35,16 @@ public class ActionPostponementRequestAboutToSubmitCallbackHandlerTest extends B
     public void givenAboutToSubmitCallbackForEvent_shouldSetFields() throws Exception {
 
         String response = RestAssured.given()
-            .log().method().log().headers().log().uri().log().body(true)
-            .contentType(ContentType.JSON)
-            .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
-            .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
-            .body(getJsonCallbackForTest("handlers/actionpostponementrequest/actionPostponementRequestAboutToSubmitCallback.json"))
-            .post("/ccdAboutToSubmit")
-            .then()
-            .statusCode(HttpStatus.SC_OK)
-            .log().all(true)
-            .extract().body().asString();
+                .log().method().log().headers().log().uri().log().body(true)
+                .contentType(ContentType.JSON)
+                .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
+                .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
+                .body(getJsonCallbackForTest("handlers/actionpostponementrequest/actionPostponementRequestAboutToSubmitCallback.json"))
+                .post("/ccdAboutToSubmit")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .log().all(true)
+                .extract().body().asString();
 
         JsonNode root = mapper.readTree(response);
         SscsCaseData result = mapper.readValue(root.path("data").toPrettyString(), new TypeReference<SscsCaseData>(){});
@@ -52,9 +52,9 @@ public class ActionPostponementRequestAboutToSubmitCallbackHandlerTest extends B
         assertThat(result.getInterlocReviewState()).isEqualTo(REVIEW_BY_JUDGE);
         assertThat(result.getInterlocReferralReason()).isEqualTo(REVIEW_POSTPONEMENT_REQUEST);
         assertThat(result.getAppealNotePad().getNotesCollection())
-            .hasSize(1)
-            .extracting(Note::getValue)
-            .extracting(NoteDetails::getNoteDetail)
-            .containsExactlyInAnyOrder("Postponement sent to judge - E2ETestDetails");
+                .hasSize(1)
+                .extracting(Note::getValue)
+                .extracting(NoteDetails::getNoteDetail)
+                .containsExactlyInAnyOrder("Postponement sent to judge - E2ETestDetails");
     }
 }

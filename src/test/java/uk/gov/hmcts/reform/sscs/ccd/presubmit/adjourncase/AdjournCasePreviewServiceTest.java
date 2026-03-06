@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -38,6 +39,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTime;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing;
@@ -155,6 +157,7 @@ class AdjournCasePreviewServiceTest {
                         .lastName("Last'NamE")
                         .build())
                     .identity(Identity.builder().build())
+                        .address(Address.builder().build())
                     .build())
                 .build())
             .adjournment(Adjournment.builder()
@@ -1734,5 +1737,45 @@ class AdjournCasePreviewServiceTest {
         assertThat(payload.getAdjournCaseTemplateBody().isNextHearingAtVenue()).isTrue();
         NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
         assertThat(templateBody.getAdjournCaseTemplateBody().getNextHearingVenue()).isEqualTo(GAP_VENUE_NAME);
+    }
+
+    @Test
+    void givenSameVenueSelectedAndVenueIsLegacy_thenPayloadContainsUpdatedProcessingVenueForNextHearingVenue() {
+        sscsCaseData.setProcessingVenue("Old venue");
+        Appellant appellant = Appellant.builder().address(Address.builder().build()).name(Name.builder().build()).identity(Identity.builder().build()).build();
+        sscsCaseData.getAppeal().setAppellant(appellant);
+        VenueDetails venueDetails = VenueDetails.builder().venueId("111111").legacyVenue("Old venue").gapsVenName("New Venue").build();
+        venueDetailsMap = new HashMap<>();
+        venueDetailsMap.put("111111",  venueDetails);
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
+        when(airLookupService.lookupAirVenueNameByPostCode(any(), any())).thenReturn("New venue");
+        when(airLookupService.lookupVenueIdByAirVenueName(eq("New venue"))).thenReturn(111111);
+        when(airLookupService.lookupVenueIdByAirVenueName(eq("Old venue"))).thenReturn(000000);
+        when(venueDataLoader.getVenueDetailsMap()).thenReturn(venueDetailsMap);
+        when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
+
+        adjournment.setTypeOfNextHearing(FACE_TO_FACE);
+
+        adjournment.setNextHearingVenue(SAME_VENUE);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response =
+                service.preview(callback,
+                        DocumentType.DRAFT_ADJOURNMENT_NOTICE,
+                        USER_AUTHORISATION,
+                        false);
+
+        NoticeIssuedTemplateBody payload = service.createPayload(response,
+                sscsCaseData,
+                "documentTypeLabel",
+                LocalDate.now(),
+                LocalDate.now(),
+                false,
+                false,
+                false,
+                USER_AUTHORISATION);
+        assertThat(payload.getAdjournCaseTemplateBody().getHeldAt()).isEqualTo(GAP_VENUE_NAME);
+        assertThat(payload.getAdjournCaseTemplateBody().getNextHearingVenue()).isEqualTo("New Venue");
+
     }
 }

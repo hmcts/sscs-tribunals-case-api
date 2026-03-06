@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.sscs.helper.service.HearingsServiceHelper.findHearingsWithRequestedHearingState;
 import static uk.gov.hmcts.reform.sscs.helper.service.HearingsServiceHelper.getHearingId;
 
 import feign.FeignException;
@@ -15,8 +16,10 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -36,6 +39,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.model.HearingEvent;
 import uk.gov.hmcts.reform.sscs.model.HearingWrapper;
 import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
+import uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus;
 import uk.gov.hmcts.reform.sscs.model.multi.hearing.CaseHearing;
 import uk.gov.hmcts.reform.sscs.model.multi.hearing.HearingsGetResponse;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingCancelRequestPayload;
@@ -65,6 +69,9 @@ public class HearingsService {
 
     // Leaving blank for now until a future change is scoped and completed, then we can add the case states back in
     private static final Long HEARING_VERSION_NUMBER = 1L;
+    public static final String EXISTING_HEARING_ERROR = "There is already a hearing request in List assist, "
+            + "are you sure you want to send another request? If you do proceed, then please cancel the existing hearing request first";
+    public static final String REQUEST_FAILURE_WARNING = "There is a listing request in failure state, please update any missing data then send a new listing request.";
 
     @Retryable(
             retryFor = UpdateCaseException.class,
@@ -117,34 +124,37 @@ public class HearingsService {
 
     private void createHearing(HearingWrapper wrapper) throws UpdateCaseException, ListingException {
         SscsCaseData caseData = wrapper.getCaseData();
-
         String caseId = caseData.getCcdCaseId();
         HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(caseId, null);
-        CaseHearing hearing = HearingsServiceHelper.findExistingRequestedHearings(hearingsGetResponse, false);
-        HmcUpdateResponse hmcUpdateResponse;
+        CaseHearing hearing = HearingsServiceHelper.findHearingsWithRequestedHearingState(hearingsGetResponse, null, true);
         overridesMapping.setDefaultListingValues(wrapper.getCaseData(), refData);
 
-        if (isNull(hearing)) {
-            HearingRequestPayload hearingPayload = hearingsMapping.buildHearingPayload(wrapper, refData);
-            log.debug("Sending Create Hearing Request for Case ID {}", caseId);
-            hmcUpdateResponse = hmcHearingApiService.sendCreateHearingRequest(hearingPayload);
-
-            var johTiers = hearingPayload.getHearingDetails().getPanelRequirements().getRoleTypes();
-            log.info("Saving JOH tiers ({}) onto the case ({})", johTiers, caseId);
-            wrapper.getCaseData().setPanelMemberComposition(new PanelMemberComposition(johTiers));
-
-            log.debug("Received Create Hearing Request Response for Case ID {}, Hearing State {} and Response:\n{}",
-                    caseId, wrapper.getHearingState().getState(), hmcUpdateResponse.toString());
-        } else {
-            hmcUpdateResponse = HmcUpdateResponse.builder()
-                    .hearingRequestId(hearing.getHearingId())
-                    .versionNumber(getHearingVersionNumber(hearing))
-                    .status(hearing.getHmcStatus())
+        if (nonNull(hearing)) {
+            HearingWrapper cancellationWrapper = HearingWrapper.builder()
+                    .caseData(wrapper.getCaseData())
+                    .eventId(wrapper.getEventId())
+                    .eventToken(wrapper.getEventToken())
+                    .caseState(wrapper.getCaseState())
+                    .hearingState(HearingState.CANCEL_HEARING)
+                    .cancellationReasons(List.of(CancellationReason.OTHER))
                     .build();
-            log.debug("Existing hearing found, skipping Create Hearing Request for Case ID {}, Hearing State {},"
-                            + "Hearing version {} and Hearing Id {}",
-                    caseId, hearing.getHmcStatus(), hearing.getRequestVersion(), hearing.getHearingId());
+
+            log.info("Cancelling existing hearing with hearing state requested or awaiting listing. "
+                    + "Case ID {}, Hearing ID {}", caseId, hearing.getHearingId());
+            cancelHearing(cancellationWrapper);
         }
+
+        HmcUpdateResponse hmcUpdateResponse;
+        HearingRequestPayload hearingPayload = hearingsMapping.buildHearingPayload(wrapper, refData);
+        log.info("Sending Create Hearing Request for Case ID {}", caseId);
+        hmcUpdateResponse = hmcHearingApiService.sendCreateHearingRequest(hearingPayload);
+
+        var johTiers = hearingPayload.getHearingDetails().getPanelRequirements().getRoleTypes();
+        log.info("Saving JOH tiers ({}) onto the case ({})", johTiers, caseId);
+        wrapper.getCaseData().setPanelMemberComposition(new PanelMemberComposition(johTiers));
+
+        log.info("Received Create Hearing Request Response for Case ID {}, Hearing State {} and Response:\n{}",
+                caseId, wrapper.getHearingState().getState(), hmcUpdateResponse.toString());
 
         hearingResponseUpdate(wrapper, hmcUpdateResponse);
     }
@@ -178,7 +188,7 @@ public class HearingsService {
         }
 
         HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(caseId, null);
-        CaseHearing hearing = HearingsServiceHelper.findExistingRequestedHearings(hearingsGetResponse, true);
+        CaseHearing hearing = HearingsServiceHelper.findHearingsWithRequestedHearingState(hearingsGetResponse, null, true);
         if (nonNull(hearing)) {
             Long hmcHearingVersionId = getHearingVersionNumber(hearing);
             Hearing caseDataHearing = HearingsServiceHelper.getHearingById(hearing.getHearingId(), caseData);
@@ -314,5 +324,22 @@ public class HearingsService {
                 .hearingState(hearingRequest.getHearingState())
                 .cancellationReasons(cancellationReasons)
                 .build();
+    }
+
+    public PreSubmitCallbackResponse<SscsCaseData> validationCheckForListedOrExceptionHearings(SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> response) {
+        if (HearingRoute.LIST_ASSIST == caseData.getSchedulingAndListingFields().getHearingRoute()) {
+            HearingsGetResponse hearingsGetResponse = hmcHearingApiService.getHearingsRequest(caseData.getCcdCaseId(), null);
+            CaseHearing listedCase = findHearingsWithRequestedHearingState(hearingsGetResponse, HmcStatus.LISTED, false);
+            if (nonNull(listedCase)) {
+                response.addError(EXISTING_HEARING_ERROR);
+                log.error("Error on case {}: There is already a hearing request in List assist", caseData.getCcdCaseId());
+            }
+            CaseHearing requestFailureCase = findHearingsWithRequestedHearingState(hearingsGetResponse, HmcStatus.EXCEPTION, false);
+            if (nonNull(requestFailureCase)) {
+                response.addWarning(REQUEST_FAILURE_WARNING);
+                log.info("Warning on case {}: There is a failed request in List assist", caseData.getCcdCaseId());
+            }
+        }
+        return response;
     }
 }

@@ -18,7 +18,7 @@ export class updateOtherPartyDataPage {
       '.govuk-caption-l',
       addUpdateOtherPartyData.updateOtherPartyDataHeading
     ); //Above heading Text
-    await webAction.isLinkClickable('Cancel');
+    await webAction.isButtonClickable('Cancel');
   }
 
   // Applying other party data for the Mandatory fields only

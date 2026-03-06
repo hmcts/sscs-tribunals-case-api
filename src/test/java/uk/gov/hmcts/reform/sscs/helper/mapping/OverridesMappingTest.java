@@ -355,7 +355,7 @@ class OverridesMappingTest {
                 .build())
             .build();
 
-        Language language = new Language("fre", "Test", "fra", "test", "Test Dialect", List.of());
+        Language language = new Language("fre", "Test", null, "test", "Test Dialect", List.of());
         given(verbalLanguages.getVerbalLanguage("French"))
             .willReturn(language);
 

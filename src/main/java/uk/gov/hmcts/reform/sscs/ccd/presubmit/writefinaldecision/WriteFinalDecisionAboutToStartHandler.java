@@ -58,6 +58,8 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
             }
         }
 
+        sscsCaseData.getSscsEsaCaseData().setWhichEsaRegulationsApply("2013");
+
         SscsUtil.setCorrectionInProgress(caseDetails, isPostHearingsEnabled);
         clearTransientFields(sscsCaseData);
 
@@ -65,17 +67,26 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
     }
 
     private void clearTransientFields(SscsCaseData caseData) {
-        if (isDraftDecisionNotOnCase(caseData) && !isCorrectionInProgress(caseData)) {
+        if (isDraftDecisionNotInSscsDocs(caseData) && isDraftDecisionNotInInternalDocs(caseData) && !isCorrectionInProgress(caseData)) {
             clearFinalDecisionTransientFields(caseData);
         } else if (isCorrectionInProgress(caseData)) {
             caseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(null);
         }
     }
 
-    private boolean isDraftDecisionNotOnCase(SscsCaseData caseData) {
+    private boolean isDraftDecisionNotInSscsDocs(SscsCaseData caseData) {
         return isNull(caseData.getSscsDocument())
                 || caseData.getSscsDocument().stream()
                 .noneMatch(doc -> doc.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue()));
+    }
+
+    private boolean isDraftDecisionNotInInternalDocs(SscsCaseData caseData) {
+        InternalCaseDocumentData internalCaseDocumentData = caseData.getInternalCaseDocumentData();
+        if ((nonNull(internalCaseDocumentData) && nonNull(internalCaseDocumentData.getSscsInternalDocument()))) {
+            return internalCaseDocumentData.getSscsInternalDocument().stream()
+                    .noneMatch(sscsDocument -> sscsDocument.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue()));
+        }
+        return true;
     }
 
     private boolean isCorrectionInProgress(SscsCaseData caseData) {

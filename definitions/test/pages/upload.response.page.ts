@@ -21,7 +21,7 @@ export class UploadResponsePage {
         await webActions.verifyPageLabel('h2', 'AT38 (Optional)'); //Section heading
         await webActions.verifyPageLabel('h2', 'FTA Evidence bundle'); //Section heading
         await webActions.verifyPageLabel('h2', 'Audio/Video Evidence'); //Section heading */
-    await webActions.isLinkClickable('Cancel');
+    await webActions.isButtonClickable('Cancel');
   }
 
   async uploadDocs(): Promise<void> {
@@ -161,8 +161,9 @@ export class UploadResponsePage {
     await webActions.clickButton('Continue');
   }
 
-  async continueSubmission(): Promise<void> {
+  async continueSubmission(assistOption = 'No'): Promise<void> {
     await webActions.clickButton('Continue');
+    if(assistOption == 'Yes') await webActions.clickButton('Ignore Warning and Continue');
   }
 
   async delay(ms: number) {
