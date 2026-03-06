@@ -4,5 +4,6 @@
   {"LiveFrom": "12/02/2026", "CaseTypeID": "Benefit", "ID": "showConfidentialityTab", "Label": "Show confidentiality tab", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "15/01/2026", "CaseTypeID": "Benefit", "ID": "awareOfAnyAdditionalOtherParties", "Label": "Are you aware of any additional Other Parties?", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "15/01/2026", "CaseTypeID": "Benefit", "ID": "addOtherPartyDetailsLabel", "Label": "Please add details of the other party.", "FieldType": "Label", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "15/01/2026", "CaseTypeID": "Benefit", "ID": "addOtherPartyCommunicationLabel", "Label": "If yes, please use the Communicate with Tribunal event to provide their details.", "FieldType": "Label", "SecurityClassification": "PUBLIC"}
+  {"LiveFrom": "15/01/2026", "CaseTypeID": "Benefit", "ID": "addOtherPartyCommunicationLabel", "Label": "If yes, please use the Communicate with Tribunal event to provide their details.", "FieldType": "Label", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "24/02/2026", "CaseTypeID": "Benefit", "ID": "confidentialityConfirmedLabel", "Label": "Please submit if confidentiality has been determined for all parties on the case.", "FieldType": "Label", "SecurityClassification": "PUBLIC"}
 ]
