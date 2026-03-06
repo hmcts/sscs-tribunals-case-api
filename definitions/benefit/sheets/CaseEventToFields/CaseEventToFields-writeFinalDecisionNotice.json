@@ -18,7 +18,7 @@
     "CaseFieldID": "issueCode",
     "CaseTypeID": "Benefit",
     "DisplayContext": "READONLY",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "01/03/2026",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
     "PageID": "typeOfAppeal",
@@ -334,7 +334,21 @@
     "FieldShowCondition" : "wcaAppeal=\"Yes\"",
     "ShowSummaryChangeOption": "Y",
     "RetainHiddenValue": "Yes"
-  },  {
+  },
+  {
+    "CaseEventID": "writeFinalDecision",
+    "CaseFieldID": "ucWriteFinalDecisionHasSVIssueCode",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "01/03/2026",
+    "PageDisplayOrder": 8,
+    "PageFieldDisplayOrder": 3,
+    "PageID": "workCapabilityAssessment",
+    "FieldShowCondition": "writeFinalDecisionGenerateNotice=\"DoNotUse\"",
+    "RetainHiddenValue": "Yes",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
     "CaseEventID": "writeFinalDecision",
     "CaseFieldID": "writeFinalDecisionSevereYesNo",
     "CaseTypeID": "Benefit",
@@ -343,7 +357,7 @@
     "PageDisplayOrder": 8,
     "PageFieldDisplayOrder": 4,
     "PageID": "workCapabilityAssessment",
-    "FieldShowCondition" : "(appeal.benefitType.code=\"ESA\" OR appeal.benefitType.code=\"UC\")  AND (issueCode=\"SV\" AND wcaAppeal=\"Yes\")",
+    "FieldShowCondition" : "wcaAppeal=\"Yes\" AND (appeal.benefitType.code=\"ESA\" OR appeal.benefitType.code=\"UC\") AND (issueCode=\"SV\" OR ucWriteFinalDecisionHasSVIssueCode = \"Yes\")",
     "ShowSummaryChangeOption": "Y",
     "RetainHiddenValue": "Yes"
   },
