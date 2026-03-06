@@ -15,6 +15,19 @@
   },
   {
     "CaseEventID": "writeFinalDecision",
+    "CaseFieldID": "issueCode",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "01/03/2026",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "typeOfAppeal",
+    "PageLabel": "Type of appeal",
+    "FieldShowCondition": "writeFinalDecisionGenerateNotice=\"DoNotUse\"",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseEventID": "writeFinalDecision",
     "CaseFieldID": "writeFinalDecisionIsDescriptorFlow",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
@@ -323,6 +336,32 @@
     "RetainHiddenValue": "Yes"
   },
   {
+    "CaseEventID": "writeFinalDecision",
+    "CaseFieldID": "ucWriteFinalDecisionHasSVIssueCode",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "01/03/2026",
+    "PageDisplayOrder": 8,
+    "PageFieldDisplayOrder": 3,
+    "PageID": "workCapabilityAssessment",
+    "FieldShowCondition": "writeFinalDecisionGenerateNotice=\"DoNotUse\"",
+    "RetainHiddenValue": "Yes",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseEventID": "writeFinalDecision",
+    "CaseFieldID": "writeFinalDecisionSevereYesNo",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "02/03/2026",
+    "PageDisplayOrder": 8,
+    "PageFieldDisplayOrder": 4,
+    "PageID": "workCapabilityAssessment",
+    "FieldShowCondition" : "wcaAppeal=\"Yes\" AND (appeal.benefitType.code=\"ESA\" OR appeal.benefitType.code=\"UC\") AND (issueCode=\"SV\" OR ucWriteFinalDecisionHasSVIssueCode = \"Yes\")",
+    "ShowSummaryChangeOption": "Y",
+    "RetainHiddenValue": "Yes"
+  },
+  {
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=workCapabilityAssessment",
     "CaseEventID": "writeFinalDecision",
     "CaseFieldID": "ucWriteFinalDecisionWorkCapabilityAssessmentStartDate",
@@ -361,7 +400,7 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "schedule6",
     "PageLabel": "Select Schedule 6 activities",
-    "PageShowCondition": "appeal.benefitType.code=\"UC\" AND wcaAppeal = \"Yes\" AND supportGroupOnlyAppeal=\"No\" AND writeFinalDecisionGenerateNotice = \"Yes\"",
+    "PageShowCondition": "appeal.benefitType.code=\"UC\" AND wcaAppeal = \"Yes\" AND supportGroupOnlyAppeal=\"No\" AND writeFinalDecisionGenerateNotice = \"Yes\" AND writeFinalDecisionSevereYesNo != \"Yes\"",
     "ShowSummaryChangeOption": "Y"
   },
   {
@@ -387,7 +426,7 @@
     "PageFieldDisplayOrder": 2,
     "PageID": "esaDecisionNoticeOptions",
     "PageLabel": "Select Schedule 2 activities",
-    "PageShowCondition": "appeal.benefitType.code=\"ESA\" AND wcaAppeal = \"Yes\" AND writeFinalDecisionGenerateNotice = \"Yes\" AND supportGroupOnlyAppeal != \"Yes\"",
+    "PageShowCondition": "appeal.benefitType.code=\"ESA\" AND wcaAppeal = \"Yes\" AND writeFinalDecisionGenerateNotice = \"Yes\" AND supportGroupOnlyAppeal != \"Yes\" AND writeFinalDecisionSevereYesNo != \"Yes\"",
     "ShowSummaryChangeOption": "Y"
   },
   {
@@ -1090,7 +1129,7 @@
     "PageFieldDisplayOrder": 2,
     "PageID": "regulation29",
     "PageLabel": "Regulation 29",
-    "PageShowCondition": "appeal.benefitType.code=\"ESA\" AND wcaAppeal = \"Yes\" AND showRegulation29Page=\"Yes\"",
+    "PageShowCondition": "appeal.benefitType.code=\"ESA\" AND wcaAppeal = \"Yes\" AND showRegulation29Page=\"Yes\" AND writeFinalDecisionSevereYesNo != \"Yes\"",
     "ShowSummaryChangeOption": "Y"
   },
   {
@@ -1118,7 +1157,7 @@
     "PageFieldDisplayOrder": 2,
     "PageID": "schedule3Activities",
     "PageLabel": "Select Schedule 3 activities",
-    "PageShowCondition": "showSchedule3ActivitiesPage=\"Yes\" AND wcaAppeal = \"Yes\"",
+    "PageShowCondition": "showSchedule3ActivitiesPage=\"Yes\" AND wcaAppeal = \"Yes\" AND writeFinalDecisionSevereYesNo != \"Yes\"",
     "ShowSummaryChangeOption": "Y"
   },
   {
@@ -1174,7 +1213,7 @@
     "PageFieldDisplayOrder": 2,
     "PageID": "schedule8Paragraph4",
     "PageLabel": "Schedule 8 Paragraph 4",
-    "PageShowCondition": "appeal.benefitType.code=\"UC\" AND wcaAppeal = \"Yes\" AND showSchedule8Paragraph4Page=\"Yes\"",
+    "PageShowCondition": "appeal.benefitType.code=\"UC\" AND wcaAppeal = \"Yes\" AND showSchedule8Paragraph4Page=\"Yes\" AND writeFinalDecisionSevereYesNo != \"Yes\"",
     "ShowSummaryChangeOption": "Y"
   },
   {
@@ -1202,7 +1241,7 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "schedule7Activities",
     "PageLabel": "Select Schedule 7 activities",
-    "PageShowCondition": "showSchedule7ActivitiesPage=\"Yes\" AND wcaAppeal = \"Yes\"",
+    "PageShowCondition": "showSchedule7ActivitiesPage=\"Yes\" AND wcaAppeal = \"Yes\" AND writeFinalDecisionSevereYesNo != \"Yes\"",
     "ShowSummaryChangeOption": "Y"
   },
   {
@@ -1235,12 +1274,25 @@
   },
   {
     "CaseEventID": "writeFinalDecision",
+    "CaseFieldID": "writeFinalDecisionSevereCriteriaApply",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "01/03/2026",
+    "PageDisplayOrder": 63,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "severeCriteria",
+    "PageLabel": "Severe Conditions Criteria Assessment",
+    "PageShowCondition": "writeFinalDecisionSevereYesNo = \"Yes\"",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseEventID": "writeFinalDecision",
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=pageSectionReference",
     "CaseFieldID": "writeFinalDecisionPageSectionReference",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 63,
+    "PageDisplayOrder": 64,
     "PageFieldDisplayOrder": 1,
     "PageID": "pageSectionReference",
     "PageLabel": "Bundle page/section reference",
@@ -1253,7 +1305,7 @@
     "CaseTypeID": "Benefit",
     "DisplayContext": "READONLY",
     "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 64,
+    "PageDisplayOrder": 65,
     "PageFieldDisplayOrder": 1,
     "PageID": "detailsOfDecision",
     "PageLabel": "Summary of outcome decision",
@@ -1266,7 +1318,7 @@
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 64,
+    "PageDisplayOrder": 65,
     "PageFieldDisplayOrder": 2,
     "PageID": "detailsOfDecision",
     "PageShowCondition": "showFinalDecisionNoticeSummaryOfOutcomePage = \"Yes\"",
@@ -1278,7 +1330,7 @@
     "CaseTypeID": "Benefit",
     "DisplayContext": "READONLY",
     "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 65,
+    "PageDisplayOrder": 66,
     "PageFieldDisplayOrder": 1,
     "PageID": "dwpReassessTheAward",
     "PageLabel": "When should DWP reassess the award?",
@@ -1291,7 +1343,7 @@
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 65,
+    "PageDisplayOrder": 66,
     "PageFieldDisplayOrder": 2,
     "PageID": "dwpReassessTheAward",
     "PageShowCondition": "showDwpReassessAwardPage = \"Yes\"",
@@ -1303,7 +1355,7 @@
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 66,
+    "PageDisplayOrder": 67,
     "PageFieldDisplayOrder": 1,
     "PageID": "reasons",
     "PageLabel": "Reasons for decision",
@@ -1317,7 +1369,7 @@
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 67,
+    "PageDisplayOrder": 68,
     "PageFieldDisplayOrder": 1,
     "PageID": "anythingElse",
     "PageLabel": "Anything else?",
@@ -1331,7 +1383,7 @@
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 68,
+    "PageDisplayOrder": 69,
     "PageFieldDisplayOrder": 1,
     "PageID": "previewDecisionNotice",
     "PageLabel": "Preview Decision Notice",

@@ -201,5 +201,7 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
         sscsCaseData.setSupportGroupOnlyAppeal(null);
         sscsUcCaseData.setDoesSchedule8Paragraph4Apply(null);
         sscsUcCaseData.setDoesSchedule9Paragraph4Apply(null);
+        sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(null);
+        sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereCriteriaApply(null);
     }
 }

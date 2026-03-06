@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import jakarta.validation.Validator;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -32,6 +34,17 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
         if (sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionSchedule7ActivitiesApply() == null) {
             sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
         }
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionHasSVIssueCode(setSevereCriteriaApplies(sscsCaseData));
+    }
+
+    private YesNo setSevereCriteriaApplies(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getElementsDisputedLimitedWork() == null) {
+            return YesNo.NO;
+        }
+        return sscsCaseData.getElementsDisputedLimitedWork().stream()
+                .filter(ele -> nonNull(ele.getValue()))
+                .anyMatch(ele -> Objects.equals(ele.getValue().getIssueCode(), "SV"))
+                ? YesNo.YES : YesNo.NO;
     }
 
     @Override
