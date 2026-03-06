@@ -1,17 +1,19 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.scenarios;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipTemplateContent;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
-public class PipScenarioEnhancedRateNoAwardTest {
+class PipScenarioEnhancedRateNoAwardTest {
 
     @Test
-    public void testScenario() {
+    void testScenario() {
 
         List<Descriptor> dailyLivingDescriptors =
             Arrays.asList(Descriptor.builder()
@@ -26,7 +28,7 @@ public class PipScenarioEnhancedRateNoAwardTest {
                     .activityAnswerLetter("d").activityAnswerPoints(4).build());
 
         List<Descriptor> mobilityDescriptors =
-            Arrays.asList(Descriptor.builder()
+            Collections.singletonList(Descriptor.builder()
                 .activityQuestionNumber("12")
                 .activityQuestionValue("12.Moving Around")
                 .activityAnswerValue("Can stand and then move more than 200 metres, either aided or unaided.")
@@ -58,34 +60,37 @@ public class PipScenarioEnhancedRateNoAwardTest {
 
         PipTemplateContent content = PipScenario.SCENARIO_AWARD_NO_AWARD.getContent(body);
 
-        String expectedContent = "The appeal is refused.\n"
-                + "\n"
-                + "The decision made by the Secretary of State on 20/09/2020 is confirmed.\n"
-                + "\n"
-                + "Felix Sydney is entitled to the daily living component at the enhanced rate from 17/12/2020 for an indefinite period.\n"
-                + "\n"
-                + "Felix Sydney has severely limited ability to carry out the activities of daily living set out below. They score 12 points. They satisfy the following descriptors:\n"
-                + "\n"
-                + "1.Preparing Food\tf.Cannot prepare and cook food.\t8\n"
-                + "2.Taking Nutrition\td.Needs prompting to be able to take nutrition.\t4\n"
-                + "\n\n"
-                + "Felix Sydney does not qualify for an award of the mobility component from 17/12/2020. They score 0 points. This is insufficient to meet the threshold for the test.\n"
-                + "\n"
-                + "12.Moving Around\ta.Can stand and then move more than 200 metres, either aided or unaided.\t0\n"
-                + "\n"
-                + "\n"
-                + "My first reasons\n"
-                + "\n"
-                + "My second reasons\n"
-                + "\n"
-                + "Something else\n"
-                + "\n"
-                + "This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative did not attend.\n"
-                + "\n";
+        String expectedContent = """
+            The appeal is refused.
 
-        Assert.assertEquals(11, content.getComponents().size());
+            The decision made by the Secretary of State on 20/09/2020 is confirmed.
 
-        Assert.assertEquals(expectedContent, content.toString());
+            Felix Sydney is entitled to the daily living component at the enhanced rate from 17/12/2020 for an indefinite period.
+
+            Felix Sydney has severely limited ability to carry out the activities of daily living set out below. They score 12 points. They satisfy the following descriptors:
+
+            1.Preparing Food\tf.Cannot prepare and cook food.\t8
+            2.Taking Nutrition\td.Needs prompting to be able to take nutrition.\t4
+
+
+            Felix Sydney does not qualify for an award of the mobility component from 17/12/2020. They score 0 points. This is insufficient to meet the threshold for the test.
+
+            12.Moving Around\ta.Can stand and then move more than 200 metres, either aided or unaided.\t0
+
+
+            My first reasons
+
+            My second reasons
+
+            Something else
+
+            This has been an oral (face to face) hearing. The following people attended: Felix Sydney the appellant. A representative from the First Tier Agency did not attend. The Tribunal considered the appeal bundle to page A1.
+
+            """;
+
+        assertEquals(11, content.getComponents().size());
+
+        assertEquals(expectedContent, content.toString());
 
     }
 

@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
+import static uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler.getJsonCallbackForTest;
 import static uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler.getJsonCallbackForTestAndReplace;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -75,6 +76,31 @@ public class GenDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString(
                 "7. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("8.")));
+        }
+    }
+
+    @Test
+    public void shouldGenerateExpectedDecisionTextWithOtherPartiesIncluded() throws IOException {
+
+        String json = getJsonCallbackForTest("handlers/writefinaldecision/writeFinalDecisionWithOtherParties.json");
+
+        byte[] bytes = callPreviewFinalDecision(json);
+        try (PDDocument document = Loader.loadPDF(bytes)) {
+            String pdfText = new PDFTextStripper().getText(document);
+            String pdfTextWithoutNewLines = replaceNewLines(pdfText);
+
+            assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
+            assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 01/01/2026 is set aside."));
+            assertThat(pdfTextWithoutNewLines, containsString("3. Decision"));
+            assertThat(pdfTextWithoutNewLines, containsString("4. Reason"));
+
+            assertThat(pdfTextWithoutNewLines, containsString("5. This has been an oral (face to face) hearing. "
+                + "The following people attended: Joe Bloggs the appellant, John Smith the second respondent, "
+                + "Jane Smith the third respondent and a representative from the First Tier Agency. "
+                + "David Jones the fourth respondent and Sarah Jones the fifth respondent did not attend. "
+                + "The Tribunal considered the appeal bundle to page B7."));
+
+            assertThat(pdfTextWithoutNewLines, not(containsString("6.")));
         }
     }
 

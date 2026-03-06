@@ -335,7 +335,7 @@ public class GenWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 5, "Reasons for decision 2");
         assertIsParagraphWithText(components, 6, "Anything else.");
         assertIsParagraphWithText(components, 7,
-                "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
+                "This has been a remote hearing in the form of a video hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7.");
         Assert.assertEquals(7, components.size());
     }
 
@@ -344,7 +344,7 @@ public class GenWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     public void nonDescriptorFlowHmrc_shouldGeneratePdfWithExpectedText(boolean allowed) throws Exception {
         setup();
         String json = getJsonCallbackForTestAndReplace("callback/hmrcScenarioCallbackNonDescriptorFlow.json", Arrays.asList("ALLOWED_OR_REFUSED"),
-                Arrays.asList(allowed ? "allowed" : "refused"));
+            List.of(allowed ? "allowed" : "refused"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
@@ -379,7 +379,7 @@ public class GenWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 5, "Reasons for decision 2");
         assertIsParagraphWithText(components, 6, "Anything else.");
         assertIsParagraphWithText(components, 7,
-                "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
+                "This has been a remote hearing in the form of a video hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7.");
         Assert.assertEquals(7, components.size());
     }
 
@@ -447,13 +447,13 @@ public class GenWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         if ("video".equals(hearingType)) {
             if (appellantAttended && presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
+                    "This has been a remote hearing in the form of a video hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7.");
             } else if (appellantAttended && !presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative did not attend.");
+                    "This has been a remote hearing in the form of a video hearing. The following people attended: Joe Bloggs the appellant. A representative from the First Tier Agency did not attend. The Tribunal considered the appeal bundle to page B7.");
             } else if (!appellantAttended && presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "This has been a remote hearing in the form of a video hearing. Joe Bloggs did not attend the hearing today. A Presenting Officer attended on behalf of the Respondent.");
+                    "This has been a remote hearing in the form of a video hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7.");
                 assertIsParagraphWithText(components, 9,
                     "Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today. ");
                 additionalParagraph = true;
@@ -467,10 +467,10 @@ public class GenWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         } else if ("telephone".equals(hearingType)) {
             if (appellantAttended && presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "This has been a remote hearing in the form of a telephone hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
+                    "This has been a remote hearing in the form of a telephone hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7.");
             } else if (appellantAttended && !presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "This has been a remote hearing in the form of a telephone hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative did not attend.");
+                    "This has been a remote hearing in the form of a telephone hearing. The following people attended: Joe Bloggs the appellant. A representative from the First Tier Agency did not attend. The Tribunal considered the appeal bundle to page B7.");
             } else if (!appellantAttended && presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
                     "This has been a remote hearing in the form of a telephone hearing. Joe Bloggs did not attend the hearing today. A Presenting Officer attended on behalf of the Respondent.");
@@ -479,7 +479,7 @@ public class GenWriteFinalDecisionIt extends WriteFinalDecisionItBase {
                 additionalParagraph = true;
             } else if (!appellantAttended && !presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "This has been a remote hearing in the form of a telephone hearing. Joe Bloggs did not attend the hearing today. First Tier Agency representative did not attend.");
+                    "This has been a remote hearing in the form of a telephone hearing. The following people attended: Joe Bloggs the appellant. A representative from the First Tier Agency did not attend. The Tribunal considered the appeal bundle to page B7.");
                 assertIsParagraphWithText(components, 9,
                     "Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today. ");
                 additionalParagraph = true;
@@ -492,10 +492,10 @@ public class GenWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         } else if ("faceToFace".equals(hearingType)) {
             if (appellantAttended && presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "This has been an oral (face to face) hearing. Joe Bloggs the appellant attended the hearing today and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
+                    "This has been an oral (face to face) hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7.");
             } else if (appellantAttended && !presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "This has been an oral (face to face) hearing. Joe Bloggs the appellant attended the hearing today and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative did not attend.");
+                    "This has been an oral (face to face) hearing. The following people attended: Joe Bloggs the appellant. A representative from the First Tier Agency did not attend. The Tribunal considered the appeal bundle to page B7.");
             } else if (!appellantAttended && presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
                     "Joe Bloggs requested an oral hearing but did not attend today. A Presenting Officer attended on behalf of the Respondent.");
