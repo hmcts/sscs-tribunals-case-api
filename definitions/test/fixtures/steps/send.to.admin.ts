@@ -17,10 +17,10 @@ export class SendToAdmin extends BaseStep {
     await this.homePage.chooseEvent('Send to admin');
     //await this.homePage.waitForLoadState();
 
-    await this.comepleteSendToAdmin();
+    await this.completeSendToAdmin();
   }
 
-  async comepleteSendToAdmin() {
+  async completeSendToAdmin() {
     //Params are passed to this page as this is a common page to be reused.
     await this.textAreaPage.verifyPageContent(
       sendToAdminData.sendToAdminCaption,

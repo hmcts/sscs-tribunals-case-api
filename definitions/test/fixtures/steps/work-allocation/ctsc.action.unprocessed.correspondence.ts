@@ -93,7 +93,7 @@ export class CtscActionUnprocessedCorrespondence extends BaseStep {
     await this.myWorkPage.verifyNoAssignedTasks();
   }
 
-  async verifyCtscAdminWithCaseAllocatorRoleCanViewAndAssignActionUnprocessedCorrespondence(caseId: string, isDormant?: boolean) {
+  async   verifyCtscAdminWithCaseAllocatorRoleCanViewAndAssignActionUnprocessedCorrespondence(caseId: string, isDormant?: boolean) {
     await this.loginUserWithCaseId(credentials.amCtscTeamLeaderNwLiverpool, true, caseId);
     await this.homePage.navigateToTab('Tasks');
 

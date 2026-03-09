@@ -29,7 +29,7 @@ test.describe.serial('Work Allocation - Review Listing Error CTSC task initiatio
     });
 });
 
-test.describe('WA - Review Listing Error CTSC task automatic cancellation when case is void', { tag: '@work-allocation' }, async () => {
+test.describe('Work Allocation - Review Listing Error CTSC task automatic cancellation when case is void', { tag: '@work-allocation' }, async () => {
     let caseId: string;
 
     test.beforeAll("Case has to be Created", async () => {
