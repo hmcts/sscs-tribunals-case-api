@@ -378,7 +378,7 @@ public abstract class WriteFinalDecisionTemplateContent {
                     appellantName,
                     appointeeName,
                     presentingOfficerAttended,
-                    bundlePage, otherPartyNamesAttended, otherPartyNamesDidNotAttend),
+                    null, otherPartyNamesAttended, otherPartyNamesDidNotAttend),
                 getConsideredParagraph(bundlePage, appointeeName));
         } else if (equalsIgnoreCase(TRIAGE, hearingType)) {
             return singletonList(getTriageConsideredParagraph(bundlePage));
@@ -392,7 +392,7 @@ public abstract class WriteFinalDecisionTemplateContent {
                     appellantName,
                     appointeeName,
                     presentingOfficerAttended,
-                    bundlePage, otherPartyNamesAttended, otherPartyNamesDidNotAttend),
+                    null, otherPartyNamesAttended, otherPartyNamesDidNotAttend),
                 getConsideredParagraph(bundlePage, appointeeName));
         }
     }
