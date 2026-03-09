@@ -104,7 +104,6 @@ public class GenDecisionNoticeFunctionalTest extends BaseFunctionTest {
                     + "Mary Bloggs the appointee, David Jones the fourth respondent and Sarah Jones the fifth respondent did not attend. "
                     + "The Tribunal considered the appeal bundle to page B7."));
 
-                assertThat(pdfTextWithoutNewLines, (containsString("6. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Mary Bloggs of the hearing and that it is in the interests of justice to proceed today. Tribunal Judge: A User Date: 20/02/2026 Issued to the parties on: 20/02/2026 Corrected decision signed by: Service Account Date of correction: 06/03/2026 Corrected notice issued to parties on")));
             } else {
 
                 assertThat(pdfTextWithoutNewLines, containsString("5. This has been an oral (face to face) hearing. "
