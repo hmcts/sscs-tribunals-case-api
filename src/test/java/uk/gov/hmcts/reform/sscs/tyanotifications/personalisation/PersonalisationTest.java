@@ -666,7 +666,7 @@ public class PersonalisationTest {
     @CsvSource({
         "PIP,'judge, doctor and disability expert', Personal Independence Payment, Taliad Annibyniaeth Personol, 'barnwr, meddyg ac arbenigwr anableddau', PIP, PIP, sscs1",
         "ESA,judge and a doctor, Employment and Support Allowance, Lwfans Cyflogaeth a Chymorth, barnwr a meddyg, ESA, ESA, sscs1",
-        "UC,'judge, doctor and disability expert (if applicable)', Universal Credit, Credyd Cynhwysol, 'barnwr, meddyg ac arbenigwr anabledd (os yw’n berthnasol)', UC, UC, sscs1",
+        "UC,'judge and doctor (if applicable)', Universal Credit, Credyd Cynhwysol, 'barnwr a meddyg (os yw’n berthnasol)', UC, UC, sscs1",
         "DLA,'judge, doctor and disability expert', Disability Living Allowance, Lwfans Byw i’r Anabl, 'barnwr, meddyg ac arbenigwr anableddau', DLA,DLA, sscs1",
         "carersAllowance,judge, Carer's Allowance, Lwfans Gofalwr, barnwr, Carer's Allowance, Lwfans Gofalwr, sscs1",
         "attendanceAllowance,'judge, doctor and disability expert', Attendance Allowance, Lwfans Gweini, 'barnwr, meddyg ac arbenigwr anableddau', Attendance Allowance, Lwfans Gweini, sscs1",
