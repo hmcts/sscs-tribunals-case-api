@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.confidentiality;
 
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.updateAppellantConfidentialityRequiredChangedDate;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.updateOtherPartiesConfidentialityChangedDate;
@@ -69,6 +70,8 @@ public class ConfidentialityTabAboutToSubmitHandler implements PreSubmitCallback
         if (sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT) || isNotEmpty(
             sscsCaseData.getOtherParties())) {
             sscsCaseData.getExtendedSscsCaseData().setShowConfidentialityTab(YES);
+        } else {
+            sscsCaseData.getExtendedSscsCaseData().setShowConfidentialityTab(NO);
         }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
