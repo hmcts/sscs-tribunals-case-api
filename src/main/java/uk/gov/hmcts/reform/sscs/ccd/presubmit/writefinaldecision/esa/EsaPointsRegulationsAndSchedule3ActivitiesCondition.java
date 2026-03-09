@@ -39,7 +39,7 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
 
     // Used for the scenario where case points start high but are lowered and regulation 29 question is skipped
     LOW_POINTS_REGULATION_29_UNSPECIFIED(EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN,
-        Arrays.asList(isWcaAppeal(TRUE), isSupportGroupOnly(NOT_TRUE, true), isRegulation29(UNSPECIFIED, false)), Optional.empty(), true, isRegulation29(SPECIFIED)),
+        Arrays.asList(isWcaAppeal(TRUE), isSupportGroupOnly(NOT_TRUE, true), isSevereConditions(FALSE), isRegulation29(UNSPECIFIED, false)), Optional.empty(), true, isRegulation29(SPECIFIED)),
     // Scenario 1
     LOW_POINTS_REGULATION_29_DOES_NOT_APPLY(EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN,
         Arrays.asList(isWcaAppeal(TRUE), isSupportGroupOnly(NOT_TRUE, true), isSevereConditions(FALSE), isRegulation29(FALSE)), Optional.of(AwardType.NO_AWARD), true, isRegulation35(UNSPECIFIED), isSchedule3ActivitiesAnswer(StringListPredicate.UNSPECIFIED)),
