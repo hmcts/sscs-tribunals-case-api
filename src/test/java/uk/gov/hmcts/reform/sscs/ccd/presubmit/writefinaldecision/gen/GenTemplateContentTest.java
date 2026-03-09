@@ -143,7 +143,7 @@ class GenTemplateContentTest {
     @CsvSource(value = {"faceToFace:This has been an oral (face to face) hearing.",
         "telephone:This has been a remote hearing in the form of a telephone hearing.",
         "video:This has been a remote hearing in the form of a video hearing."}, delimiter = ':')
-    void test_whenAppointeeOnCaseButDidNotAttend(String hearingType, String expectedHearingSentence) {
+    void testAppointeeOnCaseButDidNotAttend(String hearingType, String expectedHearingSentence) {
         WriteFinalDecisionTemplateBody body =
             WriteFinalDecisionTemplateBody.builder()
                 .hearingType(hearingType)
@@ -192,7 +192,7 @@ class GenTemplateContentTest {
     @CsvSource(value = {"faceToFace:This has been an oral (face to face) hearing.",
         "telephone:This has been a remote hearing in the form of a telephone hearing.",
         "video:This has been a remote hearing in the form of a video hearing."}, delimiter = ':')
-    void test_whenAppointeeOnCaseButDidNotAttendWithOtherParties(String hearingType, String expectedHearingSentence) {
+    void testAppointeeOnCaseButDidNotAttendWithOtherParties(String hearingType, String expectedHearingSentence) {
         WriteFinalDecisionTemplateBody body =
             WriteFinalDecisionTemplateBody.builder()
                 .hearingType(hearingType)
