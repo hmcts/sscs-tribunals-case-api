@@ -371,7 +371,7 @@ dependencies {
     
     implementation group: 'com.github.hmcts', name: 'sscs-common', version: '72fda2f'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '6.3.24'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '6.3.26'
 
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '8.0.0'
 
