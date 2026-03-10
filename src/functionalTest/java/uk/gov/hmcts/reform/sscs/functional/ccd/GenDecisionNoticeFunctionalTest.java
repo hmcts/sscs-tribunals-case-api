@@ -108,7 +108,7 @@ public class GenDecisionNoticeFunctionalTest extends BaseFunctionTest {
                     + "Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Mary Bloggs of the hearing "
                     + "and that it is in the interests of justice to proceed today. "
                     + "Tribunal Judge: A User Date: 20/02/2026 Issued to the parties on: 20/02/2026 "
-                    + "Corrected decision signed by: Service Account Date of correction: 09/03/2026 "
+                    + "Corrected decision signed by: Service Account Date of correction: 10/03/2026 "
                     + "Corrected notice issued to parties on: "));
 
                 assertThat(pdfTextWithoutNewLines, not(containsString("7.")));
