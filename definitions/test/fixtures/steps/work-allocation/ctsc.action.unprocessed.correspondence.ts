@@ -131,7 +131,7 @@ export class CtscActionUnprocessedCorrespondence extends BaseStep {
      await this.tasksTab.verifyTaskIsHidden(isDormant ? "CTSC - Action Unprocessed Correspondence - Dormant/Post Hearing" : task.name);
   }
 
-  async cancelActionUnprocessedCorrespondenceTaskWhenTheCaseIsVoid(caseId: string) {
+  async verifyActionUnprocessedCorrespondenceTaskIsCancelledWhenTheCaseIsVoid(caseId: string) {
     let voidCase = new VoidCase(this.page);
     
     await this.loginPage.goToCase(caseId);

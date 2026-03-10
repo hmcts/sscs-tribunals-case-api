@@ -28,6 +28,6 @@ test.describe('Work Allocation - CTSC - Action Unprocessed Correspondence', { ta
     test.slow();
     await ctscActionUnprocessedCorrespondenceSteps.createActionUnprocessedCorrespondenceTask(caseId);
     await ctscActionUnprocessedCorrespondenceSteps.verifyCtscAdminWithCaseAllocatorRoleCanViewAndAssignActionUnprocessedCorrespondence(caseId);
-    await ctscActionUnprocessedCorrespondenceSteps.cancelActionUnprocessedCorrespondenceTaskWhenTheCaseIsVoid(caseId);
+    await ctscActionUnprocessedCorrespondenceSteps.verifyActionUnprocessedCorrespondenceTaskIsCancelledWhenTheCaseIsVoid(caseId);
   });
 });
