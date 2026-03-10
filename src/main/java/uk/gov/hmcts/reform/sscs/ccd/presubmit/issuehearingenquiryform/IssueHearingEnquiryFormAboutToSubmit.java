@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Slf4j
 public class IssueHearingEnquiryFormAboutToSubmit implements PreSubmitCallbackHandler<SscsCaseData> {
 
+    private static final int HEF_RESPONSE_EXPECTED_BY_DAYS = 21;
     private final boolean cmOtherPartyConfidentialityEnabled;
 
     public IssueHearingEnquiryFormAboutToSubmit(
@@ -43,7 +44,7 @@ public class IssueHearingEnquiryFormAboutToSubmit implements PreSubmitCallbackHa
         }
 
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-        sscsCaseData.setDirectionDueDate(now().plusDays(21).toString());
+        sscsCaseData.setDirectionDueDate(now().plusDays(HEF_RESPONSE_EXPECTED_BY_DAYS).toString());
         sscsCaseData.setInterlocReviewState(InterlocReviewState.HEF_ISSUED);
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
