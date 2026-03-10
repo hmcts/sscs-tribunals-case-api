@@ -2,17 +2,14 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static feign.Request.HttpMethod.GET;
 import static java.nio.charset.Charset.defaultCharset;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -97,31 +94,29 @@ public class AuthorisationServiceTest {
 
     @Test
     public void should_throw_invalid_token_exception_when_invalid_token_is_received() {
-        willThrow(InvalidTokenException.class).given(serviceAuthorisationApi).getServiceName(anyString());
-
-        Throwable exception = catchThrowable(() -> authorisationService.assertIsAllowedToHandleCallback(SERVICE_HEADER));
-
-        assertThat(exception).isInstanceOf(InvalidTokenException.class);
+        doThrow(InvalidTokenException.class).when(serviceAuthorisationApi).getServiceName(anyString());
+        assertThrows(InvalidTokenException.class,
+                () -> authorisationService.assertIsAllowedToHandleCallback(SERVICE_HEADER));
     }
 
     @Test
     public void should_not_throw_any_exception_when_service_is_allowed_to_trigger_callback() {
-        given(serviceAuthorisationApi.getServiceName(CCD_DATA)).willReturn(CCD_DATA);
-        assertThatCode(() -> authorisationService.assertIsAllowedToHandleCallback(CCD_DATA)).doesNotThrowAnyException();
+        when(serviceAuthorisationApi.getServiceName(CCD_DATA)).thenReturn(CCD_DATA);
+        assertDoesNotThrow(() -> authorisationService.assertIsAllowedToHandleCallback(CCD_DATA));
     }
 
     @Test
     public void should_throw_unauthorized_exception_when_service_is_not_allowed_to_trigger_callback() {
         given(serviceAuthorisationApi.getServiceName("test_service")).willReturn("not_allowed_service");
-        assertThatCode(() -> authorisationService.assertIsAllowedToHandleCallback("test_service"))
-            .isInstanceOf(ForbiddenException.class)
-            .hasMessage("Service not_allowed_service does not have permissions to request case creation");
+        assertThrows(ForbiddenException.class,
+                () -> authorisationService.assertIsAllowedToHandleCallback("test_service"),
+                "Service not_allowed_service does not have permissions to request case creation");
     }
 
     @Test
     public void shouldThrowExceptionWhenNotAuthorised() {
-        when(serviceAuthorisationApi.getServiceName(SERVICE_HEADER)).thenThrow(createFeignException(400, "Bad Request"));
-
+        when(serviceAuthorisationApi.getServiceName(SERVICE_HEADER))
+                .thenThrow(createFeignException(400, "Bad Request"));
         assertThrows(ClientAuthorisationException.class, () -> authorisationService.authorise(SERVICE_HEADER));
     }
 
@@ -198,6 +193,24 @@ public class AuthorisationServiceTest {
 
         assertThrows(ForbiddenException.class, () -> authorisationService.allowOnlySscs(SERVICE_HEADER),
                 "Service " + CCD_DATA + " is not authorized for this action");
+    }
+
+    @Test
+    public void allowOnlySscs_shouldThrowExceptionWhenNotAuthorised() {
+        when(serviceAuthorisationApi.getServiceName(SERVICE_HEADER))
+                .thenThrow(createFeignException(400, "Bad Request"));
+        assertThrows(ClientAuthorisationException.class, () -> authorisationService.allowOnlySscs(SERVICE_HEADER));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "502, Bad Gateway",
+            "307, Temporary Redirect"
+    })
+    public void allowOnlySscs_shouldHandleFeignExceptions(int status, String message) {
+        when(serviceAuthorisationApi.getServiceName(any()))
+                .thenThrow(createFeignException(status, message));
+        assertThrows(AuthorisationException.class, () -> authorisationService.allowOnlySscs(SERVICE_HEADER));
     }
 
     private FeignException createFeignException(int status, String message) {
