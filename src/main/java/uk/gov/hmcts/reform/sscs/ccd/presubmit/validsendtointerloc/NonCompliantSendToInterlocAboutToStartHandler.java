@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getOriginalSenderDropdown;
 import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -42,7 +43,9 @@ public class NonCompliantSendToInterlocAboutToStartHandler implements PreSubmitC
 
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
-        sscsCaseData.setSelectedConfidentialityParty(
+        sscsCaseData.setOriginalSender(
+                getOriginalSenderDropdown(sscsCaseData, cmOtherPartyConfidentialityEnabled));
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
                 getSelectedConfidentialityPartyDropdown(sscsCaseData, cmOtherPartyConfidentialityEnabled));
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }

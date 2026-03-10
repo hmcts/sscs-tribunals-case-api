@@ -44,8 +44,8 @@ class NonCompliantSendToInterlocAboutToStartHandlerTest {
     @Test
     void setsFirstPartyAsDefaultWhenFlagOff() {
         var response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        DynamicList originalSender = response.getData().getOriginalSender();
-        assertThat(originalSender.getValue().getCode()).isEqualTo("appellant");
+        DynamicList selectedParty = response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty();
+        assertThat(selectedParty.getValue().getCode()).isEqualTo("appellant");
     }
 
     @Test
@@ -54,7 +54,7 @@ class NonCompliantSendToInterlocAboutToStartHandlerTest {
         callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
 
         var response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        DynamicListItem selectedValue = response.getData().getOriginalSender().getValue();
+        DynamicListItem selectedValue = response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue();
         assertThat(selectedValue.getCode()).isEmpty();
     }
 
