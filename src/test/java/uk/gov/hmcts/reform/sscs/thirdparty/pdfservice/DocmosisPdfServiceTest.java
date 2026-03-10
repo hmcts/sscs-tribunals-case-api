@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,7 +54,7 @@ public class DocmosisPdfServiceTest {
                 )
         )).thenReturn(expectedPdf);
 
-        byte[] pdfBytes = new DocmosisPdfService(docmosisPdfGenerationService).createPdf(pdfCoverSheet, template);
+        byte[] pdfBytes = new DocmosisPdfService(docmosisPdfGenerationService, new ObjectMapper()).createPdf(pdfCoverSheet, template);
 
         assertThat(pdfBytes, is(expectedPdf));
     }

@@ -57,6 +57,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.FormType.SSCS8;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService.normaliseNino;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.text.DateFormat;
@@ -183,7 +184,7 @@ public class SscsCaseTransformerTest {
         pairs = new HashMap<>();
         DwpAddressLookupService dwpAddressLookupService = new DwpAddressLookupService();
 
-        formTypeValidator2 = new FormTypeValidator(sscsJsonExtractor);
+        formTypeValidator2 = new FormTypeValidator(sscsJsonExtractor, new ObjectMapper());
 
         SscsDataHelper sscsDataHelper = new SscsDataHelper(
             null,

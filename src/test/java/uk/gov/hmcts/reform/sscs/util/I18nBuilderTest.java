@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.util;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Map;
 import org.junit.Before;
@@ -15,7 +16,7 @@ public class I18nBuilderTest {
 
     @Before
     public void setUp() {
-        i18n = new I18nBuilder(new ResourceManager());
+        i18n = new I18nBuilder(new ResourceManager(), new ObjectMapper());
     }
 
     @Test

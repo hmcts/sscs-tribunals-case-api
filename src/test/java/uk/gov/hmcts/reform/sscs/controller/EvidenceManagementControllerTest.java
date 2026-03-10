@@ -10,6 +10,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.service.SubmitAppealServiceBase.DM_STORE_USER_ID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
@@ -45,10 +46,12 @@ public class EvidenceManagementControllerTest {
 
     private EvidenceManagementController controller;
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @Before
     public void setUp() {
         openMocks(this);
-        controller = new EvidenceManagementController(evidenceManagementService, evidenceManagementSecureDocStoreService, fileToPdfConversionService, false, null);
+        controller = new EvidenceManagementController(evidenceManagementService, evidenceManagementSecureDocStoreService, fileToPdfConversionService, false, null, objectMapper);
     }
 
     @Test(expected = EvidenceDocumentsMissingException.class)
@@ -94,7 +97,7 @@ public class EvidenceManagementControllerTest {
 
     @Test
     public void shouldUploadEvidenceDocumentListSecureDocStore() throws JsonProcessingException {
-        controller = new EvidenceManagementController(evidenceManagementService, evidenceManagementSecureDocStoreService, fileToPdfConversionService, true, idamService);
+        controller = new EvidenceManagementController(evidenceManagementService, evidenceManagementSecureDocStoreService, fileToPdfConversionService, true, idamService, objectMapper);
 
         uk.gov.hmcts.reform.ccd.document.am.model.Document.Links links = new uk.gov.hmcts.reform.ccd.document.am.model.Document.Links();
         links.binary = new uk.gov.hmcts.reform.ccd.document.am.model.Document.Link();

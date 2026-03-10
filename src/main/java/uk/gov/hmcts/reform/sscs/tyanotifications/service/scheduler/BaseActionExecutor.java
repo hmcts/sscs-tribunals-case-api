@@ -33,14 +33,16 @@ public abstract class BaseActionExecutor<T> implements JobExecutor<T> {
     protected final IdamService idamService;
     private final SscsCaseCallbackDeserializer deserializer;
     private final RetryNotificationService retryNotificationService;
+    private final ObjectMapper objectMapper;
 
-    BaseActionExecutor(NotificationService notificationService, RetryNotificationService retryNotificationService, CcdService ccdService, UpdateCcdCaseService updateCcdCaseService, IdamService idamService, SscsCaseCallbackDeserializer deserializer) {
+    BaseActionExecutor(NotificationService notificationService, RetryNotificationService retryNotificationService, CcdService ccdService, UpdateCcdCaseService updateCcdCaseService, IdamService idamService, SscsCaseCallbackDeserializer deserializer, ObjectMapper objectMapper) {
         this.notificationService = notificationService;
         this.retryNotificationService = retryNotificationService;
         this.ccdService = ccdService;
         this.updateCcdCaseService = updateCcdCaseService;
         this.idamService = idamService;
         this.deserializer = deserializer;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -89,9 +91,7 @@ public abstract class BaseActionExecutor<T> implements JobExecutor<T> {
     }
 
     private String buildCcdNode(SscsCaseDetails caseDetails, String jobName) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
-        JsonNode jsonNode = mapper.valueToTree(caseDetails);
+        JsonNode jsonNode = objectMapper.valueToTree(caseDetails);
         ObjectNode node2 = (ObjectNode) jsonNode;
         ObjectNode node = JsonNodeFactory.instance.objectNode();
 
@@ -101,7 +101,7 @@ public abstract class BaseActionExecutor<T> implements JobExecutor<T> {
         node.set("case_details", node2);
         node = node.put("event_id", jobName);
 
-        return mapper.writeValueAsString(node);
+        return objectMapper.writeValueAsString(node);
     }
 
     protected abstract void updateCase(Long caseId, NotificationSscsCaseDataWrapper wrapper, IdamTokens idamTokens);
