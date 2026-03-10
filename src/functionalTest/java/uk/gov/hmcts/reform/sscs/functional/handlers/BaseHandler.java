@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.YES;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import io.restassured.RestAssured;
@@ -409,12 +410,18 @@ public class BaseHandler {
 
     }
 
-    public String serializeSscsCallback(Callback<SscsCaseData> callback) {
+    protected String serializeSscsCallback(Callback<SscsCaseData> callback) {
         try {
             return this.mapper.writeValueAsString(callback);
         } catch (IOException var3) {
             throw new IllegalArgumentException("Could not serialize caseData", var3);
         }
+    }
+
+
+    protected Callback<SscsCaseData> deserializeCallbackData(String jsonPath) throws IOException {
+        return mapper.readValue(getJsonCallbackForTest(jsonPath), new TypeReference<>() {
+        });
     }
 
     protected Callback<SscsCaseData> replaceCallbackCaseId(Callback<SscsCaseData> sscsCaseDataCallback, String id, String caseIdToBeReplaced) {
