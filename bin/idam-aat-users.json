@@ -1,10 +1,10 @@
 [
   {
     "user": {
-      "id": "ef293c8e-0cb9-4735-be49-1cf13d866d42",
+      "id": "f2f58ead-cea8-433f-9f34-3176781a05f3",
       "forename": "sscs-senior-cw",
-      "surname": "midlands-bradford",
-      "displayName": "sscs-senior-cw",
+      "surname": "nw-liverpool",
+      "displayName": "sscs-senior-cw nw-liverpool",
       "roleNames": [
         "caseworker",
         "caseworker-SSCS",
@@ -19,13 +19,540 @@
       "id": "5249c715-408f-43f6-aff3-cb4240b81751",
       "forename": "sscs-senior-cw",
       "surname": "wales-cardiff",
-      "displayName": "sscs-senior-cw",
+      "displayName": "sscs-senior-cw wales-cardiff",
       "roleNames": [
         "caseworker",
         "caseworker-SSCS",
         "caseworker-SSCS-registrar",
         "caseworker-SSCS-clerk",
         "caseworker-SSCS-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "ef293c8e-0cb9-4735-be49-1cf13d866d42",
+      "forename": "sscs-senior-cw",
+      "surname": "midlands-bradford",
+      "displayName": "sscs-senior-cw midlands-bradford",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-SSCS-registrar",
+        "caseworker-SSCS-clerk",
+        "caseworker-SSCS-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "f8cc9ff4-954e-4c7f-ae80-ff2510bf2c1e",
+      "forename": "sscs-senior-cw",
+      "surname": "ne-leeds",
+      "displayName": "sscs-senior-cw ne-leeds",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-SSCS-registrar",
+        "caseworker-SSCS-clerk",
+        "caseworker-SSCS-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "a169aa94-9cbd-410e-ae6b-6bf2cb002575",
+      "forename": "sscs-cw-1",
+      "surname": "scotland-glasgow",
+      "displayName": "sscs-cw-1 scotland-glasgow",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-SSCS-registrar",
+        "caseworker-SSCS-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "8809be9f-b7a6-4e29-b1af-be416c9c5766",
+      "forename": "sscs-cw",
+      "surname": "nw-liverpool",
+      "displayName": "sscs-cw nw-liverpool",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-SSCS-registrar",
+        "caseworker-SSCS-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "81d7ef95-dd19-467b-a4bb-96d231796fe1",
+      "forename": "sscs-cw",
+      "surname": "national-bradford",
+      "displayName": "sscs-cw national-bradford",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-SSCS-registrar",
+        "caseworker-SSCS-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "99556f9d-9088-4776-8a97-93bb1c5158b8",
+      "forename": "sscs-court-clerk",
+      "surname": "ne-leeds",
+      "displayName": "sscs-court-clerk ne-leeds",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-SSCS-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "2b7bf173-d02a-4b96-857a-137816e891fd",
+      "forename": "sscs-court-clerk",
+      "surname": "nw-liverpool",
+      "displayName": "sscs-court-clerk nw-liverpool",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-SSCS-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "f36ad1f2-a8f8-44f3-bda6-ac61d6f1ce24",
+      "forename": "sscs-court-clerk",
+      "surname": "scotland-glasgow",
+      "displayName": "sscs-court-clerk scotland-glasgow",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-SSCS-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "09ef1b3d-3c93-4558-a5f9-64493b205c7c",
+      "forename": "sscs-dwp-1",
+      "surname": "london-chelmsford",
+      "displayName": "sscs-dwp-1 london-chelmsford",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-sscs-dwpresponsewriter"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "9a3b6481-0314-4c8a-be98-5ad6a8a532a1",
+      "forename": "sscs-dwp-1",
+      "surname": "scotland-glasgow",
+      "displayName": "sscs-dwp-1 scotland-glasgow",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-sscs-dwpresponsewriter"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "f3b577ce-853b-46ee-a67f-6438d7a6cc7f",
+      "forename": "sscs-dwp",
+      "surname": "national-chesterfield",
+      "displayName": "sscs-dwp national-chesterfield",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-sscs-dwpresponsewriter"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "059d3f81-b549-4f81-9fb4-78f25ef56d0d",
+      "forename": "sscs-hmrc",
+      "surname": "wales-cardiff",
+      "displayName": "sscs-hmrc wales-cardiff",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-sscs-hmrcresponsewriter"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "bb786269-cbe3-4475-8cac-5964a6e11f56",
+      "forename": "sscs-hmrc",
+      "surname": "scotland-glasgow",
+      "displayName": "sscs-hmrc scotland-glasgow",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-sscs-hmrcresponsewriter"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "ba474dce-151a-4427-abc4-78a36ffab30a",
+      "forename": "sscs-hmrc",
+      "surname": "national-bradford",
+      "displayName": "sscs-hmrc national-bradford",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-sscs-hmrcresponsewriter"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "bb73edea-f9dd-4257-a06c-abbd39fcd5bc",
+      "forename": "sscs-hcl",
+      "surname": "midlands-bradford",
+      "displayName": "sscs-hcl midlands-bradford",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-sscs-clerk",
+        "caseworker-sscs-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "150d2842-d9c8-4a1b-8add-e6d8b36087f6",
+      "forename": "sscs-hcl",
+      "surname": "se-bexleyheath",
+      "displayName": "sscs-hcl se-bexleyheath",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-sscs-clerk",
+        "caseworker-sscs-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "24e26fd9-fd97-4af4-87b7-0b65252dcaba",
+      "forename": "sscs-hcl",
+      "surname": "ne-leeds",
+      "displayName": "sscs-hcl ne-leeds",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-sscs-clerk",
+        "caseworker-sscs-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "0261e19a-1efb-4310-a382-b1c6fc3b60f0",
+      "forename": "sscs-hcl",
+      "surname": "scotland-glasgow",
+      "displayName": "sscs-hcl scotland-glasgow",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-sscs-clerk",
+        "caseworker-sscs-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "3e7a58f8-0144-4219-b1f4-305fbe070c60",
+      "forename": "sscs-rctl",
+      "surname": "london-sutton",
+      "displayName": "sscs-rctl london-sutton",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-sscs-clerk",
+        "caseworker-sscs-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "40da6ad3-22fb-4080-ac82-904d511802af",
+      "forename": "sscs-rctl",
+      "surname": "wales-cardiff",
+      "displayName": "sscs-rctl wales-cardiff",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-sscs-clerk",
+        "caseworker-sscs-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "71e0bfe5-0b60-4638-8641-9e3416b9eccd",
+      "forename": "sscs-rctl",
+      "surname": "scotland-glasgow",
+      "displayName": "sscs-rctl scotland-glasgow",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-sscs-clerk",
+        "caseworker-sscs-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "d82d6c99-26bf-4b71-a933-0f976834fb3f",
+      "forename": "sscs-rctl",
+      "surname": "nw-liverpool",
+      "displayName": "sscs-rctl nw-liverpool",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-sscs-clerk",
+        "caseworker-sscs-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "9d895624-e679-4f23-81dc-cf73a20d9aa9",
+      "forename": "sscs-hcadmin",
+      "surname": "ne-leeds",
+      "displayName": "sscs-hcadmin ne-leeds",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-sscs-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "f7ee1300-973f-46b4-817d-e47597f2e654",
+      "forename": "sscs-hcadmin",
+      "surname": "nw-liverpool",
+      "displayName": "sscs-hcadmin nw-liverpool",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-sscs-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "a2804334-316d-43be-87bd-a21556a9727e",
+      "forename": "sscs-hcadmin",
+      "surname": "wales-cardiff",
+      "displayName": "sscs-hcadmin wales-cardiff",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-sscs-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "f44e7a2e-700e-4de1-9692-83dde3e8b418",
+      "forename": "sscs-hcadmin",
+      "surname": "scotland-glasgow",
+      "displayName": "sscs-hcadmin scotland-glasgow",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-sscs-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "f05e26a0-d8be-4cf2-a919-0882e92efa9d",
+      "forename": "sscs-rcadmin",
+      "surname": "se-bexleyheath",
+      "displayName": "sscs-rcadmin se-bexleyheath",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-sscs-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "aa4e11ab-f295-4800-acd2-58b7f30aba7b",
+      "forename": "sscs-rcadmin",
+      "surname": "midlands-bradford",
+      "displayName": "sscs-rcadmin midlands-bradford",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-sscs-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "8e653d36-57b8-4cf4-9e17-9eedf6ad04d7",
+      "forename": "sscs-rcadmin",
+      "surname": "wales-cardiff",
+      "displayName": "sscs-rcadmin wales-cardiff",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-sscs-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "eb520215-4e5c-4549-ad43-7915b2587898",
+      "forename": "sscs-rcadmin",
+      "surname": "scotland-glasgow",
+      "displayName": "sscs-rcadmin scotland-glasgow",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-sscs-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "7724c87d-dd66-4b09-91cc-2c6279bb3288",
+      "forename": "sscs-ctscdmin",
+      "surname": "national-crownhouse",
+      "displayName": "sscs-ctscdmin national-crownhouse",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-sscs-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "26332f06-1e03-4860-9e16-fd6d1faf03d8",
+      "forename": "sscs-ctscdmin",
+      "surname": "scotland-glasgow",
+      "displayName": "sscs-ctscdmin scotland-glasgow",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-sscs-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "58079802-4162-4b5f-88f8-5d5ecd2b3f32",
+      "forename": "sscs-ctscdmin",
+      "surname": "nw-liverpool",
+      "displayName": "sscs-ctscdmin nw-liverpool",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-sscs-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "8e4eeb0c-c3d4-4902-a52f-8fd165727117",
+      "forename": "sscs-ctscdmin",
+      "surname": "wales-cardiff",
+      "displayName": "sscs-ctscdmin wales-cardiff",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-sscs-clerk"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "44a4f4c5-ba06-4d3b-a36c-61697ef98678",
+      "forename": "sscs-ctsctl",
+      "surname": "scotland-glasgow",
+      "displayName": "sscs-ctsctl scotland-glasgow",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-sscs-clerk",
+        "caseworker-sscs-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "de0cc41e-66db-4287-a87b-0a3448fad186",
+      "forename": "sscs-ctsctl",
+      "surname": "wales-cardiff",
+      "displayName": "sscs-ctsctl wales-cardiff",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-sscs-clerk",
+        "caseworker-sscs-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "121ec859-76f2-4e73-b773-e74f493c17fc",
+      "forename": "sscs-ctsctl",
+      "surname": "ne-leeds",
+      "displayName": "sscs-ctsctl ne-leeds",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-sscs-clerk",
+        "caseworker-sscs-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "791b6ad8-b718-4590-ae42-16245f20b83f",
+      "forename": "sscs-ctsctl",
+      "surname": "nw-liverpool",
+      "displayName": "sscs-ctsctl nw-liverpool",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-sscs-clerk",
+        "caseworker-sscs-superuser"
+      ]
+    }
+  },
+  {
+    "user": {
+      "id": "c4f1fe32-2c2d-4dc4-8741-1dbe82186a60",
+      "forename": "sscs-ctsctl",
+      "surname": "midlands-bradford",
+      "displayName": "sscs-ctsctl midlands-bradford",
+      "roleNames": [
+        "caseworker",
+        "caseworker-SSCS",
+        "caseworker-sscs-clerk",
+        "caseworker-sscs-superuser"
       ]
     }
   }
