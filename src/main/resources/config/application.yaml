@@ -1992,6 +1992,7 @@ text:
 
 evidence-share:
     submit-types: PAPER
+    appeal-received-delay-ms: 5000
 exela:
     addressLine1: HMCTS SSCS
     addressLine2: PO BOX 12626
