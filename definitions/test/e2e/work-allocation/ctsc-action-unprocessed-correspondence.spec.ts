@@ -23,4 +23,11 @@ test.describe('Work Allocation - CTSC - Action Unprocessed Correspondence', { ta
     await ctscActionUnprocessedCorrespondenceSteps.completeActionUnprocessedCorrespondenceTask(caseId);
     await ctscActionUnprocessedCorrespondenceSteps.markDuplicateUnprocessedCorrespondenceTasksAsDone();
   });
+
+  test('Action Unprocessed Correspondence task is cancelled automatically when case is void', async ({ ctscActionUnprocessedCorrespondenceSteps }) => {
+    test.slow();
+    await ctscActionUnprocessedCorrespondenceSteps.createActionUnprocessedCorrespondenceTask(caseId);
+    await ctscActionUnprocessedCorrespondenceSteps.verifyCtscAdminWithCaseAllocatorRoleCanViewAndAssignActionUnprocessedCorrespondence(caseId);
+    await ctscActionUnprocessedCorrespondenceSteps.cancelActionUnprocessedCorrespondenceTaskWhenTheCaseIsVoid(caseId);
+  });
 });

@@ -3,6 +3,7 @@ import { BaseStep } from '../base';
 import { credentials } from '../../../config/config';
 import task from '../../../pages/content/action.unprocessed.correspondence.task_en.json';
 import actionFurtherEvidence from '../../../pages/content/action.further.evidence_en.json';
+import { VoidCase } from '../void.case';
 
 
 export class CtscActionUnprocessedCorrespondence extends BaseStep {
@@ -128,5 +129,21 @@ export class CtscActionUnprocessedCorrespondence extends BaseStep {
      await this.homePage.navigateToTab('Tasks');
      await this.tasksTab.markMultipleTasksAsDone(isDormant ? "CTSC - Action Unprocessed Correspondence - Dormant/Post Hearing" : task.name);
      await this.tasksTab.verifyTaskIsHidden(isDormant ? "CTSC - Action Unprocessed Correspondence - Dormant/Post Hearing" : task.name);
+  }
+
+  async cancelActionUnprocessedCorrespondenceTaskWhenTheCaseIsVoid(caseId: string) {
+    let voidCase = new VoidCase(this.page);
+    
+    await this.loginPage.goToCase(caseId);
+    await this.homePage.navigateToTab('Tasks');
+
+    await this.tasksTab.verifyPageContentByKeyValue(task.name, 'Assigned to', task.assignedTo);
+    await this.tasksTab.verifyManageOptions(task.name, task.assignedManageOptionsForCaseAllocator);
+
+    await voidCase.performVoidCase(caseId, false);
+
+    await this.homePage.navigateToTab('Tasks');
+    await this.homePage.delay(30000);
+    await this.tasksTab.verifyTaskIsHidden(task.name);
   }
 }
