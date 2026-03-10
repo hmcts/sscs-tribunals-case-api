@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
+import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
@@ -119,5 +120,19 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
         }
         return false;
     }
+
+    protected boolean severeConditionQuestionIsValid(SscsCaseData sscsCaseData) {
+        if (Objects.equals(sscsCaseData.getIssueCode(), "SV")) {
+            return true;
+        }
+        if (sscsCaseData.getElementsDisputedLimitedWork() == null) {
+            return false;
+        } else {
+            return sscsCaseData.getElementsDisputedLimitedWork().stream()
+                    .filter(ele -> nonNull(ele.getValue()))
+                    .anyMatch(ele -> Objects.equals(ele.getValue().getIssueCode(), "SV"));
+        }
+    }
+
 
 }

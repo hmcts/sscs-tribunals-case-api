@@ -35,6 +35,10 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
             sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
         }
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionHasSVIssueCode(setSevereCriteriaApplies(sscsCaseData));
+        if (nonNull(sscsCaseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo()) && !severeConditionQuestionIsValid(sscsCaseData)) {
+            sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(null);
+            sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereCriteriaApply(null);
+        }
     }
 
     private YesNo setSevereCriteriaApplies(SscsCaseData sscsCaseData) {
