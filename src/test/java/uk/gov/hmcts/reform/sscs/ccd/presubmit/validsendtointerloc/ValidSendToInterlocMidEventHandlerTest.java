@@ -122,14 +122,14 @@ public class ValidSendToInterlocMidEventHandlerTest {
     @Test
     void givenConfidentialityPartySelected_thenMidEventKeepsSelectedValue() {
         DynamicListItem selectedItem = new DynamicListItem("appellant", "Appellant (or Appointee)");
-        sscsCaseData.setSelectedConfidentialityParty(new DynamicList(selectedItem, null));
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(new DynamicList(selectedItem, null));
         sscsCaseData.setSelectWhoReviewsCase(new DynamicList(new DynamicListItem(REVIEW_BY_JUDGE.getId(), REVIEW_BY_JUDGE.getLabel()), null));
         sscsCaseData.setOtherParties(List.of());
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertEquals("appellant", response.getData().getSelectedConfidentialityParty().getValue().getCode());
-        assertTrue(response.getData().getSelectedConfidentialityParty().getListItems().stream()
+        assertEquals("appellant", response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode());
+        assertTrue(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getListItems().stream()
                 .anyMatch(item -> "appellant".equals(item.getCode())));
     }
 
@@ -137,15 +137,15 @@ public class ValidSendToInterlocMidEventHandlerTest {
     void givenCurrentPayloadEmptyAndCaseDetailsBeforeHasValue_thenMidEventUsesPreviousSelection() {
         DynamicListItem selectedItem = new DynamicListItem("appellant", "Appellant (or Appointee)");
         SscsCaseData beforeCaseData = sscsCaseData.toBuilder().build();
-        beforeCaseData.setSelectedConfidentialityParty(new DynamicList(selectedItem, null));
-        sscsCaseData.setSelectedConfidentialityParty(null);
+        beforeCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(new DynamicList(selectedItem, null));
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(null);
         sscsCaseData.setSelectWhoReviewsCase(new DynamicList(new DynamicListItem(REVIEW_BY_JUDGE.getId(), REVIEW_BY_JUDGE.getLabel()), null));
         sscsCaseData.setOtherParties(List.of());
         when(caseDetailsBefore.getCaseData()).thenReturn(beforeCaseData);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertEquals("appellant", response.getData().getSelectedConfidentialityParty().getValue().getCode());
+        assertEquals("appellant", response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode());
     }
 
     @Test

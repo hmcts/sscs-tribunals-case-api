@@ -327,7 +327,7 @@ public class HmctsResponseReviewedAboutToStartTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals("", response.getData().getOriginalSender().getValue().getCode());
+        assertEquals("", response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode());
     }
 
     @Test
@@ -337,7 +337,7 @@ public class HmctsResponseReviewedAboutToStartTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals("appellant", response.getData().getOriginalSender().getValue().getCode());
+        assertEquals("appellant", response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode());
     }
 
     @Test
@@ -347,7 +347,7 @@ public class HmctsResponseReviewedAboutToStartTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals("appellant", response.getData().getOriginalSender().getValue().getCode());
+        assertEquals("appellant", response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode());
     }
 
 }

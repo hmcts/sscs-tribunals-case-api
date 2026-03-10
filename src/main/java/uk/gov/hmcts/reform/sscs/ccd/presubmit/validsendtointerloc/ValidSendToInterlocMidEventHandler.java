@@ -6,8 +6,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.postponementrequest.Postpon
 import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown;
 
 import java.util.Optional;
-import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -20,7 +18,6 @@ import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.util.PdfRequestUtil;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
-@Slf4j
 @Service
 public class ValidSendToInterlocMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     public static final String POSTPONEMENTS_NOT_POSSIBLE_GAPS = "Postponement requests cannot be made for hearings listed in GAPS";
@@ -50,35 +47,19 @@ public class ValidSendToInterlocMidEventHandler implements PreSubmitCallbackHand
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         final PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
-        DynamicList incoming = sscsCaseData.getSelectedConfidentialityParty();
-        log.info("CONF_PARTY_DEBUG MID_EVENT_IN caseId={} selectedCode={} selectedLabel={} listSize={} listCodes={} reason={} selectWhoReviews={} pageId={}",
-                sscsCaseData.getCcdCaseId(),
-                incoming != null && incoming.getValue() != null ? incoming.getValue().getCode() : null,
-                incoming != null && incoming.getValue() != null ? incoming.getValue().getLabel() : null,
-                incoming != null && incoming.getListItems() != null ? incoming.getListItems().size() : 0,
-                getListCodes(incoming),
-                sscsCaseData.getInterlocReferralReason() != null ? sscsCaseData.getInterlocReferralReason().getDescription() : null,
-                sscsCaseData.getSelectWhoReviewsCase() != null && sscsCaseData.getSelectWhoReviewsCase().getValue() != null
-                        ? sscsCaseData.getSelectWhoReviewsCase().getValue().getCode() : null,
-                callback.getPageId());
+        DynamicList incoming = sscsCaseData.getExtendedSscsCaseData().getSelectedConfidentialityParty();
 
         if (isDynamicListEmpty(incoming)) {
             callback.getCaseDetailsBefore()
                     .map(CaseDetails::getCaseData)
-                    .map(SscsCaseData::getSelectedConfidentialityParty)
+                    .map(SscsCaseData::getExtendedSscsCaseData)
+                    .map(ExtendedSscsCaseData::getSelectedConfidentialityParty)
                     .filter(existingValue -> !isDynamicListEmpty(existingValue))
-                    .ifPresent(sscsCaseData::setSelectedConfidentialityParty);
+                    .ifPresent(sscsCaseData.getExtendedSscsCaseData()::setSelectedConfidentialityParty);
         }
 
-        sscsCaseData.setSelectedConfidentialityParty(
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
                 getSelectedConfidentialityPartyDropdown(sscsCaseData, cmOtherPartyConfidentialityEnabled));
-        DynamicList outgoing = sscsCaseData.getSelectedConfidentialityParty();
-        log.info("CONF_PARTY_DEBUG MID_EVENT_OUT caseId={} selectedCode={} selectedLabel={} listSize={} listCodes={}",
-                sscsCaseData.getCcdCaseId(),
-                outgoing != null && outgoing.getValue() != null ? outgoing.getValue().getCode() : null,
-                outgoing != null && outgoing.getValue() != null ? outgoing.getValue().getLabel() : null,
-                outgoing != null && outgoing.getListItems() != null ? outgoing.getListItems().size() : 0,
-                getListCodes(outgoing));
 
         if (SelectWhoReviewsCase.POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId().equals(sscsCaseData.getSelectWhoReviewsCase().getValue().getCode())) {
             validatePostponementRequest(sscsCaseData, response);
@@ -135,15 +116,6 @@ public class ValidSendToInterlocMidEventHandler implements PreSubmitCallbackHand
                 || dynamicList.getValue() == null
                 || dynamicList.getValue().getCode() == null
                 || dynamicList.getValue().getCode().isBlank();
-    }
-
-    private String getListCodes(DynamicList dropdown) {
-        if (dropdown == null || dropdown.getListItems() == null) {
-            return "[]";
-        }
-        return dropdown.getListItems().stream()
-                .map(item -> item.getCode() + ":" + item.getLabel())
-                .collect(Collectors.joining(", ", "[", "]"));
     }
 
 }

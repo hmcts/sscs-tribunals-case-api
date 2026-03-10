@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest
-@DisabledIfEnvironmentVariable(named = "CM_INTERLOC_CONFIDENTIALITY_PARTY_ENABLED", matches = "true")
+@DisabledIfEnvironmentVariable(named = "CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED", matches = "true")
 public class ValidSendToInterlocAboutToStartHandlerFeatureOffFunctionalTest extends BaseHandler {
 
     @BeforeEach
@@ -38,7 +38,7 @@ public class ValidSendToInterlocAboutToStartHandlerFeatureOffFunctionalTest exte
             .then()
             .statusCode(HttpStatus.SC_OK)
             .assertThat()
-            .body("data.originalSender.value.code", equalTo("appellant"))
-            .body("data.originalSender.list_items", hasItem(hasEntry("code", "appellant")));
+            .body("data.selectedConfidentialityParty.value.code", equalTo("appellant"))
+            .body("data.selectedConfidentialityParty.list_items", hasItem(hasEntry("code", "appellant")));
     }
 }

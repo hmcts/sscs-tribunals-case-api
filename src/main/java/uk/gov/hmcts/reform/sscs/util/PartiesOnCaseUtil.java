@@ -91,7 +91,7 @@ public class PartiesOnCaseUtil {
     public static DynamicList getSelectedConfidentialityPartyDropdown(SscsCaseData sscsCaseData, boolean clearDefaultForChildSupport) {
         List<DynamicListItem> listOptions = getPartiesOnCase(sscsCaseData);
 
-        DynamicList existingSelectedConfidentialityParty = sscsCaseData.getSelectedConfidentialityParty();
+        DynamicList existingSelectedConfidentialityParty = sscsCaseData.getExtendedSscsCaseData().getSelectedConfidentialityParty();
         DynamicListItem existingValue = existingSelectedConfidentialityParty != null
                 ? existingSelectedConfidentialityParty.getValue()
                 : null;
@@ -106,6 +106,26 @@ public class PartiesOnCaseUtil {
                 ? new DynamicListItem("", "")
                 : listOptions.get(0);
         return new DynamicList(selectedConfidentialityParty, listOptions);
+    }
+
+    public static DynamicList getOriginalSenderDropdown(SscsCaseData sscsCaseData, boolean clearDefaultForChildSupport) {
+        List<DynamicListItem> listOptions = getPartiesOnCase(sscsCaseData);
+
+        DynamicList existingOriginalSender = sscsCaseData.getOriginalSender();
+        DynamicListItem existingValue = existingOriginalSender != null
+            ? existingOriginalSender.getValue()
+            : null;
+
+        if (existingValue != null
+            && existingValue.getCode() != null
+            && listOptions.stream().anyMatch(option -> option.getCode().equals(existingValue.getCode()))) {
+            return new DynamicList(existingValue, listOptions);
+        }
+
+        DynamicListItem selectedOriginalSender = clearDefaultForChildSupport && isChildSupportAppeal(sscsCaseData)
+            ? new DynamicListItem("", "")
+            : listOptions.get(0);
+        return new DynamicList(selectedOriginalSender, listOptions);
     }
 
     public static List<String> getAllOtherPartiesOnCase(SscsCaseData sscsCaseData) {

@@ -2,12 +2,11 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.*;
+import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getOriginalSenderDropdown;
 import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -17,7 +16,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Component
-@Slf4j
 public class ValidSendToInterlocAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final boolean postponementsFeature;
@@ -52,6 +50,7 @@ public class ValidSendToInterlocAboutToStartHandler implements PreSubmitCallback
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
         setSelectWhoReviewsCase(sscsCaseData);
+        setOriginalSenderDropdown(sscsCaseData);
         setSelectedConfidentialityPartyDropdown(sscsCaseData);
 
         if (postHearingsB) {
@@ -75,22 +74,10 @@ public class ValidSendToInterlocAboutToStartHandler implements PreSubmitCallback
 
     private void setSelectedConfidentialityPartyDropdown(SscsCaseData sscsCaseData) {
         DynamicList dropdown = getSelectedConfidentialityPartyDropdown(sscsCaseData, cmOtherPartyConfidentialityEnabled);
-        sscsCaseData.setSelectedConfidentialityParty(dropdown);
-        log.info("CONF_PARTY_DEBUG ABOUT_TO_START caseId={} selectedCode={} selectedLabel={} listSize={} listCodes={} reason={}",
-                sscsCaseData.getCcdCaseId(),
-                dropdown != null && dropdown.getValue() != null ? dropdown.getValue().getCode() : null,
-                dropdown != null && dropdown.getValue() != null ? dropdown.getValue().getLabel() : null,
-                dropdown != null && dropdown.getListItems() != null ? dropdown.getListItems().size() : 0,
-                getListCodes(dropdown),
-                sscsCaseData.getInterlocReferralReason() != null ? sscsCaseData.getInterlocReferralReason().getDescription() : null);
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(dropdown);
     }
 
-    private String getListCodes(DynamicList dropdown) {
-        if (dropdown == null || dropdown.getListItems() == null) {
-            return "[]";
-        }
-        return dropdown.getListItems().stream()
-                .map(item -> item.getCode() + ":" + item.getLabel())
-                .collect(Collectors.joining(", ", "[", "]"));
+    private void setOriginalSenderDropdown(SscsCaseData sscsCaseData) {
+        sscsCaseData.setOriginalSender(getOriginalSenderDropdown(sscsCaseData, cmOtherPartyConfidentialityEnabled));
     }
 }
