@@ -143,8 +143,7 @@ class GenTemplateContentTest {
     @ParameterizedTest
     @CsvSource(value = {"faceToFace:This has been an oral (face to face) hearing.",
         "telephone:This has been a remote hearing in the form of a telephone hearing.",
-        "video:This has been a remote hearing in the form of a video hearing.",
-        "triage:xxx"}, delimiter = ':')
+        "video:This has been a remote hearing in the form of a video hearing."}, delimiter = ':')
     void testAppointeeOnCaseButDidNotAttend(String hearingType, String expectedHearingSentence) {
         WriteFinalDecisionTemplateBody body =
             WriteFinalDecisionTemplateBody.builder()
