@@ -204,8 +204,8 @@ public class AuthorisationServiceTest {
 
     @ParameterizedTest
     @CsvSource({
-            "502, Bad Gateway",
-            "307, Temporary Redirect"
+        "502, Bad Gateway",
+        "307, Temporary Redirect"
     })
     public void allowOnlySscs_shouldHandleFeignExceptions(int status, String message) {
         when(serviceAuthorisationApi.getServiceName(any()))
