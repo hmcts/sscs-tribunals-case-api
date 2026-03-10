@@ -209,8 +209,6 @@ class GenTemplateContentTest {
                 .appointeeName(APPOINTEE_NAME)
                 .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
                 .anythingElse("Something else")
-                .otherPartyNamesAttendedHearing(List.of("Georgy Jj the second respondent", "Jany Gigi the third respondent"))
-                .otherPartyNamesDidNotAttendHearing(List.of("Theo Jj the forth respondent", "Reo Gigi the fifth respondent"))
                 .build();
 
         GenTemplateContent content = GenScenario.SCENARIO_NON_DESCRIPTOR.getContent(body);
