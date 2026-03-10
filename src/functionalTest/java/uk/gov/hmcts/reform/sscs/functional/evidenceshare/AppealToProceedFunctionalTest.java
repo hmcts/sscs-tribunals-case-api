@@ -7,19 +7,19 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
 import java.io.IOException;
 import java.time.LocalDate;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 
 @Slf4j
-public class AppealToProceedFunctionalTest extends AbstractFunctionalTest {
+class AppealToProceedFunctionalTest extends AbstractFunctionalTest {
 
-    public AppealToProceedFunctionalTest() {
+    AppealToProceedFunctionalTest() {
         super();
     }
 
     // Need tribunals running to pass this functional test
     @Test
-    public void processAnAppealToProceedEvent_shouldUpdateHmctsDwpState() throws IOException {
+    void processAnAppealToProceedEvent_shouldUpdateHmctsDwpState() throws IOException {
 
         createDigitalCaseWithEvent(NON_COMPLIANT);
 

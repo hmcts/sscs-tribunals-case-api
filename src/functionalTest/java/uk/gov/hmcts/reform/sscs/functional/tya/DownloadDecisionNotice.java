@@ -9,16 +9,16 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
@@ -26,7 +26,7 @@ import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 
 
 @Slf4j
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest
 public class DownloadDecisionNotice extends BaseHandler {
@@ -37,13 +37,13 @@ public class DownloadDecisionNotice extends BaseHandler {
     @Value("${test-url}")
     private String testUrl;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         super.setUp();
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void testDownloadDecisionNotice() throws Exception {
 
         List<SscsDocument> uploaded = uploadDocument();

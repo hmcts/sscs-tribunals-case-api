@@ -1,0 +1,26 @@
+[
+  {
+    "LiveFrom": "07/01/2026",
+    "CaseTypeID": "Benefit",
+    "ID": "requestOtherPartyData",
+    "Name": "Request other party data",
+    "PreConditionState(s)": "validAppeal",
+    "PostConditionState": "awaitOtherPartyData",
+    "SecurityClassification": "Public",
+    "EventEnablingCondition": "appeal.benefitType.code=\"childSupport\"",
+    "Publish": "N"
+  },
+  {
+    "LiveFrom": "07/01/2026",
+    "CaseTypeID": "Benefit",
+    "ID": "addOtherPartyData",
+    "Name": "Add other party data",
+    "Description": "Add other party data",
+    "DisplayOrder": 1645,
+    "PreConditionState(s)": "awaitOtherPartyData",
+    "PostConditionState": "awaitConfidentialityRequirements",
+    "SecurityClassification": "Public",
+    "EventEnablingCondition": "appeal.benefitType.code=\"childSupport\"",
+    "Publish": "N"
+  }
+]
