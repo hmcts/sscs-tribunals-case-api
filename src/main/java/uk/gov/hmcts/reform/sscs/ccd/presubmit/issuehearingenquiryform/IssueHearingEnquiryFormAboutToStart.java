@@ -73,9 +73,7 @@ public class IssueHearingEnquiryFormAboutToStart implements PreSubmitCallbackHan
     }
 
     private void setDocuments(SscsCaseData sscsCaseData) {
-        final List<DynamicListItem> listOptions = new ArrayList<>();
-        listOptions.addAll(getDocumentsListOptions(sscsCaseData.getDwpDocuments()));
-        listOptions.addAll(getDocumentsListOptions(sscsCaseData.getSscsDocument()));
+        final List<DynamicListItem> listOptions = new ArrayList<>(getDocumentsListOptions(sscsCaseData.getSscsDocument()));
         var documentSelections = new ArrayList<CcdValue<DocumentSelectionDetails>>();
         var documentSelection = new CcdValue<>(new DocumentSelectionDetails(new DynamicList(null, listOptions)));
         documentSelections.add(documentSelection);
