@@ -83,6 +83,14 @@ public class AuthorisationServiceTest {
     }
 
     @Test
+    public void shouldThrowExceptionWhenNotAuthorised() {
+        String serviceAuthHeader = "anyString";
+        when(serviceAuthorisationApi.getServiceName(serviceAuthHeader)).thenThrow(FeignException.class);
+
+        assertThrows(RuntimeException.class, () -> authorisationService.authorise(serviceAuthHeader));
+    }
+
+    @Test
     public void should_throw_unauthenticated_exception_when_auth_header_is_missing() {
         assertThrows(
                 UnauthorizedException.class,

@@ -28,8 +28,6 @@ import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 import uk.gov.hmcts.reform.sscs.service.DocumentDownloadService;
 import uk.gov.hmcts.reform.sscs.service.TribunalsService;
 
-
-
 @ExtendWith(MockitoExtension.class)
 public class TyaControllerTest {
 
@@ -58,10 +56,11 @@ public class TyaControllerTest {
         ObjectNode node = JsonNodeFactory.instance.objectNode();
         when(tribunalsService.findAppeal(CASE_ID, false)).thenReturn(node);
 
-        ResponseEntity<String> receivedAppeal = controller.getAppealByCaseId(CASE_ID, false);
+        ResponseEntity<String> receivedAppeal = controller.getAppealByCaseId(SERVICE_AUTH, CASE_ID, false);
 
         assertThat(receivedAppeal.getStatusCode(), equalTo(HttpStatus.OK));
         assertThat(receivedAppeal.getBody(), equalTo(node.toString()));
+        verify(authorisationService).allowOnlySscs(SERVICE_AUTH);
     }
 
     @Test
@@ -69,17 +68,19 @@ public class TyaControllerTest {
         ObjectNode node = JsonNodeFactory.instance.objectNode();
         when(tribunalsService.findAppeal(CASE_ID, true)).thenReturn(node);
 
-        ResponseEntity<String> receivedAppeal = controller.getAppealByCaseId(CASE_ID, true);
+        ResponseEntity<String> receivedAppeal = controller.getAppealByCaseId(SERVICE_AUTH, CASE_ID, true);
 
         assertThat(receivedAppeal.getStatusCode(), equalTo(HttpStatus.OK));
         assertThat(receivedAppeal.getBody(), equalTo(node.toString()));
+        verify(authorisationService).allowOnlySscs(SERVICE_AUTH);
     }
 
     @Test
     public void testToThrowAppealNotFoundExceptionIfAppealNotFound() throws CcdException {
         when(tribunalsService.findAppeal(CASE_ID, true)).thenThrow(new AppealNotFoundException(CASE_ID));
 
-        assertThrows(AppealNotFoundException.class, () -> controller.getAppealByCaseId(CASE_ID, true));
+        assertThrows(AppealNotFoundException.class, () -> controller.getAppealByCaseId(SERVICE_AUTH, CASE_ID, true));
+        verify(authorisationService).allowOnlySscs(SERVICE_AUTH);
     }
 
     @Test
@@ -101,13 +102,24 @@ public class TyaControllerTest {
     }
 
     @Test
-    public void testToThrowForbiddenExceptionForUnauthorizedService() throws CcdException {
+    public void testToThrowForbiddenExceptionForUnauthorizedServiceForDocumentEndpoint() throws CcdException {
         String serviceAuth = "unauthorized-service-auth";
         String serviceName = "unauthorized-service";
         doThrow(new ForbiddenException("Service " + serviceName + "is not authorized for this action"))
                 .when(authorisationService).allowOnlySscs(serviceAuth);
 
         assertThrows(ForbiddenException.class, () -> controller.getAppealDocument(serviceAuth, URL));
+    }
+
+    @Test
+    public void testToThrowForbiddenExceptionForUnauthorizedServiceForAppealsEndpoint() throws CcdException {
+        String serviceAuth = "unauthorized-service-auth";
+        String serviceName = "unauthorized-service";
+        when(authorisationService.authenticate(serviceAuth)).thenReturn(serviceName);
+        doThrow(new ForbiddenException("Service " + serviceName + " is not authorized for this action"))
+                .when(authorisationService).allowOnlySscs(serviceName);
+
+        assertThrows(ForbiddenException.class, () -> controller.getAppealByCaseId(serviceAuth, CASE_ID, false));
     }
 
 }
