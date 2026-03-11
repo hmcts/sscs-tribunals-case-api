@@ -192,17 +192,18 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
             Integer venueId = airLookupService.lookupVenueIdByAirVenueName(venueName);
             log.info("Venue id for venue name {} is {} for case id {}", venueName, venueId, caseData.getCcdCaseId());
 
-            if (nonNull(venueId)) {
-                String postCode = resolvePostCode(caseData);
-                String newVenueName = airLookupService.lookupAirVenueNameByPostCode(postCode, caseData.getAppeal().getBenefitType());
-                log.info("Air lookup returned venue {} for postcode {} and case id {}", newVenueName, postCode, caseData.getCcdCaseId());
-                if (!Objects.equals(venueName, newVenueName)) {
-                    Integer newVenueId = airLookupService.lookupVenueIdByAirVenueName(newVenueName);
-                    VenueDetails venueDetails = venueDataLoader.getVenueDetailsMap().get(newVenueId.toString());
-                    if (nonNull(venueDetails) && Objects.equals(venueDetails.getLegacyVenue(), venueName)) {
-                        venueId =  newVenueId;
-                    }
+            String postCode = resolvePostCode(caseData);
+            String newVenueName = airLookupService.lookupAirVenueNameByPostCode(postCode, caseData.getAppeal().getBenefitType());
+            log.info("Air lookup returned venue {} for postcode {} and case id {}", newVenueName, postCode, caseData.getCcdCaseId());
+            if (!Objects.equals(venueName, newVenueName)) {
+                Integer newVenueId = airLookupService.lookupVenueIdByAirVenueName(newVenueName);
+                VenueDetails venueDetails = venueDataLoader.getVenueDetailsMap().get(newVenueId.toString());
+                if (nonNull(venueDetails) && Objects.equals(venueDetails.getLegacyVenue(), venueName)) {
+                    venueId =  newVenueId;
                 }
+            }
+
+            if (nonNull(venueId)) {
                 VenueDetails venueDetails = venueDataLoader.getVenueDetailsMap().get(venueId.toString());
                 log.info("Venue details for venue id {} is {} for case id {}", venueId, venueDetails, caseData.getCcdCaseId());
 
