@@ -1,13 +1,14 @@
 package uk.gov.hmcts.reform.sscs.functional.handlers.issuehearingenquiryform;
 
 import static io.restassured.RestAssured.given;
+import static java.time.LocalDate.now;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.HEF_ISSUED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
 
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import java.io.IOException;
-import java.time.LocalDate;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
@@ -16,7 +17,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
@@ -35,7 +35,10 @@ class IssueHearingEnquiryFormAboutToSubmitHandlerTest extends BaseHandler {
         assertThat(sscsCaseDataCallback.getCaseDetails().getCaseData().getDirectionDueDate()).isNull();
         assertThat(sscsCaseDataCallback.getCaseDetails().getCaseData().getInterlocReviewState()).isNull();
 
-        assertThatCaseDataUpdated(sscsCaseDataCallback);
+        final SscsCaseData caseData = callAboutToSubmitEndpoint(sscsCaseDataCallback);
+
+        assertThat(caseData.getInterlocReviewState()).isEqualTo(HEF_ISSUED);
+        assertThat(caseData.getDirectionDueDate()).isEqualTo(now().plusDays(21).toString());
     }
 
     @Test
@@ -45,19 +48,30 @@ class IssueHearingEnquiryFormAboutToSubmitHandlerTest extends BaseHandler {
             "handlers/issuehearingenquiryform/issueHearingEnquiryFormCallback.json");
 
         sscsCaseDataCallback.getCaseDetails().getCaseData().setDirectionDueDate("2025-05-24");
-        sscsCaseDataCallback.getCaseDetails().getCaseData().setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE);
+        sscsCaseDataCallback.getCaseDetails().getCaseData().setInterlocReviewState(REVIEW_BY_JUDGE);
 
-        assertThatCaseDataUpdated(sscsCaseDataCallback);
+        final SscsCaseData caseData = callAboutToSubmitEndpoint(sscsCaseDataCallback);
+
+        assertThat(caseData.getInterlocReviewState()).isEqualTo(HEF_ISSUED);
+        assertThat(caseData.getDirectionDueDate()).isEqualTo(now().plusDays(21).toString());
     }
 
-    private void assertThatCaseDataUpdated(Callback<SscsCaseData> sscsCaseDataCallback) {
-        given()
-            .log().method().log().headers().log().uri().log().body(true)
-            .contentType(ContentType.JSON).header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
-            .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
-            .body(serializeSscsCallback(sscsCaseDataCallback)).post("/ccdAboutToSubmit").then().statusCode(HttpStatus.SC_OK).log()
-            .all(true).rootPath("data").assertThat().body("interlocReviewState", equalTo("hefIssued")).assertThat()
-            .body("directionDueDate", equalTo(LocalDate.now().plusDays(21).toString()));
+
+    private SscsCaseData callAboutToSubmitEndpoint(Callback<SscsCaseData> sscsCaseDataCallback) {
+        return given().contentType(ContentType.JSON)
+                      .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
+                      .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
+                      .body(serializeSscsCallback(sscsCaseDataCallback))
+                      .post("/ccdAboutToSubmit")
+                      .then()
+                      .log()
+                      .body()
+                      .statusCode(HttpStatus.SC_OK)
+                      .and()
+                      .extract()
+                      .body()
+                      .jsonPath()
+                      .getObject("data", SscsCaseData.class);
     }
 
 }
