@@ -4,7 +4,7 @@
   "assignedToWhenNotAssigned": "Unassigned",
   "assignedTo": "sscs-ctscdmin nw-liverpool",
   "unassignedManageOptions": ["Assign to me"],
-  "assignedManageOptions": ["Reassign task", "Unassign task"],
+  "assignedManageOptions": ["Cancel task", "Mark as done", "Reassign task", "Unassign task"],
   "unassignedManageOptionsForCaseAllocator": [
     "Assign task",
     "Cancel task",
