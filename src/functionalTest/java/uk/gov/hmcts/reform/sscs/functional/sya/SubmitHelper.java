@@ -14,6 +14,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.awaitility.core.ConditionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -25,6 +26,8 @@ public class SubmitHelper {
 
     @Autowired
     private CcdService ccdService;
+    @Autowired
+    private AuthTokenGenerator authTokenGenerator;
 
     public String setLatestMrnDate(String body, LocalDate localDate) {
         return body.replaceAll("01-02-2018", localDate == null ? "" : formatter.format(localDate));
@@ -65,6 +68,7 @@ public class SubmitHelper {
 
         return RestAssured.given()
             .header("Content-Type", "application/json")
+            .header("ServiceAuthorisation", authTokenGenerator.generate())
             .body(body)
             .post("/appeals");
     }
