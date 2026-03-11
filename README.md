@@ -118,23 +118,23 @@ Run all unit tests:
 
 ### Contract or Pact Tests
 
-1. Run contract tests:
+1. Run contract tests
    ```bash
    ./gradlew contract
    ```
 
-2. Publish pact tests locally:
+2. Publish pact tests locally
    ```bash
    docker-compose -f docker-pactbroker-compose.yml up
    ./gradlew pactPublish
    ```
 
-3. Run and publish tests in one go:
+3. Run and publish tests in one go
    ```bash
    ./gradlew runAndPublishConsumerPactTests
    ```
 
-4. Verify CCD Provider Tests:
+4. Verify CCD Provider Tests
    - Clone the [ccd-data-store-api](https://github.com/hmcts/ccd-data-store-api/tree/TA-82_CcdProviderPactTest).
    - Run the `CasesControllerProviderTest` with the following configuration:
      ```java
@@ -143,7 +143,7 @@ Run all unit tests:
          port = "${PACT_BROKER_PORT:80}", consumerVersionSelectors = {
          @VersionSelector(tag = "Dev")})
      ```
-   - Publish results:
+   - Publish results
      ```java
      System.getProperties().setProperty("pact.verifier.publishResults", "true");
      ```
@@ -252,3 +252,4 @@ This avoids re-triggering the pipeline build and saves time.
 
 ### Local DM Store Not Healthy (DOWN or UNKNOWN)
 If this is the first time that the container has been created then it may need to be restarted multiple times in order for it to come up successfully!
+
