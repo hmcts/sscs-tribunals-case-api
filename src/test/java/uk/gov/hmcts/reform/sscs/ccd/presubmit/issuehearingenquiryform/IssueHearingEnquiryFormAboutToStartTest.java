@@ -141,8 +141,7 @@ class IssueHearingEnquiryFormAboutToStartTest {
         final List<DynamicListItem> documentItems = response.getData().getDocumentSelection().getFirst().getValue()
             .getDocumentsList().getListItems();
         assertThat(documentItems).extracting(DynamicListItem::getCode)
-            .containsExactlyInAnyOrder("dwp-hearing-preferences.pdf", "dwp-hearing-preferences-edited.pdf",
-                "dwp-evidence-bundle.pdf", "sscs-hearing-preferences.pdf", "sscs-hearing-preferences-edited.pdf",
+            .containsExactlyInAnyOrder("sscs-hearing-preferences.pdf", "sscs-hearing-preferences-edited.pdf",
                 "sscs-correspondence.pdf");
     }
 
