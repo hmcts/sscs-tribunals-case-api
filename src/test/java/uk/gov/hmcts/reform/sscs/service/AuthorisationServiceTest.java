@@ -83,7 +83,7 @@ public class AuthorisationServiceTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenNotAuthorised() {
+    public void shouldThrowRuntimeExceptionWhenNotAuthorised() {
         String serviceAuthHeader = "anyString";
         when(serviceAuthorisationApi.getServiceName(serviceAuthHeader)).thenThrow(FeignException.class);
 
@@ -122,7 +122,7 @@ public class AuthorisationServiceTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenNotAuthorised() {
+    public void shouldThrowClientAuthorisationExceptionWhenNotAuthorised() {
         when(serviceAuthorisationApi.getServiceName(SERVICE_HEADER))
                 .thenThrow(createFeignException(400, "Bad Request"));
         assertThrows(ClientAuthorisationException.class, () -> authorisationService.authorise(SERVICE_HEADER));

@@ -81,7 +81,6 @@ public class TyaControllerTest {
     public void testToThrowAppealNotFoundExceptionIfAppealNotFound() throws CcdException {
         when(tribunalsService.findAppeal(CASE_ID, true)).thenThrow(new AppealNotFoundException(CASE_ID));
 
-        //When / Then
         assertThrows(AppealNotFoundException.class, () -> controller.getAppealByCaseId(SERVICE_AUTH, CASE_ID, true));
         verify(authorisationService).allowOnlySscs(SERVICE_AUTH);
     }
@@ -103,21 +102,16 @@ public class TyaControllerTest {
         when(documentDownloadService.downloadFile(URL)).thenThrow(new DocumentNotFoundException());
         assertThrows(DocumentNotFoundException.class, () -> controller.getAppealDocument(SERVICE_AUTH, URL));
     }
-        when(documentDownloadService.downloadFile(URL)).thenThrow(
-                new DocumentNotFoundException());
-
-        //When / Then
-        assertThrows(DocumentNotFoundException.class, () -> controller.getAppealDocument(SERVICE_AUTH, URL));
-    }
 
     @Test
     public void testToThrowForbiddenExceptionForUnauthorizedServiceForDocumentEndpoint() throws CcdException {
-        //Given
         String serviceAuth = "unauthorized-service-auth";
         String serviceName = "unauthorized-service";
-        when(authorisationService.authenticate(serviceAuth)).thenReturn(serviceName);
         doThrow(new ForbiddenException("Service " + serviceName + "is not authorized for this action"))
-                .when(authorisationService).allowOnlySscs(serviceName);
+                .when(authorisationService).allowOnlySscs(serviceAuth);
+
+        assertThrows(ForbiddenException.class, () -> controller.getAppealByCaseId(serviceAuth, CASE_ID, false));
+    }
 
     @Test
     public void testToThrowForbiddenExceptionForUnauthorizedService() throws CcdException {
@@ -133,12 +127,9 @@ public class TyaControllerTest {
     public void testToThrowForbiddenExceptionForUnauthorizedServiceForAppealsEndpoint() throws CcdException {
         String serviceAuth = "unauthorized-service-auth";
         String serviceName = "unauthorized-service";
-        when(authorisationService.authenticate(serviceAuth)).thenReturn(serviceName);
         doThrow(new ForbiddenException("Service " + serviceName + " is not authorized for this action"))
-                .when(authorisationService).allowOnlySscs(serviceName);
+                .when(authorisationService).allowOnlySscs(serviceAuth);
 
         assertThrows(ForbiddenException.class, () -> controller.getAppealByCaseId(serviceAuth, CASE_ID, false));
     }
-
-
 }

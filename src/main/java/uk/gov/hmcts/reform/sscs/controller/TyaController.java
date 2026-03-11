@@ -47,8 +47,7 @@ public class TyaController {
             @RequestHeader(value = SERVICE_AUTHORIZATION) String serviceAuthorization,
             @RequestParam(value = "caseId") Long caseId,
             @RequestParam(value = "mya", required = false, defaultValue = "false") boolean mya) {
-        String serviceName = authorisationService.authenticate(serviceAuthorization);
-        authorisationService.allowOnlySscs(serviceName);
+        authorisationService.allowOnlySscs(serviceAuthorization);
         return ok(tribunalsService.findAppeal(caseId, mya).toString());
     }
 
