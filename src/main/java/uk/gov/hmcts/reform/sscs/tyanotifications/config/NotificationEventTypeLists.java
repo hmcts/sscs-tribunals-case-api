@@ -262,7 +262,6 @@ public final class NotificationEventTypeLists {
     public static final Set<NotificationEventType> EVENT_TYPES_FOR_NOTIFY_LETTERS = EnumSet.of(
         APPEAL_RECEIVED,
         DWP_RESPONSE_RECEIVED,
-        DWP_UPLOAD_RESPONSE,
         EVIDENCE_RECEIVED,
         JUDGE_DECISION_APPEAL_TO_PROCEED,
         NON_COMPLIANT,
@@ -454,6 +453,7 @@ public final class NotificationEventTypeLists {
         DIRECTION_ISSUED,
         DIRECTION_ISSUED_WELSH,
         DWP_APPEAL_LAPSED,
+        DWP_UPLOAD_RESPONSE,
         HEARING_BOOKED,
         HMCTS_APPEAL_LAPSED,
         POSTPONEMENT,

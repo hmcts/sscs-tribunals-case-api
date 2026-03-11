@@ -418,7 +418,6 @@ public class BaseHandler {
         }
     }
 
-
     protected Callback<SscsCaseData> deserializeCallbackData(String jsonPath) throws IOException {
         return mapper.readValue(getJsonCallbackForTest(jsonPath), new TypeReference<>() {
         });
