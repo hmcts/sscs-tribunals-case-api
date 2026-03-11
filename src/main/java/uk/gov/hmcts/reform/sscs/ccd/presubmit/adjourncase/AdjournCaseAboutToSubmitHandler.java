@@ -58,7 +58,6 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
                 VenueDetails newVenueDetails = venueService.getVenueDetailsForActiveVenueByEpimsId(newVenueEpims);
                 if (nonNull(newVenueDetails) && Objects.equals(newVenueDetails.getLegacyVenue(), processingVenue)) {
                     sscsCaseData.setProcessingVenue(newVenueName);
-                    adjournment.setNextHearingVenue(AdjournCaseNextHearingVenue.valueOf(newVenueName));
                 }
             }
         }
