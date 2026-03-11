@@ -17,11 +17,13 @@ import org.springframework.stereotype.Component;
 public class CachedHolidayClient {
 
     private final OkHttpClient httpClient;
+    private final ObjectMapper objectMapper;
     private Set<LocalDate> cachedHolidays;
     private static final String HOLIDAY_API_URL = "https://www.gov.uk/bank-holidays.json";
 
-    public CachedHolidayClient(OkHttpClient httpClient) {
+    public CachedHolidayClient(OkHttpClient httpClient, ObjectMapper objectMapper) {
         this.httpClient = httpClient;
+        this.objectMapper = objectMapper;
     }
 
     public synchronized Set<LocalDate> getHolidays() throws IOException {
@@ -40,8 +42,7 @@ public class CachedHolidayClient {
             }
 
             Set<LocalDate> holidays = new HashSet<>();
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode root = mapper.readTree(response.body().string());
+            JsonNode root = objectMapper.readTree(response.body().string());
 
             JsonNode events = root.path("england-and-wales").path("events");
             for (JsonNode event : events) {

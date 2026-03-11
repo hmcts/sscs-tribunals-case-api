@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.bulkscan.validators;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.sscs.bulkscan.helper.OcrDataBuilderTest.buildScannedValidationOcrData;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.networknt.schema.JsonSchema;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -19,7 +20,7 @@ import uk.gov.hmcts.reform.sscs.domain.CaseResponse;
 
 public class FormTypeValidatorTest {
     final SscsJsonExtractor sscsJsonExtractor = new SscsJsonExtractor();
-    final FormTypeValidator validator = new FormTypeValidator(sscsJsonExtractor);
+    final FormTypeValidator validator = new FormTypeValidator(sscsJsonExtractor, new ObjectMapper());
     private final SscsJsonExtractor mockExtractor = Mockito.mock(SscsJsonExtractor.class);
 
     @Test
@@ -205,7 +206,7 @@ public class FormTypeValidatorTest {
 
     @Test
     public void shouldReturnNullWhenSchemaFileIsMissing() {
-        FormTypeValidator validator = new FormTypeValidator(mockExtractor);
+        FormTypeValidator validator = new FormTypeValidator(mockExtractor, new ObjectMapper());
         JsonSchema schema = invokeTryLoadSscsSchema(validator, "/nonexistent_schema.json");
 
         assertThat(schema).isNull();
@@ -213,7 +214,7 @@ public class FormTypeValidatorTest {
 
     @Test
     public void shouldReturnNullWhenSchemaFileIsMalformed() {
-        FormTypeValidator validator = new FormTypeValidator(mockExtractor);
+        FormTypeValidator validator = new FormTypeValidator(mockExtractor, new ObjectMapper());
         JsonSchema schema = invokeTryLoadSscsSchema(validator, "/schema/malformed_schema.json");
 
         assertThat(schema).isNull();

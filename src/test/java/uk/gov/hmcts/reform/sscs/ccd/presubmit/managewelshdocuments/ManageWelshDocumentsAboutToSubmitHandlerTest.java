@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Optional;
@@ -30,7 +31,7 @@ public class ManageWelshDocumentsAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
     private ManageWelshDocumentsAboutToSubmitHandler handler = new ManageWelshDocumentsAboutToSubmitHandler(
-            new AddedDocumentsUtil(true), true);
+            new AddedDocumentsUtil(true, new ObjectMapper()), true);
 
     @Before
     public void setUp() {

@@ -5,6 +5,7 @@ import static java.lang.Long.parseLong;
 import static org.apache.commons.lang3.RegExUtils.replaceAll;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
@@ -24,8 +25,9 @@ public class CcdActionExecutor extends BaseActionExecutor<String> {
                              CcdService ccdService,
                              UpdateCcdCaseService updateCcdCaseService,
                              IdamService idamService,
-                             SscsCaseCallbackDeserializer deserializer) {
-        super(notificationService, retryNotificationService, ccdService, updateCcdCaseService, idamService, deserializer);
+                             SscsCaseCallbackDeserializer deserializer,
+                             ObjectMapper objectMapper) {
+        super(notificationService, retryNotificationService, ccdService, updateCcdCaseService, idamService, deserializer, objectMapper);
     }
 
     @Override

@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -43,13 +44,14 @@ public class CreateCaseControllerTest {
     private SubmitAppealService submitAppealService;
     private MockMvc mockMvc;
     private CreateCaseController controller;
+    private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
     @Before
     public void setUp() {
         ccdService = mock(CcdService.class);
         submitAppealService = mock(SubmitAppealService.class);
         idamService = mock(IdamService.class);
-        controller = new CreateCaseController(submitAppealService,ccdService, idamService);
+        controller = new CreateCaseController(submitAppealService, ccdService, idamService, objectMapper);
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
         mockMvc = standaloneSetup(controller).build();
     }

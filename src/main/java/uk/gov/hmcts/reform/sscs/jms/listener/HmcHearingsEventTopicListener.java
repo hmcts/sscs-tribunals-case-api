@@ -4,7 +4,6 @@ import static uk.gov.hmcts.reform.sscs.service.HmcHearingApi.HMCTS_DEPLOYMENT_ID
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.jms.JMSException;
 import java.nio.charset.StandardCharsets;
 import lombok.extern.slf4j.Slf4j;
@@ -32,10 +31,9 @@ public class HmcHearingsEventTopicListener {
     @Value("${hmc.deployment-id}")
     private String hmctsDeploymentId;
 
-    public HmcHearingsEventTopicListener(ProcessHmcMessageServiceV2 processHmcMessageServiceV2) {
+    public HmcHearingsEventTopicListener(ProcessHmcMessageServiceV2 processHmcMessageServiceV2, ObjectMapper objectMapper) {
         this.processHmcMessageServiceV2 = processHmcMessageServiceV2;
-        this.objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
+        this.objectMapper = objectMapper;
     }
 
     @JmsListener(

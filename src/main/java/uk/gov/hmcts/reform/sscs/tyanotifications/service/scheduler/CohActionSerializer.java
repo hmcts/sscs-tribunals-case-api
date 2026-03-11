@@ -2,13 +2,15 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.service.scheduler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobPayloadSerializer;
 
 @Component
+@RequiredArgsConstructor
 public class CohActionSerializer implements JobPayloadSerializer<CohJobPayload> {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
     @Override
     public String serialize(CohJobPayload payload) {
