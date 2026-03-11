@@ -83,7 +83,7 @@ public class AuthorisationServiceTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenNotAuthorised() {
+    public void shouldThrowRuntimeExceptionWhenNotAuthorised() {
         String serviceAuthHeader = "anyString";
         when(serviceAuthorisationApi.getServiceName(serviceAuthHeader)).thenThrow(FeignException.class);
 
@@ -122,7 +122,7 @@ public class AuthorisationServiceTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenNotAuthorised() {
+    public void shouldThrowClientAuthorisationExceptionWhenNotAuthorised() {
         when(serviceAuthorisationApi.getServiceName(SERVICE_HEADER))
                 .thenThrow(createFeignException(400, "Bad Request"));
         assertThrows(ClientAuthorisationException.class, () -> authorisationService.authorise(SERVICE_HEADER));
@@ -186,39 +186,6 @@ public class AuthorisationServiceTest {
         Service result = authorisationService.authorise(request);
 
         assertEquals(service, result);
-    }
-
-    @Test
-    public void should_not_throw_any_exception_when_service_is_sscs() {
-        when(serviceAuthorisationApi.getServiceName(SERVICE_HEADER)).thenReturn("sscs");
-
-        assertDoesNotThrow(() -> authorisationService.allowOnlySscs(SERVICE_HEADER));
-    }
-
-    @Test
-    public void should_throw_unauthorized_exception_when_service_is_not_sscs() {
-        when(serviceAuthorisationApi.getServiceName(SERVICE_HEADER)).thenReturn(CCD_DATA);
-
-        assertThrows(ForbiddenException.class, () -> authorisationService.allowOnlySscs(SERVICE_HEADER),
-                "Service " + CCD_DATA + " is not authorized for this action");
-    }
-
-    @Test
-    public void allowOnlySscs_shouldThrowExceptionWhenNotAuthorised() {
-        when(serviceAuthorisationApi.getServiceName(SERVICE_HEADER))
-                .thenThrow(createFeignException(400, "Bad Request"));
-        assertThrows(ClientAuthorisationException.class, () -> authorisationService.allowOnlySscs(SERVICE_HEADER));
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-        "502, Bad Gateway",
-        "307, Temporary Redirect"
-    })
-    public void allowOnlySscs_shouldHandleFeignExceptions(int status, String message) {
-        when(serviceAuthorisationApi.getServiceName(any()))
-                .thenThrow(createFeignException(status, message));
-        assertThrows(AuthorisationException.class, () -> authorisationService.allowOnlySscs(SERVICE_HEADER));
     }
 
     private FeignException createFeignException(int status, String message) {
