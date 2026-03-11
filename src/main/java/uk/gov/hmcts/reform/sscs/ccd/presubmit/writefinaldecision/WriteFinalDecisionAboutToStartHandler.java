@@ -72,6 +72,23 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
         } else if (isCorrectionInProgress(caseData)) {
             caseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(null);
         }
+        if (nonNull(caseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo()) && !severeConditionQuestionIsValid(caseData)) {
+            caseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(null);
+            caseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereCriteriaApply(null);
+        }
+    }
+
+    private boolean severeConditionQuestionIsValid(SscsCaseData sscsCaseData) {
+        if (Objects.equals(sscsCaseData.getIssueCode(), "SV")) {
+            return true;
+        }
+        if (sscsCaseData.getElementsDisputedLimitedWork() == null) {
+            return false;
+        } else {
+            return sscsCaseData.getElementsDisputedLimitedWork().stream()
+                    .filter(ele -> nonNull(ele.getValue()))
+                    .anyMatch(ele -> Objects.equals(ele.getValue().getIssueCode(), "SV"));
+        }
     }
 
     private boolean isDraftDecisionNotInSscsDocs(SscsCaseData caseData) {
@@ -201,5 +218,7 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
         sscsCaseData.setSupportGroupOnlyAppeal(null);
         sscsUcCaseData.setDoesSchedule8Paragraph4Apply(null);
         sscsUcCaseData.setDoesSchedule9Paragraph4Apply(null);
+        sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(null);
+        sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereCriteriaApply(null);
     }
 }

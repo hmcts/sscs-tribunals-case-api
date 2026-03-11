@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import jakarta.validation.Validator;
@@ -32,6 +33,11 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
         if (sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply() == null) {
             sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
         }
+        if (nonNull(sscsCaseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo()) && !severeConditionQuestionIsValid(sscsCaseData)) {
+            sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(null);
+            sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereCriteriaApply(null);
+        }
+
     }
 
     @Override

@@ -105,4 +105,14 @@ public abstract class UcTemplateContent extends WriteFinalDecisionTemplateConten
         return "The Secretary of State has accepted that " + appellantName + " has limited capability for "
                 + (work ? "work." : "work-related activity.") + " This was not in issue.";
     }
+
+    public String getSevereCriteriaPassedSentence() {
+        return "The appellant meets the severe conditions criteria because they will constantly meet a Schedule 7 descriptor,"
+                + " and they have a lifelong condition with no realistic prospect of recovery of function.";
+    }
+
+    public String getSevereCriteriaFailedSentence() {
+        return "The appellant does not meet the severe conditions criteria.";
+    }
+
 }
