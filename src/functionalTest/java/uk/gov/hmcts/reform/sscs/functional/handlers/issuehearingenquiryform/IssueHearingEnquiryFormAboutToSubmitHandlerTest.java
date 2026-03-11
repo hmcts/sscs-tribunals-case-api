@@ -28,7 +28,7 @@ class IssueHearingEnquiryFormAboutToSubmitHandlerTest extends BaseHandler {
 
         final SscsCaseData caseData = callAboutToSubmitEndpoint(sscsCaseDataCallback);
 
-        assertThatCaseUpdatedWithHEFData(caseData);
+        assertThatCaseUpdatedWithHearingEnquiryFormData(caseData);
     }
 
     @Test
@@ -39,10 +39,10 @@ class IssueHearingEnquiryFormAboutToSubmitHandlerTest extends BaseHandler {
 
         final SscsCaseData caseData = callAboutToSubmitEndpoint(sscsCaseDataCallback);
 
-        assertThatCaseUpdatedWithHEFData(caseData);
+        assertThatCaseUpdatedWithHearingEnquiryFormData(caseData);
     }
 
-    private static void assertThatCaseUpdatedWithHEFData(SscsCaseData caseData) {
+    private static void assertThatCaseUpdatedWithHearingEnquiryFormData(SscsCaseData caseData) {
         assertThat(caseData.getInterlocReviewState()).isEqualTo(HEF_ISSUED);
         assertThat(caseData.getDirectionDueDate()).isEqualTo(RESPONSE_DUE_DATE);
     }
