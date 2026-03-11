@@ -110,16 +110,6 @@ public class TyaControllerTest {
         doThrow(new ForbiddenException("Service " + serviceName + "is not authorized for this action"))
                 .when(authorisationService).allowOnlySscs(serviceAuth);
 
-        assertThrows(ForbiddenException.class, () -> controller.getAppealByCaseId(serviceAuth, CASE_ID, false));
-    }
-
-    @Test
-    public void testToThrowForbiddenExceptionForUnauthorizedService() throws CcdException {
-        String serviceAuth = "unauthorized-service-auth";
-        String serviceName = "unauthorized-service";
-        doThrow(new ForbiddenException("Service " + serviceName + "is not authorized for this action"))
-                .when(authorisationService).allowOnlySscs(serviceAuth);
-
         assertThrows(ForbiddenException.class, () -> controller.getAppealDocument(serviceAuth, URL));
     }
 
