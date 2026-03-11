@@ -255,5 +255,9 @@ If this is the first time that the container has been created then it may need t
 
 ### AAT Idam users
 To test work allocation you will need to create users in IDAM with the correct roles. To do this run the following two commands:
+```bash
 chmod +x bin/create-idam-users.sh
+```
+```bash
 bin/create-idam-users.sh
+```
