@@ -109,6 +109,7 @@ public class SubmitAppealTest {
         Response response = RestAssured.given()
                 .body(expectedBody)
                 .header("Content-Type", "application/json")
+                .header("ServiceAuthorisation", idamTokens.getServiceAuthorization())
                 .post("/appeals");
 
         response.then().statusCode(HttpStatus.SC_CREATED);
