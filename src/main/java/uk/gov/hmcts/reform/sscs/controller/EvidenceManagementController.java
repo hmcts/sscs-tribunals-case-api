@@ -36,7 +36,6 @@ public class EvidenceManagementController {
     private final boolean secureDocStoreEnabled;
     private final IdamService idamService;
 
-
     @Autowired
     public EvidenceManagementController(EvidenceManagementService evidenceManagementService,
                                         EvidenceManagementSecureDocStoreService evidenceManagementSecureDocStoreService,

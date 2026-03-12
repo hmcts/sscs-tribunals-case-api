@@ -26,7 +26,6 @@ import uk.gov.hmcts.reform.sscs.exception.EvidenceDocumentsMissingException;
 import uk.gov.hmcts.reform.sscs.exception.FileToPdfConversionException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.conversion.FileToPdfConversionService;
@@ -63,7 +62,7 @@ public class EvidenceManagementControllerTest {
 
     @Test
     public void shouldUploadEvidenceDocumentList() throws JsonProcessingException {
-        String jsonPayload = """
+        final String jsonPayload = """
                 {
                     "_embedded": {
                       "documents": [
@@ -102,7 +101,7 @@ public class EvidenceManagementControllerTest {
         controller =
                 new EvidenceManagementController(evidenceManagementService, evidenceManagementSecureDocStoreService,
                         fileToPdfConversionService, true, idamService);
-        String json = """
+        final String json = """
                   { "documents":
                     [
                         {
