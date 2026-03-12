@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
 import static java.lang.String.format;
 import static java.util.Base64.getEncoder;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 
 import java.io.ByteArrayOutputStream;
@@ -127,6 +128,34 @@ public class BulkPrintService implements PrintService {
         }
 
         return letter;
+    }
+
+    public byte[] buildBundledLetter(List<byte[]> documents) {
+        if (isEmpty(documents)) {
+            log.error("Failed to merge documents: document list is empty");
+            throw new BulkPrintException("Failed to merge documents: document list is empty");
+        }
+
+        if (documents.size() == 1) {
+            return documents.getFirst();
+        }
+
+        try (PDDocument bundledLetter = Loader.loadPDF(documents.getFirst())) {
+            final PDFMergerUtility merger = new PDFMergerUtility();
+            for (int i = 1; i < documents.size(); i++) {
+                if (documents.get(i) != null) {
+                    try (PDDocument loadDoc = Loader.loadPDF(documents.get(i))) {
+                        merger.appendDocument(bundledLetter, loadDoc);
+                    }
+                }
+            }
+            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bundledLetter.save(baos);
+            return baos.toByteArray();
+        } catch (IOException e) {
+            log.error("Failed to merge documents with exception {}", e.getMessage());
+            throw new BulkPrintException("Failed to merge documents with exception " + e.getMessage(), e);
+        }
     }
 
     private Optional<UUID> sendLetterWithRetry(String authToken, SscsCaseData sscsCaseData, List<String> encodedData,
