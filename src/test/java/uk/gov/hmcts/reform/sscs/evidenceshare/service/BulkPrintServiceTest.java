@@ -1,9 +1,8 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
@@ -17,18 +16,24 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -59,7 +64,7 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.exception.NonPdfBulkPrintException
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @ExtendWith(MockitoExtension.class)
-public class BulkPrintServiceTest {
+class BulkPrintServiceTest {
 
     private static final List<Pdf> PDF_LIST = singletonList(new Pdf("myData".getBytes(), "file.pdf"));
     private static final UUID LETTER_ID = UUID.randomUUID();
@@ -90,33 +95,33 @@ public class BulkPrintServiceTest {
     ArgumentCaptor<LetterWithPdfsRequest> captor;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         this.bulkPrintService = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper,
                 true, 1, ccdNotificationService);
         lenient().when(idamService.generateServiceAuthorization()).thenReturn(AUTH_TOKEN);
     }
 
     @Test
-    public void willSendToBulkPrint() {
+    void willSendToBulkPrint() {
         when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), captor.capture()))
                 .thenReturn(new SendLetterResponse(LETTER_ID));
         Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, null);
-        assertEquals("letterIds must be equal", Optional.of(LETTER_ID), letterIdOptional);
-        assertEquals("sscs-data-pack", captor.getValue().getAdditionalData().get("letterType"));
-        assertEquals("Appellant LastName", captor.getValue().getAdditionalData().get("appellantName"));
-        assertEquals("234", captor.getValue().getAdditionalData().get("caseIdentifier"));
+        assertThat(letterIdOptional).isEqualTo(Optional.of(LETTER_ID));
+        assertThat(captor.getValue().getAdditionalData()).containsEntry("letterType", "sscs-data-pack");
+        assertThat(captor.getValue().getAdditionalData()).containsEntry("appellantName", "Appellant LastName");
+        assertThat(captor.getValue().getAdditionalData()).containsEntry("caseIdentifier", "234");
     }
 
     @Test
-    public void willSendToBulkPrintWithAdditionalData() {
+    void willSendToBulkPrintWithAdditionalData() {
         when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), any(LetterWithPdfsRequest.class)))
                 .thenReturn(new SendLetterResponse(LETTER_ID));
         Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, null);
-        assertEquals("letterIds must be equal", Optional.of(LETTER_ID), letterIdOptional);
+        assertThat(letterIdOptional).isEqualTo(Optional.of(LETTER_ID));
     }
 
     @Test
-    public void willSendToBulkPrintWithAdditionalDataThatIncludesRecipients() {
+    void willSendToBulkPrintWithAdditionalDataThatIncludesRecipients() {
         when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), captor.capture())).thenReturn(new SendLetterResponse(LETTER_ID));
         Name name1 = Name.builder().firstName("Barry").lastName("Allen").build();
         Address address1 = Address.builder().line1("line1").build();
@@ -208,31 +213,29 @@ public class BulkPrintServiceTest {
 
         List<String> parties = new ArrayList<>();
         parties.add("Appellant LastName");
-        assertEquals(parties, captor.getValue().getAdditionalData().get("recipients"));
+        assertThat(captor.getValue().getAdditionalData()).containsEntry("recipients", parties);
     }
 
     @Test
-    public void willThrowAnyExceptionsToBulkPrint() {
+    void willThrowAnyExceptionsToBulkPrint() {
         when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), any(LetterWithPdfsRequest.class)))
                 .thenThrow(new RuntimeException("error"));
 
-        assertThrows(BulkPrintException.class, () -> {
-            bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, null);
-        });
+        assertThatThrownBy(() -> bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, null))
+            .isInstanceOf(BulkPrintException.class);
     }
 
     @Test
-    public void shouldThrowANonPdfBulkPrintExceptionOnHttpClientErrorExceptionFromBulkPrint() {
+    void shouldThrowANonPdfBulkPrintExceptionOnHttpClientErrorExceptionFromBulkPrint() {
         when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), any(LetterWithPdfsRequest.class)))
                 .thenThrow(new HttpClientErrorException(HttpStatus.valueOf(400)));
 
-        assertThrows(NonPdfBulkPrintException.class, () -> {
-            bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, null);
-        });
+        assertThatThrownBy(() -> bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, null))
+            .isInstanceOf(NonPdfBulkPrintException.class);
     }
 
     @Test
-    public void sendLetterNotEnabledWillNotSendToBulkPrint() {
+    void sendLetterNotEnabledWillNotSendToBulkPrint() {
         BulkPrintService notEnabledBulkPrint = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper, false, 1, ccdNotificationService);
         notEnabledBulkPrint.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, null);
         verifyNoInteractions(idamService);
@@ -240,7 +243,7 @@ public class BulkPrintServiceTest {
     }
 
     @Test
-    public void willSendToBulkPrintWithReasonableAdjustment() {
+    void willSendToBulkPrintWithReasonableAdjustment() {
         this.bulkPrintService = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper, true, 1, ccdNotificationService);
 
         SSCS_CASE_DATA.setReasonableAdjustments(ReasonableAdjustments.builder()
@@ -255,7 +258,7 @@ public class BulkPrintServiceTest {
     }
 
     @Test
-    public void shouldSendToBulkPrint_noAdditionalDataInternationalFlag() {
+    void shouldSendToBulkPrint_noAdditionalDataInternationalFlag() {
         SscsCaseData sscsCaseDataNonUK = SscsCaseData.builder()
                 .ccdCaseId("234")
                 .appeal(
@@ -272,12 +275,12 @@ public class BulkPrintServiceTest {
                 .thenReturn(new SendLetterResponse(LETTER_ID));
         Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(PDF_LIST, sscsCaseDataNonUK, null);
 
-        assertEquals("letterIds must be equal", Optional.of(LETTER_ID), letterIdOptional);
-        assertFalse("isInternational", captor.getValue().getAdditionalData().containsKey("isInternational"));
+        assertThat(letterIdOptional).isEqualTo(Optional.of(LETTER_ID));
+        assertThat(captor.getValue().getAdditionalData()).doesNotContainKey("isInternational");
     }
 
     @Test
-    public void shouldSendToBulkPrint_noAdditionalDataInternationalFlagAsInMainlandUkNull() {
+    void shouldSendToBulkPrint_noAdditionalDataInternationalFlagAsInMainlandUkNull() {
         SscsCaseData sscsCaseDataNonUK = SscsCaseData.builder()
                 .ccdCaseId("234")
                 .appeal(
@@ -294,12 +297,12 @@ public class BulkPrintServiceTest {
                 .thenReturn(new SendLetterResponse(LETTER_ID));
         Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(PDF_LIST, sscsCaseDataNonUK, null);
 
-        assertEquals("letterIds must be equal", Optional.of(LETTER_ID), letterIdOptional);
-        assertFalse("isInternational", captor.getValue().getAdditionalData().containsKey("isInternational"));
+        assertThat(letterIdOptional).isEqualTo(Optional.of(LETTER_ID));
+        assertThat(captor.getValue().getAdditionalData()).doesNotContainKey("isInternational");
     }
 
     @Test
-    public void shouldSendToBulkPrint_additionalDataInternationalFlagTrue() {
+    void shouldSendToBulkPrint_additionalDataInternationalFlagTrue() {
         SscsCaseData sscsCaseDataUK = SscsCaseData.builder()
                 .ccdCaseId("234")
                 .appeal(Appeal.builder().appellant(
@@ -315,13 +318,13 @@ public class BulkPrintServiceTest {
 
         Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(PDF_LIST, sscsCaseDataUK, null);
 
-        assertEquals("letterIds must be equal", Optional.of(LETTER_ID), letterIdOptional);
-        assertEquals("true", captor.getValue().getAdditionalData().get("isInternational"));
+        assertThat(letterIdOptional).isEqualTo(Optional.of(LETTER_ID));
+        assertThat(captor.getValue().getAdditionalData()).containsEntry("isInternational", "true");
     }
 
     @ParameterizedTest
     @MethodSource("benefitParameters")
-    public void shouldSendToBulkPrint_additionalDataIsIbcaFlagFalse(Benefit benefit, String isIbca) {
+    void shouldSendToBulkPrint_additionalDataIsIbcaFlagFalse(Benefit benefit, String isIbca) {
         SscsCaseData sscsCaseDataUK = SscsCaseData.builder()
                 .benefitCode(benefit.getBenefitCode())
                 .ccdCaseId("234")
@@ -338,14 +341,87 @@ public class BulkPrintServiceTest {
 
         Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(PDF_LIST, sscsCaseDataUK, null);
 
-        assertEquals("letterIds must be equal", Optional.of(LETTER_ID), letterIdOptional);
-        assertEquals(isIbca, captor.getValue().getAdditionalData().get("isIbca"));
+        assertThat(letterIdOptional).isEqualTo(Optional.of(LETTER_ID));
+        assertThat(captor.getValue().getAdditionalData()).containsEntry("isIbca", isIbca);
     }
 
-    public static Stream<Arguments> benefitParameters() {
+    static Stream<Arguments> benefitParameters() {
         return Stream.of(
                 Arguments.of(INFECTED_BLOOD_COMPENSATION, "true"),
                 Arguments.of(PIP, "false")
         );
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    void buildBundledLetter_nullList_throwsBulkPrintException(List<byte[]> documents) {
+        assertThatThrownBy(() -> bulkPrintService.buildBundledLetter(documents))
+            .isInstanceOf(BulkPrintException.class);
+    }
+
+    @Test
+    void buildBundledLetter_singleDocument_returnsSameDocument() throws IOException {
+        final byte[] singleDocument = createSinglePagePdf();
+
+        final byte[] result = bulkPrintService.buildBundledLetter(List.of(singleDocument));
+
+        assertThat(result).isEqualTo(singleDocument);
+    }
+
+    @Test
+    void buildBundledLetter_multipleDocuments_mergesIntoSinglePdf() throws IOException {
+        final byte[] firstDocument = createSinglePagePdf();
+        final byte[] secondDocument = createSinglePagePdf();
+
+        final byte[] result = bulkPrintService.buildBundledLetter(List.of(firstDocument, secondDocument));
+
+        assertThat(result).isNotNull();
+        try (PDDocument merged = Loader.loadPDF(result)) {
+            assertThat(merged.getNumberOfPages()).isEqualTo(2);
+        }
+    }
+
+    @Test
+    void buildBundledLetter_listWithNullSubsequentDocument_skipNullAndMergesRest() throws IOException {
+        final byte[] firstDocument = createSinglePagePdf();
+        final byte[] thirdDocument = createSinglePagePdf();
+        List<byte[]> documents = new ArrayList<>();
+        documents.add(firstDocument);
+        documents.add(null);
+        documents.add(thirdDocument);
+
+        final byte[] result = bulkPrintService.buildBundledLetter(documents);
+
+        assertThat(result).isNotNull();
+        try (PDDocument merged = Loader.loadPDF(result)) {
+            assertThat(merged.getNumberOfPages()).isEqualTo(2);
+        }
+    }
+
+    @Test
+    void buildBundledLetter_invalidFirstDocument_throwsBulkPrintException() {
+        final byte[] firstDocument = "not a pdf".getBytes();
+        final byte[] secondDocument = "also not a pdf".getBytes();
+
+        assertThatThrownBy(() -> bulkPrintService.buildBundledLetter(List.of(firstDocument, secondDocument)))
+            .isInstanceOf(BulkPrintException.class);
+    }
+
+    @Test
+    void buildBundledLetter_validFirstDocumentWithInvalidSubsequentDocument_throwsBulkPrintException() throws IOException {
+        final byte[] validFirst = createSinglePagePdf();
+        final byte[] invalidSecond = "not a pdf".getBytes();
+
+        assertThatThrownBy(() -> bulkPrintService.buildBundledLetter(List.of(validFirst, invalidSecond)))
+            .isInstanceOf(BulkPrintException.class);
+    }
+
+    private byte[] createSinglePagePdf() throws IOException {
+        try (PDDocument document = new PDDocument();
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            document.addPage(new PDPage());
+            document.save(outputStream);
+            return outputStream.toByteArray();
+        }
     }
 }

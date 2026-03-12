@@ -43,5 +43,44 @@
     "PageFieldDisplayOrder": 3,
     "PageID": "1.0",
     "Publish": "N"
+  },
+  {
+    "CaseEventID": "issueHearingEnquiryForm",
+    "CaseFieldID": "otherPartySelection",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "16/02/2026",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent",
+    "PageLabel": " ",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseEventID": "issueHearingEnquiryForm",
+    "CaseFieldID": "addDocuments",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "16/02/2026",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "2.0",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseEventID": "issueHearingEnquiryForm",
+    "CaseFieldID": "documentSelection",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "16/02/2026",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "2.0",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent",
+    "FieldShowCondition": "addDocuments = \"Yes\"",
+    "PageLabel": " ",
+    "ShowSummaryChangeOption": "Y"
   }
 ]
