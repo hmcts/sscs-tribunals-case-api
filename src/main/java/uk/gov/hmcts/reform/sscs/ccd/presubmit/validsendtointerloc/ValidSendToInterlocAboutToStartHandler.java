@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.*;
-import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getOriginalSenderDropdown;
+import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getPartiesOnCase;
 import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown;
 
 import java.util.ArrayList;
@@ -78,6 +78,8 @@ public class ValidSendToInterlocAboutToStartHandler implements PreSubmitCallback
     }
 
     private void setOriginalSenderDropdown(SscsCaseData sscsCaseData) {
-        sscsCaseData.setOriginalSender(getOriginalSenderDropdown(sscsCaseData, cmOtherPartyConfidentialityEnabled));
+        List<DynamicListItem> listOptions = getPartiesOnCase(sscsCaseData);
+
+        sscsCaseData.setOriginalSender(new DynamicList(listOptions.get(0), listOptions));
     }
 }

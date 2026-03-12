@@ -17,7 +17,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -31,13 +30,20 @@ import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.HearingsService;
 
 @Service
-@RequiredArgsConstructor
 public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final DwpAddressLookupService service;
     private final HearingsService hearingsService;
-    @Value("${feature.cm-other-party-confidentiality.enabled}")
-    private boolean cmOtherPartyConfidentialityEnabled;
+    private final boolean cmOtherPartyConfidentialityEnabled;
+
+    public HmctsResponseReviewedAboutToStartHandler(DwpAddressLookupService service,
+                                                    HearingsService hearingsService,
+                                                    @Value("${feature.cm-other-party-confidentiality.enabled}")
+                                                    boolean cmOtherPartyConfidentialityEnabled) {
+        this.service = service;
+        this.hearingsService = hearingsService;
+        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -61,7 +67,6 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
         setDefaultFieldValues(sscsCaseData);
         setDwpDocuments(sscsCaseData);
         setSelectWhoReviewsCase(sscsCaseData);
-        setOriginalSenderDropdown(sscsCaseData);
         setSelectedConfidentialityPartyDropdown(sscsCaseData);
 
         if (sscsCaseData.isIbcCase()) {

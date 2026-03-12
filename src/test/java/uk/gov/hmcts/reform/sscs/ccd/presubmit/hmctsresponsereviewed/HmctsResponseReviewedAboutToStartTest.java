@@ -26,7 +26,6 @@ import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -70,7 +69,7 @@ public class HmctsResponseReviewedAboutToStartTest {
     public void setUp() {
         openMocks(this);
         dwpAddressLookupService = new DwpAddressLookupService();
-        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService);
+        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService, false);
 
         when(callback.getEvent()).thenReturn(EventType.HMCTS_RESPONSE_REVIEWED);
 
@@ -322,7 +321,7 @@ public class HmctsResponseReviewedAboutToStartTest {
 
     @Test
     public void givenCmInterlocConfidentialityFlagEnabledForChildSupport_thenOriginalSenderHasNoDefaultSelection() {
-        ReflectionTestUtils.setField(handler, "cmOtherPartyConfidentialityEnabled", true);
+        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService, true);
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -332,7 +331,7 @@ public class HmctsResponseReviewedAboutToStartTest {
 
     @Test
     public void givenCmInterlocConfidentialityFlagDisabledForChildSupport_thenOriginalSenderDefaultsToAppellant() {
-        ReflectionTestUtils.setField(handler, "cmOtherPartyConfidentialityEnabled", false);
+        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService, false);
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -342,7 +341,7 @@ public class HmctsResponseReviewedAboutToStartTest {
 
     @Test
     public void givenCmInterlocConfidentialityFlagEnabledForNonChildSupport_thenOriginalSenderDefaultsToAppellant() {
-        ReflectionTestUtils.setField(handler, "cmOtherPartyConfidentialityEnabled", true);
+        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService, true);
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(Benefit.PIP.getShortName()).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);

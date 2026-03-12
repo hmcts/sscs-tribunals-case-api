@@ -36,13 +36,23 @@ class NonCompliantSendToInterlocAboutToStartHandlerTest {
     }
 
     @Test
-    void canHandleOnlyAboutToStartForNonCompliantSendToInterloc() {
+    void canHandleOnlyWhenFeatureFlagEnabledForNonCompliantSendToInterloc() {
+        assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
+
+        handler = new NonCompliantSendToInterlocAboutToStartHandler(true);
         assertThat(handler.canHandle(ABOUT_TO_START, callback)).isTrue();
         assertThat(handler.canHandle(CallbackType.ABOUT_TO_SUBMIT, callback)).isFalse();
     }
 
     @Test
-    void setsFirstPartyAsDefaultWhenFlagOff() {
+    void throwsWhenFlagOff() {
+        assertThatThrownBy(() -> handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void setsFirstPartyAsDefaultWhenFlagOnAndNonChildSupport() {
+        handler = new NonCompliantSendToInterlocAboutToStartHandler(true);
         var response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         DynamicList selectedParty = response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty();
         assertThat(selectedParty.getValue().getCode()).isEqualTo("appellant");
