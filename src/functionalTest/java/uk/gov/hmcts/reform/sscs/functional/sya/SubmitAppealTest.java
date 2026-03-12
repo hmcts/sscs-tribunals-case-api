@@ -181,7 +181,7 @@ public class SubmitAppealTest {
         LocalDate mrnDate = LocalDate.now();
         log.info("Generated NINO: {} and MRN date: {}", nino, mrnDate);
 
-        Response response = submitHelper.submitAppeal(nino, mrnDate);
+        Response response = submitHelper.submitAppeal(nino, mrnDate, idamTokens.getServiceAuthorization());
         response.then().statusCode(HttpStatus.SC_CREATED);
 
         final Long firstCaseId = getCcdIdFromLocationHeader(response.getHeader("Location"));
@@ -194,7 +194,7 @@ public class SubmitAppealTest {
         //create a case with different mrn date
         mrnDate = LocalDate.now().minusMonths(12);
 
-        response =  submitHelper.submitAppeal(nino, mrnDate);
+        response =  submitHelper.submitAppeal(nino, mrnDate, idamTokens.getServiceAuthorization());
         response.then().statusCode(HttpStatus.SC_CREATED);
 
         final Long secondCaseId = getCcdIdFromLocationHeader(response.getHeader("Location"));
@@ -211,7 +211,7 @@ public class SubmitAppealTest {
 
         log.info("Resubmitting case with nino {} and mrn date {} for second time", nino, mrnDate);
         // check duplicate returns 409
-        response = submitHelper.submitAppeal(nino, mrnDate);
+        response = submitHelper.submitAppeal(nino, mrnDate, idamTokens.getServiceAuthorization());
         response.then().statusCode(HttpStatus.SC_CONFLICT);
 
         log.info("True duplicate was rejected");
