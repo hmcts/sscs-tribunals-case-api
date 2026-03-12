@@ -9,7 +9,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_RESPONSE
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.UCB;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_TCW;
-import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getOriginalSenderDropdown;
 import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown;
 
 import java.util.ArrayList;
@@ -167,10 +166,4 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
         sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
                 getSelectedConfidentialityPartyDropdown(sscsCaseData, cmOtherPartyConfidentialityEnabled));
     }
-
-    private void setOriginalSenderDropdown(SscsCaseData sscsCaseData) {
-        sscsCaseData.setOriginalSender(
-                getOriginalSenderDropdown(sscsCaseData, cmOtherPartyConfidentialityEnabled));
-    }
-
 }

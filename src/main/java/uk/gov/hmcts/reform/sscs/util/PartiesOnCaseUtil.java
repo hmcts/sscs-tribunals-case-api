@@ -111,26 +111,6 @@ public class PartiesOnCaseUtil {
         return new DynamicList(selectedConfidentialityParty, listOptions);
     }
 
-    public static DynamicList getOriginalSenderDropdown(SscsCaseData sscsCaseData, boolean clearDefaultForChildSupport) {
-        List<DynamicListItem> listOptions = getPartiesOnCase(sscsCaseData);
-
-        DynamicList existingOriginalSender = sscsCaseData.getOriginalSender();
-        DynamicListItem existingValue = existingOriginalSender != null
-            ? existingOriginalSender.getValue()
-            : null;
-
-        if (existingValue != null
-            && existingValue.getCode() != null
-            && listOptions.stream().anyMatch(option -> option.getCode().equals(existingValue.getCode()))) {
-            return new DynamicList(existingValue, listOptions);
-        }
-
-        DynamicListItem selectedOriginalSender = clearDefaultForChildSupport && isChildSupportAppeal(sscsCaseData)
-            ? new DynamicListItem("", "")
-            : listOptions.get(0);
-        return new DynamicList(selectedOriginalSender, listOptions);
-    }
-
     public static List<String> getAllOtherPartiesOnCase(SscsCaseData sscsCaseData) {
         List<String> otherParties = new ArrayList<>();
         if (sscsCaseData.getOtherParties() != null && sscsCaseData.getOtherParties().size() > 0) {
