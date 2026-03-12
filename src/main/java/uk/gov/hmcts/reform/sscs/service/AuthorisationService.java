@@ -109,6 +109,42 @@ public class AuthorisationService implements RequestAuthorizer<Service> {
             log.error("Authorisation failed for authenticate request with status {}", exc.status(), authExc);
             throw authExc;
         }
+        return service;
+    }
+
+    private Service getTokenDetails(String bearerToken) {
+        try {
+            return serviceResolver.getTokenDetails(bearerToken);
+        } catch (ServiceTokenInvalidException e) {
+            throw new BearerTokenInvalidException(e);
+        } catch (ServiceTokenParsingException e) {
+            throw new AuthCheckerException("Error parsing JWT token", e);
+        }
+    }
+
+    private boolean isAllowedService(String serviceName, String uri) {
+        return switch (serviceName) {
+            case SSCS -> sscsOnlyEndpoints.stream().anyMatch(uri::startsWith);
+            case CCD -> ccdOnlyEndpoints.stream().anyMatch(uri::startsWith);
+            case BULK_SCAN_ORCH, BULK_SCAN_PROC -> bulkScanOnlyEndpoints.stream().anyMatch(uri::startsWith);
+            default -> false;
+        };
+    }
+
+    private String authenticate(String authHeader) {
+        if (authHeader == null) {
+            throw new UnauthorizedException("Missing ServiceAuthorization header");
+        }
+        try {
+            var serviceName = serviceAuthorisationApi.getServiceName(authHeader);
+            log.info("Authorising service {} to access endpoint", serviceName);
+            return  serviceName;
+        } catch (FeignException exc) {
+            RuntimeException authExc = (exc.status() >= 400 && exc.status() <= 499)
+                    ? new ClientAuthorisationException(exc) : new AuthorisationException(exc);
+            log.error("Authorisation failed for authenticate request with status {}", exc.status(), authExc);
+            throw authExc;
+        }
     }
 
     private Service getTokenDetails(String bearerToken) {
