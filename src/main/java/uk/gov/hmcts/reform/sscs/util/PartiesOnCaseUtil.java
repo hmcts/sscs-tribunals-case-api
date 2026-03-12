@@ -53,17 +53,20 @@ public class PartiesOnCaseUtil {
         }
 
         if (isNotEmpty(sscsCaseData.getOtherParties())) {
-            addOtherPartiesToListOptions(sscsCaseData, listOptions);
+            addOtherPartiesToListOptions(sscsCaseData, listOptions, true);
         }
 
         return listOptions;
     }
 
-    public static void addOtherPartiesToListOptions(SscsCaseData sscsCaseData, List<DynamicListItem> listOptions) {
+    public static void addOtherPartiesToListOptions(SscsCaseData sscsCaseData, List<DynamicListItem> listOptions,
+        boolean includeRepresentatives) {
         for (int i = 0; i < sscsCaseData.getOtherParties().size(); i++) {
             OtherParty otherParty = sscsCaseData.getOtherParties().get(i).getValue();
             addOtherPartyOrOtherPartyAppointeeToListOptions(listOptions, i, otherParty);
-            addOtherPartyRepresentativeToListOptions(listOptions, i, otherParty);
+            if (includeRepresentatives) {
+                addOtherPartyRepresentativeToListOptions(listOptions, i, otherParty);
+            }
         }
     }
 

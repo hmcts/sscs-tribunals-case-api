@@ -189,6 +189,8 @@ export class Tasks {
   }
 
   async assignTaskToCtscUser(taskName: string, userEmail: string) {
+    let homePage = new HomePage(this.page);
+    
     await this.clickAssignTask(taskName);
     await this.page
       .getByRole('radio', { name: tasksTestData.ctscRole.roleType })
@@ -221,6 +223,7 @@ export class Tasks {
       .getByRole('button', { name: tasksTestData.assignTaskButtonLabel })
       .click();
 
+    await homePage.navigateToTab('Tasks');  
     await expect(
       this.page.locator(
         `//h2[normalize-space()='${tasksTestData.tasksHeading}']`
