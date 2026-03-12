@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.functional.sya;
 import static io.restassured.RestAssured.baseURI;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTHORISATION_HEADER;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_CCD;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_CCD_CHILD_SUPPORT;
@@ -109,7 +110,7 @@ public class SubmitAppealTest {
         Response response = RestAssured.given()
                 .body(expectedBody)
                 .header("Content-Type", "application/json")
-                .header("ServiceAuthorisation", idamTokens.getServiceAuthorization())
+                .header(SERVICE_AUTHORISATION_HEADER, idamTokens.getServiceAuthorization())
                 .post("/appeals");
 
         response.then().statusCode(HttpStatus.SC_CREATED);

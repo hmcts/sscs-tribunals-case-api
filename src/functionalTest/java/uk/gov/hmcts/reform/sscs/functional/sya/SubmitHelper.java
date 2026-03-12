@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.functional.sya;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
+import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTHORISATION_HEADER;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS;
 
 import io.restassured.RestAssured;
@@ -65,7 +66,7 @@ public class SubmitHelper {
 
         return RestAssured.given()
             .header("Content-Type", "application/json")
-            .header("ServiceAuthorisation", serviceAuthorization)
+            .header(SERVICE_AUTHORISATION_HEADER, serviceAuthorization)
             .body(body)
             .post("/appeals");
     }
