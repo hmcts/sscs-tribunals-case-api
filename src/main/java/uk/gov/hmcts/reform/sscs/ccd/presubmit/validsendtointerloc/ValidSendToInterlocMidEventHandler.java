@@ -47,17 +47,6 @@ public class ValidSendToInterlocMidEventHandler implements PreSubmitCallbackHand
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         final PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
-        DynamicList incoming = sscsCaseData.getExtendedSscsCaseData().getSelectedConfidentialityParty();
-
-        if (isDynamicListEmpty(incoming)) {
-            callback.getCaseDetailsBefore()
-                    .map(CaseDetails::getCaseData)
-                    .map(SscsCaseData::getExtendedSscsCaseData)
-                    .map(ExtendedSscsCaseData::getSelectedConfidentialityParty)
-                    .filter(existingValue -> !isDynamicListEmpty(existingValue))
-                    .ifPresent(sscsCaseData.getExtendedSscsCaseData()::setSelectedConfidentialityParty);
-        }
-
         sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
                 getSelectedConfidentialityPartyDropdown(sscsCaseData, cmOtherPartyConfidentialityEnabled));
 
@@ -109,13 +98,6 @@ public class ValidSendToInterlocMidEventHandler implements PreSubmitCallbackHand
     private void setPostponementRequest(Hearing hearing, SscsCaseData sscsCaseData) {
         sscsCaseData.getPostponementRequest().setPostponementRequestHearingDateAndTime(hearing.getValue().getStart().toString());
         sscsCaseData.getPostponementRequest().setPostponementRequestHearingVenue(hearing.getValue().getVenue().getName());
-    }
-
-    private boolean isDynamicListEmpty(DynamicList dynamicList) {
-        return dynamicList == null
-                || dynamicList.getValue() == null
-                || dynamicList.getValue().getCode() == null
-                || dynamicList.getValue().getCode().isBlank();
     }
 
 }

@@ -134,7 +134,7 @@ public class ValidSendToInterlocMidEventHandlerTest {
     }
 
     @Test
-    void givenCurrentPayloadEmptyAndCaseDetailsBeforeHasValue_thenMidEventUsesPreviousSelection() {
+    void givenCurrentPayloadEmpty_thenMidEventDefaultsToFirstAvailableParty() {
         DynamicListItem selectedItem = new DynamicListItem("appellant", "Appellant (or Appointee)");
         SscsCaseData beforeCaseData = sscsCaseData.toBuilder().build();
         beforeCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(new DynamicList(selectedItem, null));
@@ -146,6 +146,8 @@ public class ValidSendToInterlocMidEventHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertEquals("appellant", response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode());
+        assertTrue(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getListItems().stream()
+                .anyMatch(item -> "appellant".equals(item.getCode())));
     }
 
     @Test
