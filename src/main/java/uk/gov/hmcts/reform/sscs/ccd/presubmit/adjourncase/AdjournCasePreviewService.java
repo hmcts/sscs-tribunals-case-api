@@ -190,22 +190,20 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
             }
         } else {
             Integer venueId = airLookupService.lookupVenueIdByAirVenueName(venueName);
-            log.info("Venue id for venue name {} is {} for case id {}", venueName, venueId, caseData.getCcdCaseId());
 
             String postCode = resolvePostCode(caseData);
             String newVenueName = airLookupService.lookupAirVenueNameByPostCode(postCode, caseData.getAppeal().getBenefitType());
-            log.info("Air lookup returned venue {} for postcode {} and case id {}", newVenueName, postCode, caseData.getCcdCaseId());
             if (!Objects.equals(venueName, newVenueName)) {
                 Integer newVenueId = airLookupService.lookupVenueIdByAirVenueName(newVenueName);
                 VenueDetails venueDetails = venueDataLoader.getVenueDetailsMap().get(newVenueId.toString());
                 if (nonNull(venueDetails) && Objects.equals(venueDetails.getLegacyVenue(), venueName)) {
+                    log.info("Venue id updated from {} to {} based on air lookup for case id {}", venueId, newVenueId, caseData.getCcdCaseId());
                     venueId =  newVenueId;
                 }
             }
 
             if (nonNull(venueId)) {
                 VenueDetails venueDetails = venueDataLoader.getVenueDetailsMap().get(venueId.toString());
-                log.info("Venue details for venue id {} is {} for case id {}", venueId, venueDetails, caseData.getCcdCaseId());
 
                 if (nonNull(venueDetails)) {
                     adjournCaseBuilder.nextHearingVenue(venueDetails.getGapsVenName());
