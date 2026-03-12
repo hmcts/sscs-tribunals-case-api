@@ -66,6 +66,7 @@ public final class PlaceholderConstants {
     public static final String ENTITY_TYPE = "entityType";
     public static final String PHONE_NUMBER = "phone_number";
     public static final String POSTPONEMENT_REQUEST = "postponement_request";
+    public static final String OTHER_PARTIES_NAMES = "other_parties_names";
 
     private PlaceholderConstants() {
         //
