@@ -172,7 +172,7 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "true,childSupport,''",
+        "true,childSupport,appellant",
         "false,childSupport,appellant",
         "true,PIP,appellant",
         "false,PIP,appellant"
