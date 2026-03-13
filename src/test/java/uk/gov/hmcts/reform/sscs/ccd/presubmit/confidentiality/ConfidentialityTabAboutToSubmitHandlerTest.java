@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.confidentiality;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
@@ -286,7 +285,6 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
                                                                                           .build())
                                                                       .build())
                                                         .build();
-        final CaseDetails<SscsCaseData> caseDetailsBefore = mock(CaseDetails.class);
         when(caseDetailsBefore.getCaseData()).thenReturn(beforeCaseData);
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
 
@@ -312,7 +310,6 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
                                                         .otherParties(singletonList(
                                                             CcdValue.<OtherParty>builder().value(beforeOtherParty).build()))
                                                         .build();
-        final CaseDetails<SscsCaseData> caseDetailsBefore = mock(CaseDetails.class);
         when(caseDetailsBefore.getCaseData()).thenReturn(beforeCaseData);
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
 
@@ -338,7 +335,6 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
                                                         .otherParties(singletonList(
                                                             CcdValue.<OtherParty>builder().value(beforeOtherParty).build()))
                                                         .build();
-        final CaseDetails<SscsCaseData> caseDetailsBefore = mock(CaseDetails.class);
         when(caseDetailsBefore.getCaseData()).thenReturn(beforeCaseData);
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
 
@@ -359,7 +355,6 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
                                                         .otherParties(singletonList(
                                                             CcdValue.<OtherParty>builder().value(beforeOtherParty).build()))
                                                         .build();
-        final CaseDetails<SscsCaseData> caseDetailsBefore = mock(CaseDetails.class);
         when(caseDetailsBefore.getCaseData()).thenReturn(beforeCaseData);
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
 
@@ -386,7 +381,6 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
                                                                                           .build())
                                                                       .build())
                                                         .build();
-        final CaseDetails<SscsCaseData> caseDetailsBefore = mock(CaseDetails.class);
         when(caseDetailsBefore.getCaseData()).thenReturn(beforeCaseData);
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
 
