@@ -149,6 +149,5 @@
   },
   "evidencePresent" : "No",
   "sscsDocument":[],
-  "dwpRegionalCentre": "Newcastle",
-  "confidentialityTab" : "Party | Name | Confidentiality Status | Confidentiality Status Confirmed\n-|-|-|-\nAppellant | Joe Bloggs | Undetermined | \r\n\n"
+  "dwpRegionalCentre": "Newcastle"
 }

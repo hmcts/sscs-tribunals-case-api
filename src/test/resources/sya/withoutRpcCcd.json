@@ -157,6 +157,5 @@
   "sscsDocument":[],
   "dwpRegionalCentre": "Newcastle",
   "pcqId": "12345678",
-  "languagePreferenceWelsh" : "No",
-  "confidentialityTab" : "Party | Name | Confidentiality Status | Confidentiality Status Confirmed\n-|-|-|-\nAppellant | Joe Bloggs | Undetermined | \r\n\n"
+  "languagePreferenceWelsh" : "No"
 }
