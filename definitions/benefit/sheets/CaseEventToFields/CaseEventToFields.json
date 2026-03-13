@@ -344,6 +344,505 @@
     "PageID": "1.0"
   },
   {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "appeal",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "appealDetails",
+    "PageLabel": "Appeal Details"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "subscriptions",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "appealDetails"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "jointParty",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "jointPartyDetails",
+    "PageLabel": "Joint Party Details"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "jointPartyName",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "jointPartyDetails"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "jointPartyIdentity",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 3,
+    "PageID": "jointPartyDetails"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "jointPartyAddressSameAsAppellant",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 4,
+    "PageID": "jointPartyDetails"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "jointPartyAddress",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 5,
+    "PageID": "jointPartyDetails"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "otherParties",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "otherPartiesDetails",
+    "PageLabel": "Other Parties"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "benefitCode",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "caseClassification",
+    "PageLabel": "Case Classification"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "issueCode",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "caseClassification"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "caseCode",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 3,
+    "PageID": "caseClassification"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "dwpRegionalCentre",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 4,
+    "PageID": "caseClassification"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "dwpOriginatingOffice",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 5,
+    "PageID": "caseClassification"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "dwpPresentingOffice",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 6,
+    "PageID": "caseClassification"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "region",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 7,
+    "PageID": "caseClassification"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "processingVenue",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 8,
+    "PageID": "caseClassification"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "isScottishCase",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 9,
+    "PageID": "caseClassification"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "formType",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 10,
+    "PageID": "caseClassification"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "dwpUCB",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 5,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "dwpFlags",
+    "PageLabel": "DWP/FTA Flags"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "dwpPHME",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 5,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "dwpFlags"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "dwpComplexAppeal",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 5,
+    "PageFieldDisplayOrder": 3,
+    "PageID": "dwpFlags"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "dwpIsOfficerAttending",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 5,
+    "PageFieldDisplayOrder": 4,
+    "PageID": "dwpFlags"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "dwpFurtherInfo",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 5,
+    "PageFieldDisplayOrder": 5,
+    "PageID": "dwpFlags"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "isConfidentialCase",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 6,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "confidentialityAndAdjustments",
+    "PageLabel": "Confidentiality & Adjustments"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "confidentialityType",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 6,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "confidentialityAndAdjustments"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "reasonableAdjustmentChoice",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 6,
+    "PageFieldDisplayOrder": 3,
+    "PageID": "confidentialityAndAdjustments"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "reasonableAdjustments",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 6,
+    "PageFieldDisplayOrder": 4,
+    "PageID": "confidentialityAndAdjustments"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "languagePreferenceWelsh",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 6,
+    "PageFieldDisplayOrder": 5,
+    "PageID": "confidentialityAndAdjustments"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "urgentCase",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 7,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "caseStatusAndNotes",
+    "PageLabel": "Case Status & Notes"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "urgentHearingRegistered",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 7,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "caseStatusAndNotes"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "urgentHearingOutcome",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 7,
+    "PageFieldDisplayOrder": 3,
+    "PageID": "caseStatusAndNotes"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "isAppellantDeceased",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 7,
+    "PageFieldDisplayOrder": 4,
+    "PageID": "caseStatusAndNotes"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "dateOfAppellantDeath",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 7,
+    "PageFieldDisplayOrder": 5,
+    "PageID": "caseStatusAndNotes"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "appealNotePad",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 7,
+    "PageFieldDisplayOrder": 6,
+    "PageID": "caseStatusAndNotes"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "decisionNotes",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 7,
+    "PageFieldDisplayOrder": 7,
+    "PageID": "caseStatusAndNotes"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "createdInGapsFrom",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 8,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "systemFlags",
+    "PageLabel": "System Flags"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "isProgressingViaGaps",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 8,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "systemFlags"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "hmctsDwpState",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 8,
+    "PageFieldDisplayOrder": 3,
+    "PageID": "systemFlags"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "interlocReviewState",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 8,
+    "PageFieldDisplayOrder": 4,
+    "PageID": "systemFlags"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "directionResponse",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 8,
+    "PageFieldDisplayOrder": 5,
+    "PageID": "systemFlags"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "elementsDisputedList",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 9,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "elementsDisputed",
+    "PageLabel": "Elements Disputed (UC)"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "elementsDisputedGeneral",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 9,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "elementsDisputed"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "elementsDisputedSanctions",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 9,
+    "PageFieldDisplayOrder": 3,
+    "PageID": "elementsDisputed"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "elementsDisputedHousing",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 9,
+    "PageFieldDisplayOrder": 4,
+    "PageID": "elementsDisputed"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "elementsDisputedChildCare",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 9,
+    "PageFieldDisplayOrder": 5,
+    "PageID": "elementsDisputed"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "elementsDisputedCare",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 9,
+    "PageFieldDisplayOrder": 6,
+    "PageID": "elementsDisputed"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "elementsDisputedChildElement",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 9,
+    "PageFieldDisplayOrder": 7,
+    "PageID": "elementsDisputed"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "elementsDisputedChildDisabled",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 9,
+    "PageFieldDisplayOrder": 8,
+    "PageID": "elementsDisputed"
+  },
+  {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "elementsDisputedLimitedWork",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 9,
+    "PageFieldDisplayOrder": 9,
+    "PageID": "elementsDisputed"
+  },
+  {
     "CaseEventID": "adjournCase",
     "CaseFieldID": "hearingRoute",
     "CaseTypeID": "Benefit",
