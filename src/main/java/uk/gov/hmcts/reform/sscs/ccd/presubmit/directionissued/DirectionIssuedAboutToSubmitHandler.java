@@ -17,7 +17,6 @@ import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -352,7 +351,8 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private SscsCaseData updateConfidentiality(SscsCaseData caseData) {
 
         if (!cmOtherPartyConfidentialityEnabled) {
-            log.debug("Not updating confidentiality. Feature flag feature.cm-other-party-confidentiality.enabled is not enabled.");
+            log.debug(
+                "Not updating confidentiality. Feature flag feature.cm-other-party-confidentiality.enabled is not enabled.");
             return caseData;
         }
 
@@ -361,26 +361,33 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         var confidentialityRequired = CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString()
             .equals(directionCode) ? YesNo.YES : YesNo.NO;
 
-        var confidentialityType = caseData.getConfidentialityType();
+        var confidentialityPartyCode = caseData.getExtendedSscsCaseData()
+            .getSelectedConfidentialityParty()
+            .getValue()
+            .getCode();
 
-        var isGeneral = ConfidentialityType.GENERAL.getCode().equalsIgnoreCase(confidentialityType);
-
-        if (YesNo.isYes(caseData.getSendDirectionNoticeToAppellantOrAppointee()) || isGeneral) {
+        if ("appellant".equalsIgnoreCase(confidentialityPartyCode)) {
+            log.debug("Updating Appellant's confidentiality as {}, caseId: {}", confidentialityRequired,
+                caseData.getCcdCaseId());
             caseData.getAppellant().ifPresent(appellant -> {
                 appellant.setConfidentialityRequired(confidentialityRequired);
                 appellant.setConfidentialityRequiredChangedDate(LocalDateTime.now());
+
             });
+        } else if (confidentialityPartyCode.startsWith("otherParty")) {
+            var otherPartyId = confidentialityPartyCode.substring(10);
 
-            log.debug("Appellant's confidentiality updated as {}, caseId: {}", confidentialityRequired, caseData.getCcdCaseId());
-        }
+            if (caseData.getOtherParties() != null && !caseData.getOtherParties().isEmpty()) {
+                log.debug("Updating Other party's confidentiality as {}, caseId: {}, otherParty Id: {}",
+                    confidentialityRequired, caseData.getCcdCaseId(), otherPartyId);
 
-        if (YesNo.isYes(caseData.getSendDirectionNoticeToOtherParty()) || isGeneral) {
-            Optional.ofNullable(caseData.getOtherParties()).orElse(List.of()).forEach(otherParty -> {
-                otherParty.getValue().setConfidentialityRequired(confidentialityRequired);
-                otherParty.getValue().setConfidentialityRequiredChangedDate(LocalDateTime.now());
-            });
-
-            log.debug("Other party's confidentiality updated as {}, caseId: {}", confidentialityRequired, caseData.getCcdCaseId());
+                caseData.getOtherParties().forEach(otherParty -> {
+                    if (otherPartyId.equalsIgnoreCase(otherParty.getValue().getId())) {
+                        otherParty.getValue().setConfidentialityRequired(confidentialityRequired);
+                        otherParty.getValue().setConfidentialityRequiredChangedDate(LocalDateTime.now());
+                    }
+                });
+            }
         }
 
         return caseData;
