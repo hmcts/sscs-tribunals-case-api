@@ -38,7 +38,6 @@ import uk.gov.hmcts.reform.sscs.service.conversion.FileToPdfConversionService;
 public class EvidenceManagementControllerTest {
 
     private static final String SERVICE_AUTH = "service-auth";
-    private static final String SERVICE_NAME = "sscs";
 
     @Mock
     private EvidenceManagementService evidenceManagementService;
@@ -63,16 +62,12 @@ public class EvidenceManagementControllerTest {
     }
 
     @Test
-    public void shouldThrowEvidenceDocumentsMissingExceptionIfThereAreNoFilesInTheRequest() throws JsonProcessingException {
-        when(authorisationService.authenticate(SERVICE_AUTH)).thenReturn(SERVICE_NAME);
-
+    public void shouldThrowEvidenceDocumentsMissingExceptionIfThereAreNoFilesInTheRequest() {
         assertThrows(EvidenceDocumentsMissingException.class, () -> controller.upload(SERVICE_AUTH, null));
     }
 
     @Test
-    public void shouldThrowEvidenceDocumentsMissingExceptionForEmptyFileList() throws JsonProcessingException {
-        when(authorisationService.authenticate(SERVICE_AUTH)).thenReturn(SERVICE_NAME);
-
+    public void shouldThrowEvidenceDocumentsMissingExceptionForEmptyFileList() {
         assertThrows(EvidenceDocumentsMissingException.class, () -> controller.upload(SERVICE_AUTH, Collections.emptyList()));
     }
 
@@ -98,7 +93,6 @@ public class EvidenceManagementControllerTest {
         List<MultipartFile> files = Collections.singletonList(file);
         when(fileToPdfConversionService.convert(files)).thenReturn(files);
         when(evidenceManagementService.upload(files, DM_STORE_USER_ID)).thenReturn(uploadResponse);
-        when(authorisationService.authenticate(SERVICE_AUTH)).thenReturn(SERVICE_NAME);
 
         ResponseEntity<String> actualUploadResponseEmbedded = controller.upload(SERVICE_AUTH, files);
 
@@ -106,8 +100,7 @@ public class EvidenceManagementControllerTest {
 
         verify(evidenceManagementService, times(1)).upload(files, DM_STORE_USER_ID);
         assertThat(actualUploadResponseEmbedded.getBody(), equalTo(json));
-        verify(authorisationService).authenticate(SERVICE_AUTH);
-        verify(authorisationService).allowOnlySscs(SERVICE_NAME);
+        verify(authorisationService).allowOnlySscs(SERVICE_AUTH);
     }
 
     @Test
@@ -138,7 +131,6 @@ public class EvidenceManagementControllerTest {
 
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
-        when(authorisationService.authenticate(SERVICE_AUTH)).thenReturn(SERVICE_NAME);
 
         when(evidenceManagementSecureDocStoreService.upload(files, idamTokens)).thenReturn(uploadResponse);
 
@@ -148,17 +140,15 @@ public class EvidenceManagementControllerTest {
 
         verify(evidenceManagementSecureDocStoreService, times(1)).upload(files, idamTokens);
         assertThat(actualUploadResponseEmbedded.getBody(), equalTo(json));
-        verify(authorisationService).authenticate(SERVICE_AUTH);
-        verify(authorisationService).allowOnlySscs(SERVICE_NAME);
+        verify(authorisationService).allowOnlySscs(SERVICE_AUTH);
     }
 
     @Test
-    public void shouldUploadEvidenceDocumentListLogsParseException() throws JsonProcessingException {
+    public void shouldUploadEvidenceDocumentListLogsParseException() {
 
         MultipartFile file = mock(MultipartFile.class);
         List<MultipartFile> files = Collections.singletonList(file);
 
-        when(authorisationService.authenticate(SERVICE_AUTH)).thenReturn(SERVICE_NAME);
         when(fileToPdfConversionService.convert(files)).thenThrow(
             new FileToPdfConversionException("Conversion to PDF error", new RuntimeException()));
 
@@ -169,9 +159,8 @@ public class EvidenceManagementControllerTest {
     public void testToThrowForbiddenExceptionForUnauthorizedService() throws CcdException {
         String serviceAuth = "unauthorized-service-auth";
         String serviceName = "unauthorized-service";
-        when(authorisationService.authenticate(serviceAuth)).thenReturn(serviceName);
         doThrow(new ForbiddenException("Service " + serviceName + " is not authorized for this action"))
-                .when(authorisationService).allowOnlySscs(serviceName);
+                .when(authorisationService).allowOnlySscs(serviceAuth);
 
         assertThrows(ForbiddenException.class, () -> controller.upload(serviceAuth, null));
     }
