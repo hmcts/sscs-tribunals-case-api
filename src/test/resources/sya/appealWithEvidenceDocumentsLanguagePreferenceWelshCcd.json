@@ -199,5 +199,6 @@
   "evidencePresent" : "Yes",
   "dwpRegionalCentre": "Newcastle",
   "languagePreferenceWelsh": "Yes",
-  "translationWorkOutstanding": "Yes"
+  "translationWorkOutstanding": "Yes",
+  "confidentialityTab" : "Party | Name | Confidentiality Status | Confidentiality Status Confirmed\n-|-|-|-\nAppellant | Joe Bloggs | Undetermined | \r\n\n"
 }

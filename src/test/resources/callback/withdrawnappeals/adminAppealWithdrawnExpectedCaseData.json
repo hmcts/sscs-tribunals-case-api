@@ -232,5 +232,6 @@
   "libertyToApplyBodyContent": null,
   "directionNoticeContent": null,
   "signedBy": null,
-  "signedRole": null
+  "signedRole": null,
+  "confidentialityTab" : "Party | Name | Confidentiality Status | Confidentiality Status Confirmed\n-|-|-|-\nAppellant | AN Test | Undetermined | \r\n\n"
 }
