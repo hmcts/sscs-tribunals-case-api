@@ -82,5 +82,15 @@
     "FieldShowCondition": "addDocuments = \"Yes\"",
     "PageLabel": " ",
     "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseEventID": "updateOtherPartyData",
+    "CaseFieldID": "domesticViolenceMarker",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "13/03/2026",
+    "PageDisplayOrder": 1,
+    "PageID": "1.0",
+    "PageLabel": "Update other party data"
   }
 ]
