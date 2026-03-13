@@ -10,6 +10,7 @@ import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.findBoolean
 import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.getBoolean;
 import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.getField;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL;
+import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.isScottishCase;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -625,6 +626,7 @@ public class SscsCaseValidator implements CaseValidator {
                     }
                     caseData.put("region", rpc.getName());
                     caseData.put("regionalProcessingCenter", rpc);
+                    caseData.put("isScottishCase", isScottishCase(rpc));
                 } else if (!isPort) {
                     warnings.add(getMessageByCallbackType(callbackType, personType,
                         getWarningMessageName(personType, appellant) + ADDRESS_POSTCODE,

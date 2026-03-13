@@ -1499,6 +1499,19 @@ public class SscsCaseValidatorTest {
         assertEquals("Address 1",
             ((RegionalProcessingCenter) response.getTransformedCase().get("regionalProcessingCenter")).getAddress1());
         assertEquals("Liverpool", (response.getTransformedCase().get("region")));
+        assertEquals("No", response.getTransformedCase().get("isScottishCase"));
+    }
+
+    @Test
+    public void givenAGlasgowPostcode_thenSetIsScottishCaseToYes() {
+        given(regionalProcessingCenterService.getByPostcode(anyString(), anyBoolean()))
+            .willReturn(RegionalProcessingCenter.builder().address1("Address 1").name("GLASGOW").build());
+
+        CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord,
+            buildMinimumAppealDataWithBenefitType(PIP.name(), buildAppellant(false), true, FormType.SSCS1PE), false);
+
+        assertEquals("GLASGOW", response.getTransformedCase().get("region"));
+        assertEquals("Yes", response.getTransformedCase().get("isScottishCase"));
     }
 
     @Test
