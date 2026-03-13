@@ -10,35 +10,48 @@ import static uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler.getJsonCa
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Arrays;
+import junitparams.JUnitParamsRunner;
+import junitparams.NamedParameters;
+import junitparams.Parameters;
 import org.apache.http.HttpResponse;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.ClassRule;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication;
+import org.springframework.test.context.junit4.rules.SpringClassRule;
+import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.functional.mya.BaseFunctionTest;
-import uk.gov.hmcts.reform.sscs.functional.mya.CitizenIdamService;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {TribunalsCaseApiApplication.class, CitizenIdamService.class})
+@RunWith(JUnitParamsRunner.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 public class GenDecisionNoticeFunctionalTest extends BaseFunctionTest {
+
+    @ClassRule
+    public static final SpringClassRule scr = new SpringClassRule();
+
+    @Rule
+    public final SpringMethodRule smr = new SpringMethodRule();
 
     @Autowired
     protected ObjectMapper objectMapper;
 
-    @ParameterizedTest
-    @ValueSource(booleans = {false, true})
-    @Disabled //Ignore this test until we support additional benefit types
+    @NamedParameters("allowed")
+    @SuppressWarnings("unused")
+    private Boolean[] allowed() {
+        return new Boolean[] { false, true};
+    }
+
+    @Test
+    @Parameters(named = "allowed")
+    @Ignore //Ignore this test until we support additional benefit types
     public void nonDescriptorFlow_shouldGeneratePdfWithExpectedText(boolean allowed) throws IOException {
 
         String json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/dlaScenarioCallbackNonDescriptorFlow.json", Arrays.asList("ALLOWED_OR_REFUSED"),
