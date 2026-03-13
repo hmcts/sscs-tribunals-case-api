@@ -17,30 +17,42 @@ import static uk.gov.hmcts.reform.sscs.bulkscan.domain.validation.ValidationStat
 import com.google.common.io.Resources;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import junitparams.JUnitParamsRunner;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit4.rules.SpringClassRule;
+import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.reform.authorisation.exceptions.InvalidTokenException;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.handlers.CcdCallbackHandler;
 import uk.gov.hmcts.reform.sscs.bulkscan.exceptionhandlers.ResponseExceptionHandler;
 import uk.gov.hmcts.reform.sscs.bulkscan.exceptions.ForbiddenException;
+import uk.gov.hmcts.reform.sscs.bulkscan.exceptions.UnauthorizedException;
 import uk.gov.hmcts.reform.sscs.domain.CaseResponse;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 
-@ExtendWith(MockitoExtension.class)
+@RunWith(JUnitParamsRunner.class)
 public class OcrValidationControllerTest {
 
-    @Mock
+    @ClassRule
+    public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
+
+    @Rule
+    public final SpringMethodRule springMethodRule = new SpringMethodRule();
+
+    @MockitoBean
     private CcdCallbackHandler handler;
 
-    @Mock
+    @MockitoBean
     private AuthorisationService authService;
 
     private MockMvc mockMvc;
 
-    @BeforeEach
+    @Before
     public void setUp() {
         OcrValidationController ocrValidationController = new OcrValidationController(handler, authService);
         mockMvc = standaloneSetup(ocrValidationController)
@@ -49,10 +61,39 @@ public class OcrValidationControllerTest {
     }
 
     @Test
+    public void should_return_401_status_when_auth_service_throws_unauthenticated_exception() throws Exception {
+        String requestBody = readResource("validation/valid-ocr-data.json");
+        given(authService.authenticate("")).willThrow(UnauthorizedException.class);
+
+        mockMvc
+            .perform(
+                post("/forms/SSCS1/validate-ocr")
+                    .header("ServiceAuthorization", "")
+                    .contentType(APPLICATION_JSON_VALUE)
+                    .content(requestBody)
+            )
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void should_return_401_status_when_auth_service_throws_invalid_token_exception() throws Exception {
+        String requestBody = readResource("validation/valid-ocr-data.json");
+        given(authService.authenticate("test-token")).willThrow(InvalidTokenException.class);
+
+        mockMvc
+            .perform(
+                post("/forms/SSCS1/validate-ocr")
+                    .header("ServiceAuthorization", "test-token")
+                    .contentType(APPLICATION_JSON_VALUE)
+                    .content(requestBody)
+            )
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     public void should_return_403_status_when_auth_service_throws_forbidden_exception() throws Exception {
         String requestBody = readResource("validation/valid-ocr-data.json");
-        doThrow(new ForbiddenException("Service does not have permissions to request case creation"))
-                .when(authService).assertIsAllowedToHandleCallback(any());
+        doThrow(new ForbiddenException("Service does not have permissions to request case creation")).when(authService).assertIsAllowedToHandleCallback(any());
 
         mockMvc
             .perform(
@@ -68,6 +109,9 @@ public class OcrValidationControllerTest {
     @Test
     public void should_return_success_message_when_ocr_data_is_valid_for_sscs1() throws Exception {
         String requestBody = readResource("validation/valid-ocr-data.json");
+
+        given(authService.authenticate("testServiceAuthHeader")).willReturn("testServiceName");
+
         given(handler.handleValidation(any()))
             .willReturn(CaseResponse.builder().warnings(emptyList()).errors(emptyList()).status(SUCCESS).build());
 
@@ -86,6 +130,9 @@ public class OcrValidationControllerTest {
     @Test
     public void should_return_success_message_when_ocr_data_is_valid_for_sscs1pe() throws Exception {
         String requestBody = readResource("validation/valid-ocr-data.json");
+
+        given(authService.authenticate("testServiceAuthHeader")).willReturn("testServiceName");
+
         given(handler.handleValidation(any()))
             .willReturn(CaseResponse.builder().warnings(emptyList()).errors(emptyList()).status(SUCCESS).build());
 
@@ -104,6 +151,9 @@ public class OcrValidationControllerTest {
     @Test
     public void should_return_success_message_when_ocr_data_has_warnings() throws Exception {
         String requestBody = readResource("validation/valid-ocr-data.json");
+
+        given(authService.authenticate("testServiceAuthHeader")).willReturn("testServiceName");
+
         given(handler.handleValidation(any()))
             .willReturn(CaseResponse.builder().warnings(newArrayList("warning1")).errors(emptyList()).status(WARNINGS).build());
 
@@ -122,6 +172,9 @@ public class OcrValidationControllerTest {
     @Test
     public void should_return_error_response_when_ocr_data_has_errors() throws Exception {
         String requestBody = readResource("validation/valid-ocr-data.json");
+
+        given(authService.authenticate("testServiceAuthHeader")).willReturn("testServiceName");
+
         given(handler.handleValidation(any()))
             .willReturn(CaseResponse.builder().warnings(newArrayList(emptyList())).errors(newArrayList("error1")).status(ERRORS).build());
 
@@ -139,6 +192,8 @@ public class OcrValidationControllerTest {
 
     @Test
     public void should_return_200_with_form_not_found_error_when_form_type_is_invalid() throws Exception {
+        given(authService.authenticate("testServiceAuthHeader")).willReturn("testServiceName");
+
         mockMvc
             .perform(
                 post("/forms/invalid-form-type/validate-ocr")
@@ -156,6 +211,7 @@ public class OcrValidationControllerTest {
 
     @Test
     public void should_return_200_with_form_not_found_error_when_form_type_case_does_not_match() throws Exception {
+        given(authService.authenticate("testServiceAuthHeader")).willReturn("testServiceName");
         mockMvc
             .perform(
                 post("/forms/sscs1/validate-ocr") //Lowercase sscs1 is invalid
@@ -172,6 +228,9 @@ public class OcrValidationControllerTest {
     @Test
     public void should_return_success_message_when_ocr_data_is_valid_for_sscs1u() throws Exception {
         String requestBody = readResource("validation/valid-ocr-data.json");
+
+        given(authService.authenticate("testServiceAuthHeader")).willReturn("testServiceName");
+
         given(handler.handleValidation(any()))
             .willReturn(CaseResponse.builder().warnings(emptyList()).errors(emptyList()).status(SUCCESS).build());
 
