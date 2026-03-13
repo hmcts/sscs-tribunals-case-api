@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.functional.sya;
 import static io.restassured.RestAssured.baseURI;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTHORISATION_HEADER;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_CCD;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_CCD_CHILD_SUPPORT;
@@ -109,6 +110,7 @@ public class SubmitAppealTest {
         Response response = RestAssured.given()
                 .body(expectedBody)
                 .header("Content-Type", "application/json")
+                .header(SERVICE_AUTHORISATION_HEADER, idamTokens.getServiceAuthorization())
                 .post("/appeals");
 
         response.then().statusCode(HttpStatus.SC_CREATED);
@@ -180,7 +182,7 @@ public class SubmitAppealTest {
         LocalDate mrnDate = LocalDate.now();
         log.info("Generated NINO: {} and MRN date: {}", nino, mrnDate);
 
-        Response response = submitHelper.submitAppeal(nino, mrnDate);
+        Response response = submitHelper.submitAppeal(nino, mrnDate, idamTokens.getServiceAuthorization());
         response.then().statusCode(HttpStatus.SC_CREATED);
 
         final Long firstCaseId = getCcdIdFromLocationHeader(response.getHeader("Location"));
@@ -193,7 +195,7 @@ public class SubmitAppealTest {
         //create a case with different mrn date
         mrnDate = LocalDate.now().minusMonths(12);
 
-        response =  submitHelper.submitAppeal(nino, mrnDate);
+        response =  submitHelper.submitAppeal(nino, mrnDate, idamTokens.getServiceAuthorization());
         response.then().statusCode(HttpStatus.SC_CREATED);
 
         final Long secondCaseId = getCcdIdFromLocationHeader(response.getHeader("Location"));
@@ -210,7 +212,7 @@ public class SubmitAppealTest {
 
         log.info("Resubmitting case with nino {} and mrn date {} for second time", nino, mrnDate);
         // check duplicate returns 409
-        response = submitHelper.submitAppeal(nino, mrnDate);
+        response = submitHelper.submitAppeal(nino, mrnDate, idamTokens.getServiceAuthorization());
         response.then().statusCode(HttpStatus.SC_CONFLICT);
 
         log.info("True duplicate was rejected");
