@@ -357,7 +357,7 @@
     "PageDisplayOrder": 8,
     "PageFieldDisplayOrder": 6,
     "PageID": "workCapabilityAssessment",
-    "FieldShowCondition" : "wcaAppeal=\"Yes\" AND issueCode=\"SV\"",
+    "FieldShowCondition" : "wcaAppeal=\"Yes\" AND issueCode=\"SV\" OR elementsDisputedLimitedWork CONTAINS \"SV\"",
     "ShowSummaryChangeOption": "Y",
     "RetainHiddenValue": "Yes"
   },
