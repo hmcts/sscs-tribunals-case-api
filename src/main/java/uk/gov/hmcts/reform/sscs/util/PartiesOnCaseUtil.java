@@ -91,7 +91,7 @@ public class PartiesOnCaseUtil {
                 .isPresent();
     }
 
-    public static DynamicList getSelectedConfidentialityPartyDropdown(SscsCaseData sscsCaseData, boolean clearDefaultForChildSupport) {
+    public static DynamicList getSelectedConfidentialityPartyDropdown(SscsCaseData sscsCaseData, boolean requireExplicitSelection) {
         List<DynamicListItem> listOptions = getPartiesOnCase(sscsCaseData);
 
         DynamicList existingSelectedConfidentialityParty = sscsCaseData.getExtendedSscsCaseData().getSelectedConfidentialityParty();
@@ -105,7 +105,7 @@ public class PartiesOnCaseUtil {
             return new DynamicList(existingValue, listOptions);
         }
 
-        DynamicListItem selectedConfidentialityParty = clearDefaultForChildSupport && isChildSupportAppeal(sscsCaseData)
+        DynamicListItem selectedConfidentialityParty = requireExplicitSelection
                 ? new DynamicListItem("", "")
                 : listOptions.get(0);
         return new DynamicList(selectedConfidentialityParty, listOptions);

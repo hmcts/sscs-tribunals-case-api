@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.*;
 import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getPartiesOnCase;
 import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown;
+import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.isChildSupportAppeal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,7 +74,8 @@ public class ValidSendToInterlocAboutToStartHandler implements PreSubmitCallback
     }
 
     private void setSelectedConfidentialityPartyDropdown(SscsCaseData sscsCaseData) {
-        DynamicList dropdown = getSelectedConfidentialityPartyDropdown(sscsCaseData, cmOtherPartyConfidentialityEnabled);
+        boolean requireExplicitSelection = cmOtherPartyConfidentialityEnabled && isChildSupportAppeal(sscsCaseData);
+        DynamicList dropdown = getSelectedConfidentialityPartyDropdown(sscsCaseData, requireExplicitSelection);
         sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(dropdown);
     }
 
