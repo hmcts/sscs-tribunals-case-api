@@ -2,18 +2,20 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPresent;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.IN_CHAMBERS;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getLastValidHearing;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -23,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder;
+import uk.gov.hmcts.reform.sscs.model.docassembly.Respondent;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody.WriteFinalDecisionTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
@@ -33,6 +36,8 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Slf4j
 public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends IssueNoticeHandler {
+
+    private static final int MAX_NUM_OF_RESPONDENT = 10;
 
     protected final DecisionNoticeQuestionService decisionNoticeQuestionService;
     protected final DecisionNoticeOutcomeService decisionNoticeOutcomeService;
@@ -165,16 +170,16 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         }
 
         writeFinalDecisionBuilder.presentingOfficerAttended("yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPresentingOfficerAttendedQuestion()));
-        if (isOtherPartyPresent(caseData) && CollectionUtils.isNotEmpty(caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions())) {
-            writeFinalDecisionBuilder.otherPartyNamesAttendedHearing(caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions().stream()
-                .filter(aq -> YesNo.YES.equals(aq.getValue().getAttendedOtherParty()))
-                .map(aq -> aq.getValue().getOtherPartyName())
-                .collect(Collectors.joining(", ")));
+
+        if (isOtherPartyPresent(caseData)) {
+            writeFinalDecisionBuilder.otherPartyNamesDidNotAttendHearing(populateOtherPartyNames(caseData, NO));
+            writeFinalDecisionBuilder.otherPartyNamesAttendedHearing(populateOtherPartyNames(caseData, YES));
         }
 
         SscsType sscsFormType = Optional.ofNullable(caseData.getBenefitType())
             .flatMap(benefit -> benefit.map(Benefit::getSscsType))
             .orElse(null);
+
         writeFinalDecisionBuilder.isHmrc(SscsType.SSCS5.equals(sscsFormType));
         writeFinalDecisionBuilder.isIbca(caseData.isIbcCase() || SscsType.SSCS8.equals(sscsFormType));
 
@@ -196,6 +201,42 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
         return builder.build();
 
+    }
+
+    private List<String> populateOtherPartyNames(SscsCaseData caseData, YesNo attended) {
+        List<String> names = new ArrayList<>();
+        List<String> respondents = new ArrayList<>();
+
+        if (caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions() == null
+            || caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions().isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        var otherPartyAttendedQuestions = caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions();
+
+        // populate respondents
+        for (int i = 0; i < otherPartyAttendedQuestions.size(); i++) {
+            var otherParty = otherPartyAttendedQuestions.get(i).getValue();
+            var respondent = (i < MAX_NUM_OF_RESPONDENT) ? Respondent.labelPrefixes[i].toLowerCase() : "";
+
+            if (otherParty.getAttendedOtherParty() == attended) {
+                respondents.add(respondent);
+                names.add(otherParty.getOtherPartyName());
+            }
+        }
+
+        var otherParties = new ArrayList<String>();
+
+        if (names.size() < MAX_NUM_OF_RESPONDENT) {
+            for (int i = 0; i < names.size(); i++) {
+                otherParties.add(String.format("%s the %s respondent", names.get(i), respondents.get(i)));
+            }
+        } else {
+            otherParties.addAll(names.subList(0, names.size() - 1));
+            otherParties.add(names.getLast() + " respondents");
+        }
+
+        return otherParties;
     }
 
     protected boolean isSetAside(SscsCaseData sscsCaseData, Outcome outcome) {

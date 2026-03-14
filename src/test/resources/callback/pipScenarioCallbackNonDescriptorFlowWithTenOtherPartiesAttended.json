@@ -1,0 +1,5268 @@
+{
+  "case_details": {
+    "id": 1771247899886008,
+    "jurisdiction": "SSCS",
+    "state": "dormantAppealState",
+    "version": 26,
+    "case_type_id": "Benefit",
+    "created_date": [
+      2026,
+      2,
+      16,
+      13,
+      18,
+      19,
+      856801000
+    ],
+    "last_modified": [
+      2026,
+      2,
+      23,
+      17,
+      4,
+      34,
+      135004000
+    ],
+    "last_state_modified_date": [
+      2026,
+      2,
+      20,
+      15,
+      50,
+      33,
+      397724000
+    ],
+    "security_classification": "PUBLIC",
+    "case_data": {
+      "caseCode": "022DD",
+      "subscriptions": {
+        "appellantSubscription": {
+          "tya": "YiwqE0Ts0M",
+          "email": "sscstest+notify@greencroftconsulting.com",
+          "mobile": "+447398785050",
+          "reason": null,
+          "subscribeSms": "Yes",
+          "subscribeEmail": "Yes",
+          "lastLoggedIntoMya": null,
+          "wantSmsNotifications": "Yes"
+        },
+        "appointeeSubscription": {
+          "tya": null,
+          "email": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeSms": null,
+          "subscribeEmail": null,
+          "lastLoggedIntoMya": null,
+          "wantSmsNotifications": null
+        },
+        "supporterSubscription": {
+          "tya": null,
+          "email": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeSms": null,
+          "subscribeEmail": null,
+          "lastLoggedIntoMya": null,
+          "wantSmsNotifications": null
+        },
+        "jointPartySubscription": {
+          "tya": null,
+          "email": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeSms": null,
+          "subscribeEmail": null,
+          "lastLoggedIntoMya": null,
+          "wantSmsNotifications": null
+        },
+        "representativeSubscription": {
+          "tya": "X9S7oZ2MPb",
+          "email": "harry.potter@wizards.com",
+          "mobile": "+447411999999",
+          "reason": null,
+          "subscribeSms": "Yes",
+          "subscribeEmail": "Yes",
+          "lastLoggedIntoMya": null,
+          "wantSmsNotifications": "Yes"
+        }
+      },
+      "hearingRoute": "gaps",
+      "dwpRegionalCentre": "Child Support",
+      "writeFinalDecisionFinanciallyQualifiedPanelMemberName": null,
+      "writeFinalDecisionGenerateNotice": "Yes",
+      "jointPartyId": "b4e32eb0-c7ab-43a9-9b1d-d95faed142f0",
+      "benefitCode": "022",
+      "writeFinalDecisionPresentingOfficerAttendedQuestion": "Yes",
+      "directionDueDate": "2026-03-09",
+      "finalDecisionWasOriginalDecisionUploaded": "No",
+      "otherPartyUCB": "No",
+      "regionalProcessingCenter": {
+        "city": "BRADFORD",
+        "name": "BRADFORD",
+        "email": "SSCS_Bradford@justice.gov.uk",
+        "epimsId": "698118",
+        "address1": "HM Courts & Tribunals Service",
+        "address2": "Social Security & Child Support Appeals",
+        "address3": "Phoenix House",
+        "address4": "Rushton Avenue",
+        "postcode": "BD3 7BH",
+        "faxNumber": "0126 434 7983",
+        "phoneNumber": "0300 123 1142",
+        "hearingRoute": "gaps"
+      },
+      "otherPartyAttendedQuestions": [
+        {
+          "value": {
+            "otherPartyName": "John Smith",
+            "attendedOtherParty": "Yes"
+          },
+          "id": "934a6aba-8e7f-4977-b92e-5589641a21e8"
+        },
+        {
+          "value": {
+            "otherPartyName": "Jane Smith",
+            "attendedOtherParty": "Yes"
+          },
+          "id": "383dbf3f-26b8-465a-a27d-c3b7ad1b972f"
+        },
+        {
+          "value": {
+            "otherPartyName": "David Jones",
+            "attendedOtherParty": "Yes"
+          },
+          "id": "cffc090b-5361-4335-b26d-904461fe9355"
+        },
+        {
+          "value": {
+            "otherPartyName": "Sarah Jones",
+            "attendedOtherParty": "Yes"
+          },
+          "id": "86717670-f9e9-4baa-b4a1-85f6fe4d5bad"
+        },
+        {
+          "value": {
+            "otherPartyName": "Billy Jones",
+            "attendedOtherParty": "Yes"
+          },
+          "id": "c15160d8-3124-4fa6-961d-63a066e713f8"
+        },
+        {
+          "value": {
+            "otherPartyName": "Julia Jones",
+            "attendedOtherParty": "Yes"
+          },
+          "id": "51ced2ee-b723-49fc-95ed-e24cecc8b126"
+        },
+        {
+          "value": {
+            "otherPartyName": "Bridget Jones",
+            "attendedOtherParty": "Yes"
+          },
+          "id": "8c7cde3c-2886-4d9a-8f5f-3403b8dfd943"
+        },
+        {
+          "value": {
+            "otherPartyName": "Adam Jones",
+            "attendedOtherParty": "Yes"
+          },
+          "id": "afd4691b-e699-4aae-9c1a-e5c24c09770e"
+        },
+        {
+          "value": {
+            "otherPartyName": "Billy Beane",
+            "attendedOtherParty": "Yes"
+          },
+          "id": "45a5caf0-68b8-4318-bc65-a8853d4deda2"
+        },
+        {
+          "value": {
+            "otherPartyName": "Clare Bennett",
+            "attendedOtherParty": "Yes"
+          },
+          "id": "a527aeca-dedf-458f-a4c4-3cbd5804f7b0"
+        }
+      ],
+      "isScottishCase": "No",
+      "issueCode": "DD",
+      "writeFinalDecisionPageSectionReference": "B7",
+      "evidencePresent": "No",
+      "finalDecisionIdamSurname": "A User",
+      "ogdType": "DWP",
+      "workBasketHearingDateIssued": null,
+      "tribunalDirectPoToAttend": "No",
+      "showFinalDecisionNoticeSummaryOfOutcomePage": "Yes",
+      "writeFinalDecisionAppellantAttendedQuestion": "Yes",
+      "addedDocuments": null,
+      "processingVenue": "Ashford",
+      "previousState": "notListable",
+      "dwpIsOfficerAttending": "No",
+      "dwpState": "finalDecisionIssued",
+      "linkedCasesBoolean": "No",
+      "poAttendanceConfirmed": "No",
+      "writeFinalDecisionReasons": [
+        {
+          "value": "Reason",
+          "id": "381735f5-9a39-43e1-82a0-16ed0c62ee7f"
+        }
+      ],
+      "writeFinalDecisionOtherPanelMemberName": null,
+      "region": "BRADFORD",
+      "correction": {
+        "isCorrectionFinalDecisionInProgress": "No"
+      },
+      "caseNamePublic": "Joe Bloggs",
+      "finalDecisionHeldAt": "In chambers",
+      "pcqId": "12345678",
+      "workBasketHearingEpimsId": null,
+      "caseManagementLocation": {
+        "region": "7",
+        "baseLocation": "698118"
+      },
+      "finalDecisionJudge": "User",
+      "ftaCommunications": [
+        {
+          "id": "0c0be37a-c090-4fa1-b5f3-c2b4f73d9700",
+          "value": {
+            "requestTopic": "otherPartyPersonalInfo",
+            "requestMessage": "ess",
+            "requestDateTime": "2026-02-20T15:40:12.078413",
+            "requestUserName": "A User",
+            "requestUserRole": "Super User",
+            "requestResponseDueDate": "2026-02-24"
+          }
+        }
+      ],
+      "caseManagementCategory": {
+        "value": {
+          "code": "childSupport",
+          "label": "Child Support"
+        },
+        "list_items": [
+          {
+            "code": "childSupport",
+            "label": "Child Support"
+          }
+        ]
+      },
+      "writeFinalDecisionDetailsOfDecision": "Decision",
+      "CaseAccessCategory": "childSupport",
+      "writeFinalDecisionDateOfDecision": "2026-01-01",
+      "preWorkAllocation": "Yes",
+      "workBasketHearingDate": null,
+      "finalDecisionGeneratedDate": "2026-02-20",
+      "documentSentToDwp": "Yes",
+      "caseNameHmctsRestricted": "Joe Bloggs",
+      "infoRequestFromTribunal": "Yes",
+      "createdInGapsFrom": "readyToList",
+      "outcome": "decisionInFavourOfAppellant",
+      "writeFinalDecisionTypeOfHearing": "faceToFace",
+      "finalDecisionIssuedDate": "2026-02-20",
+      "correspondence": [
+        {
+          "id": "8af6b733-53b7-4c63-99d2-c2666ecf66f7",
+          "value": {
+            "to": "sscstest+notify@greencroftconsulting.com",
+            "from": "benefit.and.compensation.appeals@notifications.service.gov.uk",
+            "sentOn": "16 Feb 2026 13:23",
+            "documentLink": {
+              "document_url": "http://localhost:5005/documents/4fb682c6-45c9-48a2-bb3e-bcb66c5c724e",
+              "document_filename": "appealReceived 16 Feb 2026 1323.pdf",
+              "document_binary_url": "http://localhost:5005/documents/4fb682c6-45c9-48a2-bb3e-bcb66c5c724e/binary"
+            },
+            "correspondenceType": "Email"
+          }
+        },
+        {
+          "id": "2ac0fd0b-27db-43b7-b492-8e41302891af",
+          "value": {
+            "to": "+447398785050",
+            "from": "SSCS Appeal",
+            "sentOn": "16 Feb 2026 13:23",
+            "documentLink": {
+              "document_url": "http://localhost:5005/documents/531ba2cd-b63e-4edf-9b84-fe0f9d5a2c23",
+              "document_filename": "appealReceived 16 Feb 2026 1323.pdf",
+              "document_binary_url": "http://localhost:5005/documents/531ba2cd-b63e-4edf-9b84-fe0f9d5a2c23/binary"
+            },
+            "correspondenceType": "Sms"
+          }
+        },
+        {
+          "id": "44924731-023f-4394-8d02-4855401ee205",
+          "value": {
+            "to": "sscstest+notify@greencroftconsulting.com",
+            "from": "benefit.and.compensation.appeals@notifications.service.gov.uk",
+            "sentOn": "16 Feb 2026 13:22",
+            "documentLink": {
+              "document_url": "http://localhost:5005/documents/36d511d9-ef2d-4bff-a394-6fb32f63daf7",
+              "document_filename": "validAppealCreated 16 Feb 2026 1322.pdf",
+              "document_binary_url": "http://localhost:5005/documents/36d511d9-ef2d-4bff-a394-6fb32f63daf7/binary"
+            },
+            "correspondenceType": "Email"
+          }
+        },
+        {
+          "id": "03999db2-427d-4bf8-ac0f-4f2900a42201",
+          "value": {
+            "to": "+447398785050",
+            "from": "SSCS Appeal",
+            "sentOn": "16 Feb 2026 13:22",
+            "documentLink": {
+              "document_url": "http://localhost:5005/documents/45538566-fa66-4bd2-95c9-72ffd94e2648",
+              "document_filename": "validAppealCreated 16 Feb 2026 1322.pdf",
+              "document_binary_url": "http://localhost:5005/documents/45538566-fa66-4bd2-95c9-72ffd94e2648/binary"
+            },
+            "correspondenceType": "Sms"
+          }
+        }
+      ],
+      "appeal": {
+        "mrnDetails": {
+          "dwpIssuingOffice": "Child Support",
+          "mrnDate": "2026-02-16",
+          "mrnLateReason": null,
+          "mrnMissingReason": null
+        },
+        "appellant": {
+          "id": "b15063a1-7409-45aa-ab9d-06358ef34a58",
+          "identity": {
+            "dob": "1990-02-26",
+            "nino": "LV7VW63ZY"
+          },
+          "name": {
+            "title": "Mr",
+            "firstName": "Joe",
+            "lastName": "Bloggs"
+          },
+          "address": {
+            "line1": "123 Hairy Lane",
+            "line2": "Off Hairy Park",
+            "town": "Hairyfield",
+            "county": "Kent",
+            "postcode": "TN32 6PL"
+          },
+          "contact": {
+            "email": null,
+            "phone": null,
+            "mobile": null
+          },
+          "organisation": null,
+          "isAppointee": "No",
+          "appointee": {
+            "id": "ee10883b-2f93-4a0c-ab55-488438b55c28",
+            "identity": {
+              "dob": "1991-03-31",
+              "nino": null
+            },
+            "name": {
+              "title": "Mrs",
+              "firstName": "Mary",
+              "lastName": "Bloggs"
+            },
+            "address": {
+              "line1": "999 Another Street",
+              "town": "Another Town",
+              "county": "Newcastle",
+              "postcode": "NE1 1AW"
+            },
+            "contact": {
+              "email": "sscsappointee@greencroftconsulting.com",
+              "phone": null,
+              "mobile": "01234567810"
+            },
+            "organisation": null
+          },
+          "role": {},
+          "confidentialityRequired": null,
+          "isAddressSameAsAppointee": "No"
+        },
+        "benefitType": {
+          "code": "childSupport",
+          "description": "Child Support"
+        },
+        "hearingOptions": {
+          "wantsToAttend": "Yes",
+          "wantsSupport": "Yes",
+          "languageInterpreter": "Yes",
+          "languages": "Telugu",
+          "signLanguageType": "Sign language",
+          "arrangements": [
+            "signLanguageInterpreter",
+            "hearingLoop"
+          ],
+          "scheduleHearing": "Yes",
+          "excludeDates": [
+            {
+              "value": {
+                "start": "2018-04-04",
+                "end": "2018-04-04"
+              },
+              "id": "ed30d6da-f933-4e28-be81-92b3ca02593e"
+            },
+            {
+              "value": {
+                "start": "2018-04-05",
+                "end": "2018-04-05"
+              },
+              "id": "09bc1a91-aba1-45f2-b953-c13e63407707"
+            },
+            {
+              "value": {
+                "start": "2018-04-06",
+                "end": "2018-04-06"
+              },
+              "id": "f97a67ff-e1f6-4f89-a9c3-4bee176d7416"
+            }
+          ],
+          "other": "Yes, this..."
+        },
+        "appealReasons": {
+          "reasons": [
+            {
+              "value": {
+                "reason": "aaaaaaaaaa",
+                "description": "aaaaaaaaaa"
+              },
+              "id": "37a13094-3d9c-45df-8943-2652504961d7"
+            },
+            {
+              "value": {
+                "reason": "bbbbbbbbbb",
+                "description": "bbbbbbbbbb"
+              },
+              "id": "5a33c670-9819-4200-8b2f-e9d9e5c91b6c"
+            },
+            {
+              "value": {
+                "reason": "cccccccccc",
+                "description": "cccccccccc"
+              },
+              "id": "fe9092ef-4b4d-411e-9502-3192d5ae97e2"
+            }
+          ],
+          "otherReasons": "Another reason"
+        },
+        "rep": {
+          "id": "a38a572e-2065-42a7-b6a1-318d1de83cde",
+          "identity": {
+            "dob": null,
+            "nino": null
+          },
+          "name": {
+            "title": "Mr",
+            "firstName": "Harry",
+            "lastName": "Potter"
+          },
+          "address": {
+            "line1": "123 Hairy Lane",
+            "line2": "Off Hairy Park",
+            "town": "Town",
+            "county": "County",
+            "postcode": "CM14 4LQ"
+          },
+          "contact": {
+            "email": "harry.potter@wizards.com",
+            "phone": null,
+            "mobile": "07411999999"
+          },
+          "organisation": "HP Ltd",
+          "hasRepresentative": "Yes"
+        },
+        "signer": "Joe Bloggs",
+        "hearingType": "oral",
+        "hearingSubtype": {},
+        "receivedVia": "Online"
+      },
+      "ftaResponseDueDate": "2026-02-24",
+      "otherParties": [
+        {
+          "id": "50e43a40-5b9c-4e0e-972b-3ee758359515",
+          "value": {
+            "id": "7cf0c86f-a324-4838-8a1a-b5832ff55706",
+            "name": {
+              "title": "Mr",
+              "lastName": "Smith",
+              "firstName": "John"
+            },
+            "role": {
+              "name": "Paying parent"
+            },
+            "address": {
+              "town": "Town",
+              "line1": "ad 1",
+              "postcode": "IG10 3XX"
+            },
+            "reasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "otherPartySubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "confidentialityRequired": "No",
+            "repReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "appointeeReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "sendNewOtherPartyNotification": "No",
+            "unacceptableCustomerBehaviour": "No",
+            "otherPartyAppointeeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "otherPartyRepresentativeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            }
+          }
+        },
+        {
+          "id": "8ebe6ec6-df96-4c59-8472-709650f55d8a",
+          "value": {
+            "id": "1a239c80-7578-48cb-b713-eb7976524db6",
+            "name": {
+              "title": "Mrs",
+              "lastName": "Smith",
+              "firstName": "Jane"
+            },
+            "role": {
+              "name": "Paying parent"
+            },
+            "address": {
+              "town": "Town",
+              "line1": "Ad1",
+              "postcode": "Ig10 3XX"
+            },
+            "reasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "otherPartySubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "confidentialityRequired": "No",
+            "repReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "appointeeReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "sendNewOtherPartyNotification": "Yes",
+            "unacceptableCustomerBehaviour": "No",
+            "otherPartyAppointeeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "otherPartyRepresentativeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            }
+          }
+        },
+        {
+          "id": "8a1f1548-b1a9-4b6c-9f96-f07dcf5aa2e8",
+          "value": {
+            "id": "e2944a90-686f-47be-9962-d62a995dca15",
+            "name": {
+              "title": "Master",
+              "lastName": "Jones",
+              "firstName": "David"
+            },
+            "role": {
+              "name": "Receiving parent"
+            },
+            "address": {
+              "town": "Twn",
+              "line1": "Adre1",
+              "postcode": "IG10 4GT"
+            },
+            "reasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "otherPartySubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "confidentialityRequired": "No",
+            "repReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "appointeeReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "unacceptableCustomerBehaviour": "No",
+            "otherPartyAppointeeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "otherPartyRepresentativeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            }
+          }
+        },
+        {
+          "id": "c074da19-9178-4447-98db-68c5f7165948",
+          "value": {
+            "id": "e9f65aca-0a9c-4c5f-bb97-71c67cd8ac70",
+            "name": {
+              "title": "Master",
+              "lastName": "Jones",
+              "firstName": "Sarah"
+            },
+            "role": {
+              "name": "Paying parent"
+            },
+            "address": {
+              "town": "Twn",
+              "line1": "Adss",
+              "postcode": "IG10 4GR"
+            },
+            "reasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "otherPartySubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "confidentialityRequired": "No",
+            "repReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "appointeeReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "sendNewOtherPartyNotification": "No",
+            "unacceptableCustomerBehaviour": "No",
+            "otherPartyAppointeeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "otherPartyRepresentativeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            }
+          }
+        },
+        {
+          "id": "4628809a-7307-4948-98a3-c598acd78624",
+          "value": {
+            "id": "ea8b8676-0b18-4979-a2cc-aea3537a0a09",
+            "name": {
+              "title": "Mr",
+              "lastName": "Jones",
+              "firstName": "Billy"
+            },
+            "role": {
+              "name": "Paying parent"
+            },
+            "address": {
+              "town": "Twww",
+              "line1": "B111",
+              "postcode": "IG11 4FF"
+            },
+            "reasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "otherPartySubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "confidentialityRequired": "No",
+            "repReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "appointeeReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "unacceptableCustomerBehaviour": "No",
+            "otherPartyAppointeeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "otherPartyRepresentativeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            }
+          }
+        },
+        {
+          "id": "b0c415a7-a3f0-45b3-8c2d-150ae162baa9",
+          "value": {
+            "id": "95f1fd29-0904-432a-8968-480e2d3e1646",
+            "name": {
+              "title": "Ms",
+              "lastName": "Jones",
+              "firstName": "Julia"
+            },
+            "role": {
+              "name": "Receiving parent"
+            },
+            "address": {
+              "town": "Jttt",
+              "line1": "Jjjj",
+              "postcode": "IG10 3JL"
+            },
+            "reasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "otherPartySubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "confidentialityRequired": "No",
+            "repReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "appointeeReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "unacceptableCustomerBehaviour": "No",
+            "otherPartyAppointeeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "otherPartyRepresentativeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            }
+          }
+        },
+        {
+          "id": "0a895d98-8344-440e-9861-83629083d913",
+          "value": {
+            "id": "c3f2d93a-d4d1-4dac-abff-0691bc1feb6f",
+            "name": {
+              "title": "Mrs",
+              "lastName": "Jones",
+              "firstName": "Bridget"
+            },
+            "role": {
+              "name": "Paying parent"
+            },
+            "address": {
+              "town": "Bjtown",
+              "line1": "Bj",
+              "postcode": "IG10 3BG"
+            },
+            "hearingSubtype": {
+              "wantsHearingTypeTelephone": "No"
+            },
+            "reasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "otherPartySubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "confidentialityRequired": "No",
+            "repReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "appointeeReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "unacceptableCustomerBehaviour": "No",
+            "otherPartyAppointeeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "otherPartyRepresentativeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            }
+          }
+        },
+        {
+          "id": "c24da55c-48a6-488a-8b9d-fc03398200df",
+          "value": {
+            "id": "dfb50f9b-0322-4f8e-a572-67d27435ae71",
+            "name": {
+              "title": "Mr",
+              "lastName": "Jones",
+              "firstName": "Adam"
+            },
+            "role": {
+              "name": "Receiving parent"
+            },
+            "address": {
+              "town": "Townadam",
+              "line1": "AddJo",
+              "postcode": "IG10 3AJ"
+            },
+            "reasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "otherPartySubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "confidentialityRequired": "No",
+            "repReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "appointeeReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "unacceptableCustomerBehaviour": "No",
+            "otherPartyAppointeeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "otherPartyRepresentativeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            }
+          }
+        },
+        {
+          "id": "b6572296-d17f-462f-9a45-19689e0fbd72",
+          "value": {
+            "id": "cee5c872-bc5f-4674-8d5b-ebdf6c12b984",
+            "name": {
+              "title": "Mr",
+              "lastName": "Beane",
+              "firstName": "Billy"
+            },
+            "role": {
+              "name": "Paying parent"
+            },
+            "address": {
+              "town": "Town",
+              "line1": "Bill11",
+              "postcode": "IG10 3BB"
+            },
+            "reasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "otherPartySubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "confidentialityRequired": "No",
+            "repReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "appointeeReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "sendNewOtherPartyNotification": "No",
+            "unacceptableCustomerBehaviour": "No",
+            "otherPartyAppointeeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "otherPartyRepresentativeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            }
+          }
+        },
+        {
+          "id": "1ea2a740-eb97-4383-8b06-e54b33d50f09",
+          "value": {
+            "id": "3273ed31-2b8b-4590-9114-12e3959d9b61",
+            "name": {
+              "title": "Ms",
+              "lastName": "Bennett",
+              "firstName": "Clare"
+            },
+            "role": {
+              "name": "Paying parent"
+            },
+            "address": {
+              "town": "Townn",
+              "line1": "Cla543",
+              "postcode": "IG10 3CB"
+            },
+            "reasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "otherPartySubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "confidentialityRequired": "No",
+            "repReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "appointeeReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "sendNewOtherPartyNotification": "Yes",
+            "unacceptableCustomerBehaviour": "No",
+            "otherPartyAppointeeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "otherPartyRepresentativeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            }
+          }
+        }
+      ],
+      "caseNameHmctsInternal": "Joe Bloggs",
+      "sscsDocument": [
+        {
+          "id": "b7428d4f-ebfc-4821-81b3-4011c8baeff0",
+          "value": {
+            "documentLink": {
+              "document_url": "http://localhost:5005/documents/cc78e296-042a-4061-87d0-292e0e1a0d36",
+              "document_filename": "Bloggs_3ZY.pdf",
+              "document_binary_url": "http://localhost:5005/documents/cc78e296-042a-4061-87d0-292e0e1a0d36/binary"
+            },
+            "documentType": "sscs1",
+            "documentFileName": "Bloggs_3ZY.pdf",
+            "documentDateAdded": "2026-02-16"
+          }
+        },
+        {
+          "id": "a548aebb-9ed1-4835-ab37-344476f4af05",
+          "value": {
+            "documentLink": {
+              "document_url": "http://localhost:5005/documents/b7e4ad52-821f-4c26-ba5f-34fea3df2401",
+              "document_filename": "Final Decision Notice issued on 20-02-2026.pdf",
+              "document_binary_url": "http://localhost:5005/documents/b7e4ad52-821f-4c26-ba5f-34fea3df2401/binary"
+            },
+            "documentType": "finalDecisionNotice",
+            "bundleAddition": "A",
+            "documentFileName": "Addition A - Final Decision Notice issued on 20-02-2026.pdf",
+            "documentDateAdded": "2026-02-20"
+          }
+        }
+      ],
+      "SearchCriteria": {
+        "SearchParties": [
+          {
+            "id": "ffe0a3c4-3c03-40fc-acfe-3bb3e145288c",
+            "value": {
+              "Name": "Mr Joe Bloggs",
+              "PostCode": "TN32 6PL",
+              "AddressLine1": "123 Hairy Lane"
+            }
+          },
+          {
+            "id": "cfb9ec48-3ceb-4f46-b45d-e97a485eacc4",
+            "value": {
+              "Name": "Mrs Mary Bloggs",
+              "PostCode": "NE1 1AW",
+              "AddressLine1": "999 Another Street",
+              "EmailAddress": "sscsappointee@greencroftconsulting.com"
+            }
+          }
+        ],
+        "OtherCaseReferences": [
+          {
+            "id": "195397d5-50cd-4ccf-a48c-fdcfa2f7aef7",
+            "value": "LV7VW63ZY"
+          }
+        ]
+      },
+      "writeFinalDecisionGeneratedDate": "2026-02-20",
+      "writeFinalDecisionAllowedOrRefused": "ALLOWED_OR_REFUSED",
+      "languagePreferenceWelsh": "No",
+      "caseCreated": "2026-02-16",
+      "issueFinalDecisionDate": "2026-02-20",
+      "awaitingInfoFromFta": "Yes",
+      "writeFinalDecisionAnythingElse": null
+    },
+    "data_classification": {
+      "caseCode": "PUBLIC",
+      "subscriptions": {
+        "value": {
+          "appellantSubscription": {
+            "value": {
+              "tya": "PUBLIC",
+              "email": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            },
+            "classification": "PUBLIC"
+          },
+          "appointeeSubscription": {
+            "value": {
+              "tya": "PUBLIC",
+              "email": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            },
+            "classification": "PUBLIC"
+          },
+          "supporterSubscription": {
+            "value": {
+              "tya": "PUBLIC",
+              "email": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            },
+            "classification": "PUBLIC"
+          },
+          "jointPartySubscription": {
+            "value": {
+              "tya": "PUBLIC",
+              "email": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            },
+            "classification": "PUBLIC"
+          },
+          "representativeSubscription": {
+            "value": {
+              "tya": "PUBLIC",
+              "email": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            },
+            "classification": "PUBLIC"
+          }
+        },
+        "classification": "PUBLIC"
+      },
+      "hearingRoute": "PUBLIC",
+      "dwpRegionalCentre": "PUBLIC",
+      "writeFinalDecisionGenerateNotice": "PUBLIC",
+      "jointPartyId": "PUBLIC",
+      "benefitCode": "PUBLIC",
+      "writeFinalDecisionPresentingOfficerAttendedQuestion": "PUBLIC",
+      "directionDueDate": "PUBLIC",
+      "writeFinalDecisionPreviewDocument": "PUBLIC",
+      "finalDecisionWasOriginalDecisionUploaded": "PUBLIC",
+      "otherPartyUCB": "PUBLIC",
+      "regionalProcessingCenter": {
+        "value": {
+          "city": "PUBLIC",
+          "name": "PUBLIC",
+          "email": "PUBLIC",
+          "epimsId": "PUBLIC",
+          "address1": "PUBLIC",
+          "address2": "PUBLIC",
+          "address3": "PUBLIC",
+          "address4": "PUBLIC",
+          "postcode": "PUBLIC",
+          "faxNumber": "PUBLIC",
+          "phoneNumber": "PUBLIC",
+          "hearingRoute": "PUBLIC"
+        },
+        "classification": "PUBLIC"
+      },
+      "otherPartyAttendedQuestions": {
+        "value": [
+          {
+            "id": "15ae82aa-64fe-48e2-98c0-3f57a00570eb",
+            "value": {
+              "otherPartyName": "PUBLIC",
+              "attendedOtherParty": "PUBLIC"
+            }
+          },
+          {
+            "id": "7b2801b4-221f-4691-9e63-6a6a19804e54",
+            "value": {
+              "otherPartyName": "PUBLIC",
+              "attendedOtherParty": "PUBLIC"
+            }
+          },
+          {
+            "id": "8871384b-b1c0-4023-9f4f-a3d237630c6d",
+            "value": {
+              "otherPartyName": "PUBLIC",
+              "attendedOtherParty": "PUBLIC"
+            }
+          },
+          {
+            "id": "dd5f212b-ad0a-475f-9bc4-31b1b23e89e7",
+            "value": {
+              "otherPartyName": "PUBLIC",
+              "attendedOtherParty": "PUBLIC"
+            }
+          }
+        ],
+        "classification": "PUBLIC"
+      },
+      "isScottishCase": "PUBLIC",
+      "issueCode": "PUBLIC",
+      "writeFinalDecisionPageSectionReference": "PUBLIC",
+      "evidencePresent": "PUBLIC",
+      "finalDecisionIdamSurname": "PUBLIC",
+      "ogdType": "PUBLIC",
+      "workBasketHearingDateIssued": "PUBLIC",
+      "tribunalDirectPoToAttend": "PUBLIC",
+      "showFinalDecisionNoticeSummaryOfOutcomePage": "PUBLIC",
+      "writeFinalDecisionAppellantAttendedQuestion": "PUBLIC",
+      "addedDocuments": "PUBLIC",
+      "processingVenue": "PUBLIC",
+      "previousState": "PUBLIC",
+      "dwpIsOfficerAttending": "PUBLIC",
+      "dwpState": "PUBLIC",
+      "linkedCasesBoolean": "PUBLIC",
+      "poAttendanceConfirmed": "PUBLIC",
+      "writeFinalDecisionReasons": {
+        "value": [
+          {
+            "id": "381735f5-9a39-43e1-82a0-16ed0c62ee7f",
+            "classification": "PUBLIC"
+          }
+        ],
+        "classification": "PUBLIC"
+      },
+      "region": "PUBLIC",
+      "correction": {
+        "value": {
+          "isCorrectionFinalDecisionInProgress": "PUBLIC"
+        },
+        "classification": "PUBLIC"
+      },
+      "caseNamePublic": "PUBLIC",
+      "finalDecisionHeldAt": "PUBLIC",
+      "pcqId": "PUBLIC",
+      "workBasketHearingEpimsId": "PUBLIC",
+      "caseManagementLocation": {
+        "value": {
+          "region": "PUBLIC",
+          "baseLocation": "PUBLIC"
+        },
+        "classification": "PUBLIC"
+      },
+      "finalDecisionJudge": "PUBLIC",
+      "ftaCommunications": {
+        "value": [
+          {
+            "id": "0c0be37a-c090-4fa1-b5f3-c2b4f73d9700",
+            "value": {
+              "requestTopic": "PUBLIC",
+              "requestMessage": "PUBLIC",
+              "requestDateTime": "PUBLIC",
+              "requestUserName": "PUBLIC",
+              "requestUserRole": "PUBLIC",
+              "requestResponseDueDate": "PUBLIC"
+            }
+          }
+        ],
+        "classification": "PUBLIC"
+      },
+      "caseManagementCategory": "PUBLIC",
+      "writeFinalDecisionDetailsOfDecision": "PUBLIC",
+      "CaseAccessCategory": "PUBLIC",
+      "writeFinalDecisionDateOfDecision": "PUBLIC",
+      "preWorkAllocation": "PUBLIC",
+      "workBasketHearingDate": "PUBLIC",
+      "finalDecisionGeneratedDate": "PUBLIC",
+      "documentSentToDwp": "PUBLIC",
+      "caseNameHmctsRestricted": "PUBLIC",
+      "infoRequestFromTribunal": "PUBLIC",
+      "createdInGapsFrom": "PUBLIC",
+      "outcome": "PUBLIC",
+      "writeFinalDecisionTypeOfHearing": "PUBLIC",
+      "finalDecisionIssuedDate": "PUBLIC",
+      "correspondence": {
+        "value": [
+          {
+            "id": "8af6b733-53b7-4c63-99d2-c2666ecf66f7",
+            "value": {
+              "to": "PUBLIC",
+              "from": "PUBLIC",
+              "sentOn": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "correspondenceType": "PUBLIC"
+            }
+          },
+          {
+            "id": "2ac0fd0b-27db-43b7-b492-8e41302891af",
+            "value": {
+              "to": "PUBLIC",
+              "from": "PUBLIC",
+              "sentOn": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "correspondenceType": "PUBLIC"
+            }
+          },
+          {
+            "id": "44924731-023f-4394-8d02-4855401ee205",
+            "value": {
+              "to": "PUBLIC",
+              "from": "PUBLIC",
+              "sentOn": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "correspondenceType": "PUBLIC"
+            }
+          },
+          {
+            "id": "03999db2-427d-4bf8-ac0f-4f2900a42201",
+            "value": {
+              "to": "PUBLIC",
+              "from": "PUBLIC",
+              "sentOn": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "correspondenceType": "PUBLIC"
+            }
+          }
+        ],
+        "classification": "PUBLIC"
+      },
+      "appeal": {
+        "value": {
+          "rep": {
+            "value": {
+              "id": "PUBLIC",
+              "name": {
+                "value": {
+                  "title": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "firstName": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "address": {
+                "value": {
+                  "town": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "line2": "PUBLIC",
+                  "county": "PUBLIC",
+                  "postcode": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "contact": {
+                "value": {
+                  "email": "PUBLIC",
+                  "phone": "PUBLIC",
+                  "mobile": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "identity": {
+                "value": {
+                  "dob": "PUBLIC",
+                  "nino": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "organisation": "PUBLIC",
+              "hasRepresentative": "PUBLIC"
+            },
+            "classification": "PUBLIC"
+          },
+          "signer": "PUBLIC",
+          "appellant": {
+            "value": {
+              "id": "PUBLIC",
+              "name": {
+                "value": {
+                  "title": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "firstName": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "role": {
+                "value": {},
+                "classification": "PUBLIC"
+              },
+              "address": {
+                "value": {
+                  "town": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "line2": "PUBLIC",
+                  "county": "PUBLIC",
+                  "postcode": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "contact": {
+                "value": {
+                  "email": "PUBLIC",
+                  "phone": "PUBLIC",
+                  "mobile": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "identity": {
+                "value": {
+                  "dob": "PUBLIC",
+                  "nino": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "appointee": {
+                "value": {
+                  "id": "PUBLIC",
+                  "name": {
+                    "value": {
+                      "title": "PUBLIC",
+                      "lastName": "PUBLIC",
+                      "firstName": "PUBLIC"
+                    },
+                    "classification": "PUBLIC"
+                  },
+                  "address": {
+                    "value": {
+                      "town": "PUBLIC",
+                      "line1": "PUBLIC",
+                      "county": "PUBLIC",
+                      "postcode": "PUBLIC"
+                    },
+                    "classification": "PUBLIC"
+                  },
+                  "contact": {
+                    "value": {
+                      "email": "PUBLIC",
+                      "phone": "PUBLIC",
+                      "mobile": "PUBLIC"
+                    },
+                    "classification": "PUBLIC"
+                  },
+                  "identity": {
+                    "value": {
+                      "dob": "PUBLIC",
+                      "nino": "PUBLIC"
+                    },
+                    "classification": "PUBLIC"
+                  },
+                  "organisation": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "isAppointee": "PUBLIC",
+              "organisation": "PUBLIC",
+              "confidentialityRequired": "PUBLIC",
+              "isAddressSameAsAppointee": "PUBLIC"
+            },
+            "classification": "PUBLIC"
+          },
+          "mrnDetails": {
+            "value": {
+              "mrnDate": "PUBLIC",
+              "mrnLateReason": "PUBLIC",
+              "dwpIssuingOffice": "PUBLIC",
+              "mrnMissingReason": "PUBLIC"
+            },
+            "classification": "PUBLIC"
+          },
+          "benefitType": {
+            "value": {
+              "code": "PUBLIC",
+              "description": "PUBLIC"
+            },
+            "classification": "PUBLIC"
+          },
+          "hearingType": "PUBLIC",
+          "receivedVia": "PUBLIC",
+          "appealReasons": {
+            "value": {
+              "reasons": {
+                "value": [
+                  {
+                    "id": "a7f86028-a493-4bab-a173-3c684ed8804a",
+                    "value": {
+                      "reason": "PUBLIC",
+                      "description": "PUBLIC"
+                    }
+                  },
+                  {
+                    "id": "6ed43996-4a57-45d4-bc43-027b1012e2ae",
+                    "value": {
+                      "reason": "PUBLIC",
+                      "description": "PUBLIC"
+                    }
+                  },
+                  {
+                    "id": "fcb60ea8-1646-40d5-aacf-aac6b3e81988",
+                    "value": {
+                      "reason": "PUBLIC",
+                      "description": "PUBLIC"
+                    }
+                  }
+                ],
+                "classification": "PUBLIC"
+              },
+              "otherReasons": "PUBLIC"
+            },
+            "classification": "PUBLIC"
+          },
+          "hearingOptions": {
+            "value": {
+              "other": "PUBLIC",
+              "languages": "PUBLIC",
+              "arrangements": "PUBLIC",
+              "excludeDates": {
+                "value": [
+                  {
+                    "id": "af6d84b8-6df4-42d0-9b30-1e43dc9299bf",
+                    "value": {
+                      "end": "PUBLIC",
+                      "start": "PUBLIC"
+                    }
+                  },
+                  {
+                    "id": "a138858b-76c4-491d-876b-2d827cd080ae",
+                    "value": {
+                      "end": "PUBLIC",
+                      "start": "PUBLIC"
+                    }
+                  },
+                  {
+                    "id": "0e190121-bbb5-4479-a927-153a59a6098a",
+                    "value": {
+                      "end": "PUBLIC",
+                      "start": "PUBLIC"
+                    }
+                  }
+                ],
+                "classification": "PUBLIC"
+              },
+              "wantsSupport": "PUBLIC",
+              "wantsToAttend": "PUBLIC",
+              "scheduleHearing": "PUBLIC",
+              "signLanguageType": "PUBLIC",
+              "languageInterpreter": "PUBLIC"
+            },
+            "classification": "PUBLIC"
+          },
+          "hearingSubtype": {
+            "value": {},
+            "classification": "PUBLIC"
+          }
+        },
+        "classification": "PUBLIC"
+      },
+      "ftaResponseDueDate": "PUBLIC",
+      "otherParties": {
+        "value": [
+          {
+            "id": "50e43a40-5b9c-4e0e-972b-3ee758359515",
+            "value": {
+              "id": "PUBLIC",
+              "name": {
+                "value": {
+                  "title": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "firstName": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "role": {
+                "value": {
+                  "name": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "address": {
+                "value": {
+                  "town": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "postcode": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "reasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartySubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "confidentialityRequired": "PUBLIC",
+              "repReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "appointeeReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "sendNewOtherPartyNotification": "PUBLIC",
+              "unacceptableCustomerBehaviour": "PUBLIC",
+              "otherPartyAppointeeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartyRepresentativeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              }
+            }
+          },
+          {
+            "id": "8ebe6ec6-df96-4c59-8472-709650f55d8a",
+            "value": {
+              "id": "PUBLIC",
+              "name": {
+                "value": {
+                  "title": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "firstName": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "role": {
+                "value": {
+                  "name": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "address": {
+                "value": {
+                  "town": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "postcode": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "reasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartySubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "confidentialityRequired": "PUBLIC",
+              "repReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "appointeeReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "sendNewOtherPartyNotification": "PUBLIC",
+              "unacceptableCustomerBehaviour": "PUBLIC",
+              "otherPartyAppointeeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartyRepresentativeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              }
+            }
+          },
+          {
+            "id": "8a1f1548-b1a9-4b6c-9f96-f07dcf5aa2e8",
+            "value": {
+              "id": "PUBLIC",
+              "name": {
+                "value": {
+                  "title": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "firstName": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "role": {
+                "value": {
+                  "name": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "address": {
+                "value": {
+                  "town": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "postcode": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "reasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartySubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "confidentialityRequired": "PUBLIC",
+              "repReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "appointeeReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "unacceptableCustomerBehaviour": "PUBLIC",
+              "otherPartyAppointeeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartyRepresentativeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              }
+            }
+          },
+          {
+            "id": "c074da19-9178-4447-98db-68c5f7165948",
+            "value": {
+              "id": "PUBLIC",
+              "name": {
+                "value": {
+                  "title": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "firstName": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "role": {
+                "value": {
+                  "name": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "address": {
+                "value": {
+                  "town": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "postcode": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "reasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartySubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "confidentialityRequired": "PUBLIC",
+              "repReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "appointeeReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "sendNewOtherPartyNotification": "PUBLIC",
+              "unacceptableCustomerBehaviour": "PUBLIC",
+              "otherPartyAppointeeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartyRepresentativeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              }
+            }
+          },
+          {
+            "id": "4628809a-7307-4948-98a3-c598acd78624",
+            "value": {
+              "id": "PUBLIC",
+              "name": {
+                "value": {
+                  "title": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "firstName": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "role": {
+                "value": {
+                  "name": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "address": {
+                "value": {
+                  "town": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "postcode": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "reasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartySubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "confidentialityRequired": "PUBLIC",
+              "repReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "appointeeReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "unacceptableCustomerBehaviour": "PUBLIC",
+              "otherPartyAppointeeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartyRepresentativeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              }
+            }
+          },
+          {
+            "id": "b0c415a7-a3f0-45b3-8c2d-150ae162baa9",
+            "value": {
+              "id": "PUBLIC",
+              "name": {
+                "value": {
+                  "title": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "firstName": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "role": {
+                "value": {
+                  "name": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "address": {
+                "value": {
+                  "town": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "postcode": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "reasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartySubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "confidentialityRequired": "PUBLIC",
+              "repReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "appointeeReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "unacceptableCustomerBehaviour": "PUBLIC",
+              "otherPartyAppointeeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartyRepresentativeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              }
+            }
+          },
+          {
+            "id": "0a895d98-8344-440e-9861-83629083d913",
+            "value": {
+              "id": "PUBLIC",
+              "name": {
+                "value": {
+                  "title": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "firstName": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "role": {
+                "value": {
+                  "name": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "address": {
+                "value": {
+                  "town": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "postcode": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "hearingSubtype": {
+                "value": {
+                  "wantsHearingTypeTelephone": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "reasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartySubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "confidentialityRequired": "PUBLIC",
+              "repReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "appointeeReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "unacceptableCustomerBehaviour": "PUBLIC",
+              "otherPartyAppointeeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartyRepresentativeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              }
+            }
+          },
+          {
+            "id": "c24da55c-48a6-488a-8b9d-fc03398200df",
+            "value": {
+              "id": "PUBLIC",
+              "name": {
+                "value": {
+                  "title": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "firstName": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "role": {
+                "value": {
+                  "name": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "address": {
+                "value": {
+                  "town": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "postcode": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "reasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartySubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "confidentialityRequired": "PUBLIC",
+              "repReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "appointeeReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "unacceptableCustomerBehaviour": "PUBLIC",
+              "otherPartyAppointeeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartyRepresentativeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              }
+            }
+          },
+          {
+            "id": "b6572296-d17f-462f-9a45-19689e0fbd72",
+            "value": {
+              "id": "PUBLIC",
+              "name": {
+                "value": {
+                  "title": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "firstName": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "role": {
+                "value": {
+                  "name": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "address": {
+                "value": {
+                  "town": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "postcode": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "reasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartySubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "confidentialityRequired": "PUBLIC",
+              "repReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "appointeeReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "sendNewOtherPartyNotification": "PUBLIC",
+              "unacceptableCustomerBehaviour": "PUBLIC",
+              "otherPartyAppointeeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartyRepresentativeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              }
+            }
+          },
+          {
+            "id": "1ea2a740-eb97-4383-8b06-e54b33d50f09",
+            "value": {
+              "id": "PUBLIC",
+              "name": {
+                "value": {
+                  "title": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "firstName": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "role": {
+                "value": {
+                  "name": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "address": {
+                "value": {
+                  "town": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "postcode": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "reasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartySubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "confidentialityRequired": "PUBLIC",
+              "repReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "appointeeReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "sendNewOtherPartyNotification": "PUBLIC",
+              "unacceptableCustomerBehaviour": "PUBLIC",
+              "otherPartyAppointeeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartyRepresentativeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              }
+            }
+          }
+        ],
+        "classification": "PUBLIC"
+      },
+      "caseNameHmctsInternal": "PUBLIC",
+      "sscsDocument": {
+        "value": [
+          {
+            "id": "b7428d4f-ebfc-4821-81b3-4011c8baeff0",
+            "value": {
+              "documentLink": "PUBLIC",
+              "documentType": "PUBLIC",
+              "documentFileName": "PUBLIC",
+              "documentDateAdded": "PUBLIC"
+            }
+          },
+          {
+            "id": "a548aebb-9ed1-4835-ab37-344476f4af05",
+            "value": {
+              "documentLink": "PUBLIC",
+              "documentType": "PUBLIC",
+              "bundleAddition": "PUBLIC",
+              "documentFileName": "PUBLIC",
+              "documentDateAdded": "PUBLIC"
+            }
+          }
+        ],
+        "classification": "PUBLIC"
+      },
+      "SearchCriteria": {
+        "value": {
+          "SearchParties": {
+            "value": [
+              {
+                "id": "ffe0a3c4-3c03-40fc-acfe-3bb3e145288c",
+                "value": {
+                  "Name": "PUBLIC",
+                  "PostCode": "PUBLIC",
+                  "AddressLine1": "PUBLIC"
+                }
+              },
+              {
+                "id": "cfb9ec48-3ceb-4f46-b45d-e97a485eacc4",
+                "value": {
+                  "Name": "PUBLIC",
+                  "PostCode": "PUBLIC",
+                  "AddressLine1": "PUBLIC",
+                  "EmailAddress": "PUBLIC"
+                }
+              }
+            ],
+            "classification": "PUBLIC"
+          },
+          "OtherCaseReferences": {
+            "value": [
+              {
+                "id": "195397d5-50cd-4ccf-a48c-fdcfa2f7aef7",
+                "classification": "PUBLIC"
+              }
+            ],
+            "classification": "PUBLIC"
+          }
+        },
+        "classification": "PUBLIC"
+      },
+      "writeFinalDecisionGeneratedDate": "PUBLIC",
+      "writeFinalDecisionAllowedOrRefused": "PUBLIC",
+      "languagePreferenceWelsh": "PUBLIC",
+      "caseCreated": "PUBLIC",
+      "issueFinalDecisionDate": "PUBLIC",
+      "awaitingInfoFromFta": "PUBLIC"
+    },
+    "supplementary_data": {
+      "HMCTSServiceId": "BBA3"
+    },
+    "after_submit_callback_response": null,
+    "callback_response_status_code": null,
+    "callback_response_status": null,
+    "delete_draft_response_status_code": null,
+    "delete_draft_response_status": null
+  },
+  "case_details_before": {
+    "id": 1771247899886008,
+    "jurisdiction": "SSCS",
+    "state": "dormantAppealState",
+    "version": 26,
+    "case_type_id": "Benefit",
+    "created_date": [
+      2026,
+      2,
+      16,
+      13,
+      18,
+      19,
+      856801000
+    ],
+    "last_modified": [
+      2026,
+      2,
+      23,
+      17,
+      4,
+      34,
+      135004000
+    ],
+    "last_state_modified_date": [
+      2026,
+      2,
+      20,
+      15,
+      50,
+      33,
+      397724000
+    ],
+    "security_classification": "PUBLIC",
+    "case_data": {
+      "caseCode": "022DD",
+      "subscriptions": {
+        "appellantSubscription": {
+          "tya": "YiwqE0Ts0M",
+          "email": "sscstest+notify@greencroftconsulting.com",
+          "mobile": "+447398785050",
+          "reason": null,
+          "subscribeSms": "Yes",
+          "subscribeEmail": "Yes",
+          "lastLoggedIntoMya": null,
+          "wantSmsNotifications": "Yes"
+        },
+        "appointeeSubscription": {
+          "tya": null,
+          "email": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeSms": null,
+          "subscribeEmail": null,
+          "lastLoggedIntoMya": null,
+          "wantSmsNotifications": null
+        },
+        "supporterSubscription": {
+          "tya": null,
+          "email": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeSms": null,
+          "subscribeEmail": null,
+          "lastLoggedIntoMya": null,
+          "wantSmsNotifications": null
+        },
+        "jointPartySubscription": {
+          "tya": null,
+          "email": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeSms": null,
+          "subscribeEmail": null,
+          "lastLoggedIntoMya": null,
+          "wantSmsNotifications": null
+        },
+        "representativeSubscription": {
+          "tya": "X9S7oZ2MPb",
+          "email": "harry.potter@wizards.com",
+          "mobile": "+447411999999",
+          "reason": null,
+          "subscribeSms": "Yes",
+          "subscribeEmail": "Yes",
+          "lastLoggedIntoMya": null,
+          "wantSmsNotifications": "Yes"
+        }
+      },
+      "hearingRoute": "gaps",
+      "dwpRegionalCentre": "Child Support",
+      "writeFinalDecisionGenerateNotice": "Yes",
+      "jointPartyId": "b4e32eb0-c7ab-43a9-9b1d-d95faed142f0",
+      "benefitCode": "022",
+      "writeFinalDecisionPresentingOfficerAttendedQuestion": "Yes",
+      "directionDueDate": "2026-03-09",
+      "writeFinalDecisionPreviewDocument": {
+        "document_url": "http://dm-store:5005/documents/80be7926-74cc-47be-9559-edcb9beecbb7",
+        "document_filename": "Final Decision Notice issued on 20-02-2026.pdf",
+        "document_binary_url": "http://dm-store:5005/documents/80be7926-74cc-47be-9559-edcb9beecbb7/binary"
+      },
+      "finalDecisionWasOriginalDecisionUploaded": "No",
+      "otherPartyUCB": "No",
+      "regionalProcessingCenter": {
+        "city": "BRADFORD",
+        "name": "BRADFORD",
+        "email": "SSCS_Bradford@justice.gov.uk",
+        "epimsId": "698118",
+        "address1": "HM Courts & Tribunals Service",
+        "address2": "Social Security & Child Support Appeals",
+        "address3": "Phoenix House",
+        "address4": "Rushton Avenue",
+        "postcode": "BD3 7BH",
+        "faxNumber": "0126 434 7983",
+        "phoneNumber": "0300 123 1142",
+        "hearingRoute": "gaps"
+      },
+      "otherPartyAttendedQuestions": [
+        {
+          "id": "15ae82aa-64fe-48e2-98c0-3f57a00570eb",
+          "value": {
+            "otherPartyName": "John Smith",
+            "attendedOtherParty": "Yes"
+          }
+        },
+        {
+          "id": "7b2801b4-221f-4691-9e63-6a6a19804e54",
+          "value": {
+            "otherPartyName": "Jane Smith",
+            "attendedOtherParty": "Yes"
+          }
+        },
+        {
+          "id": "8871384b-b1c0-4023-9f4f-a3d237630c6d",
+          "value": {
+            "otherPartyName": "David Jones",
+            "attendedOtherParty": "Yes"
+          }
+        },
+        {
+          "id": "dd5f212b-ad0a-475f-9bc4-31b1b23e89e7",
+          "value": {
+            "otherPartyName": "Sarah Jones",
+            "attendedOtherParty": "Yes"
+          }
+        }
+      ],
+      "isScottishCase": "No",
+      "issueCode": "DD",
+      "writeFinalDecisionPageSectionReference": "B7",
+      "evidencePresent": "No",
+      "finalDecisionIdamSurname": "A User",
+      "ogdType": "DWP",
+      "workBasketHearingDateIssued": null,
+      "tribunalDirectPoToAttend": "No",
+      "showFinalDecisionNoticeSummaryOfOutcomePage": "Yes",
+      "writeFinalDecisionAppellantAttendedQuestion": "Yes",
+      "addedDocuments": null,
+      "processingVenue": "Ashford",
+      "previousState": "notListable",
+      "dwpIsOfficerAttending": "No",
+      "dwpState": "finalDecisionIssued",
+      "linkedCasesBoolean": "No",
+      "poAttendanceConfirmed": "No",
+      "writeFinalDecisionReasons": [
+        {
+          "id": "381735f5-9a39-43e1-82a0-16ed0c62ee7f",
+          "value": "Reason"
+        }
+      ],
+      "region": "BRADFORD",
+      "correction": {
+        "isCorrectionFinalDecisionInProgress": "No"
+      },
+      "caseNamePublic": "Joe Bloggs",
+      "finalDecisionHeldAt": "In chambers",
+      "pcqId": "12345678",
+      "workBasketHearingEpimsId": null,
+      "caseManagementLocation": {
+        "region": "7",
+        "baseLocation": "698118"
+      },
+      "finalDecisionJudge": "User",
+      "ftaCommunications": [
+        {
+          "id": "0c0be37a-c090-4fa1-b5f3-c2b4f73d9700",
+          "value": {
+            "requestTopic": "otherPartyPersonalInfo",
+            "requestMessage": "ess",
+            "requestDateTime": "2026-02-20T15:40:12.078413",
+            "requestUserName": "A User",
+            "requestUserRole": "Super User",
+            "requestResponseDueDate": "2026-02-24"
+          }
+        }
+      ],
+      "caseManagementCategory": {
+        "value": {
+          "code": "childSupport",
+          "label": "Child Support"
+        },
+        "list_items": [
+          {
+            "code": "childSupport",
+            "label": "Child Support"
+          }
+        ]
+      },
+      "writeFinalDecisionDetailsOfDecision": "Decision",
+      "CaseAccessCategory": "childSupport",
+      "writeFinalDecisionDateOfDecision": "2026-01-01",
+      "preWorkAllocation": "Yes",
+      "workBasketHearingDate": null,
+      "finalDecisionGeneratedDate": "2026-02-20",
+      "documentSentToDwp": "Yes",
+      "caseNameHmctsRestricted": "Joe Bloggs",
+      "infoRequestFromTribunal": "Yes",
+      "createdInGapsFrom": "readyToList",
+      "outcome": "decisionInFavourOfAppellant",
+      "writeFinalDecisionTypeOfHearing": "faceToFace",
+      "finalDecisionIssuedDate": "2026-02-20",
+      "correspondence": [
+        {
+          "id": "8af6b733-53b7-4c63-99d2-c2666ecf66f7",
+          "value": {
+            "to": "sscstest+notify@greencroftconsulting.com",
+            "from": "benefit.and.compensation.appeals@notifications.service.gov.uk",
+            "sentOn": "16 Feb 2026 13:23",
+            "documentLink": {
+              "document_url": "http://localhost:5005/documents/4fb682c6-45c9-48a2-bb3e-bcb66c5c724e",
+              "document_filename": "appealReceived 16 Feb 2026 1323.pdf",
+              "document_binary_url": "http://localhost:5005/documents/4fb682c6-45c9-48a2-bb3e-bcb66c5c724e/binary"
+            },
+            "correspondenceType": "Email"
+          }
+        },
+        {
+          "id": "2ac0fd0b-27db-43b7-b492-8e41302891af",
+          "value": {
+            "to": "+447398785050",
+            "from": "SSCS Appeal",
+            "sentOn": "16 Feb 2026 13:23",
+            "documentLink": {
+              "document_url": "http://localhost:5005/documents/531ba2cd-b63e-4edf-9b84-fe0f9d5a2c23",
+              "document_filename": "appealReceived 16 Feb 2026 1323.pdf",
+              "document_binary_url": "http://localhost:5005/documents/531ba2cd-b63e-4edf-9b84-fe0f9d5a2c23/binary"
+            },
+            "correspondenceType": "Sms"
+          }
+        },
+        {
+          "id": "44924731-023f-4394-8d02-4855401ee205",
+          "value": {
+            "to": "sscstest+notify@greencroftconsulting.com",
+            "from": "benefit.and.compensation.appeals@notifications.service.gov.uk",
+            "sentOn": "16 Feb 2026 13:22",
+            "documentLink": {
+              "document_url": "http://localhost:5005/documents/36d511d9-ef2d-4bff-a394-6fb32f63daf7",
+              "document_filename": "validAppealCreated 16 Feb 2026 1322.pdf",
+              "document_binary_url": "http://localhost:5005/documents/36d511d9-ef2d-4bff-a394-6fb32f63daf7/binary"
+            },
+            "correspondenceType": "Email"
+          }
+        },
+        {
+          "id": "03999db2-427d-4bf8-ac0f-4f2900a42201",
+          "value": {
+            "to": "+447398785050",
+            "from": "SSCS Appeal",
+            "sentOn": "16 Feb 2026 13:22",
+            "documentLink": {
+              "document_url": "http://localhost:5005/documents/45538566-fa66-4bd2-95c9-72ffd94e2648",
+              "document_filename": "validAppealCreated 16 Feb 2026 1322.pdf",
+              "document_binary_url": "http://localhost:5005/documents/45538566-fa66-4bd2-95c9-72ffd94e2648/binary"
+            },
+            "correspondenceType": "Sms"
+          }
+        }
+      ],
+      "appeal": {
+        "rep": {
+          "id": "a38a572e-2065-42a7-b6a1-318d1de83cde",
+          "name": {
+            "title": "Mr",
+            "lastName": "Potter",
+            "firstName": "Harry"
+          },
+          "address": {
+            "town": "Town",
+            "line1": "123 Hairy Lane",
+            "line2": "Off Hairy Park",
+            "county": "County",
+            "postcode": "CM14 4LQ"
+          },
+          "contact": {
+            "email": "harry.potter@wizards.com",
+            "phone": null,
+            "mobile": "07411999999"
+          },
+          "identity": {
+            "dob": null,
+            "nino": null
+          },
+          "organisation": "HP Ltd",
+          "hasRepresentative": "Yes"
+        },
+        "signer": "Joe Bloggs",
+        "appellant": {
+          "id": "b15063a1-7409-45aa-ab9d-06358ef34a58",
+          "name": {
+            "title": "Mr",
+            "lastName": "Bloggs",
+            "firstName": "Joe"
+          },
+          "role": {},
+          "address": {
+            "town": "Hairyfield",
+            "line1": "123 Hairy Lane",
+            "line2": "Off Hairy Park",
+            "county": "Kent",
+            "postcode": "TN32 6PL"
+          },
+          "contact": {
+            "email": null,
+            "phone": null,
+            "mobile": null
+          },
+          "identity": {
+            "dob": "1990-02-26",
+            "nino": "LV7VW63ZY"
+          },
+          "appointee": {
+            "id": "ee10883b-2f93-4a0c-ab55-488438b55c28",
+            "name": {
+              "title": "Mrs",
+              "lastName": "Bloggs",
+              "firstName": "Mary"
+            },
+            "address": {
+              "town": "Another Town",
+              "line1": "999 Another Street",
+              "county": "Newcastle",
+              "postcode": "NE1 1AW"
+            },
+            "contact": {
+              "email": "sscsappointee@greencroftconsulting.com",
+              "phone": null,
+              "mobile": "01234567810"
+            },
+            "identity": {
+              "dob": "1991-03-31",
+              "nino": null
+            },
+            "organisation": null
+          },
+          "isAppointee": "No",
+          "organisation": null,
+          "confidentialityRequired": null,
+          "isAddressSameAsAppointee": "No"
+        },
+        "mrnDetails": {
+          "mrnDate": "2026-02-16",
+          "mrnLateReason": null,
+          "dwpIssuingOffice": "Child Support",
+          "mrnMissingReason": null
+        },
+        "benefitType": {
+          "code": "childSupport",
+          "description": "Child Support"
+        },
+        "hearingType": "oral",
+        "receivedVia": "Online",
+        "appealReasons": {
+          "reasons": [
+            {
+              "id": "a7f86028-a493-4bab-a173-3c684ed8804a",
+              "value": {
+                "reason": "aaaaaaaaaa",
+                "description": "aaaaaaaaaa"
+              }
+            },
+            {
+              "id": "6ed43996-4a57-45d4-bc43-027b1012e2ae",
+              "value": {
+                "reason": "bbbbbbbbbb",
+                "description": "bbbbbbbbbb"
+              }
+            },
+            {
+              "id": "fcb60ea8-1646-40d5-aacf-aac6b3e81988",
+              "value": {
+                "reason": "cccccccccc",
+                "description": "cccccccccc"
+              }
+            }
+          ],
+          "otherReasons": "Another reason"
+        },
+        "hearingOptions": {
+          "other": "Yes, this...",
+          "languages": "Telugu",
+          "arrangements": [
+            "signLanguageInterpreter",
+            "hearingLoop"
+          ],
+          "excludeDates": [
+            {
+              "id": "af6d84b8-6df4-42d0-9b30-1e43dc9299bf",
+              "value": {
+                "end": "2018-04-04",
+                "start": "2018-04-04"
+              }
+            },
+            {
+              "id": "a138858b-76c4-491d-876b-2d827cd080ae",
+              "value": {
+                "end": "2018-04-05",
+                "start": "2018-04-05"
+              }
+            },
+            {
+              "id": "0e190121-bbb5-4479-a927-153a59a6098a",
+              "value": {
+                "end": "2018-04-06",
+                "start": "2018-04-06"
+              }
+            }
+          ],
+          "wantsSupport": "Yes",
+          "wantsToAttend": "Yes",
+          "scheduleHearing": "Yes",
+          "signLanguageType": "Sign language",
+          "languageInterpreter": "Yes"
+        },
+        "hearingSubtype": {}
+      },
+      "ftaResponseDueDate": "2026-02-24",
+      "otherParties": [
+        {
+          "id": "50e43a40-5b9c-4e0e-972b-3ee758359515",
+          "value": {
+            "id": "7cf0c86f-a324-4838-8a1a-b5832ff55706",
+            "name": {
+              "title": "Mr",
+              "lastName": "Smith",
+              "firstName": "John"
+            },
+            "role": {
+              "name": "Paying parent"
+            },
+            "address": {
+              "town": "Town",
+              "line1": "ad 1",
+              "postcode": "IG10 3XX"
+            },
+            "reasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "otherPartySubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "confidentialityRequired": "No",
+            "repReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "appointeeReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "sendNewOtherPartyNotification": "No",
+            "unacceptableCustomerBehaviour": "No",
+            "otherPartyAppointeeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "otherPartyRepresentativeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            }
+          }
+        },
+        {
+          "id": "8ebe6ec6-df96-4c59-8472-709650f55d8a",
+          "value": {
+            "id": "1a239c80-7578-48cb-b713-eb7976524db6",
+            "name": {
+              "title": "Mrs",
+              "lastName": "Smith",
+              "firstName": "Jane"
+            },
+            "role": {
+              "name": "Paying parent"
+            },
+            "address": {
+              "town": "Town",
+              "line1": "Ad1",
+              "postcode": "Ig10 3XX"
+            },
+            "reasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "otherPartySubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "confidentialityRequired": "No",
+            "repReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "appointeeReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "sendNewOtherPartyNotification": "Yes",
+            "unacceptableCustomerBehaviour": "No",
+            "otherPartyAppointeeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "otherPartyRepresentativeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            }
+          }
+        },
+        {
+          "id": "8a1f1548-b1a9-4b6c-9f96-f07dcf5aa2e8",
+          "value": {
+            "id": "e2944a90-686f-47be-9962-d62a995dca15",
+            "name": {
+              "title": "Master",
+              "lastName": "Jones",
+              "firstName": "David"
+            },
+            "role": {
+              "name": "Receiving parent"
+            },
+            "address": {
+              "town": "Twn",
+              "line1": "Adre1",
+              "postcode": "IG10 4GT"
+            },
+            "reasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "otherPartySubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "confidentialityRequired": "No",
+            "repReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "appointeeReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "unacceptableCustomerBehaviour": "No",
+            "otherPartyAppointeeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "otherPartyRepresentativeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            }
+          }
+        },
+        {
+          "id": "c074da19-9178-4447-98db-68c5f7165948",
+          "value": {
+            "id": "e9f65aca-0a9c-4c5f-bb97-71c67cd8ac70",
+            "name": {
+              "title": "Master",
+              "lastName": "Jones",
+              "firstName": "Sarah"
+            },
+            "role": {
+              "name": "Paying parent"
+            },
+            "address": {
+              "town": "Twn",
+              "line1": "Adss",
+              "postcode": "IG10 4GR"
+            },
+            "reasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "otherPartySubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "confidentialityRequired": "No",
+            "repReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "appointeeReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "sendNewOtherPartyNotification": "No",
+            "unacceptableCustomerBehaviour": "No",
+            "otherPartyAppointeeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "otherPartyRepresentativeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            }
+          }
+        },
+        {
+          "id": "4628809a-7307-4948-98a3-c598acd78624",
+          "value": {
+            "id": "ea8b8676-0b18-4979-a2cc-aea3537a0a09",
+            "name": {
+              "title": "Mr",
+              "lastName": "Jones",
+              "firstName": "Billy"
+            },
+            "role": {
+              "name": "Paying parent"
+            },
+            "address": {
+              "town": "Twww",
+              "line1": "B111",
+              "postcode": "IG11 4FF"
+            },
+            "reasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "otherPartySubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "confidentialityRequired": "No",
+            "repReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "appointeeReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "unacceptableCustomerBehaviour": "No",
+            "otherPartyAppointeeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "otherPartyRepresentativeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            }
+          }
+        },
+        {
+          "id": "b0c415a7-a3f0-45b3-8c2d-150ae162baa9",
+          "value": {
+            "id": "95f1fd29-0904-432a-8968-480e2d3e1646",
+            "name": {
+              "title": "Ms",
+              "lastName": "Jones",
+              "firstName": "Julia"
+            },
+            "role": {
+              "name": "Receiving parent"
+            },
+            "address": {
+              "town": "Jttt",
+              "line1": "Jjjj",
+              "postcode": "IG10 3JL"
+            },
+            "reasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "otherPartySubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "confidentialityRequired": "No",
+            "repReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "appointeeReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "unacceptableCustomerBehaviour": "No",
+            "otherPartyAppointeeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "otherPartyRepresentativeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            }
+          }
+        },
+        {
+          "id": "0a895d98-8344-440e-9861-83629083d913",
+          "value": {
+            "id": "c3f2d93a-d4d1-4dac-abff-0691bc1feb6f",
+            "name": {
+              "title": "Mrs",
+              "lastName": "Jones",
+              "firstName": "Bridget"
+            },
+            "role": {
+              "name": "Paying parent"
+            },
+            "address": {
+              "town": "Bjtown",
+              "line1": "Bj",
+              "postcode": "IG10 3BG"
+            },
+            "hearingSubtype": {
+              "wantsHearingTypeTelephone": "No"
+            },
+            "reasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "otherPartySubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "confidentialityRequired": "No",
+            "repReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "appointeeReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "unacceptableCustomerBehaviour": "No",
+            "otherPartyAppointeeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "otherPartyRepresentativeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            }
+          }
+        },
+        {
+          "id": "c24da55c-48a6-488a-8b9d-fc03398200df",
+          "value": {
+            "id": "dfb50f9b-0322-4f8e-a572-67d27435ae71",
+            "name": {
+              "title": "Mr",
+              "lastName": "Jones",
+              "firstName": "Adam"
+            },
+            "role": {
+              "name": "Receiving parent"
+            },
+            "address": {
+              "town": "Townadam",
+              "line1": "AddJo",
+              "postcode": "IG10 3AJ"
+            },
+            "reasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "otherPartySubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "confidentialityRequired": "No",
+            "repReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "appointeeReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "unacceptableCustomerBehaviour": "No",
+            "otherPartyAppointeeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "otherPartyRepresentativeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            }
+          }
+        },
+        {
+          "id": "b6572296-d17f-462f-9a45-19689e0fbd72",
+          "value": {
+            "id": "cee5c872-bc5f-4674-8d5b-ebdf6c12b984",
+            "name": {
+              "title": "Mr",
+              "lastName": "Beane",
+              "firstName": "Billy"
+            },
+            "role": {
+              "name": "Paying parent"
+            },
+            "address": {
+              "town": "Town",
+              "line1": "Bill11",
+              "postcode": "IG10 3BB"
+            },
+            "reasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "otherPartySubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "confidentialityRequired": "No",
+            "repReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "appointeeReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "sendNewOtherPartyNotification": "No",
+            "unacceptableCustomerBehaviour": "No",
+            "otherPartyAppointeeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "otherPartyRepresentativeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            }
+          }
+        },
+        {
+          "id": "1ea2a740-eb97-4383-8b06-e54b33d50f09",
+          "value": {
+            "id": "3273ed31-2b8b-4590-9114-12e3959d9b61",
+            "name": {
+              "title": "Ms",
+              "lastName": "Bennett",
+              "firstName": "Clare"
+            },
+            "role": {
+              "name": "Paying parent"
+            },
+            "address": {
+              "town": "Townn",
+              "line1": "Cla543",
+              "postcode": "IG10 3CB"
+            },
+            "reasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "otherPartySubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "confidentialityRequired": "No",
+            "repReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "appointeeReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "sendNewOtherPartyNotification": "Yes",
+            "unacceptableCustomerBehaviour": "No",
+            "otherPartyAppointeeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            },
+            "otherPartyRepresentativeSubscription": {
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "reason": null,
+              "subscribeSms": null,
+              "subscribeEmail": null,
+              "lastLoggedIntoMya": null,
+              "wantSmsNotifications": null
+            }
+          }
+        }
+      ],
+      "caseNameHmctsInternal": "Joe Bloggs",
+      "sscsDocument": [
+        {
+          "id": "b7428d4f-ebfc-4821-81b3-4011c8baeff0",
+          "value": {
+            "documentLink": {
+              "document_url": "http://localhost:5005/documents/cc78e296-042a-4061-87d0-292e0e1a0d36",
+              "document_filename": "Bloggs_3ZY.pdf",
+              "document_binary_url": "http://localhost:5005/documents/cc78e296-042a-4061-87d0-292e0e1a0d36/binary"
+            },
+            "documentType": "sscs1",
+            "documentFileName": "Bloggs_3ZY.pdf",
+            "documentDateAdded": "2026-02-16"
+          }
+        },
+        {
+          "id": "a548aebb-9ed1-4835-ab37-344476f4af05",
+          "value": {
+            "documentLink": {
+              "document_url": "http://localhost:5005/documents/b7e4ad52-821f-4c26-ba5f-34fea3df2401",
+              "document_filename": "Final Decision Notice issued on 20-02-2026.pdf",
+              "document_binary_url": "http://localhost:5005/documents/b7e4ad52-821f-4c26-ba5f-34fea3df2401/binary"
+            },
+            "documentType": "finalDecisionNotice",
+            "bundleAddition": "A",
+            "documentFileName": "Addition A - Final Decision Notice issued on 20-02-2026.pdf",
+            "documentDateAdded": "2026-02-20"
+          }
+        }
+      ],
+      "SearchCriteria": {
+        "SearchParties": [
+          {
+            "id": "ffe0a3c4-3c03-40fc-acfe-3bb3e145288c",
+            "value": {
+              "Name": "Mr Joe Bloggs",
+              "PostCode": "TN32 6PL",
+              "AddressLine1": "123 Hairy Lane"
+            }
+          },
+          {
+            "id": "cfb9ec48-3ceb-4f46-b45d-e97a485eacc4",
+            "value": {
+              "Name": "Mrs Mary Bloggs",
+              "PostCode": "NE1 1AW",
+              "AddressLine1": "999 Another Street",
+              "EmailAddress": "sscsappointee@greencroftconsulting.com"
+            }
+          }
+        ],
+        "OtherCaseReferences": [
+          {
+            "id": "195397d5-50cd-4ccf-a48c-fdcfa2f7aef7",
+            "value": "LV7VW63ZY"
+          }
+        ]
+      },
+      "writeFinalDecisionGeneratedDate": "2026-02-20",
+      "writeFinalDecisionAllowedOrRefused": "allowed",
+      "languagePreferenceWelsh": "No",
+      "caseCreated": "2026-02-16",
+      "issueFinalDecisionDate": "2026-02-20",
+      "awaitingInfoFromFta": "Yes"
+    },
+    "data_classification": {
+      "caseCode": "PUBLIC",
+      "subscriptions": {
+        "value": {
+          "appellantSubscription": {
+            "value": {
+              "tya": "PUBLIC",
+              "email": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            },
+            "classification": "PUBLIC"
+          },
+          "appointeeSubscription": {
+            "value": {
+              "tya": "PUBLIC",
+              "email": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            },
+            "classification": "PUBLIC"
+          },
+          "supporterSubscription": {
+            "value": {
+              "tya": "PUBLIC",
+              "email": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            },
+            "classification": "PUBLIC"
+          },
+          "jointPartySubscription": {
+            "value": {
+              "tya": "PUBLIC",
+              "email": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            },
+            "classification": "PUBLIC"
+          },
+          "representativeSubscription": {
+            "value": {
+              "tya": "PUBLIC",
+              "email": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            },
+            "classification": "PUBLIC"
+          }
+        },
+        "classification": "PUBLIC"
+      },
+      "hearingRoute": "PUBLIC",
+      "dwpRegionalCentre": "PUBLIC",
+      "writeFinalDecisionGenerateNotice": "PUBLIC",
+      "jointPartyId": "PUBLIC",
+      "benefitCode": "PUBLIC",
+      "writeFinalDecisionPresentingOfficerAttendedQuestion": "PUBLIC",
+      "directionDueDate": "PUBLIC",
+      "writeFinalDecisionPreviewDocument": "PUBLIC",
+      "finalDecisionWasOriginalDecisionUploaded": "PUBLIC",
+      "otherPartyUCB": "PUBLIC",
+      "regionalProcessingCenter": {
+        "value": {
+          "city": "PUBLIC",
+          "name": "PUBLIC",
+          "email": "PUBLIC",
+          "epimsId": "PUBLIC",
+          "address1": "PUBLIC",
+          "address2": "PUBLIC",
+          "address3": "PUBLIC",
+          "address4": "PUBLIC",
+          "postcode": "PUBLIC",
+          "faxNumber": "PUBLIC",
+          "phoneNumber": "PUBLIC",
+          "hearingRoute": "PUBLIC"
+        },
+        "classification": "PUBLIC"
+      },
+      "otherPartyAttendedQuestions": {
+        "value": [
+          {
+            "id": "15ae82aa-64fe-48e2-98c0-3f57a00570eb",
+            "value": {
+              "otherPartyName": "PUBLIC",
+              "attendedOtherParty": "PUBLIC"
+            }
+          },
+          {
+            "id": "7b2801b4-221f-4691-9e63-6a6a19804e54",
+            "value": {
+              "otherPartyName": "PUBLIC",
+              "attendedOtherParty": "PUBLIC"
+            }
+          },
+          {
+            "id": "8871384b-b1c0-4023-9f4f-a3d237630c6d",
+            "value": {
+              "otherPartyName": "PUBLIC",
+              "attendedOtherParty": "PUBLIC"
+            }
+          },
+          {
+            "id": "dd5f212b-ad0a-475f-9bc4-31b1b23e89e7",
+            "value": {
+              "otherPartyName": "PUBLIC",
+              "attendedOtherParty": "PUBLIC"
+            }
+          }
+        ],
+        "classification": "PUBLIC"
+      },
+      "isScottishCase": "PUBLIC",
+      "issueCode": "PUBLIC",
+      "writeFinalDecisionPageSectionReference": "PUBLIC",
+      "evidencePresent": "PUBLIC",
+      "finalDecisionIdamSurname": "PUBLIC",
+      "ogdType": "PUBLIC",
+      "workBasketHearingDateIssued": "PUBLIC",
+      "tribunalDirectPoToAttend": "PUBLIC",
+      "showFinalDecisionNoticeSummaryOfOutcomePage": "PUBLIC",
+      "writeFinalDecisionAppellantAttendedQuestion": "PUBLIC",
+      "addedDocuments": "PUBLIC",
+      "processingVenue": "PUBLIC",
+      "previousState": "PUBLIC",
+      "dwpIsOfficerAttending": "PUBLIC",
+      "dwpState": "PUBLIC",
+      "linkedCasesBoolean": "PUBLIC",
+      "poAttendanceConfirmed": "PUBLIC",
+      "writeFinalDecisionReasons": {
+        "value": [
+          {
+            "id": "381735f5-9a39-43e1-82a0-16ed0c62ee7f",
+            "classification": "PUBLIC"
+          }
+        ],
+        "classification": "PUBLIC"
+      },
+      "region": "PUBLIC",
+      "correction": {
+        "value": {
+          "isCorrectionFinalDecisionInProgress": "PUBLIC"
+        },
+        "classification": "PUBLIC"
+      },
+      "caseNamePublic": "PUBLIC",
+      "finalDecisionHeldAt": "PUBLIC",
+      "pcqId": "PUBLIC",
+      "workBasketHearingEpimsId": "PUBLIC",
+      "caseManagementLocation": {
+        "value": {
+          "region": "PUBLIC",
+          "baseLocation": "PUBLIC"
+        },
+        "classification": "PUBLIC"
+      },
+      "finalDecisionJudge": "PUBLIC",
+      "ftaCommunications": {
+        "value": [
+          {
+            "id": "0c0be37a-c090-4fa1-b5f3-c2b4f73d9700",
+            "value": {
+              "requestTopic": "PUBLIC",
+              "requestMessage": "PUBLIC",
+              "requestDateTime": "PUBLIC",
+              "requestUserName": "PUBLIC",
+              "requestUserRole": "PUBLIC",
+              "requestResponseDueDate": "PUBLIC"
+            }
+          }
+        ],
+        "classification": "PUBLIC"
+      },
+      "caseManagementCategory": "PUBLIC",
+      "writeFinalDecisionDetailsOfDecision": "PUBLIC",
+      "CaseAccessCategory": "PUBLIC",
+      "writeFinalDecisionDateOfDecision": "PUBLIC",
+      "preWorkAllocation": "PUBLIC",
+      "workBasketHearingDate": "PUBLIC",
+      "finalDecisionGeneratedDate": "PUBLIC",
+      "documentSentToDwp": "PUBLIC",
+      "caseNameHmctsRestricted": "PUBLIC",
+      "infoRequestFromTribunal": "PUBLIC",
+      "createdInGapsFrom": "PUBLIC",
+      "outcome": "PUBLIC",
+      "writeFinalDecisionTypeOfHearing": "PUBLIC",
+      "finalDecisionIssuedDate": "PUBLIC",
+      "correspondence": {
+        "value": [
+          {
+            "id": "8af6b733-53b7-4c63-99d2-c2666ecf66f7",
+            "value": {
+              "to": "PUBLIC",
+              "from": "PUBLIC",
+              "sentOn": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "correspondenceType": "PUBLIC"
+            }
+          },
+          {
+            "id": "2ac0fd0b-27db-43b7-b492-8e41302891af",
+            "value": {
+              "to": "PUBLIC",
+              "from": "PUBLIC",
+              "sentOn": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "correspondenceType": "PUBLIC"
+            }
+          },
+          {
+            "id": "44924731-023f-4394-8d02-4855401ee205",
+            "value": {
+              "to": "PUBLIC",
+              "from": "PUBLIC",
+              "sentOn": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "correspondenceType": "PUBLIC"
+            }
+          },
+          {
+            "id": "03999db2-427d-4bf8-ac0f-4f2900a42201",
+            "value": {
+              "to": "PUBLIC",
+              "from": "PUBLIC",
+              "sentOn": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "correspondenceType": "PUBLIC"
+            }
+          }
+        ],
+        "classification": "PUBLIC"
+      },
+      "appeal": {
+        "value": {
+          "rep": {
+            "value": {
+              "id": "PUBLIC",
+              "name": {
+                "value": {
+                  "title": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "firstName": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "address": {
+                "value": {
+                  "town": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "line2": "PUBLIC",
+                  "county": "PUBLIC",
+                  "postcode": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "contact": {
+                "value": {
+                  "email": "PUBLIC",
+                  "phone": "PUBLIC",
+                  "mobile": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "identity": {
+                "value": {
+                  "dob": "PUBLIC",
+                  "nino": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "organisation": "PUBLIC",
+              "hasRepresentative": "PUBLIC"
+            },
+            "classification": "PUBLIC"
+          },
+          "signer": "PUBLIC",
+          "appellant": {
+            "value": {
+              "id": "PUBLIC",
+              "name": {
+                "value": {
+                  "title": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "firstName": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "role": {
+                "value": {},
+                "classification": "PUBLIC"
+              },
+              "address": {
+                "value": {
+                  "town": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "line2": "PUBLIC",
+                  "county": "PUBLIC",
+                  "postcode": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "contact": {
+                "value": {
+                  "email": "PUBLIC",
+                  "phone": "PUBLIC",
+                  "mobile": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "identity": {
+                "value": {
+                  "dob": "PUBLIC",
+                  "nino": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "appointee": {
+                "value": {
+                  "id": "PUBLIC",
+                  "name": {
+                    "value": {
+                      "title": "PUBLIC",
+                      "lastName": "PUBLIC",
+                      "firstName": "PUBLIC"
+                    },
+                    "classification": "PUBLIC"
+                  },
+                  "address": {
+                    "value": {
+                      "town": "PUBLIC",
+                      "line1": "PUBLIC",
+                      "county": "PUBLIC",
+                      "postcode": "PUBLIC"
+                    },
+                    "classification": "PUBLIC"
+                  },
+                  "contact": {
+                    "value": {
+                      "email": "PUBLIC",
+                      "phone": "PUBLIC",
+                      "mobile": "PUBLIC"
+                    },
+                    "classification": "PUBLIC"
+                  },
+                  "identity": {
+                    "value": {
+                      "dob": "PUBLIC",
+                      "nino": "PUBLIC"
+                    },
+                    "classification": "PUBLIC"
+                  },
+                  "organisation": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "isAppointee": "PUBLIC",
+              "organisation": "PUBLIC",
+              "confidentialityRequired": "PUBLIC",
+              "isAddressSameAsAppointee": "PUBLIC"
+            },
+            "classification": "PUBLIC"
+          },
+          "mrnDetails": {
+            "value": {
+              "mrnDate": "PUBLIC",
+              "mrnLateReason": "PUBLIC",
+              "dwpIssuingOffice": "PUBLIC",
+              "mrnMissingReason": "PUBLIC"
+            },
+            "classification": "PUBLIC"
+          },
+          "benefitType": {
+            "value": {
+              "code": "PUBLIC",
+              "description": "PUBLIC"
+            },
+            "classification": "PUBLIC"
+          },
+          "hearingType": "PUBLIC",
+          "receivedVia": "PUBLIC",
+          "appealReasons": {
+            "value": {
+              "reasons": {
+                "value": [
+                  {
+                    "id": "a7f86028-a493-4bab-a173-3c684ed8804a",
+                    "value": {
+                      "reason": "PUBLIC",
+                      "description": "PUBLIC"
+                    }
+                  },
+                  {
+                    "id": "6ed43996-4a57-45d4-bc43-027b1012e2ae",
+                    "value": {
+                      "reason": "PUBLIC",
+                      "description": "PUBLIC"
+                    }
+                  },
+                  {
+                    "id": "fcb60ea8-1646-40d5-aacf-aac6b3e81988",
+                    "value": {
+                      "reason": "PUBLIC",
+                      "description": "PUBLIC"
+                    }
+                  }
+                ],
+                "classification": "PUBLIC"
+              },
+              "otherReasons": "PUBLIC"
+            },
+            "classification": "PUBLIC"
+          },
+          "hearingOptions": {
+            "value": {
+              "other": "PUBLIC",
+              "languages": "PUBLIC",
+              "arrangements": "PUBLIC",
+              "excludeDates": {
+                "value": [
+                  {
+                    "id": "af6d84b8-6df4-42d0-9b30-1e43dc9299bf",
+                    "value": {
+                      "end": "PUBLIC",
+                      "start": "PUBLIC"
+                    }
+                  },
+                  {
+                    "id": "a138858b-76c4-491d-876b-2d827cd080ae",
+                    "value": {
+                      "end": "PUBLIC",
+                      "start": "PUBLIC"
+                    }
+                  },
+                  {
+                    "id": "0e190121-bbb5-4479-a927-153a59a6098a",
+                    "value": {
+                      "end": "PUBLIC",
+                      "start": "PUBLIC"
+                    }
+                  }
+                ],
+                "classification": "PUBLIC"
+              },
+              "wantsSupport": "PUBLIC",
+              "wantsToAttend": "PUBLIC",
+              "scheduleHearing": "PUBLIC",
+              "signLanguageType": "PUBLIC",
+              "languageInterpreter": "PUBLIC"
+            },
+            "classification": "PUBLIC"
+          },
+          "hearingSubtype": {
+            "value": {},
+            "classification": "PUBLIC"
+          }
+        },
+        "classification": "PUBLIC"
+      },
+      "ftaResponseDueDate": "PUBLIC",
+      "otherParties": {
+        "value": [
+          {
+            "id": "50e43a40-5b9c-4e0e-972b-3ee758359515",
+            "value": {
+              "id": "PUBLIC",
+              "name": {
+                "value": {
+                  "title": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "firstName": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "role": {
+                "value": {
+                  "name": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "address": {
+                "value": {
+                  "town": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "postcode": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "reasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartySubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "confidentialityRequired": "PUBLIC",
+              "repReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "appointeeReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "sendNewOtherPartyNotification": "PUBLIC",
+              "unacceptableCustomerBehaviour": "PUBLIC",
+              "otherPartyAppointeeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartyRepresentativeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              }
+            }
+          },
+          {
+            "id": "8ebe6ec6-df96-4c59-8472-709650f55d8a",
+            "value": {
+              "id": "PUBLIC",
+              "name": {
+                "value": {
+                  "title": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "firstName": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "role": {
+                "value": {
+                  "name": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "address": {
+                "value": {
+                  "town": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "postcode": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "reasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartySubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "confidentialityRequired": "PUBLIC",
+              "repReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "appointeeReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "sendNewOtherPartyNotification": "PUBLIC",
+              "unacceptableCustomerBehaviour": "PUBLIC",
+              "otherPartyAppointeeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartyRepresentativeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              }
+            }
+          },
+          {
+            "id": "8a1f1548-b1a9-4b6c-9f96-f07dcf5aa2e8",
+            "value": {
+              "id": "PUBLIC",
+              "name": {
+                "value": {
+                  "title": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "firstName": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "role": {
+                "value": {
+                  "name": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "address": {
+                "value": {
+                  "town": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "postcode": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "reasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartySubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "confidentialityRequired": "PUBLIC",
+              "repReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "appointeeReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "unacceptableCustomerBehaviour": "PUBLIC",
+              "otherPartyAppointeeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartyRepresentativeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              }
+            }
+          },
+          {
+            "id": "c074da19-9178-4447-98db-68c5f7165948",
+            "value": {
+              "id": "PUBLIC",
+              "name": {
+                "value": {
+                  "title": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "firstName": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "role": {
+                "value": {
+                  "name": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "address": {
+                "value": {
+                  "town": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "postcode": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "reasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartySubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "confidentialityRequired": "PUBLIC",
+              "repReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "appointeeReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "sendNewOtherPartyNotification": "PUBLIC",
+              "unacceptableCustomerBehaviour": "PUBLIC",
+              "otherPartyAppointeeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartyRepresentativeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              }
+            }
+          },
+          {
+            "id": "4628809a-7307-4948-98a3-c598acd78624",
+            "value": {
+              "id": "PUBLIC",
+              "name": {
+                "value": {
+                  "title": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "firstName": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "role": {
+                "value": {
+                  "name": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "address": {
+                "value": {
+                  "town": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "postcode": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "reasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartySubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "confidentialityRequired": "PUBLIC",
+              "repReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "appointeeReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "unacceptableCustomerBehaviour": "PUBLIC",
+              "otherPartyAppointeeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartyRepresentativeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              }
+            }
+          },
+          {
+            "id": "b0c415a7-a3f0-45b3-8c2d-150ae162baa9",
+            "value": {
+              "id": "PUBLIC",
+              "name": {
+                "value": {
+                  "title": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "firstName": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "role": {
+                "value": {
+                  "name": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "address": {
+                "value": {
+                  "town": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "postcode": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "reasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartySubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "confidentialityRequired": "PUBLIC",
+              "repReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "appointeeReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "unacceptableCustomerBehaviour": "PUBLIC",
+              "otherPartyAppointeeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartyRepresentativeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              }
+            }
+          },
+          {
+            "id": "0a895d98-8344-440e-9861-83629083d913",
+            "value": {
+              "id": "PUBLIC",
+              "name": {
+                "value": {
+                  "title": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "firstName": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "role": {
+                "value": {
+                  "name": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "address": {
+                "value": {
+                  "town": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "postcode": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "hearingSubtype": {
+                "value": {
+                  "wantsHearingTypeTelephone": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "reasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartySubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "confidentialityRequired": "PUBLIC",
+              "repReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "appointeeReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "unacceptableCustomerBehaviour": "PUBLIC",
+              "otherPartyAppointeeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartyRepresentativeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              }
+            }
+          },
+          {
+            "id": "c24da55c-48a6-488a-8b9d-fc03398200df",
+            "value": {
+              "id": "PUBLIC",
+              "name": {
+                "value": {
+                  "title": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "firstName": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "role": {
+                "value": {
+                  "name": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "address": {
+                "value": {
+                  "town": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "postcode": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "reasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartySubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "confidentialityRequired": "PUBLIC",
+              "repReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "appointeeReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "unacceptableCustomerBehaviour": "PUBLIC",
+              "otherPartyAppointeeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartyRepresentativeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              }
+            }
+          },
+          {
+            "id": "b6572296-d17f-462f-9a45-19689e0fbd72",
+            "value": {
+              "id": "PUBLIC",
+              "name": {
+                "value": {
+                  "title": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "firstName": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "role": {
+                "value": {
+                  "name": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "address": {
+                "value": {
+                  "town": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "postcode": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "reasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartySubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "confidentialityRequired": "PUBLIC",
+              "repReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "appointeeReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "sendNewOtherPartyNotification": "PUBLIC",
+              "unacceptableCustomerBehaviour": "PUBLIC",
+              "otherPartyAppointeeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartyRepresentativeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              }
+            }
+          },
+          {
+            "id": "1ea2a740-eb97-4383-8b06-e54b33d50f09",
+            "value": {
+              "id": "PUBLIC",
+              "name": {
+                "value": {
+                  "title": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "firstName": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "role": {
+                "value": {
+                  "name": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "address": {
+                "value": {
+                  "town": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "postcode": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "reasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartySubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "confidentialityRequired": "PUBLIC",
+              "repReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "appointeeReasonableAdjustment": {
+                "value": {
+                  "wantsReasonableAdjustment": "PUBLIC",
+                  "reasonableAdjustmentRequirements": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "sendNewOtherPartyNotification": "PUBLIC",
+              "unacceptableCustomerBehaviour": "PUBLIC",
+              "otherPartyAppointeeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              },
+              "otherPartyRepresentativeSubscription": {
+                "value": {
+                  "tya": "PUBLIC",
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "reason": "PUBLIC",
+                  "subscribeSms": "PUBLIC",
+                  "subscribeEmail": "PUBLIC",
+                  "lastLoggedIntoMya": "PUBLIC",
+                  "wantSmsNotifications": "PUBLIC"
+                },
+                "classification": "PUBLIC"
+              }
+            }
+          }
+        ],
+        "classification": "PUBLIC"
+      },
+      "caseNameHmctsInternal": "PUBLIC",
+      "sscsDocument": {
+        "value": [
+          {
+            "id": "b7428d4f-ebfc-4821-81b3-4011c8baeff0",
+            "value": {
+              "documentLink": "PUBLIC",
+              "documentType": "PUBLIC",
+              "documentFileName": "PUBLIC",
+              "documentDateAdded": "PUBLIC"
+            }
+          },
+          {
+            "id": "a548aebb-9ed1-4835-ab37-344476f4af05",
+            "value": {
+              "documentLink": "PUBLIC",
+              "documentType": "PUBLIC",
+              "bundleAddition": "PUBLIC",
+              "documentFileName": "PUBLIC",
+              "documentDateAdded": "PUBLIC"
+            }
+          }
+        ],
+        "classification": "PUBLIC"
+      },
+      "SearchCriteria": {
+        "value": {
+          "SearchParties": {
+            "value": [
+              {
+                "id": "ffe0a3c4-3c03-40fc-acfe-3bb3e145288c",
+                "value": {
+                  "Name": "PUBLIC",
+                  "PostCode": "PUBLIC",
+                  "AddressLine1": "PUBLIC"
+                }
+              },
+              {
+                "id": "cfb9ec48-3ceb-4f46-b45d-e97a485eacc4",
+                "value": {
+                  "Name": "PUBLIC",
+                  "PostCode": "PUBLIC",
+                  "AddressLine1": "PUBLIC",
+                  "EmailAddress": "PUBLIC"
+                }
+              }
+            ],
+            "classification": "PUBLIC"
+          },
+          "OtherCaseReferences": {
+            "value": [
+              {
+                "id": "195397d5-50cd-4ccf-a48c-fdcfa2f7aef7",
+                "classification": "PUBLIC"
+              }
+            ],
+            "classification": "PUBLIC"
+          }
+        },
+        "classification": "PUBLIC"
+      },
+      "writeFinalDecisionGeneratedDate": "PUBLIC",
+      "writeFinalDecisionAllowedOrRefused": "PUBLIC",
+      "languagePreferenceWelsh": "PUBLIC",
+      "caseCreated": "PUBLIC",
+      "issueFinalDecisionDate": "PUBLIC",
+      "awaitingInfoFromFta": "PUBLIC"
+    },
+    "supplementary_data": {
+      "HMCTSServiceId": "BBA3"
+    },
+    "after_submit_callback_response": null,
+    "callback_response_status_code": null,
+    "callback_response_status": null,
+    "delete_draft_response_status_code": null,
+    "delete_draft_response_status": null
+  },
+  "event_id": "writeFinalDecision",
+  "ignore_warning": false
+}
