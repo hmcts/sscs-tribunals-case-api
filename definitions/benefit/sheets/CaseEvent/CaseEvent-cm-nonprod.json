@@ -19,6 +19,7 @@
     "DisplayOrder": 1645,
     "PreConditionState(s)": "awaitOtherPartyData",
     "PostConditionState": "awaitConfidentialityRequirements",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "SecurityClassification": "Public",
     "EventEnablingCondition": "appeal.benefitType.code=\"childSupport\"",
     "Publish": "N"
