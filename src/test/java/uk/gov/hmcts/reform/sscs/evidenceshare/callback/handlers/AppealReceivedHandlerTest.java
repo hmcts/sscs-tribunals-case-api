@@ -4,8 +4,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DECISION_ISSUED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INTERLOC_VALID_APPEAL;
@@ -27,6 +29,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
+import uk.gov.hmcts.reform.sscs.evidenceshare.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -44,12 +47,16 @@ public class AppealReceivedHandlerTest {
     @Mock
     private IdamService idamService;
 
+    @Mock
+    private EvidenceShareConfig evidenceShareConfig;
+
     private AppealReceivedHandler handler;
 
 
     @Before
     public void setUp() {
-        handler = new AppealReceivedHandler(ccdService, updateCcdCaseService, idamService);
+        when(evidenceShareConfig.getAppealReceivedDelayMs()).thenReturn(10L);
+        handler = new AppealReceivedHandler(ccdService, updateCcdCaseService, idamService, evidenceShareConfig);
     }
 
     @Test(expected = IllegalStateException.class)
@@ -86,7 +93,8 @@ public class AppealReceivedHandlerTest {
     public void givenValidEventAndDigitalCaseAndTriggerEventV2IsEnabled_thenTriggerAppealReceivedEventUsingTriggerEventV2(EventType eventType) {
         handler.handle(SUBMITTED, HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder().createdInGapsFrom(READY_TO_LIST.getId()).build(), INTERLOCUTORY_REVIEW_STATE, eventType));
 
-        verify(updateCcdCaseService).triggerCaseEventV2(eq(1L), eq(EventType.APPEAL_RECEIVED.getCcdType()), eq("Appeal received"), eq("Appeal received event has been triggered from Tribunals API for digital case"), any());
+        // Use timeout to wait for the scheduled async execution
+        verify(updateCcdCaseService, timeout(1000)).triggerCaseEventV2(eq(1L), eq(EventType.APPEAL_RECEIVED.getCcdType()), eq("Appeal received"), eq("Appeal received event has been triggered from Tribunals API for digital case"), any());
     }
 
     @Test(expected = IllegalStateException.class)
