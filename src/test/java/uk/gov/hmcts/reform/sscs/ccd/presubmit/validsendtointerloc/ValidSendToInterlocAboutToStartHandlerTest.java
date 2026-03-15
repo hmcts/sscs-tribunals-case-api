@@ -172,20 +172,20 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "true,childSupport,appellant",
+        "true,childSupport,''",
         "false,childSupport,appellant",
         "true,PIP,appellant",
         "false,PIP,appellant"
     })
-    public void givenFlagAndBenefitType_thenOriginalSenderHasExpectedDefaultSelection(boolean featureFlag,
-                                                                                       String benefitType,
-                                                                                       String expectedDefault) {
+    void givenFlagAndBenefitType_thenSelectedConfidentialityPartyHasExpectedDefaultSelection(boolean featureFlag,
+                                                                                              String benefitType,
+                                                                                              String expectedDefault) {
         handler = new ValidSendToInterlocAboutToStartHandler(false, false, featureFlag);
         setupCallback();
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(benefitType).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals(expectedDefault, response.getData().getOriginalSender().getValue().getCode());
+        assertEquals(expectedDefault, response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode());
     }
 }

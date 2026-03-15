@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.hmctsresponsereviewed;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -19,12 +19,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
@@ -45,8 +43,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.HearingsService;
 
-@RunWith(JUnitParamsRunner.class)
-public class HmctsResponseReviewedAboutToStartTest {
+class HmctsResponseReviewedAboutToStartTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
     private HmctsResponseReviewedAboutToStartHandler handler;
@@ -65,8 +62,8 @@ public class HmctsResponseReviewedAboutToStartTest {
 
     private SscsCaseData sscsCaseData;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         openMocks(this);
         dwpAddressLookupService = new DwpAddressLookupService();
         handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService, false);
@@ -80,9 +77,8 @@ public class HmctsResponseReviewedAboutToStartTest {
     }
 
     @Test
-    @Parameters({"HMCTS_RESPONSE_REVIEWED"})
-    public void givenAValidEvent_thenReturnTrue(EventType eventType) {
-        when(callback.getEvent()).thenReturn(eventType);
+    public void givenAValidEvent_thenReturnTrue() {
+        when(callback.getEvent()).thenReturn(EventType.HMCTS_RESPONSE_REVIEWED);
 
         assertTrue(handler.canHandle(ABOUT_TO_START, callback));
     }
@@ -172,8 +168,8 @@ public class HmctsResponseReviewedAboutToStartTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        Assertions.assertEquals(1, response.getErrors().size());
-        Assertions.assertTrue(response.getErrors().contains(EXISTING_HEARING_ERROR));
+        assertEquals(1, response.getErrors().size());
+        assertTrue(response.getErrors().contains(EXISTING_HEARING_ERROR));
     }
 
     @Test
@@ -190,8 +186,8 @@ public class HmctsResponseReviewedAboutToStartTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        Assertions.assertEquals(1, response.getWarnings().size());
-        Assertions.assertTrue(response.getWarnings().contains(REQUEST_FAILURE_WARNING));
+        assertEquals(1, response.getWarnings().size());
+        assertTrue(response.getWarnings().contains(REQUEST_FAILURE_WARNING));
     }
 
     @Test
@@ -269,8 +265,8 @@ public class HmctsResponseReviewedAboutToStartTest {
                 .documentDateTimeAdded(dateTimeAdded).build()).build();
     }
 
-    @Test
-    @Parameters({"AT_38", "APPENDIX_12", "DWP_EVIDENCE_BUNDLE", "DWP_RESPONSE", "UCB"})
+    @ParameterizedTest
+    @EnumSource(value = DwpDocumentType.class, names = {"AT_38", "APPENDIX_12", "DWP_EVIDENCE_BUNDLE", "DWP_RESPONSE", "UCB"})
     public void givenResponseEventWithDwpDocumentsWithMultipleDates_thenPopulateLegacyFields(DwpDocumentType documentType) {
 
         DwpDocument docAtStartOfToday = buildDocument(documentType, "file-startOfToday", LocalDate.now());
