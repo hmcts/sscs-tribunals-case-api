@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
@@ -82,6 +83,11 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
             UploadParty uploadParty = getUploadParty(sscsCaseData.getOriginalSender());
             postponementRequestService.processPostponementRequest(sscsCaseData, uploadParty, Optional.empty());
         } else {
+            if (isConfidentialityReferral(sscsCaseData)
+                    && isDynamicListEmpty(sscsCaseData.getExtendedSscsCaseData().getSelectedConfidentialityParty())) {
+                preSubmitCallbackResponse.addError("Must select party");
+                return preSubmitCallbackResponse;
+            }
             InterlocReviewState interlocState = Arrays.stream(InterlocReviewState.values())
                 .filter(x -> x.getCcdDefinition().equals(sscsCaseData.getSelectWhoReviewsCase().getValue().getCode()))
                 .findFirst()
@@ -101,15 +107,19 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
                 .equals(sscsCaseData.getSelectWhoReviewsCase().getValue().getCode());
     }
 
-    private UploadParty getUploadParty(DynamicList originalSender) {
-        return REPRESENTATIVE.getCode().equals(originalSender.getValue().getCode())
-                ? REP : UploadParty.fromValue(originalSender.getValue().getCode());
+    private boolean isConfidentialityReferral(SscsCaseData sscsCaseData) {
+        return InterlocReferralReason.CONFIDENTIALITY.equals(sscsCaseData.getInterlocReferralReason());
     }
 
-    private boolean isDynamicListEmpty(DynamicList originalSender) {
-        return originalSender == null
-                || originalSender.getValue() == null
-                || originalSender.getValue().getCode() == null;
+    private UploadParty getUploadParty(DynamicList selectedParty) {
+        return REPRESENTATIVE.getCode().equals(selectedParty.getValue().getCode())
+                ? REP : UploadParty.fromValue(selectedParty.getValue().getCode());
+    }
+
+    private boolean isDynamicListEmpty(DynamicList selectedParty) {
+        return selectedParty == null
+                || selectedParty.getValue() == null
+                || selectedParty.getValue().getCode() == null;
     }
 
 }

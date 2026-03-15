@@ -86,6 +86,7 @@
   {"LiveFrom": "10/06/2019", "CaseTypeID": "Benefit", "ID": "audioVideoEvidence", "Label": "Evidence", "FieldType": "Collection", "FieldTypeParameter": "AudioVideoEvidence", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "10/06/2019", "CaseTypeID": "Benefit", "ID": "evidenceHandled", "Label": "Further evidence handled", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "10/06/2019", "CaseTypeID": "Benefit", "ID": "originalSender", "Label": "Original Sender", "FieldType": "DynamicList", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "19/02/2026", "CaseTypeID": "Benefit", "ID": "selectedConfidentialityParty", "Label": "Selected Party", "FieldType": "DynamicList", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "10/06/2019", "CaseTypeID": "Benefit", "ID": "furtherEvidenceAction", "Label": "Further Evidence Action", "FieldType": "DynamicList", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "10/06/2019", "CaseTypeID": "Benefit", "ID": "processAudioVideoAction", "Label": "Process Audio/Video Action", "FieldType": "DynamicList", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "10/06/2019", "CaseTypeID": "Benefit", "ID": "exceptionRecordReference", "Label": "Exception Record Reference", "FieldType": "Text", "SecurityClassification": "PUBLIC"},

@@ -3,9 +3,10 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.postponementrequest.PostponementRequestAboutToStartHandler.NOT_LIST_ASSIST_CASE_ERROR;
+import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown;
+import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.isChildSupportAppeal;
 
 import java.util.Optional;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -18,16 +19,19 @@ import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.util.PdfRequestUtil;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
-@Slf4j
 @Service
 public class ValidSendToInterlocMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     public static final String POSTPONEMENTS_NOT_POSSIBLE_GAPS = "Postponement requests cannot be made for hearings listed in GAPS";
     private final GenerateFile generateFile;
     private final String templateId;
+    private final boolean cmOtherPartyConfidentialityEnabled;
 
-    public ValidSendToInterlocMidEventHandler(GenerateFile generateFile, @Value("${doc_assembly.postponementrequest}") String templateId) {
+    public ValidSendToInterlocMidEventHandler(GenerateFile generateFile,
+                                              @Value("${doc_assembly.postponementrequest}") String templateId,
+                                              @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
         this.generateFile = generateFile;
         this.templateId = templateId;
+        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
 
     @Override
@@ -44,6 +48,9 @@ public class ValidSendToInterlocMidEventHandler implements PreSubmitCallbackHand
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         final PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
+        boolean requireExplicitSelection = cmOtherPartyConfidentialityEnabled && isChildSupportAppeal(sscsCaseData);
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
+                getSelectedConfidentialityPartyDropdown(sscsCaseData, requireExplicitSelection));
 
         if (SelectWhoReviewsCase.POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId().equals(sscsCaseData.getSelectWhoReviewsCase().getValue().getCode())) {
             validatePostponementRequest(sscsCaseData, response);
@@ -94,4 +101,5 @@ public class ValidSendToInterlocMidEventHandler implements PreSubmitCallbackHand
         sscsCaseData.getPostponementRequest().setPostponementRequestHearingDateAndTime(hearing.getValue().getStart().toString());
         sscsCaseData.getPostponementRequest().setPostponementRequestHearingVenue(hearing.getValue().getVenue().getName());
     }
+
 }
