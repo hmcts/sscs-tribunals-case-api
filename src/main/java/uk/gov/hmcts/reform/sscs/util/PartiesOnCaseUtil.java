@@ -91,7 +91,7 @@ public class PartiesOnCaseUtil {
                 .isPresent();
     }
 
-    public static DynamicList getSelectedConfidentialityPartyDropdown(SscsCaseData sscsCaseData, boolean requireExplicitSelection) {
+    public static DynamicList getSelectedConfidentialityPartyDropdown(SscsCaseData sscsCaseData) {
         List<DynamicListItem> listOptions = getPartiesOnCase(sscsCaseData);
 
         DynamicList existingSelectedConfidentialityParty = sscsCaseData.getExtendedSscsCaseData().getSelectedConfidentialityParty();
@@ -105,10 +105,25 @@ public class PartiesOnCaseUtil {
             return new DynamicList(existingValue, listOptions);
         }
 
-        DynamicListItem selectedConfidentialityParty = requireExplicitSelection
-                ? new DynamicListItem("", "")
-                : listOptions.get(0);
-        return new DynamicList(selectedConfidentialityParty, listOptions);
+        return new DynamicList(new DynamicListItem("", ""), listOptions);
+    }
+
+    public static DynamicList getSelectedConfidentialityPartyDropdown(SscsCaseData sscsCaseData, boolean requireExplicitSelection) {
+        DynamicList dropdown = getSelectedConfidentialityPartyDropdown(sscsCaseData);
+
+        DynamicListItem selectedValue = dropdown.getValue();
+        boolean hasSelectedValue = selectedValue != null
+                && selectedValue.getCode() != null
+                && !selectedValue.getCode().isBlank();
+
+        if (!requireExplicitSelection
+                && !hasSelectedValue
+                && dropdown.getListItems() != null
+                && !dropdown.getListItems().isEmpty()) {
+            dropdown.setValue(dropdown.getListItems().getFirst());
+        }
+
+        return dropdown;
     }
 
     public static List<String> getAllOtherPartiesOnCase(SscsCaseData sscsCaseData) {

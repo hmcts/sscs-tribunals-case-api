@@ -75,8 +75,8 @@ public class ValidSendToInterlocAboutToStartHandler implements PreSubmitCallback
 
     private void setSelectedConfidentialityPartyDropdown(SscsCaseData sscsCaseData) {
         boolean requireExplicitSelection = cmOtherPartyConfidentialityEnabled && isChildSupportAppeal(sscsCaseData);
-        DynamicList dropdown = getSelectedConfidentialityPartyDropdown(sscsCaseData, requireExplicitSelection);
-        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(dropdown);
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
+                getSelectedConfidentialityPartyDropdown(sscsCaseData, requireExplicitSelection));
     }
 
     private void setOriginalSenderDropdown(SscsCaseData sscsCaseData) {
