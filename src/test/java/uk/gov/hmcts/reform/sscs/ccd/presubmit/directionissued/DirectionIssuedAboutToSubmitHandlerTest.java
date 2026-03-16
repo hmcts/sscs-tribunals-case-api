@@ -6,8 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
@@ -28,6 +32,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -85,7 +90,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
     @BeforeEach
     public void setUp() {
         openMocks(this);
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, false);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, false, false);
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
 
         SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("myTest.doc").build()).build();
@@ -177,7 +182,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
     @Test
     void givenDirectionNoticeAlreadyExistsAndThenManuallyUploadANewNotice_thenIssueTheNewDocumentWithFooter() {
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, true);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, true, false);
         sscsCaseData.setPrePostHearing(PrePostHearing.PRE);
         sscsCaseData.getDocumentStaging().setPreviewDocument(null);
 
@@ -706,7 +711,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
     @Test
     void shouldClearInterlocReferralReason() {
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, true);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, true, false);
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_CORRECTION_APPLICATION);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -831,5 +836,120 @@ class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals(hmcHearingType, response.getData().getAppeal().getHearingOptions().getHmcHearingType());
         HearingOptions expectedHearingOptions = HearingOptions.builder().agreeLessNotice("string").hmcHearingType(hmcHearingType).build();
         assertEquals(expectedHearingOptions, response.getData().getAppeal().getHearingOptions());
+    }
+
+    @Nested
+    class CmOtherPartyConfidentialityFeatureFlagEnabled {
+        private final boolean cmOtherPartyConfidentialityFeatureFlag = true;
+
+        @ParameterizedTest
+        @CsvSource({"confidentialityGrantedSendToAdmin,YES", "confidentialityRefusedSendToAdmin,NO"})
+        void givenIssueDirectionNotice_andTheSelectedConfidentialityPartyIsAppellant_thenUpdateAppellantConfidentialityOnly(String directionType, YesNo expectedConfidentialityRequired) {
+
+            when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
+
+            handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, false, cmOtherPartyConfidentialityFeatureFlag);
+
+            callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(directionType));
+
+            DynamicListItem selectedConfidentialityParty = new DynamicListItem("appellant", "Appellant (or Appointee)");
+
+            callback.getCaseDetails().getCaseData().setExtendedSscsCaseData(ExtendedSscsCaseData.builder()
+                .selectedConfidentialityParty(new DynamicList(selectedConfidentialityParty, null))
+                .build());
+
+            var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+            assertTrue(response.getData().getAppellant().isPresent());
+            assertEquals(expectedConfidentialityRequired, response.getData().getAppellant().get().getConfidentialityRequired());
+        }
+
+        @ParameterizedTest
+        @CsvSource({"confidentialityGrantedSendToAdmin,YES", "confidentialityRefusedSendToAdmin,NO"})
+        void givenIssueDirectionNotice_andTheSelectedConfidentialityPartyIsOtherParty_thenUpdateTheSelectedOtherPartyConfidentialityOnly(String directionType, YesNo expectedConfidentialityRequired) {
+
+            var selectedConfidentialityPartyId = "666-666-666";
+
+            when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
+
+            handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, false,
+                cmOtherPartyConfidentialityFeatureFlag);
+
+            callback.getCaseDetails()
+                .getCaseData()
+                .setOtherParties(List.of(buildOtherParty("555-555-555", "Rubar", "Do"),
+                    buildOtherParty(selectedConfidentialityPartyId, "Ozan", "Mo")));
+
+            callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(directionType));
+
+            DynamicListItem selectedConfidentialityParty = new DynamicListItem("otherParty" + selectedConfidentialityPartyId,
+                "Other Party Ozan");
+
+            callback.getCaseDetails().getCaseData().setExtendedSscsCaseData(ExtendedSscsCaseData.builder()
+                .selectedConfidentialityParty(new DynamicList(selectedConfidentialityParty, null))
+                .build());
+
+            var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+            var otherPartyUpdated = response.getData().getOtherParties().stream().filter(o -> o.getValue().getId().equals(selectedConfidentialityPartyId)).toList();
+
+            assertEquals(1, otherPartyUpdated.size());   // only one of parties must be updated
+
+            assertEquals(expectedConfidentialityRequired, otherPartyUpdated.getFirst().getValue().getConfidentialityRequired());
+            assertNotNull(otherPartyUpdated.getFirst().getValue().getConfidentialityRequiredChangedDate());
+
+            // other parties beside selected one should not be updated
+            response.getData().getOtherParties().stream()
+                .filter(o -> !o.getValue().getId().equals(selectedConfidentialityPartyId))
+                .forEach(otherParty -> {
+                    assertNull(otherParty.getValue().getConfidentialityRequired());
+                    assertNull(otherParty.getValue().getConfidentialityRequiredChangedDate());
+                });
+
+            assertTrue(response.getData().getAppellant().isPresent());
+            assertNull(response.getData().getAppellant().get().getConfidentialityRequired());
+        }
+    }
+
+    @Nested
+    class CmOtherPartyConfidentialityFeatureFlagNotEnabled {
+
+        @ParameterizedTest
+        @ValueSource(strings = {"confidentialityGrantedSendToAdmin", "confidentialityRefusedSendToAdmin"})
+        void givenIssueDirectionNotice_andCmOtherPartyConfidentialityFeatureFlagNotEnabled_thenDoNotUpdateAppellantConfidentiality(String directionType) {
+
+            boolean cmOtherPartyConfidentialityFeatureFlag = false;
+
+            when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
+
+            handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, false,
+                cmOtherPartyConfidentialityFeatureFlag);
+
+            callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(directionType));
+
+            callback.getCaseDetails()
+                .getCaseData()
+                .setOtherParties(List.of(buildOtherParty("555-555-555", "Rubar", "Do"),
+                    buildOtherParty("666-666-666", "Ozan", "Mo")));
+
+            var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+            assertTrue(response.getData().getAppellant().isPresent());
+            assertNull(response.getData().getAppellant().get().getConfidentialityRequired());
+
+            assertEquals(2, response.getData().getOtherParties().size());
+
+            response.getData().getOtherParties().forEach(otherParty -> {
+                assertNull(otherParty.getValue().getConfidentialityRequired());
+                assertNull(otherParty.getValue().getConfidentialityRequiredChangedDate());
+            });
+        }
+
+    }
+
+    private CcdValue<OtherParty> buildOtherParty(String id, String firstName, String lastName) {
+        return CcdValue.<OtherParty>builder().value(OtherParty.builder()
+            .id(id)
+            .name(Name.builder().firstName(firstName).lastName(lastName).build()).build()).build();
     }
 }
