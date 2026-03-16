@@ -60,7 +60,7 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
 
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        if (isDynamicListEmpty(sscsCaseData.getSelectWhoReviewsCase())) {
+        if (isSelectionMissing(sscsCaseData.getSelectWhoReviewsCase())) {
             PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
             preSubmitCallbackResponse.addError("Must select who reviews the appeal.");
             return preSubmitCallbackResponse;
@@ -72,7 +72,7 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
                                                                           SscsCaseData sscsCaseData, String userAuth) {
         var preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
         if (isPostponementRequestInterlocSendToTcw(sscsCaseData)) {
-            if (isDynamicListEmpty(sscsCaseData.getOriginalSender())) {
+            if (isSelectionMissing(sscsCaseData.getOriginalSender())) {
                 preSubmitCallbackResponse.addError("Must select original sender");
                 return preSubmitCallbackResponse;
             }
@@ -84,7 +84,7 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
             postponementRequestService.processPostponementRequest(sscsCaseData, uploadParty, Optional.empty());
         } else {
             if (isConfidentialityReferral(sscsCaseData)
-                    && isSelectedConfidentialityPartyMissing(sscsCaseData.getExtendedSscsCaseData().getSelectedConfidentialityParty())) {
+                    && isSelectionMissing(sscsCaseData.getExtendedSscsCaseData().getSelectedConfidentialityParty())) {
                 preSubmitCallbackResponse.addError("Must select party");
                 return preSubmitCallbackResponse;
             }
@@ -116,15 +116,11 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
                 ? REP : UploadParty.fromValue(selectedParty.getValue().getCode());
     }
 
-    private boolean isDynamicListEmpty(DynamicList selectedParty) {
-        return selectedParty == null
-                || selectedParty.getValue() == null
-                || selectedParty.getValue().getCode() == null;
-    }
-
-    private boolean isSelectedConfidentialityPartyMissing(DynamicList selectedParty) {
-        return isDynamicListEmpty(selectedParty)
-                || selectedParty.getValue().getCode().isBlank();
+    private boolean isSelectionMissing(DynamicList dynamicList) {
+        return dynamicList == null
+                || dynamicList.getValue() == null
+                || dynamicList.getValue().getCode() == null
+                || dynamicList.getValue().getCode().isBlank();
     }
 
 }
