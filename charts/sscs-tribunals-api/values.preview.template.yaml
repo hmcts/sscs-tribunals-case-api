@@ -719,6 +719,7 @@ sscs-tribunals-frontend:
           - pcq-token-key
           - sscs-redis-access-key
           - sscs-redis-connection-string
+          - sscs-s2s-secret
 
 redis:
   enabled: true
