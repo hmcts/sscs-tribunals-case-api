@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.postponementrequest.PostponementRequestAboutToStartHandler.NOT_LIST_ASSIST_CASE_ERROR;
 import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown;
 import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.isChildSupportAppeal;
@@ -48,9 +50,14 @@ public class ValidSendToInterlocMidEventHandler implements PreSubmitCallbackHand
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         final PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
+        DynamicList dropdown = getSelectedConfidentialityPartyDropdown(sscsCaseData);
         boolean requireExplicitSelection = cmOtherPartyConfidentialityEnabled && isChildSupportAppeal(sscsCaseData);
-        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
-                getSelectedConfidentialityPartyDropdown(sscsCaseData, requireExplicitSelection));
+        if (!requireExplicitSelection
+                && (dropdown.getValue() == null || !isNotBlank(dropdown.getValue().getCode()))
+                && isNotEmpty(dropdown.getListItems())) {
+            dropdown.setValue(dropdown.getListItems().getFirst());
+        }
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(dropdown);
 
         if (SelectWhoReviewsCase.POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId().equals(sscsCaseData.getSelectWhoReviewsCase().getValue().getCode())) {
             validatePostponementRequest(sscsCaseData, response);

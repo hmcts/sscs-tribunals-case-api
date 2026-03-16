@@ -203,22 +203,6 @@ class PartiesOnCaseUtilTest {
         assertThat(dropdown.getListItems()).isNotEmpty();
     }
 
-    @ParameterizedTest
-    @MethodSource("selectedConfidentialityPartyDefaultingScenarios")
-    void shouldDefaultSelectedConfidentialityPartyBasedOnRequireExplicitSelection(
-        boolean requireExplicitSelection, String expectedSelectedCode) {
-        DynamicList dropdown = PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown(sscsCaseData, requireExplicitSelection);
-
-        assertThat(dropdown.getValue().getCode()).isEqualTo(expectedSelectedCode);
-    }
-
-    private static Stream<Arguments> selectedConfidentialityPartyDefaultingScenarios() {
-        return Stream.of(
-            Arguments.of(true, ""),
-            Arguments.of(false, "appellant")
-        );
-    }
-
     private void setupOtherParties() {
         OtherParty otherParty1 = OtherParty.builder()
             .id("1")

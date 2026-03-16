@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.*;
 import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getPartiesOnCase;
 import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown;
@@ -74,9 +76,14 @@ public class ValidSendToInterlocAboutToStartHandler implements PreSubmitCallback
     }
 
     private void setSelectedConfidentialityPartyDropdown(SscsCaseData sscsCaseData) {
+        DynamicList dropdown = getSelectedConfidentialityPartyDropdown(sscsCaseData);
         boolean requireExplicitSelection = cmOtherPartyConfidentialityEnabled && isChildSupportAppeal(sscsCaseData);
-        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
-                getSelectedConfidentialityPartyDropdown(sscsCaseData, requireExplicitSelection));
+        if (!requireExplicitSelection
+                && (dropdown.getValue() == null || !isNotBlank(dropdown.getValue().getCode()))
+                && isNotEmpty(dropdown.getListItems())) {
+            dropdown.setValue(dropdown.getListItems().getFirst());
+        }
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(dropdown);
     }
 
     private void setOriginalSenderDropdown(SscsCaseData sscsCaseData) {
