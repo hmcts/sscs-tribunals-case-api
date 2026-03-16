@@ -44,7 +44,7 @@ public class NonCompliantSendToInterlocAboutToStartHandler implements PreSubmitC
 
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
-        boolean requireExplicitSelection = cmOtherPartyConfidentialityEnabled && isChildSupportAppeal(sscsCaseData);
+        boolean requireExplicitSelection = isChildSupportAppeal(sscsCaseData);
         sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
                 getSelectedConfidentialityPartyDropdown(sscsCaseData, requireExplicitSelection));
         return new PreSubmitCallbackResponse<>(sscsCaseData);
