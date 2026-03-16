@@ -355,6 +355,11 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             return caseData;
         }
 
+        if (!caseData.isBenefitType(Benefit.CHILD_SUPPORT)) {
+            log.debug("Not updating confidentiality. It is not Child Maintenance case.");
+            return caseData;
+        }
+
         var directionCode = caseData.getDirectionTypeDl().getValue().getCode();
 
         var confidentialityRequired = CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString()
