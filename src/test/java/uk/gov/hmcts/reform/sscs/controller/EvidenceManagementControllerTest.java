@@ -8,7 +8,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.service.SubmitAppealServiceBase.DM_STORE_USER_ID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -65,7 +64,6 @@ public class EvidenceManagementControllerTest {
     public void setUp() {
         openMocks(this);
         controller = new EvidenceManagementController(evidenceManagementService, evidenceManagementSecureDocStoreService, fileToPdfConversionService, false, null, objectMapper, authorisationService);
-    }
 
     @Test
     public void shouldThrowEvidenceDocumentsMissingExceptionIfThereAreNoFilesInTheRequest() throws JsonProcessingException {
@@ -117,6 +115,7 @@ public class EvidenceManagementControllerTest {
 
     @Test
     public void shouldUploadEvidenceDocumentListSecureDocStore() throws JsonProcessingException {
+
         controller = new EvidenceManagementController(evidenceManagementService, evidenceManagementSecureDocStoreService, fileToPdfConversionService, true, idamService, objectMapper, authorisationService);
 
         uk.gov.hmcts.reform.ccd.document.am.model.Document.Links links = new uk.gov.hmcts.reform.ccd.document.am.model.Document.Links();
