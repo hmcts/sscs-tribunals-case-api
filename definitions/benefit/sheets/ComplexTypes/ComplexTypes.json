@@ -460,6 +460,7 @@
   {"LiveFrom": "01/01/2018", "ID": "otherParty", "ListElementCode": "address", "FieldType": "address", "ElementLabel": "Address Details", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "otherParty", "ListElementCode": "contact", "FieldType": "contact", "ElementLabel": "Contact Details", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "otherParty", "ListElementCode": "reasonableAdjustment", "FieldType": "reasonableAdjustmentDetails", "ElementLabel": "Reasonable Adjustment", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "16/03/2026", "ID": "otherParty", "ListElementCode": "domesticViolenceMarker", "FieldType": "FixedRadioList", "FieldTypeParameter": "FL_yesNoUnknown", "ElementLabel": "DV marker", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/10/2021", "ID": "otherParty", "ListElementCode": "confidentialityRequired", "FieldType": "YesOrNo", "ElementLabel": "Confidentiality Required", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/10/2021", "ID": "otherParty", "ListElementCode": "unacceptableCustomerBehaviour", "FieldType": "YesOrNo", "ElementLabel": "Unacceptable Customer Behaviour", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "otherParty", "ListElementCode": "showRole", "FieldType": "YesOrNo", "ElementLabel": "Show role for Child support", "FieldShowCondition": "name=\"DUMMY_VALUE_TO_HIDE_FIELD\"" , "SecurityClassification": "PUBLIC"},
