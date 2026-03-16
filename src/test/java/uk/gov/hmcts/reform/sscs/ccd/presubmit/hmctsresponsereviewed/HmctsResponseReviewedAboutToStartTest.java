@@ -316,7 +316,7 @@ class HmctsResponseReviewedAboutToStartTest {
     }
 
     @Test
-    public void givenCmInterlocConfidentialityFlagEnabledForChildSupport_thenOriginalSenderHasNoDefaultSelection() {
+    public void givenCmInterlocConfidentialityFlagEnabledForChildSupport_thenSelectedConfidentialityPartyHasNoDefaultSelection() {
         handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService, true);
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
 
@@ -326,7 +326,7 @@ class HmctsResponseReviewedAboutToStartTest {
     }
 
     @Test
-    public void givenCmInterlocConfidentialityFlagDisabledForChildSupport_thenOriginalSenderDefaultsToAppellant() {
+    public void givenCmInterlocConfidentialityFlagDisabledForChildSupport_thenSelectedConfidentialityPartyDefaultsToAppellant() {
         handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService, false);
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
 
@@ -336,7 +336,7 @@ class HmctsResponseReviewedAboutToStartTest {
     }
 
     @Test
-    public void givenCmInterlocConfidentialityFlagEnabledForNonChildSupport_thenOriginalSenderDefaultsToAppellant() {
+    public void givenCmInterlocConfidentialityFlagEnabledForNonChildSupport_thenSelectedConfidentialityPartyDefaultsToAppellant() {
         handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService, true);
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(Benefit.PIP.getShortName()).build());
 
