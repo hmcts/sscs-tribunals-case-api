@@ -28,14 +28,13 @@ import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 import uk.gov.hmcts.reform.sscs.service.DocumentDownloadService;
 import uk.gov.hmcts.reform.sscs.service.TribunalsService;
 
-
-
 @ExtendWith(MockitoExtension.class)
 public class TyaControllerTest {
 
     private static final Long CASE_ID = 123456789L;
     private static final String URL = "http://test";
     private static final String SERVICE_AUTH = "service-auth";
+    private static final String SERVICE_NAME = "sscs";
 
     @Mock
     private TribunalsService tribunalsService;
@@ -56,60 +55,87 @@ public class TyaControllerTest {
     @Test
     public void testToReturnAppealForGivenCaseReference() throws CcdException {
         ObjectNode node = JsonNodeFactory.instance.objectNode();
+        //Given
         when(tribunalsService.findAppeal(CASE_ID, false)).thenReturn(node);
+        when(authorisationService.authenticate(SERVICE_AUTH)).thenReturn(SERVICE_NAME);
 
+        //When
         ResponseEntity<String> receivedAppeal = controller.getAppealByCaseId(SERVICE_AUTH, CASE_ID, false);
 
+        //Then
         assertThat(receivedAppeal.getStatusCode(), equalTo(HttpStatus.OK));
         assertThat(receivedAppeal.getBody(), equalTo(node.toString()));
-        verify(authorisationService).allowOnlySscs(SERVICE_AUTH);
+        verify(authorisationService).authenticate(SERVICE_AUTH);
+        verify(authorisationService).allowOnlySscs(SERVICE_NAME);
     }
 
     @Test
     public void testToReturnMyaAppealForGivenCaseReference() throws CcdException {
         ObjectNode node = JsonNodeFactory.instance.objectNode();
+        //Given
         when(tribunalsService.findAppeal(CASE_ID, true)).thenReturn(node);
+        when(authorisationService.authenticate(SERVICE_AUTH)).thenReturn(SERVICE_NAME);
 
+        //When
         ResponseEntity<String> receivedAppeal = controller.getAppealByCaseId(SERVICE_AUTH, CASE_ID, true);
 
+        //Then
         assertThat(receivedAppeal.getStatusCode(), equalTo(HttpStatus.OK));
         assertThat(receivedAppeal.getBody(), equalTo(node.toString()));
-        verify(authorisationService).allowOnlySscs(SERVICE_AUTH);
+        verify(authorisationService).authenticate(SERVICE_AUTH);
+        verify(authorisationService).allowOnlySscs(SERVICE_NAME);
     }
 
     @Test
     public void testToThrowAppealNotFoundExceptionIfAppealNotFound() throws CcdException {
-        when(tribunalsService.findAppeal(CASE_ID, true)).thenThrow(new AppealNotFoundException(CASE_ID));
+        //Given
+        when(tribunalsService.findAppeal(CASE_ID, true)).thenThrow(
+            new AppealNotFoundException(CASE_ID));
+        when(authorisationService.authenticate(SERVICE_AUTH)).thenReturn(SERVICE_NAME);
 
+        //When / Then
         assertThrows(AppealNotFoundException.class, () -> controller.getAppealByCaseId(SERVICE_AUTH, CASE_ID, true));
-        verify(authorisationService).allowOnlySscs(SERVICE_AUTH);
+        verify(authorisationService).authenticate(SERVICE_AUTH);
+        verify(authorisationService).allowOnlySscs(SERVICE_NAME);
     }
 
     @Test
     public void testToReturnResourceForDocumentUrl() throws CcdException {
         ResponseEntity<Resource> responseEntity = ResponseEntity.of(Optional.of(new ByteArrayResource(new byte[0])));
+        //Given
         when(documentDownloadService.downloadFile(URL)).thenReturn(responseEntity);
+        when(authorisationService.authenticate(SERVICE_AUTH)).thenReturn(SERVICE_NAME);
 
+        //When
         ResponseEntity<Resource> receivedDocument = controller.getAppealDocument(SERVICE_AUTH, URL);
 
-        verify(authorisationService).allowOnlySscs(SERVICE_AUTH);
+        //Then
+        verify(authorisationService).authenticate(SERVICE_AUTH);
+        verify(authorisationService).allowOnlySscs(SERVICE_NAME);
         assertThat(receivedDocument.getStatusCode(), equalTo(HttpStatus.OK));
         assertThat(receivedDocument.getBody(), instanceOf(ByteArrayResource.class));
     }
 
     @Test
     public void testToThrowDocumentNotFoundExceptionIfError() throws CcdException {
-        when(documentDownloadService.downloadFile(URL)).thenThrow(new DocumentNotFoundException());
+        //Given
+        when(documentDownloadService.downloadFile(URL)).thenThrow(
+                new DocumentNotFoundException());
+
+        //When / Then
         assertThrows(DocumentNotFoundException.class, () -> controller.getAppealDocument(SERVICE_AUTH, URL));
     }
 
     @Test
     public void testToThrowForbiddenExceptionForUnauthorizedServiceForDocumentEndpoint() throws CcdException {
+        //Given
         String serviceAuth = "unauthorized-service-auth";
         String serviceName = "unauthorized-service";
+        when(authorisationService.authenticate(serviceAuth)).thenReturn(serviceName);
         doThrow(new ForbiddenException("Service " + serviceName + "is not authorized for this action"))
-                .when(authorisationService).allowOnlySscs(serviceAuth);
+                .when(authorisationService).allowOnlySscs(serviceName);
 
+        //When / Then
         assertThrows(ForbiddenException.class, () -> controller.getAppealDocument(serviceAuth, URL));
     }
 
@@ -117,9 +143,11 @@ public class TyaControllerTest {
     public void testToThrowForbiddenExceptionForUnauthorizedServiceForAppealsEndpoint() throws CcdException {
         String serviceAuth = "unauthorized-service-auth";
         String serviceName = "unauthorized-service";
+        when(authorisationService.authenticate(serviceAuth)).thenReturn(serviceName);
         doThrow(new ForbiddenException("Service " + serviceName + " is not authorized for this action"))
-                .when(authorisationService).allowOnlySscs(serviceAuth);
+                .when(authorisationService).allowOnlySscs(serviceName);
 
         assertThrows(ForbiddenException.class, () -> controller.getAppealByCaseId(serviceAuth, CASE_ID, false));
     }
+
 }
