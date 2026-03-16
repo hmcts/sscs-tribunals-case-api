@@ -348,7 +348,7 @@
     "CaseFieldID": "appeal",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
     "PageID": "appealDetails",
@@ -359,7 +359,7 @@
     "CaseFieldID": "subscriptions",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 2,
     "PageID": "appealDetails"
@@ -369,7 +369,7 @@
     "CaseFieldID": "jointParty",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 2,
     "PageFieldDisplayOrder": 1,
     "PageID": "jointPartyDetails",
@@ -380,7 +380,7 @@
     "CaseFieldID": "jointPartyName",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 2,
     "PageFieldDisplayOrder": 2,
     "PageID": "jointPartyDetails"
@@ -390,7 +390,7 @@
     "CaseFieldID": "jointPartyIdentity",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 2,
     "PageFieldDisplayOrder": 3,
     "PageID": "jointPartyDetails"
@@ -400,7 +400,7 @@
     "CaseFieldID": "jointPartyAddressSameAsAppellant",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 2,
     "PageFieldDisplayOrder": 4,
     "PageID": "jointPartyDetails"
@@ -410,7 +410,7 @@
     "CaseFieldID": "jointPartyAddress",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 2,
     "PageFieldDisplayOrder": 5,
     "PageID": "jointPartyDetails"
@@ -420,7 +420,7 @@
     "CaseFieldID": "otherParties",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 3,
     "PageFieldDisplayOrder": 1,
     "PageID": "otherPartiesDetails",
@@ -431,7 +431,7 @@
     "CaseFieldID": "benefitCode",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 4,
     "PageFieldDisplayOrder": 1,
     "PageID": "caseClassification",
@@ -442,7 +442,7 @@
     "CaseFieldID": "issueCode",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 4,
     "PageFieldDisplayOrder": 2,
     "PageID": "caseClassification"
@@ -452,7 +452,7 @@
     "CaseFieldID": "caseCode",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 4,
     "PageFieldDisplayOrder": 3,
     "PageID": "caseClassification"
@@ -462,7 +462,7 @@
     "CaseFieldID": "dwpRegionalCentre",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 4,
     "PageFieldDisplayOrder": 4,
     "PageID": "caseClassification"
@@ -472,7 +472,7 @@
     "CaseFieldID": "dwpOriginatingOffice",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 4,
     "PageFieldDisplayOrder": 5,
     "PageID": "caseClassification"
@@ -482,7 +482,7 @@
     "CaseFieldID": "dwpPresentingOffice",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 4,
     "PageFieldDisplayOrder": 6,
     "PageID": "caseClassification"
@@ -492,7 +492,7 @@
     "CaseFieldID": "region",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 4,
     "PageFieldDisplayOrder": 7,
     "PageID": "caseClassification"
@@ -502,7 +502,7 @@
     "CaseFieldID": "processingVenue",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 4,
     "PageFieldDisplayOrder": 8,
     "PageID": "caseClassification"
@@ -512,7 +512,7 @@
     "CaseFieldID": "isScottishCase",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 4,
     "PageFieldDisplayOrder": 9,
     "PageID": "caseClassification"
@@ -522,7 +522,7 @@
     "CaseFieldID": "formType",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 4,
     "PageFieldDisplayOrder": 10,
     "PageID": "caseClassification"
@@ -532,7 +532,7 @@
     "CaseFieldID": "dwpUCB",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 5,
     "PageFieldDisplayOrder": 1,
     "PageID": "dwpFlags",
@@ -543,7 +543,7 @@
     "CaseFieldID": "dwpPHME",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 5,
     "PageFieldDisplayOrder": 2,
     "PageID": "dwpFlags"
@@ -553,7 +553,7 @@
     "CaseFieldID": "dwpComplexAppeal",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 5,
     "PageFieldDisplayOrder": 3,
     "PageID": "dwpFlags"
@@ -563,7 +563,7 @@
     "CaseFieldID": "dwpIsOfficerAttending",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 5,
     "PageFieldDisplayOrder": 4,
     "PageID": "dwpFlags"
@@ -573,7 +573,7 @@
     "CaseFieldID": "dwpFurtherInfo",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 5,
     "PageFieldDisplayOrder": 5,
     "PageID": "dwpFlags"
@@ -583,7 +583,7 @@
     "CaseFieldID": "isConfidentialCase",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 6,
     "PageFieldDisplayOrder": 1,
     "PageID": "confidentialityAndAdjustments",
@@ -594,7 +594,7 @@
     "CaseFieldID": "confidentialityType",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 6,
     "PageFieldDisplayOrder": 2,
     "PageID": "confidentialityAndAdjustments"
@@ -604,7 +604,7 @@
     "CaseFieldID": "reasonableAdjustmentChoice",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 6,
     "PageFieldDisplayOrder": 3,
     "PageID": "confidentialityAndAdjustments"
@@ -614,7 +614,7 @@
     "CaseFieldID": "reasonableAdjustments",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 6,
     "PageFieldDisplayOrder": 4,
     "PageID": "confidentialityAndAdjustments"
@@ -624,7 +624,7 @@
     "CaseFieldID": "languagePreferenceWelsh",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 6,
     "PageFieldDisplayOrder": 5,
     "PageID": "confidentialityAndAdjustments"
@@ -634,7 +634,7 @@
     "CaseFieldID": "urgentCase",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 7,
     "PageFieldDisplayOrder": 1,
     "PageID": "caseStatusAndNotes",
@@ -645,7 +645,7 @@
     "CaseFieldID": "urgentHearingRegistered",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 7,
     "PageFieldDisplayOrder": 2,
     "PageID": "caseStatusAndNotes"
@@ -655,7 +655,7 @@
     "CaseFieldID": "urgentHearingOutcome",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 7,
     "PageFieldDisplayOrder": 3,
     "PageID": "caseStatusAndNotes"
@@ -665,7 +665,7 @@
     "CaseFieldID": "isAppellantDeceased",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 7,
     "PageFieldDisplayOrder": 4,
     "PageID": "caseStatusAndNotes"
@@ -675,7 +675,7 @@
     "CaseFieldID": "dateOfAppellantDeath",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 7,
     "PageFieldDisplayOrder": 5,
     "PageID": "caseStatusAndNotes"
@@ -685,7 +685,7 @@
     "CaseFieldID": "appealNotePad",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 7,
     "PageFieldDisplayOrder": 6,
     "PageID": "caseStatusAndNotes"
@@ -695,7 +695,7 @@
     "CaseFieldID": "decisionNotes",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 7,
     "PageFieldDisplayOrder": 7,
     "PageID": "caseStatusAndNotes"
@@ -705,7 +705,7 @@
     "CaseFieldID": "createdInGapsFrom",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 8,
     "PageFieldDisplayOrder": 1,
     "PageID": "systemFlags",
@@ -716,7 +716,7 @@
     "CaseFieldID": "isProgressingViaGaps",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 8,
     "PageFieldDisplayOrder": 2,
     "PageID": "systemFlags"
@@ -726,7 +726,7 @@
     "CaseFieldID": "hmctsDwpState",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 8,
     "PageFieldDisplayOrder": 3,
     "PageID": "systemFlags"
@@ -736,7 +736,7 @@
     "CaseFieldID": "interlocReviewState",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 8,
     "PageFieldDisplayOrder": 4,
     "PageID": "systemFlags"
@@ -746,7 +746,7 @@
     "CaseFieldID": "directionResponse",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 8,
     "PageFieldDisplayOrder": 5,
     "PageID": "systemFlags"
@@ -756,7 +756,7 @@
     "CaseFieldID": "adjournCaseNextHearingListingDuration",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "16/03/2026",
     "PageDisplayOrder": 9,
     "PageFieldDisplayOrder": 1,
     "PageID": "adjournmentDetails",
@@ -1212,7 +1212,6 @@
     "PageID": "1.0",
     "PageLabel": "Correspondence"
   },
-
   {
     "CaseEventID": "interlocInformationReceived",
     "CaseFieldID": "interlocReviewState",
@@ -4107,7 +4106,6 @@
     "PageLabel": "Issue generic letter",
     "ShowSummaryChangeOption": "N"
   },
-
   {
     "LiveFrom": "01/01/2018",
     "CaseTypeID": "Benefit",
@@ -4196,7 +4194,6 @@
     "FieldShowCondition": "sendToAllParties = \"No\" AND hasOtherParties = \"Yes\"",
     "ShowSummaryChangeOption": "N"
   },
-
   {
     "CaseEventID": "issueGenericLetter",
     "CaseFieldID": "otherPartySelection",
