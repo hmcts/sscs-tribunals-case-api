@@ -351,8 +351,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private SscsCaseData updateConfidentiality(SscsCaseData caseData) {
 
         if (!cmOtherPartyConfidentialityEnabled) {
-            log.debug(
-                "Not updating confidentiality. Feature flag feature.cm-other-party-confidentiality.enabled is not enabled.");
+            log.debug("Not updating confidentiality. Feature flag cm-other-party-confidentiality is not enabled.");
             return caseData;
         }
 
@@ -361,28 +360,29 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         var confidentialityRequired = CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString()
             .equals(directionCode) ? YesNo.YES : YesNo.NO;
 
-        var confidentialityPartyCode = caseData.getExtendedSscsCaseData()
+        var selectedConfidentialityPartyCode = caseData.getExtendedSscsCaseData()
             .getSelectedConfidentialityParty()
             .getValue()
             .getCode();
 
-        if ("appellant".equalsIgnoreCase(confidentialityPartyCode)) {
+        if ("appellant".equalsIgnoreCase(selectedConfidentialityPartyCode)) {
             log.debug("Updating Appellant's confidentiality as {}, caseId: {}", confidentialityRequired,
                 caseData.getCcdCaseId());
+
             caseData.getAppellant().ifPresent(appellant -> {
                 appellant.setConfidentialityRequired(confidentialityRequired);
                 appellant.setConfidentialityRequiredChangedDate(LocalDateTime.now());
 
             });
-        } else if (confidentialityPartyCode.startsWith("otherParty")) {
-            var otherPartyId = confidentialityPartyCode.substring(10);
+        } else if (selectedConfidentialityPartyCode.startsWith("otherParty")) {
+            var selectedConfidentialityPartyId = selectedConfidentialityPartyCode.substring(10);
 
             if (caseData.getOtherParties() != null && !caseData.getOtherParties().isEmpty()) {
                 log.debug("Updating Other party's confidentiality as {}, caseId: {}, otherParty Id: {}",
-                    confidentialityRequired, caseData.getCcdCaseId(), otherPartyId);
+                    confidentialityRequired, caseData.getCcdCaseId(), selectedConfidentialityPartyId);
 
                 caseData.getOtherParties().forEach(otherParty -> {
-                    if (otherPartyId.equalsIgnoreCase(otherParty.getValue().getId())) {
+                    if (selectedConfidentialityPartyId.equalsIgnoreCase(otherParty.getValue().getId())) {
                         otherParty.getValue().setConfidentialityRequired(confidentialityRequired);
                         otherParty.getValue().setConfidentialityRequiredChangedDate(LocalDateTime.now());
                     }
