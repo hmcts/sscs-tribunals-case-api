@@ -109,7 +109,6 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
         }
     }
 
-
     private YesNo setSevereCriteriaApplies(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getElementsDisputedLimitedWork() == null) {
             return YesNo.NO;
