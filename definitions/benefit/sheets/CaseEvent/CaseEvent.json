@@ -2209,21 +2209,6 @@
   {
     "LiveFrom": "01/01/2018",
     "CaseTypeID": "Benefit",
-    "ID": "nonCompliantSendToInterloc",
-    "Name": "Send to interloc - pre-valid",
-    "Description": "Send a case to a judge for review",
-    "DisplayOrder": 1460,
-    "PreConditionState(s)": "incompleteApplication;incompleteApplicationInformationReqsted",
-    "PostConditionState": "interlocutoryReviewState",
-    "CallBackURLAboutToStartEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToStart",
-    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
-    "ShowEventNotes": "Y",
-    "SecurityClassification": "Public",
-    "Publish": "${CCD_DEF_PUBLISH}"
-  },
-  {
-    "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
     "ID": "tcwReferToJudge",
     "Name": "Send to Judge",
     "Description": "Send to Judge",

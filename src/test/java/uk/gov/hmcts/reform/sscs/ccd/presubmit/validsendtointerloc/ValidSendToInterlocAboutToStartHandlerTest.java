@@ -53,7 +53,7 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
     private SscsCaseData sscsCaseData;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         handler = new ValidSendToInterlocAboutToStartHandler(false, false, false);
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
     }
@@ -95,7 +95,7 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
 
     @ParameterizedTest
     @EnumSource(value = EventType.class, names = {"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
-    public void givenPostponementsFeatureOn_populatesSelectWhoReviewsCaseDropDown(EventType eventType) {
+    void givenPostponementsFeatureOn_populatesSelectWhoReviewsCaseDropDown(EventType eventType) {
         ReflectionTestUtils.setField(handler, "postponementsFeature", true);
 
         when(callback.getEvent()).thenReturn(eventType);
@@ -113,7 +113,7 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenAValidSendToInterlocRequestWithRep_thenPopulateDropdownWithPartiesOnCase() {
+    void givenAValidSendToInterlocRequestWithRep_thenPopulateDropdownWithPartiesOnCase() {
         setupCallback();
         sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative("Yes").build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -131,7 +131,7 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenAValidSendToInterlocRequestWithJointParty_thenPopulateDropdownWithPartiesOnCase() {
+    void givenAValidSendToInterlocRequestWithJointParty_thenPopulateDropdownWithPartiesOnCase() {
         setupCallback();
         sscsCaseData.getJointParty().setHasJointParty(YES);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -149,7 +149,7 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenAValidSendToInterlocRequestWithJointPartyAndRep_thenPopulateDropdownWithPartiesOnCase() {
+    void givenAValidSendToInterlocRequestWithJointPartyAndRep_thenPopulateDropdownWithPartiesOnCase() {
         setupCallback();
         sscsCaseData.getJointParty().setHasJointParty(YES);
         sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative("Yes").build());
