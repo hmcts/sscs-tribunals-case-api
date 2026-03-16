@@ -84,7 +84,7 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
             postponementRequestService.processPostponementRequest(sscsCaseData, uploadParty, Optional.empty());
         } else {
             if (isConfidentialityReferral(sscsCaseData)
-                    && isDynamicListEmpty(sscsCaseData.getExtendedSscsCaseData().getSelectedConfidentialityParty())) {
+                    && isSelectedConfidentialityPartyMissing(sscsCaseData.getExtendedSscsCaseData().getSelectedConfidentialityParty())) {
                 preSubmitCallbackResponse.addError("Must select party");
                 return preSubmitCallbackResponse;
             }
@@ -120,6 +120,11 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
         return selectedParty == null
                 || selectedParty.getValue() == null
                 || selectedParty.getValue().getCode() == null;
+    }
+
+    private boolean isSelectedConfidentialityPartyMissing(DynamicList selectedParty) {
+        return isDynamicListEmpty(selectedParty)
+                || selectedParty.getValue().getCode().isBlank();
     }
 
 }
