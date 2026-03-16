@@ -38,7 +38,8 @@
     "PageFieldDisplayOrder": 2,
     "RetainHiddenValue": "Yes",
     "CaseEventFieldLabel": "Select Party",
-    "PageID": "1.0"
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "Y"
   },
   {
     "CaseEventID": "validSendToInterloc",
