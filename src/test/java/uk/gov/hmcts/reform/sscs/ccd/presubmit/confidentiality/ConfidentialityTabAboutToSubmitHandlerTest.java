@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -33,6 +34,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -61,14 +63,29 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
                                    .appeal(
                                        Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build()).build())
                                    .build();
+        when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.empty());
     }
 
-    @Test
-    void canHandleReturnsTrue() {
+    @ParameterizedTest
+    @EnumSource(value = EventType.class, names = {
+        "DWP_UPLOAD_RESPONSE",
+        "UPDATE_OTHER_PARTY_DATA",
+        "INCOMPLETE_APPLICATION_RECEIVED",
+        "CASE_UPDATED",
+        "ACTION_HEARING_RECORDING_REQUEST"
+    })
+    void canHandleReturnsTrueForEachSupportedEventType(final EventType eventType) {
+        when(callback.getEvent()).thenReturn(eventType);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isTrue();
+    }
+
+    @Test
+    void canHandleReturnsFalseForUnsupportedEventType() {
+        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+        assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
 
     @Test

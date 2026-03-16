@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
@@ -33,12 +34,14 @@ public class ConfidentialityTabAboutToSubmitHandler implements PreSubmitCallback
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        // Runs for every event type to ensure that any changes to data are reflected in the tab and also to future-proof against other new or modified events that may update confidentiality data
-        return cmOtherPartyConfidentialityEnabled && callbackType == CallbackType.ABOUT_TO_SUBMIT
-            && callback.getCaseDetails()
-                       .getCaseData()
-                       .isBenefitType(
-                           Benefit.CHILD_SUPPORT);
+        return cmOtherPartyConfidentialityEnabled
+            && (callback.getEvent() == EventType.DWP_UPLOAD_RESPONSE
+            || callback.getEvent() == EventType.UPDATE_OTHER_PARTY_DATA
+            || callback.getEvent() == EventType.INCOMPLETE_APPLICATION_RECEIVED
+            || callback.getEvent() == EventType.CASE_UPDATED
+            || callback.getEvent() == EventType.ACTION_HEARING_RECORDING_REQUEST)
+            && callbackType == CallbackType.ABOUT_TO_SUBMIT
+            && callback.getCaseDetails().getCaseData().isBenefitType(Benefit.CHILD_SUPPORT);
     }
 
     @Override
@@ -72,9 +75,9 @@ public class ConfidentialityTabAboutToSubmitHandler implements PreSubmitCallback
                                                             .orElse(null);
         final SscsCaseData currentCaseData = callback.getCaseDetails().getCaseData();
         final YesNo confidentialityRequired = currentCaseData.getAppellantConfidentialityRequired().orElse(null);
-        if (nonNull(confidentialityRequired) && (confidentialityRequiredBefore == null || !Objects.equals(confidentialityRequiredBefore, confidentialityRequired))) {
-            currentCaseData.getAppellant()
-                           .ifPresent(appellant -> appellant.setConfidentialityRequiredChangedDate(now()));
+        if (nonNull(confidentialityRequired) && (confidentialityRequiredBefore == null || !Objects.equals(
+            confidentialityRequiredBefore, confidentialityRequired))) {
+            currentCaseData.getAppellant().ifPresent(appellant -> appellant.setConfidentialityRequiredChangedDate(now()));
         }
     }
 }
