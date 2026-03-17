@@ -73,7 +73,8 @@ public class EvidenceManagementController {
             @RequestHeader(value = SERVICE_AUTHORIZATION) String serviceAuthorization,
             @RequestParam("file") List<MultipartFile> files
     ) throws JsonProcessingException {
-        authorisationService.allowOnlySscs(serviceAuthorization);
+        String serviceName = authorisationService.authenticate(serviceAuthorization);
+        authorisationService.allowOnlySscs(serviceName);
 
         if (null == files || files.isEmpty()) {
             throw new EvidenceDocumentsMissingException();

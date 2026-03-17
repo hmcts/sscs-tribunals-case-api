@@ -423,6 +423,46 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
         assertThat(response.getData().getAppeal().getAppellant().getConfidentialityRequiredChangedDate()).isAfter(originalDate);
     }
 
+    @Test
+    void canHandleReturnsTrueForUcBenefit() {
+        sscsCaseData.setAppeal(
+            Appeal.builder().benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build());
+
+        assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isTrue();
+    }
+
+    @Test
+    void handleSetsShowConfidentialityTabForChildSupportWithNoOtherParties() {
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
+
+        assertThat(response.getData().getExtendedSscsCaseData().getShowConfidentialityTab()).isEqualTo(YES);
+    }
+
+    @Test
+    void handleSetsShowConfidentialityTabForUcWithOtherParties() {
+        final OtherParty otherParty = OtherParty.builder()
+                                                .name(Name.builder().firstName("Other").lastName("Party").build())
+                                                .confidentialityRequired(YES)
+                                                .build();
+        sscsCaseData.setOtherParties(singletonList(CcdValue.<OtherParty>builder().value(otherParty).build()));
+        sscsCaseData.setAppeal(
+            Appeal.builder().benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build());
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
+
+        assertThat(response.getData().getExtendedSscsCaseData().getShowConfidentialityTab()).isEqualTo(YES);
+    }
+
+    @Test
+    void handleDoesNotSetShowConfidentialityTabForUcWithNoOtherParties() {
+        sscsCaseData.setAppeal(
+            Appeal.builder().benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build());
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
+
+        assertThat(response.getData().getExtendedSscsCaseData().getShowConfidentialityTab()).isNotEqualTo(YES);
+    }
+
     private static Stream<Arguments> appointeeNotIncludedTestCases() {
         return Stream.of(org.junit.jupiter.params.provider.Arguments.of("No",
                 Appointee.builder().name(Name.builder().firstName("Jane").lastName("Doe").build()).build()),

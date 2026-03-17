@@ -5,7 +5,6 @@ import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.YES;
-import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTHORISATION_HEADER;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
@@ -31,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
@@ -73,6 +73,9 @@ public class BaseHandler {
 
     @Autowired
     private IdamService idamService;
+
+    @Autowired
+    private AuthTokenGenerator authTokenGenerator;
 
     @Autowired
     SubmitHelper submitHelper;
@@ -174,7 +177,7 @@ public class BaseHandler {
         while (retry > 0 && (response == null || response.statusCode() != HttpStatus.OK.value())) {
             response = RestAssured
                 .given()
-                .header(SERVICE_AUTHORISATION_HEADER, idamTokens.getServiceAuthorization())
+                .header("ServiceAuthorization", authTokenGenerator.generate())
                 .when()
                 .get("appeals?mya=true&caseId=" + caseId);
             retry--;

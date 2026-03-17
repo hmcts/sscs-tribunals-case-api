@@ -25,15 +25,17 @@ import uk.gov.hmcts.reform.sscs.service.TribunalsService;
 @RestController
 public class TyaController {
 
-    private final TribunalsService tribunalsService;
-    private final DocumentDownloadService documentDownloadService;
+    private TribunalsService tribunalsService;
+
+    private DocumentDownloadService documentDownloadService;
+
     private final AuthorisationService authorisationService;
+
 
     private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
 
     @Autowired
-    public TyaController(TribunalsService tribunalsService, DocumentDownloadService documentDownloadService,
-                         AuthorisationService authorisationService) {
+    public TyaController(TribunalsService tribunalsService, DocumentDownloadService documentDownloadService, AuthorisationService authorisationService) {
         this.tribunalsService = tribunalsService;
         this.documentDownloadService = documentDownloadService;
         this.authorisationService = authorisationService;
@@ -47,7 +49,8 @@ public class TyaController {
             @RequestHeader(value = SERVICE_AUTHORIZATION) String serviceAuthorization,
             @RequestParam(value = "caseId") Long caseId,
             @RequestParam(value = "mya", required = false, defaultValue = "false") boolean mya) {
-        authorisationService.allowOnlySscs(serviceAuthorization);
+        String serviceName = authorisationService.authenticate(serviceAuthorization);
+        authorisationService.allowOnlySscs(serviceName);
         return ok(tribunalsService.findAppeal(caseId, mya).toString());
     }
 
@@ -55,10 +58,10 @@ public class TyaController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Document", content = {
         @Content(schema = @Schema(implementation = Resource.class))})})
     @GetMapping(value = "/document", produces = APPLICATION_PDF_VALUE)
-    public ResponseEntity<Resource> getAppealDocument(@RequestHeader(value = SERVICE_AUTHORIZATION)
-                                                          String serviceAuthorization,
+    public ResponseEntity<Resource> getAppealDocument(@RequestHeader(value = SERVICE_AUTHORIZATION) String serviceAuthorization,
                                                       @RequestParam(value = "url") String url) {
-        authorisationService.allowOnlySscs(serviceAuthorization);
+        String serviceName = authorisationService.authenticate(serviceAuthorization);
+        authorisationService.allowOnlySscs(serviceName);
         return documentDownloadService.downloadFile(url);
     }
 }

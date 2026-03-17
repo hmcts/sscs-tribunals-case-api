@@ -9,28 +9,33 @@ import static uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler.getJsonCa
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.apache.http.HttpResponse;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication;
+import org.springframework.test.context.junit4.rules.SpringClassRule;
+import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.functional.mya.BaseFunctionTest;
-import uk.gov.hmcts.reform.sscs.functional.mya.CitizenIdamService;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {TribunalsCaseApiApplication.class, CitizenIdamService.class})
+@RunWith(JUnitParamsRunner.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
+
+    @ClassRule
+    public static final SpringClassRule scr = new SpringClassRule();
+
+    @Rule
+    public final SpringMethodRule smr = new SpringMethodRule();
 
     @Autowired
     protected ObjectMapper objectMapper;
@@ -211,14 +216,14 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
         }
     }
 
-    @ParameterizedTest
-    @CsvSource({
-        "noRecommendation, 'The Tribunal makes no recommendation as to when the Department should reassess Joe Bloggs.'",
-        "doNotReassess, 'In view of the degree of disability found by the Tribunal, and unless the regulations change, the Tribunal would recommend that the appellant is not re-assessed.'",
-        "reassess12, 'The Tribunal recommends that the Department reassesses Joe Bloggs within 12 months from today''s date.'",
-        "reassess3, 'The Tribunal recommends that the Department reassesses Joe Bloggs within 3 months from today''s date.'",
-        "doNotReassess3, 'The Tribunal recommends that the Department does not reassess Joe Bloggs within 3 months from today''s date.'",
-        "doNotReassess18, 'The Tribunal recommends that the Department does not reassess Joe Bloggs within 18 months from today''s date.'"
+    @Test
+    @Parameters({
+        "noRecommendation, The Tribunal makes no recommendation as to when the Department should reassess Joe Bloggs.",
+        "doNotReassess, In view of the degree of disability found by the Tribunal\\, and unless the regulations change\\, the Tribunal would recommend that the appellant is not re-assessed.",
+        "reassess12, The Tribunal recommends that the Department reassesses Joe Bloggs within 12 months from today's date.",
+        "reassess3, The Tribunal recommends that the Department reassesses Joe Bloggs within 3 months from today's date.",
+        "doNotReassess3, The Tribunal recommends that the Department does not reassess Joe Bloggs within 3 months from today's date.",
+        "doNotReassess18, The Tribunal recommends that the Department does not reassess Joe Bloggs within 18 months from today's date.",
     })
     public void scenario8_allowed_notSupportGroup_LessThan15PointsSch6_Sch8Para4Applies_Sch9Para4Applies_shouldHaveExpectedText(String code, String expectedText) throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/ucDwpReassessTheAwardCallback.json");
