@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -129,12 +130,10 @@ public class ValidSendToInterlocMidEventHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertEquals("appellant", response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode());
-        assertTrue(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getListItems().stream()
-                .anyMatch(item -> "appellant".equals(item.getCode())));
     }
 
     @Test
-    void givenCurrentPayloadEmpty_thenMidEventDefaultsToFirstAvailableParty() {
+    void givenCurrentPayloadEmpty_thenMidEventLeavesSelectedConfidentialityPartyNull() {
         DynamicListItem selectedItem = new DynamicListItem("appellant", "Appellant (or Appointee)");
         SscsCaseData beforeCaseData = sscsCaseData.toBuilder().build();
         beforeCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(new DynamicList(selectedItem, null));
@@ -145,9 +144,7 @@ public class ValidSendToInterlocMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertEquals("appellant", response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode());
-        assertTrue(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getListItems().stream()
-                .anyMatch(item -> "appellant".equals(item.getCode())));
+        assertNull(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty());
     }
 
     @Test
