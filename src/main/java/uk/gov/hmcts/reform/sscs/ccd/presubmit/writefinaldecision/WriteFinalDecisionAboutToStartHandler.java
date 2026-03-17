@@ -208,7 +208,6 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
         sscsUcCaseData.setDoesSchedule9Paragraph4Apply(null);
         if (isSevereConditionsEnabled) {
             sscsUcCaseData.setUcWriteFinalDecisionHasSVIssueCode(null);
-            sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(null);
         }
     }
 }
