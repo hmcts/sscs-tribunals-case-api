@@ -45,7 +45,7 @@ class UpdateOtherPartyAboutToStartHandlerTest {
     class CanHandle {
 
         @Test
-        void givenValidCallback_returnsTrue() {
+        void shouldReturnTrueGivenValidCallback() {
             when(callback.getEvent()).thenReturn(UPDATE_OTHER_PARTY_DATA);
             when(callback.getCaseDetails()).thenReturn(caseDetails);
             when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -57,7 +57,7 @@ class UpdateOtherPartyAboutToStartHandlerTest {
         }
 
         @Test
-        void givenConfidentialityEnabled_returnsFalse() {
+        void shouldReturnFalseGivenConfidentialityEnabled() {
             handler = new UpdateOtherPartyAboutToStartHandler(true);
 
             boolean result = handler.canHandle(ABOUT_TO_START, callback);
@@ -67,7 +67,7 @@ class UpdateOtherPartyAboutToStartHandlerTest {
 
         @ParameterizedTest
         @EnumSource(value = CallbackType.class, mode = EnumSource.Mode.EXCLUDE, names = {"ABOUT_TO_START"})
-        void givenInvalidCallbackType_returnsFalse(CallbackType callbackType) {
+        void shouldReturnFalseGivenInvalidCallbackType(CallbackType callbackType) {
             boolean result = handler.canHandle(callbackType, callback);
 
             assertThat(result).isFalse();
@@ -75,7 +75,7 @@ class UpdateOtherPartyAboutToStartHandlerTest {
 
         @ParameterizedTest
         @EnumSource(value = EventType.class, mode = EnumSource.Mode.EXCLUDE, names = {"UPDATE_OTHER_PARTY_DATA"})
-        void givenInvalidEventType_returnsFalse(EventType eventType) {
+        void shouldReturnFalseGivenInvalidEventType(EventType eventType) {
             when(callback.getEvent()).thenReturn(eventType);
 
             boolean result = handler.canHandle(ABOUT_TO_START, callback);
@@ -84,7 +84,7 @@ class UpdateOtherPartyAboutToStartHandlerTest {
         }
 
         @Test
-        void givenNonUcBenefitType_returnsFalse() {
+        void shouldReturnFalseGivenNonUcBenefitType() {
             when(callback.getEvent()).thenReturn(UPDATE_OTHER_PARTY_DATA);
             when(callback.getCaseDetails()).thenReturn(caseDetails);
             when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -96,14 +96,14 @@ class UpdateOtherPartyAboutToStartHandlerTest {
         }
 
         @Test
-        void givenNullCallback_throwsNullPointerException() {
+        void shouldThrowNullPointerExceptionGivenNullCallback() {
             assertThatThrownBy(() -> handler.canHandle(ABOUT_TO_START, null))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("callback must not be null");
         }
 
         @Test
-        void givenNullCallbackType_throwsNullPointerException() {
+        void shouldThrowNullPointerExceptionGivenNullCallbackType() {
             assertThatThrownBy(() -> handler.canHandle(null, callback))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("callbacktype must not be null");
@@ -114,7 +114,7 @@ class UpdateOtherPartyAboutToStartHandlerTest {
     class Handle {
 
         @Test
-        void givenValidUcCase_returnsErrorResponse() {
+        void shouldReturnErrorResponseGivenValidUcCase() {
             when(callback.getEvent()).thenReturn(UPDATE_OTHER_PARTY_DATA);
             when(callback.getCaseDetails()).thenReturn(caseDetails);
             when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -127,7 +127,7 @@ class UpdateOtherPartyAboutToStartHandlerTest {
         }
 
         @Test
-        void givenInvalidScenario_throwsIllegalStateException() {
+        void shouldThrowIllegalStateExceptionGivenInvalidScenario() {
             when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
 
             assertThatThrownBy(() -> handler.handle(ABOUT_TO_START, callback, "user_auth"))
