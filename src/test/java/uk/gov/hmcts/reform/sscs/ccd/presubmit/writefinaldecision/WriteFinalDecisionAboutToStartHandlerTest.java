@@ -296,7 +296,7 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
     @ParameterizedTest
     @ValueSource(booleans = {false, true})
     public void givenSevereConditionsEnabledOrDisabled_thenClearSevereConditionsFieldsAccordingly(boolean isSevereConditionsEnabled) {
-        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, false, isSevereConditionsEnabled);
+        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true, isSevereConditionsEnabled);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionHasSVIssueCode(YES);
         sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(YES);
         when(callback.getCaseDetails()).thenReturn(caseDetails);

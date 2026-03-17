@@ -281,7 +281,7 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
     @Test
     @Parameters({"SV, YES", "DD, NO"})
     public void givenSevereConditionsEnabled_thenShouldSetHasSvIssueCode(String issueCode, YesNo expectedHasSvIssueCode) {
-        UcWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, false, true);
+        UcWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, true);
 
         sscsCaseData.setElementsDisputedLimitedWork(List.of(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode(issueCode).build()).build()));
         handlerWithSevereConditions.setDefaultFields(sscsCaseData);
@@ -292,7 +292,7 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
     @Test
     @Parameters({"SV", "DD"})
     public void givenSevereConditionsNotEnabled_thenShouldNotSetHasSvIssueCode(String issueCode) {
-        UcWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, false, false);
+        UcWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, false);
 
         sscsCaseData.setElementsDisputedLimitedWork(List.of(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode(issueCode).build()).build()));
         handlerWithSevereConditions.setDefaultFields(sscsCaseData);
