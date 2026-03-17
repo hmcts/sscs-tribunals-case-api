@@ -214,7 +214,7 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
                                      .appellant(null)
                                      .build());
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
 
         String tab = response.getData().getConfidentialityTab();
         assertThat(tab).contains("Other Party 1 | Other Party | Yes").doesNotContain("Appellant |").doesNotContain("Appointee |");
