@@ -351,7 +351,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private SscsCaseData updateConfidentiality(SscsCaseData caseData) {
 
         if (!cmOtherPartyConfidentialityEnabled) {
-            log.debug("Not updating confidentiality. Feature flag cm-other-party-confidentiality is not enabled.");
+            log.debug("No confidentiality update. Feature flag cm-other-party-confidentiality is not enabled.");
             return caseData;
         }
 
