@@ -671,6 +671,7 @@ sscs-tribunals-frontend:
       UPLOAD_EVIDENCE_URL: http://${SERVICE_NAME}-java/evidence/upload
       SERVICES_IDAM_LOGIN_URL: https://idam-web-public.aat.platform.hmcts.net/login
       SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
+      S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
       UV_THREADPOOL_SIZE: 64
       IBC_NI_POSTCODES_FEATURE: true
     keyVaults:
@@ -682,6 +683,7 @@ sscs-tribunals-frontend:
           - pcq-token-key
           - sscs-redis-access-key
           - sscs-redis-connection-string
+          - sscs-s2s-secret
 
 #Enable for queues/topics
 #If you need a subscription for a topic, topic name should be not longer than 10 characters
