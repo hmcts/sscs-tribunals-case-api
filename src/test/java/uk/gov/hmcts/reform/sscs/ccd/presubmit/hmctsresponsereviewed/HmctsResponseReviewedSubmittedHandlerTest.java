@@ -38,7 +38,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ExtendedSscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
@@ -157,39 +156,6 @@ public class HmctsResponseReviewedSubmittedHandlerTest {
     }
 
     @Test
-    @Parameters(method = "interlocReviewers")
-    public void givenAHmctsResponseReviewedSubmittedEventAndInterlocIsRequired_thenCopySelectedConfidentialityParty(
-            DynamicListItem reviewer, String expectedDescription) {
-
-        DynamicListItem selectedConfidentialityParty = new DynamicListItem("appellant", "Appellant (or Appointee)");
-
-        sscsCaseData = sscsCaseData.toBuilder().isInterlocRequired("Yes")
-                .selectWhoReviewsCase(new DynamicList(reviewer, null))
-                .extendedSscsCaseData(ExtendedSscsCaseData.builder()
-                        .selectedConfidentialityParty(new DynamicList(selectedConfidentialityParty, null))
-                        .build())
-                .build();
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
-
-        assertEquals(Collections.EMPTY_SET, response.getErrors());
-        verify(updateCcdCaseService).updateCaseV2(
-                eq(123L),
-                eq(VALID_SEND_TO_INTERLOC.getCcdType()),
-                eq("Send to interloc"),
-                eq(expectedDescription),
-                any(IdamTokens.class),
-                consumerArgumentCaptor.capture());
-        Consumer<SscsCaseDetails> mutator = consumerArgumentCaptor.getValue();
-        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build();
-        mutator.accept(sscsCaseDetails);
-
-        assertEquals(selectedConfidentialityParty,
-                sscsCaseDetails.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue());
-    }
-
-    @Test
     public void givenAHmctsResponseReviewedSubmittedEventAndInterlocIsNotRequired_thenTriggerReadyToListEvent() {
 
         sscsCaseData = sscsCaseData.toBuilder().isInterlocRequired("No").build();
@@ -289,10 +255,4 @@ public class HmctsResponseReviewedSubmittedHandlerTest {
                 () ->  handler.handle(SUBMITTED, callback, USER_AUTHORISATION));
     }
 
-    private Object[] interlocReviewers() {
-        return new Object[]{
-            new Object[]{new DynamicListItem("reviewByJudge", "Review by Judge"), "Send a case to a Judge for review"},
-            new Object[]{new DynamicListItem("reviewByTcw", "Review by TCW"), "Send a case to a TCW for review"}
-        };
-    }
 }
