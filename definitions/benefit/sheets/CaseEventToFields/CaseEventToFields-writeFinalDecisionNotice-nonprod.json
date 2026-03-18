@@ -37,5 +37,18 @@
     "FieldShowCondition" : "wcaAppeal=\"Yes\" AND (appeal.benefitType.code=\"ESA\" OR appeal.benefitType.code=\"UC\") AND (issueCode=\"SV\" OR ucWriteFinalDecisionHasSVIssueCode = \"Yes\")",
     "ShowSummaryChangeOption": "Y",
     "RetainHiddenValue": "Yes"
+  },
+  {
+    "CaseEventID": "writeFinalDecision",
+    "CaseFieldID": "writeFinalDecisionSevereCriteriaApply",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "17/03/2026",
+    "PageDisplayOrder": 63,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "severeCriteria",
+    "PageLabel": "Severe Conditions Criteria Assessment",
+    "PageShowCondition": "writeFinalDecisionSevereYesNo = \"Yes\"",
+    "ShowSummaryChangeOption": "Y"
   }
 ]
