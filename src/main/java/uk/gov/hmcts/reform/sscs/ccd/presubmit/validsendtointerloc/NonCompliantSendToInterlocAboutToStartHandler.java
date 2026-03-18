@@ -4,7 +4,6 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown;
 import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.isChildSupportAppeal;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -17,11 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Component
 public class NonCompliantSendToInterlocAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private final boolean cmOtherPartyConfidentialityEnabled;
-
-    public NonCompliantSendToInterlocAboutToStartHandler(
-            @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
-        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
+    public NonCompliantSendToInterlocAboutToStartHandler() {
     }
 
     @Override
@@ -29,8 +24,7 @@ public class NonCompliantSendToInterlocAboutToStartHandler implements PreSubmitC
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbackType must not be null");
 
-        return cmOtherPartyConfidentialityEnabled
-                && callbackType.equals(CallbackType.ABOUT_TO_START)
+        return callbackType.equals(CallbackType.ABOUT_TO_START)
                 && callback.getEvent() == EventType.NON_COMPLIANT_SEND_TO_INTERLOC;
     }
 

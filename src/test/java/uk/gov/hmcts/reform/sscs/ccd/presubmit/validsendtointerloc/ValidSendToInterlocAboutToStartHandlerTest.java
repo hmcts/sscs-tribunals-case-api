@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_SEND_TO_INTERLOC;
@@ -19,7 +20,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -54,7 +54,7 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new ValidSendToInterlocAboutToStartHandler(false, false, false);
+        handler = new ValidSendToInterlocAboutToStartHandler(false, false);
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
     }
 
@@ -171,21 +171,25 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-        "true,childSupport,''",
-        "false,childSupport,appellant",
-        "true,PIP,appellant",
-        "false,PIP,appellant"
-    })
-    void givenFlagAndBenefitType_thenSelectedConfidentialityPartyHasExpectedDefaultSelection(boolean featureFlag,
-                                                                                              String benefitType,
-                                                                                              String expectedDefault) {
-        handler = new ValidSendToInterlocAboutToStartHandler(false, false, featureFlag);
+    @EnumSource(value = EventType.class, names = {"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
+    void givenChildSupport_thenSelectedConfidentialityPartyHasNoDefaultSelection(EventType eventType) {
+        handler = new ValidSendToInterlocAboutToStartHandler(false, false);
+        when(callback.getEvent()).thenReturn(eventType);
         setupCallback();
-        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(benefitType).build());
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals(expectedDefault, response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode());
+        assertEquals("", response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode());
+    }
+
+    @Test
+    void givenNonChildSupport_thenSelectedConfidentialityPartyIsNotSet() {
+        setupCallback();
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("PIP").build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty());
     }
 }

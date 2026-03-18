@@ -4,7 +4,7 @@
     "CaseFieldID": "selectedConfidentialityParty",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
-    "FieldShowCondition": "isInterlocRequired=\"Yes\" AND interlocReferralReason=\"confidentiality\"",
+    "FieldShowCondition": "isInterlocRequired=\"Yes\" AND interlocReferralReason=\"confidentiality\" AND appeal.benefitType.code=\"childSupport\"",
     "LiveFrom": "19/02/2026",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 30,

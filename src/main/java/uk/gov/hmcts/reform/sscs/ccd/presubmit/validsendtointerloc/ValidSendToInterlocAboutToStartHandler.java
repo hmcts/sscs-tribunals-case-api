@@ -21,14 +21,11 @@ public class ValidSendToInterlocAboutToStartHandler implements PreSubmitCallback
 
     private final boolean postponementsFeature;
     private final boolean postHearingsB;
-    private final boolean cmOtherPartyConfidentialityEnabled;
 
     public ValidSendToInterlocAboutToStartHandler(@Value("${feature.postponements.enabled}")  boolean postponementsFeature,
-                                                  @Value("${feature.postHearingsB.enabled}")  boolean postHearingsB,
-                                                  @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
+                                                  @Value("${feature.postHearingsB.enabled}")  boolean postHearingsB) {
         this.postponementsFeature = postponementsFeature;
         this.postHearingsB = postHearingsB;
-        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
 
     @Override
@@ -52,7 +49,7 @@ public class ValidSendToInterlocAboutToStartHandler implements PreSubmitCallback
 
         setSelectWhoReviewsCase(sscsCaseData);
         setOriginalSenderDropdown(sscsCaseData);
-        if (cmOtherPartyConfidentialityEnabled && isChildSupportAppeal(sscsCaseData)) {
+        if (isChildSupportAppeal(sscsCaseData)) {
             sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
                     getSelectedConfidentialityPartyDropdown(sscsCaseData));
         }
