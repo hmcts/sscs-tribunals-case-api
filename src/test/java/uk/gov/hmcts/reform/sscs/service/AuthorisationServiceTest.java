@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.sscs.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.anyString;
@@ -13,19 +13,19 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import feign.FeignException;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.authorisation.exceptions.InvalidTokenException;
 import uk.gov.hmcts.reform.sscs.bulkscan.exceptions.ForbiddenException;
 import uk.gov.hmcts.reform.sscs.bulkscan.exceptions.UnauthorizedException;
 
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class AuthorisationServiceTest {
 
     private static final String SERVICE_HEADER = "test-header";
@@ -37,12 +37,12 @@ public class AuthorisationServiceTest {
 
     private AuthorisationService authorisationService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         authorisationService = new AuthorisationService(serviceAuthorisationApi, "ccd_data");
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         reset(serviceAuthorisationApi);
     }
@@ -57,14 +57,12 @@ public class AuthorisationServiceTest {
         verify(serviceAuthorisationApi).getServiceName(serviceAuthHeader);
     }
 
-    @Test(expected = RuntimeException.class)
-    public void shouldThrowExcpetionWhenNotAuthorise() {
+    @Test
+    public void shouldThrowExceptionWhenNotAuthorised() {
         String serviceAuthHeader = "anyString";
         when(serviceAuthorisationApi.getServiceName(serviceAuthHeader)).thenThrow(FeignException.class);
 
-        authorisationService.authorise(serviceAuthHeader);
-
-        assertFalse(true);
+        assertThrows(RuntimeException.class, () -> authorisationService.authorise(serviceAuthHeader));
     }
 
     @Test
