@@ -351,20 +351,6 @@
     "RetainHiddenValue": "Yes"
   },
   {
-    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=schedule6",
-    "CaseEventID": "writeFinalDecision",
-    "CaseFieldID": "ucWriteFinalDecisionPhysicalDisabilitiesQuestion",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 9,
-    "PageFieldDisplayOrder": 1,
-    "PageID": "schedule6",
-    "PageLabel": "Select Schedule 6 activities",
-    "PageShowCondition": "appeal.benefitType.code=\"UC\" AND wcaAppeal = \"Yes\" AND supportGroupOnlyAppeal=\"No\" AND writeFinalDecisionGenerateNotice = \"Yes\"",
-    "ShowSummaryChangeOption": "Y"
-  },
-  {
     "CaseEventID": "writeFinalDecision",
     "CaseFieldID": "ucWriteFinalDecisionMentalAssessmentQuestion",
     "CaseTypeID": "Benefit",
@@ -1165,19 +1151,6 @@
     "RetainHiddenValue": "Yes"
   },
   {
-    "CaseEventID": "writeFinalDecision",
-    "CaseFieldID": "doesSchedule8Paragraph4Apply",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
-    "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 61,
-    "PageFieldDisplayOrder": 2,
-    "PageID": "schedule8Paragraph4",
-    "PageLabel": "Schedule 8 Paragraph 4",
-    "PageShowCondition": "appeal.benefitType.code=\"UC\" AND wcaAppeal = \"Yes\" AND showSchedule8Paragraph4Page=\"Yes\"",
-    "ShowSummaryChangeOption": "Y"
-  },
-  {
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=schedule7Activities",
     "CaseEventID": "writeFinalDecision",
     "CaseFieldID": "showSchedule7ActivitiesPage",
@@ -1191,19 +1164,6 @@
     "FieldShowCondition": "appeal.benefitType.code=\"DoNotShow\"",
     "ShowSummaryChangeOption": "Y",
     "RetainHiddenValue": "Yes"
-  },
-  {
-    "CaseEventID": "writeFinalDecision",
-    "CaseFieldID": "ucWriteFinalDecisionSchedule7ActivitiesApply",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
-    "LiveFrom": "01/01/2018",
-    "PageDisplayOrder": 62,
-    "PageFieldDisplayOrder": 1,
-    "PageID": "schedule7Activities",
-    "PageLabel": "Select Schedule 7 activities",
-    "PageShowCondition": "showSchedule7ActivitiesPage=\"Yes\" AND wcaAppeal = \"Yes\"",
-    "ShowSummaryChangeOption": "Y"
   },
   {
     "CaseEventID": "writeFinalDecision",
