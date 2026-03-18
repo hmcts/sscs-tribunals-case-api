@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.healthcheck;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
@@ -22,7 +23,7 @@ public class DocmosisHealthIndicator implements HealthIndicator {
 
     public DocmosisHealthIndicator(
         @Value("${service.pdf-service.health.uri}") String docmosisStatusUri,
-        RestTemplate restTemplate
+        @Qualifier("healthCheckRestTemplate") RestTemplate restTemplate
     ) {
         this.docmosisStatusUri = docmosisStatusUri;
         this.restTemplate = restTemplate;

@@ -8,6 +8,18 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
   spotInstances:
     enabled: false
   memoryLimits: '4096Mi'
+  livenessProbe:
+    path: /health/liveness
+    initialDelaySeconds: 75
+    periodSeconds: 15
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readinessProbe:
+    path: /health/readiness
+    initialDelaySeconds: 45
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
   autoscaling:
     enabled: false
   keyVaults:

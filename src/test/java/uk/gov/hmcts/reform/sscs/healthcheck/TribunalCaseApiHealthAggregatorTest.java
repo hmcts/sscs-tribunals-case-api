@@ -1,67 +1,39 @@
 package uk.gov.hmcts.reform.sscs.healthcheck;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.boot.actuate.health.Health;
-import org.springframework.boot.actuate.health.HealthContributor;
-import org.springframework.boot.actuate.health.HealthIndicator;
-import org.springframework.boot.actuate.health.NamedContributor;
+import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.actuate.health.Status;
 
-public class TribunalCaseApiHealthAggregatorTest {
+class TribunalCaseApiHealthAggregatorTest {
 
-    private TribunalCaseApiHealthAggregator tribunalCaseApiHealthAggregator;
+    private TribunalCaseApiHealthAggregator aggregator;
 
-    @Before
-    public void setUp() {
-        openMocks(this);
-        tribunalCaseApiHealthAggregator = new TribunalCaseApiHealthAggregator();
+    @BeforeEach
+    void setUp() {
+        aggregator = new TribunalCaseApiHealthAggregator();
     }
 
     @Test
-    public void shouldReturnOverallHealthUpWithWhenSoftCheckHealthIsDown() {
-        //Given
-        HealthIndicator mockCoreCaseData = mock(HealthIndicator.class);
-        HealthIndicator mockDocumentManagement = mock(HealthIndicator.class);
-        when(mockCoreCaseData.health()).thenReturn(Health.up().build());
-        when(mockDocumentManagement.health()).thenReturn(Health.down().build());
+    void shouldAlwaysReturnUpEvenWhenDependenciesAreDown() {
+        Status result = aggregator.getAggregateStatus(Set.of(Status.UP, Status.DOWN));
 
-        List<NamedContributor<HealthContributor>> namedContributors = new ArrayList<>();
-        namedContributors.add(NamedContributor.of("coreCaseData", mockCoreCaseData));
-        namedContributors.add(NamedContributor.of("documentManagement", mockDocumentManagement));
-
-        // when
-        Status actual = tribunalCaseApiHealthAggregator.getAggregateStatus();
-
-        // then
-        Assert.assertEquals(Health.up().build().getStatus(), actual);
+        assertEquals(Status.UP, result);
     }
 
     @Test
-    public void shouldReturnOverallHealthUpWhenHardCheckHealthIsDown() {
-        //Given
-        HealthIndicator mockCoreCaseData = mock(HealthIndicator.class);
-        HealthIndicator mockDocumentManagement = mock(HealthIndicator.class);
+    void shouldReturnUpWhenAllDependenciesAreUp() {
+        Status result = aggregator.getAggregateStatus(Set.of(Status.UP));
 
-        when(mockCoreCaseData.health()).thenReturn(Health.down().build());
-        when(mockDocumentManagement.health()).thenReturn(Health.up().build());
-
-        List<NamedContributor<HealthContributor>> namedContributors = new ArrayList<>();
-        namedContributors.add(NamedContributor.of("coreCaseData", mockCoreCaseData));
-        namedContributors.add(NamedContributor.of("documentManagement", mockDocumentManagement));
-
-        // when
-        Status actual = tribunalCaseApiHealthAggregator.getAggregateStatus();
-
-        // then
-        Assert.assertEquals(Health.up().build().getStatus(), actual);
+        assertEquals(Status.UP, result);
     }
 
+    @Test
+    void shouldReturnUpWhenOnlyDependencyIsDown() {
+        Status result = aggregator.getAggregateStatus(Set.of(Status.DOWN));
+
+        assertEquals(Status.UP, result);
+    }
 }

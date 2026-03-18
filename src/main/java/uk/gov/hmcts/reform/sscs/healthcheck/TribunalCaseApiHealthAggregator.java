@@ -1,7 +1,8 @@
 package uk.gov.hmcts.reform.sscs.healthcheck;
 
 import java.util.Set;
-import org.springframework.boot.actuate.health.*;
+import org.springframework.boot.actuate.health.Status;
+import org.springframework.boot.actuate.health.StatusAggregator;
 import org.springframework.stereotype.Component;
 
 @Component

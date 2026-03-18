@@ -334,11 +334,25 @@ management:
         health:
             enabled: true
             show-details: always
+            show-components: always
+            probes:
+                enabled: true
+            group:
+                liveness:
+                    include: livenessState
+                readiness:
+                    include: readinessState
     endpoints:
         enabled-by-default: true
         web:
             base-path: /
+            exposure:
+                include: health, info, metrics, prometheus
     health:
+        livenessState:
+            enabled: true
+        readinessState:
+            enabled: true
         case-document-am-api:
             enabled: ${SECURE_DOC_STORE_FEATURE:false}
 online_hearing_finished:

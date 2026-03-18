@@ -59,7 +59,11 @@ public class SecurityConfiguration {
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web.ignoring().requestMatchers(
             "/health",
-            "/health/liveness",
+            "/health/**",
+            "/info",
+            "/metrics",
+            "/metrics/**",
+            "/prometheus",
             "/loggers/**",
             "/swagger-ui.html",
             "/swagger-ui/index.html",
