@@ -8,5 +8,8 @@
   {"LiveFrom": "08/01/2026", "CaseTypeID": "Benefit", "CaseStateID": "awaitOtherPartyData", "AccessProfile": "caseworker-sscs-judge-salaried", "CRUD": "CRUD"},
   {"LiveFrom": "08/01/2026", "CaseTypeID": "Benefit", "CaseStateID": "awaitOtherPartyData", "AccessProfile": "caseworker-sscs-dwpresponsewriter", "CRUD": "CRUD"},
   {"LiveFrom": "15/01/2026", "CaseTypeID": "Benefit", "CaseStateID": "awaitConfidentialityRequirements", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
-  {"LiveFrom": "15/01/2026", "CaseTypeID": "Benefit", "CaseStateID": "awaitConfidentialityRequirements", "AccessProfile": "caseworker-sscs-dwpresponsewriter", "CRUD": "CRUD"}
+  {"LiveFrom": "15/01/2026", "CaseTypeID": "Benefit", "CaseStateID": "awaitConfidentialityRequirements", "AccessProfile": "caseworker-sscs-dwpresponsewriter", "CRUD": "CRUD"},
+  {"LiveFrom": "15/01/2026", "CaseTypeID": "Benefit", "CaseStateID": "awaitConfidentialityRequirements", "AccessProfile": "caseworker-sscs-registrar", "CRUD": "R"},
+  {"LiveFrom": "15/01/2026", "CaseTypeID": "Benefit", "CaseStateID": "awaitConfidentialityRequirements", "AccessProfile": "caseworker-sscs-judge", "CRUD": "R"},
+  {"LiveFrom": "15/01/2026", "CaseTypeID": "Benefit", "CaseStateID": "awaitConfidentialityRequirements", "AccessProfile": "caseworker-sscs", "CRUD": "R"}
 ]
