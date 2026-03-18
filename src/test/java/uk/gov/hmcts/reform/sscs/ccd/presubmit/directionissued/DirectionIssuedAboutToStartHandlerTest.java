@@ -70,7 +70,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
     @BeforeEach
     public void setUp() {
-        handler = new DirectionIssuedAboutToStartHandler(false);
+        handler = new DirectionIssuedAboutToStartHandler(false, false);
         sscsCaseData = SscsCaseData.builder()
                 .appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build())
                 .build();
@@ -203,7 +203,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
     @Test
     public void givenAppealWithReinstatementRequest_populateDirectionTypeDropdown() {
-        handler = new DirectionIssuedAboutToStartHandler(false);
+        handler = new DirectionIssuedAboutToStartHandler(false, false);
         sscsCaseData.setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
@@ -294,7 +294,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
     @Test
     public void givenAppealWithHearingRecordingRequestOutstanding_populateDirectionTypeDropdownWithRefuseHearingRecordingRequest() {
-        handler = new DirectionIssuedAboutToStartHandler(false);
+        handler = new DirectionIssuedAboutToStartHandler(false, false);
         sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(YES);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
@@ -313,7 +313,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
     @Test
     public void givenAppealWithNoHearingRecordingRequestOutstanding_doNotPopulateDirectionTypeDropdownWithRefuseHearingRecordingRequest() {
-        handler = new DirectionIssuedAboutToStartHandler(false);
+        handler = new DirectionIssuedAboutToStartHandler(false, false);
         sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(NO);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
@@ -330,7 +330,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
     @Test
     public void givenAValidCallbackType_thenClearTheConfidentialityFields() {
-        handler = new DirectionIssuedAboutToStartHandler(false);
+        handler = new DirectionIssuedAboutToStartHandler(false, false);
         sscsCaseData.setConfidentialityType(ConfidentialityType.CONFIDENTIAL.getCode());
         sscsCaseData.setSendDirectionNoticeToFTA(YES);
         sscsCaseData.setSendDirectionNoticeToRepresentative(YES);
@@ -354,7 +354,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
     @Test
     public void givenAValidCallbackType_thenVerifyAllPartiesOnTheCase() {
-        handler = new DirectionIssuedAboutToStartHandler(false);
+        handler = new DirectionIssuedAboutToStartHandler(false, false);
 
         Appointee otherPartyAppointee = Appointee.builder()
                 .id("2").name(Name.builder().firstName("Henry").lastName("Smith").build()).build();
@@ -384,7 +384,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
     @Test
     public void givenAValidCallbackType_NoAdditionalPartiesForOtherParty() {
-        handler = new DirectionIssuedAboutToStartHandler(false);
+        handler = new DirectionIssuedAboutToStartHandler(false, false);
 
         CcdValue<OtherParty> otherParty = CcdValue.<OtherParty>builder()
                 .value(OtherParty.builder()
