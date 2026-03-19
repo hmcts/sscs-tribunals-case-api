@@ -21,6 +21,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.OTHER_PARTY;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -560,6 +561,27 @@ class DirectionIssuedAboutToSubmitHandlerTest {
         assertTrue(response.getData().getAppellant().isPresent());
         assertEquals(expectedConfidentiality, response.getData().getAppellant().get().getConfidentialityRequired());
         assertNotNull(response.getData().getAppellant().get().getConfidentialityRequiredChangedDate());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"confidentialityGrantedSendToAdmin,YES", "confidentialityRefusedSendToAdmin,NO"})
+    void givenDirectionTypeOfConfidentialityDecisionForOtherParty_shouldUpdateOnlyReferredOtherParty(
+        String directionType, YesNo expectedConfidentiality) {
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(directionType));
+        callback.getCaseDetails().getCaseData().setOriginalSender(new DynamicList(OTHER_PARTY.getCode() + "op1"));
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(NO);
+        callback.getCaseDetails().getCaseData().setOtherParties(List.of(
+            CcdValue.<OtherParty>builder().value(OtherParty.builder().id("op1").confidentialityRequired(NO).build()).build(),
+            CcdValue.<OtherParty>builder().value(OtherParty.builder().id("op2").confidentialityRequired(YES).build()).build()
+        ));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(NO, response.getData().getAppeal().getAppellant().getConfidentialityRequired());
+        assertEquals(expectedConfidentiality, response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequired());
+        assertNotNull(response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequiredChangedDate());
+        assertEquals(YES, response.getData().getOtherParties().get(1).getValue().getConfidentialityRequired());
+        assertNull(response.getData().getOtherParties().get(1).getValue().getConfidentialityRequiredChangedDate());
     }
 
     @ParameterizedTest

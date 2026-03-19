@@ -12,6 +12,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.OTHER_PARTY;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 
 import java.time.LocalDate;
@@ -349,10 +350,56 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private void updateAppellantConfidentialityFromDirection(SscsCaseData caseData) {
         String directionType = caseData.getDirectionTypeDl().getValue().getCode();
         YesNo confidentialityRequired = CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString().equals(directionType) ? YesNo.YES : YesNo.NO;
+        String originalSenderCode = Optional.ofNullable(caseData.getOriginalSender())
+            .map(DynamicList::getValue)
+            .map(DynamicListItem::getCode)
+            .orElse(null);
+
+        if (isOtherPartyReferral(originalSenderCode)) {
+            updateReferredOtherPartyConfidentiality(caseData, confidentialityRequired, originalSenderCode);
+            return;
+        }
+
         caseData.getAppellant().ifPresent(appellant -> {
             appellant.setConfidentialityRequired(confidentialityRequired);
             appellant.setConfidentialityRequiredChangedDate(LocalDateTime.now());
             log.info("Updated appellant confidentiality to {} for case id {}", confidentialityRequired, caseData.getCcdCaseId());
         });
+    }
+
+    private boolean isOtherPartyReferral(String originalSenderCode) {
+        return !isBlank(originalSenderCode) && originalSenderCode.startsWith(OTHER_PARTY.getCode());
+    }
+
+    private void updateReferredOtherPartyConfidentiality(SscsCaseData caseData, YesNo confidentialityRequired, String originalSenderCode) {
+        String otherPartyId = originalSenderCode.substring(OTHER_PARTY.getCode().length());
+        if (caseData.getOtherParties() == null) {
+            return;
+        }
+
+        caseData.getOtherParties().stream()
+            .map(CcdValue::getValue)
+            .filter(otherParty -> otherParty != null)
+            .filter(otherParty -> isMatchingOtherParty(otherParty, otherPartyId))
+            .findFirst()
+            .ifPresent(otherParty -> {
+                otherParty.setConfidentialityRequired(confidentialityRequired);
+                otherParty.setConfidentialityRequiredChangedDate(LocalDateTime.now());
+                log.info("Updated other party confidentiality to {} for case id {} and other party id {}",
+                    confidentialityRequired, caseData.getCcdCaseId(), otherParty.getId());
+            });
+    }
+
+    private boolean isMatchingOtherParty(OtherParty otherParty, String otherPartyId) {
+        if (isBlank(otherPartyId)) {
+            return true;
+        }
+
+        if (otherPartyId.equals(otherParty.getId())) {
+            return true;
+        }
+
+        return Optional.ofNullable(otherParty.getAppointee()).map(Appointee::getId).filter(otherPartyId::equals).isPresent()
+            || Optional.ofNullable(otherParty.getRep()).map(Representative::getId).filter(otherPartyId::equals).isPresent();
     }
 }
