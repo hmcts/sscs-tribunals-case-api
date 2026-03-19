@@ -2177,7 +2177,7 @@ public class NotificationServiceTest {
 
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
 
-        then(notificationHandler).should(atLeast(1)).sendNotification(
+        then(notificationHandler).should(times(1)).sendNotification(
             eq(ccdNotificationWrapper), any(), eq(LETTER),
             any(NotificationHandler.SendNotification.class));
     }

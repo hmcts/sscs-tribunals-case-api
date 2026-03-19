@@ -127,6 +127,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.REPRESENTATIVE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ACTION_POSTPONEMENT_REQUEST;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ACTION_POSTPONEMENT_REQUEST_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADD_OTHER_PARTY_DATA;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADJOURNED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADMIN_APPEAL_WITHDRAWN;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_DORMANT;
@@ -2652,5 +2653,131 @@ public class PersonalisationTest {
             .subscriptions(subscriptions)
             .infoRequests(infoRequests)
             .build();
+    }
+
+    @Test
+    public void givenAddOtherPartyDataWithUcBenefitAndAwaitConfidentialityState_thenSetsOtherPartyName() {
+        final SscsCaseData response = SscsCaseData.builder()
+            .ccdCaseId(CASE_ID)
+            .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build())
+                .appellant(Appellant.builder().name(name).build())
+                .build())
+            .otherParties(List.of(new CcdValue<>(OtherParty.builder()
+                .name(Name.builder().firstName("John").lastName("Smith").build())
+                .build())))
+            .build();
+
+        final Map<String, Object> result = personalisation.create(
+            NotificationSscsCaseDataWrapper.builder()
+                .newSscsCaseData(response)
+                .notificationEventType(ADD_OTHER_PARTY_DATA)
+                .state(State.AWAIT_CONFIDENTIALITY_REQUIREMENTS)
+                .build(),
+            new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT,
+                response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
+
+        assertThat(result.get(OTHER_PARTY_NAME)).isEqualTo("John Smith");
+    }
+
+    @Test
+    public void givenAddOtherPartyDataWithMultipleOtherParties_thenSetsFirstOtherPartyName() {
+        final SscsCaseData response = SscsCaseData.builder()
+            .ccdCaseId(CASE_ID)
+            .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build())
+                .appellant(Appellant.builder().name(name).build())
+                .build())
+            .otherParties(List.of(
+                new CcdValue<>(OtherParty.builder()
+                    .name(Name.builder().firstName("First").lastName("Party").build())
+                    .build()),
+                new CcdValue<>(OtherParty.builder()
+                    .name(Name.builder().firstName("Second").lastName("Party").build())
+                    .build())))
+            .build();
+
+        final Map<String, Object> result = personalisation.create(
+            NotificationSscsCaseDataWrapper.builder()
+                .newSscsCaseData(response)
+                .notificationEventType(ADD_OTHER_PARTY_DATA)
+                .state(State.AWAIT_CONFIDENTIALITY_REQUIREMENTS)
+                .build(),
+            new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT,
+                response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
+
+        assertThat(result.get(OTHER_PARTY_NAME)).isEqualTo("First Party");
+    }
+
+    @Test
+    public void givenAddOtherPartyDataWithNonUcBenefit_thenDoesNotSetOtherPartyName() {
+        final SscsCaseData response = SscsCaseData.builder()
+            .ccdCaseId(CASE_ID)
+            .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder().code(Benefit.PIP.name()).build())
+                .appellant(Appellant.builder().name(name).build())
+                .build())
+            .otherParties(List.of(new CcdValue<>(OtherParty.builder()
+                .name(Name.builder().firstName("John").lastName("Smith").build())
+                .build())))
+            .build();
+
+        final Map<String, Object> result = personalisation.create(
+            NotificationSscsCaseDataWrapper.builder()
+                .newSscsCaseData(response)
+                .notificationEventType(ADD_OTHER_PARTY_DATA)
+                .state(State.AWAIT_CONFIDENTIALITY_REQUIREMENTS)
+                .build(),
+            new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT,
+                response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
+
+        assertThat(result).doesNotContainKey(OTHER_PARTY_NAME);
+    }
+
+    @Test
+    public void givenAddOtherPartyDataWithUcBenefitButWrongState_thenDoesNotSetOtherPartyName() {
+        final SscsCaseData response = SscsCaseData.builder()
+            .ccdCaseId(CASE_ID)
+            .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build())
+                .appellant(Appellant.builder().name(name).build())
+                .build())
+            .otherParties(List.of(new CcdValue<>(OtherParty.builder()
+                .name(Name.builder().firstName("John").lastName("Smith").build())
+                .build())))
+            .build();
+
+        final Map<String, Object> result = personalisation.create(
+            NotificationSscsCaseDataWrapper.builder()
+                .newSscsCaseData(response)
+                .notificationEventType(ADD_OTHER_PARTY_DATA)
+                .state(State.WITH_DWP)
+                .build(),
+            new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT,
+                response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
+
+        assertThat(result).doesNotContainKey(OTHER_PARTY_NAME);
+    }
+
+    @Test
+    public void givenAddOtherPartyDataWithUcBenefitAndAwaitConfidentialityButNoOtherParties_thenDoesNotSetOtherPartyName() {
+        final SscsCaseData response = SscsCaseData.builder()
+            .ccdCaseId(CASE_ID)
+            .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build())
+                .appellant(Appellant.builder().name(name).build())
+                .build())
+            .build();
+
+        final Map<String, Object> result = personalisation.create(
+            NotificationSscsCaseDataWrapper.builder()
+                .newSscsCaseData(response)
+                .notificationEventType(ADD_OTHER_PARTY_DATA)
+                .state(State.AWAIT_CONFIDENTIALITY_REQUIREMENTS)
+                .build(),
+            new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT,
+                response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
+
+        assertThat(result).doesNotContainKey(OTHER_PARTY_NAME);
     }
 }

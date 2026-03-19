@@ -16,6 +16,7 @@ public enum NotificationEventType {
     ACTION_HEARING_RECORDING_REQUEST(EventType.ACTION_HEARING_RECORDING_REQUEST, true, true, true, false, false, 0),
     ACTION_POSTPONEMENT_REQUEST(EventType.ACTION_POSTPONEMENT_REQUEST, true, true, true, true, false, 0),
     ACTION_POSTPONEMENT_REQUEST_WELSH(EventType.ACTION_POSTPONEMENT_REQUEST_WELSH, true, true, true, true, false, 0),
+    ADD_OTHER_PARTY_DATA(EventType.ADD_OTHER_PARTY_DATA, true, true, true, true, false, 0),
     ADJOURNED(EventType.ADJOURNED, true, false, false, false, false, 0),
     ADMIN_APPEAL_WITHDRAWN(EventType.ADMIN_APPEAL_WITHDRAWN, true, true, true, false, false, 0),
     ADMIN_CORRECTION_HEADER(EventType.ADMIN_CORRECTION_HEADER, true, true, true, true, false, 0),
@@ -81,8 +82,6 @@ public enum NotificationEventType {
     TCW_DECISION_APPEAL_TO_PROCEED(EventType.TCW_DECISION_APPEAL_TO_PROCEED, true, true, true, false, false, 0),
     UPDATE_OTHER_PARTY_DATA(EventType.UPDATE_OTHER_PARTY_DATA, true, true, true, true, false, 0),
     VALID_APPEAL_CREATED(EventType.VALID_APPEAL_CREATED, true, true, false, true, false, 240L),
-    // TODO What do all these things mean
-    ADD_OTHER_PARTY_DATA(EventType.ADD_OTHER_PARTY_DATA, true, true, false, false, false, 0),
 
     @JsonEnumDefaultValue
     DO_NOT_SEND(null);
