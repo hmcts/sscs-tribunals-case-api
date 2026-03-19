@@ -3,7 +3,7 @@ name: cft-lib-em-stack
 
 services:
   rpa-em-ccd-orchestrator:
-    image: hmctspublic.azurecr.io/em/ccdorc:latest
+    image: hmctsprod.azurecr.io/em/ccdorc:latest
     environment:
       - SERVER_PORT=8080
       - CALLBACK_DOMAIN=rpa-em-ccd-orchestrator
@@ -29,7 +29,7 @@ services:
       - "host.docker.internal:host-gateway"
 
   stitching-api:
-    image: hmctspublic.azurecr.io/em/stitching:latest
+    image: hmctsprod.azurecr.io/em/stitching:latest
     healthcheck:
       interval: 10s
       timeout: 10s
