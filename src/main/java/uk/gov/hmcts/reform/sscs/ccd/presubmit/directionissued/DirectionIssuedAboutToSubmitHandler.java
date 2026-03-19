@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -360,10 +361,14 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         var confidentialityRequired = CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString()
             .equals(directionCode) ? YesNo.YES : YesNo.NO;
 
-        var selectedConfidentialityPartyCode = caseData.getExtendedSscsCaseData()
-            .getSelectedConfidentialityParty()
-            .getValue()
-            .getCode();
+        var selectedConfidentialityPartyCode = caseData.getExtendedSscsCaseData().getSelectedConfidentialityParty() != null
+            ? caseData.getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode()
+            : null;
+
+        if (StringUtils.isBlank(selectedConfidentialityPartyCode)) {
+            log.debug("The confidentiality party has been not selected. caseId: {}", caseData.getCcdCaseId());
+            return caseData;
+        }
 
         if ("appellant".equalsIgnoreCase(selectedConfidentialityPartyCode)) {
             log.debug("Updating Appellant's confidentiality as {}, caseId: {}", confidentialityRequired,
@@ -374,15 +379,15 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                 appellant.setConfidentialityRequiredChangedDate(LocalDateTime.now());
 
             });
-        } else if (selectedConfidentialityPartyCode.startsWith("otherParty")) {
-            var selectedConfidentialityPartyId = selectedConfidentialityPartyCode.substring(10);
+        } else if (StringUtils.startsWithIgnoreCase(selectedConfidentialityPartyCode, "otherParty")) {
+            var otherPartyId = selectedConfidentialityPartyCode.substring("otherParty".length());
 
             if (caseData.getOtherParties() != null && !caseData.getOtherParties().isEmpty()) {
                 log.debug("Updating Other party's confidentiality as {}, caseId: {}, otherParty Id: {}",
-                    confidentialityRequired, caseData.getCcdCaseId(), selectedConfidentialityPartyId);
+                    confidentialityRequired, caseData.getCcdCaseId(), otherPartyId);
 
                 caseData.getOtherParties().forEach(otherParty -> {
-                    if (selectedConfidentialityPartyId.equalsIgnoreCase(otherParty.getValue().getId())) {
+                    if (otherPartyId.equalsIgnoreCase(otherParty.getValue().getId())) {
                         otherParty.getValue().setConfidentialityRequired(confidentialityRequired);
                         otherParty.getValue().setConfidentialityRequiredChangedDate(LocalDateTime.now());
                     }

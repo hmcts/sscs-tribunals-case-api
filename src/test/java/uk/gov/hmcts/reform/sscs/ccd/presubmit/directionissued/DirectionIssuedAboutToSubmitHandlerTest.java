@@ -848,7 +848,8 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
             when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
 
-            handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, false, cmOtherPartyConfidentialityFeatureFlag);
+            handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, false,
+                cmOtherPartyConfidentialityFeatureFlag);
 
             callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(directionType));
 
@@ -861,7 +862,9 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
             assertTrue(response.getData().getAppellant().isPresent());
-            assertEquals(expectedConfidentialityRequired, response.getData().getAppellant().get().getConfidentialityRequired());
+            assertEquals(expectedConfidentialityRequired,
+                response.getData().getAppellant().get().getConfidentialityRequired());
+            assertNotNull(response.getData().getAppellant().get().getConfidentialityRequiredChangedDate());
         }
 
         @ParameterizedTest
@@ -882,7 +885,8 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
             callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(directionType));
 
-            DynamicListItem selectedConfidentialityParty = new DynamicListItem("otherParty" + selectedConfidentialityPartyId,
+            DynamicListItem selectedConfidentialityParty = new DynamicListItem(
+                "otherParty" + selectedConfidentialityPartyId,
                 "Other Party Ozan");
 
             callback.getCaseDetails().getCaseData().setExtendedSscsCaseData(ExtendedSscsCaseData.builder()
@@ -891,11 +895,16 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
             var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-            var otherPartyUpdated = response.getData().getOtherParties().stream().filter(o -> o.getValue().getId().equals(selectedConfidentialityPartyId)).toList();
+            var otherPartyUpdated = response.getData()
+                .getOtherParties()
+                .stream()
+                .filter(o -> o.getValue().getId().equals(selectedConfidentialityPartyId))
+                .toList();
 
             assertEquals(1, otherPartyUpdated.size());   // only one of parties must be updated
 
-            assertEquals(expectedConfidentialityRequired, otherPartyUpdated.getFirst().getValue().getConfidentialityRequired());
+            assertEquals(expectedConfidentialityRequired,
+                otherPartyUpdated.getFirst().getValue().getConfidentialityRequired());
             assertNotNull(otherPartyUpdated.getFirst().getValue().getConfidentialityRequiredChangedDate());
 
             // other parties beside selected one should not be updated
@@ -908,6 +917,42 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
             assertTrue(response.getData().getAppellant().isPresent());
             assertNull(response.getData().getAppellant().get().getConfidentialityRequired());
+            assertNull(response.getData().getAppellant().get().getConfidentialityRequiredChangedDate());
+        }
+
+        @ParameterizedTest
+        @CsvSource({"confidentialityGrantedSendToAdmin", "confidentialityRefusedSendToAdmin"})
+        void givenIssueDirectionNotice_andThereIsNoSelectedConfidentialityParty_thenDoNotUpdateConfidentialityRequired(String directionType) {
+
+            var selectedConfidentialityPartyId = "666-666-666";
+
+            when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
+
+            handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, false,
+                cmOtherPartyConfidentialityFeatureFlag);
+
+            callback.getCaseDetails()
+                .getCaseData()
+                .setOtherParties(List.of(buildOtherParty("555-555-555", "Rubar", "Do"),
+                    buildOtherParty(selectedConfidentialityPartyId, "Ozan", "Mo")));
+
+            callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(directionType));
+
+            callback.getCaseDetails().getCaseData().setExtendedSscsCaseData(ExtendedSscsCaseData.builder()
+                .selectedConfidentialityParty(null)
+                .build());
+
+            var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+            // other parties beside selected one should not be updated
+            response.getData().getOtherParties().forEach(otherParty -> {
+                assertNull(otherParty.getValue().getConfidentialityRequired());
+                assertNull(otherParty.getValue().getConfidentialityRequiredChangedDate());
+            });
+
+            assertTrue(response.getData().getAppellant().isPresent());
+            assertNull(response.getData().getAppellant().get().getConfidentialityRequired());
+            assertNull(response.getData().getAppellant().get().getConfidentialityRequiredChangedDate());
         }
     }
 
@@ -936,6 +981,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
             assertTrue(response.getData().getAppellant().isPresent());
             assertNull(response.getData().getAppellant().get().getConfidentialityRequired());
+            assertNull(response.getData().getAppellant().get().getConfidentialityRequiredChangedDate());
 
             assertEquals(2, response.getData().getOtherParties().size());
 
