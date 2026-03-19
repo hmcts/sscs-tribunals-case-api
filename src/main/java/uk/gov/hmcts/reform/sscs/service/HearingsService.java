@@ -5,7 +5,11 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.helper.service.HearingsServiceHelper.findHearingsWithRequestedHearingState;
 import static uk.gov.hmcts.reform.sscs.helper.service.HearingsServiceHelper.getHearingId;
 
+import static uk.gov.hmcts.reform.sscs.config.MetricsConstants.*;
+
 import feign.FeignException;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import java.util.List;
 import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
@@ -65,6 +69,7 @@ public class HearingsService {
     private final HearingServiceConsumer hearingServiceConsumer;
     private final HearingsMapping hearingsMapping;
     private final OverridesMapping overridesMapping;
+    private final MeterRegistry meterRegistry;
 
 
     // Leaving blank for now until a future change is scoped and completed, then we can add the case states back in
@@ -92,33 +97,49 @@ public class HearingsService {
             throws UnhandleableHearingStateException, UpdateCaseException, ListingException {
 
         String caseId = wrapper.getCaseData().getCcdCaseId();
+        String operation = wrapper.getHearingState().getState();
+        Timer.Sample sample = Timer.start(meterRegistry);
+
         log.info("Processing Hearing Wrapper for Case ID {}, Case State {} and Hearing State {}",
                 caseId,
                 wrapper.getCaseState().toString(),
-                wrapper.getHearingState().getState());
+                operation);
 
-        switch (wrapper.getHearingState()) {
-            case ADJOURN_CREATE_HEARING -> {
-                wrapper.getCaseData().getAdjournment().setAdjournmentInProgress(YesNo.YES);
-                wrapper.setHearingState(HearingState.CREATE_HEARING);
-                createHearing(wrapper);
+        try {
+            switch (wrapper.getHearingState()) {
+                case ADJOURN_CREATE_HEARING -> {
+                    wrapper.getCaseData().getAdjournment().setAdjournmentInProgress(YesNo.YES);
+                    wrapper.setHearingState(HearingState.CREATE_HEARING);
+                    createHearing(wrapper);
+                }
+                case CREATE_HEARING -> createHearing(wrapper);
+                case UPDATE_HEARING -> updateHearing(wrapper);
+                case UPDATED_CASE -> log.info(
+                        "Updated case API not supported. Case ID {}",
+                        caseId
+                );
+                case CANCEL_HEARING -> cancelHearing(wrapper);
+                case PARTY_NOTIFIED -> log.info(
+                        "Parties notified API not supported. Case ID {}",
+                        caseId
+                );
+                default -> {
+                    UnhandleableHearingStateException err = new UnhandleableHearingStateException(wrapper.getHearingState());
+                    log.error(err.getMessage(), err);
+                    throw err;
+                }
             }
-            case CREATE_HEARING -> createHearing(wrapper);
-            case UPDATE_HEARING -> updateHearing(wrapper);
-            case UPDATED_CASE -> log.info(
-                    "Updated case API not supported. Case ID {}",
-                    caseId
-            );
-            case CANCEL_HEARING -> cancelHearing(wrapper);
-            case PARTY_NOTIFIED -> log.info(
-                    "Parties notified API not supported. Case ID {}",
-                    caseId
-            );
-            default -> {
-                UnhandleableHearingStateException err = new UnhandleableHearingStateException(wrapper.getHearingState());
-                log.error(err.getMessage(), err);
-                throw err;
-            }
+            sample.stop(Timer.builder(HEARINGS_REQUEST_DURATION)
+                .tag(TAG_OPERATION, operation)
+                .tag(TAG_OUTCOME, "success")
+                .register(meterRegistry));
+        } catch (Exception e) {
+            sample.stop(Timer.builder(HEARINGS_REQUEST_DURATION)
+                .tag(TAG_OPERATION, operation)
+                .tag(TAG_OUTCOME, "error")
+                .register(meterRegistry));
+            meterRegistry.counter(HEARINGS_REQUEST_ERRORS, TAG_OPERATION, operation).increment();
+            throw e;
         }
     }
 

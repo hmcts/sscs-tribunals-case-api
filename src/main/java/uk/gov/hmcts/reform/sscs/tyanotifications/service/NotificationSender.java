@@ -2,8 +2,10 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.sscs.config.MetricsConstants.*;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -49,6 +51,7 @@ public class NotificationSender {
     private final SaveCorrespondenceAsyncService saveCorrespondenceAsyncService;
     private final BulkPrintService bulkPrintService;
     private final Boolean saveCorrespondence;
+    private final MeterRegistry meterRegistry;
 
     @Autowired
     public NotificationSender(@Qualifier("notificationClient") NotificationClient notificationClient,
@@ -57,7 +60,8 @@ public class NotificationSender {
                               NotificationTestRecipients notificationTestRecipients,
                               MarkdownTransformationService markdownTransformationService,
                               SaveCorrespondenceAsyncService saveCorrespondenceAsyncService,
-                              @Value("${feature.save_correspondence}") Boolean saveCorrespondence
+                              @Value("${feature.save_correspondence}") Boolean saveCorrespondence,
+                              MeterRegistry meterRegistry
     ) {
         this.notificationClient = notificationClient;
         this.testNotificationClient = testNotificationClient;
@@ -66,6 +70,7 @@ public class NotificationSender {
         this.bulkPrintService = bulkPrintService;
         this.saveCorrespondence = saveCorrespondence;
         this.saveCorrespondenceAsyncService = saveCorrespondenceAsyncService;
+        this.meterRegistry = meterRegistry;
     }
 
     public void sendEmail(String templateId, String emailAddress, Map<String, Object> personalisation, String reference,
@@ -92,6 +97,7 @@ public class NotificationSender {
             log.info("Uploaded correspondence email into ccd for case id {}.", sscsCaseData.getCcdCaseId());
         }
 
+        meterRegistry.counter(NOTIFICATION_SENT, TAG_CHANNEL, "email").increment();
         log.info("Email Notification send for case id : {}, Gov notify id: {} ", sscsCaseData.getCcdCaseId(),
             (sendEmailResponse != null) ? sendEmailResponse.getNotificationId() : null);
     }
@@ -140,6 +146,7 @@ public class NotificationSender {
             log.info("Uploaded correspondence sms into ccd for case id {}.", sscsCaseData.getCcdCaseId());
         }
 
+        meterRegistry.counter(NOTIFICATION_SENT, TAG_CHANNEL, "sms").increment();
         log.info("Sms Notification send for case id : {}, Gov notify id: {} ", sscsCaseData.getCcdCaseId(),
             (sendSmsResponse != null) ? sendSmsResponse.getNotificationId() : null);
     }
@@ -180,6 +187,7 @@ public class NotificationSender {
                     client, sendLetterResponse.getNotificationId().toString(), correspondence, ccdCaseId);
         }
 
+        meterRegistry.counter(NOTIFICATION_SENT, TAG_CHANNEL, "letter").increment();
         log.info("Letter Notification send for case id : {}, Gov notify id: {} ",
                 ccdCaseId, (sendLetterResponse != null) ? sendLetterResponse.getNotificationId() : null);
     }
@@ -325,6 +333,7 @@ public class NotificationSender {
 
     @Recover
     public void getBackendResponseFallback(Throwable e) {
+        meterRegistry.counter(NOTIFICATION_FAILED).increment();
         log.error("Failed sending.....", e);
     }
 }

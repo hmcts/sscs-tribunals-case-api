@@ -338,6 +338,10 @@ management:
         enabled-by-default: true
         web:
             base-path: /
+    dynatrace:
+        metrics:
+            export:
+                enabled: true
     health:
         case-document-am-api:
             enabled: ${SECURE_DOC_STORE_FEATURE:false}

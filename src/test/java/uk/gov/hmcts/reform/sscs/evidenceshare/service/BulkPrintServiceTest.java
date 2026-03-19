@@ -97,7 +97,7 @@ class BulkPrintServiceTest {
     @BeforeEach
     void setUp() {
         this.bulkPrintService = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper,
-                true, 1, ccdNotificationService);
+                true, 1, ccdNotificationService, new io.micrometer.core.instrument.simple.SimpleMeterRegistry());
         lenient().when(idamService.generateServiceAuthorization()).thenReturn(AUTH_TOKEN);
     }
 
@@ -236,7 +236,7 @@ class BulkPrintServiceTest {
 
     @Test
     void sendLetterNotEnabledWillNotSendToBulkPrint() {
-        BulkPrintService notEnabledBulkPrint = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper, false, 1, ccdNotificationService);
+        BulkPrintService notEnabledBulkPrint = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper, false, 1, ccdNotificationService, new io.micrometer.core.instrument.simple.SimpleMeterRegistry());
         notEnabledBulkPrint.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, null);
         verifyNoInteractions(idamService);
         verifyNoInteractions(sendLetterApi);
@@ -244,7 +244,7 @@ class BulkPrintServiceTest {
 
     @Test
     void willSendToBulkPrintWithReasonableAdjustment() {
-        this.bulkPrintService = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper, true, 1, ccdNotificationService);
+        this.bulkPrintService = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper, true, 1, ccdNotificationService, new io.micrometer.core.instrument.simple.SimpleMeterRegistry());
 
         SSCS_CASE_DATA.setReasonableAdjustments(ReasonableAdjustments.builder()
                 .appellant(ReasonableAdjustmentDetails.builder()

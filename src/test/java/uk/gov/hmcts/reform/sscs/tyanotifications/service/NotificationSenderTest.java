@@ -115,7 +115,8 @@ public class NotificationSenderTest {
                 blacklist,
                 markdownTransformationService,
                 saveCorrespondenceAsyncService,
-                saveCorrespondence
+                saveCorrespondence,
+                new io.micrometer.core.instrument.simple.SimpleMeterRegistry()
         );
     }
 

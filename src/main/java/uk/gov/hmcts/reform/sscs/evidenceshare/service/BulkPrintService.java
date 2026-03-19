@@ -4,7 +4,9 @@ import static java.lang.String.format;
 import static java.util.Base64.getEncoder;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.config.MetricsConstants.*;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -53,19 +55,23 @@ public class BulkPrintService implements PrintService {
     private final Integer maxRetryAttempts;
     private final BulkPrintServiceHelper bulkPrintServiceHelper;
     private final CcdNotificationService ccdNotificationService;
+    private final MeterRegistry meterRegistry;
 
     @Autowired
     public BulkPrintService(SendLetterApi sendLetterApi,
                             IdamService idamService,
                             BulkPrintServiceHelper bulkPrintServiceHelper,
                             @Value("${send-letter.enabled}") boolean sendLetterEnabled,
-                            @Value("${send-letter.maxRetryAttempts}") Integer maxRetryAttempts, CcdNotificationService ccdNotificationService) {
+                            @Value("${send-letter.maxRetryAttempts}") Integer maxRetryAttempts,
+                            CcdNotificationService ccdNotificationService,
+                            MeterRegistry meterRegistry) {
         this.idamService = idamService;
         this.bulkPrintServiceHelper = bulkPrintServiceHelper;
         this.sendLetterApi = sendLetterApi;
         this.sendLetterEnabled = sendLetterEnabled;
         this.maxRetryAttempts = maxRetryAttempts;
         this.ccdNotificationService = ccdNotificationService;
+        this.meterRegistry = meterRegistry;
     }
 
     public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, final SscsCaseData sscsCaseData, FurtherEvidenceLetterType letterType, EventType event, String recipient) {
@@ -169,6 +175,7 @@ public class BulkPrintService implements PrintService {
 
         } catch (Exception e) {
             if (reTryNumber > maxRetryAttempts) {
+                meterRegistry.counter(EVIDENCE_SHARE_FAILED).increment();
                 String message = format("Failed to send to bulk print for case %s with error %s.",
                     sscsCaseData.getCcdCaseId(), e.getMessage());
                 throw new BulkPrintException(message, e);
@@ -188,6 +195,7 @@ public class BulkPrintService implements PrintService {
                 getAdditionalData(sscsCaseData, recipient)
             )
         );
+        meterRegistry.counter(EVIDENCE_SHARE_SENT).increment();
         log.info("Letter service produced the following letter Id {} for case {}",
             sendLetterResponse.letterId, sscsCaseData.getCcdCaseId());
 

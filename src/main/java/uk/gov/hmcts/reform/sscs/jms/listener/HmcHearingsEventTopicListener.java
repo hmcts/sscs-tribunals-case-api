@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.sscs.jms.listener;
 
+import static uk.gov.hmcts.reform.sscs.config.MetricsConstants.*;
 import static uk.gov.hmcts.reform.sscs.service.HmcHearingApi.HMCTS_DEPLOYMENT_ID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.jms.JMSException;
 import java.nio.charset.StandardCharsets;
 import lombok.extern.slf4j.Slf4j;
@@ -28,12 +30,15 @@ public class HmcHearingsEventTopicListener {
     private final ObjectMapper objectMapper;
 
     private final ProcessHmcMessageServiceV2 processHmcMessageServiceV2;
+    private final MeterRegistry meterRegistry;
 
     @Value("${hmc.deployment-id}")
     private String hmctsDeploymentId;
 
-    public HmcHearingsEventTopicListener(ProcessHmcMessageServiceV2 processHmcMessageServiceV2) {
+    public HmcHearingsEventTopicListener(ProcessHmcMessageServiceV2 processHmcMessageServiceV2,
+                                          MeterRegistry meterRegistry) {
         this.processHmcMessageServiceV2 = processHmcMessageServiceV2;
+        this.meterRegistry = meterRegistry;
         this.objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
     }
@@ -44,6 +49,7 @@ public class HmcHearingsEventTopicListener {
         containerFactory = "hmcHearingsEventTopicContainerFactory"
     )
     public void onMessage(JmsBytesMessage message) throws JMSException, HmcEventProcessingException {
+        meterRegistry.counter(SERVICEBUS_RECEIVED).increment();
         log.info("message deploymentId , {}", message.getStringProperty(HMCTS_DEPLOYMENT_ID));
         log.info("application deploymentId , {}", hmctsDeploymentId);
 
@@ -64,8 +70,10 @@ public class HmcHearingsEventTopicListener {
             );
 
             processHmcMessageServiceV2.processEventMessage(hmcMessage);
+            meterRegistry.counter(HEARINGS_EVENTS_PROCESSED).increment();
         } catch (JsonProcessingException | MessageProcessingException
                  | HearingUpdateException | ExhaustedRetryException ex) {
+            meterRegistry.counter(HEARINGS_EVENTS_FAILED).increment();
             log.error("Unable to successfully deliver HMC message: {}", convertedMessage, ex);
             throw new HmcEventProcessingException(String.format(
                 "Unable to successfully deliver HMC message: %s",

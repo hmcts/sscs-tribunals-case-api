@@ -48,7 +48,7 @@ class HmcHearingsEventTopicListenerTest {
 
     @BeforeEach
     void setup() throws JMSException {
-        hmcHearingsEventTopicListener = new HmcHearingsEventTopicListener(processHmcMessageServiceV2);
+        hmcHearingsEventTopicListener = new HmcHearingsEventTopicListener(processHmcMessageServiceV2, new io.micrometer.core.instrument.simple.SimpleMeterRegistry());
         ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "objectMapper", mockObjectMapper);
         given(bytesMessage.getStringProperty("hmctsDeploymentId")).willReturn("test");
         ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "hmctsDeploymentId", "test");

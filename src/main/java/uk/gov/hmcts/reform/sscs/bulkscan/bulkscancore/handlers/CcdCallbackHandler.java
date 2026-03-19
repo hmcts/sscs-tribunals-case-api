@@ -17,6 +17,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import static uk.gov.hmcts.reform.sscs.config.MetricsConstants.BULK_SCAN_PROCESSED;
+import static uk.gov.hmcts.reform.sscs.config.MetricsConstants.BULK_SCAN_VALIDATION_FAILED;
+
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -63,6 +67,7 @@ public class CcdCallbackHandler {
     private final DwpAddressLookupService dwpAddressLookupService;
     private final CaseManagementLocationService caseManagementLocationService;
     private final boolean caseAccessManagementFeature;
+    private final MeterRegistry meterRegistry;
 
     public CcdCallbackHandler(CaseValidator caseValidator,
                               SscsDataHelper sscsDataHelper,
@@ -70,7 +75,8 @@ public class CcdCallbackHandler {
                               AppealPostcodeHelper appealPostcodeHelper,
                               DwpAddressLookupService dwpAddressLookupService,
                               CaseManagementLocationService caseManagementLocationService,
-                              @Value("${feature.case-access-management.enabled}") boolean caseAccessManagementFeature) {
+                              @Value("${feature.case-access-management.enabled}") boolean caseAccessManagementFeature,
+                              MeterRegistry meterRegistry) {
         this.caseValidator = caseValidator;
         this.sscsDataHelper = sscsDataHelper;
         this.caseTransformer = caseTransformer;
@@ -78,6 +84,7 @@ public class CcdCallbackHandler {
         this.dwpAddressLookupService = dwpAddressLookupService;
         this.caseManagementLocationService = caseManagementLocationService;
         this.caseAccessManagementFeature = caseAccessManagementFeature;
+        this.meterRegistry = meterRegistry;
     }
 
     public CaseResponse handleValidation(ExceptionRecord exceptionRecord) {
@@ -87,6 +94,7 @@ public class CcdCallbackHandler {
         CaseResponse caseTransformationResponse = caseTransformer.transformExceptionRecord(exceptionRecord, true);
 
         if (caseTransformationResponse.getErrors() != null && !caseTransformationResponse.getErrors().isEmpty()) {
+            meterRegistry.counter(BULK_SCAN_VALIDATION_FAILED).increment();
             log.info("Errors found during validation");
             return caseTransformationResponse;
         }
@@ -121,9 +129,11 @@ public class CcdCallbackHandler {
         CaseResponse caseValidationResponse = caseValidator.validateExceptionRecord(caseTransformationResponse, exceptionRecord, caseTransformationResponse.getTransformedCase(), false);
 
         if (!isEmpty(caseValidationResponse.getErrors())) {
+            meterRegistry.counter(BULK_SCAN_VALIDATION_FAILED).increment();
             log.info(LOGSTR_VALIDATION_ERRORS, exceptionRecordId, stringJoin(caseValidationResponse.getErrors()));
             throw new InvalidExceptionRecordException(caseValidationResponse.getErrors());
         } else if (BooleanUtils.isTrue(exceptionRecord.getIsAutomatedProcess()) && !isEmpty(caseValidationResponse.getWarnings())) {
+            meterRegistry.counter(BULK_SCAN_VALIDATION_FAILED).increment();
             log.info(LOGSTR_VALIDATION_WARNING, exceptionRecordId, stringJoin(caseValidationResponse.getWarnings()));
             throw new InvalidExceptionRecordException(caseValidationResponse.getWarnings());
         } else {
@@ -131,6 +141,7 @@ public class CcdCallbackHandler {
 
             stampReferredCase(caseValidationResponse, eventId);
 
+            meterRegistry.counter(BULK_SCAN_PROCESSED).increment();
             return new SuccessfulTransformationResponse(
                 new CaseCreationDetails(
                     CASE_TYPE_ID,

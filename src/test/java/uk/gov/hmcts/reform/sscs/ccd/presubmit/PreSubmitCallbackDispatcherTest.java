@@ -21,6 +21,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
 
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -65,7 +66,7 @@ public class PreSubmitCallbackDispatcherTest {
         response1.addErrors(List.of("error1"));
         response2 = new PreSubmitCallbackResponse<>(caseDataMutation2);
         response2.addErrors(List.of("error2", "error3"));
-        preSubmitCallbackDispatcher = new PreSubmitCallbackDispatcher<>(List.of(handler1, handler2));
+        preSubmitCallbackDispatcher = new PreSubmitCallbackDispatcher<>(List.of(handler1, handler2), new SimpleMeterRegistry());
     }
 
     @Test
@@ -133,7 +134,7 @@ public class PreSubmitCallbackDispatcherTest {
     @Test
     public void should_not_error_if_no_handlers_are_provided() {
         PreSubmitCallbackDispatcher<CaseData> preSubmitCallbackDispatcher =
-                new PreSubmitCallbackDispatcher<>(Collections.emptyList());
+                new PreSubmitCallbackDispatcher<>(Collections.emptyList(), new SimpleMeterRegistry());
 
         assertDoesNotThrow(() -> {
             PreSubmitCallbackResponse<CaseData> callbackResponse =
