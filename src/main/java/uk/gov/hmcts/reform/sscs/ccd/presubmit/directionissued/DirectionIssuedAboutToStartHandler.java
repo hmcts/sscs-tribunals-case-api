@@ -22,9 +22,14 @@ import uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil;
 @Service
 public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private final boolean isPostHearingsEnabled;
+    private final boolean cmDirectionTypesConfidentiality;
 
-    public DirectionIssuedAboutToStartHandler(@Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled) {
+    public DirectionIssuedAboutToStartHandler(
+        @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled,
+        @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentiality
+    ) {
         this.isPostHearingsEnabled = isPostHearingsEnabled;
+        this.cmDirectionTypesConfidentiality = cmOtherPartyConfidentiality;
     }
 
     @Override
@@ -67,6 +72,12 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
         listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
         listOptions.add(new DynamicListItem(ISSUE_AND_SEND_TO_ADMIN.toString(), ISSUE_AND_SEND_TO_ADMIN.getLabel()));
+
+        if (cmDirectionTypesConfidentiality
+            && InterlocReferralReason.CONFIDENTIALITY.equals(sscsCaseData.getInterlocReferralReason())) {
+            listOptions.add(new DynamicListItem(CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString(), CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.getLabel()));
+            listOptions.add(new DynamicListItem(CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN.toString(), CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN.getLabel()));
+        }
 
         if (isYes(sscsCaseData.getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding())) {
             listOptions.add(new DynamicListItem(REFUSE_HEARING_RECORDING_REQUEST.toString(), REFUSE_HEARING_RECORDING_REQUEST.getLabel()));
