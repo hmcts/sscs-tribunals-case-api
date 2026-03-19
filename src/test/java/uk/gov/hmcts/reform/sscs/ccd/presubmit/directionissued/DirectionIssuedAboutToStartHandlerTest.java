@@ -8,6 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.APPEAL_TO_PROCEED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.GRANT_EXTENSION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.GRANT_REINSTATEMENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.GRANT_URGENT_HEARING;
@@ -47,6 +49,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
@@ -165,6 +168,60 @@ public class DirectionIssuedAboutToStartHandlerTest {
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getDirectionTypeDl());
         assertEquals(5, response.getData().getDirectionTypeDl().getListItems().size());
+    }
+
+    @Test
+    public void givenAppealWithConfidentialityReferralAndFeatureFlagEnabled_populateDirectionTypeDropdown() {
+        handler = new DirectionIssuedAboutToStartHandler(false, true);
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
+
+        List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
+        listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
+        listOptions.add(new DynamicListItem(ISSUE_AND_SEND_TO_ADMIN.toString(), ISSUE_AND_SEND_TO_ADMIN.getLabel()));
+        listOptions.add(new DynamicListItem(CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString(),
+            CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.getLabel()));
+        listOptions.add(new DynamicListItem(CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN.toString(),
+            CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN.getLabel()));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
+        assertEquals(expected, response.getData().getDirectionTypeDl());
+        assertEquals(5, response.getData().getDirectionTypeDl().getListItems().size());
+    }
+
+    @Test
+    public void givenAppealWithConfidentialityReferralAndFeatureFlagDisabled_doNotPopulateDirectionTypeDropdown() {
+        handler = new DirectionIssuedAboutToStartHandler(false, false);
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
+
+        List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
+        listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
+        listOptions.add(new DynamicListItem(ISSUE_AND_SEND_TO_ADMIN.toString(), ISSUE_AND_SEND_TO_ADMIN.getLabel()));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
+        assertEquals(expected, response.getData().getDirectionTypeDl());
+        assertEquals(3, response.getData().getDirectionTypeDl().getListItems().size());
+    }
+
+    @Test
+    public void givenAppealWithoutConfidentialityReferralAndFeatureFlagEnaled_doNotPopulateDirectionTypeDropdown() {
+        handler = new DirectionIssuedAboutToStartHandler(false, true);
+
+        List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
+        listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
+        listOptions.add(new DynamicListItem(ISSUE_AND_SEND_TO_ADMIN.toString(), ISSUE_AND_SEND_TO_ADMIN.getLabel()));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
+        assertEquals(expected, response.getData().getDirectionTypeDl());
+        assertEquals(3, response.getData().getDirectionTypeDl().getListItems().size());
     }
 
     @Test

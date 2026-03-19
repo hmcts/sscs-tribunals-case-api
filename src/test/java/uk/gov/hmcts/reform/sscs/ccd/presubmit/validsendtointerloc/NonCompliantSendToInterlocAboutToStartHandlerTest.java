@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -32,35 +31,23 @@ class NonCompliantSendToInterlocAboutToStartHandlerTest {
         CaseDetails<SscsCaseData> caseDetails =
                 new CaseDetails<>(1234L, "SSCS", State.WITH_DWP, caseData, now(), "Benefit");
         callback = new Callback<>(caseDetails, Optional.of(caseDetails), NON_COMPLIANT_SEND_TO_INTERLOC, false);
-        handler = new NonCompliantSendToInterlocAboutToStartHandler(false);
+        handler = new NonCompliantSendToInterlocAboutToStartHandler();
     }
 
     @Test
-    void canHandleOnlyWhenFeatureFlagEnabledForNonCompliantSendToInterloc() {
-        assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
-
-        handler = new NonCompliantSendToInterlocAboutToStartHandler(true);
+    void canHandleForNonCompliantSendToInterloc() {
         assertThat(handler.canHandle(ABOUT_TO_START, callback)).isTrue();
         assertThat(handler.canHandle(CallbackType.ABOUT_TO_SUBMIT, callback)).isFalse();
     }
 
     @Test
-    void throwsWhenFlagOff() {
-        assertThatThrownBy(() -> handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION))
-                .isInstanceOf(IllegalStateException.class);
-    }
-
-    @Test
-    void setsFirstPartyAsDefaultWhenFlagOnAndNonChildSupport() {
-        handler = new NonCompliantSendToInterlocAboutToStartHandler(true);
+    void doesNotSetSelectionForNonChildSupport() {
         var response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        DynamicList selectedParty = response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty();
-        assertThat(selectedParty.getValue().getCode()).isEqualTo("appellant");
+        assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty()).isNull();
     }
 
     @Test
-    void clearsDefaultSelectionWhenFlagOnForChildSupport() {
-        handler = new NonCompliantSendToInterlocAboutToStartHandler(true);
+    void clearsDefaultSelectionForChildSupport() {
         callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
 
         var response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);

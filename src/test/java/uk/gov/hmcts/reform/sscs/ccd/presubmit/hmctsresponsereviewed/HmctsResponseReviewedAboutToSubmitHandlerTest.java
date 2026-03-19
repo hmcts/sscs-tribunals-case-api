@@ -49,6 +49,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DwpDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpResponseDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ExtendedSscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
@@ -128,6 +129,22 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
         assertEquals("002CC", response.getData().getCaseCode());
         assertEquals(LocalDate.now().minusDays(1).toString(), response.getData().getDwpResponseDate());
+    }
+
+    @Test
+    public void givenSelectedConfidentialityParty_whenAboutToSubmit_thenValueIsPreserved() {
+        DynamicListItem selectedParty = new DynamicListItem("appellant", "Appellant (or Appointee)");
+        callback.getCaseDetails().getCaseData().setExtendedSscsCaseData(
+                ExtendedSscsCaseData.builder()
+                        .selectedConfidentialityParty(new DynamicList(selectedParty, null))
+                        .build());
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(selectedParty, response.getData()
+                .getExtendedSscsCaseData()
+                .getSelectedConfidentialityParty()
+                .getValue());
     }
 
     @Test

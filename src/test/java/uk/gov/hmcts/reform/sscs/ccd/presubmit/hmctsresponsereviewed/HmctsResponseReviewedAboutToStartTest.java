@@ -66,7 +66,7 @@ class HmctsResponseReviewedAboutToStartTest {
     void setUp() {
         openMocks(this);
         dwpAddressLookupService = new DwpAddressLookupService();
-        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService, false);
+        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService);
 
         when(callback.getEvent()).thenReturn(EventType.HMCTS_RESPONSE_REVIEWED);
 
@@ -316,8 +316,8 @@ class HmctsResponseReviewedAboutToStartTest {
     }
 
     @Test
-    public void givenCmInterlocConfidentialityFlagEnabledForChildSupport_thenSelectedConfidentialityPartyHasNoDefaultSelection() {
-        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService, true);
+    public void givenChildSupport_thenSelectedConfidentialityPartyHasNoDefaultSelection() {
+        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService);
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -326,23 +326,13 @@ class HmctsResponseReviewedAboutToStartTest {
     }
 
     @Test
-    public void givenCmInterlocConfidentialityFlagDisabledForChildSupport_thenSelectedConfidentialityPartyDefaultsToAppellant() {
-        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService, false);
-        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        assertEquals("appellant", response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode());
-    }
-
-    @Test
-    public void givenCmInterlocConfidentialityFlagEnabledForNonChildSupport_thenSelectedConfidentialityPartyDefaultsToAppellant() {
-        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService, true);
+    public void givenNonChildSupport_thenSelectedConfidentialityPartyIsNotSet() {
+        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService);
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(Benefit.PIP.getShortName()).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals("appellant", response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode());
+        assertNull(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty());
     }
 
 }

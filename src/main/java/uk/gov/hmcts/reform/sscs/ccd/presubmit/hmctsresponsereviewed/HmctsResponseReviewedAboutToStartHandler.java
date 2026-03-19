@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.hmctsresponsereviewed;
 
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.APPENDIX_12;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.AT_38;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_EVIDENCE_BUNDLE;
@@ -18,7 +17,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -35,15 +33,11 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
 
     private final DwpAddressLookupService service;
     private final HearingsService hearingsService;
-    private final boolean cmOtherPartyConfidentialityEnabled;
 
     public HmctsResponseReviewedAboutToStartHandler(DwpAddressLookupService service,
-                                                    HearingsService hearingsService,
-                                                    @Value("${feature.cm-other-party-confidentiality.enabled}")
-                                                    boolean cmOtherPartyConfidentialityEnabled) {
+                                                    HearingsService hearingsService) {
         this.service = service;
         this.hearingsService = hearingsService;
-        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
 
     @Override
@@ -68,7 +62,10 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
         setDefaultFieldValues(sscsCaseData);
         setDwpDocuments(sscsCaseData);
         setSelectWhoReviewsCase(sscsCaseData);
-        setSelectedConfidentialityPartyDropdown(sscsCaseData);
+        if (isChildSupportAppeal(sscsCaseData)) {
+            sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
+                    getSelectedConfidentialityPartyDropdown(sscsCaseData));
+        }
 
         if (sscsCaseData.isIbcCase()) {
             final String benefitCode = sscsCaseData.getBenefitCode();
@@ -164,14 +161,4 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
         sscsCaseData.setSelectWhoReviewsCase(new DynamicList(new DynamicListItem("", ""), listOptions));
     }
 
-    private void setSelectedConfidentialityPartyDropdown(SscsCaseData sscsCaseData) {
-        DynamicList dropdown = getSelectedConfidentialityPartyDropdown(sscsCaseData);
-        boolean requireExplicitSelection = cmOtherPartyConfidentialityEnabled && isChildSupportAppeal(sscsCaseData);
-        if (!requireExplicitSelection
-                && (dropdown.getValue() == null || !isNotBlank(dropdown.getValue().getCode()))
-                && isNotEmpty(dropdown.getListItems())) {
-            dropdown.setValue(dropdown.getListItems().getFirst());
-        }
-        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(dropdown);
-    }
 }

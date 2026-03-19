@@ -1,18 +1,14 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown;
 import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.isChildSupportAppeal;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -20,11 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Component
 public class NonCompliantSendToInterlocAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private final boolean cmOtherPartyConfidentialityEnabled;
-
-    public NonCompliantSendToInterlocAboutToStartHandler(
-            @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
-        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
+    public NonCompliantSendToInterlocAboutToStartHandler() {
     }
 
     @Override
@@ -32,8 +24,7 @@ public class NonCompliantSendToInterlocAboutToStartHandler implements PreSubmitC
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbackType must not be null");
 
-        return cmOtherPartyConfidentialityEnabled
-                && callbackType.equals(CallbackType.ABOUT_TO_START)
+        return callbackType.equals(CallbackType.ABOUT_TO_START)
                 && callback.getEvent() == EventType.NON_COMPLIANT_SEND_TO_INTERLOC;
     }
 
@@ -47,14 +38,10 @@ public class NonCompliantSendToInterlocAboutToStartHandler implements PreSubmitC
 
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
-        DynamicList dropdown = getSelectedConfidentialityPartyDropdown(sscsCaseData);
-        boolean requireExplicitSelection = isChildSupportAppeal(sscsCaseData);
-        if (!requireExplicitSelection
-                && (dropdown.getValue() == null || !isNotBlank(dropdown.getValue().getCode()))
-                && isNotEmpty(dropdown.getListItems())) {
-            dropdown.setValue(dropdown.getListItems().getFirst());
+        if (isChildSupportAppeal(sscsCaseData)) {
+            sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
+                    getSelectedConfidentialityPartyDropdown(sscsCaseData));
         }
-        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(dropdown);
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 }
