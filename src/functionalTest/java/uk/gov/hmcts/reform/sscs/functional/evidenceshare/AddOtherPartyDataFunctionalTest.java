@@ -56,21 +56,6 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
                 return new UpdateCcdCaseService.UpdateResult(ADD_OTHER_PARTY, ADD_OTHER_PARTY);
             });
 
-            await().atMost(30, SECONDS).untilAsserted(() -> {
-                var cdAfterEvent = findCaseById(ccdCaseId);
-
-                assertThat(cdAfterEvent.getState()).isEqualTo(State.AWAIT_CONFIDENTIALITY_REQUIREMENTS.toString());
-                assertThat(cdAfterEvent.getData().getExtendedSscsCaseData().getAwareOfAnyAdditionalOtherParties()).isEqualTo(YesNo.YES);
-                assertThat(cdAfterEvent.getData().getOtherParties().getFirst().getValue().getName().getTitle()).isEqualTo("Miss");
-                assertThat(cdAfterEvent.getData().getOtherParties().getFirst().getValue().getName().getFirstName()).isEqualTo("Bella");
-                assertThat(cdAfterEvent.getData().getOtherParties().getFirst().getValue().getName().getLastName()).isEqualTo("Kiki");
-                assertThat(cdAfterEvent.getData().getOtherParties().getFirst().getValue().getAddress().getPostcode()).isEqualTo(POSTCODE);
-                assertThat(cdAfterEvent.getData().getOtherParties().getFirst().getValue().getAddress().getTown()).isEqualTo(TOWN);
-                assertThat(cdAfterEvent.getData().getOtherParties().getFirst().getValue().getAddress().getLine1()).isEqualTo(ADDRESS_LINE_1);
-                assertThat(cdAfterEvent.getData().getExtendedSscsCaseData().getConfidentialityTab())
-                    .contains("Other Party 1 | Bella Kiki | Undetermined |");
-            });
-
         await().atMost(30, SECONDS).untilAsserted(() -> {
             var cdAfterEvent = findCaseById(ccdCaseId);
 
@@ -86,6 +71,8 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
             assertThat(cdAfterEvent.getData().getOtherParties().getFirst().getValue().getAddress().getTown()).isEqualTo(TOWN);
             assertThat(cdAfterEvent.getData().getOtherParties().getFirst().getValue().getAddress().getLine1()).isEqualTo(
                 ADDRESS_LINE_1);
+            assertThat(cdAfterEvent.getData().getExtendedSscsCaseData().getConfidentialityTab())
+                .contains("Other Party 1 | Bella Kiki | Undetermined |");
         });
     }
 
