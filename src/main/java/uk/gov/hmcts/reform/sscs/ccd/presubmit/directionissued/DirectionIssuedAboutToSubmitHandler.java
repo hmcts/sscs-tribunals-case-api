@@ -41,6 +41,7 @@ import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
 @Slf4j
 public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
+    private static final String OTHER_PARTY = "otherParty";
     private final FooterService footerService;
     private final DwpAddressLookupService dwpAddressLookupService;
     private final int dwpResponseDueDays;
@@ -350,7 +351,6 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     }
 
     private SscsCaseData updateConfidentiality(SscsCaseData caseData) {
-
         if (!cmOtherPartyConfidentialityEnabled) {
             log.debug("No confidentiality update. Feature flag cm-other-party-confidentiality is not enabled.");
             return caseData;
@@ -379,8 +379,8 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                 appellant.setConfidentialityRequiredChangedDate(LocalDateTime.now());
 
             });
-        } else if (StringUtils.startsWithIgnoreCase(selectedConfidentialityPartyCode, "otherParty")) {
-            var otherPartyId = selectedConfidentialityPartyCode.substring("otherParty".length());
+        } else if (StringUtils.startsWithIgnoreCase(selectedConfidentialityPartyCode, OTHER_PARTY)) {
+            var otherPartyId = selectedConfidentialityPartyCode.substring(OTHER_PARTY.length());
 
             if (caseData.getOtherParties() != null && !caseData.getOtherParties().isEmpty()) {
                 log.debug("Updating Other party's confidentiality as {}, caseId: {}, otherParty Id: {}",
