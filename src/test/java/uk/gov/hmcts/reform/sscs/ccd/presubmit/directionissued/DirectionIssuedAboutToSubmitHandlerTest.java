@@ -551,6 +551,18 @@ class DirectionIssuedAboutToSubmitHandlerTest {
     }
 
     @ParameterizedTest
+    @CsvSource({"confidentialityGrantedSendToAdmin,YES", "confidentialityRefusedSendToAdmin,NO"})
+    void givenDirectionTypeOfConfidentialityDecision_shouldUpdateAppellantConfidentiality(String directionType, YesNo expectedConfidentiality) {
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(directionType));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getData().getAppellant().isPresent());
+        assertEquals(expectedConfidentiality, response.getData().getAppellant().get().getConfidentialityRequired());
+        assertNotNull(response.getData().getAppellant().get().getConfidentialityRequiredChangedDate());
+    }
+
+    @ParameterizedTest
     @ValueSource(strings = {"file.png", "file.jpg", "file.doc"})
     void givenManuallyUploadedFileIsNotAPdf_thenAddAnErrorToResponse(String filename) {
         sscsCaseData.getDocumentStaging().setPreviewDocument(null);

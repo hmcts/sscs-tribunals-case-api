@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REJECT_HEARING_RECORDING_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
@@ -13,6 +15,7 @@ import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -185,6 +188,10 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             caseData.setInterlocReferralReason(REJECT_HEARING_RECORDING_REQUEST);
         } else if (DirectionType.ISSUE_AND_SEND_TO_ADMIN.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION);
+        } else if (CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
+            || CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
+            updateAppellantConfidentialityFromDirection(caseData);
+            caseData.setInterlocReviewState(null);
         } else {
             caseData.setInterlocReviewState(null);
         }
@@ -337,5 +344,15 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     // SSCS-11486 AC3
     private void clearInterlocReferralReason(SscsCaseData caseData) {
         caseData.setInterlocReferralReason(null);
+    }
+
+    private void updateAppellantConfidentialityFromDirection(SscsCaseData caseData) {
+        String directionType = caseData.getDirectionTypeDl().getValue().getCode();
+        YesNo confidentialityRequired = CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString().equals(directionType) ? YesNo.YES : YesNo.NO;
+        caseData.getAppellant().ifPresent(appellant -> {
+            appellant.setConfidentialityRequired(confidentialityRequired);
+            appellant.setConfidentialityRequiredChangedDate(LocalDateTime.now());
+            log.info("Updated appellant confidentiality to {} for case id {}", confidentialityRequired, caseData.getCcdCaseId());
+        });
     }
 }
