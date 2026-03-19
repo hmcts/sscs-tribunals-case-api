@@ -95,15 +95,6 @@ public class AuthorisationService implements RequestAuthorizer<Service> {
         }
     }
 
-    public void allowOnlySscs(String serviceAuthorisation) {
-        String serviceName = authenticate(serviceAuthorisation);
-        if (!serviceName.equalsIgnoreCase(SSCS)) {
-            throw new ForbiddenException(
-                    "Service " + serviceName + " is not authorized for this action"
-            );
-        }
-    }
-
     private String authenticate(String authHeader) {
         if (authHeader == null) {
             throw new UnauthorizedException("Missing ServiceAuthorization header");

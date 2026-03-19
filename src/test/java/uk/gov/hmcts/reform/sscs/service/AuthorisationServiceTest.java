@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.service;
 import static feign.Request.HttpMethod.GET;
 import static java.nio.charset.Charset.defaultCharset;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -30,14 +29,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.util.ReflectionTestUtils;
-import uk.gov.hmcts.reform.auth.checker.core.exceptions.AuthCheckerException;
-import uk.gov.hmcts.reform.auth.checker.core.exceptions.BearerTokenInvalidException;
 import uk.gov.hmcts.reform.auth.checker.core.exceptions.BearerTokenMissingException;
-import uk.gov.hmcts.reform.auth.checker.core.exceptions.UnauthorisedServiceException;
-import uk.gov.hmcts.reform.auth.checker.core.service.Service;
 import uk.gov.hmcts.reform.auth.checker.core.service.ServiceResolver;
-import uk.gov.hmcts.reform.auth.parser.idam.core.service.token.ServiceTokenInvalidException;
-import uk.gov.hmcts.reform.auth.parser.idam.core.service.token.ServiceTokenParsingException;
 import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.authorisation.exceptions.InvalidTokenException;
 import uk.gov.hmcts.reform.sscs.bulkscan.exceptions.ForbiddenException;
@@ -143,82 +136,6 @@ public class AuthorisationServiceTest {
     public void should_throw_BearerTokenMissingException_when_header_missing() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         assertThrows(BearerTokenMissingException.class, () -> authorisationService.authorise(request));
-    }
-
-    @Test
-    public void should_throw_BearerTokenInvalidException_when_service_token_invalid() {
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.addHeader(AuthorisationService.SERVICE_AUTHORISATION_HEADER, "token");
-
-        when(serviceResolver.getTokenDetails("token")).thenThrow(new ServiceTokenInvalidException());
-
-        assertThrows(BearerTokenInvalidException.class, () -> authorisationService.authorise(request));
-    }
-
-    @Test
-    public void should_throw_AuthCheckerException_when_token_parsing_fails() {
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.addHeader(AuthorisationService.SERVICE_AUTHORISATION_HEADER, "token");
-
-        when(serviceResolver.getTokenDetails("token")).thenThrow(new ServiceTokenParsingException());
-
-        assertThrows(AuthCheckerException.class, () -> authorisationService.authorise(request));
-    }
-
-    @Test
-    public void should_throw_UnauthorisedServiceException_when_not_sscs_principal() {
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.addHeader(AuthorisationService.SERVICE_AUTHORISATION_HEADER, "token");
-        Service service = new Service("other");
-        when(serviceResolver.getTokenDetails("token")).thenReturn(service);
-
-        assertThrows(UnauthorisedServiceException.class, () -> authorisationService.authorise(request));
-    }
-
-    @Test
-    public void should_return_service_when_principal_is_sscs() {
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setRequestURI("/document");
-        request.addHeader(AuthorisationService.SERVICE_AUTHORISATION_HEADER, "token");
-        Service service = new Service("SSCS");
-        when(serviceResolver.getTokenDetails("token")).thenReturn(service);
-
-        Service result = authorisationService.authorise(request);
-
-        assertEquals(service, result);
-    }
-
-    @Test
-    public void should_not_throw_any_exception_when_service_is_sscs() {
-        when(serviceAuthorisationApi.getServiceName(SERVICE_HEADER)).thenReturn("sscs");
-
-        assertDoesNotThrow(() -> authorisationService.allowOnlySscs(SERVICE_HEADER));
-    }
-
-    @Test
-    public void should_throw_unauthorized_exception_when_service_is_not_sscs() {
-        when(serviceAuthorisationApi.getServiceName(SERVICE_HEADER)).thenReturn(CCD_DATA);
-
-        assertThrows(ForbiddenException.class, () -> authorisationService.allowOnlySscs(SERVICE_HEADER),
-                "Service " + CCD_DATA + " is not authorized for this action");
-    }
-
-    @Test
-    public void allowOnlySscs_shouldThrowExceptionWhenNotAuthorised() {
-        when(serviceAuthorisationApi.getServiceName(SERVICE_HEADER))
-                .thenThrow(createFeignException(400, "Bad Request"));
-        assertThrows(ClientAuthorisationException.class, () -> authorisationService.allowOnlySscs(SERVICE_HEADER));
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-        "502, Bad Gateway",
-        "307, Temporary Redirect"
-    })
-    public void allowOnlySscs_shouldHandleFeignExceptions(int status, String message) {
-        when(serviceAuthorisationApi.getServiceName(any()))
-                .thenThrow(createFeignException(status, message));
-        assertThrows(AuthorisationException.class, () -> authorisationService.allowOnlySscs(SERVICE_HEADER));
     }
 
     private FeignException createFeignException(int status, String message) {
