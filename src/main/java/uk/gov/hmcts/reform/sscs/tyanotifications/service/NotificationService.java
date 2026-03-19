@@ -4,6 +4,7 @@ import static java.util.Arrays.asList;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getBenefitByCodeOrThrowException;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
@@ -397,10 +398,20 @@ public class NotificationService {
             }
         }
 
+        if (ADD_OTHER_PARTY_DATA.equals(notificationType)) {
+            if (!notificationWrapper.getNewSscsCaseData().isBenefitType(UC)
+                || State.AWAIT_CONFIDENTIALITY_REQUIREMENTS != notificationWrapper.getSscsCaseDataWrapper().getState()) {
+                log.info("Cannot complete notification {} as benefit type is not UC or state is not awaiting confidentiality requirements for caseId {}.",
+                    notificationType.getId(), notificationWrapper.getCaseId());
+                return false;
+            }
+        }
+
         log.info("Notification valid to send for case id {} and event {} in state {}",
             notificationWrapper.getCaseId(),
             notificationType.getId(),
             notificationWrapper.getSscsCaseDataWrapper().getState());
+
         return true;
     }
 

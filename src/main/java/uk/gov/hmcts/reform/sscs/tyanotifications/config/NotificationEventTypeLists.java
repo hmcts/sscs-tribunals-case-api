@@ -166,7 +166,8 @@ public final class NotificationEventTypeLists {
         SET_ASIDE_REQUEST,
         STRUCK_OUT,
         STATEMENT_OF_REASONS_REQUEST,
-        UPDATE_OTHER_PARTY_DATA
+        UPDATE_OTHER_PARTY_DATA,
+        ADD_OTHER_PARTY_DATA
     );
 
     public static final Set<NotificationEventType> EVENT_TYPES_FOR_BUNDLED_LETTER = EnumSet.of(
@@ -256,7 +257,8 @@ public final class NotificationEventTypeLists {
         STATEMENT_OF_REASONS_REQUEST,
         STRUCK_OUT,
         UPDATE_OTHER_PARTY_DATA,
-        VALID_APPEAL_CREATED
+        VALID_APPEAL_CREATED,
+        ADD_OTHER_PARTY_DATA
     );
 
     public static final Set<NotificationEventType> EVENT_TYPES_FOR_NOTIFY_LETTERS = EnumSet.of(

@@ -33,6 +33,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.REPRESENTATIVE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ACTION_HEARING_RECORDING_REQUEST;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ACTION_POSTPONEMENT_REQUEST;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADD_OTHER_PARTY_DATA;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADJOURNED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADMIN_APPEAL_WITHDRAWN;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_LAPSED;
@@ -2159,6 +2160,49 @@ public class NotificationServiceTest {
         then(notificationHandler).should(atLeastOnce()).sendNotification(
             eq(ccdNotificationWrapper), eq("emailTemplateId"), eq("Email"),
             any(NotificationHandler.SendNotification.class));
+    }
+
+    @Test
+    public void givenAddOtherPartyDataWithUcBenefitAndAwaitingConfidentiality_willProceedWithNotification() {
+        final CcdNotificationWrapper ccdNotificationWrapper = buildBaseWrapper(ADD_OTHER_PARTY_DATA, APPELLANT_WITH_ADDRESS, null, null);
+        ccdNotificationWrapper.getNewSscsCaseData().getAppeal().getBenefitType().setCode(Benefit.UC.getShortName());
+        ccdNotificationWrapper.getSscsCaseDataWrapper().setState(State.AWAIT_CONFIDENTIALITY_REQUIREMENTS);
+
+        final Notification notification = new Notification(
+            Template.builder().docmosisTemplateId(LETTER_TEMPLATE_ID).build(),
+            Destination.builder().build(),
+            new HashMap<>(), new Reference(), null);
+        given(factory.create(any(NotificationWrapper.class), any(SubscriptionWithType.class))).willReturn(notification);
+        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(new byte[]{1});
+
+        notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
+
+        then(notificationHandler).should(atLeast(1)).sendNotification(
+            eq(ccdNotificationWrapper), any(), eq(LETTER),
+            any(NotificationHandler.SendNotification.class));
+    }
+
+    @Test
+    public void givenAddOtherPartyDataWithNonUcBenefit_willNotSendNotification() {
+        final CcdNotificationWrapper ccdNotificationWrapper = buildBaseWrapper(ADD_OTHER_PARTY_DATA, APPELLANT_WITH_ADDRESS, null, null);
+        ccdNotificationWrapper.getSscsCaseDataWrapper().setState(State.AWAIT_CONFIDENTIALITY_REQUIREMENTS);
+
+        notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
+
+        verifyNoInteractions(notificationValidService);
+        verifyNoInteractions(notificationHandler);
+    }
+
+    @Test
+    public void givenAddOtherPartyDataWithUcBenefitButWrongState_willNotSendNotification() {
+        final CcdNotificationWrapper ccdNotificationWrapper = buildBaseWrapper(ADD_OTHER_PARTY_DATA, APPELLANT_WITH_ADDRESS, null, null);
+        ccdNotificationWrapper.getNewSscsCaseData().getAppeal().getBenefitType().setCode(Benefit.UC.getShortName());
+        ccdNotificationWrapper.getSscsCaseDataWrapper().setState(State.WITH_DWP);
+
+        notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
+
+        verifyNoInteractions(notificationValidService);
+        verifyNoInteractions(notificationHandler);
     }
 
     private NotificationService getNotificationService() {

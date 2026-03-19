@@ -893,6 +893,8 @@ notification:
             docmosisId: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome-v3.docx
         sORRefused:
             docmosisId: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome-v3.docx
+        addOtherPartyData:
+            docmosisId: TB-SCS-GNO-ENG-other-party-added-to-appeal.docx
         paper:
             responseReceived:
                 appellant:
