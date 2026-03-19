@@ -22,14 +22,11 @@ public class ValidSendToInterlocMidEventHandler implements PreSubmitCallbackHand
     public static final String POSTPONEMENTS_NOT_POSSIBLE_GAPS = "Postponement requests cannot be made for hearings listed in GAPS";
     private final GenerateFile generateFile;
     private final String templateId;
-    private final boolean cmOtherPartyConfidentialityEnabled;
 
     public ValidSendToInterlocMidEventHandler(GenerateFile generateFile,
-                                              @Value("${doc_assembly.postponementrequest}") String templateId,
-                                              @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
+                                              @Value("${doc_assembly.postponementrequest}") String templateId) {
         this.generateFile = generateFile;
         this.templateId = templateId;
-        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
 
     @Override
