@@ -88,7 +88,7 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "severeCriteria",
     "PageLabel": "Severe Conditions Criteria",
-    "PageShowCondition": "writeFinalDecisionSevereYesNo = \"Yes\" OR ucWriteFinalDecisionSchedule7ActivitiesApply = \"Yes\"",
+    "PageShowCondition":  "(ucWriteFinalDecisionSchedule7ActivitiesQuestion !=\"\" AND writeFinalDecisionAllowedOrRefused = \"allowed\") OR writeFinalDecisionSevereYesNo = \"Yes\"",
     "ShowSummaryChangeOption": "Y"
   }
 ]
