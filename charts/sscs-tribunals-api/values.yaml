@@ -148,11 +148,20 @@ elastic:
   enabled: false
 sscs-tribunals-frontend:
   enabled: false
-redis:
-  enabled: false
+hmcts-redis:
+  enabled: true
+  architecture: standalone
+  auth:
+    enabled: false
+    sentinel: false
   image:
     registry: hmctsprod.azurecr.io
-    repository: imported/bitnami/redis
+    repository: imported/redis
+    tag: 8.2.1
+  sentinel:
+    enabled: false
+  metrics:
+    enabled: false
 ccd:
   enabled: false
 em-ccdorc:
