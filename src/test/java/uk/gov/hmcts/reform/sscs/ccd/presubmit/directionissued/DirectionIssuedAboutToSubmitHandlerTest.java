@@ -967,7 +967,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
         @ParameterizedTest
         @CsvSource({"confidentialityGrantedSendToAdmin", "confidentialityRefusedSendToAdmin"})
-        void givenIssueDirectionNotice_ndOneOfOtherPartyIsSelectedAsConfidentialityPartyButOtherPartiesFieldValueIsNull_thenDoNotUpdateConfidentiality(String directionType) {
+        void givenIssueDirectionNotice_andOneOfOtherPartyIsSelectedAsConfidentialityPartyButOtherPartiesFieldValueIsNull_thenDoNotUpdateConfidentiality(String directionType) {
             when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
 
             handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, false,
