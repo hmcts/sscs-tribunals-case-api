@@ -12,7 +12,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.SneakyThrows;
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
@@ -49,12 +48,11 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
     @Nested
     class ChildSupport {
         @Test
-        @SneakyThrows
         void shouldTransitionToCorrectStateWhenOtherPartyDataAddedToCase() {
 
             final SscsCaseDetails caseWithState = createCaseFromEvent(Benefit.CHILD_SUPPORT, VALID_APPEAL_CREATED);
             await().atMost(TIMEOUT, SECONDS).untilAsserted(() -> {
-                var caseDetails = findCaseById(ccdCaseId);
+                final var caseDetails = findCaseById(caseWithState.getId().toString());
                 assertThat(caseDetails.getState()).isEqualTo(State.AWAIT_OTHER_PARTY_DATA.toString());
             });
 
@@ -65,7 +63,7 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
                     return new UpdateCcdCaseService.UpdateResult(ADD_OTHER_PARTY, ADD_OTHER_PARTY);
                 });
 
-            await().atMost(TIMEOUT, SECONDS).untilAsserted(() -> assertThatPartyAdded(findCaseById(ccdCaseId)));
+            await().atMost(TIMEOUT, SECONDS).untilAsserted(() -> assertThatPartyAdded(findCaseById(caseWithState.getId().toString())));
         }
     }
 
@@ -87,7 +85,7 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
 
             await()
                 .atMost(TIMEOUT, SECONDS)
-                .untilAsserted(() -> assertThat(findCaseById(ccdCaseId).getState()).isIn(State.WITH_DWP.toString()));
+                .untilAsserted(() -> assertThat(findCaseById(caseDetails.getId().toString()).getState()).isEqualTo(State.WITH_DWP.toString()));
 
             updateCcdCaseService.updateCaseV2(caseDetails.getId(), ADD_OTHER_PARTY_DATA.getCcdType(), idamService.getIdamTokens(),
                 cd -> {
@@ -96,13 +94,12 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
                     return new UpdateCcdCaseService.UpdateResult(ADD_OTHER_PARTY, ADD_OTHER_PARTY);
                 });
 
-            assertEventuallyInState(caseDetails.getId(), State.AWAIT_CONFIDENTIALITY_REQUIREMENTS.toString());
-            await().atMost(TIMEOUT, SECONDS).untilAsserted(() -> assertThatPartyAdded(findCaseById(ccdCaseId)));
+            await().atMost(TIMEOUT, SECONDS).untilAsserted(() -> assertThatPartyAdded(findCaseById(caseDetails.getId().toString())));
 
             assertThatPdfTextIsCorrect(getDocument(caseDetails.getId(), "addOtherPartyData"), getExpectedContent(caseDetails));
         }
 
-        private static @NonNull String getExpectedContent(final SscsCaseDetails caseDetails) throws IOException {
+        private static String getExpectedContent(final SscsCaseDetails caseDetails) throws IOException {
             return new ClassPathResource("tyanotifications/addotherparty/addOtherPartyDataExpected.template")
                 .getContentAsString(StandardCharsets.UTF_8)
                 .replace("${CASE_ID}", caseDetails.getId().toString())
@@ -111,7 +108,7 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
         }
     }
 
-    private void assertThatPartyAdded(SscsCaseDetails cdAfterEvent) {
+    private void assertThatPartyAdded(final SscsCaseDetails cdAfterEvent) {
         assertThat(cdAfterEvent.getState()).isEqualTo(State.AWAIT_CONFIDENTIALITY_REQUIREMENTS.toString());
         assertThat(cdAfterEvent.getData().getExtendedSscsCaseData().getAwareOfAnyAdditionalOtherParties()).isEqualTo(YesNo.YES);
         final OtherParty otherParty = cdAfterEvent.getData().getOtherParties().getFirst().getValue();
