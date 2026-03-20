@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
 import static io.restassured.RestAssured.baseURI;
+import static java.time.Duration.ofSeconds;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.nonNull;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -8,6 +9,7 @@ import static java.util.stream.Collectors.joining;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.awaitility.Awaitility.waitAtMost;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DOCUMENT;
@@ -248,15 +250,15 @@ abstract class AbstractFunctionalTest {
     }
 
     Resource getDocument(Long caseId, String correspondenceName) {
-        final List<Correspondence> correspondenceList = defaultAwait().until(
+        final List<Correspondence> correspondenceList = waitAtMost(ofSeconds(30)).until(
             () -> findCaseById(caseId.toString()).getData().getCorrespondence(),
-            (correspondences) -> isNotEmpty(correspondences) && containsDocument(correspondences, correspondenceName));
+            correspondences -> isNotEmpty(correspondences) && containsDocument(correspondences, correspondenceName));
         final Correspondence correspondence = correspondenceList.stream()
             .filter(c -> c.getValue().getDocumentLink().getDocumentFilename().contains(correspondenceName)).findFirst()
             .orElseThrow();
         final String documentBinaryUrl = correspondence.getValue().getDocumentLink().getDocumentBinaryUrl();
         final ResponseEntity<Resource> resourceResponseEntity = documentDownloadClientApi.downloadBinary("oauth2Token",
-            getIdamTokens().getServiceAuthorization(),
+                getIdamTokens().getServiceAuthorization(),
             "caseworker,citizen", "sscs", URI.create(documentBinaryUrl).getPath());
         assertThat(resourceResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         return resourceResponseEntity.getBody();

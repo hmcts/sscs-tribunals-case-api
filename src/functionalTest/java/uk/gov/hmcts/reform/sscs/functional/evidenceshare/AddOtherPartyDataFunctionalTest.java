@@ -56,15 +56,9 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
                 assertThat(caseDetails.getState()).isEqualTo(State.AWAIT_OTHER_PARTY_DATA.toString());
             });
 
-            updateCcdCaseService.updateCaseV2(caseWithState.getId(), ADD_OTHER_PARTY_DATA.getCcdType(),
-                idamService.getIdamTokens(), cd -> {
-                    cd.getData().setOtherParties(List.of(new CcdValue<>(buildOtherParty())));
-                    cd.getData().getExtendedSscsCaseData().setAwareOfAnyAdditionalOtherParties(YesNo.YES);
-                    return new UpdateCcdCaseService.UpdateResult(ADD_OTHER_PARTY, ADD_OTHER_PARTY);
-                });
-
-            await().atMost(TIMEOUT, SECONDS).untilAsserted(() -> assertThatPartyAdded(findCaseById(caseWithState.getId().toString())));
+            runAddOtherPartyDataEvent(caseWithState);
         }
+
     }
 
     @Nested
@@ -85,17 +79,10 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
 
             await()
                 .atMost(TIMEOUT, SECONDS)
-                .untilAsserted(() -> assertThat(findCaseById(caseDetails.getId().toString()).getState()).isEqualTo(State.WITH_DWP.toString()));
+                .untilAsserted(() -> assertThat(findCaseById(caseDetails.getId().toString()).getState()).isEqualTo(
+                    State.WITH_DWP.toString()));
 
-            updateCcdCaseService.updateCaseV2(caseDetails.getId(), ADD_OTHER_PARTY_DATA.getCcdType(), idamService.getIdamTokens(),
-                cd -> {
-                    cd.getData().setOtherParties(List.of(new CcdValue<>(buildOtherParty())));
-                    cd.getData().getExtendedSscsCaseData().setAwareOfAnyAdditionalOtherParties(YesNo.YES);
-                    return new UpdateCcdCaseService.UpdateResult(ADD_OTHER_PARTY, ADD_OTHER_PARTY);
-                });
-
-            await().atMost(TIMEOUT, SECONDS).untilAsserted(() -> assertThatPartyAdded(findCaseById(caseDetails.getId().toString())));
-
+            runAddOtherPartyDataEvent(caseDetails);
             assertThatPdfTextIsCorrect(getDocument(caseDetails.getId(), "addOtherPartyData"), getExpectedContent(caseDetails));
         }
 
@@ -106,6 +93,19 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
                 .replace("${OTHER_PARTY_NAME}", "Bella Kiki")
                 .replace("${TODAY_DATE}", LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         }
+    }
+
+    private void runAddOtherPartyDataEvent(SscsCaseDetails caseWithState) {
+        updateCcdCaseService.updateCaseV2(caseWithState.getId(), ADD_OTHER_PARTY_DATA.getCcdType(), idamService.getIdamTokens(),
+            cd -> {
+                cd.getData().setOtherParties(List.of(new CcdValue<>(buildOtherParty())));
+                cd.getData().getExtendedSscsCaseData().setAwareOfAnyAdditionalOtherParties(YesNo.YES);
+                return new UpdateCcdCaseService.UpdateResult(ADD_OTHER_PARTY, ADD_OTHER_PARTY);
+            });
+
+        await()
+            .atMost(TIMEOUT, SECONDS)
+            .untilAsserted(() -> assertThatPartyAdded(findCaseById(caseWithState.getId().toString())));
     }
 
     private void assertThatPartyAdded(final SscsCaseDetails cdAfterEvent) {
