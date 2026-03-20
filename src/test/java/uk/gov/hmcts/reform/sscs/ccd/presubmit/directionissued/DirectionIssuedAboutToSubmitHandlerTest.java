@@ -28,6 +28,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -842,6 +843,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
     @Nested
     class CmOtherPartyConfidentialityFeatureFlagEnabled {
         private final boolean cmOtherPartyConfidentialityFeatureFlag = true;
+        private final LocalDateTime testStartDateTime = LocalDateTime.now();
 
         @ParameterizedTest
         @CsvSource({"confidentialityGrantedSendToAdmin,YES", "confidentialityRefusedSendToAdmin,NO"})
@@ -862,7 +864,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequired).hasValue(expectedConfidentialityRequired);
-            assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequiredChangedDate).isNotNull();
+            assertThat(response.getData().getAppellant().orElseThrow(AssertionError::new).getConfidentialityRequiredChangedDate()).isAfterOrEqualTo(testStartDateTime);
         }
 
         @ParameterizedTest
@@ -895,7 +897,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
             assertThat(otherPartyUpdated.size()).isEqualTo(1);  // only one of other parties must be updated
             assertThat(otherPartyUpdated.getFirst().getValue().getConfidentialityRequired()).isEqualTo(expectedConfidentialityRequired);
-            assertThat(otherPartyUpdated.getFirst().getValue().getConfidentialityRequiredChangedDate()).isNotNull();
+            assertThat(otherPartyUpdated.getFirst().getValue().getConfidentialityRequiredChangedDate()).isAfterOrEqualTo(testStartDateTime);
 
             // other parties beside selected one should not be updated
             response.getData().getOtherParties().stream()
