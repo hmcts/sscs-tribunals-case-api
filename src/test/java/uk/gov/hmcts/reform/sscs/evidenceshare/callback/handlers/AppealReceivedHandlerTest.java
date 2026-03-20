@@ -92,8 +92,6 @@ public class AppealReceivedHandlerTest {
     @Parameters({"VALID_APPEAL_CREATED", "DRAFT_TO_VALID_APPEAL_CREATED", "VALID_APPEAL", "INTERLOC_VALID_APPEAL"})
     public void givenValidEventAndDigitalCaseAndTriggerEventV2IsEnabled_thenTriggerAppealReceivedEventUsingTriggerEventV2(EventType eventType) {
         handler.handle(SUBMITTED, HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder().createdInGapsFrom(READY_TO_LIST.getId()).build(), INTERLOCUTORY_REVIEW_STATE, eventType));
-
-        // Use timeout to wait for the scheduled async execution
         verify(updateCcdCaseService, timeout(1000)).triggerCaseEventV2(eq(1L), eq(EventType.APPEAL_RECEIVED.getCcdType()), eq("Appeal received"), eq("Appeal received event has been triggered from Tribunals API for digital case"), any());
     }
 
