@@ -1,0 +1,28 @@
+UC Benefit Appeals
+HMCTS
+www.gov.uk/appeal-benefit-decision
+${TODAY_DATE}
+Your UC appeal
+
+Appeal reference number: ${CASE_ID}
+Dear User Test
+${OTHER_PARTY_NAME} has been added as a party to your UC appeal. This is because DWP
+told us they’re impacted by the decision/outcome of this appeal.
+HM Courts & Tribunals Service must, by law, share all the evidence relating to the
+appeal with the other parties involved in it. The other parties may therefore
+receive information which shows where you live. If you do not wish for the other
+parties to know where you live, we can prevent this happening by removing
+address details from any evidence sent to the other parties. It is only information
+that leads to the identification of your home address that can be kept confidential.
+Please tell us, within 14 days, if you want your address to be kept confidential.
+You can do this by writing to the address on the document cover sheet attached.
+UC Appeals
+HM Courts and Tribunals Service
+Telephone: 0300 123 1142
+User Test
+10 Coverfield Lane
+Glen Close
+Brighton
+Carmarthenshire
+TS1 1ST
+NOTIFY

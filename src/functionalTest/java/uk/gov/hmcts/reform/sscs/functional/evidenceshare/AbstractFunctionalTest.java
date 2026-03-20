@@ -26,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -141,13 +142,22 @@ abstract class AbstractFunctionalTest {
         return createCaseWithState(eventType, benefit.getShortName(), benefit.getDescription(), null);
     }
 
+    SscsCaseDetails createCaseFromEvent(Benefit benefit, EventType eventType, Consumer<SscsCaseData> caseDataConsumer) {
+        return createCaseWithState(eventType, benefit.getShortName(), benefit.getDescription(), null, caseDataConsumer);
+    }
+
     SscsCaseDetails createCaseWithState(EventType eventType, String benefitType, String benefitDescription,
         String createdInGapsFrom) {
+        return createCaseWithState(eventType, benefitType, benefitDescription, createdInGapsFrom, caseData -> { });
+    }
+
+    SscsCaseDetails createCaseWithState(EventType eventType, String benefitType, String benefitDescription,
+        String createdInGapsFrom, Consumer<SscsCaseData> caseDataConsumer) {
         idamTokens = getIdamTokens();
 
-        SscsCaseData minimalCaseData = CaseDataUtils.buildMinimalCaseData();
+        final SscsCaseData minimalCaseData = CaseDataUtils.buildMinimalCaseData();
 
-        SscsCaseData caseData = minimalCaseData.toBuilder()
+        final SscsCaseData caseData = minimalCaseData.toBuilder()
             .createdInGapsFrom(createdInGapsFrom)
             .appeal(minimalCaseData.getAppeal().toBuilder()
                 .benefitType(BenefitType.builder()
@@ -158,8 +168,9 @@ abstract class AbstractFunctionalTest {
                 .build())
             .build();
 
+        caseDataConsumer.accept(caseData);
 
-        SscsCaseDetails caseDetails = ccdService.createCase(caseData, eventType.getCcdType(),
+        final SscsCaseDetails caseDetails = ccdService.createCase(caseData, eventType.getCcdType(),
             "Evidence share service created case",
             "Evidence share service case created for functional test", idamTokens);
         ccdCaseId = String.valueOf(caseDetails.getId());
