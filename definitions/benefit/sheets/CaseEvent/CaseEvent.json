@@ -334,6 +334,7 @@
     "PostConditionState": "validAppeal",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
+    "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/sendNotification",
     "Publish": "N"
   },
   {
@@ -3011,6 +3012,7 @@
     "Description": "Create a test case in validAppealCreated state",
     "DisplayOrder": 9990,
     "PostConditionState": "validAppeal",
+    "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/sendNotification",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
     "Publish": "N"
