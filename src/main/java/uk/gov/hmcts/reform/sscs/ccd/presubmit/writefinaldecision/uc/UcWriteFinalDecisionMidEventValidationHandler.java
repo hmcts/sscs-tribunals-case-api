@@ -41,7 +41,7 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
         }
         if (isSevereConditionsEnabled) {
             sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionHasSVIssueCode(setSevereCriteriaApplies(sscsCaseData));
-            if (!("Yes").equals(sscsCaseData.getSscsUcCaseData().getShowSchedule7ActivitiesPage()) || ("No").equals(sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionSchedule7ActivitiesApply())) {
+            if (!YES.equals(sscsCaseData.getSscsUcCaseData().getShowSchedule7ActivitiesPage()) || NO.equals(sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionSchedule7ActivitiesApply())) {
                 sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(null);
             }
 
