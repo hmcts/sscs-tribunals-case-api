@@ -26,6 +26,8 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
     private final UserDetailsService userDetailsService;
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
+    @Value("${feature.severeConditions.enabled}")
+    private final boolean isSevereConditionsEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -108,6 +110,9 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
         finalDecisionCaseData.setWriteFinalDecisionDateOfDecision(null);
 
         sscsCaseData.setWcaAppeal(null);
+        if (isSevereConditionsEnabled) {
+            sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(null);
+        }
         finalDecisionCaseData.setOtherPartyAttendedQuestions(new ArrayList<>());
 
         //PIP
@@ -201,5 +206,8 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
         sscsCaseData.setSupportGroupOnlyAppeal(null);
         sscsUcCaseData.setDoesSchedule8Paragraph4Apply(null);
         sscsUcCaseData.setDoesSchedule9Paragraph4Apply(null);
+        if (isSevereConditionsEnabled) {
+            sscsUcCaseData.setUcWriteFinalDecisionHasSVIssueCode(null);
+        }
     }
 }
