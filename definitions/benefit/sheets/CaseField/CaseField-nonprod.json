@@ -2,5 +2,5 @@
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "functionalTest", "Label": "From functional test", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "13/03/2026", "CaseTypeID": "Benefit", "ID": "writeFinalDecisionSevereYesNo", "Label": "Is this a severe conditions criteria only appeal?", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "17/03/2026", "CaseTypeID": "Benefit", "ID": "writeFinalDecisionSevereCriteriaApply", "Label": "Do the severe conditions criteria apply?", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "13/03/2026", "CaseTypeID": "Benefit", "ID": "ucWriteFinalDecisionHasSVIssueCode", "Label": "Does the severe conditions criteria apply?", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"}
+  {"LiveFrom": "13/03/2026", "CaseTypeID": "Benefit", "ID": "ucWriteFinalDecisionHasSVIssueCode", "Label": "Do the severe conditions criteria apply?", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"}
 ]
