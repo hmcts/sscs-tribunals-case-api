@@ -219,7 +219,7 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
         int minPointsValue = 0;
         int maxPointsValue = 0;
 
-        if (wcaAppeal != null && wcaAppeal.booleanValue()) {
+        if (wcaAppeal != null && wcaAppeal && !isTrue(isSevereCondition)) {
             minPointsValue = 14;
             maxPointsValue = 15;
         }
@@ -228,14 +228,9 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
 
             for (boolean allowed : Arrays.asList(false, true)) {
 
-                if (isTrue(isSevereCondition)) {
-                    if (!isTrue(supportGroupOnly)) {
-                        minPointsValue = 0;
-                        maxPointsValue = 0;
-                    } else {
-                        minPointsValue = 14;
-                        maxPointsValue = 15;
-                    }
+                if (isTrue(isSevereCondition) && isTrue(supportGroupOnly)) {
+                    minPointsValue = 14;
+                    maxPointsValue = 15;
                 }
 
                 for (int points = minPointsValue; points <= maxPointsValue; points++) {
