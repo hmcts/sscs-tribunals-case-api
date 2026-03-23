@@ -62,6 +62,7 @@ import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.evidenceshare.exception.BulkPrintException;
 import uk.gov.hmcts.reform.sscs.evidenceshare.exception.NonPdfBulkPrintException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.service.BusinessEventLogger;
 
 @ExtendWith(MockitoExtension.class)
 class BulkPrintServiceTest {
@@ -91,13 +92,16 @@ class BulkPrintServiceTest {
     @Mock
     private CcdNotificationService ccdNotificationService;
 
+    @Mock
+    private BusinessEventLogger businessEventLogger;
+
     @Captor
     ArgumentCaptor<LetterWithPdfsRequest> captor;
 
     @BeforeEach
     void setUp() {
         this.bulkPrintService = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper,
-                true, 1, ccdNotificationService);
+                true, 1, ccdNotificationService, businessEventLogger);
         lenient().when(idamService.generateServiceAuthorization()).thenReturn(AUTH_TOKEN);
     }
 
@@ -236,7 +240,7 @@ class BulkPrintServiceTest {
 
     @Test
     void sendLetterNotEnabledWillNotSendToBulkPrint() {
-        BulkPrintService notEnabledBulkPrint = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper, false, 1, ccdNotificationService);
+        BulkPrintService notEnabledBulkPrint = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper, false, 1, ccdNotificationService, businessEventLogger);
         notEnabledBulkPrint.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, null);
         verifyNoInteractions(idamService);
         verifyNoInteractions(sendLetterApi);
@@ -244,7 +248,7 @@ class BulkPrintServiceTest {
 
     @Test
     void willSendToBulkPrintWithReasonableAdjustment() {
-        this.bulkPrintService = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper, true, 1, ccdNotificationService);
+        this.bulkPrintService = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper, true, 1, ccdNotificationService, businessEventLogger);
 
         SSCS_CASE_DATA.setReasonableAdjustments(ReasonableAdjustments.builder()
                 .appellant(ReasonableAdjustmentDetails.builder()

@@ -93,6 +93,7 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.PanelRequirements;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.PartyDetails;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.RequestDetails;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
+import uk.gov.hmcts.reform.sscs.service.BusinessEventLogger;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 @ExtendWith(MockitoExtension.class)
@@ -129,6 +130,8 @@ class HearingsServiceTest {
     private ArgumentCaptor<Consumer<SscsCaseDetails>> caseDataConsumerCaptor;
     @Mock
     private OverridesMapping overridesMapping;
+    @Mock
+    private BusinessEventLogger businessEventLogger;
 
     @InjectMocks
     private HearingsService hearingsService;

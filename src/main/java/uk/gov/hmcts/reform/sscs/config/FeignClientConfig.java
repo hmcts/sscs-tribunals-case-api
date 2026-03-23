@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.sscs.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.RequestInterceptor;
 import feign.Retryer;
 import feign.codec.Decoder;
 import feign.codec.ErrorDecoder;
 import feign.jackson.JacksonDecoder;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
@@ -35,6 +37,16 @@ public class FeignClientConfig {
                            @Value("${feign.client.retryer.maxPeriod}") long maxPeriod,
                            @Value("${feign.client.retryer.maxAttempts}") int maxAttempts) {
         return new Retryer.Default(period, maxPeriod, maxAttempts);
+    }
+
+    @Bean
+    public RequestInterceptor correlationIdInterceptor() {
+        return template -> {
+            String correlationId = MDC.get(CorrelationIdFilter.CORRELATION_ID_MDC_KEY);
+            if (correlationId != null) {
+                template.header(CorrelationIdFilter.CORRELATION_ID_HEADER, correlationId);
+            }
+        };
     }
 
 }
