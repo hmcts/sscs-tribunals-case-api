@@ -392,7 +392,7 @@ dependencies {
     implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.5.0'
 
     implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.7.6'
-    implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '9.0.3'
+    implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '9.2.4'
 
     implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
     implementation group: 'com.squareup.okio', name: 'okio-jvm', version: '3.16.0'
