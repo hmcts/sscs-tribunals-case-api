@@ -179,6 +179,8 @@ public class NotificationService {
                 wrapper.setNotificationEventTypeOverridden(true);
             }
         } else if (DRAFT_TO_VALID_APPEAL_CREATED.equals(wrapper.getNotificationType())) {
+
+            // TODO Check if we want to do anything around this
             wrapper.setNotificationType(VALID_APPEAL_CREATED);
         } else if (DRAFT_TO_NON_COMPLIANT.equals(wrapper.getNotificationType())) {
             wrapper.setNotificationType(NON_COMPLIANT);
