@@ -1167,6 +1167,20 @@
   },
   {
     "CaseEventID": "writeFinalDecision",
+    "CaseFieldID": "ucWriteFinalDecisionSchedule7ActivitiesQuestion",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 62,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "schedule7Activities",
+    "FieldShowCondition": "ucWriteFinalDecisionSchedule7ActivitiesApply != \"No\"",
+    "PageLabel": "Select Schedule 7 activities",
+    "ShowSummaryChangeOption": "Y",
+    "RetainHiddenValue": "Yes"
+  },
+  {
+    "CaseEventID": "writeFinalDecision",
     "CaseFieldID": "doesSchedule9Paragraph4Apply",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
