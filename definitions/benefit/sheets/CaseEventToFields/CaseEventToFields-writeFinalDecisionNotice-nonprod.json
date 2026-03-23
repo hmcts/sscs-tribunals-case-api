@@ -89,6 +89,7 @@
     "PageID": "schedule7Activities",
     "FieldShowCondition": "ucWriteFinalDecisionSchedule7ActivitiesApply != \"No\"",
     "PageLabel": "Select Schedule 7 activities",
+    "RetainHiddenValue": "No",
     "ShowSummaryChangeOption": "Y"
   },
   {
