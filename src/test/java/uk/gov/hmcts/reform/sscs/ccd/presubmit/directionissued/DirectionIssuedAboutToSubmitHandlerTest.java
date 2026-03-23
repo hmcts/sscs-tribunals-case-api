@@ -21,6 +21,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REJECT_
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_ADMIN_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_INFORMATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.NONE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_TCW;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.WELSH_TRANSLATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
@@ -865,6 +866,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequired).hasValue(expectedConfidentialityRequired);
             assertThat(response.getData().getAppellant().orElseThrow(AssertionError::new).getConfidentialityRequiredChangedDate()).isAfterOrEqualTo(testStartDateTime);
+            assertThat(response.getData().getInterlocReviewState()).isEqualTo(AWAITING_ADMIN_ACTION);
         }
 
         @ParameterizedTest
@@ -884,6 +886,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
                     buildOtherParty(selectedPartyId, "Ozan", "Mo")));
 
             callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(directionType));
+            callback.getCaseDetails().getCaseData().setInterlocReviewState(REVIEW_BY_TCW);
 
             var selectedConfidentialityParty = new DynamicList(new DynamicListItem("otherParty" + selectedPartyId,"xx"), null);
 
@@ -909,6 +912,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequired).isEmpty();
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequiredChangedDate).isEmpty();
+            assertThat(response.getData().getInterlocReviewState()).isEqualTo(AWAITING_ADMIN_ACTION);
         }
 
         @ParameterizedTest
@@ -938,6 +942,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             });
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequired).isEmpty();
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequiredChangedDate).isEmpty();
+            assertThat(response.getData().getInterlocReviewState()).isEqualTo(callback.getCaseDetails().getCaseData().getInterlocReviewState());
         }
 
         @ParameterizedTest
@@ -963,6 +968,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             assertThat(response.getData().getOtherParties().size()).isEqualTo(0);
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequired).isEmpty();
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequiredChangedDate).isEmpty();
+            assertThat(response.getData().getInterlocReviewState()).isEqualTo(callback.getCaseDetails().getCaseData().getInterlocReviewState());
         }
 
         @ParameterizedTest
@@ -988,6 +994,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             assertThat(response.getData().getOtherParties()).isNull();
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequired).isEmpty();
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequiredChangedDate).isEmpty();
+            assertThat(response.getData().getInterlocReviewState()).isEqualTo(callback.getCaseDetails().getCaseData().getInterlocReviewState());
         }
 
         @ParameterizedTest
@@ -1018,6 +1025,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             });
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequired).isEmpty();
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequiredChangedDate).isEmpty();
+            assertThat(response.getData().getInterlocReviewState()).isEqualTo(callback.getCaseDetails().getCaseData().getInterlocReviewState());
         }
     }
 
@@ -1050,6 +1058,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             });
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequired).isEmpty();
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequiredChangedDate).isEmpty();
+            assertThat(response.getData().getInterlocReviewState()).isEqualTo(callback.getCaseDetails().getCaseData().getInterlocReviewState());
         }
     }
 

@@ -377,8 +377,9 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             caseData.getAppellant().ifPresent(appellant -> {
                 appellant.setConfidentialityRequired(confidentialityRequired);
                 appellant.setConfidentialityRequiredChangedDate(LocalDateTime.now());
-
             });
+
+            caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION);
         } else if (StringUtils.startsWithIgnoreCase(selectedConfidentialityPartyCode, OTHER_PARTY)) {
             var otherPartyId = selectedConfidentialityPartyCode.substring(OTHER_PARTY.length());
 
@@ -392,6 +393,8 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                         otherParty.getValue().setConfidentialityRequiredChangedDate(LocalDateTime.now());
                     }
                 });
+
+                caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION);
             }
         }
 
