@@ -355,7 +355,7 @@ ccd:
 
   logstash:
     image: hmctsprod.azurecr.io/imported/elastic/logstash
-    imageTag: "9.2.4""
+    imageTag: "9.2.4"
     imagePullPolicy: "IfNotPresent"
     logstashJavaOpts: -Xmx1g -Xms512M
     persistence:
