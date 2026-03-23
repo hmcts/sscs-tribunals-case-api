@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.evidenceshare.exception.BulkPrintException;
 import uk.gov.hmcts.reform.sscs.evidenceshare.exception.NonPdfBulkPrintException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.service.BusinessEventLogger;
 
 @Service
 @Slf4j
@@ -53,19 +54,23 @@ public class BulkPrintService implements PrintService {
     private final Integer maxRetryAttempts;
     private final BulkPrintServiceHelper bulkPrintServiceHelper;
     private final CcdNotificationService ccdNotificationService;
+    private final BusinessEventLogger businessEventLogger;
 
     @Autowired
     public BulkPrintService(SendLetterApi sendLetterApi,
                             IdamService idamService,
                             BulkPrintServiceHelper bulkPrintServiceHelper,
                             @Value("${send-letter.enabled}") boolean sendLetterEnabled,
-                            @Value("${send-letter.maxRetryAttempts}") Integer maxRetryAttempts, CcdNotificationService ccdNotificationService) {
+                            @Value("${send-letter.maxRetryAttempts}") Integer maxRetryAttempts,
+                            CcdNotificationService ccdNotificationService,
+                            BusinessEventLogger businessEventLogger) {
         this.idamService = idamService;
         this.bulkPrintServiceHelper = bulkPrintServiceHelper;
         this.sendLetterApi = sendLetterApi;
         this.sendLetterEnabled = sendLetterEnabled;
         this.maxRetryAttempts = maxRetryAttempts;
         this.ccdNotificationService = ccdNotificationService;
+        this.businessEventLogger = businessEventLogger;
     }
 
     public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, final SscsCaseData sscsCaseData, FurtherEvidenceLetterType letterType, EventType event, String recipient) {
@@ -163,14 +168,16 @@ public class BulkPrintService implements PrintService {
         try {
             return sendLetter(authToken, sscsCaseData, encodedData, recipient);
         } catch (HttpClientErrorException e) {
-            log.info(format("Failed to send to bulk print for case %s with error %s. Non-pdf's/broken pdf's seen in list of documents, please correct.",
-                sscsCaseData.getCcdCaseId(), e.getMessage()));
+            businessEventLogger.logEvidenceShareEvent("bulkPrintSend", sscsCaseData.getCcdCaseId(),
+                "failure", "nonPdfError=" + e.getMessage());
             throw new NonPdfBulkPrintException(e);
 
         } catch (Exception e) {
             if (reTryNumber > maxRetryAttempts) {
                 String message = format("Failed to send to bulk print for case %s with error %s.",
                     sscsCaseData.getCcdCaseId(), e.getMessage());
+                businessEventLogger.logEvidenceShareEvent("bulkPrintSend", sscsCaseData.getCcdCaseId(),
+                    "failure", "retriesExhausted=" + e.getMessage());
                 throw new BulkPrintException(message, e);
             }
             log.info(String.format("Caught recoverable error %s, retrying %s out of %s",
@@ -190,6 +197,8 @@ public class BulkPrintService implements PrintService {
         );
         log.info("Letter service produced the following letter Id {} for case {}",
             sendLetterResponse.letterId, sscsCaseData.getCcdCaseId());
+        businessEventLogger.logEvidenceShareEvent("bulkPrintSend", sscsCaseData.getCcdCaseId(),
+            "success", "letterId=" + sendLetterResponse.letterId);
 
         return Optional.of(sendLetterResponse.letterId);
     }

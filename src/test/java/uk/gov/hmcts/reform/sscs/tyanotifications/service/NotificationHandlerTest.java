@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEvent
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationClientRuntimeException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
+import uk.gov.hmcts.reform.sscs.service.BusinessEventLogger;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.reminder.JobGroupGenerator;
 import uk.gov.service.notify.NotificationClientException;
 
@@ -46,6 +47,8 @@ public class NotificationHandlerTest {
     private NotificationWrapper notificationWrapper;
     @Mock
     private NotificationHandler.SendNotification sendNotification;
+    @Mock
+    private BusinessEventLogger businessEventLogger;
     private NotificationHandler underTest;
 
     @Mock
@@ -56,7 +59,7 @@ public class NotificationHandlerTest {
 
     @Before
     public void setUp() {
-        underTest = new NotificationHandler(outOfHoursCalculator, jobScheduler, jobGroupGenerator);
+        underTest = new NotificationHandler(outOfHoursCalculator, jobScheduler, jobGroupGenerator, businessEventLogger);
 
         Logger logger = (Logger) LoggerFactory.getLogger(NotificationHandler.class.getName());
         logger.addAppender(mockAppender);
@@ -169,7 +172,7 @@ public class NotificationHandlerTest {
         try {
             underTest.sendNotification(notificationWrapper, "someTemplate", "Email", sendNotification);
         } catch (NotificationClientRuntimeException e) {
-            verifyExpectedLogMessage(mockAppender, captorLoggingEvent, notificationWrapper.getNewSscsCaseData().getCcdCaseId(), "Could not send Email notification for case id: 123", Level.ERROR);
+            verify(businessEventLogger).logNotificationEvent("notificationSend", "123", "Email", "someTemplate", "failure");
             throw e;
         }
     }
@@ -198,7 +201,7 @@ public class NotificationHandlerTest {
         try {
             underTest.sendNotification(notificationWrapper, "someTemplate", "Email", sendNotification);
         } catch (Throwable throwable) {
-            verifyExpectedLogMessage(mockAppender, captorLoggingEvent, notificationWrapper.getNewSscsCaseData().getCcdCaseId(), "Could not send Email notification for case id:", Level.ERROR);
+            verify(businessEventLogger).logNotificationEvent("notificationSend", "123", "Email", "someTemplate", "failure");
             throw throwable;
         }
     }
@@ -211,7 +214,7 @@ public class NotificationHandlerTest {
             .send();
 
         underTest.sendNotification(notificationWrapper, "someTemplate", "Email", sendNotification);
-        verifyExpectedLogMessage(mockAppender, captorLoggingEvent, notificationWrapper.getNewSscsCaseData().getCcdCaseId(), "Could not send Email notification for case id:", Level.ERROR);
+        verify(businessEventLogger).logNotificationEvent("notificationSend", "123", "Email", "someTemplate", "failure");
     }
 
     private void stubData() {

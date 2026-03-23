@@ -54,6 +54,7 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.HmcUpdateResponse;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
+import uk.gov.hmcts.reform.sscs.service.BusinessEventLogger;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 @EnableRetry
@@ -92,6 +93,8 @@ class HearingsServiceRetryTest {
     private PanelCompositionService panelCompositionService;
     @MockitoBean
     private OverridesMapping overridesMapping;
+    @MockitoBean
+    private BusinessEventLogger businessEventLogger;
 
     @Mock
     private Consumer<SscsCaseData> sscsCaseDataConsumer;
