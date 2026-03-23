@@ -1,5 +1,6 @@
 {
   "name": "CTSC - Action Unprocessed Correspondence",
+  "dormantName": "CTSC - Action Unprocessed Correspondence - Dormant/Post Hearing",
   "priority": "high",
   "assignedToWhenNotAssigned": "Unassigned",
   "assignedTo": "sscs-ctscdmin nw-liverpool",
