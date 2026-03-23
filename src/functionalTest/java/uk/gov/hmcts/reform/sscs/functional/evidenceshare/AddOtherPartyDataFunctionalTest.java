@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static uk.gov.hmcts.reform.sscs.bulkscan.BaseFunctionalTest.generateRandomNino;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADD_OTHER_PARTY_DATA;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 
@@ -22,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
@@ -45,18 +47,39 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
     @Autowired
     private UpdateCcdCaseService updateCcdCaseService;
 
+    private static void updateCase(SscsCaseData caseData) {
+        caseData.getAppellant().ifPresent(app -> app.getIdentity().setNino(generateRandomNino()));
+        caseData.getAppeal().setRep(null);
+        caseData.setEvidencePresent("No");
+        caseData
+            .getAppellant()
+            .ifPresent(app -> app.setAddress(Address
+                .builder()
+                .line1(ADDRESS_LINE_1)
+                .line2(ADDRESS_LINE_2)
+                .town(TOWN)
+                .county(COUNTY)
+                .postcode(POSTCODE)
+                .build()));
+    }
+
     @Nested
     class ChildSupport {
         @Test
         void shouldTransitionToCorrectStateWhenOtherPartyDataAddedToCase() {
 
-            final SscsCaseDetails caseWithState = createCaseFromEvent(Benefit.CHILD_SUPPORT, VALID_APPEAL_CREATED);
+            final SscsCaseDetails caseWithState = createCaseFromEvent(Benefit.CHILD_SUPPORT, VALID_APPEAL_CREATED,
+                AddOtherPartyDataFunctionalTest::updateCase);
             await().atMost(TIMEOUT, SECONDS).untilAsserted(() -> {
                 final var caseDetails = findCaseById(caseWithState.getId().toString());
                 assertThat(caseDetails.getState()).isEqualTo(State.AWAIT_OTHER_PARTY_DATA.toString());
             });
 
             runAddOtherPartyDataEvent(caseWithState);
+
+            await()
+                .atMost(TIMEOUT, SECONDS)
+                .untilAsserted(() -> assertThatPartyAdded(findCaseById(caseWithState.getId().toString())));
         }
 
     }
@@ -66,16 +89,8 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
         @Test
         @SneakyThrows
         void shouldGenerateAddOtherPartyDataNotificationDocument() {
-            final SscsCaseDetails caseDetails = createCaseFromEvent(Benefit.UC, VALID_APPEAL_CREATED, caseData -> caseData
-                .getAppellant()
-                .ifPresent(app -> app.setAddress(Address
-                    .builder()
-                    .line1(ADDRESS_LINE_1)
-                    .line2(ADDRESS_LINE_2)
-                    .town(TOWN)
-                    .county(COUNTY)
-                    .postcode(POSTCODE)
-                    .build())));
+            final SscsCaseDetails caseDetails = createCaseFromEvent(Benefit.UC, VALID_APPEAL_CREATED,
+                AddOtherPartyDataFunctionalTest::updateCase);
 
             await()
                 .atMost(TIMEOUT, SECONDS)
@@ -83,6 +98,10 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
                     State.WITH_DWP.toString()));
 
             runAddOtherPartyDataEvent(caseDetails);
+
+            await()
+                .atMost(TIMEOUT, SECONDS)
+                .untilAsserted(() -> assertThatPartyAdded(findCaseById(caseDetails.getId().toString())));
             assertThatPdfTextIsCorrect(getDocument(caseDetails.getId(), "addOtherPartyData"), getExpectedContent(caseDetails));
         }
 
@@ -102,10 +121,6 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
                 cd.getData().getExtendedSscsCaseData().setAwareOfAnyAdditionalOtherParties(YesNo.YES);
                 return new UpdateCcdCaseService.UpdateResult(ADD_OTHER_PARTY, ADD_OTHER_PARTY);
             });
-
-        await()
-            .atMost(TIMEOUT, SECONDS)
-            .untilAsserted(() -> assertThatPartyAdded(findCaseById(caseWithState.getId().toString())));
     }
 
     private void assertThatPartyAdded(final SscsCaseDetails cdAfterEvent) {

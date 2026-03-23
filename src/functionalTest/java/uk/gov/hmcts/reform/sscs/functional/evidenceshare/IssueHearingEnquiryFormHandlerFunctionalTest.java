@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
 import java.io.IOException;
+import uk.gov.hmcts.reform.sscs.bulkscan.BaseFunctionalTest;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -29,7 +30,7 @@ class IssueHearingEnquiryFormHandlerFunctionalTest extends AbstractFunctionalTes
     @SneakyThrows
     @EnabledIfEnvironmentVariable(named = "CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED", matches = "true")
     void shouldIssueHearingEnquiryForm() {
-        final SscsCaseDetails caseDetails = createCaseFromEvent(Benefit.CHILD_SUPPORT, EventType.VALID_APPEAL_CREATED);
+        final SscsCaseDetails caseDetails = createCaseFromEvent(Benefit.CHILD_SUPPORT, EventType.VALID_APPEAL_CREATED, sscsCaseData -> BaseFunctionalTest.generateRandomNino());
         assertEventuallyInState(caseDetails.getId(), "awaitOtherPartyData");
         addOtherParties(caseDetails);
         issueHearingEnquiryForm(caseDetails);

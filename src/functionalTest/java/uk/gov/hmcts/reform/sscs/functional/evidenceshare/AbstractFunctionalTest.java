@@ -12,9 +12,9 @@ import static org.awaitility.Awaitility.await;
 import static org.awaitility.Awaitility.waitAtMost;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
+import static uk.gov.hmcts.reform.sscs.bulkscan.BaseFunctionalTest.generateRandomNino;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DOCUMENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -88,10 +87,6 @@ abstract class AbstractFunctionalTest {
     private DocumentDownloadClientApi documentDownloadClientApi;
     @Autowired
     private ObjectMapper mapper;
-
-    static String getRandomNino() {
-        return RandomStringUtils.secure().nextAlphanumeric(9).toUpperCase();
-    }
 
     public void simulateCcdCallback(String json) {
 
@@ -207,7 +202,7 @@ abstract class AbstractFunctionalTest {
         String json = getJson(fileName);
         json = json.replace("CASE_ID_TO_BE_REPLACED", String.valueOf(caseDetails.getId()));
         json = json.replace("CREATED_IN_GAPS_FROM", State.READY_TO_LIST.getId());
-        json = json.replaceAll("NINO_TO_BE_REPLACED", getRandomNino());
+        json = json.replaceAll("NINO_TO_BE_REPLACED", generateRandomNino());
 
         json = uploadCaseDocument(EVIDENCE_DOCUMENT_PDF, EVIDENCE_DOCUMENT_TYPE, json);
         json = uploadCaseDocument(EXISTING_DOCUMENT_PDF, EXISTING_DOCUMENT_TYPE, json);
@@ -250,7 +245,7 @@ abstract class AbstractFunctionalTest {
     }
 
     Resource getDocument(Long caseId, String correspondenceName) {
-        final List<Correspondence> correspondenceList = waitAtMost(ofSeconds(30)).until(
+        final List<Correspondence> correspondenceList = defaultAwait().until(
             () -> findCaseById(caseId.toString()).getData().getCorrespondence(),
             correspondences -> isNotEmpty(correspondences) && containsDocument(correspondences, correspondenceName));
         final Correspondence correspondence = correspondenceList.stream()
