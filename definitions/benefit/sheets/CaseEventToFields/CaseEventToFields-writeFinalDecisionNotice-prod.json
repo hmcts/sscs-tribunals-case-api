@@ -38,5 +38,19 @@
     "PageLabel": "Select Schedule 7 activities",
     "PageShowCondition": "showSchedule7ActivitiesPage=\"Yes\" AND wcaAppeal = \"Yes\"",
     "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseEventID": "writeFinalDecision",
+    "CaseFieldID": "ucWriteFinalDecisionSchedule7ActivitiesQuestion",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 62,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "schedule7Activities",
+    "FieldShowCondition": "ucWriteFinalDecisionSchedule7ActivitiesApply != \"No\"",
+    "PageLabel": "Select Schedule 7 activities",
+    "ShowSummaryChangeOption": "Y",
+    "RetainHiddenValue": "Yes"
   }
 ]
