@@ -23,6 +23,7 @@
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/sendNotification",
     "PreConditionState(s)": "awaitOtherPartyData;withDwp",
     "PostConditionState": "awaitConfidentialityRequirements",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "SecurityClassification": "Public",
     "EventEnablingCondition": "appeal.benefitType.code=\"childSupport\" OR appeal.benefitType.code=\"UC\"",
     "Publish": "N"

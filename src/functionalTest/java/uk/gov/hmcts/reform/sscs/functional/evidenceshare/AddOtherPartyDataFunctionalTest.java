@@ -133,6 +133,8 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
         assertThat(otherParty.getAddress().getPostcode()).isEqualTo(POSTCODE);
         assertThat(otherParty.getAddress().getTown()).isEqualTo(TOWN);
         assertThat(otherParty.getAddress().getLine1()).isEqualTo(ADDRESS_LINE_1);
+        assertThat(cdAfterEvent.getData().getExtendedSscsCaseData().getConfidentialityTab())
+            .contains("Other Party 1 | Bella Kiki | Undetermined |");
     }
 
     private OtherParty buildOtherParty() {
