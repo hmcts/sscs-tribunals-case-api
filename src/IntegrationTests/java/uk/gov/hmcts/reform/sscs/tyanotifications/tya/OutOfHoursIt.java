@@ -40,6 +40,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.BulkPrintService;
+import uk.gov.hmcts.reform.sscs.service.BusinessEventLogger;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobScheduler;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
@@ -159,7 +160,7 @@ public class OutOfHoursIt {
         when(outOfHoursCalculator.getStartOfNextInHoursPeriod()).thenReturn(zoned);
         when(outOfHoursCalculator.isItOutOfHours()).thenReturn(true);
 
-        notificationHandler = new NotificationHandler(outOfHoursCalculator, jobScheduler, jobGroupGenerator);
+        notificationHandler = new NotificationHandler(outOfHoursCalculator, jobScheduler, jobGroupGenerator, mock(BusinessEventLogger.class));
 
         NotificationSender sender = new NotificationSender(notificationClient, null, bulkPrintService, notificationTestRecipients, markdownTransformationService, saveCorrespondenceAsyncService, false);
         SendNotificationService sendNotificationService = new SendNotificationService(sender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
