@@ -1,6 +1,6 @@
 import { expect, Page } from '@playwright/test';
 import { BaseStep } from './base';
-import { credentials } from '../../config/config';
+import { credentials, featureFlags } from '../../config/config';
 import addUpdateOtherPartyData from '../../pages/content/update.other.party.data_en.json';
 import addUpdateSubscriptionData from '../../pages/content/update.subscription.data_en.json';
 import createCaseBasedOnCaseType from '../../api/client/sscs/factory/appeal.type.factory';
@@ -15,6 +15,12 @@ export class UpdateOtherPartyData extends BaseStep {
     this.page = page;
   }
 
+  private async getChildSupportEndState() {
+    return featureFlags.cmOtherPartyConfidentialityEnabled
+      ? 'Await Other Party Data'
+      : 'With FTA';
+  }
+
   /*
     ToDo: performOtherPartyData function is replicated for each benefit type. There are a few mandatory fields and few different
     fields on update other party data page for different benefit types. The functions below (perform<xyz>) and the corresponding
@@ -27,7 +33,7 @@ export class UpdateOtherPartyData extends BaseStep {
     const ChildSupportCaseId = await createCaseBasedOnCaseType('CHILDSUPPORT');
 
     // Starting event
-    await this.goToUpdateOtherPartyData(this.page, ChildSupportCaseId);
+    await this.goToUpdateOtherPartyData(ChildSupportCaseId);
     await this.updateOtherPartyDataPage.verifyPageContent();
 
     // Filling fields and Submitting the event
@@ -53,7 +59,10 @@ export class UpdateOtherPartyData extends BaseStep {
 
     // Verifying History tab + end state
     await this.verifyHistoryTabDetails('Update subscription');
-    await this.historyTab.verifyPageContentByKeyValue('End state', 'With FTA');
+    await this.historyTab.verifyPageContentByKeyValue(
+      'End state',
+      await this.getChildSupportEndState()
+    );
     await this.historyTab.verifyPageContentByKeyValue(
       'Event',
       'Update subscription'
@@ -81,15 +90,14 @@ export class UpdateOtherPartyData extends BaseStep {
       'Postcode',
       addUpdateOtherPartyData.updateOtherPartyDataAddressPostCode
     );
+    await expect(
+      this.page.locator(
+        `//tr[.//th[normalize-space()="Unacceptable Customer Behaviour"] and .//td[normalize-space()="${addUpdateOtherPartyData.updateOtherPartyDataBehaviour}"]]`
+      ).first()
+    ).toBeVisible();
     await this.page
       .getByRole('row', { name: 'Confidentiality Required No', exact: true })
-      .locator(`//tr[.='Confidentiality RequiredNo']`); // couldn't use the same method as other options for these 2 lines 58, 59
-    await this.page
-      .getByRole('row', {
-        name: 'Unacceptable Customer Behaviour No',
-        exact: true
-      })
-      .locator(`//span[.='Unacceptable Customer Behaviour']`);
+      .locator(`//tr[.='Confidentiality RequiredNo']`);
     await this.otherPartyDetailsTab.verifyPageContentByKeyValue(
       'Role',
       addUpdateOtherPartyData.updateOtherPartyDataRole
@@ -113,7 +121,7 @@ export class UpdateOtherPartyData extends BaseStep {
     const TaxCreditCaseId = await createCaseBasedOnCaseType('TAX CREDIT');
 
     // Starting event
-    await this.goToUpdateOtherPartyData(this.page, TaxCreditCaseId);
+    await this.goToUpdateOtherPartyData(TaxCreditCaseId);
     await this.updateOtherPartyDataPage.verifyPageContent();
 
     // Filling fields and Submitting the event
@@ -223,8 +231,28 @@ export class UpdateOtherPartyData extends BaseStep {
   }
   
   // Event created to select Update other party data event from next steps dropdown menu:
-  private async goToUpdateOtherPartyData(page: Page, caseId: string) {
+  private async chooseEventWithRetry(eventName: string, attempts: number = 5) {
+    let lastError;
+    for (let attempt = 1; attempt <= attempts; attempt++) {
+      try {
+        await this.homePage.chooseEvent(eventName);
+        return;
+      } catch (error) {
+        lastError = error;
+        if (attempt === attempts) {
+          throw lastError;
+        }
+        await this.homePage.delay(2000);
+        await this.homePage.reloadPage();
+        await expect(this.homePage.summaryTab.first()).toBeVisible();
+      }
+    }
+  }
+
+  private async goToUpdateOtherPartyData(
+    caseId: string
+  ) {
     await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
-    await this.homePage.chooseEvent('Update other party data');
+    await this.chooseEventWithRetry('Update other party data');
   }
 }

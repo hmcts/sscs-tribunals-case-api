@@ -13,10 +13,12 @@ export class updateOtherPartyDataPage {
     webAction = new WebAction(this.page);
   }
 
-  async verifyPageContent() {
+  async verifyPageContent(
+    heading: string = addUpdateOtherPartyData.updateOtherPartyDataHeading
+  ) {
     await webAction.verifyPageLabel(
       '.govuk-caption-l',
-      addUpdateOtherPartyData.updateOtherPartyDataHeading
+      heading
     ); //Above heading Text
     await webAction.isButtonClickable('Cancel');
   }
