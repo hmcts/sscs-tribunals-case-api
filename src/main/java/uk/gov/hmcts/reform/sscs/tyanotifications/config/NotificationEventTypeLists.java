@@ -58,7 +58,9 @@ public final class NotificationEventTypeLists {
         JOINT_PARTY_ADDED,
         ACTION_HEARING_RECORDING_REQUEST,
         ACTION_POSTPONEMENT_REQUEST_WELSH,
-        UPDATE_OTHER_PARTY_DATA
+        UPDATE_OTHER_PARTY_DATA,
+        ADMIN_SEND_TO_VALID_APPEAL,
+        VALID_APPEAL
     );
 
     // TODO move to EVENTS_TO_HANDLE when feature.postHearings.enabled removed
@@ -167,7 +169,9 @@ public final class NotificationEventTypeLists {
         STRUCK_OUT,
         STATEMENT_OF_REASONS_REQUEST,
         UPDATE_OTHER_PARTY_DATA,
-        VALID_APPEAL_CREATED
+        VALID_APPEAL_CREATED,
+        ADMIN_SEND_TO_VALID_APPEAL,
+        VALID_APPEAL
     );
 
     public static final Set<NotificationEventType> EVENT_TYPES_FOR_BUNDLED_LETTER = EnumSet.of(
@@ -257,7 +261,9 @@ public final class NotificationEventTypeLists {
         STATEMENT_OF_REASONS_REQUEST,
         STRUCK_OUT,
         UPDATE_OTHER_PARTY_DATA,
-        VALID_APPEAL_CREATED
+        VALID_APPEAL_CREATED,
+        ADMIN_SEND_TO_VALID_APPEAL,
+        VALID_APPEAL
     );
 
     public static final Set<NotificationEventType> EVENT_TYPES_FOR_NOTIFY_LETTERS = EnumSet.of(
