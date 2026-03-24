@@ -5,7 +5,7 @@ name: cft-lib-doc-stack
 
 services:
   dm-store:
-    image: "${DM_STORE_USE_LOCAL-hmctspublic.azurecr.io/}dm/store:${DM_STORE_TAG:-latest}"
+    image: "${DM_STORE_USE_LOCAL-hmctsprod.azurecr.io/}dm/store:${DM_STORE_TAG:-latest}"
     healthcheck:
       disable: true
     environment:
@@ -44,7 +44,7 @@ services:
       - "host.docker.internal:host-gateway"
 
   pdf-service-api:
-    image: hmctspublic.azurecr.io/cmc/pdf-service:latest
+    image: hmctsprod.azurecr.io/cmc/pdf-service:latest
     environment:
       - JAVA_OPTS=-Xms8m -Xmx256m -Djava.security.egd=file:/dev/./urandom -XX:MaxMetaspaceSize=128m
       - S2S_URL=http://host.docker.internal:4502

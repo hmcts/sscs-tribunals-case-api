@@ -1,6 +1,6 @@
 java: &javavalues #This is an anchor to reuse settings in Job mode.
   enabled: true
-  image: 'hmctspublic.azurecr.io/sscs/tribunals-api:latest'
+  image: 'hmctsprod.azurecr.io/sscs/tribunals-api:latest'
   applicationPort: 8080
   terminationGracePeriodSeconds: 120
   aadIdentityName: sscs
@@ -149,11 +149,8 @@ elastic:
   enabled: false
 sscs-tribunals-frontend:
   enabled: false
-redis:
+hmcts-redis:
   enabled: false
-  image:
-    registry: hmctspublic.azurecr.io
-    repository: imported/bitnami/redis
 ccd:
   enabled: false
 em-ccdorc:
