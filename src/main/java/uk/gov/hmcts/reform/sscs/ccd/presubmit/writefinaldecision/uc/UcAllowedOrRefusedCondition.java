@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc;
 
+import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
@@ -145,21 +146,36 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
             isAnyPoints(),
             isAnySchedule7(),
             isDwpReassessTheAward(UNSPECIFIED)),
-    SEVERE_CONDITIONS_ALLOWED(
+    SEVERE_CONDITIONS_ALLOWED_SV_CASE(
             isAllowedOrRefused(ALLOWED),
             isWcaAppeal(TRUE, false),
             isSevereConditions(TRUE),
             isAnySupportGroupOnly(),
             isAnyPoints(),
             isAnySchedule7()),
-    SEVERE_CONDITIONS_REFUSED(
+    SEVERE_CONDITIONS_REFUSED_SV_CASE(
             isAllowedOrRefused(REFUSED),
             isWcaAppeal(TRUE, false),
             isSevereConditions(TRUE),
             isAnySupportGroupOnly(),
             isAnyPoints(),
             isAnySchedule7(),
-            isDwpReassessTheAward(UNSPECIFIED)),;
+            isDwpReassessTheAward(UNSPECIFIED)),
+    SEVERE_CONDITIONS_ALLOWED_NON_SV_CASE(
+            isAllowedOrRefused(ALLOWED),
+            isWcaAppeal(TRUE, false),
+            isSevereConditions(TRUE),
+            isAnySupportGroupOnly(),
+            isPoints(POINTS_GREATER_OR_EQUAL_TO_FIFTEEN),
+            isSchedule7(NOT_EMPTY)),
+    SEVERE_CONDITIONS_REFUSED_NON_SV_CASE(
+            isAllowedOrRefused(REFUSED),
+            isWcaAppeal(TRUE, false),
+            isSevereConditions(TRUE),
+            isAnySupportGroupOnly(),
+            isPoints(POINTS_GREATER_OR_EQUAL_TO_FIFTEEN),
+            isSchedule7(NOT_EMPTY),
+            isDwpReassessTheAward(UNSPECIFIED));
 
     Optional<UcPointsCondition> primaryPointsCondition;
     Optional<FieldCondition> schedule7ActivitiesSelected;
@@ -199,7 +215,9 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
             return UcScenario.SCENARIO_9;
         } else if (NON_WCA_APPEAL_ALLOWED == this || NON_WCA_APPEAL_REFUSED == this) {
             return UcScenario.SCENARIO_10;
-        }  else if (SEVERE_CONDITIONS_ALLOWED == this || SEVERE_CONDITIONS_REFUSED == this) {
+        }  else if (SEVERE_CONDITIONS_ALLOWED_SV_CASE == this || SEVERE_CONDITIONS_REFUSED_SV_CASE == this) {
+            return YesNo.isYes(caseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply()) ? UcScenario.SCENARIO_13 : UcScenario.SCENARIO_14;
+        }  else if (SEVERE_CONDITIONS_ALLOWED_NON_SV_CASE == this || SEVERE_CONDITIONS_REFUSED_NON_SV_CASE == this) {
             return YesNo.isYes(caseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply()) ? UcScenario.SCENARIO_13 : UcScenario.SCENARIO_14;
         } else {
             throw new IllegalStateException("No scenario applicable");
@@ -250,7 +268,9 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
 
     static YesNoFieldCondition isSevereConditions(Predicate<YesNo> predicate) {
         return new YesNoFieldCondition("Severe Conditions", predicate,
-                s -> YesNo.isYes(s.getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo()) ? YesNo.YES : YesNo.NO, false);
+                s -> YesNo.isYes(s.getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo())
+                        ||  nonNull(s.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply())
+                        ? YesNo.YES : YesNo.NO, false);
     }
 
     static YesNoFieldCondition isDwpReassessTheAward(Predicate<YesNo> predicate) {
