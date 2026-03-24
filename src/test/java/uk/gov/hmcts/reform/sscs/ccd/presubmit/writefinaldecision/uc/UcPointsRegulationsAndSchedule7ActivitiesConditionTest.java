@@ -99,7 +99,7 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
             new Boolean[] {true, true, true, false, false},
             new Boolean[] {true, true, true, true, false},
 
-            new Boolean[] {true, null, null, null, true},
+            //new Boolean[] {true, null, null, null, true},
         };
     }
 

@@ -14,6 +14,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPre
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.UNSPECIFIED;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcPointsCondition.POINTS_LESS_THAN_FIFTEEN;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcPointsCondition.ZERO_POINTS;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -151,15 +152,15 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
             isWcaAppeal(TRUE, false),
             isSevereConditions(TRUE),
             isAnySupportGroupOnly(),
-            isAnyPoints(),
-            isAnySchedule7()),
+            isPoints(ZERO_POINTS),
+            isSchedule7(EMPTY)),
     SEVERE_CONDITIONS_REFUSED_SV_CASE(
             isAllowedOrRefused(REFUSED),
             isWcaAppeal(TRUE, false),
             isSevereConditions(TRUE),
             isAnySupportGroupOnly(),
-            isAnyPoints(),
-            isAnySchedule7(),
+            isPoints(ZERO_POINTS),
+            isSchedule7(EMPTY),
             isDwpReassessTheAward(UNSPECIFIED)),
     SEVERE_CONDITIONS_ALLOWED_NON_SV_CASE(
             isAllowedOrRefused(ALLOWED),
@@ -167,7 +168,8 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
             isSevereConditions(TRUE),
             isAnySupportGroupOnly(),
             isPoints(POINTS_GREATER_OR_EQUAL_TO_FIFTEEN),
-            isSchedule7(NOT_EMPTY)),
+            isSchedule7(NOT_EMPTY),
+            isSchdeul8Paragraph4(UNSPECIFIED)),
     SEVERE_CONDITIONS_REFUSED_NON_SV_CASE(
             isAllowedOrRefused(REFUSED),
             isWcaAppeal(TRUE, false),
@@ -175,6 +177,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
             isAnySupportGroupOnly(),
             isPoints(POINTS_GREATER_OR_EQUAL_TO_FIFTEEN),
             isSchedule7(NOT_EMPTY),
+            isSchdeul8Paragraph4(UNSPECIFIED),
             isDwpReassessTheAward(UNSPECIFIED));
 
     Optional<UcPointsCondition> primaryPointsCondition;
