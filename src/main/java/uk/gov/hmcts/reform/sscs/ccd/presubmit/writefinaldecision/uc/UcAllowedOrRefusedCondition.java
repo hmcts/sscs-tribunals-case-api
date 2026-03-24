@@ -101,7 +101,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
         isSchdeul8Paragraph4(YesNoPredicate.TRUE)
     ),
     // Scenario 4
-    ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_SELECTED(
+    ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_7_SELECTED(
         isAllowedOrRefused(ALLOWED),
         isWcaAppeal(TRUE, false),
         isSevereConditions(FALSE),
@@ -110,7 +110,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
         isSchedule7(NOT_EMPTY),
         isSchdeul8Paragraph4(UNSPECIFIED)),
     // SCENARIO_3
-    ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_NOT_SELECTED(
+    ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_7_NOT_SELECTED(
         isAllowedOrRefused(ALLOWED),
         isWcaAppeal(TRUE, false),
         isSevereConditions(FALSE),
@@ -195,9 +195,9 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
             return UcScenario.SCENARIO_1;
         } else if (REFUSED_SUPPORT_GROUP_ONLY_LOW_POINTS == this || REFUSED_SUPPORT_GROUP_ONLY_HIGH_POINTS == this) {
             return UcScenario.SCENARIO_2;
-        } else if (ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_NOT_SELECTED == this && isSchedule9Paragraph4(TRUE).isSatisified(caseData)) {
+        } else if (ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_7_NOT_SELECTED == this && isSchedule9Paragraph4(TRUE).isSatisified(caseData)) {
             return UcScenario.SCENARIO_3;
-        } else if ((ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_NOT_SELECTED == this && isSchedule9Paragraph4(UNSPECIFIED).isSatisified(caseData)) || ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_SELECTED == this) {
+        } else if ((ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_7_NOT_SELECTED == this && isSchedule9Paragraph4(UNSPECIFIED).isSatisified(caseData)) || ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_7_SELECTED == this) {
             return UcScenario.SCENARIO_4;
         }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_HIGH_POINTS == this && caseData.getSscsUcCaseData().getSchedule7Selections().isEmpty()) {
             if (isSchedule9Paragraph4(TRUE).isSatisified(caseData)) {
