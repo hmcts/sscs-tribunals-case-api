@@ -680,6 +680,7 @@ notification:
             appointee:
                 emailId: 362d9a85-e0e4-412b-b874-020c0464e2b4
                 smsId: f41222ef-c05c-4682-9634-6b034a166368
+                docmosisId: TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx.docx
         resendAppealCreated:
             appellant:
                 emailId: 01293b93-b23e-40a3-ad78-2c6cd01cd21c
