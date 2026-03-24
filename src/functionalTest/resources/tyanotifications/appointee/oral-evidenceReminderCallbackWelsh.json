@@ -75,6 +75,18 @@
         "hearingType": "oral"
       },
       "caseReference": "SC022/14/12423",
+      "regionalProcessingCenter": {
+        "faxNumber": "0126 434 7983",
+        "address4": "PO Box 14620",
+        "phoneNumber": "0300 123 1142",
+        "name": "BIRMINGHAM",
+        "address1": "HM Courts & Tribunals Service",
+        "address2": "Social Security & Child Support Appeals",
+        "address3": "Administrative Support Centre",
+        "postcode": "B16 6FR",
+        "city": "BIRMINGHAM",
+        "email":"Birmingham-SYA-Receipts@justice.gov.uk"
+      },
       "events": [
         {
           "id": "a95eb829-2da3-4ff4-9d21-90d22583facf",
