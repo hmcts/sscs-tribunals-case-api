@@ -158,5 +158,5 @@ docker run --rm --name json2xlsx \
   -e "CCD_DEF_ENV=${UPPERCASE_ENV}" \
   -e "CCD_DEF_VERSION=${CCD_DEF_VERSION}" \
   -e "CCD_DEF_PUBLISH=${CCD_DEF_PUBLISH}" \
-  hmctspublic.azurecr.io/ccd/definition-processor:latest \
+  hmctsprod.azurecr.io/ccd/definition-processor:latest \
   json2xlsx -D /tmp/json/sheets "$excludedFilenamePatterns" -o "/tmp/output/${ccdDefinitionFile}"
