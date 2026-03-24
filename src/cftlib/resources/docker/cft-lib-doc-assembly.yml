@@ -3,7 +3,7 @@ version: '3.5'
 name: cft-lib-doc-assembly
 services:
   rpa-dg-docassembly-api:
-    image: hmctspublic.azurecr.io/dg/docassembly:latest
+    image: hmctsprod.azurecr.io/dg/docassembly:latest
     environment:
       - S2S_BASE_URI=http://host.docker.internal:4502
       - IDAM_API_BASE_URI=${IDAM_STUB_SERVICE_NAME:-http://rse-idam-simulator:5062}
