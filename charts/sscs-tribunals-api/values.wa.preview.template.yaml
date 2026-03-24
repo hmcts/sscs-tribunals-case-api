@@ -47,7 +47,7 @@ java:
 am-org-role-mapping-service:
   enabled: true
   java:
-    image: 'hmctspublic.azurecr.io/am/org-role-mapping-service:latest'
+    image: 'hmctsprod.azurecr.io/am/org-role-mapping-service:latest'
     ingressHost: orm-${SERVICE_FQDN}
     releaseNameOverride: ${SERVICE_NAME}-am-org-role-mapping-service
     devmemoryRequests: 1024Mi
@@ -116,7 +116,7 @@ aac-manage-case-assignment:
     disableKeyVaults: true
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-aac-manage-case-assignment
-    image: hmctspublic.azurecr.io/aac/manage-case-assignment:latest
+    image: hmctsprod.azurecr.io/aac/manage-case-assignment:latest
     ingressHost: aac-${SERVICE_FQDN}
     environment:
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
@@ -146,7 +146,7 @@ aac-manage-case-assignment:
 em-ccdorc:
   enabled: true
   java:
-    image: hmctspublic.azurecr.io/em/ccdorc:latest
+    image: hmctsprod.azurecr.io/em/ccdorc:latest
     releaseNameOverride: ${SERVICE_NAME}-em-ccdorc
     ingressHost: em-ccdorc-${SERVICE_FQDN}
     environment:
@@ -170,7 +170,7 @@ em-ccdorc:
 em-stitching:
   enabled: ${PREVIEW_BRANCH_WITH_LOCAL_CCD}
   java:
-    image: hmctspublic.azurecr.io/em/stitching:latest
+    image: hmctsprod.azurecr.io/em/stitching:latest
     releaseNameOverride: ${SERVICE_NAME}-em-stitching
     ingressHost: em-stitching-${SERVICE_FQDN}
     environment:
@@ -205,7 +205,7 @@ em-stitching:
 ccd-case-document-am-api:
   enabled: true
   java:
-    image: hmctspublic.azurecr.io/ccd/case-document-am-api:latest
+    image: hmctsprod.azurecr.io/ccd/case-document-am-api:latest
     releaseNameOverride: ${SERVICE_NAME}-ccd-case-document-am-api
     environment:
       CCD_DATA_STORE_API_BASE_URL: http://${SERVICE_NAME}-ccd-data-store-api
@@ -224,7 +224,7 @@ xui-webapp:
     devcpuLimits: "1000m"
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
-    image: hmctspublic.azurecr.io/xui/webapp:latest
+    image: hmctsprod.azurecr.io/xui/webapp:latest
     ingressHost: xui-${SERVICE_FQDN}
     environment:
       HEALTH_CCD_COMPONENT_API: ${CCD_GW_API}/health
@@ -354,7 +354,7 @@ ccd:
     replicas: 1
 
   logstash:
-    image: hmctspublic.azurecr.io/imported/logstash/logstash
+    image: hmctsprod.azurecr.io/imported/logstash/logstash
     imageTag: "7.16.1"
     imagePullPolicy: "IfNotPresent"
     logstashJavaOpts: -Xmx1g -Xms512M
@@ -365,7 +365,7 @@ ccd:
         value: "${SERVICE_NAME}-es-master"
     extraInitContainers: |
       - name: download-postgres-jdbc
-        image: hmctspublic.azurecr.io/curl:7.70.0
+        image: hmctsprod.azurecr.io/curl:7.70.0
         command: ['curl', '-L', 'https://jdbc.postgresql.org/download/postgresql-42.3.3.jar', '-o', '/logstash-lib/postgresql.jar']
         volumeMounts:
         - name: logstash-lib
@@ -531,7 +531,7 @@ ccd:
 
   ccd-admin-web:
     nodejs:
-      image: hmctspublic.azurecr.io/ccd/admin-web:latest
+      image: hmctsprod.azurecr.io/ccd/admin-web:latest
       ingressHost: admin-web-${SERVICE_FQDN}
       environment:
         ADMINWEB_GLOBAL_SEARCH_INDEX_URL: http://${SERVICE_NAME}-ccd-definition-store/elastic-support/global-search/index
@@ -636,7 +636,7 @@ ccd:
       disableKeyVaults: true
 
   ccd-user-profile-importer:
-    image: hmctspublic.azurecr.io/ccd/user-profile-importer:db2r9a
+    image: hmctsprod.azurecr.io/ccd/user-profile-importer:db2r9a
     environment:
       AUTH_PROVIDER_BASE_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
       CCD_USER_PROFILE_URL: http://${SERVICE_NAME}-ccd-user-profile-api
@@ -652,14 +652,14 @@ elastic:
 sscs-tribunals-frontend:
   enabled: true
   nodejs:
-    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:latest
+    image: hmctsprod.azurecr.io/sscs/tribunals-frontend:latest
     ingressHost: sya-${SERVICE_FQDN}
     registerAdditionalDns:
       enabled: true
       prefix: iba
       primaryIngressHost: sya-${SERVICE_FQDN}
     environment:
-      REDIS_URL: redis://${SERVICE_NAME}-redis-master
+      REDIS_URL: redis://${SERVICE_NAME}-hmcts-redis-master
       APPINSIGHTS_ROLE_NAME: ${SERVICE_NAME}
       PCQ_URL: "https://pcq.aat.platform.hmcts.net"
       FT_ANTENNA_WEBCHAT: false
@@ -972,7 +972,7 @@ ccd-message-publisher:
 sscs-cron-trigger:
   job:
     kind: CronJob
-    image: 'hmctspublic.azurecr.io/sscs/cron-trigger:pr-5'
+    image: 'hmctsprod.azurecr.io/sscs/cron-trigger:pr-5'
     releaseNameOverride: ${SERVICE_NAME}-sscs-cron-trigger
     name: ${SERVICE_NAME}-sscs-cron-trigger
     schedule: "0 10-17 * * *"
