@@ -130,6 +130,7 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
 
+        assertThat(response.getData().getExtendedSscsCaseData().getShowConfidentialityTab()).isEqualTo(YES);
         final String tab = response.getData().getExtendedSscsCaseData().getConfidentialityTab();
         assertThat(tab).isEqualToNormalizingWhitespace("""
             Party | Name | Confidentiality Status | Confidentiality Status Confirmed
@@ -181,7 +182,7 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
 
-        assertThat(response.getData().getExtendedSscsCaseData().getShowConfidentialityTab()).isNull();
+        assertThat(response.getData().getExtendedSscsCaseData().getShowConfidentialityTab()).isEqualTo(NO);
     }
 
     @Test
@@ -203,8 +204,9 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
         when(caseDetailsBefore.getCaseData()).thenReturn(beforeCaseData);
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
 
+        assertThat(response.getData().getExtendedSscsCaseData().getShowConfidentialityTab()).isEqualTo(YES);
         String tab = response.getData().getExtendedSscsCaseData().getConfidentialityTab();
         assertThat(tab).isEqualToNormalizingPunctuationAndWhitespace("""
             Party | Name | Confidentiality Status | Confidentiality Status Confirmed
