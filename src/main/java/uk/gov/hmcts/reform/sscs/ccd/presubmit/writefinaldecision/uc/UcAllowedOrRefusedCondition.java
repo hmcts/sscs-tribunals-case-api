@@ -14,7 +14,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPre
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.UNSPECIFIED;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcPointsCondition.POINTS_LESS_THAN_FIFTEEN;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcPointsCondition.ZERO_POINTS;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -147,21 +146,24 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
             isAnyPoints(),
             isAnySchedule7(),
             isDwpReassessTheAward(UNSPECIFIED)),
+    // Scenario 13
     SEVERE_CONDITIONS_ALLOWED_SV_CASE(
             isAllowedOrRefused(ALLOWED),
             isWcaAppeal(TRUE, false),
             isSevereConditions(TRUE),
             isAnySupportGroupOnly(),
-            isPoints(ZERO_POINTS),
+            isPoints(POINTS_LESS_THAN_FIFTEEN),
             isSchedule7(EMPTY)),
+    // Scenario 14
     SEVERE_CONDITIONS_REFUSED_SV_CASE(
             isAllowedOrRefused(REFUSED),
             isWcaAppeal(TRUE, false),
             isSevereConditions(TRUE),
             isAnySupportGroupOnly(),
-            isPoints(ZERO_POINTS),
+            isPoints(POINTS_LESS_THAN_FIFTEEN),
             isSchedule7(EMPTY),
             isDwpReassessTheAward(UNSPECIFIED)),
+    //Scenario 15
     SEVERE_CONDITIONS_ALLOWED_NON_SV_CASE(
             isAllowedOrRefused(ALLOWED),
             isWcaAppeal(TRUE, false),
@@ -170,6 +172,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
             isPoints(POINTS_GREATER_OR_EQUAL_TO_FIFTEEN),
             isSchedule7(NOT_EMPTY),
             isSchdeul8Paragraph4(UNSPECIFIED)),
+    // Scenario 16
     SEVERE_CONDITIONS_REFUSED_NON_SV_CASE(
             isAllowedOrRefused(REFUSED),
             isWcaAppeal(TRUE, false),

@@ -7,7 +7,6 @@ import java.util.function.IntPredicate;
  */
 public enum UcPointsCondition {
 
-    ZERO_POINTS(points -> points == 0, "awarded zero points"),
     POINTS_LESS_THAN_FIFTEEN(points -> points < 15, "awarded less than 15 points"),
     POINTS_GREATER_OR_EQUAL_TO_FIFTEEN(points -> points >= 15, "awarded 15 points or more");
 
