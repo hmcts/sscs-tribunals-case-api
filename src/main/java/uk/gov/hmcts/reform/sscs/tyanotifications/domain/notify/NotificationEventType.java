@@ -82,13 +82,11 @@ public enum NotificationEventType {
     UPDATE_OTHER_PARTY_DATA(EventType.UPDATE_OTHER_PARTY_DATA, true, true, true, true, false, 0),
     // TODO put the delay back in
     VALID_APPEAL_CREATED(EventType.VALID_APPEAL_CREATED, true, true, false, true, false, 0),
-
-
     ADMIN_SEND_TO_VALID_APPEAL(EventType.ADMIN_SEND_TO_VALID_APPEAL, false, false, false, true, false, 0),
+    APPEAL_TO_PROCEED(EventType.APPEAL_TO_PROCEED, false, false, false, true, false, 0),
+    INTERLOC_VALID_APPEAL(EventType.INTERLOC_VALID_APPEAL, false, false, false, true, false, 0),
     VALID_APPEAL(EventType.VALID_APPEAL, false, false, false, true, false, 0),
-
-
-
+    CREATE_TEST_CASE(EventType.CREATE_TEST_CASE, false, false, false, true, false, 0),
     @JsonEnumDefaultValue
     DO_NOT_SEND(null);
 
