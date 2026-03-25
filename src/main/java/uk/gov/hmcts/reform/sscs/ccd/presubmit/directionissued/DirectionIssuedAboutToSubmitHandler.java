@@ -23,6 +23,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -39,6 +41,7 @@ import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
 
 @Service
 @Slf4j
+@Order(Ordered.LOWEST_PRECEDENCE - 1)
 public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final FooterService footerService;
@@ -350,13 +353,14 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private void updateAppellantConfidentialityFromDirection(SscsCaseData caseData) {
         String directionType = caseData.getDirectionTypeDl().getValue().getCode();
         YesNo confidentialityRequired = CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString().equals(directionType) ? YesNo.YES : YesNo.NO;
-        String originalSenderCode = Optional.ofNullable(caseData.getOriginalSender())
+        String selectedConfidentialityPartyCode = Optional.ofNullable(caseData.getExtendedSscsCaseData())
+            .map(ExtendedSscsCaseData::getSelectedConfidentialityParty)
             .map(DynamicList::getValue)
             .map(DynamicListItem::getCode)
             .orElse(null);
 
-        if (isOtherPartyReferral(originalSenderCode)) {
-            updateReferredOtherPartyConfidentiality(caseData, confidentialityRequired, originalSenderCode);
+        if (isOtherPartyReferral(selectedConfidentialityPartyCode)) {
+            updateReferredOtherPartyConfidentiality(caseData, confidentialityRequired, selectedConfidentialityPartyCode);
             return;
         }
 
@@ -367,12 +371,12 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         });
     }
 
-    private boolean isOtherPartyReferral(String originalSenderCode) {
-        return !isBlank(originalSenderCode) && originalSenderCode.startsWith(OTHER_PARTY.getCode());
+    private boolean isOtherPartyReferral(String selectedConfidentialityPartyCode) {
+        return !isBlank(selectedConfidentialityPartyCode) && selectedConfidentialityPartyCode.startsWith(OTHER_PARTY.getCode());
     }
 
-    private void updateReferredOtherPartyConfidentiality(SscsCaseData caseData, YesNo confidentialityRequired, String originalSenderCode) {
-        String otherPartyId = originalSenderCode.substring(OTHER_PARTY.getCode().length());
+    private void updateReferredOtherPartyConfidentiality(SscsCaseData caseData, YesNo confidentialityRequired, String selectedConfidentialityPartyCode) {
+        String otherPartyId = selectedConfidentialityPartyCode.substring(OTHER_PARTY.getCode().length());
         if (caseData.getOtherParties() == null) {
             return;
         }
