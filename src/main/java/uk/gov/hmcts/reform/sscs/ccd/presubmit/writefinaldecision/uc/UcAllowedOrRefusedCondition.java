@@ -119,7 +119,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
         isSchedule7(EMPTY),
         isSchdeul8Paragraph4(UNSPECIFIED),
         isSchedule9Paragraph4(YesNoPredicate.TRUE)),
-    ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_UNSPECIFIED(
+    ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_7_UNSPECIFIED(
         isAllowedOrRefused(ALLOWED),
         isWcaAppeal(TRUE,true),
         isSevereConditions(FALSE),
@@ -153,7 +153,8 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
             isSevereConditions(TRUE),
             isAnySupportGroupOnly(),
             isPoints(POINTS_LESS_THAN_FIFTEEN),
-            isSchedule7(EMPTY)),
+            isAnySchedule7(),
+            isSchedule7ActivitiesAnswer(StringListPredicate.UNSPECIFIED)),
     // Scenario 14
     SEVERE_CONDITIONS_REFUSED_SV_CASE(
             isAllowedOrRefused(REFUSED),
@@ -161,27 +162,17 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
             isSevereConditions(TRUE),
             isAnySupportGroupOnly(),
             isPoints(POINTS_LESS_THAN_FIFTEEN),
-            isSchedule7(EMPTY),
-            isDwpReassessTheAward(UNSPECIFIED)),
-    //Scenario 15
+            isAnySchedule7(),
+            isDwpReassessTheAward(UNSPECIFIED),
+            isSchedule7ActivitiesAnswer(StringListPredicate.UNSPECIFIED)),
+    //Scenario 15 or Scenario 16 depending on whether severe criteria apply or not
     SEVERE_CONDITIONS_ALLOWED_NON_SV_CASE(
             isAllowedOrRefused(ALLOWED),
             isWcaAppeal(TRUE, false),
             isSevereConditions(TRUE),
             isAnySupportGroupOnly(),
-            isPoints(POINTS_GREATER_OR_EQUAL_TO_FIFTEEN),
-            isSchedule7(NOT_EMPTY),
-            isSchdeul8Paragraph4(UNSPECIFIED)),
-    // Scenario 16
-    SEVERE_CONDITIONS_REFUSED_NON_SV_CASE(
-            isAllowedOrRefused(REFUSED),
-            isWcaAppeal(TRUE, false),
-            isSevereConditions(TRUE),
-            isAnySupportGroupOnly(),
-            isPoints(POINTS_GREATER_OR_EQUAL_TO_FIFTEEN),
-            isSchedule7(NOT_EMPTY),
-            isSchdeul8Paragraph4(UNSPECIFIED),
-            isDwpReassessTheAward(UNSPECIFIED));
+            isAnyPoints(),
+            isSchedule7(NOT_EMPTY));
 
     Optional<UcPointsCondition> primaryPointsCondition;
     Optional<FieldCondition> schedule7ActivitiesSelected;
@@ -223,7 +214,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
             return UcScenario.SCENARIO_10;
         }  else if (SEVERE_CONDITIONS_ALLOWED_SV_CASE == this || SEVERE_CONDITIONS_REFUSED_SV_CASE == this) {
             return YesNo.isYes(caseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply()) ? UcScenario.SCENARIO_13 : UcScenario.SCENARIO_14;
-        }  else if (SEVERE_CONDITIONS_ALLOWED_NON_SV_CASE == this || SEVERE_CONDITIONS_REFUSED_NON_SV_CASE == this) {
+        }  else if (SEVERE_CONDITIONS_ALLOWED_NON_SV_CASE == this) {
             return YesNo.isYes(caseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply()) ? UcScenario.SCENARIO_15 : UcScenario.SCENARIO_16;
         } else {
             throw new IllegalStateException("No scenario applicable");
