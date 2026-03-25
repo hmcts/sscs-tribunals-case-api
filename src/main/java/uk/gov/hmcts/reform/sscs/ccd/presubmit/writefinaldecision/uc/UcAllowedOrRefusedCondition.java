@@ -224,7 +224,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
         }  else if (SEVERE_CONDITIONS_ALLOWED_SV_CASE == this || SEVERE_CONDITIONS_REFUSED_SV_CASE == this) {
             return YesNo.isYes(caseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply()) ? UcScenario.SCENARIO_13 : UcScenario.SCENARIO_14;
         }  else if (SEVERE_CONDITIONS_ALLOWED_NON_SV_CASE == this || SEVERE_CONDITIONS_REFUSED_NON_SV_CASE == this) {
-            return YesNo.isYes(caseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply()) ? UcScenario.SCENARIO_13 : UcScenario.SCENARIO_14;
+            return YesNo.isYes(caseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply()) ? UcScenario.SCENARIO_15 : UcScenario.SCENARIO_16;
         } else {
             throw new IllegalStateException("No scenario applicable");
         }
