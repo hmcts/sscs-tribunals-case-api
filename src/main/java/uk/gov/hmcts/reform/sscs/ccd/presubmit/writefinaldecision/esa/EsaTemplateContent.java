@@ -110,5 +110,14 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
         return "This is because no descriptor from Schedule 3 of the " + getUsageDependentBenefitTypeRegulationsString() + " applied. Regulation 35 did not apply.";
     }
 
+    public String getSevereCriteriaPassedSentence() {
+        return "The appellant meets the severe conditions criteria because they will constantly meet a Schedule 7 descriptor,"
+                + " and they have a lifelong condition with no realistic prospect of recovery of function.";
+    }
+
+    public String getSevereCriteriaFailedSentence() {
+        return "The appellant does not meet the severe conditions criteria.";
+    }
+
     public abstract EsaScenario getScenario();
 }
