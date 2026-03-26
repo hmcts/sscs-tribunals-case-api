@@ -8,10 +8,7 @@ public enum UcScenario {
     SCENARIO_1(Scenario1Content::new), SCENARIO_2(Scenario2Content::new), SCENARIO_3(Scenario3Content::new),
     SCENARIO_4(Scenario4Content::new), SCENARIO_5(Scenario5Content::new), SCENARIO_6(Scenario6Content::new),
     SCENARIO_7(Scenario7Content::new), SCENARIO_8(Scenario8Content::new), SCENARIO_9(Scenario9Content::new),
-    SCENARIO_10(Scenario10Content::new), SCENARIO_12(Scenario12Content::new), SCENARIO_13(Scenario13Content::new),
-    SCENARIO_14(Scenario14Content::new), SCENARIO_15(Scenario15Content::new), SCENARIO_16(Scenario16Content::new),
-    SCENARIO_17(Scenario17Content::new), SCENARIO_18(Scenario18Content::new), SCENARIO_19(Scenario19Content::new),
-    SCENARIO_20(Scenario20Content::new);
+    SCENARIO_10(Scenario10Content::new), SCENARIO_12(Scenario12Content::new), SCENARIO_13(Scenario13Content::new);
 
     Function<WriteFinalDecisionTemplateBody, UcTemplateContent> contentSupplier;
 

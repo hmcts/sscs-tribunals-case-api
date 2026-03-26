@@ -48,7 +48,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
     REFUSED_NON_SUPPORT_GROUP_ONLY(
         isAllowedOrRefused(REFUSED),
         isWcaAppeal(TRUE, false),
-        isSevereConditions(UNSPECIFIED, false),
+        isSevereConditions(FALSE),
         isSupportGroupOnly(YesNoPredicate.NOT_TRUE, true),
         isAnyPoints(),
         isAnySchedule7(),
@@ -61,7 +61,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
     REFUSED_SUPPORT_GROUP_ONLY_LOW_POINTS(
         isAllowedOrRefused(REFUSED),
         isWcaAppeal(TRUE, false),
-        isSevereConditions(UNSPECIFIED, false),
+        isSevereConditions(FALSE),
         isSupportGroupOnly(YesNoPredicate.TRUE, true),
         isPoints(POINTS_LESS_THAN_FIFTEEN),
         isAnySchedule7(),
@@ -72,7 +72,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
     REFUSED_SUPPORT_GROUP_ONLY_HIGH_POINTS(
         isAllowedOrRefused(REFUSED),
         isWcaAppeal(TRUE, false),
-        isSevereConditions(UNSPECIFIED, false),
+        isSevereConditions(FALSE),
         isSupportGroupOnly(YesNoPredicate.TRUE, true),
         isPoints(POINTS_GREATER_OR_EQUAL_TO_FIFTEEN),
         isAnySchedule7(),
@@ -83,7 +83,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
     ALLOWED_NON_SUPPORT_GROUP_ONLY_HIGH_POINTS(
         isAllowedOrRefused(ALLOWED),
         isWcaAppeal(TRUE, false),
-        isAnySevereConditions(),
+        isSevereConditions(FALSE),
         isSupportGroupOnly(YesNoPredicate.NOT_TRUE, true),
         isPoints(POINTS_GREATER_OR_EQUAL_TO_FIFTEEN),
         isAnySchedule7(),
@@ -92,7 +92,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
     ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS(
         isAllowedOrRefused(ALLOWED),
         isWcaAppeal(TRUE, false),
-        isAnySevereConditions(),
+        isSevereConditions(FALSE),
         isSupportGroupOnly(NOT_TRUE, true),
         isPoints(POINTS_LESS_THAN_FIFTEEN),
         isAnySchedule7(),
@@ -103,7 +103,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
     ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_7_SELECTED(
         isAllowedOrRefused(ALLOWED),
         isWcaAppeal(TRUE, false),
-        isAnySevereConditions(),
+        isSevereConditions(FALSE),
         isSupportGroupOnly(TRUE, true),
         isAnyPoints(),
         isSchedule7(NOT_EMPTY),
@@ -112,7 +112,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
     ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_7_NOT_SELECTED(
         isAllowedOrRefused(ALLOWED),
         isWcaAppeal(TRUE, false),
-        isSevereConditions(UNSPECIFIED, false),
+        isSevereConditions(FALSE),
         isSupportGroupOnly(TRUE, true),
         isAnyPoints(),
         isSchedule7(EMPTY),
@@ -121,7 +121,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
     ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_7_UNSPECIFIED(
         isAllowedOrRefused(ALLOWED),
         isWcaAppeal(TRUE,true),
-        isSevereConditions(UNSPECIFIED, false),
+        isSevereConditions(FALSE),
         isSupportGroupOnly(TRUE, true),
         isAnyPoints(),
         isSchedule7(StringListPredicate.UNSPECIFIED),
@@ -131,7 +131,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
     NON_WCA_APPEAL_ALLOWED(
             isAllowedOrRefused(ALLOWED),
             isWcaAppeal(FALSE, true),
-            isSevereConditions(UNSPECIFIED, false),
+            isSevereConditions(FALSE),
             isAnySupportGroupOnly(),
             isAnyPoints(),
             isAnySchedule7(),
@@ -140,7 +140,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
     NON_WCA_APPEAL_REFUSED(
             isAllowedOrRefused(REFUSED),
             isWcaAppeal(FALSE, true),
-            isSevereConditions(UNSPECIFIED, false),
+            isSevereConditions(FALSE),
             isAnySupportGroupOnly(),
             isAnyPoints(),
             isAnySchedule7(),
@@ -149,7 +149,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
     SEVERE_CONDITIONS_ALLOWED_SV_CASE(
             isAllowedOrRefused(ALLOWED),
             isWcaAppeal(TRUE, false),
-            isSevereConditions(TRUE, false),
+            isSevereConditions(TRUE),
             isAnySupportGroupOnly(),
             isPoints(POINTS_LESS_THAN_FIFTEEN),
             isAnySchedule7(),
@@ -158,12 +158,37 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
     SEVERE_CONDITIONS_REFUSED_SV_CASE(
             isAllowedOrRefused(REFUSED),
             isWcaAppeal(TRUE, false),
-            isSevereConditions(TRUE, false),
+            isSevereConditions(TRUE),
             isAnySupportGroupOnly(),
             isPoints(POINTS_LESS_THAN_FIFTEEN),
             isAnySchedule7(),
             isDwpReassessTheAward(UNSPECIFIED),
-            isSchedule7ActivitiesAnswer(StringListPredicate.UNSPECIFIED));
+            isSchedule7ActivitiesAnswer(StringListPredicate.UNSPECIFIED)),
+    //Scenario 6
+    SEVERE_CONDITIONS_ALLOWED_HIGH_POINTS_NON_SV_CASE(
+            isAllowedOrRefused(ALLOWED),
+            isWcaAppeal(TRUE, false),
+            isSevereConditions(TRUE),
+            isAnySupportGroupOnly(),
+            isAnyPoints(),
+            isSchedule7(NOT_EMPTY)),
+    // scenario 4
+    SEVERE_CONDITIONS_ALLOWED_SUPPORT_GROUP_SCHEDULE7_CASE(
+            isAllowedOrRefused(ALLOWED),
+            isWcaAppeal(TRUE, false),
+            isSevereConditions(TRUE),
+            isSupportGroupOnly(TRUE, true),
+            isAnyPoints(),
+            isSchedule7(NOT_EMPTY)),
+    // scenario 9
+    SEVERE_CONDITIONS_ALLOWED_NON_SUPPORT_GROUP_LOW_POINTS_SCHEDULE7_CASE(
+            isAllowedOrRefused(ALLOWED),
+            isWcaAppeal(TRUE, false),
+            isSevereConditions(TRUE),
+            isSupportGroupOnly(TRUE, false),
+            isPoints(POINTS_LESS_THAN_FIFTEEN),
+            isSchedule7(NOT_EMPTY),
+            isSchdeul8Paragraph4(YesNoPredicate.TRUE));
 
 
     Optional<UcPointsCondition> primaryPointsCondition;
@@ -174,7 +199,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
 
 
     UcAllowedOrRefusedCondition(
-        AllowedOrRefusedCondition allowedOrRefusedCondition, YesNoFieldCondition wcaAppealCondition, Optional<YesNoFieldCondition> severeCondition, Optional<YesNoFieldCondition> supportGroupOnlyCondition, Optional<UcPointsCondition> primaryPointsCondition, Optional<StringListPredicate> schedule7ActivitiesSelected,
+        AllowedOrRefusedCondition allowedOrRefusedCondition, YesNoFieldCondition wcaAppealCondition, YesNoFieldCondition severeCondition, Optional<YesNoFieldCondition> supportGroupOnlyCondition, Optional<UcPointsCondition> primaryPointsCondition, Optional<StringListPredicate> schedule7ActivitiesSelected,
         FieldCondition...validationConditions) {
         this(allowedOrRefusedCondition, wcaAppealCondition, severeCondition, supportGroupOnlyCondition, primaryPointsCondition, schedule7ActivitiesSelected, isAnyPoints(), validationConditions);
     }
@@ -206,13 +231,19 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
             return UcScenario.SCENARIO_10;
         }  else if (SEVERE_CONDITIONS_ALLOWED_SV_CASE == this || SEVERE_CONDITIONS_REFUSED_SV_CASE == this) {
             return UcScenario.SCENARIO_13;
+        }  else if (SEVERE_CONDITIONS_ALLOWED_HIGH_POINTS_NON_SV_CASE == this) {
+            return UcScenario.SCENARIO_6;
+        } else if (SEVERE_CONDITIONS_ALLOWED_SUPPORT_GROUP_SCHEDULE7_CASE == this) {
+            return UcScenario.SCENARIO_4;
+        } else if (SEVERE_CONDITIONS_ALLOWED_NON_SUPPORT_GROUP_LOW_POINTS_SCHEDULE7_CASE == this) {
+            return UcScenario.SCENARIO_9;
         } else {
             throw new IllegalStateException("No scenario applicable");
         }
     }
 
     UcAllowedOrRefusedCondition(
-        AllowedOrRefusedCondition allowedOrRefusedCondition, YesNoFieldCondition wcaAppealCondition, Optional<YesNoFieldCondition> severeCondition, Optional<YesNoFieldCondition> supportGroupOnlyCondition, Optional<UcPointsCondition> primaryPointsCondition, Optional<StringListPredicate> schedule7ActivitiesSelected, Optional<UcPointsCondition> validationPointsCondition,
+        AllowedOrRefusedCondition allowedOrRefusedCondition, YesNoFieldCondition wcaAppealCondition, YesNoFieldCondition severeCondition, Optional<YesNoFieldCondition> supportGroupOnlyCondition, Optional<UcPointsCondition> primaryPointsCondition, Optional<StringListPredicate> schedule7ActivitiesSelected, Optional<UcPointsCondition> validationPointsCondition,
         FieldCondition...validationConditions) {
         if (schedule7ActivitiesSelected.isPresent()) {
             this.schedule7ActivitiesSelected = Optional.of(isSchedule7ActivitiesAnswer(schedule7ActivitiesSelected.get()));
@@ -223,9 +254,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
         this.primaryConditions = new ArrayList<>();
         primaryConditions.add(allowedOrRefusedCondition);
         primaryConditions.add(wcaAppealCondition);
-        if (severeCondition.isPresent()) {
-            primaryConditions.add(severeCondition.get());
-        }
+        primaryConditions.add(severeCondition);
         if (supportGroupOnlyCondition.isPresent()) {
             primaryConditions.add(supportGroupOnlyCondition.get());
         }
@@ -255,13 +284,9 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
             s -> s.isWcaAppeal() ? YesNo.YES : YesNo.NO, displayIsSatisfiedMessage);
     }
 
-    static Optional<YesNoFieldCondition> isSevereConditions(Predicate<YesNo> predicate, boolean displayPointsSatisfiedMessageOnError) {
-        return Optional.of(new YesNoFieldCondition("Severe Conditions", predicate,
-                s -> s.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply() == null ? null : YesNo.YES, displayPointsSatisfiedMessageOnError));
-    }
-
-    static Optional<YesNoFieldCondition> isAnySevereConditions() {
-        return Optional.empty();
+    static YesNoFieldCondition isSevereConditions(Predicate<YesNo> predicate) {
+        return (new YesNoFieldCondition("Severe Conditions", predicate,
+                s -> s.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply() == null ? YesNo.NO : YesNo.YES));
     }
 
     static YesNoFieldCondition isDwpReassessTheAward(Predicate<YesNo> predicate) {
