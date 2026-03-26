@@ -288,7 +288,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
 
     static YesNoFieldCondition isSevereConditions(Predicate<YesNo> predicate) {
         return (new YesNoFieldCondition("Severe Conditions", predicate,
-                s -> s.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply() == null ? YesNo.NO : YesNo.YES));
+                s -> s.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply() == null ? YesNo.NO : YesNo.YES, false));
     }
 
     static YesNoFieldCondition isDwpReassessTheAward(Predicate<YesNo> predicate) {
