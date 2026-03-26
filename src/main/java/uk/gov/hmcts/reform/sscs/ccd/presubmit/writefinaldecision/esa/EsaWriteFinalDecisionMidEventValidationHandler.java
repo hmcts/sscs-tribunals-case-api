@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import jakarta.validation.Validator;
@@ -16,10 +17,15 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 @Component
 public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDecisionMidEventValidationHandlerBase {
 
+    @Value("${feature.severeConditions.enabled}")
+    private final boolean isSevereConditionsEnabled;
+
     public EsaWriteFinalDecisionMidEventValidationHandler(Validator validator,
                                                           DecisionNoticeService decisionNoticeService,
-                                                          @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled) {
+                                                          @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled,
+                                                          @Value("${feature.severeConditions.enabled}") boolean isSevereConditionsEnabled) {
         super(validator, decisionNoticeService, isPostHearingsEnabled);
+        this.isSevereConditionsEnabled = isSevereConditionsEnabled;
     }
 
     @Override
@@ -31,6 +37,13 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
     protected void setDefaultFields(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply() == null) {
             sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
+        }
+
+        if (isSevereConditionsEnabled) {
+            if (nonNull(sscsCaseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo()) && !severeConditionQuestionIsValid(sscsCaseData)) {
+                sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(null);
+                sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereCriteriaApply(null);
+            }
         }
     }
 
