@@ -25,7 +25,7 @@ services:
       - cftlib_default
 
   ccd-message-publisher:
-    image: hmctspublic.azurecr.io/ccd/message-publisher:latest
+    image: hmctsprod.azurecr.io/ccd/message-publisher:latest
     container_name: wa-message-publisher
     environment:
       DATA_STORE_DB_HOST: shared-database-pg
@@ -43,7 +43,7 @@ services:
       - cftlib_default
 
   wa-workflow-api:
-    image: "hmctspublic.azurecr.io/wa/workflow-api:latest"
+    image: "hmctsprod.azurecr.io/wa/workflow-api:latest"
     container_name: wa-workflow-api
     environment:
       CAMUNDA_URL: http://wa-camunda-bpm:8999/engine-rest
@@ -66,7 +66,7 @@ services:
       - cftlib_default
 
   wa-task-management-api:
-      image: "hmctspublic.azurecr.io/wa/task-management-api:latest"
+      image: "hmctsprod.azurecr.io/wa/task-management-api:latest"
       container_name: wa-task-management-api
       environment:
         CAMUNDA_URL: http://wa-camunda-bpm:8999/engine-rest
@@ -96,7 +96,7 @@ services:
         - cftlib_default
 
   case-event-handler:
-      image: "hmctspublic.azurecr.io/wa/case-event-handler:latest"
+      image: "hmctsprod.azurecr.io/wa/case-event-handler:latest"
       container_name: wa-case-event-handler
       environment:
         POSTGRES_HOST: shared-database-pg
@@ -137,7 +137,7 @@ services:
         - cftlib_default
 
   wa-task-monitor:
-    image: "hmctspublic.azurecr.io/wa/task-monitor:latest"
+    image: "hmctsprod.azurecr.io/wa/task-monitor:latest"
     container_name: wa-task-monitor
     environment:
       S2S_URL: http://host.docker.internal:4502/
