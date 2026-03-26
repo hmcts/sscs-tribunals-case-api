@@ -1,0 +1,41 @@
+[
+  {
+    "CaseEventID": "writeFinalDecision",
+    "CaseFieldID": "issueCode",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "13/03/2026",
+    "PageDisplayOrder": 8,
+    "PageFieldDisplayOrder": 4,
+    "PageID": "workCapabilityAssessment",
+    "FieldShowCondition": "wcaAppeal=\"DoNotUse\"",
+    "ShowSummaryChangeOption": "N",
+    "RetainHiddenValue": "Yes"
+  },
+  {
+    "CaseEventID": "writeFinalDecision",
+    "CaseFieldID": "ucWriteFinalDecisionHasSVIssueCode",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "13/03/2026",
+    "PageDisplayOrder": 8,
+    "PageFieldDisplayOrder": 5,
+    "PageID": "workCapabilityAssessment",
+    "FieldShowCondition": "writeFinalDecisionGenerateNotice=\"DoNotUse\"",
+    "RetainHiddenValue": "Yes",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseEventID": "writeFinalDecision",
+    "CaseFieldID": "writeFinalDecisionSevereYesNo",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "13/03/2026",
+    "PageDisplayOrder": 8,
+    "PageFieldDisplayOrder": 6,
+    "PageID": "workCapabilityAssessment",
+    "FieldShowCondition" : "wcaAppeal=\"Yes\" AND (appeal.benefitType.code=\"ESA\" OR appeal.benefitType.code=\"UC\") AND (issueCode=\"SV\" OR ucWriteFinalDecisionHasSVIssueCode = \"Yes\")",
+    "ShowSummaryChangeOption": "Y",
+    "RetainHiddenValue": "Yes"
+  }
+]

@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.confidentiality;
 
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.updateAppellantConfidentialityRequiredChangedDate;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.updateOtherPartiesConfidentialityChangedDate;
 
@@ -45,8 +48,9 @@ public class ConfidentialityTabAboutToSubmitHandler implements PreSubmitCallback
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         // Runs for every event type to ensure that any changes to data are reflected in the tab and also to future-proof against other new or modified events that may update confidentiality data
-        return cmOtherPartyConfidentialityEnabled && callbackType == CallbackType.ABOUT_TO_SUBMIT && callback.getCaseDetails()
-            .getCaseData().isBenefitType(Benefit.CHILD_SUPPORT);
+        return cmOtherPartyConfidentialityEnabled && callbackType == CallbackType.ABOUT_TO_SUBMIT && (callback.getCaseDetails()
+            .getCaseData().isBenefitType(Benefit.CHILD_SUPPORT) || callback.getCaseDetails().getCaseData()
+            .isBenefitType(Benefit.UC));
     }
 
     @Override
@@ -62,6 +66,13 @@ public class ConfidentialityTabAboutToSubmitHandler implements PreSubmitCallback
         updateOtherPartiesConfidentialityRequiredChangedDate(callback);
         sscsCaseData.getExtendedSscsCaseData()
             .setConfidentialityTab(getConfidentialitySummaryEntries(sscsCaseData.getOtherParties(), sscsCaseData.getAppeal()));
+
+        if (sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT) || isNotEmpty(
+            sscsCaseData.getOtherParties())) {
+            sscsCaseData.getExtendedSscsCaseData().setShowConfidentialityTab(YES);
+        } else {
+            sscsCaseData.getExtendedSscsCaseData().setShowConfidentialityTab(NO);
+        }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
@@ -80,11 +91,9 @@ public class ConfidentialityTabAboutToSubmitHandler implements PreSubmitCallback
             .forEach(entry -> results.add(CcdValue.<ConfidentialitySummaryEntry>builder().value(entry).build()));
 
         var confidentialityMarkdown = new StringBuilder();
-        results.forEach(entry -> {
-            confidentialityMarkdown.append(
-                String.format("%s | %s | %s | %s\r\n", entry.getValue().getParty(), entry.getValue().getName(),
-                    entry.getValue().getConfidentialityRequired(), entry.getValue().getConfidentialityRequiredChangedDate()));
-        });
+        results.forEach(entry -> confidentialityMarkdown.append(
+            String.format("%s | %s | %s | %s\r\n", entry.getValue().getParty(), entry.getValue().getName(),
+                entry.getValue().getConfidentialityRequired(), entry.getValue().getConfidentialityRequiredChangedDate())));
 
         return """
             Party | Name | Confidentiality Status | Confidentiality Status Confirmed
@@ -158,6 +167,7 @@ public class ConfidentialityTabAboutToSubmitHandler implements PreSubmitCallback
     private void updateOtherPartiesConfidentialityRequiredChangedDate(Callback<SscsCaseData> callback) {
         final List<CcdValue<OtherParty>> previousOtherParties = callback.getCaseDetailsBefore().map(CaseDetails::getCaseData)
             .map(SscsCaseData::getOtherParties).orElse(null);
-        updateOtherPartiesConfidentialityChangedDate(callback.getCaseDetails().getCaseData().getOtherParties(), previousOtherParties);
+        updateOtherPartiesConfidentialityChangedDate(callback.getCaseDetails().getCaseData().getOtherParties(),
+            previousOtherParties);
     }
 }
