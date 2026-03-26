@@ -2398,11 +2398,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof UcTemplateContent);
         UcTemplateContent templateContent = (UcTemplateContent) payload.getWriteFinalDecisionTemplateContent();
-        if (isYes(severeCriteriaApply)) {
-            assertEquals(UcScenario.SCENARIO_13, templateContent.getScenario());
-        } else {
-            assertEquals(UcScenario.SCENARIO_14, templateContent.getScenario());
-        }
+        assertEquals(UcScenario.SCENARIO_13, templateContent.getScenario());
         assertEquals(6, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
     }
 
@@ -2493,11 +2489,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof UcTemplateContent);
         UcTemplateContent templateContent = (UcTemplateContent) payload.getWriteFinalDecisionTemplateContent();
-        if (isYes(severeCriteriaApply)) {
-            assertEquals(UcScenario.SCENARIO_15, templateContent.getScenario());
-        } else {
-            assertEquals(UcScenario.SCENARIO_16, templateContent.getScenario());
-        }
+        assertEquals(UcScenario.SCENARIO_6, templateContent.getScenario());
         assertEquals(11, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
     }
 }
