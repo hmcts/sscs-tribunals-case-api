@@ -44,7 +44,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
     @Override
     protected WriteFinalDecisionMidEventValidationHandlerBase createValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService, boolean isPostHearingsEnabled) {
-        return new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, isPostHearingsEnabled);
+        return new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, isPostHearingsEnabled, false);
     }
 
     @Override
