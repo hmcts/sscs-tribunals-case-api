@@ -169,9 +169,10 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
             isAllowedOrRefused(ALLOWED),
             isWcaAppeal(TRUE, false),
             isSevereConditions(TRUE),
-            isAnySupportGroupOnly(),
-            isAnyPoints(),
-            isSchedule7(NOT_EMPTY)),
+            isSupportGroupOnly(YesNoPredicate.NOT_TRUE, true),
+            isPoints(POINTS_GREATER_OR_EQUAL_TO_FIFTEEN),
+            isAnySchedule7(),
+            isSupportGroupOnly(YesNoPredicate.FALSE, false).get()),
     // scenario 4
     SEVERE_CONDITIONS_ALLOWED_SUPPORT_GROUP_SCHEDULE7_CASE(
             isAllowedOrRefused(ALLOWED),
@@ -179,17 +180,18 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
             isSevereConditions(TRUE),
             isSupportGroupOnly(TRUE, true),
             isAnyPoints(),
-            isSchedule7(NOT_EMPTY)),
+            isSchedule7(NOT_EMPTY),
+            isSchdeul8Paragraph4(UNSPECIFIED)),
     // scenario 9
     SEVERE_CONDITIONS_ALLOWED_NON_SUPPORT_GROUP_LOW_POINTS_SCHEDULE7_CASE(
             isAllowedOrRefused(ALLOWED),
             isWcaAppeal(TRUE, false),
             isSevereConditions(TRUE),
-            isSupportGroupOnly(TRUE, false),
+            isSupportGroupOnly(NOT_TRUE, true),
             isPoints(POINTS_LESS_THAN_FIFTEEN),
             isSchedule7(NOT_EMPTY),
+            isSupportGroupOnly(YesNoPredicate.FALSE, false).get(),
             isSchdeul8Paragraph4(YesNoPredicate.TRUE));
-
 
     Optional<UcPointsCondition> primaryPointsCondition;
     Optional<FieldCondition> schedule7ActivitiesSelected;
