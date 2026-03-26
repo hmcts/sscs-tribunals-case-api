@@ -178,10 +178,9 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
             isAllowedOrRefused(ALLOWED),
             isWcaAppeal(TRUE, false),
             isSevereConditions(TRUE),
-            isSupportGroupOnly(TRUE, false),
+            isSupportGroupOnly(TRUE, true),
             isAnyPoints(),
-            isSchedule7(NOT_EMPTY),
-            isSchdeul8Paragraph4(UNSPECIFIED)),
+            isSchedule7(NOT_EMPTY)),
     // scenario 19 or 20 depending on whether severe criteria apply or not
     SEVERE_CONDITIONS_ALLOWED_NON_SUPPORT_GROUP_LOW_POINTS_SCHEDULE7_CASE(
             isAllowedOrRefused(ALLOWED),
