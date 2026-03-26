@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -19,12 +20,16 @@ import java.util.Map;
 import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceTestBase;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcScenario;
@@ -58,7 +63,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
     protected WriteFinalDecisionPreviewDecisionServiceBase createPreviewDecisionService(GenerateFile generateFile, UserDetailsService userDetailsService,
                                                                                         DocumentConfiguration documentConfiguration) {
         return new UcWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService, ucDecisionNoticeQuestionService, ucDecisionNoticeOutcomeService, documentConfiguration,
-            venueDataLoader);
+            venueDataLoader, false);
     }
 
     @Override
@@ -2332,5 +2337,167 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
             "You have awarded less than 15 points and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.",
             response.getErrors().iterator().next());
 
+    }
+
+    @Disabled
+    @ParameterizedTest
+    @CsvSource({"refused, false, YES", "refused, false, NO",
+            "allowed, true, YES", "allowed, true, NO"})
+    public void willSetPreviewFile_WhenAllowedOrRefusedSevereCriteriaOnlySvCase(String allowedOrRefused, boolean expectedIsEntitled, YesNo severeCriteriaApply) {
+
+        String endDate = "2018-11-10";
+        setCommonPreviewParams(sscsCaseData, endDate);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.setWcaAppeal(YES);
+        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused(allowedOrRefused);
+        sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereCriteriaApply(severeCriteriaApply);
+
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
+
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
+        assertEquals(DocumentLink.builder()
+                .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern(DD_MM_YYYY))))
+                .documentBinaryUrl(URL + "/binary")
+                .documentUrl(URL)
+                .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
+
+        boolean appealAllowedExpectation = expectedIsEntitled;
+
+        boolean setAsideExpectation = expectedIsEntitled;
+
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10",
+                appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
+
+        assertEquals("Judge Full Name", payload.getUserName());
+        assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
+
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+
+        assertNotNull(body);
+
+        // Common assertions
+        assertCommonPreviewParams(body, endDate, false);
+
+        assertNull(body.getUcAwardRate());
+        assertEquals(0, body.getUcSchedule6Descriptors().size());
+        assertEquals(0, body.getUcNumberOfPoints().intValue());
+
+        assertNull(body.getDwpReassessTheAward());
+        assertNull(payload.getDateIssued());
+        assertEquals(LocalDate.now(), payload.getGeneratedDate());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+
+        assertNotNull(payload.getWriteFinalDecisionTemplateContent());
+        assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof UcTemplateContent);
+        UcTemplateContent templateContent = (UcTemplateContent) payload.getWriteFinalDecisionTemplateContent();
+        if (isYes(severeCriteriaApply)) {
+            assertEquals(UcScenario.SCENARIO_13, templateContent.getScenario());
+        } else {
+            assertEquals(UcScenario.SCENARIO_14, templateContent.getScenario());
+        }
+        assertEquals(6, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
+    }
+
+    @Disabled
+    @ParameterizedTest
+    @CsvSource({"YES", "NO"})
+    public void willSetPreviewFile_WhenAllowedSevereCriteriaNonSvCaseWithSchedule7Selected(YesNo severeCriteriaApply) {
+
+        String endDate = "2018-11-10";
+        setCommonPreviewParams(sscsCaseData, endDate);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.setWcaAppeal(YES);
+        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(List.of("mobilisingUnaided"));
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(List.of("schedule7MobilisingUnaided", "schedule7AppropriatenessOfBehaviour"));
+        sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereCriteriaApply(severeCriteriaApply);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
+
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
+        assertEquals(DocumentLink.builder()
+                .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern(DD_MM_YYYY))))
+                .documentBinaryUrl(URL + "/binary")
+                .documentUrl(URL)
+                .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
+
+        boolean appealAllowedExpectation = true;
+
+        boolean setAsideExpectation = true;
+
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10",
+                appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
+
+        assertEquals("Judge Full Name", payload.getUserName());
+        assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
+
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+        assertNotNull(body);
+
+        // Common assertions
+        assertCommonPreviewParams(body, endDate, false);
+
+        assertEquals("higher rate", body.getUcAwardRate());
+
+        assertEquals(1, body.getUcSchedule6Descriptors().size());
+        assertEquals(15, body.getUcSchedule6Descriptors().getFirst().getActivityAnswerPoints());
+        assertEquals("a", body.getUcSchedule6Descriptors().getFirst().getActivityAnswerLetter());
+        assertEquals(
+                "Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.",
+                body.getUcSchedule6Descriptors().getFirst().getActivityAnswerValue());
+        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.",
+                body.getUcSchedule6Descriptors().getFirst().getActivityQuestionValue());
+        assertEquals("1", body.getUcSchedule6Descriptors().getFirst().getActivityQuestionNumber());
+        assertEquals(15, body.getUcNumberOfPoints().intValue());
+
+        assertEquals(2, body.getUcSchedule7Descriptors().size());
+        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally "
+                        + "or could reasonably be worn or used. Cannot either: (a) mobilise more than 50 metres on level ground without stopping in order to avoid significant "
+                        + "discomfort or exhaustion; or (b) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.",
+                body.getUcSchedule7Descriptors().getFirst().getActivityQuestionValue());
+
+        assertEquals("1", body.getUcSchedule7Descriptors().getFirst().getActivityQuestionNumber());
+        assertNull(body.getUcSchedule7Descriptors().getFirst().getActivityAnswerLetter());
+        assertNull(body.getUcSchedule7Descriptors().getFirst().getActivityAnswerValue());
+        assertEquals(0, body.getUcSchedule7Descriptors().getFirst().getActivityAnswerPoints());
+
+        assertNotNull(body.getUcSchedule7Descriptors().get(1));
+        assertEquals(
+                "14. Appropriateness of behaviour with other people, due to cognitive impairment or mental disorder. Has, on a daily basis, uncontrollable episodes of aggressive or disinhibited behaviour that would be unreasonable in any workplace.",
+                body.getUcSchedule7Descriptors().get(1).getActivityQuestionValue());
+
+        assertEquals("14", body.getUcSchedule7Descriptors().get(1).getActivityQuestionNumber());
+        assertNull(body.getUcSchedule7Descriptors().get(1).getActivityAnswerLetter());
+        assertNull(body.getUcSchedule7Descriptors().get(1).getActivityAnswerValue());
+        assertEquals(0, body.getUcSchedule7Descriptors().get(1).getActivityAnswerPoints());
+
+        assertTrue(body.isUcIsEntited());
+        assertEquals(LocalDate.now(), payload.getGeneratedDate());
+
+        assertNotNull(payload.getWriteFinalDecisionTemplateContent());
+        assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof UcTemplateContent);
+        UcTemplateContent templateContent = (UcTemplateContent) payload.getWriteFinalDecisionTemplateContent();
+        if (isYes(severeCriteriaApply)) {
+            assertEquals(UcScenario.SCENARIO_15, templateContent.getScenario());
+        } else {
+            assertEquals(UcScenario.SCENARIO_16, templateContent.getScenario());
+        }
+        assertEquals(11, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
     }
 }

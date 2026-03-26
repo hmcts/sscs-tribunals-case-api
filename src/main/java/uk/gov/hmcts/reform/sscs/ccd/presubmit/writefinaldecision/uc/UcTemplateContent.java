@@ -6,7 +6,10 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcScenario;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcTemplateComponentId;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
+import uk.gov.hmcts.reform.sscs.model.docassembly.Paragraph;
+import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateContent;
 
 public abstract class UcTemplateContent extends WriteFinalDecisionTemplateContent {
@@ -104,6 +107,23 @@ public abstract class UcTemplateContent extends WriteFinalDecisionTemplateConten
     public String getSecretaryOfStateAcceptsHasLimitedCapabilityForWorkSentence(String appellantName, boolean work) {
         return "The Secretary of State has accepted that " + appellantName + " has limited capability for "
                 + (work ? "work." : "work-related activity.") + " This was not in issue.";
+    }
+
+    public void addSevereCriteriaApplyIfPresent(WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody) {
+        if (nonNull(writeFinalDecisionTemplateBody.getSevereCriteriaApplies())) {
+            addComponent(new Paragraph(UcTemplateComponentId.SEVERE_CRITERIA_APPLY_PARAGRAPH.name(),
+                    getSevereCriteriaApplySentence(writeFinalDecisionTemplateBody.getSevereCriteriaApplies()))
+            );
+        }
+    }
+
+    public String getSevereCriteriaApplySentence(Boolean severeCriteriaApply) {
+        if (severeCriteriaApply) {
+            return "The appellant meets the severe conditions criteria because they will constantly meet a Schedule 7 descriptor,"
+                    + " and they have a lifelong condition with no realistic prospect of recovery of function.";
+        } else {
+            return "The appellant does not meet the severe conditions criteria.";
+        }
     }
 
     public String getSevereCriteriaPassedSentence() {
