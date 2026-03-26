@@ -2342,7 +2342,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
     @Disabled
     @ParameterizedTest
     @CsvSource({"refused, false, YES", "refused, false, NO",
-            "allowed, true, YES", "allowed, true, NO"})
+        "allowed, true, YES", "allowed, true, NO"})
     public void willSetPreviewFile_WhenAllowedOrRefusedSevereCriteriaOnlySvCase(String allowedOrRefused, boolean expectedIsEntitled, YesNo severeCriteriaApply) {
 
         String endDate = "2018-11-10";

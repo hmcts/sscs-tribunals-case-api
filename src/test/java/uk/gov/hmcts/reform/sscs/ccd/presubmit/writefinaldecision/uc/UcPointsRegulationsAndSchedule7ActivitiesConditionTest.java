@@ -43,63 +43,63 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
     @SuppressWarnings("unused")
     private Object[] wcaAppealAndScheduleAndRegulationQuestionCombinations() {
         return new Object[] {
-            new Boolean[] {false, null, null, null, false},
-            new Boolean[] {false, null, null, false, false},
-            new Boolean[] {false, null, null, true, false},
-            new Boolean[] {false, null, false, null, false},
-            new Boolean[] {false, null, false, false, false},
-            new Boolean[] {false, null, false, true, false},
-            new Boolean[] {false, null, true, null, false},
-            new Boolean[] {false, null, true, false, false},
-            new Boolean[] {false, null, true, true, false},
-            new Boolean[] {false, false, null, null, false},
-            new Boolean[] {false, false, null, false, false},
-            new Boolean[] {false, false, null, true, false},
-            new Boolean[] {false, false, false, null, false},
-            new Boolean[] {false, false, false, false, false},
-            new Boolean[] {false, false, false, true, false},
-            new Boolean[] {false, false, true, null, false},
-            new Boolean[] {false, false, true, false, false},
-            new Boolean[] {false, false, true, true, false},
-            new Boolean[] {false, true, null, null, false},
-            new Boolean[] {false, true, null, false, false},
-            new Boolean[] {false, true, null, true, false},
-            new Boolean[] {false, true, false, null, false},
-            new Boolean[] {false, true, false, false, false},
-            new Boolean[] {false, true, false, true, false},
-            new Boolean[] {false, true, true, null, false},
-            new Boolean[] {false, true, true, false, false},
-            new Boolean[] {false, true, true, true, false},
+            new Boolean[] {false, null, null, null, false, false},
+            new Boolean[] {false, null, null, false, false, false},
+            new Boolean[] {false, null, null, true, false, false},
+            new Boolean[] {false, null, false, null, false, false},
+            new Boolean[] {false, null, false, false, false, false},
+            new Boolean[] {false, null, false, true, false, false},
+            new Boolean[] {false, null, true, null, false, false},
+            new Boolean[] {false, null, true, false, false, false},
+            new Boolean[] {false, null, true, true, false, false},
+            new Boolean[] {false, false, null, null, false, false},
+            new Boolean[] {false, false, null, false, false, false},
+            new Boolean[] {false, false, null, true, false, false},
+            new Boolean[] {false, false, false, null, false, false},
+            new Boolean[] {false, false, false, false, false, false},
+            new Boolean[] {false, false, false, true, false, false},
+            new Boolean[] {false, false, true, null, false, false},
+            new Boolean[] {false, false, true, false, false, false},
+            new Boolean[] {false, false, true, true, false, false},
+            new Boolean[] {false, true, null, null, false, false},
+            new Boolean[] {false, true, null, false, false, false},
+            new Boolean[] {false, true, null, true, false, false},
+            new Boolean[] {false, true, false, null, false, false},
+            new Boolean[] {false, true, false, false, false, false},
+            new Boolean[] {false, true, false, true, false, false},
+            new Boolean[] {false, true, true, null, false, false},
+            new Boolean[] {false, true, true, false, false, false},
+            new Boolean[] {false, true, true, true, false, false},
 
-            new Boolean[] {true, null, null, null, false},
-            new Boolean[] {true, null, null, false, false},
-            new Boolean[] {true, null, null, true, false},
-            new Boolean[] {true, null, false, null, false},
-            new Boolean[] {true, null, false, false, false},
-            new Boolean[] {true, null, false, true, false},
-            new Boolean[] {true, null, true, null, false},
-            new Boolean[] {true, null, true, false, false},
-            new Boolean[] {true, null, true, true, false},
-            new Boolean[] {true, false, null, null, false},
-            new Boolean[] {true, false, null, false, false},
-            new Boolean[] {true, false, null, true, false},
-            new Boolean[] {true, false, false, null, false},
-            new Boolean[] {true, false, false, false, false},
-            new Boolean[] {true, false, false, true, false},
-            new Boolean[] {true, false, true, null, false},
-            new Boolean[] {true, false, true, false, false},
-            new Boolean[] {true, false, true, true, false},
-            new Boolean[] {true, true, null, null, false},
-            new Boolean[] {true, true, null, false, false},
-            new Boolean[] {true, true, null, true, false},
-            new Boolean[] {true, true, false, null, false},
-            new Boolean[] {true, true, false, false, false},
-            new Boolean[] {true, true, false, true, false},
-            new Boolean[] {true, true, true, null, false},
-            new Boolean[] {true, true, true, false, false},
-            new Boolean[] {true, true, true, true, false},
-
-            //new Boolean[] {true, null, null, null, true},
+            new Boolean[] {true, null, null, null, false, false},
+            new Boolean[] {true, null, null, false, false, false},
+            new Boolean[] {true, null, null, true, false, false},
+            new Boolean[] {true, null, false, null, false, false},
+            new Boolean[] {true, null, false, false, false, false},
+            new Boolean[] {true, null, false, true, false, false},
+            new Boolean[] {true, null, true, null, false, false},
+            new Boolean[] {true, null, true, false, false, false},
+            new Boolean[] {true, null, true, true, false, false},
+            new Boolean[] {true, false, null, null, false, false},
+            new Boolean[] {true, false, null, false, false, false},
+            new Boolean[] {true, false, null, true, false, false},
+            new Boolean[] {true, false, false, null, false, false},
+            new Boolean[] {true, false, false, false, false, false},
+            new Boolean[] {true, false, false, true, false, false},
+            new Boolean[] {true, false, true, null, false, false},
+            new Boolean[] {true, false, true, false, false, false},
+            new Boolean[] {true, false, true, true, false, false},
+            new Boolean[] {true, true, null, null, false, false},
+            new Boolean[] {true, true, null, false, false, false},
+            new Boolean[] {true, true, null, true, false, false},
+            new Boolean[] {true, true, false, null, false, false},
+            new Boolean[] {true, true, false, false, false, false},
+            new Boolean[] {true, true, false, true, false, false},
+            new Boolean[] {true, true, true, null, false, false},
+            new Boolean[] {true, true, true, false, false, false},
+            new Boolean[] {true, true, true, true, false, false},
+            //new Boolean[] {true, null, null, null, true, false},
+            //new Boolean[] {true, null, null, null, true, true},
         };
     }
 
@@ -121,12 +121,12 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
      * If refused no sch 3 activity and Reg 35 doesn’t apply.
      *
      */
-    private boolean isValidAllowedOrRefusedCombinationExpected(int points, Boolean wcaAppeal, Boolean isSevereCondition, Boolean doesSchedule8Paragraph4Apply, Boolean schedule7ActivitiesSelected,
-        Boolean doesSchedule9Paragraph4Apply, boolean allowed, Boolean supportGroupOnly) {
+    private boolean isValidAllowedOrRefusedCombinationExpected(int points, Boolean wcaAppeal, Boolean isSvCase, Boolean doesSchedule8Paragraph4Apply, Boolean schedule7ActivitiesSelected,
+                                                               Boolean doesSchedule9Paragraph4Apply, boolean allowed, Boolean supportGroupOnly) {
         if (!wcaAppeal.booleanValue()) {
             return true;
         }
-        if (isSevereCondition && !isTrue(supportGroupOnly)) {
+        if (isSvCase && !isTrue(supportGroupOnly)) {
             return true;
         }
         if (supportGroupOnly == null) {
@@ -156,15 +156,15 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
         return false;
     }
 
-    private boolean isValidPointsBasedCombinationExpected(int points, Boolean wcaAppeal, Boolean isSevereCondition, Boolean doesSchedule8Paragraph4Apply, Boolean schedule7ActivitiesSelected,
-        Boolean doesSchedule9Paragraph4, Boolean supportGroupOnly) {
+    private boolean isValidPointsBasedCombinationExpected(int points, Boolean wcaAppeal, Boolean isSvCase, Boolean doesSchedule8Paragraph4Apply, Boolean schedule7ActivitiesSelected,
+                                                          Boolean doesSchedule9Paragraph4, Boolean supportGroupOnly) {
 
         // If it's not a wca appeal we don't do any points-based validation - always valid
         if (!wcaAppeal.booleanValue()) {
             return true;
         }
-        // For WCA appeals, if severe condition only appeal, then valid regardless of points or schedule/regulation answers
-        if (wcaAppeal.booleanValue() && isSevereCondition.booleanValue() && !isTrue(supportGroupOnly)) {
+        // For WCA appeals, if SV issue code is on case, then valid regardless of points or schedule/regulation answers
+        if (wcaAppeal.booleanValue() && isSvCase.booleanValue() && !isTrue(supportGroupOnly)) {
             return true;
         }
         // For WCA appeals, if points < 15
@@ -214,12 +214,12 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
     @Parameters(named = "wcaAppealAndScheduleAndRegulationQuestionCombinations")
     public void testThatAtExactlyOneConditionIsApplicableForAllPointsAndActivityCombinations(
         Boolean wcaAppeal, Boolean doesSchedule8Paragraph4Apply, Boolean schedule7ActivitiesSelected,
-        Boolean doesSchedule9Paragraph4Apply, Boolean isSevereCondition) {
+        Boolean doesSchedule9Paragraph4Apply, Boolean isSvCase, Boolean isSevereCriteriaApplyShown) {
 
         int minPointsValue = 0;
         int maxPointsValue = 0;
 
-        if (wcaAppeal != null && wcaAppeal && !isTrue(isSevereCondition)) {
+        if (wcaAppeal != null && wcaAppeal && !isTrue(isSvCase)) {
             minPointsValue = 14;
             maxPointsValue = 15;
         }
@@ -228,7 +228,7 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
 
             for (boolean allowed : Arrays.asList(false, true)) {
 
-                if (isTrue(isSevereCondition) && isTrue(supportGroupOnly)) {
+                if (isTrue(isSvCase) && isTrue(supportGroupOnly)) {
                     minPointsValue = 14;
                     maxPointsValue = 15;
                 }
@@ -238,7 +238,7 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
                     int conditionApplicableCount = 0;
 
                     final boolean isValidCombinationExpected =
-                        isValidPointsBasedCombinationExpected(points, wcaAppeal, isSevereCondition, doesSchedule8Paragraph4Apply, schedule7ActivitiesSelected,
+                        isValidPointsBasedCombinationExpected(points, wcaAppeal, isSvCase, doesSchedule8Paragraph4Apply, schedule7ActivitiesSelected,
                             doesSchedule9Paragraph4Apply, supportGroupOnly);
 
                     List<String> schedule7Activities = null;
@@ -260,7 +260,10 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
                                 .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
                                 .build())
                             .supportGroupOnlyAppeal(supportGroupOnly == null ? null : supportGroupOnly ? "Yes" : "No")
-                            .extendedSscsCaseData(ExtendedSscsCaseData.builder().writeFinalDecisionSevereYesNo(isSevereCondition ? YES : NO).build())
+                            .extendedSscsCaseData(ExtendedSscsCaseData.builder()
+                                    .writeFinalDecisionSevereYesNo(isSvCase ? YES : null)
+                                    .writeFinalDecisionSevereCriteriaApply(isSevereCriteriaApplyShown == null ? null : isSevereCriteriaApplyShown ? YES : null)
+                                    .build())
                             .dwpReassessTheAward(null)
                             .wcaAppeal(YES)
                             .sscsUcCaseData(
@@ -314,7 +317,7 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
                         int allowedOrRefusedConditionApplicableCount = 0;
 
                         final boolean isValidAllowedOrRefusedCombinationExpected =
-                            isValidAllowedOrRefusedCombinationExpected(points, wcaAppeal, isSevereCondition, doesSchedule8Paragraph4Apply, schedule7ActivitiesSelected,
+                            isValidAllowedOrRefusedCombinationExpected(points, wcaAppeal, isSvCase, doesSchedule8Paragraph4Apply, schedule7ActivitiesSelected,
                                 doesSchedule9Paragraph4Apply, allowed, supportGroupOnly);
 
                         UcAllowedOrRefusedCondition matchingAllowedOrRefusedCondition = null;
