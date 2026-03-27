@@ -4,6 +4,7 @@ import static java.util.Arrays.asList;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getBenefitByCodeOrThrowException;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
@@ -43,6 +44,9 @@ public class NotificationService {
     private final NotificationHandler notificationHandler;
     private final OutOfHoursCalculator outOfHoursCalculator;
     private final NotificationConfig notificationConfig;
+    private final SendNotificationService sendNotificationService;
+    private final boolean covid19Feature;
+    private final boolean cmOtherPartyConfidentialityEnabled;
 
     @SuppressWarnings("squid:S107")
     @Autowired
@@ -54,7 +58,8 @@ public class NotificationService {
         OutOfHoursCalculator outOfHoursCalculator,
         NotificationConfig notificationConfig,
         SendNotificationService sendNotificationService,
-        @Value("${feature.covid19}") boolean covid19Feature) {
+        @Value("${feature.covid19}") boolean covid19Feature,
+        @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
 
         this.notificationFactory = notificationFactory;
         this.reminderService = reminderService;
@@ -64,11 +69,8 @@ public class NotificationService {
         this.notificationConfig = notificationConfig;
         this.sendNotificationService = sendNotificationService;
         this.covid19Feature = covid19Feature;
+        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
-
-    private final SendNotificationService sendNotificationService;
-
-    private final boolean covid19Feature;
 
     public void manageNotificationAndSubscription(NotificationWrapper notificationWrapper, boolean fromReminderService) {
         NotificationEventType notificationType = notificationWrapper.getNotificationType();
@@ -113,6 +115,13 @@ public class NotificationService {
         } else if (notificationWrapper.getNotificationType().equals(DWP_UPLOAD_RESPONSE)) {
             log.info("Trigger second notification event for {}", UPDATE_OTHER_PARTY_DATA.getId());
             notificationWrapper.getSscsCaseDataWrapper().setNotificationEventType(UPDATE_OTHER_PARTY_DATA);
+            sendNotificationPerSubscription(notificationWrapper);
+        } else if (cmOtherPartyConfidentialityEnabled
+            && notificationWrapper.getNotificationType().equals(DIRECTION_ISSUED)
+            && notificationWrapper.getSscsCaseDataWrapper().getNewSscsCaseData().isBenefitType(CHILD_SUPPORT)
+            && (notificationWrapper.getSscsCaseDataWrapper().getNewSscsCaseData().getDirectionTypeDl().getValue().getCode().equals(DirectionType.APPEAL_TO_PROCEED.toString()))) {
+            log.info("Trigger second notification event for {} with {}", DIRECTION_ISSUED.getId(), DirectionType.APPEAL_TO_PROCEED.getLabel());
+            notificationWrapper.getSscsCaseDataWrapper().setNotificationEventType(NOTIFY_APPELLANT_VALID_APPEAL);
             sendNotificationPerSubscription(notificationWrapper);
         }
     }
@@ -179,8 +188,6 @@ public class NotificationService {
                 wrapper.setNotificationEventTypeOverridden(true);
             }
         } else if (DRAFT_TO_VALID_APPEAL_CREATED.equals(wrapper.getNotificationType())) {
-
-            // TODO Check if we want to do anything around this
             wrapper.setNotificationType(VALID_APPEAL_CREATED);
         } else if (DRAFT_TO_NON_COMPLIANT.equals(wrapper.getNotificationType())) {
             wrapper.setNotificationType(NON_COMPLIANT);
@@ -233,9 +240,6 @@ public class NotificationService {
 
     private boolean isValidNotification(NotificationWrapper wrapper, SubscriptionWithType subscriptionWithType) {
         Subscription subscription = subscriptionWithType.getSubscription();
-
-
-
         return (isMandatoryLetterEventType(wrapper.getNotificationType())
             || isOkToSendNotification(wrapper, wrapper.getNotificationType(), subscription, notificationValidService));
     }

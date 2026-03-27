@@ -58,14 +58,7 @@ public final class NotificationEventTypeLists {
         JOINT_PARTY_ADDED,
         ACTION_HEARING_RECORDING_REQUEST,
         ACTION_POSTPONEMENT_REQUEST_WELSH,
-        UPDATE_OTHER_PARTY_DATA,
-        ADMIN_SEND_TO_VALID_APPEAL,
-        APPEAL_TO_PROCEED,
-        INTERLOC_VALID_APPEAL,
-        CREATE_TEST_CASE,
-        VALID_APPEAL,
-        JUDGE_DECISION_APPEAL_TO_PROCEED,
-        TCW_DECISION_APPEAL_TO_PROCEED
+        UPDATE_OTHER_PARTY_DATA
     );
 
     // TODO move to EVENTS_TO_HANDLE when feature.postHearings.enabled removed
@@ -174,15 +167,7 @@ public final class NotificationEventTypeLists {
         STRUCK_OUT,
         STATEMENT_OF_REASONS_REQUEST,
         UPDATE_OTHER_PARTY_DATA,
-        VALID_APPEAL_CREATED,
-        ADMIN_SEND_TO_VALID_APPEAL,
-        APPEAL_TO_PROCEED,
-        INTERLOC_VALID_APPEAL,
-        CREATE_TEST_CASE,
-        VALID_APPEAL,
-        JUDGE_DECISION_APPEAL_TO_PROCEED,
-        TCW_DECISION_APPEAL_TO_PROCEED,
-        DRAFT_TO_VALID_APPEAL_CREATED
+        NOTIFY_APPELLANT_VALID_APPEAL
     );
 
     public static final Set<NotificationEventType> EVENT_TYPES_FOR_BUNDLED_LETTER = EnumSet.of(
@@ -273,14 +258,7 @@ public final class NotificationEventTypeLists {
         STRUCK_OUT,
         UPDATE_OTHER_PARTY_DATA,
         VALID_APPEAL_CREATED,
-        ADMIN_SEND_TO_VALID_APPEAL,
-        APPEAL_TO_PROCEED,
-        INTERLOC_VALID_APPEAL,
-        VALID_APPEAL,
-        CREATE_TEST_CASE,
-        JUDGE_DECISION_APPEAL_TO_PROCEED,
-        TCW_DECISION_APPEAL_TO_PROCEED,
-        DRAFT_TO_VALID_APPEAL_CREATED
+        NOTIFY_APPELLANT_VALID_APPEAL
     );
 
     public static final Set<NotificationEventType> EVENT_TYPES_FOR_NOTIFY_LETTERS = EnumSet.of(
