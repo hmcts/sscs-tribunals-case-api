@@ -167,7 +167,7 @@ public class NotificationsItBase {
     public void setup() throws Exception {
         NotificationSender sender = new NotificationSender(notificationClient, null, bulkPrintService, notificationTestRecipients, markdownTransformationService, saveCorrespondenceAsyncService, saveCorrespondence);
 
-        SendNotificationService sendNotificationService = new SendNotificationService(sender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
+        SendNotificationService sendNotificationService = new SendNotificationService(sender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService, false);
 
         setupNotificationService(sendNotificationService);
 
@@ -198,7 +198,7 @@ public class NotificationsItBase {
     }
 
     private void setupNotificationService(SendNotificationService sendNotificationService) {
-        service = new NotificationService(factory, reminderService, notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false);
+        service = new NotificationService(factory, reminderService, notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, false);
     }
 
     protected NotificationService getNotificationService() {
