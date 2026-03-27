@@ -100,6 +100,7 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
             new Boolean[] {true, true, true, null, false},
             new Boolean[] {true, true, true, false, false},
             new Boolean[] {true, true, true, true, false},
+            new Boolean[] {true, null, null, null, true}
         };
     }
 
@@ -260,7 +261,7 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
                                 .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
                                 .build())
                             .supportGroupOnlyAppeal(supportGroupOnly == null ? null : supportGroupOnly ? "Yes" : "No")
-                            .extendedSscsCaseData(ExtendedSscsCaseData.builder().writeFinalDecisionSevereYesNo(isSevereCondition ? YES : NO).build())
+                            .extendedSscsCaseData(ExtendedSscsCaseData.builder().writeFinalDecisionSevereCriteriaApply(isSevereCondition ? YES : null).build())
                             .dwpReassessTheAward(null)
                             .wcaAppeal(YES)
                             .sscsUcCaseData(
