@@ -129,9 +129,9 @@ public class NotificationServiceBase {
 
     NotificationService initialiseNotificationService() {
         SendNotificationService sendNotificationService = new SendNotificationService(notificationSender,
-            notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
+            notificationHandler, notificationValidService, pdfLetterService, pdfStoreService,false);
         return new NotificationService(notificationFactory, reminderService, notificationValidService,
-            notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false
+            notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, false
         );
     }
 

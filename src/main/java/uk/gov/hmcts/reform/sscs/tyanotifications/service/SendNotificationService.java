@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.FINAL_DECISION_
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.POSTPONEMENT_REQUEST_DIRECTION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.STATEMENT_OF_REASONS_GRANTED;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.STATEMENT_OF_REASONS_REFUSED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.getPostponementRequestStatus;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ADDRESS_LINE_1;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPEAL_RESPOND_DATE;
@@ -42,6 +43,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SET_ASIDE_REFUSED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SOR_EXTEND_TIME;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SOR_REFUSED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.VALID_APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.LetterType.GOV_NOTIFY;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.addBlankPageAtTheEndIfOddPage;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.buildBundledLetter;
@@ -98,16 +100,18 @@ public class SendNotificationService {
     private final NotificationValidService notificationValidService;
     private final PdfLetterService pdfLetterService;
     private final PdfStoreService pdfStoreService;
+    private final boolean cmOtherPartyConfidentialityEnabled;
 
     @Autowired
     public SendNotificationService(NotificationSender notificationSender, NotificationHandler notificationHandler,
                                    NotificationValidService notificationValidService, PdfLetterService pdfLetterService,
-                                   PdfStoreService pdfStoreService) {
+                                   PdfStoreService pdfStoreService, @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
         this.notificationSender = notificationSender;
         this.notificationHandler = notificationHandler;
         this.notificationValidService = notificationValidService;
         this.pdfLetterService = pdfLetterService;
         this.pdfStoreService = pdfStoreService;
+        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
 
     boolean sendEmailSmsLetterNotification(NotificationWrapper wrapper, Notification notification,
@@ -249,6 +253,9 @@ public class SendNotificationService {
 
     private boolean sendMandatoryLetterNotification(NotificationWrapper wrapper, Notification notification, SubscriptionWithType subscriptionWithType, Address addressToUse) {
         if (NotificationEventTypeLists.EVENT_TYPES_FOR_MANDATORY_LETTERS.contains(wrapper.getNotificationType())) {
+            if (shouldNotSend(wrapper)) {
+                return false;
+            }
             if (isBundledLetter(wrapper.getNotificationType()) || (isNotBlank(notification.getDocmosisLetterTemplate()))) {
                 return sendBundledAndDocmosisLetterNotification(wrapper, notification, getNameToUseForLetter(wrapper, subscriptionWithType), subscriptionWithType);
             } else if (hasLetterTemplate(notification)) {
@@ -259,6 +266,13 @@ public class SendNotificationService {
             }
         }
         return false;
+    }
+
+    private boolean shouldNotSend(NotificationWrapper wrapper) {
+        return (cmOtherPartyConfidentialityEnabled && VALID_APPEAL_CREATED == wrapper.getNotificationType() && !wrapper
+            .getNewSscsCaseData()
+            .isBenefitType(CHILD_SUPPORT))
+            || (!cmOtherPartyConfidentialityEnabled && VALID_APPEAL_CREATED == wrapper.getNotificationType());
     }
 
     protected void sendLetterNotificationToAddress(NotificationWrapper wrapper, Notification notification, final Address address, SubscriptionWithType subscriptionWithType) throws NotificationClientException {
