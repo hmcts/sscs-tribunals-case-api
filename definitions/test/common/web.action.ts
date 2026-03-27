@@ -195,4 +195,8 @@ export class WebAction {
   async pause() {
     await this.page.pause();
   }
+
+  async waitForSpinnerToDisappear() {
+    await this.page.waitForSelector('.spinner', { state: 'hidden' });
+  }
 }
