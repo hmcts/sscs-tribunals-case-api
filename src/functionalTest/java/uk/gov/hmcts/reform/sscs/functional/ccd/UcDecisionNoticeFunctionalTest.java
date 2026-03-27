@@ -285,6 +285,45 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
         }
     }
 
+    @Test
+    public void scenario13_allowed_WcaAppealWithSvIssueCodeAndSevereCriteriaApply() throws IOException {
+        String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedWcaAppealWithSvIssueCodeAndSevereCriteriaApply.json");
+        json.replace("doesWriteFinalDecisionSevereCriteriaApply", "Yes");
+        byte[] bytes = callPreviewFinalDecision(json);
+        try (PDDocument document = Loader.loadPDF(bytes)) {
+            String pdfText = new PDFTextStripper().getText(document);
+            String pdfTextWithoutNewLines = replaceNewLines(pdfText);
+            assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
+            assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 11/11/2020 is set aside."));
+            assertThat(pdfTextWithoutNewLines, containsString("3. The appellant meets the severe conditions criteria because they will constantly meet a Schedule 7 descriptor, and they have a lifelong condition with no realistic prospect of recovery of function."));
+            assertThat(pdfTextWithoutNewLines, containsString("4. Reasons for decision 1"));
+            assertThat(pdfTextWithoutNewLines, containsString("5. Reasons for decision 2"));
+            assertThat(pdfTextWithoutNewLines, containsString("6. Anything else."));
+            assertThat(pdfTextWithoutNewLines, containsString("7. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent."));
+            assertThat(pdfTextWithoutNewLines, not(containsString("8.")));
+        }
+    }
+
+    @Test
+    public void scenario13_refused_WcaAppealWithSvIssueCodeAndSevereCriteriaDoNotApply() throws IOException {
+        String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedWcaAppealWithSvIssueCodeAndSevereCriteriaApply.json");
+        json.replace("allowed", "refused");
+        json.replace("doesWriteFinalDecisionSevereCriteriaApply", "No");
+        byte[] bytes = callPreviewFinalDecision(json);
+        try (PDDocument document = Loader.loadPDF(bytes)) {
+            String pdfText = new PDFTextStripper().getText(document);
+            String pdfTextWithoutNewLines = replaceNewLines(pdfText);
+            assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
+            assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 11/11/2020 is set aside."));
+            assertThat(pdfTextWithoutNewLines, containsString("3. The appellant does not meet the severe conditions criteria."));
+            assertThat(pdfTextWithoutNewLines, containsString("4. Reasons for decision 1"));
+            assertThat(pdfTextWithoutNewLines, containsString("5. Reasons for decision 2"));
+            assertThat(pdfTextWithoutNewLines, containsString("6. Anything else."));
+            assertThat(pdfTextWithoutNewLines, containsString("7. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent."));
+            assertThat(pdfTextWithoutNewLines, not(containsString("8.")));
+        }
+    }
+
     private String replaceNewLines(String pdfText) {
         return pdfText.replaceAll("-\n", "-").replaceAll("[\\n\\t]", " ").replaceAll("\\s{2,}", " ");
     }
