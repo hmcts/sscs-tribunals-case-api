@@ -103,7 +103,8 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
         };
     }
 
-    private boolean isValidCombinationFromSelectSchedule7ActivitiesOnwards(Boolean schedule7ActivitiesSelected, Boolean doesSchedule9Paragraph4Apply) {
+    private boolean isValidCombinationFromSelectSchedule7ActivitiesOnwards(Boolean schedule7ActivitiesSelected,
+        Boolean doesSchedule9Paragraph4Apply) {
         if (schedule7ActivitiesSelected == null) {
             return false;
         } else {
@@ -121,7 +122,7 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
      *
      */
     private boolean isValidAllowedOrRefusedCombinationExpected(int points, Boolean wcaAppeal, Boolean isSevereCondition, Boolean doesSchedule8Paragraph4Apply, Boolean schedule7ActivitiesSelected,
-       Boolean doesSchedule9Paragraph4Apply, boolean allowed, Boolean supportGroupOnly) {
+        Boolean doesSchedule9Paragraph4Apply, boolean allowed, Boolean supportGroupOnly) {
         if (!wcaAppeal.booleanValue()) {
             return true;
         }
@@ -156,7 +157,7 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
     }
 
     private boolean isValidPointsBasedCombinationExpected(int points, Boolean wcaAppeal, Boolean isSevereCondition, Boolean doesSchedule8Paragraph4Apply, Boolean schedule7ActivitiesSelected,
-      Boolean doesSchedule9Paragraph4, Boolean supportGroupOnly) {
+        Boolean doesSchedule9Paragraph4, Boolean supportGroupOnly) {
 
         // If it's not a wca appeal we don't do any points-based validation - always valid
         if (!wcaAppeal.booleanValue()) {
