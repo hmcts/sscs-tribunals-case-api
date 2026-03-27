@@ -700,6 +700,8 @@ notification:
             docmosisId: TB-SCS-LET-ENG-Set-Aside-Grant-Refused-v2.docx
         setAsideRefused:
             docmosisId: TB-SCS-LET-ENG-Set-Aside-Grant-Refused-v2.docx
+        adminSendToValidAppeal:
+            docmosisId: TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx
         directionIssued:
             appealToProceed:
                 appellant:
