@@ -16,6 +16,7 @@ public final class NotificationEventTypeLists {
         ADJOURNED,
         ADMIN_APPEAL_WITHDRAWN,
         ADMIN_CORRECTION_HEADER,
+        ADMIN_SEND_TO_VALID_APPEAL,
         APPEAL_DORMANT,
         APPEAL_LAPSED,
         APPEAL_RECEIVED,
@@ -37,6 +38,7 @@ public final class NotificationEventTypeLists {
         LIBERTY_TO_APPLY_GRANTED,
         LIBERTY_TO_APPLY_REFUSED,
         NON_COMPLIANT,
+        NOTIFY_APPELLANT_VALID_APPEAL,
         DRAFT_TO_NON_COMPLIANT,
         PERMISSION_TO_APPEAL_GRANTED,
         PERMISSION_TO_APPEAL_REFUSED,
@@ -123,6 +125,7 @@ public final class NotificationEventTypeLists {
         ACTION_POSTPONEMENT_REQUEST_WELSH,
         ADMIN_APPEAL_WITHDRAWN,
         ADMIN_CORRECTION_HEADER,
+        ADMIN_SEND_TO_VALID_APPEAL,
         APPEAL_LAPSED,
         APPEAL_RECEIVED,
         APPEAL_WITHDRAWN,
@@ -149,6 +152,7 @@ public final class NotificationEventTypeLists {
         JOINT_PARTY_ADDED,
         LIBERTY_TO_APPLY_REQUEST,
         NON_COMPLIANT,
+        NOTIFY_APPELLANT_VALID_APPEAL,
         PERMISSION_TO_APPEAL_GRANTED,
         PERMISSION_TO_APPEAL_REFUSED,
         PERMISSION_TO_APPEAL_REQUEST,
@@ -167,8 +171,6 @@ public final class NotificationEventTypeLists {
         STRUCK_OUT,
         STATEMENT_OF_REASONS_REQUEST,
         UPDATE_OTHER_PARTY_DATA,
-        NOTIFY_APPELLANT_VALID_APPEAL,
-        ADMIN_SEND_TO_VALID_APPEAL,
         VALID_APPEAL_CREATED
     );
 
@@ -215,6 +217,7 @@ public final class NotificationEventTypeLists {
         ACTION_POSTPONEMENT_REQUEST_WELSH,
         ADMIN_APPEAL_WITHDRAWN,
         ADMIN_CORRECTION_HEADER,
+        ADMIN_SEND_TO_VALID_APPEAL,
         APPEAL_LAPSED,
         APPEAL_RECEIVED,
         APPEAL_WITHDRAWN,
@@ -240,6 +243,7 @@ public final class NotificationEventTypeLists {
         JOINT_PARTY_ADDED,
         LIBERTY_TO_APPLY_REQUEST,
         NON_COMPLIANT,
+        NOTIFY_APPELLANT_VALID_APPEAL,
         PERMISSION_TO_APPEAL_GRANTED,
         PERMISSION_TO_APPEAL_REFUSED,
         PERMISSION_TO_APPEAL_REQUEST,
@@ -259,9 +263,7 @@ public final class NotificationEventTypeLists {
         STATEMENT_OF_REASONS_REQUEST,
         STRUCK_OUT,
         UPDATE_OTHER_PARTY_DATA,
-        VALID_APPEAL_CREATED,
-        NOTIFY_APPELLANT_VALID_APPEAL,
-        ADMIN_SEND_TO_VALID_APPEAL
+        VALID_APPEAL_CREATED
     );
 
     public static final Set<NotificationEventType> EVENT_TYPES_FOR_NOTIFY_LETTERS = EnumSet.of(

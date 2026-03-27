@@ -709,6 +709,10 @@ notification:
             docmosisId: TB-SCS-LET-ENG-Set-Aside-Grant-Refused-v2.docx
         adminSendToValidAppeal:
             docmosisId: TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx
+        interlocValidAppeal:
+            docmosisId: TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx
+        notifyAppellantValidAppeal:
+            docmosisId: TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx
         directionIssued:
             appealToProceed:
                 appellant:
