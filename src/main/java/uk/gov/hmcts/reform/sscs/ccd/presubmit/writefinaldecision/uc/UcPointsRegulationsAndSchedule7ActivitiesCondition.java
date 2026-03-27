@@ -39,7 +39,7 @@ public enum UcPointsRegulationsAndSchedule7ActivitiesCondition implements Points
 
     // Used for the scenario where case points start high but are lowered and regulation 29 question is skipped
     LOW_POINTS_SCHEDULE_8_PARAGRAPH_4_UNSPECIFIED(UcPointsCondition.POINTS_LESS_THAN_FIFTEEN,
-        Arrays.asList(isWcaAppeal(TRUE), isSupportGroupOnly(NOT_TRUE, true), isSchedule8Paragraph4(UNSPECIFIED, false)), Optional.empty(), true, isSchedule8Paragraph4(SPECIFIED)),
+        Arrays.asList(isWcaAppeal(TRUE), isSupportGroupOnly(NOT_TRUE, true), isSevereConditions(NOT_TRUE),  isSchedule8Paragraph4(UNSPECIFIED, false)), Optional.empty(), true, isSchedule8Paragraph4(SPECIFIED)),
     // Scenario 1
     LOW_POINTS_SCHEDULE_8_PARAGRAPH_4_DOES_NOT_APPLY(UcPointsCondition.POINTS_LESS_THAN_FIFTEEN,
         Arrays.asList(isWcaAppeal(TRUE), isSupportGroupOnly(NOT_TRUE, true), isSchedule8Paragraph4(FALSE)), Optional.of(AwardType.NO_AWARD), true, isSchedule9Paragraph4(UNSPECIFIED), isSchedule7ActivitiesAnswer(
@@ -80,7 +80,8 @@ public enum UcPointsRegulationsAndSchedule7ActivitiesCondition implements Points
         StringListPredicate.EMPTY)),
     // SCENARIO 10
     NON_WCA_APPEAL(UcPointsCondition.POINTS_LESS_THAN_FIFTEEN,
-            Arrays.asList(isWcaAppeal(FALSE)), Optional.empty(), false, isDwpReassessTheAward(UNSPECIFIED));
+            Arrays.asList(isWcaAppeal(FALSE)), Optional.empty(), false, isDwpReassessTheAward(UNSPECIFIED)),
+    SEVERE_CONDITIONS(UcPointsCondition.POINTS_LESS_THAN_FIFTEEN, Arrays.asList(isWcaAppeal(TRUE), isSevereConditions(TRUE), isSupportGroupOnly(NOT_TRUE,false)), Optional.empty(), false);
     List<YesNoFieldCondition> primaryConditions;
     List<FieldCondition> validationConditions;
 
@@ -135,6 +136,11 @@ public enum UcPointsRegulationsAndSchedule7ActivitiesCondition implements Points
     static YesNoFieldCondition isWcaAppeal(Predicate<YesNo> predicate) {
         return new YesNoFieldCondition("WCA Appeal", predicate,
             sscsCaseData -> sscsCaseData.isWcaAppeal() ? YesNo.YES : YesNo.NO, false);
+    }
+
+    static YesNoFieldCondition isSevereConditions(Predicate<YesNo> predicate) {
+        return new YesNoFieldCondition("Severe Conditions", predicate,
+                sscsCaseData -> YesNo.isYes(sscsCaseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo())  ? YesNo.YES : YesNo.NO, false);
     }
 
     static YesNoFieldCondition isDwpReassessTheAward(Predicate<YesNo> predicate) {
