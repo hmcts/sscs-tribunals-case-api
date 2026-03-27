@@ -167,7 +167,8 @@ public final class NotificationEventTypeLists {
         STRUCK_OUT,
         STATEMENT_OF_REASONS_REQUEST,
         UPDATE_OTHER_PARTY_DATA,
-        NOTIFY_APPELLANT_VALID_APPEAL
+        NOTIFY_APPELLANT_VALID_APPEAL,
+        ADMIN_SEND_TO_VALID_APPEAL
     );
 
     public static final Set<NotificationEventType> EVENT_TYPES_FOR_BUNDLED_LETTER = EnumSet.of(
@@ -258,7 +259,8 @@ public final class NotificationEventTypeLists {
         STRUCK_OUT,
         UPDATE_OTHER_PARTY_DATA,
         VALID_APPEAL_CREATED,
-        NOTIFY_APPELLANT_VALID_APPEAL
+        NOTIFY_APPELLANT_VALID_APPEAL,
+        ADMIN_SEND_TO_VALID_APPEAL
     );
 
     public static final Set<NotificationEventType> EVENT_TYPES_FOR_NOTIFY_LETTERS = EnumSet.of(
