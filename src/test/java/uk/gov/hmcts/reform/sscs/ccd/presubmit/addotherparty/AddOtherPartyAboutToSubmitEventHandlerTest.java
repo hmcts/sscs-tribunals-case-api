@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADD_OTHER_PARTY_DATA;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 
+import java.time.LocalDate;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -143,11 +144,12 @@ class AddOtherPartyAboutToSubmitEventHandlerTest {
         }
 
         @Test
-        void shouldSetInterlocReviewStateToHefIssued() {
+        void shouldSetInterlocReviewStateToHefIssuedAndDueDateTo21DaysInTheFuture() {
             final var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
             assertThat(response.getErrors()).isEmpty();
             assertThat(response.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.HEF_ISSUED);
+            assertThat(response.getData().getDirectionDueDate()).isEqualTo(LocalDate.now().plusDays(21).toString());
         }
 
         @Test

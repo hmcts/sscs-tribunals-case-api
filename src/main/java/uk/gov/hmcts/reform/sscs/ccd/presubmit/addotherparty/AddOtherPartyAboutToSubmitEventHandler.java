@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.addotherparty;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
+import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.generateDwpResponseDueDate;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,7 @@ class AddOtherPartyAboutToSubmitEventHandler implements PreSubmitCallbackHandler
         }
         final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         caseData.setInterlocReviewState(InterlocReviewState.HEF_ISSUED);
+        caseData.setDirectionDueDate(generateDwpResponseDueDate(21));
         return new PreSubmitCallbackResponse<>(caseData);
     }
 }
