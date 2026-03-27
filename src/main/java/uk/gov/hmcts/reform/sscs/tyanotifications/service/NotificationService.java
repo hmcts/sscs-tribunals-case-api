@@ -234,6 +234,8 @@ public class NotificationService {
     private boolean isValidNotification(NotificationWrapper wrapper, SubscriptionWithType subscriptionWithType) {
         Subscription subscription = subscriptionWithType.getSubscription();
 
+
+
         return (isMandatoryLetterEventType(wrapper.getNotificationType())
             || isOkToSendNotification(wrapper, wrapper.getNotificationType(), subscription, notificationValidService));
     }
