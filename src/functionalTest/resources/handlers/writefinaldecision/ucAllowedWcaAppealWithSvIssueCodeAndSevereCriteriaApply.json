@@ -47,7 +47,7 @@
       "writeFinalDecisionOtherPanelMemberName":"Dr Other",
       "writeFinalDecisionAnythingElse":"Anything else.",
       "writeFinalDecisionSevereYesNo": "Yes",
-      "writeFinalDecisionSevereCriteriaApply": "doesWriteFinalDecisionSevereCriteriaApply",
+      "writeFinalDecisionSevereCriteriaApply": "Yes",
       "writeFinalDecisionReasons":[
         {
           "id":"43a7febc-c78e-48f9-86da-acb61673e879",
