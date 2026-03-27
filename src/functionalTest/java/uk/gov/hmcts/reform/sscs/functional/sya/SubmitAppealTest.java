@@ -209,11 +209,9 @@ public class SubmitAppealTest {
         });
 
         log.info("Resubmitting case with nino {} and mrn date {} for second time", nino, mrnDate);
-        // check duplicate returns 409 - use await to allow Elasticsearch indexing to catch up
-        submitHelper.defaultAwait().untilAsserted(() -> {
-            Response duplicateResponse = submitHelper.submitAppeal(nino, mrnDate);
-            duplicateResponse.then().statusCode(HttpStatus.SC_CONFLICT);
-        });
+        // check duplicate returns 409
+        response = submitHelper.submitAppeal(nino, mrnDate);
+        response.then().statusCode(HttpStatus.SC_CONFLICT);
 
         log.info("True duplicate was rejected");
     }
