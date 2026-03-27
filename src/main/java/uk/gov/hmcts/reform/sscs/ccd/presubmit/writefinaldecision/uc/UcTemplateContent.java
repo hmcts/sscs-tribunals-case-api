@@ -117,21 +117,12 @@ public abstract class UcTemplateContent extends WriteFinalDecisionTemplateConten
         }
     }
 
-    public String getSevereCriteriaApplySentence(Boolean severeCriteriaApply) {
+    private String getSevereCriteriaApplySentence(Boolean severeCriteriaApply) {
         if (severeCriteriaApply) {
             return "The appellant meets the severe conditions criteria because they will constantly meet a Schedule 7 descriptor,"
                     + " and they have a lifelong condition with no realistic prospect of recovery of function.";
         } else {
             return "The appellant does not meet the severe conditions criteria.";
         }
-    }
-
-    public String getSevereCriteriaPassedSentence() {
-        return "The appellant meets the severe conditions criteria because they will constantly meet a Schedule 7 descriptor,"
-                + " and they have a lifelong condition with no realistic prospect of recovery of function.";
-    }
-
-    public String getSevereCriteriaFailedSentence() {
-        return "The appellant does not meet the severe conditions criteria.";
     }
 }

@@ -10,6 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcScenario;
+import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
 class UcTemplateContentTest {
 
@@ -59,6 +60,23 @@ class UcTemplateContentTest {
     void shouldReturnDoesHaveLimitedCapabilityForWorkRelatedActivitySentence(String appellantName, boolean isTreatedLimitedCapability, String expected) {
         String formattedSentence = content.getLimitedCapabilityForWorkRelatedSentence(appellantName, isTreatedLimitedCapability, LocalDate.of(2025, 11, 18));
         assertThat(formattedSentence).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldReturnSevereCriteriaPassedSentence() {
+        WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody = WriteFinalDecisionTemplateBody.builder().severeCriteriaApplies(true).build();
+        content.addSevereCriteriaApplyIfPresent(writeFinalDecisionTemplateBody);
+        assertThat(content.getComponents()).hasSize(1);
+        assertThat(content.getComponents().get(0).getContent()).isEqualTo("The appellant meets the severe conditions criteria because they will constantly meet a Schedule 7 descriptor,"
+                + " and they have a lifelong condition with no realistic prospect of recovery of function.");
+    }
+
+    @Test
+    void shouldReturnSevereCriteriaFailedSentence() {
+        WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody = WriteFinalDecisionTemplateBody.builder().severeCriteriaApplies(false).build();
+        content.addSevereCriteriaApplyIfPresent(writeFinalDecisionTemplateBody);
+        assertThat(content.getComponents()).hasSize(1);
+        assertThat(content.getComponents().get(0).getContent()).isEqualTo("The appellant does not meet the severe conditions criteria.");
     }
 
     private static class UcTemplateContentUnderTest extends UcTemplateContent {

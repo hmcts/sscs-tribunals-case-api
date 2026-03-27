@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -2338,7 +2337,6 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
     }
 
-    @Disabled
     @ParameterizedTest
     @CsvSource({"refused, false, YES", "refused, false, NO",
         "allowed, true, YES", "allowed, true, NO"})
@@ -2354,10 +2352,12 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(YES);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused(allowedOrRefused);
         sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereCriteriaApply(severeCriteriaApply);
-
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
+        UcWriteFinalDecisionPreviewDecisionService ucWriteFinalDecisionPreviewDecisionService = new UcWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService, ucDecisionNoticeQuestionService, ucDecisionNoticeOutcomeService, documentConfiguration,
+                venueDataLoader, true); ;
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = ucWriteFinalDecisionPreviewDecisionService.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
@@ -2388,6 +2388,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNull(body.getUcAwardRate());
         assertEquals(0, body.getUcSchedule6Descriptors().size());
         assertEquals(0, body.getUcNumberOfPoints().intValue());
+        assertEquals(body.getSevereCriteriaApplies(), severeCriteriaApply.toBoolean());
 
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
@@ -2401,7 +2402,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertEquals(6, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
     }
 
-    @Disabled
+
     @ParameterizedTest
     @CsvSource({"YES", "NO"})
     public void willSetPreviewFile_WhenAllowedSevereCriteriaNonSvCaseWithSchedule7Selected(YesNo severeCriteriaApply) {
@@ -2421,7 +2422,10 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(List.of("schedule7MobilisingUnaided", "schedule7AppropriatenessOfBehaviour"));
         sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereCriteriaApply(severeCriteriaApply);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
+        UcWriteFinalDecisionPreviewDecisionService ucWriteFinalDecisionPreviewDecisionService = new UcWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService, ucDecisionNoticeQuestionService, ucDecisionNoticeOutcomeService, documentConfiguration,
+                venueDataLoader, true); ;
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = ucWriteFinalDecisionPreviewDecisionService.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
@@ -2471,6 +2475,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertNull(body.getUcSchedule7Descriptors().getFirst().getActivityAnswerLetter());
         assertNull(body.getUcSchedule7Descriptors().getFirst().getActivityAnswerValue());
         assertEquals(0, body.getUcSchedule7Descriptors().getFirst().getActivityAnswerPoints());
+        assertEquals(body.getSevereCriteriaApplies(), severeCriteriaApply.toBoolean());
 
         assertNotNull(body.getUcSchedule7Descriptors().get(1));
         assertEquals(

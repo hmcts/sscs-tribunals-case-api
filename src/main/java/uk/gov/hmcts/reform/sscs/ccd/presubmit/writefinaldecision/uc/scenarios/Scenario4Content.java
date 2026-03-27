@@ -19,7 +19,6 @@ public class Scenario4Content extends UcTemplateContent {
             getSecretaryOfStateAcceptsHasLimitedCapabilityForWorkSentence(writeFinalDecisionTemplateBody.getAppellantName(), true)));
         addComponent(new Paragraph(UcTemplateComponentId.SCHEDULE_7_PARAGRAPH.name(), getSchedule7AppliesParagraph(writeFinalDecisionTemplateBody.getUcSchedule7Descriptors())));
         addComponent(new DescriptorTable(UcTemplateComponentId.SCHEDULE_7_DESCRIPTORS.name(), writeFinalDecisionTemplateBody.getUcSchedule7Descriptors(), true));
-        addSevereCriteriaApplyIfPresent(writeFinalDecisionTemplateBody);
         addReasonsIfPresent(writeFinalDecisionTemplateBody);
         addAnythingElseIfPresent(writeFinalDecisionTemplateBody);
         addHearingType(writeFinalDecisionTemplateBody);

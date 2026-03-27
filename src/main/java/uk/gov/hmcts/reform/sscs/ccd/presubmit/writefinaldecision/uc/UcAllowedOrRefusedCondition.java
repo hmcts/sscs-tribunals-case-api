@@ -145,7 +145,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
             isAnyPoints(),
             isAnySchedule7(),
             isDwpReassessTheAward(UNSPECIFIED)),
-    // Scenario 13 or 14 depending on whether severe criteria apply or not
+    // Scenario 13
     SEVERE_CONDITIONS_ALLOWED_SV_CASE(
             isAllowedOrRefused(ALLOWED),
             isWcaAppeal(TRUE, false),
@@ -172,26 +172,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
             isSupportGroupOnly(YesNoPredicate.NOT_TRUE, true),
             isPoints(POINTS_GREATER_OR_EQUAL_TO_FIFTEEN),
             isAnySchedule7(),
-            isSupportGroupOnly(YesNoPredicate.FALSE, false).get()),
-    // scenario 4
-    SEVERE_CONDITIONS_ALLOWED_SUPPORT_GROUP_SCHEDULE7_CASE(
-            isAllowedOrRefused(ALLOWED),
-            isWcaAppeal(TRUE, false),
-            isSevereConditions(TRUE),
-            isSupportGroupOnly(TRUE, true),
-            isAnyPoints(),
-            isSchedule7(NOT_EMPTY),
-            isSchdeul8Paragraph4(UNSPECIFIED)),
-    // scenario 9
-    SEVERE_CONDITIONS_ALLOWED_NON_SUPPORT_GROUP_LOW_POINTS_SCHEDULE7_CASE(
-            isAllowedOrRefused(ALLOWED),
-            isWcaAppeal(TRUE, false),
-            isSevereConditions(TRUE),
-            isSupportGroupOnly(NOT_TRUE, true),
-            isPoints(POINTS_LESS_THAN_FIFTEEN),
-            isSchedule7(NOT_EMPTY),
-            isSupportGroupOnly(YesNoPredicate.FALSE, false).get(),
-            isSchdeul8Paragraph4(YesNoPredicate.TRUE));
+            isSupportGroupOnly(YesNoPredicate.FALSE, false).get());
 
     Optional<UcPointsCondition> primaryPointsCondition;
     Optional<FieldCondition> schedule7ActivitiesSelected;
@@ -235,10 +216,6 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
             return UcScenario.SCENARIO_13;
         }  else if (SEVERE_CONDITIONS_ALLOWED_HIGH_POINTS_NON_SV_CASE == this) {
             return UcScenario.SCENARIO_6;
-        } else if (SEVERE_CONDITIONS_ALLOWED_SUPPORT_GROUP_SCHEDULE7_CASE == this) {
-            return UcScenario.SCENARIO_4;
-        } else if (SEVERE_CONDITIONS_ALLOWED_NON_SUPPORT_GROUP_LOW_POINTS_SCHEDULE7_CASE == this) {
-            return UcScenario.SCENARIO_9;
         } else {
             throw new IllegalStateException("No scenario applicable");
         }
