@@ -2537,85 +2537,54 @@ public class NotificationServiceTest {
     }
 
     @Test
-    public void givenDirectionIssuedForChildSupportWithAppealToProceed_whenCmFeatureDisabled_thenDoNotSendSecondNotification() {
-        final SscsCaseData caseData = getSscsCaseDataBuilder(APPELLANT_WITH_ADDRESS, Representative.builder().hasRepresentative("no").build(), null)
-            .appeal(Appeal.builder()
-                .hearingType(AppealHearingType.ORAL.name())
-                .hearingOptions(HearingOptions.builder().wantsToAttend(YES).build())
-                .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
-                .appellant(APPELLANT_WITH_ADDRESS)
-                .rep(Representative.builder().hasRepresentative("no").build())
-                .build())
-            .directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()))
+    @Parameters({
+        "false, CHILD_SUPPORT, APPEAL_TO_PROCEED",
+        "true, PIP, APPEAL_TO_PROCEED",
+        "true, PIP, PROVIDE_INFORMATION",
+        "true, CHILD_SUPPORT, PROVIDE_INFORMATION"
+    })
+    public void givenDirectionIssuedWithVariousScenarios_thenSendAppropriateNumberOfNotifications(
+        boolean cmFeatureEnabled, String benefitCode, String directionType) {
+
+        final SscsCaseData.SscsCaseDataBuilder caseDataBuilder = getSscsCaseDataBuilder(
+            APPELLANT_WITH_ADDRESS,
+            Representative.builder().hasRepresentative("no").build(),
+            null);
+
+        if (Benefit.CHILD_SUPPORT.getDescription().equals(benefitCode)) {
+            caseDataBuilder.appeal(Appeal.builder()
+                                         .hearingType(AppealHearingType.ORAL.name())
+                                         .hearingOptions(HearingOptions.builder().wantsToAttend(YES).build())
+                                         .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
+                                         .appellant(APPELLANT_WITH_ADDRESS)
+                                         .rep(Representative.builder().hasRepresentative("no").build())
+                                         .build());
+        }
+
+        final SscsCaseData caseData = caseDataBuilder
+            .directionTypeDl(new DynamicList(DirectionType.valueOf(directionType).toString()))
             .build();
+
         final CcdNotificationWrapper wrapper = buildBaseWrapperWithCaseData(caseData, DIRECTION_ISSUED);
 
         final Notification notification = new Notification(
             Template.builder().emailTemplateId(EMAIL_TEMPLATE_ID).smsTemplateId(null).build(),
             Destination.builder().email("test@testing.com").sms(null).build(),
             new HashMap<>(), new Reference(), null);
+
         given(factory.create(any(), any())).willReturn(notification);
 
-        final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
-        final NotificationService serviceWithCmDisabled = new NotificationService(factory, reminderService,
-            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, false
+        final SendNotificationService sendNotificationService = new SendNotificationService(
+            notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
+
+        final NotificationService service = new NotificationService(
+            factory, reminderService, notificationValidService, notificationHandler,
+            outOfHoursCalculator, notificationConfig, sendNotificationService, false, cmFeatureEnabled
         );
 
-        serviceWithCmDisabled.manageNotificationAndSubscription(wrapper, false);
+        service.manageNotificationAndSubscription(wrapper, false);
 
         then(factory).should(times(1)).create(any(), any());
-    }
 
-    @Test
-    public void givenDirectionIssuedForNonChildSupportWithAppealToProceed_whenCmFeatureEnabled_thenDoNotSendSecondNotification() {
-        final SscsCaseData caseData = getSscsCaseDataBuilder(APPELLANT_WITH_ADDRESS, Representative.builder().hasRepresentative("no").build(), null)
-            .directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()))
-            .build();
-        final CcdNotificationWrapper wrapper = buildBaseWrapperWithCaseData(caseData, DIRECTION_ISSUED);
-
-        final Notification notification = new Notification(
-            Template.builder().emailTemplateId(EMAIL_TEMPLATE_ID).smsTemplateId(null).build(),
-            Destination.builder().email("test@testing.com").sms(null).build(),
-            new HashMap<>(), new Reference(), null);
-        given(factory.create(any(), any())).willReturn(notification);
-
-        final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
-        final NotificationService serviceWithCmEnabled = new NotificationService(factory, reminderService,
-            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, true
-        );
-
-        serviceWithCmEnabled.manageNotificationAndSubscription(wrapper, false);
-
-        then(factory).should(times(1)).create(any(), any());
-    }
-
-    @Test
-    public void givenDirectionIssuedForChildSupportWithNonAppealToProceedDirection_whenCmFeatureEnabled_thenDoNotSendSecondNotification() {
-        final SscsCaseData caseData = getSscsCaseDataBuilder(APPELLANT_WITH_ADDRESS, Representative.builder().hasRepresentative("no").build(), null)
-            .appeal(Appeal.builder()
-                .hearingType(AppealHearingType.ORAL.name())
-                .hearingOptions(HearingOptions.builder().wantsToAttend(YES).build())
-                .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
-                .appellant(APPELLANT_WITH_ADDRESS)
-                .rep(Representative.builder().hasRepresentative("no").build())
-                .build())
-            .directionTypeDl(new DynamicList(DirectionType.PROVIDE_INFORMATION.toString()))
-            .build();
-        final CcdNotificationWrapper wrapper = buildBaseWrapperWithCaseData(caseData, DIRECTION_ISSUED);
-
-        final Notification notification = new Notification(
-            Template.builder().emailTemplateId(EMAIL_TEMPLATE_ID).smsTemplateId(null).build(),
-            Destination.builder().email("test@testing.com").sms(null).build(),
-            new HashMap<>(), new Reference(), null);
-        given(factory.create(any(), any())).willReturn(notification);
-
-        final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
-        final NotificationService serviceWithCmEnabled = new NotificationService(factory, reminderService,
-            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, true
-        );
-
-        serviceWithCmEnabled.manageNotificationAndSubscription(wrapper, false);
-
-        then(factory).should(times(1)).create(any(), any());
     }
 }
