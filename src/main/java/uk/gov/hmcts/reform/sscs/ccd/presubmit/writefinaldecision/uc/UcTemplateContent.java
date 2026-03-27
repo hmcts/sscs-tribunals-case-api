@@ -112,8 +112,7 @@ public abstract class UcTemplateContent extends WriteFinalDecisionTemplateConten
     public void addSevereCriteriaApplyIfPresent(WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody) {
         if (nonNull(writeFinalDecisionTemplateBody.getSevereCriteriaApplies())) {
             addComponent(new Paragraph(UcTemplateComponentId.SEVERE_CRITERIA_APPLY_PARAGRAPH.name(),
-                    getSevereCriteriaApplySentence(writeFinalDecisionTemplateBody.getSevereCriteriaApplies()))
-            );
+                    getSevereCriteriaApplySentence(writeFinalDecisionTemplateBody.getSevereCriteriaApplies())));
         }
     }
 

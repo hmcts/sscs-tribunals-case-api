@@ -139,8 +139,8 @@ public enum UcPointsRegulationsAndSchedule7ActivitiesCondition implements Points
     }
 
     static YesNoFieldCondition isSevereConditions(Predicate<YesNo> predicate) {
-        return (new YesNoFieldCondition("Severe Conditions", predicate,
-                s -> s.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply() == null ? YesNo.NO : YesNo.YES, false));
+        return new YesNoFieldCondition("Severe Conditions", predicate,
+                s -> s.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply() == null ? YesNo.NO : YesNo.YES, false);
     }
 
     static YesNoFieldCondition isDwpReassessTheAward(Predicate<YesNo> predicate) {

@@ -68,7 +68,7 @@ class UcTemplateContentTest {
         content.addSevereCriteriaApplyIfPresent(writeFinalDecisionTemplateBody);
         assertThat(content.getComponents()).hasSize(1);
         assertThat(content.getComponents().get(0).getContent()).isEqualTo("The appellant meets the severe conditions criteria because they will constantly meet a Schedule 7 descriptor,"
-                + " and they have a lifelong condition with no realistic prospect of recovery of function.");
+            + " and they have a lifelong condition with no realistic prospect of recovery of function.");
     }
 
     @Test

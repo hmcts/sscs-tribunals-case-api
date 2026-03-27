@@ -46,6 +46,7 @@ import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDecisionPreviewDecisionServiceTestBase {
 
     private static final String DD_MM_YYYY = "dd-MM-YYYY";
+    private static final boolean isSevereConditionsEnabled = false;
     protected UcDecisionNoticeOutcomeService ucDecisionNoticeOutcomeService;
     protected UcDecisionNoticeQuestionService ucDecisionNoticeQuestionService;
     protected VenueDataLoader venueDataLoader;
@@ -61,7 +62,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
     protected WriteFinalDecisionPreviewDecisionServiceBase createPreviewDecisionService(GenerateFile generateFile, UserDetailsService userDetailsService,
                                                                                         DocumentConfiguration documentConfiguration) {
         return new UcWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService, ucDecisionNoticeQuestionService, ucDecisionNoticeOutcomeService, documentConfiguration,
-            venueDataLoader, false);
+            venueDataLoader, isSevereConditionsEnabled);
     }
 
     @Override

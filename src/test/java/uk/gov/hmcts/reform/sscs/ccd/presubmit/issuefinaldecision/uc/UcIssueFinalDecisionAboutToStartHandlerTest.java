@@ -66,6 +66,7 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
     private IssueFinalDecisionAboutToStartHandler handler;
     private static final String URL = "http://dm-store/documents/123";
     private static final String UC_TEMPLATE_ID = "esanuts.docx";
+    private static final boolean isSevereConditionsEnabled = false;
 
     @Mock
     private UserDetailsService userDetailsService;
@@ -169,7 +170,7 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
         when(ucDecisionNoticeOutcomeService.getBenefitType()).thenReturn("UC");
         UcDecisionNoticeQuestionService esaDecisionNoticeQuestionService = new UcDecisionNoticeQuestionService();
         final UcWriteFinalDecisionPreviewDecisionService previewDecisionService = new UcWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
-            esaDecisionNoticeQuestionService, ucDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader, false);
+            esaDecisionNoticeQuestionService, ucDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader, isSevereConditionsEnabled);
         when(generateFile.assemble(any())).thenReturn(URL);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(List.of("mobilisingUnaided"));
@@ -208,7 +209,7 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
         when(ucDecisionNoticeOutcomeService.getBenefitType()).thenReturn("UC");
 
         final UcWriteFinalDecisionPreviewDecisionService previewDecisionService = new UcWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
-            esaDecisionNoticeQuestionService, ucDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader, false);
+            esaDecisionNoticeQuestionService, ucDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader, isSevereConditionsEnabled);
 
         when(generateFile.assemble(any())).thenReturn(URL);
         sscsCaseData.setWcaAppeal(NO);

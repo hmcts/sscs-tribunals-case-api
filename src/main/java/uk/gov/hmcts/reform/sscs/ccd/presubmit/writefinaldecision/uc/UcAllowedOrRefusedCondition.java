@@ -202,7 +202,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
             } else {
                 return UcScenario.SCENARIO_5;
             }
-        } else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_HIGH_POINTS == this && !caseData.getSscsUcCaseData().getSchedule7Selections().isEmpty()) {
+        } else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_HIGH_POINTS == this && !caseData.getSscsUcCaseData().getSchedule7Selections().isEmpty() || SEVERE_CONDITIONS_ALLOWED_HIGH_POINTS_NON_SV_CASE == this) {
             return UcScenario.SCENARIO_6;
         }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS == this && caseData.getSscsUcCaseData().getSchedule7Selections().isEmpty() && isSchedule9Paragraph4(FALSE).isSatisified(caseData)) {
             return UcScenario.SCENARIO_7;
@@ -214,8 +214,6 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
             return UcScenario.SCENARIO_10;
         }  else if (SEVERE_CONDITIONS_ALLOWED_SV_CASE == this || SEVERE_CONDITIONS_REFUSED_SV_CASE == this) {
             return UcScenario.SCENARIO_13;
-        }  else if (SEVERE_CONDITIONS_ALLOWED_HIGH_POINTS_NON_SV_CASE == this) {
-            return UcScenario.SCENARIO_6;
         } else {
             throw new IllegalStateException("No scenario applicable");
         }
@@ -264,8 +262,8 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
     }
 
     static YesNoFieldCondition isSevereConditions(Predicate<YesNo> predicate) {
-        return (new YesNoFieldCondition("Severe Conditions", predicate,
-                s -> s.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply() == null ? YesNo.NO : YesNo.YES, false));
+        return new YesNoFieldCondition("Severe Conditions", predicate,
+                s -> s.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply() == null ? YesNo.NO : YesNo.YES, false);
     }
 
     static YesNoFieldCondition isDwpReassessTheAward(Predicate<YesNo> predicate) {
