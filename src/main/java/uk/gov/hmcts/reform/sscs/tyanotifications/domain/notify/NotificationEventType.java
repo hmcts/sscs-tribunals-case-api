@@ -80,8 +80,7 @@ public enum NotificationEventType {
     SYA_APPEAL_CREATED(EventType.SYA_APPEAL_CREATED, true, true, false, true, false, 0),
     TCW_DECISION_APPEAL_TO_PROCEED(EventType.TCW_DECISION_APPEAL_TO_PROCEED, true, true, true, false, false, 0),
     UPDATE_OTHER_PARTY_DATA(EventType.UPDATE_OTHER_PARTY_DATA, true, true, true, true, false, 0),
-    // TODO - restore the delay
-    VALID_APPEAL_CREATED(EventType.VALID_APPEAL_CREATED, true, true, false, true, false, 0),
+    VALID_APPEAL_CREATED(EventType.VALID_APPEAL_CREATED, true, true, false, true, false, 240L),
     NOTIFY_APPELLANT_VALID_APPEAL(EventType.DIRECTION_ISSUED, false, false, false, true, false, 0),
     ADMIN_SEND_TO_VALID_APPEAL(EventType.ADMIN_SEND_TO_VALID_APPEAL, false, false, false, true, false, 0),
     INTERLOC_VALID_APPEAL(EventType.INTERLOC_VALID_APPEAL, false, false, false, true, false, 0),
