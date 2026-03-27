@@ -119,7 +119,14 @@ public class NotificationService {
         } else if (cmOtherPartyConfidentialityEnabled
             && notificationWrapper.getNotificationType().equals(DIRECTION_ISSUED)
             && notificationWrapper.getSscsCaseDataWrapper().getNewSscsCaseData().isBenefitType(CHILD_SUPPORT)
-            && (notificationWrapper.getSscsCaseDataWrapper().getNewSscsCaseData().getDirectionTypeDl().getValue().getCode().equals(DirectionType.APPEAL_TO_PROCEED.toString()))) {
+            && notificationWrapper.getSscsCaseDataWrapper().getNewSscsCaseData().getDirectionTypeDl() != null
+            && notificationWrapper
+            .getSscsCaseDataWrapper()
+            .getNewSscsCaseData()
+            .getDirectionTypeDl()
+            .getValue()
+            .getCode()
+            .equals(DirectionType.APPEAL_TO_PROCEED.toString())) {
             log.info("Trigger second notification event for {} with {}", DIRECTION_ISSUED.getId(), DirectionType.APPEAL_TO_PROCEED.getLabel());
             notificationWrapper.getSscsCaseDataWrapper().setNotificationEventType(NOTIFY_APPELLANT_VALID_APPEAL);
             sendNotificationPerSubscription(notificationWrapper);
