@@ -24,7 +24,10 @@ export class updateOtherPartyDataPage {
   }
 
   // Applying other party data for the Mandatory fields only
-  async applyOtherPartyData( caseType: string = "NONIBC" ) {
+  async applyOtherPartyData(
+    caseType: string = "NONIBC",
+    confidentialityRequired: string = addUpdateOtherPartyData.updateOtherPartyDataConfidentiality
+  ) {
     await this.page.getByRole('button', { name: 'Add new' }).click(); //fields are expanded here
     await this.page.getByText('First Name');
     await this.page
@@ -48,7 +51,12 @@ export class updateOtherPartyDataPage {
       .locator('#otherParties_0_address_postcode')
       .fill(addUpdateOtherPartyData.updateOtherPartyDataAddressPostCode);      
     await this.page
-      .locator('#otherParties_0_confidentialityRequired_No')
+      .locator(
+        confidentialityRequired ===
+          addUpdateOtherPartyData.updateOtherPartyDataConfidentialityYes
+          ? '#otherParties_0_confidentialityRequired_Yes'
+          : '#otherParties_0_confidentialityRequired_No'
+      )
       .click();
     await this.page
       .locator('#otherParties_0_unacceptableCustomerBehaviour_No')
@@ -65,6 +73,49 @@ export class updateOtherPartyDataPage {
           .locator('#otherParties_0_address_inMainlandUk_Yes')
           .click(); //ToDo : Change to dynamic value
       }
+    await webAction.clickButton('Submit');
+  }
+
+  async applyChildSupportConfidentialOtherPartyData() {
+    await this.page.getByRole('button', { name: 'Add new' }).click();
+    await this.page.getByText('First Name');
+    await this.page
+      .locator('#otherParties_0_name_firstName')
+      .fill(addUpdateOtherPartyData.updateOtherPartyDataFirstName);
+    await this.page
+      .locator('#otherParties_0_name_lastName')
+      .fill(addUpdateOtherPartyData.updateOtherPartyDataLastName);
+    await this.page
+      .locator('#otherParties_0_address_line1')
+      .fill(addUpdateOtherPartyData.updateOtherPartyDataAddressLine);
+    await this.page
+      .locator('#otherParties_0_address_town')
+      .fill(addUpdateOtherPartyData.updateOtherPartyDataAddressTown);
+    await this.page
+      .locator('#otherParties_0_address_postcode')
+      .fill(addUpdateOtherPartyData.updateOtherPartyDataAddressPostCode);
+    await this.page.locator('#otherParties_0_confidentialityRequired_Yes').click();
+    await this.page
+      .locator('#otherParties_0_unacceptableCustomerBehaviour_No')
+      .click();
+    await this.page.locator('#otherParties_0_role_name').selectOption({ label: 'Paying parent' });
+    await this.page
+      .getByRole('group', { name: /Wants To Attend/i })
+      .getByLabel('Yes')
+      .check();
+    await this.page
+      .getByRole('group', { name: /Wants Support/i })
+      .getByLabel('No')
+      .check();
+    await this.page
+      .getByRole('group', { name: /Unavailable dates/i })
+      .getByLabel('No')
+      .check();
+    await this.page
+      .getByRole('group', { name: /Agree less notice/i })
+      .getByLabel('Yes')
+      .check();
+
     await webAction.clickButton('Submit');
   }
 

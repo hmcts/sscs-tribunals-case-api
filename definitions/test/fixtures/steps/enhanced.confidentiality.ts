@@ -105,6 +105,13 @@ export class EnhancedConfidentiality extends BaseStep {
     await new Promise((f) => setTimeout(f, 3000)); //Delay required for the Case to be ready
   }
 
+  async prepareConfidentialCase(caseId: string) {
+    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
+    await this.requestForConfidentiality();
+    await this.grantConfidentialityForAppellant(caseId);
+    await this.verifyConfidentialityFlag();
+  }
+
   async uploadSupplementaryCorrespondence(caseId: string) {
     await this.loginUserWithCaseId(credentials.superUser, false, caseId);
     await this.homePage.chooseEvent('Supplementary response');

@@ -11,6 +11,9 @@
   "ucBenefitCode": "001",
   "ucIssueCode": "WC",
   "dlaIssueCode": "EI",
+  "childSupportIssueCode": "CP",
+  "childSupportEditedEvidenceReason": "Confidentiality",
+  "childSupportFtaState": "Appeal registered (FTA)",
   "ucDisputeOption": "No",
   "ucJointPartyOnCase": "No",
   "ucJointPartyOnCase_Yes": "Yes"

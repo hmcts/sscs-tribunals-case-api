@@ -1,0 +1,71 @@
+{
+  "benefitType": {
+    "description": "Child Support",
+    "code": "childSupport"
+  },
+  "childMaintenanceNumber": "00123",
+  "mrn": {
+    "dwpIssuingOffice": "Child Maintenance Service Group",
+    "date": "20-10-2022",
+    "reasonForBeingLate": "Lost my paperwork"
+  },
+  "isAppointee": false,
+  "evidenceProvide": "false",
+  "appellant": {
+    "title": "Mr",
+    "firstName": "Tester",
+    "lastName": "John",
+    "dob": "22-03-2000",
+    "nino": "TA818615C",
+    "contactDetails": {
+      "addressLine1": "123 Hairy Lane",
+      "addressLine2": "Off Hairy Park",
+      "townCity": "Hairyfield",
+      "county": "Kent",
+      "postCode": "CF24 0AD",
+      "phoneNumber": "07398785050",
+      "emailAddress": "hmctspentet1@mailinator.com"
+    }
+  },
+  "smsNotify": {
+    "wantsSMSNotifications": true,
+    "smsNumber": "07398785050"
+  },
+  "hasRepresentative": true,
+  "representative": {
+    "title": "Mr",
+    "firstName": "Harry",
+    "lastName": "Potter",
+    "organisation": "HP Ltd",
+    "contactDetails": {
+      "addressLine1": "123 Hairy Lane",
+      "addressLine2": "Off Hairy Park",
+      "townCity": "Town",
+      "county": "County",
+      "postCode": "CF240AD",
+      "phoneNumber": "07398785051",
+      "emailAddress": "hmctspentet2@mailinator.com"
+    }
+  },
+  "reasonsForAppealing": {
+    "reasons": [
+      {
+        "whatYouDisagreeWith": "aaaaaaaaaa",
+        "reasonForAppealing": "aaaaaaaaaa"
+      },
+      {
+        "whatYouDisagreeWith": "bbbbbbbbbb",
+        "reasonForAppealing": "bbbbbbbbbb"
+      },
+      {
+        "whatYouDisagreeWith": "cccccccccc",
+        "reasonForAppealing": "cccccccccc"
+      }
+    ],
+    "otherReasons": "Another reason"
+  },
+  "hearingType": "paper",
+  "signAndSubmit": {
+    "signer": "Tester John"
+  }
+}

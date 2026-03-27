@@ -208,6 +208,29 @@ export class UpdateOtherPartyData extends BaseStep {
     );
     await this.eventNameAndDescriptionPage.confirmSubmission();
   }
+
+  async makeChildSupportCaseConfidential(caseId: string) {
+    await this.goToUpdateOtherPartyData(caseId);
+    await this.updateOtherPartyDataPage.verifyPageContent();
+    await this.updateOtherPartyDataPage.applyChildSupportConfidentialOtherPartyData();
+    await this.eventNameAndDescriptionPage.inputData(
+      eventTestData.eventSummaryInput,
+      eventTestData.eventDescriptionInput
+    );
+    await this.eventNameAndDescriptionPage.confirmSubmission();
+    await expect(this.homePage.summaryTab).toBeVisible();
+    await this.homePage.delay(3000);
+
+    await this.homePage.chooseEvent('Update subscription');
+    await this.updateOtherPartyDataPage.applyOtherPartiesSubscription();
+    await this.eventNameAndDescriptionPage.inputData(
+      eventTestData.eventSummaryInput,
+      eventTestData.eventDescriptionInput
+    );
+    await this.eventNameAndDescriptionPage.confirmSubmission();
+    await expect(this.homePage.summaryTab).toBeVisible();
+    await this.homePage.delay(3000);
+  }
   
   async verifyOtherPartyDetailsIBC(){
     // Navigate to Other Party Details tab + validations
