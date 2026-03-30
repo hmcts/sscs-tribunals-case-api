@@ -66,6 +66,11 @@ services:
 
   azure-storage-emulator-azurite:
     image: mcr.microsoft.com/azure-storage/azurite
+    command: >
+      azurite-blob
+      --blobHost 0.0.0.0
+      --blobPort 10000
+      --skipApiVersionCheck
     ports:
       - 10000:10000
     environment:
