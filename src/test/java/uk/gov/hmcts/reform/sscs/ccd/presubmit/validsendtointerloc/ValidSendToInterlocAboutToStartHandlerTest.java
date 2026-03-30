@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_SEND_TO_INTERLOC;
@@ -27,6 +28,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
@@ -51,7 +53,7 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
     private SscsCaseData sscsCaseData;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         handler = new ValidSendToInterlocAboutToStartHandler(false, false);
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
     }
@@ -93,7 +95,7 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
 
     @ParameterizedTest
     @EnumSource(value = EventType.class, names = {"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
-    public void givenPostponementsFeatureOn_populatesSelectWhoReviewsCaseDropDown(EventType eventType) {
+    void givenPostponementsFeatureOn_populatesSelectWhoReviewsCaseDropDown(EventType eventType) {
         ReflectionTestUtils.setField(handler, "postponementsFeature", true);
 
         when(callback.getEvent()).thenReturn(eventType);
@@ -111,7 +113,7 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenAValidSendToInterlocRequestWithRep_thenPopulateDropdownWithPartiesOnCase() {
+    void givenAValidSendToInterlocRequestWithRep_thenPopulateDropdownWithPartiesOnCase() {
         setupCallback();
         sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative("Yes").build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -129,7 +131,7 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenAValidSendToInterlocRequestWithJointParty_thenPopulateDropdownWithPartiesOnCase() {
+    void givenAValidSendToInterlocRequestWithJointParty_thenPopulateDropdownWithPartiesOnCase() {
         setupCallback();
         sscsCaseData.getJointParty().setHasJointParty(YES);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -147,7 +149,7 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenAValidSendToInterlocRequestWithJointPartyAndRep_thenPopulateDropdownWithPartiesOnCase() {
+    void givenAValidSendToInterlocRequestWithJointPartyAndRep_thenPopulateDropdownWithPartiesOnCase() {
         setupCallback();
         sscsCaseData.getJointParty().setHasJointParty(YES);
         sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative("Yes").build());
@@ -166,5 +168,28 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
         expectedList.add(expectedListItem3);
 
         assertEquals(new DynamicList(expectedListItem1, expectedList), response.getData().getOriginalSender());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = EventType.class, names = {"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
+    void givenChildSupport_thenSelectedConfidentialityPartyHasNoDefaultSelection(EventType eventType) {
+        handler = new ValidSendToInterlocAboutToStartHandler(false, false);
+        when(callback.getEvent()).thenReturn(eventType);
+        setupCallback();
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertEquals("", response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode());
+    }
+
+    @Test
+    void givenNonChildSupport_thenSelectedConfidentialityPartyIsNotSet() {
+        setupCallback();
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("PIP").build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty());
     }
 }

@@ -1,6 +1,7 @@
 [
   {"LiveFrom": "12/02/2026", "CaseTypeID": "Benefit", "ID": "confidentialityTab", "Label": "Confidentiality", "FieldType": "Text", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "12/02/2026", "CaseTypeID": "Benefit", "ID": "confidentialityTabLabel", "Label": "${confidentialityTab}", "FieldType": "Label", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "19/02/2026", "CaseTypeID": "Benefit", "ID": "selectedConfidentialityParty", "Label": "Selected Party", "FieldType": "DynamicList", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "12/02/2026", "CaseTypeID": "Benefit", "ID": "showConfidentialityTab", "Label": "Show confidentiality tab", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "15/01/2026", "CaseTypeID": "Benefit", "ID": "awareOfAnyAdditionalOtherParties", "Label": "Are you aware of any additional Other Parties?", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "15/01/2026", "CaseTypeID": "Benefit", "ID": "addOtherPartyDetailsLabel", "Label": "Please add details of the other party.", "FieldType": "Label", "SecurityClassification": "PUBLIC"},
