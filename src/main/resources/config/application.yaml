@@ -166,6 +166,10 @@ docmosis:
             generic-letter:
                 cover: TB-SCS-LET-ENG-Cover-Sheet.docx
                 name: TB-SCS-LET-ENG-Issue-Generic-Letter.docx
+            hearing-enquiry-form:
+                cover: TB-SCS-LET-ENG-Cover-Sheet.docx
+                name: TB-SCS-GNO-ENG-Hearing-Enquiry-Form-Cover-Sheet.docx
+                form: TB-SCS-GNO-ENG-Hearing-Enquiry-Form.docx
             postHearingAppSorWritten:
                 cover: TB-SCS-GNO-ENG-00012.docx
                 name: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome-v3.docx
@@ -279,6 +283,8 @@ feature:
         enabled: ${HEARINGS_CASE_UPDATE_V2_ENABLED:false}
     cm-other-party-confidentiality:
         enabled: ${CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED:false}
+    severeConditions:
+        enabled: ${SEVERE_CONDITIONS_FEATURE:false}
 
 idam:
     api:
@@ -2153,4 +2159,3 @@ feign:
                 loggerLevel: full
             core-case-data-api:
                 loggerLevel: full
-

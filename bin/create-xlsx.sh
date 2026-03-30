@@ -144,6 +144,8 @@ fi
 
 echo "$excludedFilenamePatterns"
 
+az acr login --name hmctsprod --subscription 8999dec3-0104-4a27-94ee-6588559729d1
+
 docker run --rm --name json2xlsx \
   -v "${RUN_DIR}/definitions/${TYPE}:/tmp/json" \
   -v "${RUN_DIR}/definitions/${TYPE}:/tmp/output" \
@@ -158,5 +160,5 @@ docker run --rm --name json2xlsx \
   -e "CCD_DEF_ENV=${UPPERCASE_ENV}" \
   -e "CCD_DEF_VERSION=${CCD_DEF_VERSION}" \
   -e "CCD_DEF_PUBLISH=${CCD_DEF_PUBLISH}" \
-  hmctspublic.azurecr.io/ccd/definition-processor:latest \
+  hmctsprod.azurecr.io/ccd/definition-processor:latest \
   json2xlsx -D /tmp/json/sheets "$excludedFilenamePatterns" -o "/tmp/output/${ccdDefinitionFile}"

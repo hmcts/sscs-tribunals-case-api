@@ -3,6 +3,7 @@ import { BaseStep } from '../base';
 import { credentials } from '../../../config/config';
 import task from '../../../pages/content/action.unprocessed.correspondence.task_en.json';
 import actionFurtherEvidence from '../../../pages/content/action.further.evidence_en.json';
+import { VoidCase } from '../void.case';
 
 
 export class CtscActionUnprocessedCorrespondence extends BaseStep {
@@ -87,7 +88,7 @@ export class CtscActionUnprocessedCorrespondence extends BaseStep {
     
   }
 
-  async verifyActionUnprocessedCorrespondenceTaskCompleted(caseId: string) {
+  async verifyActionUnprocessedCorrespondenceTaskCompleted() {
     await this.homePage.navigateToTab('Tasks');
     await this.homePage.navigateToMyWork();
     await this.myWorkPage.verifyNoAssignedTasks();
@@ -104,19 +105,19 @@ export class CtscActionUnprocessedCorrespondence extends BaseStep {
       await this.tasksTab.verifyManageOptions(task.name, task.unassignedManageOptionsForCaseAllocator);
       await this.tasksTab.assignTaskToCtscUser(task.name, credentials.amCtscAdminNwLiverpool.email);
     } else {
-      await this.tasksTab.verifyTaskIsDisplayed("CTSC - Action Unprocessed Correspondence - Dormant/Post Hearing");
-      await this.tasksTab.verifyPriortiy("CTSC - Action Unprocessed Correspondence - Dormant/Post Hearing", task.priority);
-      await this.tasksTab.verifyPageContentByKeyValue("CTSC - Action Unprocessed Correspondence - Dormant/Post Hearing", 'Assigned to', task.assignedToWhenNotAssigned);
-      await this.tasksTab.verifyManageOptions("CTSC - Action Unprocessed Correspondence - Dormant/Post Hearing", task.unassignedManageOptionsForCaseAllocator);
-      await this.tasksTab.assignTaskToCtscUser("CTSC - Action Unprocessed Correspondence - Dormant/Post Hearing", credentials.amCtscAdminNwLiverpool.email);
+      await this.tasksTab.verifyTaskIsDisplayed(task.dormantName);
+      await this.tasksTab.verifyPriortiy(task.dormantName, task.priority);
+      await this.tasksTab.verifyPageContentByKeyValue(task.dormantName, 'Assigned to', task.assignedToWhenNotAssigned);
+      await this.tasksTab.verifyManageOptions(task.dormantName, task.unassignedManageOptionsForCaseAllocator);
+      await this.tasksTab.assignTaskToCtscUser(task.dormantName, credentials.amCtscAdminNwLiverpool.email);
     }
     await this.signOut();
     await this.loginUserWithCaseId(credentials.amCtscAdminNwLiverpool, false, caseId);
     await this.homePage.navigateToMyWork();
     if(!isDormant) {
-      await this.myWorkPage.verifyTaskAssignedToMe("Joe Bloggs", "Personal Independence Payment", "CARDIFF", "CTSC - Action Unprocessed Correspondence", "high");
+      await this.myWorkPage.verifyTaskAssignedToMe("Joe Bloggs", "Personal Independence Payment", "CARDIFF", task.name, task.priority);
     } else {
-      await this.myWorkPage.verifyTaskAssignedToMe("Joe Bloggs", "Personal Independence Payment", "CARDIFF", "CTSC - Action Unprocessed Correspondence - Dormant/Post Hearing", "high");
+      await this.myWorkPage.verifyTaskAssignedToMe("Joe Bloggs", "Personal Independence Payment", "CARDIFF", task.dormantName, task.priority);
     }
   }
 
@@ -126,7 +127,23 @@ export class CtscActionUnprocessedCorrespondence extends BaseStep {
     
   async markDuplicateUnprocessedCorrespondenceTasksAsDone(isDormant?: boolean) {
      await this.homePage.navigateToTab('Tasks');
-     await this.tasksTab.markMultipleTasksAsDone(isDormant ? "CTSC - Action Unprocessed Correspondence - Dormant/Post Hearing" : task.name);
-     await this.tasksTab.verifyTaskIsHidden(isDormant ? "CTSC - Action Unprocessed Correspondence - Dormant/Post Hearing" : task.name);
+     await this.tasksTab.markMultipleTasksAsDone(isDormant ? task.dormantName : task.name);
+     await this.tasksTab.verifyTaskIsHidden(isDormant ? task.dormantName : task.name);
+  }
+
+  async verifyActionUnprocessedCorrespondenceTaskIsCancelledWhenTheCaseIsVoid(caseId: string, isDormant?: boolean) {
+    let voidCase = new VoidCase(this.page);
+    
+    await this.loginPage.goToCase(caseId);
+    await this.homePage.navigateToTab('Tasks');
+
+    await this.tasksTab.verifyPageContentByKeyValue(isDormant ? task.dormantName : task.name, 'Assigned to', task.assignedTo);
+    await this.tasksTab.verifyManageOptions(isDormant ? task.dormantName : task.name, task.assignedManageOptionsForCaseAllocator);
+
+    await voidCase.performVoidCase(caseId, false);
+
+    await this.homePage.navigateToTab('Tasks');
+    await this.homePage.delay(30000);
+    await this.tasksTab.verifyTaskIsHidden(isDormant ? task.dormantName : task.name);
   }
 }

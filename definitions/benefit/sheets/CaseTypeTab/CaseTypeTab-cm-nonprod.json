@@ -1,6 +1,8 @@
 [
-  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "confidentiality", "TabLabel": "Confidentiality", "TabDisplayOrder": 3, "CaseFieldID": "isConfidentialCaseLabel", "TabFieldDisplayOrder": 1, "FieldShowCondition": "isConfidentialCase =\"Yes\""},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "summary_sscs", "TabLabel": "Summary", "TabDisplayOrder": 1, "CaseFieldID": "selectedConfidentialityParty", "TabFieldDisplayOrder": 59, "FieldShowCondition": "interlocReferralReason=\"confidentiality\""},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "confidentiality", "TabLabel": "Confidentiality", "TabDisplayOrder": 3, "CaseFieldID": "isConfidentialCaseLabel", "TabFieldDisplayOrder": 1, "TabShowCondition": "showConfidentialityTab=\"Yes\" OR appeal.benefitType.code=\"childSupport\"","FieldShowCondition": "isConfidentialCase =\"Yes\""},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "confidentiality", "TabLabel": "Confidentiality", "TabDisplayOrder": 3, "CaseFieldID": "confidentialityTab", "TabFieldDisplayOrder": 2, "FieldShowCondition": "summaryName=\"Do Not Show\""},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "confidentiality", "TabLabel": "Confidentiality", "TabDisplayOrder": 3, "CaseFieldID": "showConfidentialityTab", "TabFieldDisplayOrder": 2, "FieldShowCondition": "summaryName=\"Do Not Show\""},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "confidentiality", "TabLabel": "Confidentiality", "TabDisplayOrder": 3, "CaseFieldID": "confidentialityTabLabel", "TabFieldDisplayOrder": 2},
   {"LiveFrom": "15/01/2026", "CaseTypeID": "Benefit", "TabID": "other_party_sscs", "TabLabel": "Other Party Details", "TabDisplayOrder": 29, "CaseFieldID": "awareOfAnyAdditionalOtherParties", "TabFieldDisplayOrder": 2}
 ]

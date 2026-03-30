@@ -1,26 +1,13 @@
 {
   "name": "CTSC - Action Unprocessed Correspondence",
+  "dormantName": "CTSC - Action Unprocessed Correspondence - Dormant/Post Hearing",
   "priority": "high",
   "assignedToWhenNotAssigned": "Unassigned",
-  "assignedTo": "SSCS ctscadmin",
+  "assignedTo": "sscs-ctscdmin nw-liverpool",
   "unassignedManageOptions": ["Cancel task", "Assign to me"],
-  "assignedManageOptions": [
-    "Cancel task",
-    "Mark as done",
-    "Reassign task",
-    "Unassign task"
-  ],
-  "unassignedManageOptionsForCaseAllocator": [
-    "Assign task",
-    "Cancel task",
-    "Assign to me"
-  ],
-  "assignedManageOptionsForCaseAllocator": [
-    "Cancel task",
-    "Mark as done",
-    "Reassign task",
-    "Unassign task"
-  ],
+  "assignedManageOptions": ["Cancel task", "Mark as done", "Reassign task", "Unassign task"],
+  "unassignedManageOptionsForCaseAllocator": ["Assign task", "Cancel task", "Assign to me"],
+  "assignedManageOptionsForCaseAllocator": ["Cancel task", "Mark as done", "Reassign task", "Unassign task"],
   "nextStepsOptions": ["Action Further Evidence", "Manage Documents"],
   "actionFurtherEvidence": {
     "link": "Action Further Evidence",
