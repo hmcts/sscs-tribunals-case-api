@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -19,6 +20,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -62,6 +64,8 @@ public class ValidSendToInterlocMidEventHandlerTest {
 
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
+    @Mock
+    private CaseDetails<SscsCaseData> caseDetailsBefore;
 
     @Mock
     private IdamService idamService;
@@ -108,10 +112,39 @@ public class ValidSendToInterlocMidEventHandlerTest {
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
         when(callback.getEvent()).thenReturn(EventType.VALID_SEND_TO_INTERLOC);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseData);
         when(caseDetails.getState()).thenReturn(sscsCaseData.getState());
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
+    }
+
+    @Test
+    void givenConfidentialityPartySelected_thenMidEventKeepsSelectedValue() {
+        DynamicListItem selectedItem = new DynamicListItem("appellant", "Appellant (or Appointee)");
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(new DynamicList(selectedItem, null));
+        sscsCaseData.setSelectWhoReviewsCase(new DynamicList(new DynamicListItem(REVIEW_BY_JUDGE.getId(), REVIEW_BY_JUDGE.getLabel()), null));
+        sscsCaseData.setOtherParties(List.of());
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals("appellant", response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode());
+    }
+
+    @Test
+    void givenCurrentPayloadEmpty_thenMidEventLeavesSelectedConfidentialityPartyNull() {
+        DynamicListItem selectedItem = new DynamicListItem("appellant", "Appellant (or Appointee)");
+        SscsCaseData beforeCaseData = sscsCaseData.toBuilder().build();
+        beforeCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(new DynamicList(selectedItem, null));
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(null);
+        sscsCaseData.setSelectWhoReviewsCase(new DynamicList(new DynamicListItem(REVIEW_BY_JUDGE.getId(), REVIEW_BY_JUDGE.getLabel()), null));
+        sscsCaseData.setOtherParties(List.of());
+        when(caseDetailsBefore.getCaseData()).thenReturn(beforeCaseData);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty());
     }
 
     @Test

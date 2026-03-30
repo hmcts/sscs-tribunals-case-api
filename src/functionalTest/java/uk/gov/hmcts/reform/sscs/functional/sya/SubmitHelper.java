@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.functional.sya;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
+import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTHORISATION_HEADER;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS;
 
 import io.restassured.RestAssured;
@@ -58,13 +59,14 @@ public class SubmitHelper {
         return body.replace("MRN_DWP_ISSUING_OFFICE", dwpIssuingOffice);
     }
 
-    protected Response submitAppeal(String nino, LocalDate mrnDate) {
+    protected Response submitAppeal(String nino, LocalDate mrnDate, String serviceAuthorization) {
         String body = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS.getSerializedMessage();
         body = setNino(body, nino);
         body = setLatestMrnDate(body, mrnDate);
 
         return RestAssured.given()
             .header("Content-Type", "application/json")
+            .header(SERVICE_AUTHORISATION_HEADER, serviceAuthorization)
             .body(body)
             .post("/appeals");
     }

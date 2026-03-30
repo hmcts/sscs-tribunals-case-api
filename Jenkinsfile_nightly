@@ -93,8 +93,6 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 
 def setEnvVars(envName) {
     env.PREVIEW_BRANCH_WITH_LOCAL_CCD = false
-    env.TEST_E2E_URL_WEB = "https://manage-case.${envName}.platform.hmcts.net/"
-    env.TEST_E2E_API_URI = "http://sscs-tribunals-api-${envName}.service.core-compute-${envName}.internal"
     env.CCD_API_URL = "http://ccd-data-store-api-${envName}.service.core-compute-${envName}.internal"
     env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-${envName}.service.core-compute-${envName}.internal"
     env.CCD_GW_API = "https://gateway-ccd.${envName}.platform.hmcts.net"
@@ -111,6 +109,7 @@ withNightlyPipeline(type, product, component) {
     env.Rules = params.SecurityRules
     setEnvVars(env.NONPROD_ENVIRONMENT_NAME)
     env.TEST_E2E_URL_WEB = params.UI_URL_TO_TEST
+    env.TEST_E2E_API_URI = params.API_URL_TO_TEST
 
     loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')

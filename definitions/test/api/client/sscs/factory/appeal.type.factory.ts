@@ -49,7 +49,7 @@ async function createCaseBasedOnCaseType(caseType: string) {
   let caseTypeLower = caseType.toLowerCase();
   let apiUrl =
     caseTypeLower.includes('incomplete') ||
-    caseTypeLower.includes('noncompliant')
+      caseTypeLower.includes('noncompliant')
       ? `${urls.tribunalsApiUri}/appeals`
       : `${urls.tribunalsApiUri}/api/appeals`;
 
@@ -57,9 +57,21 @@ async function createCaseBasedOnCaseType(caseType: string) {
     dataPayload.appellant.nino = StringUtilsComponent.getRandomNINumber();
   }
 
-  const response = await apiContext.post(apiUrl, {
+  const headers = { 'Content-Type': 'application/json' };
+
+  if (caseTypeLower.includes('incomplete')) {
+    const s2sResponse = await apiContext.post(`${urls.s2sUrl}/testing-support/lease`, {
+      data: { microservice: 'sscs' }
+    });
+
+    headers['ServiceAuthorization'] = await s2sResponse.text();
+  }
+
+  let response = await apiContext.post(apiUrl, {
+    headers,
     data: dataPayload
   });
+
   const respHeaders = response.headers();
   const locationUrl: string = respHeaders.location;
   return locationUrl.substring(locationUrl.lastIndexOf('/') + 1);
