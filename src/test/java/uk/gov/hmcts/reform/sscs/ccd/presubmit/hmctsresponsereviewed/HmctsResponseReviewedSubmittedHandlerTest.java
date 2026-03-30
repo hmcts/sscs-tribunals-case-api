@@ -254,5 +254,4 @@ public class HmctsResponseReviewedSubmittedHandlerTest {
         assertThatExceptionOfType(FeignException.class).isThrownBy(
                 () ->  handler.handle(SUBMITTED, callback, USER_AUTHORISATION));
     }
-
 }
