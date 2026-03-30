@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REJECT_HEARING_RECORDING_REQUEST;
@@ -18,6 +19,7 @@ import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -192,13 +194,15 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             caseData.setInterlocReferralReason(REJECT_HEARING_RECORDING_REQUEST);
         } else if (DirectionType.ISSUE_AND_SEND_TO_ADMIN.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION);
-        } else if (CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
-            || CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
-            updateAppellantConfidentialityFromDirection(caseData);
+        } else if (isConfidentialityDirection(caseData.getDirectionTypeDl().getValue().getCode())) {
+            if (isBenefitTypeWithConfidentialityTab(caseData)) {
+                applyConfidentialityDecisionFromDirection(caseData);
+            }
             caseData.setInterlocReviewState(null);
         } else {
             caseData.setInterlocReviewState(null);
         }
+
         return caseData;
     }
 
@@ -206,6 +210,15 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         return caseData.getAppeal().getBenefitType() != null
             && Benefit.CHILD_SUPPORT.getShortName().equalsIgnoreCase(caseData.getAppeal().getBenefitType().getCode())
             ? dwpResponseDueDaysChildSupport : dwpResponseDueDays;
+    }
+
+    private boolean isConfidentialityDirection(String directionTypeCode) {
+        return CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString().equals(directionTypeCode)
+            || CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN.toString().equals(directionTypeCode);
+    }
+
+    private boolean isBenefitTypeWithConfidentialityTab(SscsCaseData caseData) {
+        return caseData.isBenefitType(Benefit.CHILD_SUPPORT) || caseData.isBenefitType(Benefit.UC);
     }
 
     private SscsCaseData updateCaseAfterReinstatementGranted(SscsCaseData caseData, SscsDocumentTranslationStatus documentTranslationStatus) {
@@ -350,7 +363,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         caseData.setInterlocReferralReason(null);
     }
 
-    private void updateAppellantConfidentialityFromDirection(SscsCaseData caseData) {
+    private void applyConfidentialityDecisionFromDirection(SscsCaseData caseData) {
         String directionType = caseData.getDirectionTypeDl().getValue().getCode();
         YesNo confidentialityRequired = CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString().equals(directionType) ? YesNo.YES : YesNo.NO;
         String selectedConfidentialityPartyCode = Optional.ofNullable(caseData.getExtendedSscsCaseData())
@@ -365,6 +378,9 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         }
 
         caseData.getAppellant().ifPresent(appellant -> {
+            if (confidentialityRequired == appellant.getConfidentialityRequired()) {
+                return;
+            }
             appellant.setConfidentialityRequired(confidentialityRequired);
             appellant.setConfidentialityRequiredChangedDate(LocalDateTime.now());
             log.info("Updated appellant confidentiality to {} for case id {}", confidentialityRequired, caseData.getCcdCaseId());
@@ -372,7 +388,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     }
 
     private boolean isOtherPartyReferral(String selectedConfidentialityPartyCode) {
-        return !isBlank(selectedConfidentialityPartyCode) && selectedConfidentialityPartyCode.startsWith(OTHER_PARTY.getCode());
+        return isNotBlank(selectedConfidentialityPartyCode) && selectedConfidentialityPartyCode.startsWith(OTHER_PARTY.getCode());
     }
 
     private void updateReferredOtherPartyConfidentiality(SscsCaseData caseData, YesNo confidentialityRequired, String selectedConfidentialityPartyCode) {
@@ -383,10 +399,13 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         caseData.getOtherParties().stream()
             .map(CcdValue::getValue)
-            .filter(otherParty -> otherParty != null)
+            .filter(Objects::nonNull)
             .filter(otherParty -> isMatchingOtherParty(otherParty, otherPartyId))
             .findFirst()
             .ifPresent(otherParty -> {
+                if (confidentialityRequired == otherParty.getConfidentialityRequired()) {
+                    return;
+                }
                 otherParty.setConfidentialityRequired(confidentialityRequired);
                 otherParty.setConfidentialityRequiredChangedDate(LocalDateTime.now());
                 log.info("Updated other party confidentiality to {} for case id {} and other party id {}",
@@ -396,7 +415,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
     private boolean isMatchingOtherParty(OtherParty otherParty, String otherPartyId) {
         if (isBlank(otherPartyId)) {
-            return true;
+            return false;
         }
 
         if (otherPartyId.equals(otherParty.getId())) {
