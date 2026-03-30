@@ -6,7 +6,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcPointsRegulationsAndSchedule7ActivitiesCondition.HIGH_POINTS_SCHEDULE_9_PARAGRAPH_4_UNSPECIFIED;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcPointsRegulationsAndSchedule7ActivitiesCondition.LOW_POINTS_SCHEDULE6_AND_REG_29_SKIPPED_SCHEDULE_9_PARAGRAPH_4_UNSPECIFIED_SUPPORT_GROUP_ONLY;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcPointsRegulationsAndSchedule7ActivitiesCondition.SEVERE_CONDITIONS;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcPointsRegulationsAndSchedule7ActivitiesCondition.SEVERE_CONDITIONS_WITH_SV_ISSUE_CODE;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -393,13 +393,13 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
         List<UcPointsRegulationsAndSchedule7ActivitiesCondition> applicableConditions = getAllApplicableRegulationsAndSchedule7ActivitiesConditionsForCaseData(caseData);
 
         Assert.assertEquals(1,applicableConditions.size());
-        Assert.assertEquals(SEVERE_CONDITIONS, applicableConditions.getFirst());
+        Assert.assertEquals(SEVERE_CONDITIONS_WITH_SV_ISSUE_CODE, applicableConditions.getFirst());
         Assert.assertTrue(applicableConditions.getFirst().getOptionalErrorMessage(questionService, caseData).isEmpty());
 
         List<UcAllowedOrRefusedCondition> applicableAllowedOrRefusedConditions = getAllApplicableUcAllowedOrRefusedConditionsForCaseData(caseData);
 
         Assert.assertEquals(1, applicableAllowedOrRefusedConditions.size());
-        Assert.assertEquals(UcAllowedOrRefusedCondition.SEVERE_CONDITIONS_ALLOWED_SV_CASE, applicableAllowedOrRefusedConditions.getFirst());
+        Assert.assertEquals(UcAllowedOrRefusedCondition.SEVERE_CONDITIONS_ALLOWED_SV_ISSUE_CODE_CASE, applicableAllowedOrRefusedConditions.getFirst());
         Assert.assertTrue(applicableAllowedOrRefusedConditions.getFirst().getOptionalErrorMessage(questionService, caseData).isEmpty());
     }
 
@@ -434,7 +434,7 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
         List<UcAllowedOrRefusedCondition> applicableAllowedOrRefusedConditions = getAllApplicableUcAllowedOrRefusedConditionsForCaseData(caseData);
 
         Assert.assertEquals(1, applicableAllowedOrRefusedConditions.size());
-        Assert.assertEquals(UcAllowedOrRefusedCondition.SEVERE_CONDITIONS_ALLOWED_HIGH_POINTS_NON_SV_CASE, applicableAllowedOrRefusedConditions.getFirst());
+        Assert.assertEquals(UcAllowedOrRefusedCondition.SEVERE_CONDITIONS_ALLOWED_HIGH_POINTS_SEVERE_CONDITIONS_CASE, applicableAllowedOrRefusedConditions.getFirst());
         Assert.assertTrue(applicableAllowedOrRefusedConditions.getFirst().getOptionalErrorMessage(questionService, caseData).isEmpty());
     }
 
@@ -468,7 +468,7 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
         List<UcAllowedOrRefusedCondition> applicableAllowedOrRefusedConditions = getAllApplicableUcAllowedOrRefusedConditionsForCaseData(caseData);
 
         Assert.assertEquals(1, applicableAllowedOrRefusedConditions.size());
-        Assert.assertEquals(UcAllowedOrRefusedCondition.ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_7_SELECTED_SV, applicableAllowedOrRefusedConditions.getFirst());
+        Assert.assertEquals(UcAllowedOrRefusedCondition.ALLOWED_SUPPORT_GROUP_ONLY_SEVERE_CONDITIONS_CASE, applicableAllowedOrRefusedConditions.getFirst());
         Assert.assertTrue(applicableAllowedOrRefusedConditions.getFirst().getOptionalErrorMessage(questionService, caseData).isEmpty());
     }
 
@@ -503,7 +503,7 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
         List<UcAllowedOrRefusedCondition> applicableAllowedOrRefusedConditions = getAllApplicableUcAllowedOrRefusedConditionsForCaseData(caseData);
 
         Assert.assertEquals(1, applicableAllowedOrRefusedConditions.size());
-        Assert.assertEquals(UcAllowedOrRefusedCondition.ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS_SV, applicableAllowedOrRefusedConditions.getFirst());
+        Assert.assertEquals(UcAllowedOrRefusedCondition.ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS_SEVERE_CONDITIONS_CASE, applicableAllowedOrRefusedConditions.getFirst());
         Assert.assertTrue(applicableAllowedOrRefusedConditions.getFirst().getOptionalErrorMessage(questionService, caseData).isEmpty());
     }
 

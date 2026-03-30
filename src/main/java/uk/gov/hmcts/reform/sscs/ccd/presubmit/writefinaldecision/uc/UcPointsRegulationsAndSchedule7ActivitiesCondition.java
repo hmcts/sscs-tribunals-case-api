@@ -85,7 +85,7 @@ public enum UcPointsRegulationsAndSchedule7ActivitiesCondition implements Points
     NON_WCA_APPEAL(UcPointsCondition.POINTS_LESS_THAN_FIFTEEN,
             Arrays.asList(isWcaAppeal(FALSE)), Optional.empty(), false, isDwpReassessTheAward(UNSPECIFIED)),
     //Scenario 13
-    SEVERE_CONDITIONS(UcPointsCondition.POINTS_LESS_THAN_FIFTEEN, Arrays.asList(isWcaAppeal(TRUE), isSevereConditions(TRUE),
+    SEVERE_CONDITIONS_WITH_SV_ISSUE_CODE(UcPointsCondition.POINTS_LESS_THAN_FIFTEEN, Arrays.asList(isWcaAppeal(TRUE), isSevereConditions(TRUE),
             isSupportGroupOnly(NOT_TRUE,false), isSchedule8Paragraph4(UNSPECIFIED)),
             Optional.empty(), false, isSchedule7ActivitiesAnswer(StringListPredicate.UNSPECIFIED));
     List<YesNoFieldCondition> primaryConditions;
