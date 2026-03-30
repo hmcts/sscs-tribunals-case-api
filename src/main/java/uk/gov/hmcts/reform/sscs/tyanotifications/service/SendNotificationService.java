@@ -269,10 +269,10 @@ public class SendNotificationService {
     }
 
     private boolean shouldNotSend(NotificationWrapper wrapper) {
-        return (cmOtherPartyConfidentialityEnabled && VALID_APPEAL_CREATED == wrapper.getNotificationType() && !wrapper
+        return (cmOtherPartyConfidentialityEnabled && VALID_APPEAL_CREATED.equals(wrapper.getNotificationType()) && !wrapper
             .getNewSscsCaseData()
             .isBenefitType(CHILD_SUPPORT))
-            || (!cmOtherPartyConfidentialityEnabled && VALID_APPEAL_CREATED == wrapper.getNotificationType());
+            || (!cmOtherPartyConfidentialityEnabled && VALID_APPEAL_CREATED.equals(wrapper.getNotificationType()));
     }
 
     protected void sendLetterNotificationToAddress(NotificationWrapper wrapper, Notification notification, final Address address, SubscriptionWithType subscriptionWithType) throws NotificationClientException {

@@ -874,7 +874,7 @@ public class Personalisation<E extends NotificationWrapper> {
                 return getSubscriptionTemplateNameWithDirection(notificationEventType, directionType, subscriptionType);
             }
             if (NOTIFY_APPELLANT_VALID_APPEAL.equals(notificationEventType) && DirectionType.APPEAL_TO_PROCEED.toString().equals(directionType)) {
-                return getSubscriptionTemplateNameWithDirection(notificationEventType, "validAppeal", subscriptionType);
+                return getSubscriptionTemplateNameWithDirection(notificationEventType, "appealToProceedNotifyValidAppeal", subscriptionType);
             }
         }
 

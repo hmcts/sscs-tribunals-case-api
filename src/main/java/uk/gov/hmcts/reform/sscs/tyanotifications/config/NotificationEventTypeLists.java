@@ -31,6 +31,7 @@ public final class NotificationEventTypeLists {
         DWP_RESPONSE_RECEIVED,
         DWP_UPLOAD_RESPONSE,
         EVIDENCE_RECEIVED,
+        INTERLOC_VALID_APPEAL,
         ISSUE_ADJOURNMENT_NOTICE,
         ISSUE_ADJOURNMENT_NOTICE_WELSH,
         ISSUE_FINAL_DECISION,
@@ -60,7 +61,9 @@ public final class NotificationEventTypeLists {
         JOINT_PARTY_ADDED,
         ACTION_HEARING_RECORDING_REQUEST,
         ACTION_POSTPONEMENT_REQUEST_WELSH,
-        UPDATE_OTHER_PARTY_DATA
+        UPDATE_OTHER_PARTY_DATA,
+        VALID_APPEAL,
+        VALID_APPEAL_CREATED
     );
 
     // TODO move to EVENTS_TO_HANDLE when feature.postHearings.enabled removed
@@ -143,6 +146,7 @@ public final class NotificationEventTypeLists {
         DWP_UPLOAD_RESPONSE,
         HEARING_BOOKED,
         HMCTS_APPEAL_LAPSED,
+        INTERLOC_VALID_APPEAL,
         ISSUE_ADJOURNMENT_NOTICE,
         ISSUE_ADJOURNMENT_NOTICE_WELSH,
         ISSUE_FINAL_DECISION,
@@ -171,6 +175,7 @@ public final class NotificationEventTypeLists {
         STRUCK_OUT,
         STATEMENT_OF_REASONS_REQUEST,
         UPDATE_OTHER_PARTY_DATA,
+        VALID_APPEAL,
         VALID_APPEAL_CREATED
     );
 
@@ -234,6 +239,7 @@ public final class NotificationEventTypeLists {
         DWP_UPLOAD_RESPONSE,
         HEARING_BOOKED,
         HMCTS_APPEAL_LAPSED,
+        INTERLOC_VALID_APPEAL,
         ISSUE_ADJOURNMENT_NOTICE,
         ISSUE_ADJOURNMENT_NOTICE_WELSH,
         ISSUE_FINAL_DECISION,
@@ -263,6 +269,7 @@ public final class NotificationEventTypeLists {
         STATEMENT_OF_REASONS_REQUEST,
         STRUCK_OUT,
         UPDATE_OTHER_PARTY_DATA,
+        VALID_APPEAL,
         VALID_APPEAL_CREATED
     );
 

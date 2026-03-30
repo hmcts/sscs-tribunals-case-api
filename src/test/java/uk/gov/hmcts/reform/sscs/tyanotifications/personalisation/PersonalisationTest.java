@@ -500,8 +500,8 @@ class PersonalisationTest {
 
     @ParameterizedTest
     @CsvSource({
-        "APPELLANT, directionIssued.validAppeal.appellant",
-        "APPOINTEE, directionIssued.validAppeal.appointee"
+        "APPELLANT, directionIssued.appealToProceedNotifyValidAppeal.appellant",
+        "APPOINTEE, directionIssued.appealToProceedNotifyValidAppeal.appointee"
     })
     void whenNotifyAppellantValidAppealWithAppealToProceedDirection_shouldGenerateDocmosisTemplateUnderValidAppeal(
             SubscriptionType subscriptionType, String expectedDocmosisTemplate) {

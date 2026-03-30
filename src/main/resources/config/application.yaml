@@ -711,7 +711,7 @@ notification:
             docmosisId: TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx
         interlocValidAppeal:
             docmosisId: TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx
-        notifyAppellantValidAppeal:
+        validAppeal:
             docmosisId: TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx
         directionIssued:
             appealToProceed:
@@ -725,7 +725,7 @@ notification:
                     docmosisId: TB-SCS-GNO-ENG-00551-v3.docx
                 other_party:
                     docmosisId: TB-SCS-GNO-ENG-00551-v3.docx
-            validAppeal:
+            appealToProceedNotifyValidAppeal:
                 appellant:
                     docmosisId: TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx
                 appointee:
