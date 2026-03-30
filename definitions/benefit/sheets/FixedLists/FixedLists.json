@@ -148,6 +148,7 @@
   {"LiveFrom": "01/01/2018", "ID": "FL_interlocWorkflow", "ListElementCode": "awaitingAdminAction", "ListElement": "Awaiting Admin Action"},
   {"LiveFrom": "01/01/2018", "ID": "FL_interlocWorkflow", "ListElementCode": "awaitingInformation", "ListElement": "Awaiting Information"},
   {"LiveFrom": "01/01/2018", "ID": "FL_interlocWorkflow", "ListElementCode": "none", "ListElement": "N/A"},
+  {"LiveFrom": "01/01/2018", "ID": "FL_interlocWorkflow", "ListElementCode": "hefIssued", "ListElement": "HEF Issued"},
   {"LiveFrom": "01/01/2018", "ID": "FL_selectWhoReviewsCase", "ListElementCode": "reviewByTcw", "ListElement": "Review by TCW"},
   {"LiveFrom": "01/01/2018", "ID": "FL_selectWhoReviewsCase", "ListElementCode": "reviewByJudge", "ListElement": "Review by Judge"},
   {"LiveFrom": "01/01/2018", "ID": "FL_selectWhoReviewsCase", "ListElementCode": "postponementRequestInterlocSendToTcw", "ListElement": "Postponement request for interloc - send to TCW"},
