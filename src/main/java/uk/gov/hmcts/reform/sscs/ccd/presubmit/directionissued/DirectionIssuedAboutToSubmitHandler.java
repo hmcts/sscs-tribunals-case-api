@@ -13,6 +13,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.APPELLANT;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.OTHER_PARTY;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 
@@ -377,18 +378,28 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             return;
         }
 
-        caseData.getAppellant().ifPresent(appellant -> {
-            if (confidentialityRequired == appellant.getConfidentialityRequired()) {
-                return;
-            }
-            appellant.setConfidentialityRequired(confidentialityRequired);
-            appellant.setConfidentialityRequiredChangedDate(LocalDateTime.now());
-            log.info("Updated appellant confidentiality to {} for case id {}", confidentialityRequired, caseData.getCcdCaseId());
-        });
+        if (isAppellantReferral(selectedConfidentialityPartyCode)) {
+            caseData.getAppellant().ifPresent(appellant -> {
+                if (confidentialityRequired == appellant.getConfidentialityRequired()) {
+                    return;
+                }
+                appellant.setConfidentialityRequired(confidentialityRequired);
+                appellant.setConfidentialityRequiredChangedDate(LocalDateTime.now());
+                log.info("Updated appellant confidentiality to {} for case id {}", confidentialityRequired, caseData.getCcdCaseId());
+            });
+            return;
+        }
+
+        log.warn("Unrecognised confidentiality target '{}'. No confidentiality update applied for case {}",
+            selectedConfidentialityPartyCode, caseData.getCcdCaseId());
     }
 
     private boolean isOtherPartyReferral(String selectedConfidentialityPartyCode) {
         return isNotBlank(selectedConfidentialityPartyCode) && selectedConfidentialityPartyCode.startsWith(OTHER_PARTY.getCode());
+    }
+
+    private boolean isAppellantReferral(String selectedConfidentialityPartyCode) {
+        return isNotBlank(selectedConfidentialityPartyCode) && APPELLANT.getCode().equals(selectedConfidentialityPartyCode);
     }
 
     private void updateReferredOtherPartyConfidentiality(SscsCaseData caseData, YesNo confidentialityRequired, String selectedConfidentialityPartyCode) {

@@ -21,6 +21,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.APPELLANT;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.OTHER_PARTY;
 
 import java.time.LocalDate;
@@ -558,6 +559,8 @@ class DirectionIssuedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().getAppeal()
             .setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(directionType));
+        callback.getCaseDetails().getCaseData().getExtendedSscsCaseData()
+            .setSelectedConfidentialityParty(new DynamicList(APPELLANT.getCode()));
         final LocalDateTime testStart = LocalDateTime.now();
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
