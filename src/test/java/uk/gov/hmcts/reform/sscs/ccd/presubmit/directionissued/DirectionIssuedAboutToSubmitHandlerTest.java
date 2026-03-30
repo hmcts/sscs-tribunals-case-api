@@ -656,6 +656,39 @@ class DirectionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
+    void givenOtherPartyRepresentativeIdSelected_shouldNotUpdateAnyOtherPartyConfidentiality() {
+        callback.getCaseDetails().getCaseData().getAppeal()
+            .setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(
+            new DynamicList(DirectionType.CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString()));
+        callback.getCaseDetails().getCaseData().getExtendedSscsCaseData()
+            .setSelectedConfidentialityParty(new DynamicList(OTHER_PARTY.getCode() + "rep-1"));
+
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(NO);
+        callback.getCaseDetails().getCaseData().setOtherParties(List.of(
+            CcdValue.<OtherParty>builder()
+                .value(OtherParty.builder()
+                    .id("op1")
+                    .confidentialityRequired(NO)
+                    .rep(Representative.builder().id("rep-1").build())
+                    .build())
+                .build(),
+            CcdValue.<OtherParty>builder()
+                .value(OtherParty.builder().id("op2").confidentialityRequired(YES).build())
+                .build()
+        ));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(NO, response.getData().getAppeal().getAppellant().getConfidentialityRequired());
+        assertNull(response.getData().getAppeal().getAppellant().getConfidentialityRequiredChangedDate());
+        assertEquals(NO, response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequired());
+        assertNull(response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequiredChangedDate());
+        assertEquals(YES, response.getData().getOtherParties().get(1).getValue().getConfidentialityRequired());
+        assertNull(response.getData().getOtherParties().get(1).getValue().getConfidentialityRequiredChangedDate());
+    }
+
+    @Test
     void givenDirectionTypeOfConfidentialityDecisionForNonConfidentialityTabBenefit_shouldNotUpdateConfidentiality() {
         callback.getCaseDetails().getCaseData().getAppeal()
             .setBenefitType(BenefitType.builder().code("pip").build());

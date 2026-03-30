@@ -429,11 +429,6 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             return false;
         }
 
-        if (otherPartyId.equals(otherParty.getId())) {
-            return true;
-        }
-
-        return Optional.ofNullable(otherParty.getAppointee()).map(Appointee::getId).filter(otherPartyId::equals).isPresent()
-            || Optional.ofNullable(otherParty.getRep()).map(Representative::getId).filter(otherPartyId::equals).isPresent();
+        return otherPartyId.equals(otherParty.getId());
     }
 }
