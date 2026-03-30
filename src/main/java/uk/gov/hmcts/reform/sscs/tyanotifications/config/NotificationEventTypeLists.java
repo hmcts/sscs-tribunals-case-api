@@ -62,8 +62,7 @@ public final class NotificationEventTypeLists {
         ACTION_HEARING_RECORDING_REQUEST,
         ACTION_POSTPONEMENT_REQUEST_WELSH,
         UPDATE_OTHER_PARTY_DATA,
-        VALID_APPEAL,
-        VALID_APPEAL_CREATED
+        VALID_APPEAL
     );
 
     // TODO move to EVENTS_TO_HANDLE when feature.postHearings.enabled removed
