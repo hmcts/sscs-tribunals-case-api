@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.functional.mya;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class AppellantStatementTest extends BaseFunctionTest {
 

@@ -308,7 +308,12 @@ idam:
         url: ${IDAM_S2S_AUTH:http://localhost:4502}
     url: ${IDAM_API_URL:http://localhost:5062}
 
-allowed-services-for-callback : ccd_data,bulk_scan_processor,bulk_scan_orchestrator,sscs  # comma separated list of service names
+allowed-services-for-callback : ccd_data,bulk_scan_processor,bulk_scan_orchestrator,sscs # comma separated list of service names
+s2s:
+    service-to-endpoint-mapping:
+        sscs: /document, /appeals, /evidence/upload, /api/continuous-online-hearings
+        ccd: /ccdAboutToStart, /ccdAboutToSubmit, /ccdSubmittedEvent, /ccdMidEvent
+        bulkscan: /validate-record, /forms/, /transform-exception-record, /transform-scanned-data
 
 judicial-ref:
     api:
