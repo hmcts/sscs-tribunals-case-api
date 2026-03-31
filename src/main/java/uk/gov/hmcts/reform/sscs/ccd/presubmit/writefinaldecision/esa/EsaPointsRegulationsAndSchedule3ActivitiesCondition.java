@@ -73,7 +73,7 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
     // SCENARIO 10
     NON_WCA_APPEAL(EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN,
             Arrays.asList(isWcaAppeal(FALSE)), Optional.empty(), false, isDwpReassessTheAward(UNSPECIFIED)),
-    SEVERE_CONDITIONS(EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN, Arrays.asList(isWcaAppeal(TRUE), isSevereConditions(TRUE)), Optional.empty(), true);
+    SEVERE_CONDITIONS(EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN, Arrays.asList(isWcaAppeal(TRUE), isSevereConditions(TRUE), isRegulation29(UNSPECIFIED)), Optional.empty(), true);
     List<YesNoFieldCondition> primaryConditions;
     List<FieldCondition> validationConditions;
 
@@ -132,7 +132,7 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
 
     static YesNoFieldCondition isSevereConditions(Predicate<YesNo> predicate) {
         return new YesNoFieldCondition("Severe Conditions", predicate,
-                sscsCaseData -> YesNo.isYes(sscsCaseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo())  ? YesNo.YES : YesNo.NO, false);
+            s -> s.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply() == null ? YesNo.NO : YesNo.YES, false);
     }
 
     static YesNoFieldCondition isDwpReassessTheAward(Predicate<YesNo> predicate) {
