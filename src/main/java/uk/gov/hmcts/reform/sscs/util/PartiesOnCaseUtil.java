@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
@@ -89,23 +88,6 @@ public class PartiesOnCaseUtil {
         return sscsCaseData.getBenefitType()
                 .filter(f -> f == Benefit.CHILD_SUPPORT)
                 .isPresent();
-    }
-
-    public static DynamicList getSelectedConfidentialityPartyDropdown(SscsCaseData sscsCaseData) {
-        List<DynamicListItem> listOptions = getPartiesOnCase(sscsCaseData);
-
-        DynamicList existingSelectedConfidentialityParty = sscsCaseData.getExtendedSscsCaseData().getSelectedConfidentialityParty();
-        DynamicListItem existingValue = existingSelectedConfidentialityParty != null
-                ? existingSelectedConfidentialityParty.getValue()
-                : null;
-
-        if (existingValue != null
-                && existingValue.getCode() != null
-                && listOptions.stream().anyMatch(option -> option.getCode().equals(existingValue.getCode()))) {
-            return new DynamicList(existingValue, listOptions);
-        }
-
-        return new DynamicList(new DynamicListItem("", ""), listOptions);
     }
 
     public static List<String> getAllOtherPartiesOnCase(SscsCaseData sscsCaseData) {
