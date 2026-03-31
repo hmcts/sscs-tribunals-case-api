@@ -42,7 +42,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
         if (isSevereConditionsEnabled) {
             if (nonNull(sscsCaseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo()) && !severeConditionQuestionIsValid(sscsCaseData)) {
                 sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(null);
-                sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereCriteriaApply(null);
+                sscsCaseData.getExtendedSscsCaseData().setEsaWriteFinalDecisionSevereCriteriaApply(null);
             }
         }
     }

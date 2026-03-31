@@ -88,7 +88,20 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "severeCriteria",
     "PageLabel": "Severe Conditions Criteria",
-    "PageShowCondition":  "(showSchedule7ActivitiesPage = \"Yes\" AND ucWriteFinalDecisionSchedule7ActivitiesApply = \"Yes\" AND ucWriteFinalDecisionSchedule7ActivitiesQuestion !=\"\" AND writeFinalDecisionAllowedOrRefused = \"allowed\") OR (showSchedule3ActivitiesPage = \"Yes\" AND esaWriteFinalDecisionSchedule3ActivitiesApply=\"Yes\") OR writeFinalDecisionSevereYesNo = \"Yes\"",
+    "PageShowCondition":  "(showSchedule7ActivitiesPage = \"Yes\" AND ucWriteFinalDecisionSchedule7ActivitiesApply = \"Yes\" AND ucWriteFinalDecisionSchedule7ActivitiesQuestion !=\"\" AND writeFinalDecisionAllowedOrRefused = \"allowed\") OR (appeal.benefitType.code = \"UC\" AND writeFinalDecisionSevereYesNo = \"Yes\")",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseEventID": "writeFinalDecision",
+    "CaseFieldID": "esaWriteFinalDecisionSevereCriteriaApply",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "17/03/2026",
+    "PageDisplayOrder": 63,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "esaSevereCriteria",
+    "PageLabel": "Severe Conditions Criteria",
+    "PageShowCondition":  "(showSchedule3ActivitiesPage = \"Yes\" AND esaWriteFinalDecisionSchedule3ActivitiesApply=\"Yes\" AND writeFinalDecisionAllowedOrRefused = \"allowed\") OR (appeal.benefitType.code = \"ESA\" AND writeFinalDecisionSevereYesNo = \"Yes\")",
     "ShowSummaryChangeOption": "Y"
   },
   {
