@@ -4,12 +4,12 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import jakarta.validation.Validator;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionMidEventValidationHandlerBase;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 
@@ -110,5 +110,20 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
 
     private boolean isWcaNotSupportGroupOnly(SscsCaseData sscsCaseData) {
         return sscsCaseData.isWcaAppeal() && !sscsCaseData.isSupportGroupOnlyAppeal();
+    }
+
+    private boolean severeConditionQuestionIsValid(SscsCaseData sscsCaseData) {
+        if (Issue.SV.name().equals(sscsCaseData.getIssueCode())) {
+            return true;
+        }
+        if (sscsCaseData.getElementsDisputedLimitedWork() == null) {
+            return false;
+        } else {
+            return sscsCaseData.getElementsDisputedLimitedWork().stream()
+                    .map(ElementDisputed::getValue)
+                    .filter(Objects::nonNull)
+                    .map(ElementDisputedDetails::getIssueCode)
+                    .anyMatch(issueCode -> Issue.SV.name().equals(issueCode));
+        }
     }
 }

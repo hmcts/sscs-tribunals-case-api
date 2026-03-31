@@ -9,7 +9,6 @@ import jakarta.validation.Validator;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -118,20 +117,4 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
         }
         return false;
     }
-
-    protected boolean severeConditionQuestionIsValid(SscsCaseData sscsCaseData) {
-        if (Issue.SV.name().equals(sscsCaseData.getIssueCode())) {
-            return true;
-        }
-        if (sscsCaseData.getElementsDisputedLimitedWork() == null) {
-            return false;
-        } else {
-            return sscsCaseData.getElementsDisputedLimitedWork().stream()
-                    .map(ElementDisputed::getValue)
-                    .filter(Objects::nonNull)
-                    .map(ElementDisputedDetails::getIssueCode)
-                    .anyMatch(issueCode -> Issue.SV.name().equals(issueCode));
-        }
-    }
-
 }
