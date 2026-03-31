@@ -13,6 +13,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFin
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import java.time.LocalDate;
+import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.NamedParameters;
 import junitparams.Parameters;
@@ -35,6 +36,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ElementDisputed;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ElementDisputedDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
@@ -68,6 +71,11 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
     @Mock
     protected UserInfo userInfo;
 
+    @Mock
+    protected ElementDisputed elementDisputed;
+
+    @Mock
+    protected ElementDisputedDetails elementDisputedDetails;
 
     @Mock
     protected DecisionNoticeService decisionNoticeService;
@@ -409,5 +417,49 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
     public void throwsExceptionIfItCannotHandleTheAppeal() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
         handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+    }
+
+    @Test
+    public void whenIssueCodeIsSV_thenReturnTrue() {
+        sscsCaseData.setIssueCode("SV");
+        sscsCaseData.setElementsDisputedLimitedWork(null);
+
+        boolean result = handler.severeConditionQuestionIsValid(sscsCaseData);
+
+        assertTrue(result);
+    }
+
+    @Test
+    public void whenIssueCodeIsNotSvAndElementDisputedLimitedWorkIsNull_thenReturnFalse() {
+        sscsCaseData.setIssueCode("CE");
+        sscsCaseData.setElementsDisputedLimitedWork(null);
+
+        boolean result = handler.severeConditionQuestionIsValid(sscsCaseData);
+
+        assertFalse(result);
+    }
+
+    @Test
+    public void whenElementDisputedLimitedWorkContainSV_thenReturnTrue() {
+        when(elementDisputedDetails.getIssueCode()).thenReturn("SV");
+        when(elementDisputed.getValue()).thenReturn(elementDisputedDetails);
+        sscsCaseData.setIssueCode("CE");
+        sscsCaseData.setElementsDisputedLimitedWork(List.of(elementDisputed));
+
+        boolean result = handler.severeConditionQuestionIsValid(sscsCaseData);
+
+        assertTrue(result);
+    }
+
+    @Test
+    public void whenElementDisputedLimitedWorkDoNotContainSV_thenReturnFalse() {
+        when(elementDisputedDetails.getIssueCode()).thenReturn("CE");
+        when(elementDisputed.getValue()).thenReturn(elementDisputedDetails);
+        sscsCaseData.setIssueCode("CE");
+        sscsCaseData.setElementsDisputedLimitedWork(List.of(elementDisputed));
+
+        boolean result = handler.severeConditionQuestionIsValid(sscsCaseData);
+
+        assertFalse(result);
     }
 }

@@ -16,9 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
@@ -122,15 +120,17 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
     }
 
     protected boolean severeConditionQuestionIsValid(SscsCaseData sscsCaseData) {
-        if (Objects.equals(sscsCaseData.getIssueCode(), "SV")) {
+        if (Issue.SV.name().equals(sscsCaseData.getIssueCode())) {
             return true;
         }
         if (sscsCaseData.getElementsDisputedLimitedWork() == null) {
             return false;
         } else {
             return sscsCaseData.getElementsDisputedLimitedWork().stream()
-                    .filter(ele -> nonNull(ele.getValue()))
-                    .anyMatch(ele -> Objects.equals(ele.getValue().getIssueCode(), "SV"));
+                    .map(ElementDisputed::getValue)
+                    .filter(Objects::nonNull)
+                    .map(ElementDisputedDetails::getIssueCode)
+                    .anyMatch(issueCode -> Issue.SV.name().equals(issueCode));
         }
     }
 
