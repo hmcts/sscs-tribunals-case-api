@@ -142,6 +142,7 @@
         "epimsId": "698118"
       },
       "processingVenue": "Basildon CC",
+      "isScottishCase": "No",
       "interlocReferralReason": "over13MonthsAndGroundsMissing",
       "evidencePresent": "Yes",
       "bulkScanCaseReference": "1234567890",

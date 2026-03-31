@@ -426,9 +426,10 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     public void maybeChangeIsScottish(RegionalProcessingCenter oldRpc, RegionalProcessingCenter newRpc, SscsCaseData caseData) {
-        if (oldRpc != newRpc) {
-            String isScottishCase = isScottishCase(newRpc);
-            caseData.setIsScottishCase(isScottishCase);
+        boolean rpcChanged = oldRpc != newRpc;
+        boolean isScottishCaseNotSet = isEmpty(caseData.getIsScottishCase());
+        if (rpcChanged || isScottishCaseNotSet) {
+            caseData.setIsScottishCase(isScottishCase(newRpc));
         }
     }
 
