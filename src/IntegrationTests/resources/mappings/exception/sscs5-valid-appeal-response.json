@@ -146,6 +146,7 @@
         "region": "1"
       },
       "processingVenue": "Basildon CC",
+      "isScottishCase": "No",
       "evidencePresent": "Yes",
       "bulkScanCaseReference": "1234567890",
       "benefitCode": "057",
