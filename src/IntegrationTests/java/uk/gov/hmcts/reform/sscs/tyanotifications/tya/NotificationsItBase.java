@@ -167,7 +167,7 @@ public class NotificationsItBase {
     public void setup() throws Exception {
         NotificationSender sender = new NotificationSender(notificationClient, null, bulkPrintService, notificationTestRecipients, markdownTransformationService, saveCorrespondenceAsyncService, saveCorrespondence);
 
-        SendNotificationService sendNotificationService = new SendNotificationService(sender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService, false);
+        SendNotificationService sendNotificationService = new SendNotificationService(sender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
 
         setupNotificationService(sendNotificationService);
 

@@ -195,7 +195,7 @@ public class SendNotificationServiceTest {
     public void setup() {
         openMocks(this);
 
-        classUnderTest = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService, false);
+        classUnderTest = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
 
         Logger logger = (Logger) LoggerFactory.getLogger(SendNotificationService.class.getName());
         logger.addAppender(mockAppender);
@@ -315,7 +315,7 @@ public class SendNotificationServiceTest {
     public void shouldSendMandatoryLetterForValidAppealCreatedBasedOnConfidentialityAndBenefitType(boolean confidentialityEnabled,
         Benefit benefit, NotificationEventType eventType, boolean expectedToSend) {
         SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler,
-            notificationValidService, pdfLetterService, pdfStoreService, confidentialityEnabled);
+            notificationValidService, pdfLetterService, pdfStoreService);
         SubscriptionWithType appellantEmptySubscription = new SubscriptionWithType(EMPTY_SUBSCRIPTION, SubscriptionType.APPELLANT,
             null, null);
         CcdNotificationWrapper wrapper = buildBaseWrapper(APPELLANT_WITH_ADDRESS, eventType, null, benefit, "Online",

@@ -1411,7 +1411,7 @@ public class NotificationServiceTest {
         CcdNotificationWrapper ccdNotificationWrapper = buildBaseWrapper(HEARING_BOOKED, APPELLANT_WITH_ADDRESS, null, null);
         ccdNotificationWrapper.getNewSscsCaseData().setDwpState(DwpState.FINAL_DECISION_ISSUED);
 
-        SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService, false);
+        SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
 
         final NotificationService notificationService = new NotificationService(factory, reminderService,
             notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, false
@@ -1577,7 +1577,7 @@ public class NotificationServiceTest {
         given(notificationValidService.isNotificationStillValidToSend(anyList(), eq(notificationEventType)))
             .willReturn(true);
 
-        SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService, false);
+        SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
 
         final NotificationService notificationService = new NotificationService(factory, reminderService,
             notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, true, false
@@ -1674,7 +1674,7 @@ public class NotificationServiceTest {
     }
 
     private void sendWrapperAndVerifyNoMoreInteractions(CcdNotificationWrapper ccdNotificationWrapper) {
-        SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService, false);
+        SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
 
         final NotificationService notificationService = new NotificationService(factory, reminderService,
             notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, false
@@ -2133,7 +2133,7 @@ public class NotificationServiceTest {
         CcdNotificationWrapper ccdNotificationWrapper = buildBaseWrapper(POSTPONEMENT, APPELLANT_WITH_ADDRESS, null, null);
         ccdNotificationWrapper.getNewSscsCaseData().getSchedulingAndListingFields().setHearingRoute(HearingRoute.GAPS);
 
-        SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService, false);
+        SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
 
         final NotificationService notificationService = new NotificationService(factory, reminderService,
             notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, false
@@ -2164,7 +2164,7 @@ public class NotificationServiceTest {
     }
 
     private NotificationService getNotificationService() {
-        SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService, false);
+        SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
 
         final NotificationService notificationService = new NotificationService(factory, reminderService,
             notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, false
@@ -2523,7 +2523,7 @@ public class NotificationServiceTest {
             new HashMap<>(), new Reference(), null);
         given(factory.create(ccdNotificationWrapperCaptor.capture(), any())).willReturn(notification);
 
-        final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService, false);
+        final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
         final NotificationService serviceWithCmEnabled = new NotificationService(factory, reminderService,
             notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, true
         );
@@ -2573,7 +2573,7 @@ public class NotificationServiceTest {
         given(factory.create(any(), any())).willReturn(notification);
 
         final SendNotificationService sendNotificationService = new SendNotificationService(
-            notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService, false);
+            notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
 
         final NotificationService service = new NotificationService(
             factory, reminderService, notificationValidService, notificationHandler,
@@ -2601,7 +2601,7 @@ public class NotificationServiceTest {
         final CcdNotificationWrapper wrapper = buildBaseWrapperWithCaseData(caseData, eventType);
 
         final SendNotificationService sendNotificationService = new SendNotificationService(
-            notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService, false);
+            notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
         final NotificationService service = new NotificationService(
             factory, reminderService, notificationValidService, notificationHandler,
             outOfHoursCalculator, notificationConfig, sendNotificationService, false, cmEnabled
@@ -2640,7 +2640,7 @@ public class NotificationServiceTest {
         given(notificationValidService.isNotificationStillValidToSend(anyList(), any())).willReturn(true);
 
         final SendNotificationService sendNotificationService = new SendNotificationService(
-            notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService, false);
+            notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
         final NotificationService service = new NotificationService(
             factory, reminderService, notificationValidService, notificationHandler,
             outOfHoursCalculator, notificationConfig, sendNotificationService, false, true
