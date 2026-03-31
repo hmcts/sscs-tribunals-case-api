@@ -5,18 +5,15 @@ import { credentials, featureFlags } from '../config/config';
 const users = [
   {
     label: 'superuser',
-    credentials: credentials.superUser,
-    locked: true
+    credentials: credentials.superUser
   },
   {
     label: 'judge',
-    credentials: credentials.judge,
-    locked: false
+    credentials: credentials.judge
   },
   {
     label: 'legal officer',
-    credentials: credentials.legalOfficer,
-    locked: false
+    credentials: credentials.legalOfficer
   }
 ] as const;
 
@@ -27,15 +24,6 @@ test.describe('CM interlocutory review appeal validated', () => {
   );
 
   for (const user of users) {
-    if (user.locked) {
-      test.skip(
-        `${user.label} validates an interlocutory review pre-valid Child Support appeal and moves it to Await Other Party Data`,
-        async () => {},
-        'Superuser account is locked'
-      );
-      continue;
-    }
-
     test(
       `${user.label} validates an interlocutory review pre-valid Child Support appeal and moves it to Await Other Party Data`,
       { tag: '@nightly-pipeline' },
