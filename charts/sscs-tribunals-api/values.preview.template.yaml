@@ -38,7 +38,7 @@ java:
     POST_HEARINGS_B_FEATURE: true
     GAPS_SWITCHOVER_FEATURE: true
     ELASTIC_SEARCH_FEATURE: true
-    SEVERE_CONDITIONS_FEATURE: false
+    SEVERE_CONDITIONS_FEATURE: true
     ELINKS_V2_FEATURE_ENABLED: true
     DELETED_REDACTED_DOC_ENABLED: true
     TESTING_SUPPORT_ENABLED: true
@@ -708,6 +708,7 @@ sscs-tribunals-frontend:
       UPLOAD_EVIDENCE_URL: http://${SERVICE_NAME}-java/evidence/upload
       SERVICES_IDAM_LOGIN_URL: https://idam-web-public.aat.platform.hmcts.net/login
       SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
+      S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
       UV_THREADPOOL_SIZE: 64
       IBC_NI_POSTCODES_FEATURE: true
     keyVaults:
@@ -719,6 +720,7 @@ sscs-tribunals-frontend:
           - pcq-token-key
           - sscs-redis-access-key
           - sscs-redis-connection-string
+          - sscs-s2s-secret
 
 hmcts-redis:
   enabled: true
