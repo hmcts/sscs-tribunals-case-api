@@ -388,19 +388,19 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
-            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is to be treated as having limited capability for work and for work-related activity from 18/11/2025."));
+            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is to be treated as having limited capability for work and has limited capability for work-related activity from 18/11/2025."));
             assertThat(pdfTextWithoutNewLines, containsString("4. This is because insufficient points were scored under Schedule 6 of the Universal Credit (UC) Regulations 2013 to meet the threshold for the Work Capability Assessment."));
             assertThat(pdfTextWithoutNewLines, not(containsString("1. Mobilising unaided by another person")));
             assertThat(pdfTextWithoutNewLines, not(containsString("9 points")));
             assertThat(pdfTextWithoutNewLines, containsString("5. The tribunal applied Schedule 8, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work."));
             assertThat(pdfTextWithoutNewLines, containsString("6. The following activity and descriptor from Schedule 7 of the UC Regulations applied:"));
             assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used. Cannot either: (a) mobilise more than 50 metres"));
-            assertThat(pdfTextWithoutNewLines, containsString("6. The appellant does not meet the severe conditions criteria."));
-            assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision"));
-            assertThat(pdfTextWithoutNewLines, containsString("7. Anything else"));
-            assertThat(pdfTextWithoutNewLines, containsString("8. The tribunal considered the appeal bundle to page B7."));
-            assertThat(pdfTextWithoutNewLines, containsString("9. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal recommends that the Department reassesses Joe Bloggs within 3 months from today's date."));
-            assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
+            assertThat(pdfTextWithoutNewLines, containsString("7. The appellant does not meet the severe conditions criteria."));
+            assertThat(pdfTextWithoutNewLines, containsString("8. Reasons for decision"));
+            assertThat(pdfTextWithoutNewLines, containsString("9. Anything else"));
+            assertThat(pdfTextWithoutNewLines, containsString("10. The tribunal considered the appeal bundle to page B7."));
+            assertThat(pdfTextWithoutNewLines, containsString("11. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal recommends that the Department reassesses Joe Bloggs within 3 months from today's date."));
+            assertThat(pdfTextWithoutNewLines, not(containsString("12.")));
         }
     }
 
