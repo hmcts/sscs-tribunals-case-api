@@ -8,6 +8,7 @@ import esaPayload from '../../../data/payload/create-appeal/esa_sya.json';
 import childSupportPayload from '../../../data/payload/create-appeal/child_support_sya.json';
 import childSupportCmConfidentialityPayload from '../../../data/payload/create-appeal/child_support_cm_confidentiality.json';
 import childSupportPreValidConfidentialityPayload from '../../../data/payload/create-appeal/child_support_prevalid_confidentiality.json';
+import childSupportInterlocReviewValidationPayload from '../../../data/payload/create-appeal/child_support_interloc_review_validation.json';
 import ucPreValidConfidentialityPayload from '../../../data/payload/create-appeal/uc_prevalid_confidentiality.json';
 import taxCreditPayload from '../../../data/payload/create-appeal/tax_credit_sya.json';
 import pipSandLPayload from '../../../data/payload/create-appeal/pip_sandl_sya.json';
@@ -97,8 +98,15 @@ async function createCaseFromPayload(dataPayload: any, incompleteOrNonCompliant:
   return locationUrl.substring(locationUrl.lastIndexOf('/') + 1);
 }
 
+function clonePayload(payload: any) {
+  return JSON.parse(JSON.stringify(payload));
+}
+
 export async function createChildSupportCaseForCmConfidentiality() {
-  return createCaseFromPayload(childSupportCmConfidentialityPayload);
+  const payload = clonePayload(childSupportCmConfidentialityPayload);
+  payload.appellant.nino = StringUtilsComponent.getRandomNINumber();
+
+  return createCaseFromPayload(payload);
 }
 
 export async function createChildSupportCaseForPreValidConfidentiality() {
@@ -106,6 +114,13 @@ export async function createChildSupportCaseForPreValidConfidentiality() {
     childSupportPreValidConfidentialityPayload,
     true
   );
+}
+
+export async function createChildSupportCaseForInterlocReviewValidation() {
+  const payload = clonePayload(childSupportInterlocReviewValidationPayload);
+  payload.appellant.nino = StringUtilsComponent.getRandomNINumber();
+
+  return createCaseFromPayload(payload, true);
 }
 
 export async function createUcCaseForPreValidConfidentiality() {

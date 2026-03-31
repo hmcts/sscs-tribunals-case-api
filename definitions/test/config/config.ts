@@ -92,6 +92,10 @@ export const credentials = {
     email: process.env.TEST_JUDGE_USERNAME,
     password: process.env.TEST_JUDGE_PASSWORD
   },
+  legalOfficer: {
+    email: process.env.TEST_LEGAL_OFFICER_USERNAME,
+    password: process.env.TEST_LEGAL_OFFICER_PASSWORD
+  },
   seniorJudge: {
     email: process.env.SENIOR_JUDGE_USERNAME,
     password: process.env.SENIOR_JUDGE_PASSWORD

@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 import { BaseStep } from './base';
 import { credentials } from '../../config/config';
 import createCaseBasedOnCaseType from '../../api/client/sscs/factory/appeal.type.factory';
@@ -13,6 +13,82 @@ export class IssueDirectionsNotice extends BaseStep {
   constructor(page: Page) {
     super(page);
     this.page = page;
+  }
+
+  private async waitForAwaitOtherPartyData() {
+    for (let attempt = 0; attempt < 8; attempt++) {
+      await this.homePage.navigateToTab('Summary');
+      const summaryState = await this.page
+        .locator('#summaryState')
+        .textContent()
+        .catch(() => '');
+
+      if (summaryState?.includes('Await Other Party Data')) {
+        return;
+      }
+
+      await this.homePage.delay(5000);
+      await this.homePage.reloadPage();
+    }
+
+    await this.homePage.navigateToTab('Summary');
+    await this.summaryTab.verifyPageSectionByKeyValue(
+      'Appeal status',
+      'Await Other Party Data'
+    );
+  }
+
+  private async waitForRequestOtherPartyDataHistory() {
+    for (let attempt = 0; attempt < 8; attempt++) {
+      await this.homePage.navigateToTab('History');
+      const historyEvent = await this.page
+        .getByRole('link', { name: 'Request other party data' })
+        .first()
+        .isVisible()
+        .catch(() => false);
+
+      if (historyEvent) {
+        await this.historyTab.verifyPageContentByKeyValue(
+          'End state',
+          'Await Other Party Data'
+        );
+        return;
+      }
+
+      await this.homePage.delay(5000);
+      await this.homePage.reloadPage();
+    }
+
+    await this.homePage.navigateToTab('History');
+    await this.historyTab.verifyEventCompleted('Request other party data');
+    await this.historyTab.verifyPageContentByKeyValue(
+      'End state',
+      'Await Other Party Data'
+    );
+  }
+
+  async validateChildSupportInterlocReviewPreValidAppeal(caseId: string, user) {
+    await this.loginUserWithCaseId(user, true, caseId);
+    await expect(this.page.locator('#summaryState')).toContainText(
+      'Interlocutory Review - Pre-Valid'
+    );
+    await this.homePage.chooseEvent('Issue directions notice');
+
+    await this.issueDirectionPage.selectHearingOption(
+      issueDirectionTestdata.preHearingType
+    );
+    await this.issueDirectionPage.selectDirectionType(
+      issueDirectionTestdata.appealToProceedDirectionType
+    );
+    await this.issueDirectionPage.chooseRecipients('#confidentialityType-general');
+    await this.issueDirectionPage.chooseNoticeType('#generateNotice_Yes');
+    await this.issueDirectionPage.enterNoticeContent(true);
+    await this.issueDirectionPage.confirmSubmission();
+    await this.issueDirectionPage.confirmSubmission();
+    await this.issueDirectionPage.confirmSubmission();
+
+    await this.waitForAwaitOtherPartyData();
+    await this.waitForRequestOtherPartyDataHistory();
   }
 
   async performIssueDirectionNoticeIncompleteApplicationPreHearingAppealToProceed() {

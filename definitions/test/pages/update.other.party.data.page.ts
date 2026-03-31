@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 import { WebAction } from '../common/web.action';
 import addUpdateOtherPartyData from './content/update.other.party.data_en.json';
 import addUpdateSubscriptionData from './content/update.subscription.data_en.json';
@@ -16,10 +16,19 @@ export class updateOtherPartyDataPage {
   async verifyPageContent(
     heading: string = addUpdateOtherPartyData.updateOtherPartyDataHeading
   ) {
-    await webAction.verifyPageLabel(
-      '.govuk-caption-l',
-      heading
-    ); //Above heading Text
+    const captionCount = await this.page.locator('.govuk-caption-l').count();
+
+    if (captionCount > 0) {
+      await webAction.verifyPageLabel(
+        '.govuk-caption-l',
+        heading
+      );
+    } else {
+      await expect(
+        this.page.getByRole('heading', { name: heading, exact: true }).first()
+      ).toBeVisible();
+    }
+
     await webAction.isButtonClickable('Cancel');
   }
 
@@ -115,6 +124,46 @@ export class updateOtherPartyDataPage {
       .getByRole('group', { name: /Agree less notice/i })
       .getByLabel('Yes')
       .check();
+
+    await webAction.clickButton('Submit');
+  }
+
+  async applyChildSupportFtaAddOtherPartyData() {
+    await this.applyChildSupportFtaAddOtherPartyDataWithValues();
+  }
+
+  async applyChildSupportFtaAddOtherPartyDataWithValues(values = {
+    title: addUpdateOtherPartyData.updateOtherPartyDataTitle,
+    firstName: addUpdateOtherPartyData.updateOtherPartyDataFirstName,
+    lastName: addUpdateOtherPartyData.updateOtherPartyDataLastName,
+    addressLine1: addUpdateOtherPartyData.updateOtherPartyDataAddressLine,
+    town: addUpdateOtherPartyData.updateOtherPartyDataAddressTown,
+    postcode: addUpdateOtherPartyData.updateOtherPartyDataAddressPostCode
+  }) {
+    await this.page.getByRole('button', { name: 'Add new' }).click();
+    await this.page.locator('#otherParties_0_name_title').fill(values.title);
+    await this.page
+      .locator('#otherParties_0_name_firstName')
+      .fill(values.firstName);
+    await this.page
+      .locator('#otherParties_0_name_lastName')
+      .fill(values.lastName);
+    await this.page
+      .locator('#otherParties_0_address_line1')
+      .fill(values.addressLine1);
+    await this.page
+      .locator('#otherParties_0_address_town')
+      .fill(values.town);
+    await this.page
+      .locator('#otherParties_0_address_postcode')
+      .fill(values.postcode);
+    await this.page
+      .locator('#otherParties_0_unacceptableCustomerBehaviour_No')
+      .click();
+    await this.page
+      .locator('#otherParties_0_role_name')
+      .selectOption({ label: addUpdateOtherPartyData.updateOtherPartyDataDropdownValue });
+    await this.page.locator('#awareOfAnyAdditionalOtherParties_No').click();
 
     await webAction.clickButton('Submit');
   }
