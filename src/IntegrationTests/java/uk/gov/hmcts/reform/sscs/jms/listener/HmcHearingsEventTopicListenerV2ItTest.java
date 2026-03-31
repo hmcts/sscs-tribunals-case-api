@@ -97,7 +97,7 @@ public class HmcHearingsEventTopicListenerV2ItTest {
     @Test
     public void testHearingsUpdateV2() throws JMSException, HmcEventProcessingException, JsonProcessingException, CaseException, MessageProcessingException {
 
-        hmcHearingsEventTopicListener = new HmcHearingsEventTopicListener(processHmcMessageServiceV2);
+        hmcHearingsEventTopicListener = new HmcHearingsEventTopicListener(processHmcMessageServiceV2, new io.micrometer.core.instrument.simple.SimpleMeterRegistry());
         ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "objectMapper", mapper);
 
         HmcMessage hmcMessage = createHmcMessage("BBA3");

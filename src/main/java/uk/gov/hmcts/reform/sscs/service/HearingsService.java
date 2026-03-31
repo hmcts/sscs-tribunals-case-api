@@ -2,10 +2,9 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.sscs.config.MetricsConstants.*;
 import static uk.gov.hmcts.reform.sscs.helper.service.HearingsServiceHelper.findHearingsWithRequestedHearingState;
 import static uk.gov.hmcts.reform.sscs.helper.service.HearingsServiceHelper.getHearingId;
-
-import static uk.gov.hmcts.reform.sscs.config.MetricsConstants.*;
 
 import feign.FeignException;
 import io.micrometer.core.instrument.MeterRegistry;

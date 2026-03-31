@@ -8,19 +8,18 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.bulkscan.validators.SscsCaseValidator.IS_NOT_A_VALID_POSTCODE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.NONE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.config.MetricsConstants.BULK_SCAN_PROCESSED;
+import static uk.gov.hmcts.reform.sscs.config.MetricsConstants.BULK_SCAN_VALIDATION_FAILED;
 import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.generateBenefitCode;
 import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.generateCaseCode;
 import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.generateIssueCode;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import static uk.gov.hmcts.reform.sscs.config.MetricsConstants.BULK_SCAN_PROCESSED;
-import static uk.gov.hmcts.reform.sscs.config.MetricsConstants.BULK_SCAN_VALIDATION_FAILED;
-
-import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;

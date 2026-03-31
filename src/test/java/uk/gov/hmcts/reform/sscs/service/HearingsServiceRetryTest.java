@@ -92,6 +92,8 @@ class HearingsServiceRetryTest {
     private PanelCompositionService panelCompositionService;
     @MockitoBean
     private OverridesMapping overridesMapping;
+    @MockitoBean
+    private io.micrometer.core.instrument.MeterRegistry meterRegistry;
 
     @Mock
     private Consumer<SscsCaseData> sscsCaseDataConsumer;

@@ -36,7 +36,7 @@ public class HmcHearingsEventTopicListener {
     private String hmctsDeploymentId;
 
     public HmcHearingsEventTopicListener(ProcessHmcMessageServiceV2 processHmcMessageServiceV2,
-                                          MeterRegistry meterRegistry) {
+                                         MeterRegistry meterRegistry) {
         this.processHmcMessageServiceV2 = processHmcMessageServiceV2;
         this.meterRegistry = meterRegistry;
         this.objectMapper = new ObjectMapper();
