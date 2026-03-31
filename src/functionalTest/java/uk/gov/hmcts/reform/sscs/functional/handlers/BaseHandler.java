@@ -1,14 +1,19 @@
 package uk.gov.hmcts.reform.sscs.functional.handlers;
 
 import static io.restassured.RestAssured.baseURI;
+import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.YES;
+import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTHORISATION_HEADER;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.http.Header;
 import io.restassured.response.Response;
 import java.io.File;
 import java.io.IOException;
@@ -23,6 +28,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +71,7 @@ public class BaseHandler {
     private static final List<String> DWP_DOCUMENT_TYPES = Arrays.stream(DwpDocumentType.values())
         .map(DwpDocumentType::getValue)
         .toList();
+
     @Autowired
     protected CcdService ccdService;
 
@@ -171,11 +178,13 @@ public class BaseHandler {
         while (retry > 0 && (response == null || response.statusCode() != HttpStatus.OK.value())) {
             response = RestAssured
                 .given()
+                .header(SERVICE_AUTHORISATION_HEADER, idamTokens.getServiceAuthorization())
                 .when()
                 .get("appeals?mya=true&caseId=" + caseId);
             retry--;
         }
 
+        Assertions.assertNotNull(response);
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         return response.then().extract().body().asString();
     }
@@ -324,7 +333,6 @@ public class BaseHandler {
 
     private static SscsCaseData buildCaseData(final String surname, final String nino) {
         return buildCaseData(surname, nino, new SscsCaseData());
-
     }
 
 
@@ -409,7 +417,7 @@ public class BaseHandler {
 
     }
 
-    public String serializeSscsCallback(Callback<SscsCaseData> callback) {
+    protected String serializeSscsCallback(Callback<SscsCaseData> callback) {
         try {
             return this.mapper.writeValueAsString(callback);
         } catch (IOException var3) {
@@ -417,9 +425,31 @@ public class BaseHandler {
         }
     }
 
+    protected Callback<SscsCaseData> deserializeCallbackData(String jsonPath) throws IOException {
+        return mapper.readValue(getJsonCallbackForTest(jsonPath), new TypeReference<>() {
+        });
+    }
+
     protected Callback<SscsCaseData> replaceCallbackCaseId(Callback<SscsCaseData> sscsCaseDataCallback, String id, String caseIdToBeReplaced) {
         String jsonCallback = serializeSscsCallback(sscsCaseDataCallback);
         jsonCallback = jsonCallback.replace(caseIdToBeReplaced, id);
         return deserializer.deserialize(jsonCallback);
+    }
+
+    protected SscsCaseData callAboutToSubmitEndpoint(Callback<SscsCaseData> sscsCaseDataCallback) {
+        return given().contentType(ContentType.JSON)
+                      .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
+                      .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
+                      .body(serializeSscsCallback(sscsCaseDataCallback))
+                      .post("/ccdAboutToSubmit")
+                      .then()
+                      .log()
+                      .body()
+                      .statusCode(org.apache.http.HttpStatus.SC_OK)
+                      .and()
+                      .extract()
+                      .body()
+                      .jsonPath()
+                      .getObject("data", SscsCaseData.class);
     }
 }

@@ -63,7 +63,7 @@ public class EvidenceManagementController {
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<String> upload(
-        @RequestParam("file") List<MultipartFile> files
+            @RequestParam("file") List<MultipartFile> files
     ) throws JsonProcessingException {
         if (null == files || files.isEmpty()) {
             throw new EvidenceDocumentsMissingException();
@@ -93,7 +93,7 @@ public class EvidenceManagementController {
 
 
         } catch (FileToPdfConversionException e) {
-            log.error("Error while converting files for evidence upload: " + e.getMessage());
+            log.error("Error while converting files for evidence upload: {}", e.getMessage());
             throw e;
         }
     }

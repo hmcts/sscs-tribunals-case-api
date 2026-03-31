@@ -1,8 +1,5 @@
 package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.APPEAL_TO_PROCEED;
 
 import java.io.IOException;
@@ -123,10 +120,4 @@ class RequestOtherPartyDataTest extends AbstractFunctionalTest {
         }
     }
 
-    private void assertEventuallyInState(long caseId, String expectedState) {
-        await().atMost(60, SECONDS).pollInterval(2, SECONDS).untilAsserted(() -> {
-            SscsCaseDetails caseDetails = findCaseById(Long.toString(caseId));
-            assertThat(caseDetails.getState()).isEqualTo(expectedState);
-        });
-    }
 }

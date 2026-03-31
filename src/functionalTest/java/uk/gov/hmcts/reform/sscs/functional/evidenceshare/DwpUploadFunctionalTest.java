@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
+import static java.time.Duration.ofSeconds;
 import static java.util.Collections.singletonList;
+import static org.awaitility.Awaitility.waitAtMost;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
@@ -55,7 +57,7 @@ class DwpUploadFunctionalTest extends AbstractFunctionalTest {
 
         simulateCcdCallback(json);
 
-        defaultAwait().untilAsserted(() -> {
+        waitAtMost(ofSeconds(30)).untilAsserted(() -> {
             SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
             assertEquals("readyToList", caseDetails.getState());
         });

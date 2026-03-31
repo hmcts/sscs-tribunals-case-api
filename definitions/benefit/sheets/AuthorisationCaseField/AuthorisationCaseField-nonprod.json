@@ -1,3 +1,6 @@
 [
-  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "functionalTest", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"}
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "functionalTest", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2026", "CaseTypeID": "Benefit", "CaseFieldID": "writeFinalDecisionSevereYesNo", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "17/03/2026", "CaseTypeID": "Benefit", "CaseFieldID": "writeFinalDecisionSevereCriteriaApply", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "13/03/2026", "CaseTypeID": "Benefit", "CaseFieldID": "ucWriteFinalDecisionHasSVIssueCode", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"}
 ]

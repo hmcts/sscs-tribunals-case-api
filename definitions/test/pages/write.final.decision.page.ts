@@ -1814,7 +1814,8 @@ export class WriteFinalDecisionPages {
   }
 
   async submitContinueBtn(): Promise<void> {
-    await webActions.clickButton('Continue');
+      webActions.clickButton('Continue');
+      webActions.waitForSpinnerToDisappear();
   }
 
   async verifyDocumentTitle(expText: string) {
@@ -1822,8 +1823,40 @@ export class WriteFinalDecisionPages {
   }
 
   async confirmSubmission(): Promise<void> {
-    await this.page.waitForTimeout(3000);
-    await webActions.clickSubmitButton();
-    await this.page.waitForTimeout(3000);
+    webActions.waitForSpinnerToDisappear();
+    webActions.clickSubmitButton();
+    webActions.waitForSpinnerToDisappear();
   }
+
+  async verifyPageContentForSevereConditionsCriteriaPage() {
+    await webActions.verifyPageLabel(
+      '.govuk-caption-l',
+      writeFinalDecisionData.eventNameCaptor
+    );
+    await webActions.verifyPageLabel(
+      'h1.govuk-heading-l',
+      writeFinalDecisionData.severeConditionsCriteriaPageHeading
+    );
+    await webActions.verifyPageLabel(
+      '.form-label',
+      writeFinalDecisionData.severeConditionsCriteriaLabel
+    );
+  }
+
+  async inputAndVerifyPageContentForSevereConditionsCriteriaPageData(conditionsApply: boolean) {
+    await webActions.verifyPageLabel(
+      "[for='writeFinalDecisionSevereCriteriaApply_Yes']",
+      writeFinalDecisionData.yesLabel
+    );
+    await webActions.verifyPageLabel(
+      "[for='writeFinalDecisionSevereCriteriaApply_No']",
+      writeFinalDecisionData.noLabel
+    );
+    await webActions.verifyElementVisibility('#writeFinalDecisionSevereCriteriaApply_Yes');
+    await webActions.verifyElementVisibility('#writeFinalDecisionSevereCriteriaApply_No');
+
+    const choice = conditionsApply ? 'Yes' : 'No';
+    await webActions.clickElementById(`#writeFinalDecisionSevereCriteriaApply_${choice}`);
+  }
+
 }
