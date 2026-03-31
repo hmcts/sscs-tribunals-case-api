@@ -11,12 +11,15 @@ import jakarta.validation.Validator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ElementDisputed;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ElementDisputedDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
@@ -285,6 +288,42 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertEquals(showWorkCapabilityPage, response.getData().getShowWorkCapabilityAssessmentPage());
+    }
+
+    @Test
+    public void givenSevereConditionOnlyIsSetAndIssueCodeNotSv_thenSevereConditionFieldsAreCleared() {
+        EsaWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions =
+                new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService,
+                        true, true);
+        sscsCaseData.setElementsDisputedLimitedWork(List.of(ElementDisputed.builder().value(
+                ElementDisputedDetails.builder().issueCode("CE").build()).build()));
+        sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(YES);
+        sscsCaseData.getExtendedSscsCaseData().setEsaWriteFinalDecisionSevereCriteriaApply(YES);
+
+        handlerWithSevereConditions.setDefaultFields(sscsCaseData);
+
+        assertNull(sscsCaseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo());
+        assertNull(sscsCaseData.getExtendedSscsCaseData().getEsaWriteFinalDecisionSevereCriteriaApply());
+    }
+
+    @Test
+    @Parameters({
+            "NO, SV",
+            "null, CE"
+    })
+    public void givenSevereConditionOnlyNotSetOrIssueCodeIsSv_thenShouldNotClearSevereConditionFields(@Nullable YesNo isSevereConditionOnly, String issueCode) {
+        EsaWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions =
+                new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService,
+                        true, true);
+        sscsCaseData.setElementsDisputedLimitedWork(List.of(ElementDisputed.builder().value(
+                ElementDisputedDetails.builder().issueCode(issueCode).build()).build()));
+        sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(isSevereConditionOnly);
+        sscsCaseData.getExtendedSscsCaseData().setEsaWriteFinalDecisionSevereCriteriaApply(YES);
+
+        handlerWithSevereConditions.setDefaultFields(sscsCaseData);
+
+        assertEquals(isSevereConditionOnly, sscsCaseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo());
+        assertEquals(YES, sscsCaseData.getExtendedSscsCaseData().getEsaWriteFinalDecisionSevereCriteriaApply());
     }
 
 }
