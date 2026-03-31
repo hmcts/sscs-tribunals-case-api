@@ -240,7 +240,7 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
 
     static YesNoFieldCondition isSevereConditions(Predicate<YesNo> predicate) {
         return new YesNoFieldCondition("Severe Conditions", predicate,
-                s -> YesNo.isYes(s.getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo()) ? YesNo.YES : YesNo.NO, false);
+                s -> s.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply() == null ? YesNo.NO : YesNo.YES, false);
     }
 
     static Optional<YesNoFieldCondition> isAnySupportGroupOnly() {
