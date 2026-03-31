@@ -44,6 +44,19 @@
       "writeFinalDecisionDateOfDecision":"2020-11-17",
       "writeFinalDecisionPageSectionReference":"B7",
       "writeFinalDecisionTypeOfHearing":"telephone",
+      "wcaAppeal":"Yes",
+      "writeFinalDecisionMedicallyQualifiedPanelMemberName":"Dr Doolittle",
+      "writeFinalDecisionAllowedOrRefused":"allowed",
+      "dwpReassessTheAward":"noRecommendation",
+      "writeFinalDecisionOtherPanelMemberName":"Professor Plum",
+      "writeFinalDecisionReasons":[
+        {
+          "id":"9829383f-2e0f-4c7c-9cd2-f68adad7c821",
+          "value":"Reasons for decision"
+        }
+      ],
+      "writeFinalDecisionAnythingElse":"Anything else",
+      "ucWriteFinalDecisionWorkCapabilityAssessmentStartDate" : "2025-11-18",
       "ucWriteFinalDecisionPhysicalDisabilitiesQuestion":[
         "standingAndSitting",
         "mobilisingUnaided"
@@ -283,21 +296,6 @@
           }
         }
       ],
-      "wcaAppeal":"Yes",
-      "writeFinalDecisionMedicallyQualifiedPanelMemberName":"Dr Doolittle",
-      "writeFinalDecisionAllowedOrRefused":"allowed",
-      "ucWriteFinalDecisionMentalAssessmentQuestion":[],
-      "dwpReassessTheAward":"noRecommendation",
-      "writeFinalDecisionOtherPanelMemberName":"Professor Plum",
-      "writeFinalDecisionReasons":[
-        {
-          "id":"9829383f-2e0f-4c7c-9cd2-f68adad7c821",
-          "value":"Reasons for decision"
-        }
-      ],
-      "writeFinalDecisionAnythingElse":"Anything else",
-      "ucWriteFinalDecisionWorkCapabilityAssessmentStartDate" : "2025-11-18",
-      "ucWriteFinalDecisionSchedule7ActivitiesApply":"No",
       "caseCreated":"2020-11-05",
       "region":"BRADFORD"
     },
