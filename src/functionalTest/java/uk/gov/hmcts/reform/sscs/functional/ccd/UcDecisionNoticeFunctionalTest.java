@@ -108,7 +108,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
     @Test
     public void scenario4_allowed_isSupportGroup_selectionMadeForSch7() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedIsSupportGroupSch7SelectionMadeCallback.json");
-        json = json.replaceFirst("writeFinalDecisionSevereCriteriaApply", "");
+        json = json.replaceFirst("writeFinalDecisionSevereCriteriaApplyCondition", "");
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = Loader.loadPDF(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
@@ -291,7 +291,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
     @ConditionalOnProperty("feature.severeConditions.enabled")
     public void scenario13_allowed_WcaAppeal_SvIssueCode_SevereCriteriaApply() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedWcaAppealWithSvIssueCodeAndSevereCriteriaApply.json");
-        json = json.replaceFirst("writeFinalDecisionSevereCriteriaApply", "Yes");
+        json = json.replaceFirst("writeFinalDecisionSevereCriteriaApplyCondition", "Yes");
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = Loader.loadPDF(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
@@ -312,7 +312,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
     public void scenario13_refused_WcaAppeal_SvIssueCode_SevereCriteriaDoNotApply() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedWcaAppealWithSvIssueCodeAndSevereCriteriaApply.json");
         json = json.replaceFirst("allowed", "refused");
-        json = json.replaceFirst("writeFinalDecisionSevereCriteriaApply", "No");
+        json = json.replaceFirst("writeFinalDecisionSevereCriteriaApplyCondition", "No");
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = Loader.loadPDF(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
@@ -332,7 +332,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
     @ConditionalOnProperty("feature.severeConditions.enabled")
     public void scenario4_allowed_WcaAppeal_SupportGroupOnly_Schedule7Activities_SevereCriteriaDoNotApply() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedIsSupportGroupSch7SelectionMadeCallback.json");
-        json = json.replaceFirst("writeFinalDecisionSevereCriteriaApply", "No");
+        json = json.replaceFirst("writeFinalDecisionSevereCriteriaApplyCondition", "No");
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = Loader.loadPDF(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);

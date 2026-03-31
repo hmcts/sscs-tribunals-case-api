@@ -36,7 +36,7 @@
     "case_data":{
       "caseCode":"051DD",
       "supportGroupOnlyAppeal":"Yes",
-      "writeFinalDecisionSevereCriteriaApply":"writeFinalDecisionSevereCriteriaApply",
+      "writeFinalDecisionSevereCriteriaApply":"writeFinalDecisionSevereCriteriaApplyCondition",
       "wcaAppeal":"Yes",
       "writeFinalDecisionMedicallyQualifiedPanelMemberName":"Dr Doolitle",
       "writeFinalDecisionAllowedOrRefused":"allowed",
