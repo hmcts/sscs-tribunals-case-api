@@ -124,18 +124,49 @@ export class UpdateOtherPartyData extends BaseStep {
     }
   }
 
-  private async submitEventWithOptionalSecondSubmit() {
-    await this.page.getByRole('button', { name: 'Submit', exact: true }).click();
-    await this.homePage.delay(5000);
+  private async submitEventWithOptionalSecondSubmit(attempts: number = 5) {
+    let lastError: unknown;
 
-    const secondSubmit = this.page.getByRole('button', {
-      name: 'Submit',
-      exact: true
-    });
+    for (let attempt = 1; attempt <= attempts; attempt++) {
+      try {
+        await this.page.getByRole('button', { name: 'Submit', exact: true }).click();
+        await this.homePage.delay(5000);
 
-    if (await secondSubmit.isVisible().catch(() => false)) {
-      await secondSubmit.click();
+        const secondSubmit = this.page.getByRole('button', {
+          name: 'Submit',
+          exact: true
+        });
+
+        if (await secondSubmit.isVisible().catch(() => false)) {
+          await secondSubmit.click();
+          await this.homePage.delay(5000);
+        }
+
+        const concurrencyErrorVisible = await this.page
+          .getByRole('heading', { name: 'The event could not be created' })
+          .isVisible()
+          .catch(() => false);
+
+        if (!concurrencyErrorVisible) {
+          return;
+        }
+
+        lastError = new Error('The event could not be created');
+        if (attempt === attempts) {
+          throw lastError;
+        }
+
+        await this.homePage.delay(10000);
+      } catch (error) {
+        lastError = error;
+        if (attempt === attempts) {
+          throw lastError;
+        }
+        await this.homePage.delay(5000);
+      }
     }
+
+    throw lastError;
   }
 
   private async reloginIfRedirectedToSignIn(user, caseId: string) {
@@ -419,6 +450,7 @@ export class UpdateOtherPartyData extends BaseStep {
     await this.homePage.signOut();
 
     await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
+    await this.reloginIfRedirectedToSignIn(credentials.amCaseWorker, caseId);
     await this.waitForSummaryState('Await Confidentiality Requirements');
     await this.verifyConfidentialityRows([
       {
