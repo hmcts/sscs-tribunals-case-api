@@ -9,7 +9,7 @@ import static uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler.getJsonCa
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.List;
 import org.apache.http.HttpResponse;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
@@ -19,6 +19,7 @@ import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -66,8 +67,8 @@ public class GenDecisionNoticeFunctionalTest extends BaseFunctionTest {
         }
     }
 
-    @Test
-    @Parameters({"Yes", "No"})
+    @ParameterizedTest
+    @CsvSource({"Yes", "No"})
     public void shouldGenerateExpectedDecisionTextWithOtherPartiesIncluded(String isAppointeeOnCase) throws IOException {
 
         String json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/writeFinalDecisionWithOtherParties.json",
@@ -109,8 +110,6 @@ public class GenDecisionNoticeFunctionalTest extends BaseFunctionTest {
 
                 assertThat(pdfTextWithoutNewLines, not(containsString("6.")));
             }
-
-
         }
     }
 
