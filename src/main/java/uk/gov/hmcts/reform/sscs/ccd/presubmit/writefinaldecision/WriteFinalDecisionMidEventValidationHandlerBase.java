@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
-import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
@@ -9,13 +8,16 @@ import jakarta.validation.Validator;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
@@ -45,8 +47,8 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType == CallbackType.MID_EVENT
             && callback.getEvent() == EventType.WRITE_FINAL_DECISION
-            && nonNull(callback.getCaseDetails())
-            && nonNull(callback.getCaseDetails().getCaseData())
+            && Objects.nonNull(callback.getCaseDetails())
+            && Objects.nonNull(callback.getCaseDetails().getCaseData())
             && getBenefitType().equals(getBenefitTypeFromCallback(callback));
     }
 
@@ -117,4 +119,5 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
         }
         return false;
     }
+
 }

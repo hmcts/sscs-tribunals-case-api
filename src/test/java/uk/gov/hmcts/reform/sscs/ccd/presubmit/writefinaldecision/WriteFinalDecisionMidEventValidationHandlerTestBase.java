@@ -35,8 +35,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ElementDisputed;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ElementDisputedDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
@@ -70,11 +68,6 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
     @Mock
     protected UserInfo userInfo;
 
-    @Mock
-    protected ElementDisputed elementDisputed;
-
-    @Mock
-    protected ElementDisputedDetails elementDisputedDetails;
 
     @Mock
     protected DecisionNoticeService decisionNoticeService;
