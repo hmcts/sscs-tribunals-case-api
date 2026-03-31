@@ -699,13 +699,24 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     @ParameterizedTest
     @CsvSource({"Birmingham,No", "Glasgow,Yes"})
     void givenChangeInNullRpcChangeIsScottish(String newRpcName, String expected) {
-
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         caseData.setIsScottishCase("No");
         RegionalProcessingCenter oldRpc = null;
         RegionalProcessingCenter newRpc = RegionalProcessingCenter.builder().name(newRpcName).build();
 
         handler.maybeChangeIsScottish(oldRpc, newRpc, caseData);
+
+        assertEquals(expected, caseData.getIsScottishCase());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"Glasgow,Yes", "Birmingham,No"})
+    void givenSameRpcButIsScottishCaseNotSet_shouldBackfillIsScottishCase(String rpcName, String expected) {
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        caseData.setIsScottishCase(null);
+        RegionalProcessingCenter rpc = RegionalProcessingCenter.builder().name(rpcName).build();
+
+        handler.maybeChangeIsScottish(rpc, rpc, caseData);
 
         assertEquals(expected, caseData.getIsScottishCase());
     }
