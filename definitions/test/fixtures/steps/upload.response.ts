@@ -234,6 +234,7 @@ export class UploadResponse extends BaseStep {
 
     await this.uploadResponsePage.clickAddNewButton();
     await this.uploadResponsePage.selectUcIssueCode(
+      uploadResponseTestdata.elementDisputedForChildElementIssueCodes,
       uploadResponseTestdata.ucIssueCode
     );
     await this.homePage.delay(2000);
@@ -297,6 +298,7 @@ export class UploadResponse extends BaseStep {
 
     await this.uploadResponsePage.clickAddNewButton();
     await this.uploadResponsePage.selectUcIssueCode(
+      uploadResponseTestdata.elementDisputedForChildElementIssueCodes,
       uploadResponseTestdata.ucIssueCode
     );
     await this.homePage.delay(2000);
@@ -443,6 +445,45 @@ export class UploadResponse extends BaseStep {
       uploadResponseTestdata.pipIssueCode
     );
     await this.checkYourAnswersPage.confirmSubmission();
+  }
+
+  async uploadResponseUcAppealWcaAndSvIssueCode(caseId: string){
+    await this.loginUserWithCaseId(
+      credentials.dwpResponseWriter,
+      false,
+      caseId
+    );
+
+    await this.homePage.chooseEvent('Upload response');
+    await this.uploadResponsePage.verifyPageContent();
+    await this.uploadResponsePage.uploadDocs();
+    await this.uploadResponsePage.chooseAssistOption('No');
+    await this.uploadResponsePage.continueSubmission();
+
+    await this.uploadResponsePage.selectElementDisputed('limitedCapabilityWork');
+    await this.uploadResponsePage.continueSubmission();
+
+    await this.uploadResponsePage.clickAddNewButton();
+    await this.uploadResponsePage.selectUcIssueCode(
+      uploadResponseTestdata.elementDisputedForLimitedWorkIssueCodes,
+      uploadResponseTestdata.ucSccIssueCode
+    );
+    await this.homePage.delay(2000);
+    await this.uploadResponsePage.continueSubmission();
+
+    await this.uploadResponsePage.chooseDisputeOption(
+      uploadResponseTestdata.ucDisputeOption
+    );
+     await this.uploadResponsePage.continueSubmission();
+
+    await this.uploadResponsePage.isJPOnTheCase(uploadResponseTestdata.ucJointPartyOnCase)
+    await this.homePage.delay(2000);
+    await this.uploadResponsePage.continueSubmission();
+
+    await this.checkYourAnswersPage.confirmAndSignOut();
+
+    await this.validateHistory(caseId);
+
   }
 
   async checkHmcEnvironment(request: APIRequestContext) {

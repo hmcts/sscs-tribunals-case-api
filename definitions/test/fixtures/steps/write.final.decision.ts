@@ -502,4 +502,60 @@ export class WriteFinalDecision extends BaseStep {
     await this.writeFinalDecisionPage.confirmSubmission();
     await this.verifyHistoryTabDetails('Write final decision');
   }
+
+  async performWriteFinalDecisionForUniversalCreditAppealWhereSccApplies(universalCreditCaseId: string){
+    await this.loginUserWithCaseId(credentials.judge,true,universalCreditCaseId);
+    await this.homePage.chooseEvent('Write final decision');
+    await this.writeFinalDecisionPage.inputTypeOfAppealPageData(true,true,'UNIVERSAL CREDIT'); 
+    await this.writeFinalDecisionPage.submitContinueBtn();
+
+    await this.writeFinalDecisionPage.verifyPageContentAllowedOrRefusedPage();
+    await this.writeFinalDecisionPage.chooseAllowedOrRefused('#writeFinalDecisionAllowedOrRefused-allowed');
+    await this.writeFinalDecisionPage.submitContinueBtn();
+
+    await this.writeFinalDecisionPage.verifyPageContentTypeOfHearingPage();
+    await this.writeFinalDecisionPage.inputTypeOfHearingPageData(false);
+    await this.writeFinalDecisionPage.submitContinueBtn();
+    
+    await this.writeFinalDecisionPage.verifyPageContentForPanelMembersPage('UNIVERSAL CREDIT');
+    await this.writeFinalDecisionPage.inputPageContentForPanelMembersPageData('UNIVERSAL CREDIT');
+    await this.writeFinalDecisionPage.submitContinueBtn();
+
+    await this.writeFinalDecisionPage.verifyPageContentForDecisionDatePage();
+    await this.writeFinalDecisionPage.inputTypePageContentForDecisionPageData();
+    await this.writeFinalDecisionPage.submitContinueBtn();
+    
+    await this.writeFinalDecisionPage.verifyPageContentForWorkCapabilityAssessmentPage();
+    await this.writeFinalDecisionPage.inputAndVerifyPageContentForWorkCapabilityAssessmentPageData(false, true, true, false, true);
+    await this.writeFinalDecisionPage.submitContinueBtn();
+    await this.writeFinalDecisionPage.submitContinueBtn();
+
+    await this.writeFinalDecisionPage.verifyPageContentForSevereConditionsCriteriaPage();
+    await this.writeFinalDecisionPage.inputAndVerifyPageContentForSevereConditionsCriteriaPageData(true);
+    await this.writeFinalDecisionPage.submitContinueBtn();
+
+    await this.writeFinalDecisionPage.verifyPageContentForBundleSectionReferencePage();
+    await this.writeFinalDecisionPage.inputPageContentForBundleSectionReferencePageData();
+    await this.writeFinalDecisionPage.submitContinueBtn();
+    
+    await this.writeFinalDecisionPage.verifyPageContentForReassessTheAwardPage();
+    await this.writeFinalDecisionPage.inputPageContentForReassessTheAwardPage();
+    await this.writeFinalDecisionPage.submitContinueBtn();
+
+    await this.writeFinalDecisionPage.verifyPageContentForReasonForDecisionPage();
+    await this.writeFinalDecisionPage.inputPageContentForReasonForDecisionPageData();
+    await this.writeFinalDecisionPage.submitContinueBtn();
+
+    await this.writeFinalDecisionPage.verifyPageContentForAnythingElseDecisionPage();
+    await this.writeFinalDecisionPage.inputPageContentForAnythingElsePageData();
+    await this.writeFinalDecisionPage.submitContinueBtn();
+
+    await this.writeFinalDecisionPage.verifyPageContentForPreviewDecisionNoticePage(true);
+    await this.writeFinalDecisionPage.submitContinueBtn();
+
+    await this.writeFinalDecisionPage.verifyPageContentForCheckYourAnswersPageForAllowedUcScc();
+    await this.writeFinalDecisionPage.confirmSubmission();
+    await this.verifyHistoryTabDetails('Write final decision');
+
+  }
 }

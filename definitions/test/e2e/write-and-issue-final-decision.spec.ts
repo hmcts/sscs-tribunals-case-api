@@ -2,6 +2,7 @@ import { test } from '../lib/steps.factory';
 import createCaseBasedOnCaseType from '../api/client/sscs/factory/appeal.type.factory';
 import { credentials } from '../config/config';
 import dateUtilsComponent from '../utils/DateUtilsComponent';
+import performAppealDormantOnCase from '../api/client/sscs/appeal.event';
 
 let caseId: string;
 
@@ -105,6 +106,17 @@ test.describe(
       await issueFinalDecisionSteps.performIssueFinalDecisionForAnAppeal();
       // await performAppealDormantOnCase(universalCreditCaseId);
     });
+    test("Issue Final Decision - SV issue code - 'Yes' notice generated, SCC appeal 'Yes' - SCC applies 'Yes'", async ({
+      uploadResponseSteps ,issueFinalDecisionSteps
+    }) => {
+      let universalCreditCaseId = await createCaseBasedOnCaseType('UC');
+
+      await uploadResponseSteps.uploadResponseUcAppealWcaAndSvIssueCode(universalCreditCaseId)
+      await issueFinalDecisionSteps.performWriteFinalDecisionForUniversalCreditAppealWhereSccApplies(universalCreditCaseId);
+      await issueFinalDecisionSteps.performIssueFinalDecisionForAnAppeal();
+      await performAppealDormantOnCase(universalCreditCaseId);
+    });
+    
   }
 );
 
