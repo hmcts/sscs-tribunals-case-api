@@ -37,13 +37,12 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
 
     private EsaDecisionNoticeQuestionService esaDecisionNoticeQuestionService;
     private VenueDataLoader venueDataLoader;
-    @Value("${feature.severeConditions.enabled}")
     private final boolean isSevereConditionsEnabled;
 
     @Autowired
     public EsaWriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, UserDetailsService userDetailsService,
                                                        EsaDecisionNoticeQuestionService decisionNoticeQuestionService, EsaDecisionNoticeOutcomeService outcomeService,
-                                                       DocumentConfiguration documentConfiguration, VenueDataLoader venueDataLoader, boolean isSevereConditionsEnabled) {
+                                                       DocumentConfiguration documentConfiguration, VenueDataLoader venueDataLoader, @Value("${feature.severeConditions.enabled}") boolean isSevereConditionsEnabled) {
         super(generateFile, userDetailsService, decisionNoticeQuestionService, outcomeService, documentConfiguration, venueDataLoader);
         this.esaDecisionNoticeQuestionService = decisionNoticeQuestionService;
         this.venueDataLoader = venueDataLoader;
