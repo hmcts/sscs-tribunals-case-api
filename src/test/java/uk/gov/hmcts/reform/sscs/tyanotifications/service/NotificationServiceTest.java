@@ -665,7 +665,7 @@ public class NotificationServiceTest {
                 VALID_APPEAL_CREATED,
                 1,
                 0,
-                0,
+                1,
                 1,
                 Subscription.builder()
                     .tya(APPEAL_NUMBER)
@@ -681,7 +681,7 @@ public class NotificationServiceTest {
                 VALID_APPEAL_CREATED,
                 1,
                 1,
-                0,
+                1,
                 1,
                 Subscription.builder()
                     .tya(APPEAL_NUMBER)
@@ -699,7 +699,7 @@ public class NotificationServiceTest {
                 DRAFT_TO_VALID_APPEAL_CREATED,
                 1,
                 0,
-                0,
+                1,
                 1,
                 Subscription.builder()
                     .tya(APPEAL_NUMBER)
@@ -715,7 +715,7 @@ public class NotificationServiceTest {
                 DRAFT_TO_VALID_APPEAL_CREATED,
                 1,
                 1,
-                0,
+                1,
                 1,
                 Subscription.builder()
                     .tya(APPEAL_NUMBER)

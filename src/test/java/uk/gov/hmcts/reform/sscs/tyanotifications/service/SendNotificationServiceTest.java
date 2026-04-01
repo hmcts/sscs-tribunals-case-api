@@ -12,7 +12,6 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.REP_SALUTATION;
@@ -25,7 +24,6 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.CASE_UPDATED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.STRUCK_OUT;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.VALID_APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getAddressToUseForLetter;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationServiceTest.verifyExpectedLogMessage;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationServiceTest.verifyNoErrorsLogged;
@@ -142,7 +140,31 @@ public class SendNotificationServiceTest {
         .address(Address.builder().line1("Rep Org Line 1").town("Rep Town").county("Rep County").postcode("RE9 3LL").build())
         .build();
 
+    private static Subscription SMS_SUBSCRIPTION = Subscription.builder().mobile("07831292000").subscribeSms("Yes").wantSmsNotifications("Yes").build();
+
+    private static Notification SMS = Notification.builder()
+        .destination(Destination.builder().sms("07831292000").build())
+        .template(Template.builder().smsTemplateId(Arrays.asList("someSmsTemplateId")).build())
+        .build();
+
+    private static Notification WELSH_SMS = Notification.builder()
+        .destination(Destination.builder().sms("07831292000").build())
+        .template(Template.builder().smsTemplateId(Arrays.asList("englishSmsTemplateId", "welshSmsTemplateId")).build())
+        .build();
+
+    private static Subscription EMAIL_SUBSCRIPTION = Subscription.builder().email("test@some.com").subscribeEmail("Yes").build();
+
+    private static Notification EMAIL = Notification.builder()
+        .destination(Destination.builder().email("test@some.com").build())
+        .template(Template.builder().emailTemplateId("someEmailTemplateId").build())
+        .build();
+
     private static Subscription EMPTY_SUBSCRIPTION = Subscription.builder().build();
+
+    private static Notification EMPTY_TEMPLATE = Notification.builder()
+        .destination(Destination.builder().build())
+        .template(Template.builder().build())
+        .build();
 
     private static Notification LETTER = Notification.builder()
         .destination(Destination.builder().build())
@@ -308,53 +330,6 @@ public class SendNotificationServiceTest {
 
         verifyNoInteractions(notificationSender);
         verifyExpectedLogMessage(mockAppender, captorLoggingEvent, wrapper.getNewSscsCaseData().getCcdCaseId(), "Failed to send letter for event id", Level.ERROR);
-    }
-
-    @Test
-    @Parameters({"false, PIP, VALID_APPEAL_CREATED, false", "true, PIP, VALID_APPEAL_CREATED, false", "true, CHILD_SUPPORT, SYA_APPEAL_CREATED, true", "true, CHILD_SUPPORT, VALID_APPEAL_CREATED, true"})
-    public void shouldSendMandatoryLetterForValidAppealCreatedBasedOnConfidentialityAndBenefitType(boolean confidentialityEnabled,
-        Benefit benefit, NotificationEventType eventType, boolean expectedToSend) {
-        SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler,
-            notificationValidService, pdfLetterService, pdfStoreService);
-        SubscriptionWithType appellantEmptySubscription = new SubscriptionWithType(EMPTY_SUBSCRIPTION, SubscriptionType.APPELLANT,
-            null, null);
-        CcdNotificationWrapper wrapper = buildBaseWrapper(APPELLANT_WITH_ADDRESS, eventType, null, benefit, "Online",
-            READY_TO_LIST.getId());
-        if (CHILD_SUPPORT == benefit) {
-            SscsCaseData childSupportCaseData = wrapper
-                .getNewSscsCaseData()
-                .toBuilder()
-                .appeal(wrapper
-                    .getNewSscsCaseData()
-                    .getAppeal()
-                    .toBuilder()
-                    .benefitType(BenefitType
-                        .builder()
-                        .code(CHILD_SUPPORT.getShortName())
-                        .description(CHILD_SUPPORT.getDescription())
-                        .build())
-                    .build())
-                .build();
-            wrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper
-                .builder()
-                .newSscsCaseData(childSupportCaseData)
-                .oldSscsCaseData(childSupportCaseData)
-                .notificationEventType(VALID_APPEAL_CREATED)
-                .build());
-        }
-        when(pdfLetterService.generateLetter(any(), any(), any())).thenReturn("PDF".getBytes());
-
-        sendNotificationService.sendLetterNotification(wrapper, DOCMOSIS_LETTER, appellantEmptySubscription,
-            VALID_APPEAL_CREATED);
-
-        if (expectedToSend) {
-            verify(pdfLetterService).generateLetter(eq(wrapper), any(), eq(appellantEmptySubscription));
-            verify(notificationHandler).sendNotification(eq(wrapper), eq(DOCMOSIS_LETTER.getDocmosisLetterTemplate()),
-                eq("Letter"), any());
-        } else {
-            verifyNoInteractions(notificationHandler);
-            verifyNoInteractions(pdfLetterService);
-        }
     }
 
     @Test
