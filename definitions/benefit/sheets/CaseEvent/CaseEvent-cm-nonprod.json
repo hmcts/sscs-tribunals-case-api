@@ -19,13 +19,13 @@
     "DisplayOrder": 130,
     "CallBackURLAboutToStartEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToStart",
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent",
-    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "PreConditionState(s)": "awaitOtherPartyData;withDwp",
     "PostConditionState": "awaitConfidentialityRequirements",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "SecurityClassification": "Public",
     "EventEnablingCondition": "appeal.benefitType.code=\"childSupport\" OR appeal.benefitType.code=\"UC\"",
-    "Publish": "N"
+    "Publish": "N",
+    "ShowSummary": "N"
   },
   {
     "LiveFrom": "16/02/2026",
