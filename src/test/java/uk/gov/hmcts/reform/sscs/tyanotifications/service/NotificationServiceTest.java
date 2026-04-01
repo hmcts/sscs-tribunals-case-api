@@ -145,7 +145,7 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis.PdfLetterServi
 @RunWith(JUnitParamsRunner.class)
 public class NotificationServiceTest {
 
-    static Appellant APPELLANT_WITH_ADDRESS = Appellant.builder()
+    static final Appellant APPELLANT_WITH_ADDRESS = Appellant.builder()
         .name(Name.builder().firstName("Ap").lastName("pellant").build())
         .address(Address.builder().line1("Appellant Line 1").town("Appellant Town").county("Appellant County").postcode("AP9 3LL").build())
         .build();

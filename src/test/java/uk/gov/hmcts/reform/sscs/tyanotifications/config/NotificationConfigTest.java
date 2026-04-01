@@ -213,27 +213,15 @@ class NotificationConfigTest {
         final Template template = new NotificationConfig(env).getTemplate("emailTemplateName", "smsTemplateName",
             "letterTemplateName", "letterTemplateName", null, wrapper, "readyToList");
 
-        assertThat(template.getSmsSenderTemplateId()).isEqualTo("");
+        assertThat(template.getSmsSenderTemplateId()).isEmpty();
     }
 
-    @Test
-    void getTemplateSetsNullDocmosisWhenValidAppealCreatedAndCmFlagDisabled() {
-        when(env.getProperty("notification.english.oral.letterTemplateName.docmosisId")).thenReturn("docmosisId");
-
-        final CcdNotificationWrapper wrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper
-            .builder()
-            .notificationEventType(VALID_APPEAL_CREATED)
-            .newSscsCaseData(SscsCaseData.builder().appeal(Appeal.builder().hearingType(ORAL.name()).build()).build())
-            .build());
-
-        final Template template = new NotificationConfig(env).getTemplate("emailTemplateName", "smsTemplateName",
-            "letterTemplateName", "letterTemplateName", Benefit.PIP, wrapper, "readyToList");
-
-        assertThat(template.getDocmosisTemplateId()).isNull();
-    }
-
-    @Test
-    void getTemplateSetsNullDocmosisWhenValidAppealCreatedAndCmFlagEnabledNonChildSupport() {
+    @ParameterizedTest
+    @CsvSource({
+        "false, PIP",
+        "true, PIP"
+    })
+    void getTemplateSetsNullDocmosisWhenValidAppealCreatedAndNonChildSupport(boolean cmFlagEnabled, Benefit benefit) {
         when(env.getProperty("notification.english.oral.letterTemplateName.docmosisId")).thenReturn("docmosisId");
 
         final CcdNotificationWrapper wrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper
@@ -243,36 +231,49 @@ class NotificationConfigTest {
             .build());
 
         final NotificationConfig config = new NotificationConfig(env);
-        setField(config, "cmOtherPartyConfidentialityEnabled", true);
+        if (cmFlagEnabled) {
+            setField(config, "cmOtherPartyConfidentialityEnabled", true);
+        }
 
         final Template template = config.getTemplate("emailTemplateName", "smsTemplateName",
-            "letterTemplateName", "letterTemplateName", Benefit.PIP, wrapper, "readyToList");
-
+            "letterTemplateName", "letterTemplateName", benefit, wrapper, "readyToList");
+    
         assertThat(template.getDocmosisTemplateId()).isNull();
     }
 
-    @Test
-    void getTemplateKeepsDocmosisWhenValidAppealCreatedAndCmFlagEnabledChildSupport() {
+    @ParameterizedTest
+    @CsvSource({
+        "VALID_APPEAL_CREATED, childSupport, true, docmosisId",
+        "APPEAL_RECEIVED, , true, docmosisId"
+    })
+    void getTemplateKeepsDocmosisWhenConditionsMet(String notificationEventType, String benefitCode, boolean cmFlagEnabled,
+        String expectedDocmosisId) {
         when(env.getProperty("notification.english.oral.letterTemplateName.docmosisId")).thenReturn("docmosisId");
+
+        SscsCaseData.SscsCaseDataBuilder caseDataBuilder = SscsCaseData.builder()
+                                                                       .appeal(Appeal.builder()
+                                                                                     .hearingType(ORAL.name())
+                                                                                     .benefitType(
+                                                                                         benefitCode != null ? BenefitType
+                                                                                                               .builder()
+                                                                                                               .code(benefitCode)
+                                                                                                               .build() : null)
+                                                                                     .build());
 
         final CcdNotificationWrapper wrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper
             .builder()
-            .notificationEventType(VALID_APPEAL_CREATED)
-            .newSscsCaseData(SscsCaseData.builder()
-                .appeal(Appeal.builder()
-                    .hearingType(ORAL.name())
-                    .benefitType(BenefitType.builder().code("childSupport").build())
-                    .build())
-                .build())
+            .notificationEventType(
+                uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.valueOf(notificationEventType))
+            .newSscsCaseData(caseDataBuilder.build())
             .build());
 
         final NotificationConfig config = new NotificationConfig(env);
-        setField(config, "cmOtherPartyConfidentialityEnabled", true);
+        setField(config, "cmOtherPartyConfidentialityEnabled", cmFlagEnabled);
 
         final Template template = config.getTemplate("emailTemplateName", "smsTemplateName",
             "letterTemplateName", "letterTemplateName", Benefit.PIP, wrapper, "readyToList");
 
-        assertThat(template.getDocmosisTemplateId()).isEqualTo("docmosisId");
+        assertThat(template.getDocmosisTemplateId()).isEqualTo(expectedDocmosisId);
     }
 
     @Test

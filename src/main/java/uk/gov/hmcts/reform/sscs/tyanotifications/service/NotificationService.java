@@ -412,14 +412,11 @@ public class NotificationService {
             }
         }
 
-        if (cmOtherPartyConfidentialityEnabled && (ADMIN_SEND_TO_VALID_APPEAL.equals(notificationType)
-            || INTERLOC_VALID_APPEAL.equals(notificationType)
-            || VALID_APPEAL.equals(notificationType))
-            && !notificationWrapper.getNewSscsCaseData().isBenefitType(CHILD_SUPPORT)) {
-            return false;
-        } else if (!cmOtherPartyConfidentialityEnabled && (ADMIN_SEND_TO_VALID_APPEAL.equals(notificationType)
-            || INTERLOC_VALID_APPEAL.equals(notificationType)
-            || VALID_APPEAL.equals(notificationType))) {
+        boolean validAppealPostState = ADMIN_SEND_TO_VALID_APPEAL.equals(notificationType) || INTERLOC_VALID_APPEAL.equals(
+            notificationType) || VALID_APPEAL.equals(notificationType);
+        if ((cmOtherPartyConfidentialityEnabled && validAppealPostState && !notificationWrapper
+            .getNewSscsCaseData()
+            .isBenefitType(CHILD_SUPPORT)) || (!cmOtherPartyConfidentialityEnabled && validAppealPostState)) {
             return false;
         }
 
