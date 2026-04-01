@@ -207,5 +207,8 @@
 
   "esaReachingTitle": "Physical Disabilities: Reaching",
   "esaCognitiveTitle": "Mental, cognitive and intellectual function assessment: Learning tasks",
-  "esaSchedule3ActivitiesPageHeading": "Schedule 3 activities"
+  "esaSchedule3ActivitiesPageHeading": "Schedule 3 activities",
+
+  "severeConditionsCriteriaPageHeading": "Severe Conditions Criteria",
+  "severeConditionsCriteriaLabel": "Do the severe conditions criteria apply?"
 }
