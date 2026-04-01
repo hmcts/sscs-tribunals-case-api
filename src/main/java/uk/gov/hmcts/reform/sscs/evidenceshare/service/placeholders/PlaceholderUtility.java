@@ -36,138 +36,172 @@ public final class PlaceholderUtility {
     }
 
     public static Address getAddress(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String otherPartyId) {
+        Address address;
         if (FurtherEvidenceLetterType.APPELLANT_LETTER.getValue().equals(letterType.getValue())) {
-            return getAppellantAddress(caseData);
+            address = getAppellantAddress(caseData);
         } else if (FurtherEvidenceLetterType.JOINT_PARTY_LETTER.getValue().equals(letterType.getValue())) {
-            return getJointPartyAddress(caseData);
+            address = getJointPartyAddress(caseData);
         } else if (FurtherEvidenceLetterType.OTHER_PARTY_LETTER.getValue().equals(letterType.getValue()) || FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER.getValue().equals(letterType.getValue())) {
-            return getOtherPartyAddress(caseData, otherPartyId);
+            address = getOtherPartyAddress(caseData, otherPartyId);
+        } else {
+            address = getRepsAddress(caseData);
         }
-        return getRepsAddress(caseData);
+        if (!isValidLetterAddress(address)) {
+            log.error("Sending letter with invalid address for case {}, letterType={}, otherPartyId={}. Address: {}",
+                    caseData.getCcdCaseId(), letterType.getValue(), otherPartyId, address);
+        }
+        return address;
+    }
+
+    public static boolean isValidLetterAddress(Address address) {
+        return address != null
+                && isNoneBlank(address.getLine1())
+                && isNoneBlank(address.getPostcode());
     }
 
     private static Address getRepsAddress(SscsCaseData caseData) {
         return Optional.of(caseData.getAppeal())
-            .map(Appeal::getRep)
-            .map(Representative::getAddress)
-            .orElseGet(PlaceholderUtility::getEmptyAddress);
+                .map(Appeal::getRep)
+                .map(Representative::getAddress)
+                .orElseGet(PlaceholderUtility::getEmptyAddress);
     }
 
     private static Address getAppellantAddress(SscsCaseData caseData) {
         return Optional.of(caseData.getAppeal())
-            .map(Appeal::getAppellant)
-            .filter(appellant -> "yes".equalsIgnoreCase(appellant.getIsAppointee()))
-            .map(Appellant::getAppointee)
-            .map(Appointee::getAddress)
-            .orElseGet(() -> defaultAddress(caseData.getAppeal()));
+                .map(Appeal::getAppellant)
+                .filter(appellant -> "yes".equalsIgnoreCase(appellant.getIsAppointee()))
+                .map(Appellant::getAppointee)
+                .map(Appointee::getAddress)
+                .orElseGet(() -> defaultAddress(caseData.getAppeal()));
     }
 
     private static Address getJointPartyAddress(SscsCaseData caseData) {
         return isYes(caseData.getJointParty().getJointPartyAddressSameAsAppellant()) ? getAppellantAddress(caseData)
-            : ofNullable(caseData.getJointParty().getAddress()).orElse(getEmptyAddress());
+                : ofNullable(caseData.getJointParty().getAddress()).orElse(getEmptyAddress());
     }
 
     private static Address getOtherPartyAddress(SscsCaseData caseData, String otherPartyId) {
-        if (otherPartyId != null) {
+        if (otherPartyId != null && caseData.getOtherParties() != null) {
             for (CcdValue<OtherParty> otherParty : caseData.getOtherParties()) {
-                if (otherPartyId.contains(otherParty.getValue().getId())) {
+                if (matchesId(otherPartyId, otherParty.getValue().getId())) {
                     return otherParty.getValue().getAddress();
-                } else if (otherParty.getValue().getAppointee() != null && otherPartyId.contains(otherParty.getValue().getAppointee().getId())) {
+                } else if (otherParty.getValue().getAppointee() != null && matchesId(otherPartyId, otherParty.getValue().getAppointee().getId())) {
                     return otherParty.getValue().getAppointee().getAddress();
-                } else if (otherParty.getValue().getRep() != null && otherPartyId.contains(otherParty.getValue().getRep().getId())) {
+                } else if (otherParty.getValue().getRep() != null && matchesId(otherPartyId, otherParty.getValue().getRep().getId())) {
                     return otherParty.getValue().getRep().getAddress();
                 }
             }
+            log.error("No matching other party found for otherPartyId={} in case {}", otherPartyId, caseData.getCcdCaseId());
         }
         return getEmptyAddress();
     }
 
+    private static boolean matchesId(String searchId, String entityId) {
+        if (searchId == null || entityId == null) {
+            return false;
+        }
+        return searchId.equals(entityId) || searchId.contains(entityId);
+    }
+
     private static Address defaultAddress(Appeal appeal) {
         return Optional.of(appeal)
-            .map(Appeal::getAppellant)
-            .map(Appellant::getAddress)
-            .orElseGet(PlaceholderUtility::getEmptyAddress);
+                .map(Appeal::getAppellant)
+                .map(Appellant::getAddress)
+                .orElseGet(PlaceholderUtility::getEmptyAddress);
     }
 
     private static Address getEmptyAddress() {
         log.error("Sending out letter with empty address");
 
         return Address.builder()
-            .line1(StringUtils.EMPTY)
-            .line2(StringUtils.EMPTY)
-            .county(StringUtils.EMPTY)
-            .postcode(StringUtils.EMPTY)
-            .build();
+                .line1(StringUtils.EMPTY)
+                .line2(StringUtils.EMPTY)
+                .county(StringUtils.EMPTY)
+                .postcode(StringUtils.EMPTY)
+                .build();
     }
 
     public static String getName(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String otherPartyId) {
+        String name;
         if (FurtherEvidenceLetterType.APPELLANT_LETTER.getValue().equals(letterType.getValue())) {
-            return extractNameAppellant(caseData);
+            name = extractNameAppellant(caseData);
         } else if (FurtherEvidenceLetterType.REPRESENTATIVE_LETTER.getValue().equals(letterType.getValue())) {
-            return extractNameRep(caseData.getAppeal().getRep());
+            name = extractNameRep(caseData.getAppeal().getRep());
         } else if (FurtherEvidenceLetterType.JOINT_PARTY_LETTER.getValue().equals(letterType.getValue())) {
-            return extractNameJointParty(caseData);
+            name = extractNameJointParty(caseData);
         } else if (FurtherEvidenceLetterType.OTHER_PARTY_LETTER.getValue().equals(letterType.getValue())
-            || FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER.getValue().equals(letterType.getValue())) {
-            return getOtherPartyName(caseData, otherPartyId);
+                || FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER.getValue().equals(letterType.getValue())) {
+            name = getOtherPartyName(caseData, otherPartyId);
         } else if (FurtherEvidenceLetterType.DWP_LETTER.getValue().equals(letterType.getValue())) {
             return DWP;
+        } else {
+            return null;
         }
-        return null;
+        if (SIR_MADAM.equals(name)) {
+            log.error("Recipient name resolved to Sir/Madam for case {}, letterType={}, otherPartyId={}",
+                    caseData.getCcdCaseId(), letterType.getValue(), otherPartyId);
+        }
+        return name;
     }
 
     private static String extractNameAppellant(SscsCaseData caseData) {
         return Optional.of(caseData.getAppeal())
-            .map(Appeal::getAppellant)
-            .filter(appellant -> "yes".equalsIgnoreCase(appellant.getIsAppointee()))
-            .map(Appellant::getAppointee)
-            .map(Appointee::getName)
-            .filter(PlaceholderUtility::isValidName)
-            .map(Name::getFullNameNoTitle)
-            .orElseGet(() -> Optional.of(caseData.getAppeal())
                 .map(Appeal::getAppellant)
-                .map(Appellant::getName)
+                .filter(appellant -> "yes".equalsIgnoreCase(appellant.getIsAppointee()))
+                .map(Appellant::getAppointee)
+                .map(Appointee::getName)
                 .filter(PlaceholderUtility::isValidName)
                 .map(Name::getFullNameNoTitle)
-                .orElse(SIR_MADAM));
+                .orElseGet(() -> Optional.of(caseData.getAppeal())
+                        .map(Appeal::getAppellant)
+                        .map(Appellant::getName)
+                        .filter(PlaceholderUtility::isValidName)
+                        .map(Name::getFullNameNoTitle)
+                        .orElse(SIR_MADAM));
     }
 
     private static String extractNameRep(Representative representative) {
         return Optional.of(representative)
-            .map(Representative::getName)
-            .filter(PlaceholderUtility::isValidName)
-            .map(Name::getFullNameNoTitle)
-            .orElseGet(() -> Optional.of(representative)
-                .map(Representative::getOrganisation)
-                .filter(StringUtils::isNoneBlank)
-                .orElse(SIR_MADAM));
+                .map(Representative::getName)
+                .filter(PlaceholderUtility::isValidName)
+                .map(Name::getFullNameNoTitle)
+                .orElseGet(() -> Optional.of(representative)
+                        .map(Representative::getOrganisation)
+                        .filter(StringUtils::isNoneBlank)
+                        .orElse(SIR_MADAM));
     }
 
     private static String extractNameJointParty(SscsCaseData caseData) {
         return ofNullable(caseData.getJointParty().getName())
-            .filter(jpn -> isValidName(Name.builder().firstName(jpn.getFirstName()).lastName(jpn.getLastName()).build()))
-            .map(Name::getFullNameNoTitle)
-            .orElse(SIR_MADAM);
+                .filter(jpn -> isValidName(Name.builder().firstName(jpn.getFirstName()).lastName(jpn.getLastName()).build()))
+                .map(Name::getFullNameNoTitle)
+                .orElse(SIR_MADAM);
     }
 
     private static String getOtherPartyName(SscsCaseData caseData, String otherPartyId) {
-        if (otherPartyId != null) {
+        if (otherPartyId != null && caseData.getOtherParties() != null) {
             for (CcdValue<OtherParty> otherParty : caseData.getOtherParties()) {
                 OtherParty otherPartyValue = otherParty.getValue();
 
-                if (otherPartyId.contains(otherPartyValue.getId())
-                    && isValidName(otherPartyValue.getName())) {
-                    return otherPartyValue.getName().getFullNameNoTitle();
+                if (matchesId(otherPartyId, otherPartyValue.getId())) {
+                    if (isValidName(otherPartyValue.getName())) {
+                        return otherPartyValue.getName().getFullNameNoTitle();
+                    }
+                    log.error("Other party matched by id={} but name is invalid for case {}", otherPartyId, caseData.getCcdCaseId());
+                    return SIR_MADAM;
                 } else if (otherPartyValue.getAppointee() != null
-                    && otherPartyId.contains(otherPartyValue.getAppointee().getId())
-                    && isValidName(otherPartyValue.getAppointee().getName())) {
-                    return otherPartyValue.getAppointee().getName().getFullNameNoTitle();
+                        && matchesId(otherPartyId, otherPartyValue.getAppointee().getId())) {
+                    if (isValidName(otherPartyValue.getAppointee().getName())) {
+                        return otherPartyValue.getAppointee().getName().getFullNameNoTitle();
+                    }
+                    log.error("Other party appointee matched by id={} but name is invalid for case {}", otherPartyId, caseData.getCcdCaseId());
+                    return SIR_MADAM;
                 } else if (otherPartyValue.getRep() != null
-                    && otherPartyId.contains(otherPartyValue.getRep().getId())
-                    && isValidName(otherPartyValue.getRep().getName())) {
+                        && matchesId(otherPartyId, otherPartyValue.getRep().getId())) {
                     return extractNameRep(otherPartyValue.getRep());
                 }
             }
+            log.error("No matching other party found for name resolution, otherPartyId={} in case {}", otherPartyId, caseData.getCcdCaseId());
         }
         return SIR_MADAM;
     }
@@ -182,3 +216,4 @@ public final class PlaceholderUtility {
                 ? "" : caseData.getPostponementRequest().getActionPostponementRequestSelected();
     }
 }
+

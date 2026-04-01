@@ -1886,6 +1886,40 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertEquals(expectedName, response.getData().getSscsDocument().getFirst().getValue().getOriginalSenderOtherPartyName());
     }
 
+    @Test
+    @Parameters({
+        "otherParty,    df0d77d2-3852-40b2-9be6-3383e17aa3ad, Other Party",
+        "otherPartyRep, b594060e-4506-4dbf-a6fd-07ceaed5099e, Rep Party"
+    })
+    public void findOriginalSenderOtherPartyIdPreservesHexCharsInUuid(String otherPartyCode, String otherPartyId, String expectedName) {
+        ScannedDocument scannedDocument = ScannedDocument
+            .builder()
+            .value(
+                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
+                    .url(DOC_LINK).build()).build();
+        List<ScannedDocument> docs = new ArrayList<>();
+        docs.add(scannedDocument);
+        sscsCaseData.setScannedDocuments(docs);
+        sscsCaseData.setOtherParties(List.of(new CcdValue<>(
+            OtherParty.builder()
+                .id("df0d77d2-3852-40b2-9be6-3383e17aa3ad")
+                .name(Name.builder().firstName("Other").lastName("Party").build())
+                .rep(Representative.builder()
+                    .id("b594060e-4506-4dbf-a6fd-07ceaed5099e")
+                    .name(Name.builder().firstName("Rep").lastName("Party").build())
+                    .hasRepresentative(YES)
+                    .build())
+                .build())));
+
+        DynamicList originalSender = buildOriginalSenderItemListForGivenOption(otherPartyCode + otherPartyId, "Other party " + expectedName);
+        sscsCaseData.setOriginalSender(originalSender);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(otherPartyId, response.getData().getSscsDocument().getFirst().getValue().getOriginalSenderOtherPartyId());
+        assertEquals(expectedName, response.getData().getSscsDocument().getFirst().getValue().getOriginalSenderOtherPartyName());
+    }
+
     @Parameters({"ISSUE_FURTHER_EVIDENCE,No,0", "ISSUE_FURTHER_EVIDENCE,Yes,0", "ISSUE_FURTHER_EVIDENCE,null,0",
         "OTHER_DOCUMENT_MANUAL,Yes,0", "OTHER_DOCUMENT_MANUAL,No,0", "OTHER_DOCUMENT_MANUAL,null,1",
         "SEND_TO_INTERLOC_REVIEW_BY_TCW,Yes,0", "SEND_TO_INTERLOC_REVIEW_BY_TCW,No,0", "SEND_TO_INTERLOC_REVIEW_BY_TCW,,1",
