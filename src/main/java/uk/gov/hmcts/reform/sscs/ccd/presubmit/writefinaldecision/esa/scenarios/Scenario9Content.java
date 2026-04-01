@@ -18,6 +18,7 @@ public class Scenario9Content extends EsaTemplateContent {
         addComponent(new Paragraph(EsaTemplateComponentId.DISEASE_OR_DISABLEMENT_PARAGRAPH.name(), getRegulation29And35DiseaseOrDisablementSentence(true, false)));
         addComponent(new Paragraph(EsaTemplateComponentId.SCHEDULE_3_PARAGRAPH.name(), getSchedule3AppliesParagraph(writeFinalDecisionTemplateBody.getEsaSchedule3Descriptors())));
         addDescriptorTableIfPopulated(new DescriptorTable(EsaTemplateComponentId.SCHEDULE_3_DESCRIPTORS.name(), writeFinalDecisionTemplateBody.getEsaSchedule3Descriptors(), true));
+        addSevereCriteriaApplyIfPresent(writeFinalDecisionTemplateBody);
         addReasonsIfPresent(writeFinalDecisionTemplateBody);
         addAnythingElseIfPresent(writeFinalDecisionTemplateBody);
         addHearingType(writeFinalDecisionTemplateBody);

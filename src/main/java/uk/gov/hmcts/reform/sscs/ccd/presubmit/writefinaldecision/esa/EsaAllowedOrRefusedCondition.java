@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AllowedO
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AllowedOrRefusedPredicate.REFUSED;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.StringListPredicate.EMPTY;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.StringListPredicate.NOT_EMPTY;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.ANY;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.FALSE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.NOT_TRUE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.TRUE;
@@ -92,7 +93,7 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
     ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS(
             isAllowedOrRefused(ALLOWED),
             isWcaAppeal(TRUE, false),
-            isSevereConditions(UNSPECIFIED),
+            isSevereConditions(ANY),
             isSupportGroupOnly(NOT_TRUE, true),
             isPoints(POINTS_LESS_THAN_FIFTEEN),
             isAnySchedule3(),
@@ -103,7 +104,7 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
     ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_SELECTED(
             isAllowedOrRefused(ALLOWED),
             isWcaAppeal(TRUE, false),
-            isSevereConditions(UNSPECIFIED),
+            isSevereConditions(ANY),
             isSupportGroupOnly(TRUE, true),
             isAnyPoints(),
             isSchedule3(NOT_EMPTY),
