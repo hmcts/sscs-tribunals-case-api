@@ -174,7 +174,7 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
     SEVERE_CONDITIONS_ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS(
             isAllowedOrRefused(ALLOWED),
             isWcaAppeal(TRUE, false),
-            isSevereConditions(UNSPECIFIED),
+            isSevereConditions(TRUE),
             isSupportGroupOnly(NOT_TRUE, true),
             isPoints(POINTS_LESS_THAN_FIFTEEN),
             isAnySchedule3(),
