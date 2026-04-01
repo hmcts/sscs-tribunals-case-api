@@ -1296,14 +1296,23 @@ export class WriteFinalDecisionPages {
     // Start date fields stay hidden until WCA is set to 'Yes', so only assert labels after selection.
   }
 
-  async inputAndVerifyPageContentForWorkCapabilityAssessmentPageData(
-    supportGroup: boolean,
+  async inputAndVerifyPageContentForWorkCapabilityAssessmentPageData({
     appealHasSvIssueCode = false,
+    appealAllowed = true,
+    supportGroup = false,
     isSccOnlyAppeal = false,
     isESACase = false,
-    includeStartDate = false,
-    esaRegulationYear: '2008' | '2013' = '2013',
-  ) {
+    includeStartDate = true,
+    esaRegulationYear = '2013'
+  }: {
+    appealHasSvIssueCode?: boolean;
+    appealAllowed?: boolean;
+    supportGroup?: boolean;
+    isSccOnlyAppeal?: boolean;
+    isESACase?: boolean;
+    includeStartDate?: boolean;
+    esaRegulationYear?: '2008' | '2013';
+  }) {
     await webActions.clickElementById('#wcaAppeal_Yes');
     await webActions.verifyPageLabel(
       '#supportGroupOnlyAppeal legend > .form-label',
@@ -1347,11 +1356,12 @@ export class WriteFinalDecisionPages {
       ? await webActions.clickElementById('#supportGroupOnlyAppeal_Yes')
       : await webActions.clickElementById('#supportGroupOnlyAppeal_No');
 
-    isSccOnlyAppeal
-      ? await webActions.clickElementById('#writeFinalDecisionSevereYesNo_Yes')
-      : await webActions.clickElementById('#writeFinalDecisionSevereYesNo_No');
+    if (appealHasSvIssueCode) {
+      const elementId = isSccOnlyAppeal ? '#writeFinalDecisionSevereYesNo_Yes' : '#writeFinalDecisionSevereYesNo_No';
+      await webActions.clickElementById(elementId);
+    }
 
-    if (includeStartDate) {
+    if (includeStartDate && appealAllowed) {
       // The start date fields appear after selecting WCA = Yes; use a safe past date.
       await webActions.verifyElementVisibility(
         '#ucWriteFinalDecisionWorkCapabilityAssessmentStartDate legend > .form-label'
@@ -1831,8 +1841,9 @@ export class WriteFinalDecisionPages {
     );
   }
 
-  async chooseAllowedOrRefused(optionVal: string) {
-    await webActions.clickElementById(optionVal);
+  async appealAllowed(IsAllowed: boolean) {
+    const choice = IsAllowed ? 'allowed' : 'refused';
+    await webActions.clickElementById(`#writeFinalDecisionAllowedOrRefused-${choice}`);
   }
 
   async submitContinueBtn(): Promise<void> {
@@ -1861,11 +1872,11 @@ export class WriteFinalDecisionPages {
     );
     await webActions.verifyPageLabel(
       '.form-label',
-      writeFinalDecisionData.severeConditionsCriteriaLabel
+      writeFinalDecisionData.doSccApplyLabel
     );
   }
 
-  async inputAndVerifyPageContentForSevereConditionsCriteriaPageData(conditionsApply: boolean) {
+  async inputAndVerifyPageContentForSevereConditionsCriteriaPageData(sccConditionsApply: boolean) {
     await webActions.verifyPageLabel(
       "[for='writeFinalDecisionSevereCriteriaApply_Yes']",
       writeFinalDecisionData.yesLabel
@@ -1877,7 +1888,7 @@ export class WriteFinalDecisionPages {
     await webActions.verifyElementVisibility('#writeFinalDecisionSevereCriteriaApply_Yes');
     await webActions.verifyElementVisibility('#writeFinalDecisionSevereCriteriaApply_No');
 
-    const choice = conditionsApply ? 'Yes' : 'No';
+    const choice = sccConditionsApply ? 'Yes' : 'No';
     await webActions.clickElementById(`#writeFinalDecisionSevereCriteriaApply_${choice}`);
   }
 
@@ -1886,26 +1897,45 @@ export class WriteFinalDecisionPages {
     await expect(row.getByText(expectedValue, { exact: true })).toBeVisible();
   }
 
-  async verifyPageContentForCheckYourAnswersPageForAllowedUcScc() {
+  async verifyPageContentForCheckYourAnswersPageForUcScc({
+    isAppealAllowed,
+    isSccOnlyAppeal,
+    doSccApply
+  }: {
+    isAppealAllowed: boolean;
+    isSccOnlyAppeal: boolean;
+    doSccApply: boolean
+  }) {
+
+    let appealAllowedValue = isAppealAllowed ? writeFinalDecisionData.allowedLabel : writeFinalDecisionData.refusedLabel;
+    let sccOnlyAppealValue = isSccOnlyAppeal ? writeFinalDecisionData.yesLabel : writeFinalDecisionData.noLabel;
+    let doSccApplyValue = doSccApply ? writeFinalDecisionData.yesLabel : writeFinalDecisionData.noLabel;
+
     const expectedRows = [
       { label: writeFinalDecisionData.generateNoticeLabel, value: writeFinalDecisionData.yesLabel },
-      { label: writeFinalDecisionData.isTheAppealLabel, value: writeFinalDecisionData.allowedLabel },
+      { label: writeFinalDecisionData.isTheAppealLabel, value: appealAllowedValue },
       { label: writeFinalDecisionData.whatTypeOfHearingWasHeldLabel, value: writeFinalDecisionData.faceToFaceLabel },
       { label: writeFinalDecisionData.didAPresentingOfficerLabel, value: writeFinalDecisionData.yesLabel },
       { label: writeFinalDecisionData.didTheAppellantAttendTheHearing, value: writeFinalDecisionData.noLabel },
       { label: writeFinalDecisionData.isThisAWCAAppeal, value: writeFinalDecisionData.yesLabel },
       { label: writeFinalDecisionData.isThisASupportGroupOnlyAppealLabel, value: writeFinalDecisionData.noLabel },
-      { label: writeFinalDecisionData.isThisASccOnlyAppealLabel, value: writeFinalDecisionData.yesLabel },
+      { label: writeFinalDecisionData.isThisASccOnlyAppealLabel, value: sccOnlyAppealValue },
+      { label: writeFinalDecisionData.doSccApplyLabel, value: doSccApplyValue },
       { label: writeFinalDecisionData.whatIsTheLastPageInTheTribunalBundleLabel, value: writeFinalDecisionData.lastPageInTheTribunalBundleInput },
-      { label: writeFinalDecisionData.whenShouldFTAReAssessTheAwardLabel, value: writeFinalDecisionData.reassessWithin3MonthsLabel },
       { label: writeFinalDecisionData.reasonsForDecisionLabel, value: writeFinalDecisionData.reasonsForDecisionInput },
       { label: writeFinalDecisionData.checkYourAnswersAnythingElse, value: writeFinalDecisionData.anythingElseInput }
     ]
 
+    if (isAppealAllowed) {
+      expectedRows.push({
+        label: writeFinalDecisionData.whenShouldFTAReAssessTheAwardLabel,
+        value: writeFinalDecisionData.reassessWithin3MonthsLabel
+      });
+    }
+
     for (const { label, value } of expectedRows) {
       await this.verifyValueByLabelInCheckYourAnswersTable(label, value);
     }
-
   }
 
 

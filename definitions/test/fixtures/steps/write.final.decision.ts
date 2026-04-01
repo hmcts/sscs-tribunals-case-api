@@ -33,9 +33,7 @@ export class WriteFinalDecision extends BaseStep {
     await this.writeFinalDecisionPage.submitContinueBtn();
     //Allowed or Refused Page (Because we opted not in the previous page)
     await this.writeFinalDecisionPage.verifyPageContentAllowedOrRefusedPage();
-    await this.writeFinalDecisionPage.chooseAllowedOrRefused(
-      '#writeFinalDecisionAllowedOrRefused-allowed'
-    );
+    await this.writeFinalDecisionPage.appealAllowed(true);
     await this.writeFinalDecisionPage.submitContinueBtn();
 
     await this.writeFinalDecisionPage.verifyPageContentTypeOfHearingPage();
@@ -196,9 +194,7 @@ export class WriteFinalDecision extends BaseStep {
 
     //Allowed or Refused Page (Because we opted not in the previous page)
     await this.writeFinalDecisionPage.verifyPageContentAllowedOrRefusedPage();
-    await this.writeFinalDecisionPage.chooseAllowedOrRefused(
-      '#writeFinalDecisionAllowedOrRefused-refused'
-    );
+    await this.writeFinalDecisionPage.appealAllowed(false);
     await this.writeFinalDecisionPage.submitContinueBtn();
 
     await this.writeFinalDecisionPage.verifyPageContentForPreviewDecisionNoticePage(
@@ -245,9 +241,7 @@ export class WriteFinalDecision extends BaseStep {
 
     //Allowed or Refused Page (Because we opted not in the previous page)
     await this.writeFinalDecisionPage.verifyPageContentAllowedOrRefusedPage();
-    await this.writeFinalDecisionPage.chooseAllowedOrRefused(
-      '#writeFinalDecisionAllowedOrRefused-allowed'
-    );
+    await this.writeFinalDecisionPage.appealAllowed(true);
     await this.writeFinalDecisionPage.submitContinueBtn();
 
     await this.writeFinalDecisionPage.verifyPageContentTypeOfHearingPage();
@@ -267,11 +261,11 @@ export class WriteFinalDecision extends BaseStep {
     await this.writeFinalDecisionPage.submitContinueBtn();
 
     await this.writeFinalDecisionPage.verifyPageContentForWorkCapabilityAssessmentPage();
-    await this.writeFinalDecisionPage.inputAndVerifyPageContentForWorkCapabilityAssessmentPageData(
-      true,
-      false,
-      true
-    );
+    await this.writeFinalDecisionPage.inputAndVerifyPageContentForWorkCapabilityAssessmentPageData({
+      supportGroup: true,
+      isESACase: false,
+      includeStartDate: true
+    });
     await this.writeFinalDecisionPage.submitContinueBtn();
 
     await this.writeFinalDecisionPage.verifyPageContentForSchedule7ActivitiesPage();
@@ -314,9 +308,13 @@ export class WriteFinalDecision extends BaseStep {
       false
     );
     await this.writeFinalDecisionPage.confirmSubmission();
-    await this.verifyHistoryTabDetails('Issue final decision');
+    await this.verifyHistoryTabDetails('Issue final decision',);
   }
 
+  async verifyAppealDormantAfterIssueFinalDecisionEvent() {
+    await this.verifyEndStateInHistoryTab('Dormant'); 
+  }
+  
   async verifyFinalDecisionForAnAppeal() {
     await this.homePage.navigateToTab('Documents');
     await this.documentsTab.verifyPageContentByKeyValue(
@@ -343,9 +341,7 @@ export class WriteFinalDecision extends BaseStep {
 
     // Allowed or Refused Page (Because we opted not in the previous page)
     await this.writeFinalDecisionPage.verifyPageContentAllowedOrRefusedPage();
-    await this.writeFinalDecisionPage.chooseAllowedOrRefused(
-      '#writeFinalDecisionAllowedOrRefused-refused'
-    );
+    await this.writeFinalDecisionPage.appealAllowed(false);
     await this.writeFinalDecisionPage.submitContinueBtn();
 
     await this.writeFinalDecisionPage.verifyPageContentTypeOfHearingPage();
@@ -365,10 +361,11 @@ export class WriteFinalDecision extends BaseStep {
     await this.writeFinalDecisionPage.submitContinueBtn();
 
     await this.writeFinalDecisionPage.verifyPageContentForWorkCapabilityAssessmentPage();
-    await this.writeFinalDecisionPage.inputAndVerifyPageContentForWorkCapabilityAssessmentPageData(
-      false,
-      true
-    );
+    await this.writeFinalDecisionPage.inputAndVerifyPageContentForWorkCapabilityAssessmentPageData({
+      appealAllowed: false,
+      supportGroup: false,
+      isESACase: true,
+    });
     await this.writeFinalDecisionPage.submitContinueBtn();
 
     await this.writeFinalDecisionPage.verifyPageContentForSchedule2ActivitiesPage();
@@ -429,9 +426,7 @@ export class WriteFinalDecision extends BaseStep {
 
     // Allowed or Refused Page (Because we opted not in the previous page)
     await this.writeFinalDecisionPage.verifyPageContentAllowedOrRefusedPage();
-    await this.writeFinalDecisionPage.chooseAllowedOrRefused(
-      '#writeFinalDecisionAllowedOrRefused-allowed'
-    );
+    await this.writeFinalDecisionPage.appealAllowed(true);
     await this.writeFinalDecisionPage.submitContinueBtn();
 
     await this.writeFinalDecisionPage.verifyPageContentTypeOfHearingPage();
@@ -451,10 +446,12 @@ export class WriteFinalDecision extends BaseStep {
     await this.writeFinalDecisionPage.submitContinueBtn();
 
     await this.writeFinalDecisionPage.verifyPageContentForWorkCapabilityAssessmentPage();
-    await this.writeFinalDecisionPage.inputAndVerifyPageContentForWorkCapabilityAssessmentPageData(
-      false,
-      true
-    );
+    await this.writeFinalDecisionPage.inputAndVerifyPageContentForWorkCapabilityAssessmentPageData({
+      appealAllowed: true,
+      supportGroup: false,
+      isESACase: true,
+      includeStartDate: false
+    });
     await this.writeFinalDecisionPage.submitContinueBtn();
 
     await this.writeFinalDecisionPage.verifyPageContentForSchedule2ActivitiesPage();
@@ -503,20 +500,31 @@ export class WriteFinalDecision extends BaseStep {
     await this.verifyHistoryTabDetails('Write final decision');
   }
 
-  async performWriteFinalDecisionForUniversalCreditAppealWhereSccApplies(universalCreditCaseId: string){
-    await this.loginUserWithCaseId(credentials.judge,true,universalCreditCaseId);
+  async performWriteFinalDecisionForUniversalCreditAppealWithScc({
+    universalCreditCaseId,
+    isAppealAllowed = true,
+    sccAppeal = true,
+    sccApplies = true
+  }: {
+    universalCreditCaseId: string,
+    isAppealAllowed?: boolean,
+    sccAppeal?: boolean,
+    sccApplies?: boolean
+  }) {
+
+    await this.loginUserWithCaseId(credentials.judge, true, universalCreditCaseId);
     await this.homePage.chooseEvent('Write final decision');
-    await this.writeFinalDecisionPage.inputTypeOfAppealPageData(true,true,'UNIVERSAL CREDIT'); 
+    await this.writeFinalDecisionPage.inputTypeOfAppealPageData(true, true, 'UNIVERSAL CREDIT');
     await this.writeFinalDecisionPage.submitContinueBtn();
 
     await this.writeFinalDecisionPage.verifyPageContentAllowedOrRefusedPage();
-    await this.writeFinalDecisionPage.chooseAllowedOrRefused('#writeFinalDecisionAllowedOrRefused-allowed');
+    await this.writeFinalDecisionPage.appealAllowed(isAppealAllowed);
     await this.writeFinalDecisionPage.submitContinueBtn();
 
     await this.writeFinalDecisionPage.verifyPageContentTypeOfHearingPage();
     await this.writeFinalDecisionPage.inputTypeOfHearingPageData(false);
     await this.writeFinalDecisionPage.submitContinueBtn();
-    
+
     await this.writeFinalDecisionPage.verifyPageContentForPanelMembersPage('UNIVERSAL CREDIT');
     await this.writeFinalDecisionPage.inputPageContentForPanelMembersPageData('UNIVERSAL CREDIT');
     await this.writeFinalDecisionPage.submitContinueBtn();
@@ -524,23 +532,31 @@ export class WriteFinalDecision extends BaseStep {
     await this.writeFinalDecisionPage.verifyPageContentForDecisionDatePage();
     await this.writeFinalDecisionPage.inputTypePageContentForDecisionPageData();
     await this.writeFinalDecisionPage.submitContinueBtn();
-    
+
     await this.writeFinalDecisionPage.verifyPageContentForWorkCapabilityAssessmentPage();
-    await this.writeFinalDecisionPage.inputAndVerifyPageContentForWorkCapabilityAssessmentPageData(false, true, true, false, true);
+    await this.writeFinalDecisionPage.inputAndVerifyPageContentForWorkCapabilityAssessmentPageData({
+        appealHasSvIssueCode: true,
+        appealAllowed: isAppealAllowed,
+        supportGroup: false,
+        isSccOnlyAppeal: sccAppeal,
+        isESACase: false,
+    });
     await this.writeFinalDecisionPage.submitContinueBtn();
     await this.writeFinalDecisionPage.submitContinueBtn();
 
     await this.writeFinalDecisionPage.verifyPageContentForSevereConditionsCriteriaPage();
-    await this.writeFinalDecisionPage.inputAndVerifyPageContentForSevereConditionsCriteriaPageData(true);
+    await this.writeFinalDecisionPage.inputAndVerifyPageContentForSevereConditionsCriteriaPageData(sccApplies);
     await this.writeFinalDecisionPage.submitContinueBtn();
 
     await this.writeFinalDecisionPage.verifyPageContentForBundleSectionReferencePage();
     await this.writeFinalDecisionPage.inputPageContentForBundleSectionReferencePageData();
     await this.writeFinalDecisionPage.submitContinueBtn();
-    
+
+    if (isAppealAllowed) {
     await this.writeFinalDecisionPage.verifyPageContentForReassessTheAwardPage();
     await this.writeFinalDecisionPage.inputPageContentForReassessTheAwardPage();
     await this.writeFinalDecisionPage.submitContinueBtn();
+    }
 
     await this.writeFinalDecisionPage.verifyPageContentForReasonForDecisionPage();
     await this.writeFinalDecisionPage.inputPageContentForReasonForDecisionPageData();
@@ -553,7 +569,11 @@ export class WriteFinalDecision extends BaseStep {
     await this.writeFinalDecisionPage.verifyPageContentForPreviewDecisionNoticePage(true);
     await this.writeFinalDecisionPage.submitContinueBtn();
 
-    await this.writeFinalDecisionPage.verifyPageContentForCheckYourAnswersPageForAllowedUcScc();
+    await this.writeFinalDecisionPage.verifyPageContentForCheckYourAnswersPageForUcScc({
+      isAppealAllowed: isAppealAllowed,
+      isSccOnlyAppeal: sccAppeal,
+      doSccApply: sccApplies
+    });
     await this.writeFinalDecisionPage.confirmSubmission();
     await this.verifyHistoryTabDetails('Write final decision');
 
