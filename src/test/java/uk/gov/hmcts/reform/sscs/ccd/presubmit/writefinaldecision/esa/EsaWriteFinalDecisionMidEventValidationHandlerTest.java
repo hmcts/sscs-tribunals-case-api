@@ -44,7 +44,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
     @Override
     protected WriteFinalDecisionMidEventValidationHandlerBase createValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService, boolean isPostHearingsEnabled) {
-        return new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, isPostHearingsEnabled, false);
+        return new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, isPostHearingsEnabled);
     }
 
     @Override
@@ -285,40 +285,5 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertEquals(showWorkCapabilityPage, response.getData().getShowWorkCapabilityAssessmentPage());
-    }
-
-    @Test
-    public void givenSevereConditionOnlyIsSetAndIssueCodeNotSv_thenSevereConditionFieldsAreCleared() {
-        sscsCaseData.setIssueCode("CE");
-        sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(YES);
-        sscsCaseData.getExtendedSscsCaseData().setEsaWriteFinalDecisionSevereCriteriaApply(YES);
-        EsaWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions =
-                new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService,
-                        true, true);
-
-        handlerWithSevereConditions.setDefaultFields(sscsCaseData);
-
-        assertNull(sscsCaseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo());
-        assertNull(sscsCaseData.getExtendedSscsCaseData().getEsaWriteFinalDecisionSevereCriteriaApply());
-    }
-
-    @Test
-    @Parameters({
-        "null, CE",
-        "NO, SV"
-    })
-    public void givenSevereConditionOnlyNotSetOrIssueCodeIsSv_thenShouldNotClearSevereConditionFields(
-            @Nullable YesNo isSevereConditionOnly, String caseIssueCode) {
-        sscsCaseData.setIssueCode(caseIssueCode);
-        sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(isSevereConditionOnly);
-        sscsCaseData.getExtendedSscsCaseData().setEsaWriteFinalDecisionSevereCriteriaApply(YES);
-        EsaWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions =
-                new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService,
-                        true, true);
-
-        handlerWithSevereConditions.setDefaultFields(sscsCaseData);
-
-        assertEquals(isSevereConditionOnly, sscsCaseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo());
-        assertEquals(YES, sscsCaseData.getExtendedSscsCaseData().getEsaWriteFinalDecisionSevereCriteriaApply());
     }
 }

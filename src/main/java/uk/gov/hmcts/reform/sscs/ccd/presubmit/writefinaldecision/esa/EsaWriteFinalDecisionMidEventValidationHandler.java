@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
-import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
@@ -10,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Issue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionMidEventValidationHandlerBase;
@@ -20,15 +18,10 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 @Component
 public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDecisionMidEventValidationHandlerBase {
 
-    @Value("${feature.severeConditions.enabled}")
-    private final boolean isSevereConditionsEnabled;
-
     public EsaWriteFinalDecisionMidEventValidationHandler(Validator validator,
                                                           DecisionNoticeService decisionNoticeService,
-                                                          @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled,
-                                                          @Value("${feature.severeConditions.enabled}") boolean isSevereConditionsEnabled) {
+                                                          @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled) {
         super(validator, decisionNoticeService, isPostHearingsEnabled);
-        this.isSevereConditionsEnabled = isSevereConditionsEnabled;
     }
 
     @Override
@@ -40,14 +33,6 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
     protected void setDefaultFields(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply() == null) {
             sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
-        }
-
-        if (isSevereConditionsEnabled) {
-            if (nonNull(sscsCaseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo())
-                    && !Issue.SV.name().equals(sscsCaseData.getIssueCode())) {
-                sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(null);
-                sscsCaseData.getExtendedSscsCaseData().setEsaWriteFinalDecisionSevereCriteriaApply(null);
-            }
         }
     }
 
