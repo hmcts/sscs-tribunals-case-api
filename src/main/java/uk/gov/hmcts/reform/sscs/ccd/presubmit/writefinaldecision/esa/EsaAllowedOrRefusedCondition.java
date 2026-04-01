@@ -48,7 +48,7 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
     REFUSED_NON_SUPPORT_GROUP_ONLY(
             isAllowedOrRefused(REFUSED),
             isWcaAppeal(TRUE, false),
-            isSevereConditions(FALSE),
+            isSevereConditions(UNSPECIFIED),
             isSupportGroupOnly(YesNoPredicate.NOT_TRUE, true),
             isAnyPoints(),
             isAnySchedule3(),
@@ -145,20 +145,22 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
             isAnyPoints(),
             isAnySchedule3(),
             isDwpReassessTheAward(UNSPECIFIED)),
-    SEVERE_CONDITIONS_ALLOWED(
+    SEVERE_CONDITIONS_ALLOWED_SV_ISSUE_CODE(
             isAllowedOrRefused(ALLOWED),
             isWcaAppeal(TRUE, true),
             isSevereConditions(TRUE),
-            isAnySupportGroupOnly(),
+            isSupportGroupOnly(NOT_TRUE, true),
             isAnyPoints(),
-            isAnySchedule3()),
-    SEVERE_CONDITIONS_REFUSED(
+            isSchedule3(StringListPredicate.UNSPECIFIED),
+            isSchedule3ActivitiesAnswer(StringListPredicate.UNSPECIFIED)),
+    SEVERE_CONDITIONS_REFUSED_SV_ISSUE_CODE(
             isAllowedOrRefused(REFUSED),
             isWcaAppeal(TRUE, true),
-            isSevereConditions(TRUE),
-            isAnySupportGroupOnly(),
+            isSevereConditions(FALSE),
+            isSupportGroupOnly(NOT_TRUE, true),
             isAnyPoints(),
-            isAnySchedule3(),
+            isSchedule3(StringListPredicate.UNSPECIFIED),
+            isSchedule3ActivitiesAnswer(StringListPredicate.UNSPECIFIED),
             isDwpReassessTheAward(UNSPECIFIED));
 
     Optional<EsaPointsCondition> primaryPointsCondition;
@@ -198,9 +200,9 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
             return EsaScenario.SCENARIO_9;
         } else if (NON_WCA_APPEAL_ALLOWED == this || NON_WCA_APPEAL_REFUSED == this) {
             return EsaScenario.SCENARIO_10;
-        } else if (SEVERE_CONDITIONS_ALLOWED == this || SEVERE_CONDITIONS_REFUSED == this) {
+        } else if (SEVERE_CONDITIONS_ALLOWED_SV_ISSUE_CODE == this || SEVERE_CONDITIONS_REFUSED_SV_ISSUE_CODE == this) {
             //TODO: update templates once added
-            return YesNo.isYes(caseData.getExtendedSscsCaseData().getEsaWriteFinalDecisionSevereCriteriaApply()) ? EsaScenario.SCENARIO_10 : EsaScenario.SCENARIO_12;
+            return YesNo.isYes(caseData.getExtendedSscsCaseData().getEsaWriteFinalDecisionSevereCriteriaApply()) ? EsaScenario.SCENARIO_13 : EsaScenario.SCENARIO_14;
         } else {
             throw new IllegalStateException("No scenario applicable");
         }
@@ -240,7 +242,7 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
 
     static YesNoFieldCondition isSevereConditions(Predicate<YesNo> predicate) {
         return new YesNoFieldCondition("Severe Conditions", predicate,
-                s -> YesNo.isYes(s.getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo()) ? YesNo.YES : YesNo.NO, false);
+                s -> YesNo.isYes(s.getExtendedSscsCaseData().getEsaWriteFinalDecisionSevereCriteriaApply()) ? YesNo.YES : YesNo.NO, false);
     }
 
     static Optional<YesNoFieldCondition> isAnySupportGroupOnly() {
