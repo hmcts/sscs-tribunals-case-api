@@ -175,6 +175,7 @@
         }
       ],
       "processingVenue": "Cardiff",
+      "isScottishCase": "No",
       "linkedCasesBoolean": "No",
       "caseCreated": "2019-08-02",
       "regionalProcessingCenter": {
