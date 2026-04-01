@@ -7,7 +7,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AllowedO
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AllowedOrRefusedPredicate.REFUSED;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.StringListPredicate.EMPTY;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.StringListPredicate.NOT_EMPTY;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.ANY;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.FALSE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.NOT_TRUE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.TRUE;
@@ -93,7 +92,7 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
     ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS(
             isAllowedOrRefused(ALLOWED),
             isWcaAppeal(TRUE, false),
-            isSevereConditions(ANY),
+            isSevereConditions(UNSPECIFIED),
             isSupportGroupOnly(NOT_TRUE, true),
             isPoints(POINTS_LESS_THAN_FIFTEEN),
             isAnySchedule3(),
@@ -104,7 +103,7 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
     ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_SELECTED(
             isAllowedOrRefused(ALLOWED),
             isWcaAppeal(TRUE, false),
-            isSevereConditions(ANY),
+            isSevereConditions(UNSPECIFIED),
             isSupportGroupOnly(TRUE, true),
             isAnyPoints(),
             isSchedule3(NOT_EMPTY),
@@ -162,7 +161,25 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
             isAnyPoints(),
             isSchedule3(StringListPredicate.UNSPECIFIED),
             isSchedule3ActivitiesAnswer(StringListPredicate.UNSPECIFIED),
-            isDwpReassessTheAward(UNSPECIFIED));
+            isDwpReassessTheAward(UNSPECIFIED)),
+    SEVERE_CONDITIONS_ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_SELECTED(
+            isAllowedOrRefused(ALLOWED),
+            isWcaAppeal(TRUE, false),
+            isSevereConditions(TRUE),
+            isSupportGroupOnly(TRUE, true),
+            isAnyPoints(),
+            isSchedule3(NOT_EMPTY),
+            isRegulation29(UNSPECIFIED)),
+    // SCENARIO_3
+    SEVERE_CONDITIONS_ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS(
+            isAllowedOrRefused(ALLOWED),
+            isWcaAppeal(TRUE, false),
+            isSevereConditions(UNSPECIFIED),
+            isSupportGroupOnly(NOT_TRUE, true),
+            isPoints(POINTS_LESS_THAN_FIFTEEN),
+            isAnySchedule3(),
+            isSupportGroupOnly(YesNoPredicate.FALSE, false).get(),
+            isRegulation29(YesNoPredicate.TRUE));
 
     Optional<EsaPointsCondition> primaryPointsCondition;
     Optional<FieldCondition> schedule3ActivitiesSelected;
@@ -183,7 +200,8 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
             return EsaScenario.SCENARIO_2;
         } else if (ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_NOT_SELECTED == this && isRegulation35(TRUE).isSatisified(caseData)) {
             return EsaScenario.SCENARIO_3;
-        } else if ((ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_NOT_SELECTED == this && isRegulation35(UNSPECIFIED).isSatisified(caseData)) || ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_SELECTED == this) {
+        } else if ((ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_NOT_SELECTED == this && isRegulation35(UNSPECIFIED).isSatisified(caseData)) || ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_SELECTED == this
+                || SEVERE_CONDITIONS_ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_SELECTED == this) {
             return EsaScenario.SCENARIO_4;
         }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_HIGH_POINTS == this && caseData.getSscsEsaCaseData().getSchedule3Selections().isEmpty()) {
             if (isRegulation35(TRUE).isSatisified(caseData)) {
@@ -197,7 +215,8 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
             return EsaScenario.SCENARIO_7;
         }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS == this && caseData.getSscsEsaCaseData().getSchedule3Selections().isEmpty() && isRegulation35(TRUE).isSatisified(caseData)) {
             return EsaScenario.SCENARIO_8;
-        }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS == this && !caseData.getSscsEsaCaseData().getSchedule3Selections().isEmpty()) {
+        }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS == this && !caseData.getSscsEsaCaseData().getSchedule3Selections().isEmpty()
+                || SEVERE_CONDITIONS_ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS == this) {
             return EsaScenario.SCENARIO_9;
         } else if (NON_WCA_APPEAL_ALLOWED == this || NON_WCA_APPEAL_REFUSED == this) {
             return EsaScenario.SCENARIO_10;
