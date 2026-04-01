@@ -3,11 +3,10 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.*;
 import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getPartiesOnCase;
-import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown;
-import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.isChildSupportAppeal;
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -17,6 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Component
+@Slf4j
 public class ValidSendToInterlocAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final boolean postponementsFeature;
@@ -49,10 +49,6 @@ public class ValidSendToInterlocAboutToStartHandler implements PreSubmitCallback
 
         setSelectWhoReviewsCase(sscsCaseData);
         setOriginalSenderDropdown(sscsCaseData);
-        if (isChildSupportAppeal(sscsCaseData)) {
-            sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
-                    getSelectedConfidentialityPartyDropdown(sscsCaseData));
-        }
 
         if (postHearingsB) {
             sscsCaseData.setPrePostHearing(null);
