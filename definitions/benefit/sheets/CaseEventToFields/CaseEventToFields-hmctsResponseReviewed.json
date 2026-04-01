@@ -58,7 +58,7 @@
     "CaseEventID": "hmctsResponseReviewed",
     "CaseFieldID": "dwpEditedEvidenceReason",
     "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
+    "DisplayContext": "OPTIONAL",
     "LiveFrom": "10/10/2019",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 4,

@@ -38,7 +38,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ExtendedSscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
@@ -99,13 +98,11 @@ public class HmctsResponseReviewedSubmittedHandlerTest {
     @Test
     public void givenAHmctsResponseReviewedSubmittedEventAndInterlocIsRequiredForJudge_thenTriggerValidSendToInterlocEvent() {
         DynamicListItem selectReviewer = new DynamicListItem("reviewByJudge", "Review by Judge");
-        DynamicListItem selectedConfidentialityParty = new DynamicListItem("appellant", "Appellant (or Appointee)");
+        DynamicListItem originalSender = new DynamicListItem("appellant", "Appellant (or Appointee)");
 
         sscsCaseData = sscsCaseData.toBuilder().isInterlocRequired("Yes")
                 .selectWhoReviewsCase(new DynamicList(selectReviewer, null))
-                .extendedSscsCaseData(ExtendedSscsCaseData.builder()
-                        .selectedConfidentialityParty(new DynamicList(selectedConfidentialityParty, null))
-                        .build())
+                .originalSender(new DynamicList(originalSender, null))
                 .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -125,21 +122,18 @@ public class HmctsResponseReviewedSubmittedHandlerTest {
         mutator.accept(sscsCaseDetails);
 
         assertEquals(selectReviewer, sscsCaseDetails.getData().getSelectWhoReviewsCase().getValue());
-        assertEquals(selectedConfidentialityParty,
-                sscsCaseDetails.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue());
+        assertEquals(originalSender, sscsCaseDetails.getData().getOriginalSender().getValue());
     }
 
     @Test
     public void givenAHmctsResponseReviewedSubmittedEventAndInterlocIsRequiredForTcw_thenTriggerValidSendToInterlocEvent() {
 
         DynamicListItem value = new DynamicListItem("reviewByTcw", "Review by TCW");
-        DynamicListItem selectedConfidentialityParty = new DynamicListItem("appellant", "Appellant (or Appointee)");
+        DynamicListItem originalSender = new DynamicListItem("appellant", "Appellant (or Appointee)");
 
         sscsCaseData = sscsCaseData.toBuilder().isInterlocRequired("Yes")
                 .selectWhoReviewsCase(new DynamicList(value, null))
-                .extendedSscsCaseData(ExtendedSscsCaseData.builder()
-                        .selectedConfidentialityParty(new DynamicList(selectedConfidentialityParty, null))
-                        .build())
+                .originalSender(new DynamicList(originalSender, null))
                 .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -158,8 +152,7 @@ public class HmctsResponseReviewedSubmittedHandlerTest {
         mutator.accept(sscsCaseDetails);
 
         assertEquals(value, sscsCaseDetails.getData().getSelectWhoReviewsCase().getValue());
-        assertEquals(selectedConfidentialityParty,
-                sscsCaseDetails.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue());
+        assertEquals(originalSender, sscsCaseDetails.getData().getOriginalSender().getValue());
     }
 
     @Test
@@ -261,5 +254,4 @@ public class HmctsResponseReviewedSubmittedHandlerTest {
         assertThatExceptionOfType(FeignException.class).isThrownBy(
                 () ->  handler.handle(SUBMITTED, callback, USER_AUTHORISATION));
     }
-
 }
