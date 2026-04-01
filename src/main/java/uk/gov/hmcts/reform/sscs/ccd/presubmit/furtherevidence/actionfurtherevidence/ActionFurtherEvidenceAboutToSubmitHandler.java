@@ -652,8 +652,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     private String findOriginalSenderOtherPartyId(DocumentType documentType, String originalSender) {
 
         if (OTHER_PARTY_EVIDENCE.equals(documentType) || OTHER_PARTY_REPRESENTATIVE_EVIDENCE.equals(documentType)) {
-            String originalSenderOtherPartyId = originalSender.replaceAll("[A-Za-z]", "");
-            return !originalSenderOtherPartyId.equals("") && originalSenderOtherPartyId != null ? originalSenderOtherPartyId : null;
+            String originalSenderOtherPartyId = originalSender
+                .replaceFirst("^otherPartyRep", "")
+                .replaceFirst("^otherParty", "");
+            return !originalSenderOtherPartyId.isEmpty() ? originalSenderOtherPartyId : null;
         }
         return null;
     }

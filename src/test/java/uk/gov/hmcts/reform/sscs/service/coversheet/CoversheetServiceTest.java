@@ -16,6 +16,7 @@ import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -173,6 +174,101 @@ public class CoversheetServiceTest {
                 .id(12345L)
                 .data(getSscsCaseDataBuiler()
                         .languagePreferenceWelsh("Yes")
+                        .build())
+                .build();
+    }
+
+    @Test
+    public void canLoadCcdCaseWithAppointeeAndProducePdf() {
+        when(onlineHearingService.getCcdCase(onlineHearingId))
+                .thenReturn(Optional.of(createSscsCaseDetailsWithAppointee()));
+
+        byte[] pdf = {2, 4, 6, 0, 1};
+        PdfCoverSheet pdfSummary = new PdfCoverSheet("12345", "appointeeFirst appointeeLast",
+                "appointeeLine1", "appointeeLine2", "appointeeTown", "appointeeCounty", "appointeePostcode",
+                englishTempateDetails.get(hmctsImgVal), welshTempateDetails.get(hmctsImgVal));
+        when(pdfService.createPdf(pdfSummary, englishTempateDetails.get(template))).thenReturn(pdf);
+
+        Optional<byte[]> pdfOptional =
+                new CoversheetService(onlineHearingService, pdfService, ccdService, idamService, documentConfiguration).createCoverSheet(onlineHearingId);
+
+        assertThat(pdfOptional.isPresent(), is(true));
+        assertThat(pdfOptional.get(), is(pdf));
+        verify(pdfService).createPdf(eq(pdfSummary), eq(englishTempateDetails.get(template)));
+    }
+
+    @Test
+    public void canLoadCcdCaseWithNullNameAndProducePdf() {
+        when(onlineHearingService.getCcdCase(onlineHearingId))
+                .thenReturn(Optional.of(createSscsCaseDetailsWithNullName()));
+
+        byte[] pdf = {2, 4, 6, 0, 1};
+        PdfCoverSheet pdfSummary = new PdfCoverSheet("12345", "", "line1", "line2",
+                "town", "county", "postcode", englishTempateDetails.get(hmctsImgVal),
+                welshTempateDetails.get(hmctsImgVal));
+        when(pdfService.createPdf(pdfSummary, englishTempateDetails.get(template))).thenReturn(pdf);
+
+        Optional<byte[]> pdfOptional =
+                new CoversheetService(onlineHearingService, pdfService, ccdService, idamService, documentConfiguration).createCoverSheet(onlineHearingId);
+
+        assertThat(pdfOptional.isPresent(), is(true));
+        assertThat(pdfOptional.get(), is(pdf));
+        verify(pdfService).createPdf(eq(pdfSummary), eq(englishTempateDetails.get(template)));
+    }
+
+    private SscsCaseDetails createSscsCaseDetailsWithAppointee() {
+        return SscsCaseDetails.builder()
+                .id(12345L)
+                .data(SscsCaseData.builder()
+                        .appeal(Appeal.builder()
+                                .appellant(Appellant.builder()
+                                        .isAppointee("Yes")
+                                        .name(Name.builder()
+                                                .firstName("firstname")
+                                                .lastName("lastname")
+                                                .build())
+                                        .address(Address.builder()
+                                                .line1("line1")
+                                                .line2("line2")
+                                                .town("town")
+                                                .county("county")
+                                                .postcode("postcode")
+                                                .build())
+                                        .appointee(Appointee.builder()
+                                                .name(Name.builder()
+                                                        .firstName("appointeeFirst")
+                                                        .lastName("appointeeLast")
+                                                        .build())
+                                                .address(Address.builder()
+                                                        .line1("appointeeLine1")
+                                                        .line2("appointeeLine2")
+                                                        .town("appointeeTown")
+                                                        .county("appointeeCounty")
+                                                        .postcode("appointeePostcode")
+                                                        .build())
+                                                .build())
+                                        .build())
+                                .build())
+                        .build())
+                .build();
+    }
+
+    private SscsCaseDetails createSscsCaseDetailsWithNullName() {
+        return SscsCaseDetails.builder()
+                .id(12345L)
+                .data(SscsCaseData.builder()
+                        .appeal(Appeal.builder()
+                                .appellant(Appellant.builder()
+                                        .name(null)
+                                        .address(Address.builder()
+                                                .line1("line1")
+                                                .line2("line2")
+                                                .town("town")
+                                                .county("county")
+                                                .postcode("postcode")
+                                                .build())
+                                        .build())
+                                .build())
                         .build())
                 .build();
     }

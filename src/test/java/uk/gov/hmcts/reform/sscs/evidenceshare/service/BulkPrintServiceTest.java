@@ -416,6 +416,46 @@ class BulkPrintServiceTest {
             .isInstanceOf(BulkPrintException.class);
     }
 
+    @Test
+    void willSendToBulkPrintWithNullAppellantName() {
+        SscsCaseData caseDataWithNullName = SscsCaseData.builder()
+                .ccdCaseId("999")
+                .appeal(Appeal.builder().appellant(
+                                Appellant.builder()
+                                        .name(null)
+                                        .address(Address.builder().line1("line1").build())
+                                        .build())
+                        .build())
+                .build();
+
+        when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), captor.capture()))
+                .thenReturn(new SendLetterResponse(LETTER_ID));
+
+        bulkPrintService.sendToBulkPrint(PDF_LIST, caseDataWithNullName, "Some Recipient");
+
+        assertThat(captor.getValue().getAdditionalData()).containsEntry("appellantName", "Some Recipient");
+    }
+
+    @Test
+    void willSendToBulkPrintWithNullNameAndNullRecipient() {
+        SscsCaseData caseDataWithNullName = SscsCaseData.builder()
+                .ccdCaseId("999")
+                .appeal(Appeal.builder().appellant(
+                                Appellant.builder()
+                                        .name(null)
+                                        .address(Address.builder().line1("line1").build())
+                                        .build())
+                        .build())
+                .build();
+
+        when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), captor.capture()))
+                .thenReturn(new SendLetterResponse(LETTER_ID));
+
+        bulkPrintService.sendToBulkPrint(PDF_LIST, caseDataWithNullName, null);
+
+        assertThat(captor.getValue().getAdditionalData()).containsEntry("appellantName", "Unknown");
+    }
+
     private byte[] createSinglePagePdf() throws IOException {
         try (PDDocument document = new PDDocument();
              ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {

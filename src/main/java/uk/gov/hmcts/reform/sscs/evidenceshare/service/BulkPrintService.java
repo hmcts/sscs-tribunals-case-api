@@ -198,7 +198,10 @@ public class BulkPrintService implements PrintService {
         Map<String, Object> additionalData = new HashMap<>();
         additionalData.put(LETTER_TYPE_KEY, "sscs-data-pack");
         additionalData.put(CASE_IDENTIFIER, sscsCaseData.getCcdCaseId());
-        additionalData.put(APPELLANT_NAME, sscsCaseData.getAppeal().getAppellant().getName().getFullNameNoTitle());
+        String appellantName = Optional.ofNullable(sscsCaseData.getAppeal().getAppellant().getName())
+                .map(name -> name.getFullNameNoTitle())
+                .orElse(recipient);
+        additionalData.put(APPELLANT_NAME, appellantName != null ? appellantName : "Unknown");
         additionalData.put(RECIPIENTS, getRecipients(recipient));
 
         YesNo isInUk = sscsCaseData.getAppeal().getAppellant().getAddress().getInMainlandUk();
