@@ -2208,6 +2208,118 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
     }
 
+
+    @Test
+    public void willSetPreviewFile_WhenAllowedNotSupportGroupOnlyWithSevereConditionsYes() {
+
+        String endDate = "2018-11-10";
+        setCommonPreviewParams(sscsCaseData, endDate);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.setWcaAppeal(YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(YES);
+        sscsCaseData.getExtendedSscsCaseData().setEsaWriteFinalDecisionSevereCriteriaApply(YES);
+
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
+
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
+        assertEquals(DocumentLink.builder()
+                .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern(DD_MM_YYYY))))
+                .documentBinaryUrl(URL + "/binary")
+                .documentUrl(URL)
+                .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
+
+        boolean appealAllowedExpectation = true;
+
+        boolean setAsideExpectation = true;
+
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10",
+                appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
+
+        assertEquals("Judge Full Name", payload.getUserName());
+        assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
+
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+
+        assertNotNull(body);
+
+        // Common assertions
+        assertCommonPreviewParams(body, endDate, false);
+
+
+        assertNull(body.getDwpReassessTheAward());
+        assertNull(payload.getDateIssued());
+        assertEquals(LocalDate.now(), payload.getGeneratedDate());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+
+        assertNotNull(payload.getWriteFinalDecisionTemplateContent());
+        assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
+        EsaTemplateContent templateContent = (EsaTemplateContent)payload.getWriteFinalDecisionTemplateContent();
+        assertEquals(EsaScenario.SCENARIO_13, templateContent.getScenario());
+    }
+
+
+    @Test
+    public void willSetPreviewFile_WhenRefusedNotSupportGroupOnlyWithSevereConditionsNo() {
+
+        String endDate = "2018-11-10";
+        setCommonPreviewParams(sscsCaseData, endDate);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.setWcaAppeal(YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
+        sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(YES);
+        sscsCaseData.getExtendedSscsCaseData().setEsaWriteFinalDecisionSevereCriteriaApply(NO);
+
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
+
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
+        assertEquals(DocumentLink.builder()
+                .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern(DD_MM_YYYY))))
+                .documentBinaryUrl(URL + "/binary")
+                .documentUrl(URL)
+                .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
+
+        boolean appealAllowedExpectation = false;
+
+        boolean setAsideExpectation = false;
+
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10",
+                appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
+
+        assertEquals("Judge Full Name", payload.getUserName());
+        assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
+
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+
+        assertNotNull(body);
+
+        // Common assertions
+        assertCommonPreviewParams(body, endDate, false);
+
+
+        assertNull(body.getDwpReassessTheAward());
+        assertNull(payload.getDateIssued());
+        assertEquals(LocalDate.now(), payload.getGeneratedDate());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+
+        assertNotNull(payload.getWriteFinalDecisionTemplateContent());
+        assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
+        EsaTemplateContent templateContent = (EsaTemplateContent)payload.getWriteFinalDecisionTemplateContent();
+        assertEquals(EsaScenario.SCENARIO_14, templateContent.getScenario());
+    }
+
     @Override
     protected boolean isDescriptorFlowSupported() {
         return true;
