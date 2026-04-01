@@ -57,7 +57,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
     @Override
     protected WriteFinalDecisionPreviewDecisionServiceBase createPreviewDecisionService(GenerateFile generateFile, UserDetailsService userDetailsService,
         DocumentConfiguration documentConfiguration) {
-        return new EsaWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService, esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
+        return new EsaWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService, esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader, true);
     }
 
     @Override
@@ -2254,6 +2254,8 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
 
         assertNull(body.getDwpReassessTheAward());
+        assertTrue(body.getSevereCriteriaApplies());
+
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
         assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
@@ -2310,6 +2312,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
 
         assertNull(body.getDwpReassessTheAward());
+        assertFalse(body.getSevereCriteriaApplies());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
         assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
@@ -2317,7 +2320,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
         EsaTemplateContent templateContent = (EsaTemplateContent)payload.getWriteFinalDecisionTemplateContent();
-        assertEquals(EsaScenario.SCENARIO_14, templateContent.getScenario());
+        assertEquals(EsaScenario.SCENARIO_13, templateContent.getScenario());
     }
 
     @Override

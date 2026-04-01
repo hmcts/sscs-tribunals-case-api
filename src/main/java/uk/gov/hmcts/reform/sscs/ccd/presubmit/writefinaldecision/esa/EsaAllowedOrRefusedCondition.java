@@ -201,8 +201,7 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
         } else if (NON_WCA_APPEAL_ALLOWED == this || NON_WCA_APPEAL_REFUSED == this) {
             return EsaScenario.SCENARIO_10;
         } else if (SEVERE_CONDITIONS_ALLOWED_SV_ISSUE_CODE == this || SEVERE_CONDITIONS_REFUSED_SV_ISSUE_CODE == this) {
-            //TODO: update templates once added
-            return YesNo.isYes(caseData.getExtendedSscsCaseData().getEsaWriteFinalDecisionSevereCriteriaApply()) ? EsaScenario.SCENARIO_13 : EsaScenario.SCENARIO_14;
+            return  EsaScenario.SCENARIO_13;
         } else {
             throw new IllegalStateException("No scenario applicable");
         }
