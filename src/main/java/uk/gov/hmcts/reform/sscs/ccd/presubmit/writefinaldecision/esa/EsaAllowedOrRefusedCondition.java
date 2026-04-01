@@ -161,7 +161,17 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
             isAnyPoints(),
             isSchedule3(StringListPredicate.UNSPECIFIED),
             isSchedule3ActivitiesAnswer(StringListPredicate.UNSPECIFIED),
-            isDwpReassessTheAward(UNSPECIFIED));
+            isDwpReassessTheAward(UNSPECIFIED)),
+    ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS_SEVERE_CONDITIONS(
+            isAllowedOrRefused(ALLOWED),
+            isWcaAppeal(TRUE, false),
+            isSevereConditions(TRUE),
+            isSupportGroupOnly(NOT_TRUE, true),
+            isPoints(POINTS_LESS_THAN_FIFTEEN),
+            isSchedule3(NOT_EMPTY),
+            isSupportGroupOnly(YesNoPredicate.FALSE, false).get(),
+            isRegulation29(YesNoPredicate.TRUE)
+    ),;
 
     Optional<EsaPointsCondition> primaryPointsCondition;
     Optional<FieldCondition> schedule3ActivitiesSelected;
@@ -196,7 +206,7 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
             return EsaScenario.SCENARIO_7;
         }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS == this && caseData.getSscsEsaCaseData().getSchedule3Selections().isEmpty() && isRegulation35(TRUE).isSatisified(caseData)) {
             return EsaScenario.SCENARIO_8;
-        }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS == this && !caseData.getSscsEsaCaseData().getSchedule3Selections().isEmpty()) {
+        }  else if ((ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS == this && !caseData.getSscsEsaCaseData().getSchedule3Selections().isEmpty()) || ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS_SEVERE_CONDITIONS == this) {
             return EsaScenario.SCENARIO_9;
         } else if (NON_WCA_APPEAL_ALLOWED == this || NON_WCA_APPEAL_REFUSED == this) {
             return EsaScenario.SCENARIO_10;
