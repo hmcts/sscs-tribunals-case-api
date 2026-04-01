@@ -324,6 +324,7 @@ public final class NotificationEventTypeLists {
 
     public static final Set<NotificationEventType> EVENTS_VALID_FOR_APPOINTEE = EnumSet.of(
         ADMIN_CORRECTION_HEADER,
+        ADMIN_SEND_TO_VALID_APPEAL,
         APPEAL_RECEIVED,
         CORRECTION_GRANTED,
         CORRECTION_REFUSED,
@@ -333,13 +334,15 @@ public final class NotificationEventTypeLists {
         DWP_APPEAL_LAPSED,
         DWP_RESPONSE_RECEIVED,
         HMCTS_APPEAL_LAPSED,
+        INTERLOC_VALID_APPEAL,
         ISSUE_FINAL_DECISION,
         ISSUE_FINAL_DECISION_WELSH,
-        LIBERTY_TO_APPLY_GRANTED,
-        LIBERTY_TO_APPLY_REFUSED,
         JOINT_PARTY_ADDED,
         JUDGE_DECISION_APPEAL_TO_PROCEED,
+        LIBERTY_TO_APPLY_GRANTED,
+        LIBERTY_TO_APPLY_REFUSED,
         NON_COMPLIANT,
+        NOTIFY_APPELLANT_VALID_APPEAL,
         PROVIDE_APPOINTEE_DETAILS,
         RESEND_APPEAL_CREATED,
         SET_ASIDE_GRANTED,
@@ -349,6 +352,7 @@ public final class NotificationEventTypeLists {
         SYA_APPEAL_CREATED,
         SUBSCRIPTION_UPDATED,
         TCW_DECISION_APPEAL_TO_PROCEED,
+        VALID_APPEAL,
         VALID_APPEAL_CREATED
     );
 
