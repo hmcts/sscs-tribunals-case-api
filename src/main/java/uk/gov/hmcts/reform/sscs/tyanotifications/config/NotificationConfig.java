@@ -121,17 +121,7 @@ public class NotificationConfig {
             .orElse(null);
 
         String docmosisTemplateId = getTemplateId(appealHearingType, hearingRoute, docmosisTemplateName, "docmosisId", languagePreference);
-        if (StringUtils.isNotBlank(docmosisTemplateId)) {
-            if (docmosisTemplateName.split("\\.")[0].equals("appealReceived") && !State.READY_TO_LIST.getId().equals(createdInGapsFrom)) {
-                docmosisTemplateId = null;
-            }
-            if ((cmOtherPartyConfidentialityEnabled && VALID_APPEAL_CREATED.equals(notificationWrapper.getNotificationType()) && !notificationWrapper
-                .getNewSscsCaseData()
-                .isBenefitType(CHILD_SUPPORT))
-                || (!cmOtherPartyConfidentialityEnabled && VALID_APPEAL_CREATED.equals(notificationWrapper.getNotificationType()))) {
-                docmosisTemplateId = null;
-            }
-        }
+        docmosisTemplateId = docmosisSuppressScenarios(docmosisTemplateName, notificationWrapper, createdInGapsFrom, docmosisTemplateId);
         return Template.builder()
             .emailTemplateId(getTemplateId(appealHearingType, hearingRoute, emailTemplateName, "emailId", languagePreference))
             .smsTemplateId(getSmsTemplates(appealHearingType, hearingRoute, smsTemplateName, "smsId", languagePreference))
@@ -139,6 +129,24 @@ public class NotificationConfig {
             .letterTemplateId(getTemplateId(appealHearingType, hearingRoute, letterTemplateName, "letterId", languagePreference))
             .docmosisTemplateId(docmosisTemplateId)
             .build();
+    }
+
+    private String docmosisSuppressScenarios(String docmosisTemplateName, NotificationWrapper notificationWrapper,
+        String createdInGapsFrom, String docmosisTemplateId) {
+        if (StringUtils.isNotBlank(docmosisTemplateId)) {
+            if (docmosisTemplateName.split("\\.")[0].equals("appealReceived") && !State.READY_TO_LIST.getId().equals(
+                createdInGapsFrom)) {
+                docmosisTemplateId = null;
+            }
+            if ((cmOtherPartyConfidentialityEnabled && VALID_APPEAL_CREATED.equals(
+                notificationWrapper.getNotificationType()) && !notificationWrapper
+                .getNewSscsCaseData()
+                .isBenefitType(CHILD_SUPPORT))
+                || (!cmOtherPartyConfidentialityEnabled && VALID_APPEAL_CREATED.equals(notificationWrapper.getNotificationType()))) {
+                docmosisTemplateId = null;
+            }
+        }
+        return docmosisTemplateId;
     }
 
     private LanguagePreference shouldSwitchLanguage(LanguagePreference languagePreference, boolean shouldSwitchLanguage) {
