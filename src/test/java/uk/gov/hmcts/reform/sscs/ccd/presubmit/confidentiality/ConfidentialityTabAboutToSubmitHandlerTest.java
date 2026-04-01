@@ -245,7 +245,7 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
         when(caseDetailsBefore.getCaseData()).thenReturn(beforeCaseData);
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
 
         String tab = response.getData().getConfidentialityTab();
         assertThat(tab).isEqualToNormalizingPunctuationAndWhitespace("""

@@ -290,6 +290,20 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
     }
 
     @Test
+    @Parameters({"NO, Yes", "YES, No"})
+    public void givenSevereConditionsEnabledAndSchedule7DoesNotApply_thenShouldClearSchedule7ActivitiesWhenNoSce(YesNo showSchedule7ActivitiesPage, String ucWriteFinalDecisionSchedule7ActivitiesApply) {
+        sscsCaseData.getSscsUcCaseData().setShowSchedule7ActivitiesPage(showSchedule7ActivitiesPage);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(ucWriteFinalDecisionSchedule7ActivitiesApply);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(List.of("schedule7MobilisingUnaided"));
+        UcWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, true);
+        handlerWithSevereConditions.setDefaultFields(sscsCaseData);
+
+        assertThat(sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionSchedule7ActivitiesQuestion()).isNull();
+    }
+
+
+
+    @Test
     @Parameters({"SV", "DD"})
     public void givenSevereConditionsNotEnabled_thenShouldNotSetHasSvIssueCode(String issueCode) {
         UcWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, false);
