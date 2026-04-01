@@ -93,5 +93,18 @@
     "PageLabel": "Select Schedule 3 activities",
     "PageShowCondition": "showSchedule3ActivitiesPage=\"Yes\" AND wcaAppeal = \"Yes\"",
     "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseEventID": "writeFinalDecision",
+    "CaseFieldID": "doesRegulation29Apply",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 58,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "regulation29",
+    "PageLabel": "Regulation 29",
+    "PageShowCondition": "appeal.benefitType.code=\"ESA\" AND wcaAppeal = \"Yes\" AND showRegulation29Page=\"Yes\"",
+    "ShowSummaryChangeOption": "Y"
   }
 ]
