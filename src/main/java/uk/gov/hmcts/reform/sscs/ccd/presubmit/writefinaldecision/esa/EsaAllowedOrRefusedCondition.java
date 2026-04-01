@@ -177,7 +177,7 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
             isSevereConditions(TRUE),
             isSupportGroupOnly(NOT_TRUE, true),
             isPoints(POINTS_LESS_THAN_FIFTEEN),
-            isAnySchedule3(),
+            isSchedule3(NOT_EMPTY),
             isSupportGroupOnly(YesNoPredicate.FALSE, false).get(),
             isRegulation29(YesNoPredicate.TRUE));
 
