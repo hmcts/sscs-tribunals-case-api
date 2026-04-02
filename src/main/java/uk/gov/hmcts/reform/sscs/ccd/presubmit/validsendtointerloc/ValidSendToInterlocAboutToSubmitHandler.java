@@ -7,8 +7,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_SEND_TO_INTERL
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.CONFIDENTIALITY;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty.REP;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.REPRESENTATIVE;
-import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.isConfidentialityReferral;
-import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.isSelectionMissing;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -23,6 +21,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
