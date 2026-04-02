@@ -201,4 +201,26 @@ class ValidSendToInterlocAboutToStartHandlerTest {
 
         assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty()).isNull();
     }
+    @ParameterizedTest
+    @EnumSource(value = EventType.class, names = {"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
+    void givenChildSupport_thenSelectedConfidentialityPartyHasNoDefaultSelection(EventType eventType) {
+        handler = new ValidSendToInterlocAboutToStartHandler(false, false, true);
+        when(callback.getEvent()).thenReturn(eventType);
+        setupCallback();
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertEquals("", response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode());
+    }
+
+    @Test
+    void givenNonChildSupport_thenSelectedConfidentialityPartyIsNotSet() {
+        setupCallback();
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("PIP").build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty());
+    }
 }
