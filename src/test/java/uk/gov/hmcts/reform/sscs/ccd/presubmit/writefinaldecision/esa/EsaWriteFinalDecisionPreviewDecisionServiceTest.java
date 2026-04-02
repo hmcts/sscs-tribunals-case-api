@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Test;
@@ -2212,7 +2214,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
     @Test
     public void willSetPreviewFile_WhenAllowedNotSupportGroupOnlyWithSevereConditionsYes() {
 
-        String endDate = "2018-11-10";
+        String endDate = "2026-03-01";
         setCommonPreviewParams(sscsCaseData, endDate);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -2253,24 +2255,26 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertCommonPreviewParams(body, endDate, false);
 
 
-        assertNull(body.getDwpReassessTheAward());
-        assertTrue(body.getSevereCriteriaApplies());
+        assertThat(body.getDwpReassessTheAward()).isNull();
+        assertThat(body.getSevereCriteriaApplies()).isTrue();
+        assertThat(payload.getWriteFinalDecisionTemplateContent().getComponents().stream()
+                .anyMatch(content -> Objects.equals(content.getId(), "SEVERE_CRITERIA_APPLY_PARAGRAPH"))).isTrue();
 
-        assertNull(payload.getDateIssued());
-        assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertThat(payload.getDateIssued()).isNull();
+        assertThat(LocalDate.now()).isEqualTo(payload.getGeneratedDate());
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isNull();
 
-        assertNotNull(payload.getWriteFinalDecisionTemplateContent());
-        assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
+        assertThat(payload.getWriteFinalDecisionTemplateContent()).isNotNull();
+        assertThat(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent).isTrue();
         EsaTemplateContent templateContent = (EsaTemplateContent)payload.getWriteFinalDecisionTemplateContent();
-        assertEquals(EsaScenario.SCENARIO_13, templateContent.getScenario());
+        assertThat(EsaScenario.SCENARIO_13).isEqualTo(templateContent.getScenario());
     }
 
 
     @Test
     public void willSetPreviewFile_WhenRefusedNotSupportGroupOnlyWithSevereConditionsNo() {
 
-        String endDate = "2018-11-10";
+        String endDate = "2026-03-01";
         setCommonPreviewParams(sscsCaseData, endDate);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -2284,12 +2288,12 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
-        assertEquals(DocumentLink.builder()
+        assertThat(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument()).isNotNull();
+        assertThat(DocumentLink.builder()
                 .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern(DD_MM_YYYY))))
                 .documentBinaryUrl(URL + "/binary")
                 .documentUrl(URL)
-                .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
+                .build()).isEqualTo(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         boolean appealAllowedExpectation = false;
 
@@ -2298,29 +2302,179 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10",
                 appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
-        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
+        assertThat(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal()).isTrue();
 
-        assertEquals("Judge Full Name", payload.getUserName());
-        assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
+        assertThat("Judge Full Name").isEqualTo(payload.getUserName());
+        assertThat("DRAFT DECISION NOTICE").isEqualTo(payload.getNoticeType());
+        assertThat(payload.getWriteFinalDecisionTemplateContent().getComponents().stream()
+                .anyMatch(content -> Objects.equals(content.getId(), "SEVERE_CRITERIA_APPLY_PARAGRAPH"))).isTrue();
+
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
 
-        assertNotNull(body);
+        assertThat(body).isNotNull();
 
         // Common assertions
         assertCommonPreviewParams(body, endDate, false);
 
 
-        assertNull(body.getDwpReassessTheAward());
-        assertFalse(body.getSevereCriteriaApplies());
-        assertNull(payload.getDateIssued());
-        assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertThat(body.getDwpReassessTheAward()).isNull();
+        assertThat(body.getSevereCriteriaApplies()).isFalse();
+        assertThat(payload.getDateIssued()).isNull();
+        assertThat(LocalDate.now()).isEqualTo(payload.getGeneratedDate());
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isNull();
 
-        assertNotNull(payload.getWriteFinalDecisionTemplateContent());
-        assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
+        assertThat(payload.getWriteFinalDecisionTemplateContent()).isNotNull();
+        assertThat(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent).isTrue();
         EsaTemplateContent templateContent = (EsaTemplateContent)payload.getWriteFinalDecisionTemplateContent();
-        assertEquals(EsaScenario.SCENARIO_13, templateContent.getScenario());
+        assertThat(EsaScenario.SCENARIO_13).isEqualTo(templateContent.getScenario());
+    }
+
+    @Test
+    public void willSetPreviewFile_WhenAllowedNotSupportGroupOnlyWithSchedule3_WhenLowPoints_WithSevereConditions() {
+
+        String endDate = "2026-03-01";
+        setCommonPreviewParams(sscsCaseData, endDate);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(List.of("schedule3MobilisingUnaided", "schedule3AppropriatenessOfBehaviour"));
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YES);
+        sscsCaseData.setWcaAppeal(YES);
+        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getExtendedSscsCaseData().setEsaWriteFinalDecisionSevereCriteriaApply(YES);
+
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(List.of("mobilisingUnaided"));
+
+        // 9 points awarded for this question - low, which means regulation 29 must apply
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1c");
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
+
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
+        assertEquals(DocumentLink.builder()
+                .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern(DD_MM_YYYY))))
+                .documentBinaryUrl(URL + "/binary")
+                .documentUrl(URL)
+                .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
+
+        boolean appealAllowedExpectation = true;
+
+        boolean setAsideExpectation = true;
+
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10",
+                appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
+
+        assertThat("Judge Full Name").isEqualTo(payload.getUserName());
+        assertThat("DRAFT DECISION NOTICE").isEqualTo(payload.getNoticeType());
+
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+
+        assertThat(body).isNotNull();
+
+        // Common assertions
+        assertCommonPreviewParams(body, endDate, false);
+
+        assertThat("higher rate").isEqualTo(body.getEsaAwardRate());
+
+        assertThat(body.getEsaSchedule2Descriptors()).isNotNull();
+        assertThat(1).isEqualTo(body.getEsaSchedule2Descriptors().size());
+        assertThat(body.getEsaSchedule2Descriptors().getFirst()).isNotNull();
+        assertThat(9).isEqualTo(body.getEsaSchedule2Descriptors().getFirst().getActivityAnswerPoints());
+        assertThat("c").isEqualTo(body.getEsaSchedule2Descriptors().getFirst().getActivityAnswerLetter());
+        assertThat("Cannot, unaided by another person, either: (i) mobilise more than 100 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 100 metres within a reasonable timescale because of significant discomfort or exhaustion.").isEqualTo(body.getEsaSchedule2Descriptors().getFirst().getActivityAnswerValue());
+        assertThat("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.").isEqualTo(body.getEsaSchedule2Descriptors().getFirst().getActivityQuestionValue());
+        assertThat("1").isEqualTo(body.getEsaSchedule2Descriptors().getFirst().getActivityQuestionNumber());
+        assertThat(body.getEsaNumberOfPoints()).isNotNull();
+        assertThat(9).isEqualTo(body.getEsaNumberOfPoints().intValue());
+
+        assertThat(body.isEsaIsEntited()).isTrue();
+        assertThat(body.getSevereCriteriaApplies()).isTrue();
+        assertThat(body.getDwpReassessTheAward()).isNull();
+        assertThat(payload.getDateIssued()).isNull();
+        assertThat(LocalDate.now()).isEqualTo(payload.getGeneratedDate());
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isNull();
+
+        assertThat(payload.getWriteFinalDecisionTemplateContent()).isNotNull();
+        assertThat(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent).isTrue();
+        EsaTemplateContent templateContent = (EsaTemplateContent)payload.getWriteFinalDecisionTemplateContent();
+        assertThat(EsaScenario.SCENARIO_9).isEqualTo(templateContent.getScenario());
+        assertThat(12).isEqualTo(payload.getWriteFinalDecisionTemplateContent().getComponents().size());
+    }
+
+
+    @Test
+    public void willSetPreviewFile_WhenAllowedAndSupportGroupOnlySchedule3_WhenSevereConditionsSelected() {
+
+        String endDate = "2026-03-01";
+        setCommonPreviewParams(sscsCaseData, endDate);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(List.of("schedule3MobilisingUnaided", "schedule3AppropriatenessOfBehaviour"));
+        sscsCaseData.setWcaAppeal(YES);
+        sscsCaseData.setSupportGroupOnlyAppeal("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getExtendedSscsCaseData().setEsaWriteFinalDecisionSevereCriteriaApply(YES);
+
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
+
+        assertThat(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument()).isNotNull();
+        assertThat(DocumentLink.builder()
+                .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern(DD_MM_YYYY))))
+                .documentBinaryUrl(URL + "/binary")
+                .documentUrl(URL)
+                .build()).isEqualTo(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
+
+        boolean appealAllowedExpectation = true;
+
+        boolean setAsideExpectation = true;
+
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10",
+                appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+
+        assertThat(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal()).isTrue();
+
+        assertThat("Judge Full Name").isEqualTo(payload.getUserName());
+        assertThat("DRAFT DECISION NOTICE").isEqualTo(payload.getNoticeType());
+
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+
+        assertThat(body).isNotNull();
+
+        // Common assertions
+        assertCommonPreviewParams(body, endDate, false);
+
+        assertThat("higher rate").isEqualTo(body.getEsaAwardRate());
+
+        assertThat(payload.getWriteFinalDecisionTemplateContent().getComponents().stream()
+                .anyMatch(content -> Objects.equals(content.getId(), "SEVERE_CRITERIA_APPLY_PARAGRAPH"))).isTrue();
+
+
+        assertThat(body.getEsaSchedule2Descriptors()).isNull();
+        assertThat(body.getEsaNumberOfPoints()).isNull();
+
+        assertThat(body.isEsaIsEntited()).isTrue();
+        assertThat(body.getDwpReassessTheAward()).isNull();
+        assertThat(body.getSevereCriteriaApplies()).isTrue();
+        assertThat(payload.getDateIssued()).isNull();
+        assertThat(LocalDate.now()).isEqualTo(payload.getGeneratedDate());
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isNull();
+
+        assertThat(payload.getWriteFinalDecisionTemplateContent()).isNotNull();
+        assertThat(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent).isTrue();
+        EsaTemplateContent templateContent = (EsaTemplateContent)payload.getWriteFinalDecisionTemplateContent();
+        assertThat(EsaScenario.SCENARIO_4).isEqualTo(templateContent.getScenario());
+        assertThat(10).isEqualTo(payload.getWriteFinalDecisionTemplateContent().getComponents().size());
     }
 
     @Override
