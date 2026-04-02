@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_SEND_TO_INTERLOC;
@@ -124,14 +125,13 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
     private boolean isSelectionMissing(DynamicList dynamicList) {
         return dynamicList == null
                 || dynamicList.getValue() == null
-                || dynamicList.getValue().getCode() == null
-                || dynamicList.getValue().getCode().isBlank();
+                || isBlank(dynamicList.getValue().getCode());
     }
 
     private boolean isDynamicListEmpty(DynamicList originalSender) {
         return originalSender == null
                 || originalSender.getValue() == null
-                || originalSender.getValue().getCode() == null;
+                || isBlank(originalSender.getValue().getCode());
     }
 
 }
