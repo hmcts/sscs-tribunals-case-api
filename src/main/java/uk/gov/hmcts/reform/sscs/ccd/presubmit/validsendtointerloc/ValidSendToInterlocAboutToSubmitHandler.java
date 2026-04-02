@@ -6,8 +6,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADMIN_SEND_TO_INTERL
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_SEND_TO_INTERLOC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty.REP;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.REPRESENTATIVE;
-import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.isConfidentialityReferral;
-import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.isSelectionMissing;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -20,6 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
@@ -116,6 +115,17 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
     private UploadParty getUploadParty(DynamicList originalSender) {
         return REPRESENTATIVE.getCode().equals(originalSender.getValue().getCode())
                 ? REP : UploadParty.fromValue(originalSender.getValue().getCode());
+    }
+
+    private boolean isConfidentialityReferral(SscsCaseData sscsCaseData) {
+        return InterlocReferralReason.CONFIDENTIALITY.equals(sscsCaseData.getInterlocReferralReason());
+    }
+
+    private boolean isSelectionMissing(DynamicList dynamicList) {
+        return dynamicList == null
+                || dynamicList.getValue() == null
+                || dynamicList.getValue().getCode() == null
+                || dynamicList.getValue().getCode().isBlank();
     }
 
     private boolean isDynamicListEmpty(DynamicList originalSender) {

@@ -43,6 +43,7 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
         this.hearingsService = hearingsService;
         this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
+
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");

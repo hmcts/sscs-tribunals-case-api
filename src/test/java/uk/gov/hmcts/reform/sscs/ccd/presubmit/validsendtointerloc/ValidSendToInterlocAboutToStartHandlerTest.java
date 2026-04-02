@@ -169,6 +169,7 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
 
         assertEquals(new DynamicList(expectedListItem1, expectedList), response.getData().getOriginalSender());
     }
+
     @ParameterizedTest
     @EnumSource(value = EventType.class, names = {"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
     void givenChildSupport_thenSelectedConfidentialityPartyHasNoDefaultSelection(EventType eventType) {
