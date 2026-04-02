@@ -3,8 +3,6 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -1247,7 +1245,7 @@ public class NotificationServiceTest {
         verify(notificationHandler, never()).sendNotification(any(), any(), any(), any());
         ArgumentCaptor<ZonedDateTime> argument = ArgumentCaptor.forClass(ZonedDateTime.class);
         verify(notificationHandler).scheduleNotification(eq(ccdNotificationWrapper), argument.capture());
-        assertThat(argument.getValue().isBefore(ZonedDateTime.now().plusMinutes(6)), is(true));
+        assertThat(argument.getValue()).isBefore(ZonedDateTime.now().plusMinutes(6));
         verifyNoMoreInteractions(reminderService);
 
         verifyNoErrorsLogged(mockAppender, captorLoggingEvent);
@@ -2549,7 +2547,7 @@ public class NotificationServiceTest {
             Representative.builder().hasRepresentative("no").build(),
             null);
 
-        if (Benefit.CHILD_SUPPORT.getDescription().equals(benefitCode)) {
+        if (Benefit.CHILD_SUPPORT.name().equals(benefitCode)) {
             caseDataBuilder.appeal(Appeal.builder()
                                          .hearingType(AppealHearingType.ORAL.name())
                                          .hearingOptions(HearingOptions.builder().wantsToAttend(YES).build())
