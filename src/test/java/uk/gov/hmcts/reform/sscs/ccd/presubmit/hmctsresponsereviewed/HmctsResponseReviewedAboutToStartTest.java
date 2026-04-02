@@ -336,4 +336,23 @@ class HmctsResponseReviewedAboutToStartTest {
         assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty()).isNull();
     }
 
+    @Test
+    public void givenChildSupport_thenSelectedConfidentialityPartyHasNoDefaultSelection() {
+        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService, true);
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertEquals("", response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode());
+    }
+
+    @Test
+    public void givenNonChildSupport_thenSelectedConfidentialityPartyIsNotSet() {
+        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService, true);
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(Benefit.PIP.getShortName()).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty());
+    }
 }
