@@ -80,6 +80,51 @@ class PartiesOnCaseUtilTest {
     }
 
     @Test
+    void shouldRetainExistingSelectedConfidentialityPartyWhenStillValid() {
+        OtherParty otherParty = OtherParty.builder()
+            .id("1")
+            .name(Name.builder().firstName("Bo").lastName("Surname").build())
+            .build();
+        sscsCaseData.setOtherParties(List.of(new CcdValue<>(otherParty)));
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
+            new DynamicList(
+                new DynamicListItem(PartyItemList.OTHER_PARTY.getCode() + "1", "Other party 1 - Bo Surname"),
+                new ArrayList<>()
+            )
+        );
+
+        DynamicList response = PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown(sscsCaseData);
+
+        assertThat(response.getValue().getCode()).isEqualTo(PartyItemList.OTHER_PARTY.getCode() + "1");
+        assertThat(response.getListItems()).extracting(DynamicListItem::getCode)
+            .contains(PartyItemList.APPELLANT.getCode(), PartyItemList.OTHER_PARTY.getCode() + "1");
+    }
+
+    @Test
+    void shouldResetSelectedConfidentialityPartyWhenExistingSelectionNotInCurrentOptions() {
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
+            new DynamicList(new DynamicListItem("invalidCode", "Invalid"), new ArrayList<>())
+        );
+
+        DynamicList response = PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown(sscsCaseData);
+
+        assertThat(response.getValue().getCode()).isEmpty();
+        assertThat(response.getValue().getLabel()).isEmpty();
+        assertThat(response.getListItems()).extracting(DynamicListItem::getCode)
+            .contains(PartyItemList.APPELLANT.getCode());
+    }
+
+    @Test
+    void shouldReturnBlankSelectedConfidentialityPartyWhenNoExistingSelection() {
+        DynamicList response = PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown(sscsCaseData);
+
+        assertThat(response.getValue().getCode()).isEmpty();
+        assertThat(response.getValue().getLabel()).isEmpty();
+        assertThat(response.getListItems()).extracting(DynamicListItem::getCode)
+            .containsExactly(PartyItemList.APPELLANT.getCode());
+    }
+
+    @Test
     void willGetOtherPartyAndRepOnChildSupportAppeal() {
 
         OtherParty otherParty = OtherParty.builder()
