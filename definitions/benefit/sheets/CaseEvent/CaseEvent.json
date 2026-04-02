@@ -376,6 +376,20 @@
     "Publish": "N"
   },
   {
+    "LiveFrom": "16/03/2026",
+    "CaseTypeID": "Benefit",
+    "ID": "superUserFullEdit",
+    "Name": "Super User - Full Case Edit",
+    "Description": "Allows super user to edit any core case field for data correction",
+    "DisplayOrder": 281,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "ShowSummary": "Y",
+    "ShowEventNotes": "Y",
+    "SecurityClassification": "Public",
+    "Publish": "N"
+  },
+  {
     "LiveFrom": "01/01/2018",
     "CaseTypeID": "Benefit",
     "ID": "adminAppealWithdrawn",
