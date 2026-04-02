@@ -22,11 +22,14 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -37,6 +40,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReissueArtifactUi;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -184,6 +188,38 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
         callback = new Callback<>(caseDetails, Optional.of(caseDetails), APPEAL_RECEIVED, false);
 
         assertThrows(IllegalStateException.class, () -> handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION));
+    }
+
+    @ParameterizedTest
+    @MethodSource("missingSelectionScenarios")
+    void givenConfidentialityReferral_whenSelectionMissing_thenReturnsMustSelectPartyError(DynamicList selectedParty) {
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(selectedParty);
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(1));
+        assertTrue(response.getErrors().contains("Must select party"));
+    }
+
+    @Test
+    void givenConfidentialityReferral_whenSelectionPresent_thenDoesNotReturnMustSelectPartyError() {
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
+                new DynamicList(new DynamicListItem("appellant", "Appellant"), Collections.emptyList()));
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(Collections.emptySet(), response.getErrors());
+    }
+
+    private static Stream<Arguments> missingSelectionScenarios() {
+        return Stream.of(
+                Arguments.of((DynamicList) null),
+                Arguments.of(new DynamicList(null, Collections.emptyList())),
+                Arguments.of(new DynamicList(new DynamicListItem(null, "Appellant"), Collections.emptyList())),
+                Arguments.of(new DynamicList(new DynamicListItem("  ", "Appellant"), Collections.emptyList()))
+        );
     }
 
     private SscsCaseData setupDataForPostponementRequestInterlocSendToTcw(

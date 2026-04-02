@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
@@ -76,6 +77,51 @@ class PartiesOnCaseUtilTest {
         assertEquals("appellant", response.get(0).getCode());
         assertEquals("dwp", response.get(1).getCode());
         assertEquals("hmcts", response.get(2).getCode());
+    }
+
+    @Test
+    void shouldRetainExistingSelectedConfidentialityPartyWhenStillValid() {
+        OtherParty otherParty = OtherParty.builder()
+            .id("1")
+            .name(Name.builder().firstName("Bo").lastName("Surname").build())
+            .build();
+        sscsCaseData.setOtherParties(List.of(new CcdValue<>(otherParty)));
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
+            new DynamicList(
+                new DynamicListItem(PartyItemList.OTHER_PARTY.getCode() + "1", "Other party 1 - Bo Surname"),
+                new ArrayList<>()
+            )
+        );
+
+        DynamicList response = PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown(sscsCaseData);
+
+        assertThat(response.getValue().getCode()).isEqualTo(PartyItemList.OTHER_PARTY.getCode() + "1");
+        assertThat(response.getListItems()).extracting(DynamicListItem::getCode)
+            .contains(PartyItemList.APPELLANT.getCode(), PartyItemList.OTHER_PARTY.getCode() + "1");
+    }
+
+    @Test
+    void shouldResetSelectedConfidentialityPartyWhenExistingSelectionNotInCurrentOptions() {
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
+            new DynamicList(new DynamicListItem("invalidCode", "Invalid"), new ArrayList<>())
+        );
+
+        DynamicList response = PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown(sscsCaseData);
+
+        assertThat(response.getValue().getCode()).isEmpty();
+        assertThat(response.getValue().getLabel()).isEmpty();
+        assertThat(response.getListItems()).extracting(DynamicListItem::getCode)
+            .contains(PartyItemList.APPELLANT.getCode());
+    }
+
+    @Test
+    void shouldReturnBlankSelectedConfidentialityPartyWhenNoExistingSelection() {
+        DynamicList response = PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown(sscsCaseData);
+
+        assertThat(response.getValue().getCode()).isEmpty();
+        assertThat(response.getValue().getLabel()).isEmpty();
+        assertThat(response.getListItems()).extracting(DynamicListItem::getCode)
+            .containsExactly(PartyItemList.APPELLANT.getCode());
     }
 
     @Test
