@@ -1,2 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd"/>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+    <suppress until="2026-06-30Z">
+        <notes><![CDATA[
+        Temporary suppression for CVE-2025-67030 on plexus-utils from static analysis tooling chain.
+        This does not affect application runtime classpath.
+        Remove after upstream dependency upgrade.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.codehaus\.plexus/plexus-utils@.*$</packageUrl>
+        <cve>CVE-2025-67030</cve>
+    </suppress>
+</suppressions>
