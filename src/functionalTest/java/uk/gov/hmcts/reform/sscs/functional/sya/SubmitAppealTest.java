@@ -154,7 +154,8 @@ public class SubmitAppealTest {
                 "statementOfReasons",
                 "statementOfReasonsBodyContent",
                 "statementOfReasonsGenerateNotice",
-                "preWorkAllocation")
+                "preWorkAllocation",
+                "confidentialityTab")
             .isEqualTo(changeExpectedFields(expectedResponse, nino, mrnDate));
 
         assertThat(expectedState).isEqualTo(sscsCaseDetails.getState());
