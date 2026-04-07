@@ -50,9 +50,6 @@ public class CoversheetService {
                 .map(sscsCase -> {
 
                     SscsCaseData sscsCaseData = sscsCase.getData();
-                    String derivedTemplate = documentConfiguration.getEvidence()
-                            .get(sscsCaseData.getLanguagePreference()).get(TEMPLATE);
-
                     Appellant appellant = sscsCaseData.getAppeal().getAppellant();
                     Address address;
                     String fullName;
@@ -92,6 +89,8 @@ public class CoversheetService {
                                     .get(LanguagePreference.WELSH).get(HMCTS_IMG_VALUE)
                     );
 
+                    String derivedTemplate = documentConfiguration.getEvidence()
+                            .get(sscsCaseData.getLanguagePreference()).get(TEMPLATE);
                     return pdfService.createPdf(pdfCoverSheet, derivedTemplate);
                 });
     }
