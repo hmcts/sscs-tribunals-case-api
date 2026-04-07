@@ -56,7 +56,7 @@ public class AppealReceivedHandlerTest {
     @Before
     public void setUp() {
         when(evidenceShareConfig.getAppealReceivedDelayMs()).thenReturn(10L);
-        handler = new AppealReceivedHandler(ccdService, updateCcdCaseService, idamService, evidenceShareConfig);
+        handler = new AppealReceivedHandler(updateCcdCaseService, idamService, evidenceShareConfig);
     }
 
     @Test(expected = IllegalStateException.class)

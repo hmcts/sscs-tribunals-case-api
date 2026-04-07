@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 
+import jakarta.annotation.PreDestroy;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -16,10 +17,10 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @Slf4j
 @Service
@@ -36,14 +37,18 @@ public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     @Autowired
-    public AppealReceivedHandler(CcdService ccdService,
-                                 UpdateCcdCaseService updateCcdCaseService,
+    public AppealReceivedHandler(UpdateCcdCaseService updateCcdCaseService,
                                  IdamService idamService,
                                  EvidenceShareConfig evidenceShareConfig) {
         this.dispatchPriority = DispatchPriority.LATEST;
         this.updateCcdCaseService = updateCcdCaseService;
         this.idamService = idamService;
         this.evidenceShareConfig = evidenceShareConfig;
+    }
+
+    @PreDestroy
+    public void shutdown() {
+        scheduler.shutdown();
     }
 
     @Override
@@ -67,11 +72,11 @@ public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
 
         Long caseId = callback.getCaseDetails().getId();
         long delayMs = evidenceShareConfig.getAppealReceivedDelayMs();
+        IdamTokens idamTokens = idamService.getIdamTokens();
 
         log.info("Scheduling appealReceived event for case id {} with delay of {}ms", caseId, delayMs);
         // This handler was causing 409 conflicts with Send to bulk print handler for digital cases as was trying to trigger the sent to fta event at the same time.
-        // This sleep should resolve this issue until we address properly with tickets SSCS-7525 and SSCS-7526 which look at removing the appeal received event.
-        // 2026/3/10 have updated the thread sleep to a non-blocking async/await long term fix mentioned above still needs looking at
+        // This delay should resolve this issue until we address properly with tickets SSCS-7525 and SSCS-7526 which look at removing the appeal received event.
         scheduler.schedule(() -> {
             try {
                 log.info("About to update case v2 with appealReceived event for id {}", caseId);
@@ -80,7 +85,7 @@ public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
                         APPEAL_RECEIVED.getCcdType(),
                         "Appeal received",
                         "Appeal received event has been triggered from Tribunals API for digital case",
-                        idamService.getIdamTokens()
+                        idamTokens
                 );
             } catch (Exception e) {
                 log.error("Failed to trigger appealReceived event for case id {}: {}", caseId, e.getMessage(), e);
