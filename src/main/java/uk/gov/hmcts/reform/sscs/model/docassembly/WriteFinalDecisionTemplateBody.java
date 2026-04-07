@@ -127,4 +127,6 @@ public class WriteFinalDecisionTemplateBody {
     private LocalDate ucCapabilityAssessmentStartDate;
     @JsonProperty("esa_regulations_year")
     private String esaRegulationsYear;
+    @JsonProperty("severe_criteria_applies")
+    private Boolean severeCriteriaApplies;
 }
