@@ -35,34 +35,36 @@
     "security_classification":"PUBLIC",
     "case_data":{
       "caseCode":"051DD",
-      "supportGroupOnlyAppeal":"Yes",
-      "writeFinalDecisionSevereCriteriaApply":"writeFinalDecisionSevereCriteriaApplyCondition",
-      "wcaAppeal":"Yes",
-      "writeFinalDecisionMedicallyQualifiedPanelMemberName":"Dr Doolitle",
-      "writeFinalDecisionAllowedOrRefused":"allowed",
-      "ucWriteFinalDecisionMentalAssessmentQuestion":[],
-      "dwpReassessTheAward":"doNotReassess",
-      "ucWriteFinalDecisionMobilisingUnaidedQuestion":"mobilisingUnaided1a",
+      "supportGroupOnlyAppeal":"No",
       "writeFinalDecisionGenerateNotice":"Yes",
+      "doesSchedule8Paragraph4Apply":"Yes",
+      "writeFinalDecisionSevereCriteriaApply":"No",
       "writeFinalDecisionDateOfDecision":"2020-11-17",
       "writeFinalDecisionPageSectionReference":"B7",
       "writeFinalDecisionTypeOfHearing":"triage",
       "ucWriteFinalDecisionPhysicalDisabilitiesQuestion":[
         "mobilisingUnaided"
       ],
-      "ucWriteFinalDecisionSchedule7ActivitiesQuestion":[
-        "schedule7MobilisingUnaided"
-      ],
-      "writeFinalDecisionOtherPanelMemberName":"Professor Plum",
+      "ucWriteFinalDecisionMobilisingUnaidedQuestion":"mobilisingUnaided1b",
+      "doesSchedule9Paragraph4Apply":"",
+      "wcaAppeal":"Yes",
+      "writeFinalDecisionAllowedOrRefused":"allowed",
+      "ucWriteFinalDecisionMentalAssessmentQuestion":[],
+      "dwpReassessTheAward":"reassess3",
+      "writeFinalDecisionMedicallyQualifiedPanelMemberName":"Dr Pepper",
+      "writeFinalDecisionOtherPanelMemberName":"Professor Orange",
       "writeFinalDecisionReasons":[
         {
-          "id":"c5d206c1-9630-4f05-b7e8-175b0617c2cc",
+          "id":"ddfd2632-5ee2-4684-9b96-a90bea89bdc5",
           "value":"Reasons for decision"
         }
       ],
-      "writeFinalDecisionAnythingElse":"Anything else",
       "ucWriteFinalDecisionSchedule7ActivitiesApply":"Yes",
+      "ucWriteFinalDecisionSchedule7ActivitiesQuestion":[
+        "schedule7MobilisingUnaided"
+      ],
       "ucWriteFinalDecisionWorkCapabilityAssessmentStartDate" : "2025-11-18",
+      "writeFinalDecisionAnythingElse":"Anything else",
       "subscriptions":{
         "appellantSubscription":{
           "tya":"0oGRulRKtA",
@@ -132,7 +134,6 @@
       "isScottishCase":"No",
       "createdInGapsFrom":"readyToList",
       "issueCode":"DD",
-      "evidencePresent":"No",
       "appeal":{
         "mrnDetails":{
           "dwpIssuingOffice":"Coatbridge Benefit Centre",
@@ -205,21 +206,21 @@
                 "start":"2018-04-04",
                 "end":"2018-04-04"
               },
-              "id":"3597f228-d8f5-4af7-88d0-c5923ee7ae9b"
+              "id":"b9068b5c-0ea1-44e1-85f3-5fc2f318c977"
             },
             {
               "value":{
                 "start":"2018-04-05",
                 "end":"2018-04-05"
               },
-              "id":"a2c13933-45e2-41ef-b52b-8f3f14857a76"
+              "id":"5fd096af-d583-4793-b2a2-8ad0242be25d"
             },
             {
               "value":{
                 "start":"2018-04-06",
                 "end":"2018-04-06"
               },
-              "id":"04fb57a0-186c-488a-8252-0c84b52d70ae"
+              "id":"6b4cfb5d-9b90-4bb3-921f-4f7c41c8751c"
             }
           ],
           "other":"Yes, this..."
@@ -231,21 +232,21 @@
                 "reason":"aaaaaaaaaa",
                 "description":"aaaaaaaaaa"
               },
-              "id":"158f6866-37c9-470e-811b-109bdcc1acf4"
+              "id":"3d0413ce-3de4-4397-825e-ff5e6dfc4769"
             },
             {
               "value":{
                 "reason":"bbbbbbbbbb",
                 "description":"bbbbbbbbbb"
               },
-              "id":"115a885a-73f9-4fce-bb7a-941ffa480ba0"
+              "id":"546f5959-d85b-4425-8055-9707542e6283"
             },
             {
               "value":{
                 "reason":"cccccccccc",
                 "description":"cccccccccc"
               },
-              "id":"ac9e6b08-e362-41d2-8d7a-54fc7e680f3a"
+              "id":"ff51e565-9445-4cd8-87fd-2b05b05d9584"
             }
           ],
           "otherReasons":"Another reason"
@@ -278,6 +279,7 @@
         },
         "receivedVia":"Online"
       },
+      "evidencePresent":"No",
       "sscsDocument":[
         {
           "id":"e0a86d4b-f0ab-4373-8b44-de6a670ac0b7",
