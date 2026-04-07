@@ -39,49 +39,55 @@ public enum UcPointsRegulationsAndSchedule7ActivitiesCondition implements Points
 
     // Used for the scenario where case points start high but are lowered and regulation 29 question is skipped
     LOW_POINTS_SCHEDULE_8_PARAGRAPH_4_UNSPECIFIED(UcPointsCondition.POINTS_LESS_THAN_FIFTEEN,
-        Arrays.asList(isWcaAppeal(TRUE), isSupportGroupOnly(NOT_TRUE, true), isSevereConditions(NOT_TRUE),  isSchedule8Paragraph4(UNSPECIFIED, false)), Optional.empty(), true, isSchedule8Paragraph4(SPECIFIED)),
+        Arrays.asList(isWcaAppeal(TRUE), isSupportGroupOnly(NOT_TRUE, true), isSevereConditions(NOT_TRUE),
+                isSchedule8Paragraph4(UNSPECIFIED, false)), Optional.empty(), true, isSchedule8Paragraph4(SPECIFIED)),
     // Scenario 1
     LOW_POINTS_SCHEDULE_8_PARAGRAPH_4_DOES_NOT_APPLY(UcPointsCondition.POINTS_LESS_THAN_FIFTEEN,
-        Arrays.asList(isWcaAppeal(TRUE), isSupportGroupOnly(NOT_TRUE, true), isSchedule8Paragraph4(FALSE)), Optional.of(AwardType.NO_AWARD), true, isSchedule9Paragraph4(UNSPECIFIED), isSchedule7ActivitiesAnswer(
-        StringListPredicate.UNSPECIFIED)),
+        Arrays.asList(isWcaAppeal(TRUE), isSupportGroupOnly(NOT_TRUE, true), isSchedule8Paragraph4(FALSE)),
+            Optional.of(AwardType.NO_AWARD), true, isSchedule9Paragraph4(UNSPECIFIED), isSchedule7ActivitiesAnswer(StringListPredicate.UNSPECIFIED)),
     // SCENARIO_9
     LOW_POINTS_SCHEDULE_8_PARAGRAPH_4_DOES_APPLY_SCHEDULE_9_PARAGRAPH_4_UNSPECIFIED_NON_SUPPORT_GROUP_ONLY(UcPointsCondition.POINTS_LESS_THAN_FIFTEEN,
-        Arrays.asList(isWcaAppeal(TRUE), isSupportGroupOnly(NOT_TRUE, true), isSchedule8Paragraph4(TRUE), isSchedule9Paragraph4(UNSPECIFIED)), Optional.of(AwardType.HIGHER_RATE),  true, isSchedule7ActivitiesAnswer(
-        StringListPredicate.NOT_EMPTY)),
+        Arrays.asList(isWcaAppeal(TRUE), isSupportGroupOnly(NOT_TRUE, true), isSchedule8Paragraph4(TRUE), isSchedule9Paragraph4(UNSPECIFIED)),
+            Optional.of(AwardType.HIGHER_RATE),  true, isSchedule7ActivitiesAnswer(StringListPredicate.NOT_EMPTY)),
     // SCENARIO_7
     LOW_POINTS_SCHEDULE_8_PARAGRAPH_4_DOES_APPLY_SCHEDULE_9_PARAGRAPH_4_DOES_NOT_APPLY_NON_SUPPORT_GROUP_ONLY(UcPointsCondition.POINTS_LESS_THAN_FIFTEEN,
-        Arrays.asList(isWcaAppeal(TRUE), isSupportGroupOnly(NOT_TRUE, true), isSchedule8Paragraph4(TRUE), isSchedule9Paragraph4(FALSE)), Optional.of(AwardType.LOWER_RATE), true, isSchedule7ActivitiesAnswer(
-        StringListPredicate.EMPTY)),
+        Arrays.asList(isWcaAppeal(TRUE), isSupportGroupOnly(NOT_TRUE, true), isSchedule8Paragraph4(TRUE), isSchedule9Paragraph4(FALSE)),
+            Optional.of(AwardType.LOWER_RATE), true, isSchedule7ActivitiesAnswer(StringListPredicate.EMPTY)),
     // SCENARIO_8
     LOW_POINTS_SCHEDULE_8_PARAGRAPH_4_DOES_APPLY_SCHEDULE_9_PARAGRAPH_4_DOES_APPLY_NON_SUPPORT_GROUP_ONLY(UcPointsCondition.POINTS_LESS_THAN_FIFTEEN,
-        Arrays.asList(isWcaAppeal(TRUE), isSupportGroupOnly(NOT_TRUE, true), isSchedule8Paragraph4(TRUE), isSchedule9Paragraph4(TRUE)), Optional.of(AwardType.HIGHER_RATE), true, isSchedule7ActivitiesAnswer(
-        StringListPredicate.EMPTY)),
+        Arrays.asList(isWcaAppeal(TRUE), isSupportGroupOnly(NOT_TRUE, true), isSchedule8Paragraph4(TRUE), isSchedule9Paragraph4(TRUE)),
+            Optional.of(AwardType.HIGHER_RATE), true, isSchedule7ActivitiesAnswer(StringListPredicate.EMPTY)),
     // SCENARIO_4
     LOW_POINTS_SCHEDULE6_AND_REG_29_SKIPPED_SCHEDULE_9_PARAGRAPH_4_UNSPECIFIED_SUPPORT_GROUP_ONLY(UcPointsCondition.POINTS_LESS_THAN_FIFTEEN,
-        Arrays.asList(isWcaAppeal(TRUE), isSupportGroupOnly(TRUE, true), isSchedule9Paragraph4(UNSPECIFIED)), Optional.of(AwardType.HIGHER_RATE),  false, isSchedule7ActivitiesAnswer(
-        StringListPredicate.NOT_EMPTY), isSchedule8Paragraph4(UNSPECIFIED)),
+        Arrays.asList(isWcaAppeal(TRUE), isSupportGroupOnly(TRUE, true), isSchedule9Paragraph4(UNSPECIFIED)),
+            Optional.of(AwardType.HIGHER_RATE),  false, isSchedule7ActivitiesAnswer(StringListPredicate.NOT_EMPTY), isSchedule8Paragraph4(UNSPECIFIED)),
     // SCENARIO_2
     LOW_POINTS_SCHEDULE6_AND_REG_29_SKIPPED_SCHEDULE_9_PARAGRAPH_4_DOES_NOT_APPLY_SUPPORT_GROUP_ONLY(UcPointsCondition.POINTS_LESS_THAN_FIFTEEN,
-        Arrays.asList(isWcaAppeal(TRUE), isSupportGroupOnly(TRUE, true), isSchedule9Paragraph4(FALSE)), Optional.of(AwardType.LOWER_RATE), false, isSchedule7ActivitiesAnswer(StringListPredicate.EMPTY), isSchedule8Paragraph4(UNSPECIFIED)),
+        Arrays.asList(isWcaAppeal(TRUE), isSupportGroupOnly(TRUE, true), isSchedule9Paragraph4(FALSE)),
+            Optional.of(AwardType.LOWER_RATE), false, isSchedule7ActivitiesAnswer(StringListPredicate.EMPTY), isSchedule8Paragraph4(UNSPECIFIED)),
     // SCENARIO_3
     LOW_POINTS_SCHEDULE6_AND_REG_29_SKIPPED_SCHEDULE_9_PARAGRAPH_4_DOES_APPLY_SUPPORT_GROUP_ONLY(UcPointsCondition.POINTS_LESS_THAN_FIFTEEN,
-        Arrays.asList(isWcaAppeal(TRUE), isSupportGroupOnly(TRUE, true),  isSchedule9Paragraph4(TRUE)), Optional.of(AwardType.HIGHER_RATE), false, isSchedule7ActivitiesAnswer(StringListPredicate.EMPTY), isSchedule8Paragraph4(UNSPECIFIED)),
+        Arrays.asList(isWcaAppeal(TRUE), isSupportGroupOnly(TRUE, true),  isSchedule9Paragraph4(TRUE)),
+            Optional.of(AwardType.HIGHER_RATE), false, isSchedule7ActivitiesAnswer(StringListPredicate.EMPTY), isSchedule8Paragraph4(UNSPECIFIED)),
     // SCENARIO_6
     HIGH_POINTS_SCHEDULE_9_PARAGRAPH_4_UNSPECIFIED(UcPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN,
-        isWcaAppeal(TRUE), isSchedule9Paragraph4(UNSPECIFIED), Optional.of(AwardType.HIGHER_RATE), true, isSchedule8Paragraph4(UNSPECIFIED), isSupportGroupOnly(NOT_TRUE, true), isSchedule7ActivitiesAnswer(
-        StringListPredicate.NOT_EMPTY)),
+        isWcaAppeal(TRUE), isSchedule9Paragraph4(UNSPECIFIED), Optional.of(AwardType.HIGHER_RATE), true, isSchedule8Paragraph4(UNSPECIFIED),
+            isSupportGroupOnly(NOT_TRUE, true), isSchedule7ActivitiesAnswer(StringListPredicate.NOT_EMPTY)),
     // SCENARIO_5
     HIGH_POINTS_SCHEDULE_9_PARAGRAPH_4_DOES_NOT_APPLY(UcPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN,
-        isWcaAppeal(TRUE), isSchedule9Paragraph4(FALSE), Optional.of(AwardType.LOWER_RATE),  true, isSchedule8Paragraph4(UNSPECIFIED), isSupportGroupOnly(NOT_TRUE, true), isSchedule7ActivitiesAnswer(
-        StringListPredicate.EMPTY)),
+        isWcaAppeal(TRUE), isSchedule9Paragraph4(FALSE), Optional.of(AwardType.LOWER_RATE),  true, isSchedule8Paragraph4(UNSPECIFIED),
+            isSupportGroupOnly(NOT_TRUE, true), isSchedule7ActivitiesAnswer(StringListPredicate.EMPTY)),
     // SCENARIO_5
     HIGH_POINTS_SCHEDULE_9_PARAGRAPH_4_DOES_APPLY(UcPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN,
-        isWcaAppeal(TRUE), isSchedule9Paragraph4(TRUE), Optional.of(AwardType.HIGHER_RATE),  true, isSchedule8Paragraph4(UNSPECIFIED), isSupportGroupOnly(NOT_TRUE, true), isSchedule7ActivitiesAnswer(
-        StringListPredicate.EMPTY)),
+        isWcaAppeal(TRUE), isSchedule9Paragraph4(TRUE), Optional.of(AwardType.HIGHER_RATE),  true, isSchedule8Paragraph4(UNSPECIFIED),
+            isSupportGroupOnly(NOT_TRUE, true), isSchedule7ActivitiesAnswer(StringListPredicate.EMPTY)),
     // SCENARIO 10
     NON_WCA_APPEAL(UcPointsCondition.POINTS_LESS_THAN_FIFTEEN,
             Arrays.asList(isWcaAppeal(FALSE)), Optional.empty(), false, isDwpReassessTheAward(UNSPECIFIED)),
-    SEVERE_CONDITIONS(UcPointsCondition.POINTS_LESS_THAN_FIFTEEN, Arrays.asList(isWcaAppeal(TRUE), isSevereConditions(TRUE), isSupportGroupOnly(NOT_TRUE,false)), Optional.empty(), false);
+    //Scenario 13
+    SEVERE_CONDITIONS_WITH_SV_ISSUE_CODE(UcPointsCondition.POINTS_LESS_THAN_FIFTEEN, Arrays.asList(isWcaAppeal(TRUE), isSevereConditions(TRUE),
+            isSupportGroupOnly(NOT_TRUE,false), isSchedule8Paragraph4(UNSPECIFIED)),
+            Optional.empty(), false, isSchedule7ActivitiesAnswer(StringListPredicate.UNSPECIFIED));
     List<YesNoFieldCondition> primaryConditions;
     List<FieldCondition> validationConditions;
 
@@ -140,7 +146,7 @@ public enum UcPointsRegulationsAndSchedule7ActivitiesCondition implements Points
 
     static YesNoFieldCondition isSevereConditions(Predicate<YesNo> predicate) {
         return new YesNoFieldCondition("Severe Conditions", predicate,
-                sscsCaseData -> YesNo.isYes(sscsCaseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo())  ? YesNo.YES : YesNo.NO, false);
+                s -> s.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply() == null ? YesNo.NO : YesNo.YES, false);
     }
 
     static YesNoFieldCondition isDwpReassessTheAward(Predicate<YesNo> predicate) {

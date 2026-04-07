@@ -28,7 +28,6 @@ export class UploadResponse extends BaseStep {
 
   async validateHistory(caseId: string, needsToLogin: boolean = true) {
     let historyLinks = this.presetLinks;
-    historyLinks.push('Add a hearing');
     if (needsToLogin) {
       await this.loginUserWithCaseId(credentials.hmrcSuperUser, false, caseId);
     }
