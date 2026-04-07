@@ -1,37 +1,39 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc;
 
-import org.junit.Assert;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.Test;
 
 public class UcPointsConditionTest {
 
     @Test
     public void testConditionsWhenLessThan15() {
-        Assert.assertFalse(UcPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN.getPointsRequirementCondition().test(14));
-        Assert.assertTrue(UcPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(14));
+        assertThat(UcPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN.getPointsRequirementCondition().test(14)).isFalse();
+        assertThat(UcPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(14)).isTrue();
     }
 
     @Test
     public void testConditionWhenEqualTo15() {
-        Assert.assertTrue(UcPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN.getPointsRequirementCondition().test(15));
-        Assert.assertFalse(UcPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(15));
+        assertThat(UcPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN.getPointsRequirementCondition().test(15)).isTrue();
+        assertThat(UcPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(15)).isFalse();
     }
 
     @Test
     public void testConditionWhenGreaterThan15() {
-        Assert.assertTrue(UcPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN.getPointsRequirementCondition().test(16));
-        Assert.assertFalse(UcPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(16));
+        assertThat(UcPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN.getPointsRequirementCondition().test(16)).isTrue();
+        assertThat(UcPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(16)).isFalse();
     }
 
     /**
      * Test the continuity of boundaries between point ranges for daily living conditions. (ie. this test will fail if there are any gaps, or overlap between the boundaries)
      */
     @Test
-    public void testThatAtExactlyOnePointsConditionPassesForAllPossiblePointValues() {
+    public void testThatAtExactlyOnePointsConditionPassesForPossiblePointValues() {
 
         int minPoints = 0;
         int maxPoints = 100;
         for (int points = minPoints; points < maxPoints; points++) {
+
             int pointsConditionSatisfiedCount = 0;
             for (UcPointsCondition ucPointsCondition : UcPointsCondition.values()) {
                 if (ucPointsCondition.getPointsRequirementCondition().test(points)) {
@@ -39,15 +41,18 @@ public class UcPointsConditionTest {
                 }
             }
 
-            Assert.assertEquals("Expected 1 condition to be satisfied for points:" + points + " but " + pointsConditionSatisfiedCount + " were satisfied",
-                1, pointsConditionSatisfiedCount);
+            if (pointsConditionSatisfiedCount != 1) {
+                System.out.println("Expected 1 condition to be satisfied for points:" + points + " but " + pointsConditionSatisfiedCount + " were satisfied");
+            }
+
+            assertThat(pointsConditionSatisfiedCount).isEqualTo(1);
         }
     }
 
     @Test
     public void testAllPointsConditionAttributesAreNotNull() {
         for (UcPointsCondition ucPointsCondition : UcPointsCondition.values()) {
-            Assert.assertNotNull(ucPointsCondition.getPointsRequirementCondition());
+            assertThat(ucPointsCondition.getPointsRequirementCondition()).isNotNull();
         }
     }
 }

@@ -88,7 +88,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
         isPoints(POINTS_GREATER_OR_EQUAL_TO_FIFTEEN),
         isAnySchedule7(),
         isSupportGroupOnly(YesNoPredicate.FALSE, false).get()),
-    // Scenario 7 and Scenario 8
+    // Scenario 7 and Scenario 8 and Scenario 9
     ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS(
         isAllowedOrRefused(ALLOWED),
         isWcaAppeal(TRUE, false),
@@ -100,7 +100,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
         isSchdeul8Paragraph4(YesNoPredicate.TRUE)
     ),
     // Scenario 4
-    ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_SELECTED(
+    ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_7_SELECTED(
         isAllowedOrRefused(ALLOWED),
         isWcaAppeal(TRUE, false),
         isSevereConditions(FALSE),
@@ -109,7 +109,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
         isSchedule7(NOT_EMPTY),
         isSchdeul8Paragraph4(UNSPECIFIED)),
     // SCENARIO_3
-    ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_NOT_SELECTED(
+    ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_7_NOT_SELECTED(
         isAllowedOrRefused(ALLOWED),
         isWcaAppeal(TRUE, false),
         isSevereConditions(FALSE),
@@ -118,7 +118,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
         isSchedule7(EMPTY),
         isSchdeul8Paragraph4(UNSPECIFIED),
         isSchedule9Paragraph4(YesNoPredicate.TRUE)),
-    ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_UNSPECIFIED(
+    ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_7_UNSPECIFIED(
         isAllowedOrRefused(ALLOWED),
         isWcaAppeal(TRUE,true),
         isSevereConditions(FALSE),
@@ -145,21 +145,58 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
             isAnyPoints(),
             isAnySchedule7(),
             isDwpReassessTheAward(UNSPECIFIED)),
-    SEVERE_CONDITIONS_ALLOWED(
+    // Scenario 13
+    SEVERE_CONDITIONS_ALLOWED_SV_ISSUE_CODE_CASE(
             isAllowedOrRefused(ALLOWED),
             isWcaAppeal(TRUE, false),
             isSevereConditions(TRUE),
-            isAnySupportGroupOnly(),
-            isAnyPoints(),
-            isAnySchedule7()),
-    SEVERE_CONDITIONS_REFUSED(
+            isSupportGroupOnly(NOT_TRUE, true),
+            isPoints(POINTS_LESS_THAN_FIFTEEN),
+            isSchedule7(StringListPredicate.UNSPECIFIED),
+            isSchedule7ActivitiesAnswer(StringListPredicate.UNSPECIFIED),
+            isSchdeul8Paragraph4(UNSPECIFIED),
+            isSupportGroupOnly(YesNoPredicate.FALSE, false).get()),
+    // Scenario 13
+    SEVERE_CONDITIONS_REFUSED_SV_ISSUE_CODE_CASE(
             isAllowedOrRefused(REFUSED),
             isWcaAppeal(TRUE, false),
             isSevereConditions(TRUE),
-            isAnySupportGroupOnly(),
+            isSupportGroupOnly(NOT_TRUE, true),
+            isPoints(POINTS_LESS_THAN_FIFTEEN),
+            isSchedule7(StringListPredicate.UNSPECIFIED),
+            isDwpReassessTheAward(UNSPECIFIED),
+            isSchdeul8Paragraph4(UNSPECIFIED),
+            isSchedule7ActivitiesAnswer(StringListPredicate.UNSPECIFIED),
+            isSupportGroupOnly(YesNoPredicate.FALSE, false).get()),
+    //Scenario 6
+    SEVERE_CONDITIONS_ALLOWED_HIGH_POINTS_SEVERE_CONDITIONS_CASE(
+            isAllowedOrRefused(ALLOWED),
+            isWcaAppeal(TRUE, false),
+            isSevereConditions(TRUE),
+            isSupportGroupOnly(YesNoPredicate.NOT_TRUE, true),
+            isPoints(POINTS_GREATER_OR_EQUAL_TO_FIFTEEN),
+            isSchedule7(NOT_EMPTY),
+            isSupportGroupOnly(YesNoPredicate.FALSE, false).get()),
+    // Scenario 4
+    ALLOWED_SUPPORT_GROUP_ONLY_SEVERE_CONDITIONS_CASE(
+            isAllowedOrRefused(ALLOWED),
+            isWcaAppeal(TRUE, false),
+            isSevereConditions(TRUE),
+            isSupportGroupOnly(TRUE, true),
             isAnyPoints(),
-            isAnySchedule7(),
-            isDwpReassessTheAward(UNSPECIFIED)),;
+            isSchedule7(NOT_EMPTY),
+            isSchdeul8Paragraph4(UNSPECIFIED)),
+    // Scenario 9
+    ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS_SEVERE_CONDITIONS_CASE(
+            isAllowedOrRefused(ALLOWED),
+            isWcaAppeal(TRUE, false),
+            isSevereConditions(TRUE),
+            isSupportGroupOnly(NOT_TRUE, true),
+            isPoints(POINTS_LESS_THAN_FIFTEEN),
+            isSchedule7(NOT_EMPTY),
+            isSupportGroupOnly(YesNoPredicate.FALSE, false).get(),
+            isSchdeul8Paragraph4(YesNoPredicate.TRUE)
+    ),;
 
     Optional<UcPointsCondition> primaryPointsCondition;
     Optional<FieldCondition> schedule7ActivitiesSelected;
@@ -179,9 +216,9 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
             return UcScenario.SCENARIO_1;
         } else if (REFUSED_SUPPORT_GROUP_ONLY_LOW_POINTS == this || REFUSED_SUPPORT_GROUP_ONLY_HIGH_POINTS == this) {
             return UcScenario.SCENARIO_2;
-        } else if (ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_NOT_SELECTED == this && isSchedule9Paragraph4(TRUE).isSatisified(caseData)) {
+        } else if (ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_7_NOT_SELECTED == this && isSchedule9Paragraph4(TRUE).isSatisified(caseData)) {
             return UcScenario.SCENARIO_3;
-        } else if ((ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_NOT_SELECTED == this && isSchedule9Paragraph4(UNSPECIFIED).isSatisified(caseData)) || ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_SELECTED == this) {
+        } else if ((ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_7_NOT_SELECTED == this && isSchedule9Paragraph4(UNSPECIFIED).isSatisified(caseData)) || ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_7_SELECTED == this || ALLOWED_SUPPORT_GROUP_ONLY_SEVERE_CONDITIONS_CASE == this) {
             return UcScenario.SCENARIO_4;
         }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_HIGH_POINTS == this && caseData.getSscsUcCaseData().getSchedule7Selections().isEmpty()) {
             if (isSchedule9Paragraph4(TRUE).isSatisified(caseData)) {
@@ -189,18 +226,18 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
             } else {
                 return UcScenario.SCENARIO_5;
             }
-        } else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_HIGH_POINTS == this && !caseData.getSscsUcCaseData().getSchedule7Selections().isEmpty()) {
+        } else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_HIGH_POINTS == this && !caseData.getSscsUcCaseData().getSchedule7Selections().isEmpty() || SEVERE_CONDITIONS_ALLOWED_HIGH_POINTS_SEVERE_CONDITIONS_CASE == this) {
             return UcScenario.SCENARIO_6;
         }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS == this && caseData.getSscsUcCaseData().getSchedule7Selections().isEmpty() && isSchedule9Paragraph4(FALSE).isSatisified(caseData)) {
             return UcScenario.SCENARIO_7;
         }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS == this && caseData.getSscsUcCaseData().getSchedule7Selections().isEmpty() && isSchedule9Paragraph4(TRUE).isSatisified(caseData)) {
             return UcScenario.SCENARIO_8;
-        }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS == this && !caseData.getSscsUcCaseData().getSchedule7Selections().isEmpty()) {
+        }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS == this && !caseData.getSscsUcCaseData().getSchedule7Selections().isEmpty() || ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS_SEVERE_CONDITIONS_CASE == this) {
             return UcScenario.SCENARIO_9;
         } else if (NON_WCA_APPEAL_ALLOWED == this || NON_WCA_APPEAL_REFUSED == this) {
             return UcScenario.SCENARIO_10;
-        }  else if (SEVERE_CONDITIONS_ALLOWED == this || SEVERE_CONDITIONS_REFUSED == this) {
-            return YesNo.isYes(caseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply()) ? UcScenario.SCENARIO_9 : UcScenario.SCENARIO_10;
+        }  else if (SEVERE_CONDITIONS_ALLOWED_SV_ISSUE_CODE_CASE == this || SEVERE_CONDITIONS_REFUSED_SV_ISSUE_CODE_CASE == this) {
+            return UcScenario.SCENARIO_13;
         } else {
             throw new IllegalStateException("No scenario applicable");
         }
@@ -250,7 +287,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
 
     static YesNoFieldCondition isSevereConditions(Predicate<YesNo> predicate) {
         return new YesNoFieldCondition("Severe Conditions", predicate,
-                s -> YesNo.isYes(s.getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo()) ? YesNo.YES : YesNo.NO, false);
+                s -> s.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply() == null ? YesNo.NO : YesNo.YES, false);
     }
 
     static YesNoFieldCondition isDwpReassessTheAward(Predicate<YesNo> predicate) {
