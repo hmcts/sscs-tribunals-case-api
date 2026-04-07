@@ -24,10 +24,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
-import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Entity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
@@ -297,16 +295,4 @@ public class OtherPartyDataUtil {
         return byId;
     }
 
-    public static void updateAppellantConfidentialityRequiredChangedDate(final Callback<SscsCaseData> callback) {
-        final YesNo confidentialityRequiredBefore = callback.getCaseDetailsBefore()
-            .map(CaseDetails::getCaseData)
-            .flatMap(SscsCaseData::getAppellantConfidentialityRequired)
-            .orElse(null);
-        final SscsCaseData currentCaseData = callback.getCaseDetails().getCaseData();
-        final YesNo confidentialityRequired = currentCaseData.getAppellantConfidentialityRequired().orElse(null);
-        if (nonNull(confidentialityRequired) && (confidentialityRequiredBefore == null || !Objects.equals(confidentialityRequiredBefore, confidentialityRequired))) {
-            currentCaseData.getAppellant()
-                .ifPresent(appellant -> appellant.setConfidentialityRequiredChangedDate(now()));
-        }
-    }
 }
