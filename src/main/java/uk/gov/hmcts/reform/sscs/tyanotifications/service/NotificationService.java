@@ -17,6 +17,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationVali
 
 import java.time.ZonedDateTime;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,6 +38,8 @@ import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 public class NotificationService {
     private static final List<String> PROCESS_AUDIO_VIDEO_ACTIONS_THAT_REQUIRES_NOTICE = asList("issueDirectionsNotice", "excludeEvidence", "admitEvidence");
     private static final String READY_TO_LIST = "readyToList";
+    private static final EnumSet<NotificationEventType> SEND_TO_VALID_APPEAL = EnumSet.of(ADMIN_SEND_TO_VALID_APPEAL,
+        INTERLOC_VALID_APPEAL, VALID_APPEAL);
 
     private final NotificationFactory notificationFactory;
     private final ReminderService reminderService;
@@ -119,14 +122,7 @@ public class NotificationService {
         } else if (cmOtherPartyConfidentialityEnabled
             && notificationWrapper.getNotificationType().equals(DIRECTION_ISSUED)
             && notificationWrapper.getSscsCaseDataWrapper().getNewSscsCaseData().isBenefitType(CHILD_SUPPORT)
-            && notificationWrapper.getSscsCaseDataWrapper().getNewSscsCaseData().getDirectionTypeDl() != null
-            && notificationWrapper
-            .getSscsCaseDataWrapper()
-            .getNewSscsCaseData()
-            .getDirectionTypeDl()
-            .getValue()
-            .getCode()
-            .equals(DirectionType.APPEAL_TO_PROCEED.toString())) {
+            && isAppealToProceed(notificationWrapper)) {
             log.info("Trigger second notification event for {} with {}", DIRECTION_ISSUED.getId(), DirectionType.APPEAL_TO_PROCEED.getLabel());
             notificationWrapper.getSscsCaseDataWrapper().setNotificationEventType(NOTIFY_APPELLANT_VALID_APPEAL);
             sendNotificationPerSubscription(notificationWrapper);
@@ -412,8 +408,7 @@ public class NotificationService {
             }
         }
 
-        boolean validAppealPostState = ADMIN_SEND_TO_VALID_APPEAL.equals(notificationType) || INTERLOC_VALID_APPEAL.equals(
-            notificationType) || VALID_APPEAL.equals(notificationType);
+        boolean validAppealPostState = SEND_TO_VALID_APPEAL.contains(notificationType);
         if ((cmOtherPartyConfidentialityEnabled && validAppealPostState && !notificationWrapper
             .getNewSscsCaseData()
             .isBenefitType(CHILD_SUPPORT)) || (!cmOtherPartyConfidentialityEnabled && validAppealPostState)) {
@@ -430,6 +425,17 @@ public class NotificationService {
     private static boolean hasNonNullHearingDetails(HearingDetails oldHearingDetails, HearingDetails newHearingDetails) {
         return nonNull(oldHearingDetails) && nonNull(oldHearingDetails.getHearingId())
                 && nonNull(newHearingDetails) && nonNull(newHearingDetails.getHearingId());
+    }
+
+    private static boolean isAppealToProceed(NotificationWrapper notificationWrapper) {
+        return notificationWrapper.getSscsCaseDataWrapper().getNewSscsCaseData().getDirectionTypeDl() != null
+            && notificationWrapper
+            .getSscsCaseDataWrapper()
+            .getNewSscsCaseData()
+            .getDirectionTypeDl()
+            .getValue()
+            .getCode()
+            .equals(DirectionType.APPEAL_TO_PROCEED.toString());
     }
 
     private boolean isHearingBookedInformationTheSame(HearingDetails newHearing, HearingDetails oldHearing) {
