@@ -117,8 +117,7 @@ export class HomePage {
   async findAndNavigateToCase(caseId: string): Promise<void> {
     await this.page.getByRole('link', { name: 'Find case' }).first().waitFor();
     await this.page.getByRole('link', { name: 'Find case' }).first().click();
-    await this.delay(3000);
-    await expect(this.page.getByText('Filters').first()).toBeVisible();
+    await expect(this.page.getByText('Filters').first()).toBeVisible({ timeout: 15000 });
     logger.debug(`url of the page is ######## ${this.page.url()}`);
     const expUrl = this.page.url();
 
@@ -133,7 +132,6 @@ export class HomePage {
     await webActions.inputField(this.caseRefInputField, caseId);
     await webActions.clickApplyFilterButton();
 
-    await this.delay(3000);
     await webActions.verifyTotalElements(
       `#search-result > table > tbody > tr > td:nth-child(1) > a[href='/cases/case-details/${caseId}']`,
       1
@@ -153,20 +151,23 @@ export class HomePage {
     await this.selectToViewTasksAndCasesIfRequired();
     await this.page.getByRole('link', { name: 'Case list' }).first().waitFor();
     await this.page.getByRole('link', { name: 'Case list' }).first().click();
-    await this.delay(3000);
-    await expect(this.page.getByText('Filters').first()).toBeVisible();
+    await expect(this.page.getByText('Filters').first()).toBeVisible({ timeout: 15000 });
   }
 
   async chooseEvent(eventName: string): Promise<void> {
-    await this.delay(3000);
+    const nextStep = this.page.locator(this.nextStepDropDown).first();
+    try {
+      await expect(nextStep).toBeVisible({ timeout: 15000 });
+    } catch {
+      // Next step dropdown not yet rendered - reload and retry
+      await this.page.reload({ waitUntil: 'load' });
+      await expect(nextStep).toBeVisible({ timeout: 30000 });
+    }
     await webActions.chooseOptionByLabel(this.nextStepDropDown, eventName);
     await expect(
       this.page.getByRole('button', { name: 'Go', exact: true })
     ).toBeEnabled();
-    await this.delay(5000);
     await webActions.clickSubmitButton();
-    // await webActions.clickNextStepButton(this.submitNextStepButton);
-    // await webActions.clickGoButton('Go');
   }
 
   async clickBeforeTabBtn(): Promise<void> {
@@ -342,7 +343,7 @@ export class HomePage {
   async startCaseCreate(jurisdiction, caseType, event): Promise<void> {
     await this.page.getByRole('link', { name: 'Create case' }).waitFor();
     await this.page.getByRole('link', { name: 'Create case' }).click();
-    await this.delay(3000);
+    await this.page.getByLabel('Jurisdiction').waitFor({ state: 'visible' });
     await this.page.getByLabel('Jurisdiction').selectOption(jurisdiction);
     await this.page.getByLabel('Case type').selectOption(caseType);
     await this.page.getByLabel('Event').selectOption(event);
@@ -357,6 +358,7 @@ export class HomePage {
   }
 
   async scrollToStartOfTabs() {
-    await this.page.getByRole('tablist').evaluate(el => (el.style = 'transform: translateX(0px);'));
+    // Set the transform style directly to avoid type errors with CSSStyleDeclaration
+    await this.page.getByRole('tablist').evaluate(el => { el.style.transform = 'translateX(0px)'; });
   }
 }

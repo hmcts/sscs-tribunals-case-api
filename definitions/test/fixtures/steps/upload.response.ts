@@ -95,7 +95,6 @@ export class UploadResponse extends BaseStep {
     );
     await this.checkYourAnswersPage.confirmAndSignOut();
 
-    await this.homePage.delay(3000);
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
 
     await this.homePage.navigateToTab('Summary');
@@ -126,7 +125,6 @@ export class UploadResponse extends BaseStep {
     );
     await this.checkYourAnswersPage.confirmAndSignOut();
 
-    await this.homePage.delay(3000);
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
 
     await this.homePage.navigateToTab('Summary');
@@ -235,13 +233,11 @@ export class UploadResponse extends BaseStep {
     await this.uploadResponsePage.selectUcIssueCode(
       uploadResponseTestdata.ucIssueCode
     );
-    await this.homePage.delay(2000);
     await this.uploadResponsePage.continueSubmission();
 
     await this.uploadResponsePage.chooseDisputeOption(
       uploadResponseTestdata.ucDisputeOption
     );
-    await this.homePage.delay(2000);
     await this.uploadResponsePage.continueSubmission();
 
     await this.uploadResponsePage.isJPOnTheCase(
@@ -298,13 +294,11 @@ export class UploadResponse extends BaseStep {
     await this.uploadResponsePage.selectUcIssueCode(
       uploadResponseTestdata.ucIssueCode
     );
-    await this.homePage.delay(2000);
     await this.uploadResponsePage.continueSubmission();
 
     await this.uploadResponsePage.chooseDisputeOption(
       uploadResponseTestdata.ucDisputeOption
     );
-    await this.homePage.delay(2000);
     await this.uploadResponsePage.continueSubmission();
 
     await this.uploadResponsePage.isJPOnTheCase(
@@ -333,7 +327,6 @@ export class UploadResponse extends BaseStep {
     );
     await this.uploadResponsePage.chooseAssistOption('Yes');
     await this.uploadResponsePage.continueSubmission();
-    await this.uploadResponsePage.delay(1000);
     await this.uploadResponsePage.verifyDocMissingErrorMsg();
     // await performAppealDormantOnCase(pipErrorCaseId);
   }

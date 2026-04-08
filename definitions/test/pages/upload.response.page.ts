@@ -29,17 +29,17 @@ export class UploadResponsePage {
       '#dwpResponseDocument_documentLink',
       uploadResponseTestdata.testfileone
     );
-    await this.page.waitForTimeout(9000);
+    await this.page.waitForLoadState('domcontentloaded');
     await webActions.uploadFileUsingAFileChooser(
       '#dwpAT38Document_documentLink',
       uploadResponseTestdata.testfiletwo
     );
-    await this.page.waitForTimeout(9000);
+    await this.page.waitForLoadState('domcontentloaded');
     await webActions.uploadFileUsingAFileChooser(
       '#dwpEvidenceBundleDocument_documentLink',
       uploadResponseTestdata.testfilethree
     );
-    await this.page.waitForTimeout(7000);
+    await this.page.waitForLoadState('domcontentloaded');
   }
 
   async uploadPartialDocs(): Promise<void> {
@@ -47,12 +47,12 @@ export class UploadResponsePage {
       '#dwpResponseDocument_documentLink',
       uploadResponseTestdata.testfileone
     );
-    await this.page.waitForTimeout(7000);
+    await this.page.waitForLoadState('domcontentloaded');
     await webActions.uploadFileUsingAFileChooser(
       '#dwpEvidenceBundleDocument_documentLink',
       uploadResponseTestdata.testfilethree
     );
-    await this.page.waitForTimeout(7000);
+    await this.page.waitForLoadState('domcontentloaded');
   }
 
   async uploadPHEDocs(): Promise<void> {
@@ -64,17 +64,17 @@ export class UploadResponsePage {
       '#dwpEditedResponseDocument_documentLink',
       uploadResponseTestdata.testfileone
     );
-    await this.page.waitForTimeout(10000);
+    await this.page.waitForLoadState('domcontentloaded');
     await webActions.uploadFileUsingAFileChooser(
       '#dwpEditedEvidenceBundleDocument_documentLink',
       uploadResponseTestdata.testfiletwo
     );
-    await this.page.waitForTimeout(7000);
+    await this.page.waitForLoadState('domcontentloaded');
     await webActions.uploadFileUsingAFileChooser(
       '#appendix12Doc_documentLink',
       uploadResponseTestdata.testfilethree
     );
-    await this.page.waitForTimeout(7000);
+    await this.page.waitForLoadState('domcontentloaded');
   }
 
   async uploadAVDocs(): Promise<void> {
@@ -83,12 +83,12 @@ export class UploadResponsePage {
       '#dwpUploadAudioVideoEvidence_0_documentLink',
       uploadResponseTestdata.testaudiofile
     );
-    await this.page.waitForTimeout(10000);
+    await this.page.waitForLoadState('domcontentloaded');
     await webActions.uploadFileUsingAFileChooser(
       '#dwpUploadAudioVideoEvidence_0_rip1Document',
       uploadResponseTestdata.testfiletwo
     );
-    await this.page.waitForTimeout(7000);
+    await this.page.waitForLoadState('domcontentloaded');
   }
 
   async uploadUCBDocs(): Promise<void> {
@@ -97,7 +97,7 @@ export class UploadResponsePage {
       '#dwpUcbEvidenceDocument',
       uploadResponseTestdata.testfileone
     );
-    await this.page.waitForTimeout(10000);
+    await this.page.waitForLoadState('domcontentloaded');
   }
 
   async verifyDocMissingErrorMsg(): Promise<void> {

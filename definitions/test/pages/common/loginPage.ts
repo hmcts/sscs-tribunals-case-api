@@ -1,4 +1,4 @@
-import { expect, Locator, Page } from '@playwright/test';
+import { Locator, Page, expect } from '@playwright/test';
 import { WebAction } from '../../common/web.action';
 
 let webActions: WebAction;
@@ -37,7 +37,6 @@ export class LoginPage {
     await webActions.inputField('#username', user.email);
     await webActions.inputField('#password', user.password);
     await webActions.clickButton('Sign in');
-    await webActions.delay(10000);
-    await this.signOutBtn.isVisible();
+    await expect(this.signOutBtn).toBeVisible({ timeout: 30000 });
   }
 }

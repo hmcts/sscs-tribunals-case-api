@@ -272,7 +272,6 @@ export abstract class BaseStep {
     comment?: string
   ) {
     await this.homePage.navigateToTab('History');
-    await this.homePage.delay(1000);
     if (event) await this.historyTab.verifyEventCompleted(event);
   }
 
@@ -290,6 +289,5 @@ export abstract class BaseStep {
     comment?: string
   ) {
     await this.homePage.navigateToTab('Other Party Details');
-    await this.homePage.delay(1000);
   }
 }
