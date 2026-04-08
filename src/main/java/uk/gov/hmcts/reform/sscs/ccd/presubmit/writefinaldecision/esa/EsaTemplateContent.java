@@ -124,7 +124,7 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
 
     private String getSevereCriteriaApplySentence(Boolean severeCriteriaApply) {
         if (severeCriteriaApply) {
-            return "The appellant meets the severe conditions criteria because they will constantly meet a Schedule 7 descriptor,"
+            return "The appellant meets the severe conditions criteria because they will constantly meet a Schedule 3 descriptor,"
                     + " and they have a lifelong condition with no realistic prospect of recovery of function.";
         } else {
             return "The appellant does not meet the severe conditions criteria.";
