@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -200,6 +201,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                 applyConfidentialityDecisionFromDirection(caseData);
             }
             caseData.setInterlocReviewState(null);
+            return caseData;
         } else {
             caseData.setInterlocReviewState(null);
         }
@@ -365,7 +367,15 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     }
 
     private void applyConfidentialityDecisionFromDirection(SscsCaseData caseData) {
-        String directionType = caseData.getDirectionTypeDl().getValue().getCode();
+        String directionType = Optional.ofNullable(caseData.getDirectionTypeDl())
+            .map(DynamicList::getValue)
+            .map(DynamicListItem::getCode)
+            .orElse(null);
+        if (isBlank(directionType)) {
+            log.warn("Direction type is missing for confidentiality decision on case {}. No update applied.",
+                caseData.getCcdCaseId());
+            return;
+        }
         YesNo confidentialityRequired = CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString().equals(directionType) ? YesNo.YES : YesNo.NO;
         String selectedConfidentialityPartyCode = Optional.ofNullable(caseData.getExtendedSscsCaseData())
             .map(ExtendedSscsCaseData::getSelectedConfidentialityParty)
@@ -404,7 +414,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
     private void updateReferredOtherPartyConfidentiality(SscsCaseData caseData, YesNo confidentialityRequired, String selectedConfidentialityPartyCode) {
         String otherPartyId = selectedConfidentialityPartyCode.substring(OTHER_PARTY.getCode().length());
-        if (caseData.getOtherParties() == null) {
+        if (CollectionUtils.isEmpty(caseData.getOtherParties())) {
             return;
         }
 

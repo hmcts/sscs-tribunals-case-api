@@ -734,6 +734,30 @@ class DirectionIssuedAboutToSubmitHandlerTest {
         assertNull(response.getData().getOtherParties().get(1).getValue().getConfidentialityRequiredChangedDate());
     }
 
+    @Test
+    void givenConfidentialityDirectionWithoutTypeCode_shouldNotUpdateAnyPartyConfidentiality() {
+        callback.getCaseDetails().getCaseData().getAppeal()
+            .setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(""));
+        callback.getCaseDetails().getCaseData().getExtendedSscsCaseData()
+            .setSelectedConfidentialityParty(new DynamicList(OTHER_PARTY.getCode() + "op1"));
+
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(NO);
+        callback.getCaseDetails().getCaseData().setOtherParties(List.of(
+            CcdValue.<OtherParty>builder().value(OtherParty.builder().id("op1").confidentialityRequired(NO).build()).build(),
+            CcdValue.<OtherParty>builder().value(OtherParty.builder().id("op2").confidentialityRequired(YES).build()).build()
+        ));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(NO, response.getData().getAppeal().getAppellant().getConfidentialityRequired());
+        assertNull(response.getData().getAppeal().getAppellant().getConfidentialityRequiredChangedDate());
+        assertEquals(NO, response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequired());
+        assertNull(response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequiredChangedDate());
+        assertEquals(YES, response.getData().getOtherParties().get(1).getValue().getConfidentialityRequired());
+        assertNull(response.getData().getOtherParties().get(1).getValue().getConfidentialityRequiredChangedDate());
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"file.png", "file.jpg", "file.doc"})
     void givenManuallyUploadedFileIsNotAPdf_thenAddAnErrorToResponse(String filename) {
