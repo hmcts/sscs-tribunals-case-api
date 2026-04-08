@@ -1,5 +1,44 @@
 [
   {
+    "CaseEventID": "writeFinalDecision",
+    "CaseFieldID": "issueCode",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "13/03/2026",
+    "PageDisplayOrder": 8,
+    "PageFieldDisplayOrder": 4,
+    "PageID": "workCapabilityAssessment",
+    "FieldShowCondition": "wcaAppeal=\"DoNotUse\"",
+    "ShowSummaryChangeOption": "N",
+    "RetainHiddenValue": "Yes"
+  },
+  {
+    "CaseEventID": "writeFinalDecision",
+    "CaseFieldID": "ucWriteFinalDecisionHasSVIssueCode",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "13/03/2026",
+    "PageDisplayOrder": 8,
+    "PageFieldDisplayOrder": 5,
+    "PageID": "workCapabilityAssessment",
+    "FieldShowCondition": "writeFinalDecisionGenerateNotice=\"DoNotUse\"",
+    "RetainHiddenValue": "Yes",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseEventID": "writeFinalDecision",
+    "CaseFieldID": "writeFinalDecisionSevereYesNo",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "13/03/2026",
+    "PageDisplayOrder": 8,
+    "PageFieldDisplayOrder": 6,
+    "PageID": "workCapabilityAssessment",
+    "FieldShowCondition" : "wcaAppeal=\"Yes\" AND (appeal.benefitType.code=\"ESA\" OR appeal.benefitType.code=\"UC\") AND (issueCode=\"SV\" OR ucWriteFinalDecisionHasSVIssueCode = \"Yes\")",
+    "ShowSummaryChangeOption": "Y",
+    "RetainHiddenValue": "Yes"
+  },
+  {
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=schedule6",
     "CaseEventID": "writeFinalDecision",
     "CaseFieldID": "ucWriteFinalDecisionPhysicalDisabilitiesQuestion",
@@ -10,7 +49,7 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "schedule6",
     "PageLabel": "Select Schedule 6 activities",
-    "PageShowCondition": "appeal.benefitType.code=\"UC\" AND wcaAppeal = \"Yes\" AND supportGroupOnlyAppeal=\"No\" AND writeFinalDecisionGenerateNotice = \"Yes\"",
+    "PageShowCondition": "appeal.benefitType.code=\"UC\" AND wcaAppeal = \"Yes\" AND supportGroupOnlyAppeal=\"No\" AND writeFinalDecisionGenerateNotice = \"Yes\"  AND writeFinalDecisionSevereYesNo != \"Yes\"",
     "ShowSummaryChangeOption": "Y"
   },
   {
@@ -23,7 +62,7 @@
     "PageFieldDisplayOrder": 2,
     "PageID": "schedule8Paragraph4",
     "PageLabel": "Schedule 8 Paragraph 4",
-    "PageShowCondition": "appeal.benefitType.code=\"UC\" AND wcaAppeal = \"Yes\" AND showSchedule8Paragraph4Page=\"Yes\"",
+    "PageShowCondition": "appeal.benefitType.code=\"UC\" AND wcaAppeal = \"Yes\" AND showSchedule8Paragraph4Page=\"Yes\" AND writeFinalDecisionSevereYesNo != \"Yes\"",
     "ShowSummaryChangeOption": "Y"
   },
   {
@@ -36,7 +75,33 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "schedule7Activities",
     "PageLabel": "Select Schedule 7 activities",
-    "PageShowCondition": "showSchedule7ActivitiesPage=\"Yes\" AND wcaAppeal = \"Yes\"",
+    "PageShowCondition": "showSchedule7ActivitiesPage=\"Yes\" AND wcaAppeal = \"Yes\" AND writeFinalDecisionSevereYesNo != \"Yes\"",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseEventID": "writeFinalDecision",
+    "CaseFieldID": "writeFinalDecisionSevereCriteriaApply",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "17/03/2026",
+    "PageDisplayOrder": 63,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "severeCriteria",
+    "PageLabel": "Severe Conditions Criteria",
+    "PageShowCondition":  "(showSchedule7ActivitiesPage = \"Yes\" AND ucWriteFinalDecisionSchedule7ActivitiesApply = \"Yes\" AND ucWriteFinalDecisionSchedule7ActivitiesQuestion !=\"\" AND writeFinalDecisionAllowedOrRefused = \"allowed\") OR (appeal.benefitType.code = \"UC\" AND writeFinalDecisionSevereYesNo = \"Yes\")",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseEventID": "writeFinalDecision",
+    "CaseFieldID": "esaWriteFinalDecisionSevereCriteriaApply",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "17/03/2026",
+    "PageDisplayOrder": 63,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "esaSevereCriteria",
+    "PageLabel": "Severe Conditions Criteria",
+    "PageShowCondition":  "(showSchedule3ActivitiesPage = \"Yes\" AND esaWriteFinalDecisionSchedule3ActivitiesApply=\"Yes\" AND writeFinalDecisionAllowedOrRefused = \"allowed\" AND wcaAppeal = \"Yes\") OR (appeal.benefitType.code = \"ESA\" AND writeFinalDecisionSevereYesNo = \"Yes\")",
     "ShowSummaryChangeOption": "Y"
   },
   {
@@ -50,7 +115,7 @@
     "PageFieldDisplayOrder": 2,
     "PageID": "esaDecisionNoticeOptions",
     "PageLabel": "Select Schedule 2 activities",
-    "PageShowCondition": "appeal.benefitType.code=\"ESA\" AND wcaAppeal = \"Yes\" AND writeFinalDecisionGenerateNotice = \"Yes\" AND supportGroupOnlyAppeal != \"Yes\"",
+    "PageShowCondition": "appeal.benefitType.code=\"ESA\" AND wcaAppeal = \"Yes\" AND writeFinalDecisionGenerateNotice = \"Yes\" AND supportGroupOnlyAppeal != \"Yes\" AND writeFinalDecisionSevereYesNo != \"Yes\"",
     "ShowSummaryChangeOption": "Y"
   },
   {
@@ -64,7 +129,7 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "standingAndSitting",
     "PageLabel": "Physical Disabilities: Standing and sitting",
-    "PageShowCondition": "esaWriteFinalDecisionPhysicalDisabilitiesQuestion CONTAINS \"standingAndSitting\" AND wcaAppeal = \"Yes\" AND supportGroupOnlyAppeal != \"Yes\"",
+    "PageShowCondition": "esaWriteFinalDecisionPhysicalDisabilitiesQuestion CONTAINS \"standingAndSitting\" AND wcaAppeal = \"Yes\" AND supportGroupOnlyAppeal != \"Yes\" AND writeFinalDecisionSevereYesNo != \"Yes\"",
     "ShowSummaryChangeOption": "Y"
   },
   {
@@ -78,7 +143,7 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "gettingAbout",
     "PageLabel": "Mental, cognitive and intellectual function assessment: Getting about",
-    "PageShowCondition": "esaWriteFinalDecisionMentalAssessmentQuestion CONTAINS \"gettingAbout\" AND wcaAppeal = \"Yes\" AND supportGroupOnlyAppeal != \"Yes\"",
+    "PageShowCondition": "esaWriteFinalDecisionMentalAssessmentQuestion CONTAINS \"gettingAbout\" AND wcaAppeal = \"Yes\" AND supportGroupOnlyAppeal != \"Yes\" AND writeFinalDecisionSevereYesNo != \"Yes\"",
     "ShowSummaryChangeOption": "Y"
   },
   {
@@ -91,7 +156,7 @@
     "PageFieldDisplayOrder": 2,
     "PageID": "schedule3Activities",
     "PageLabel": "Select Schedule 3 activities",
-    "PageShowCondition": "showSchedule3ActivitiesPage=\"Yes\" AND wcaAppeal = \"Yes\"",
+    "PageShowCondition": "showSchedule3ActivitiesPage=\"Yes\" AND wcaAppeal = \"Yes\" AND writeFinalDecisionSevereYesNo != \"Yes\"",
     "ShowSummaryChangeOption": "Y"
   },
   {
@@ -104,7 +169,7 @@
     "PageFieldDisplayOrder": 2,
     "PageID": "regulation29",
     "PageLabel": "Regulation 29",
-    "PageShowCondition": "appeal.benefitType.code=\"ESA\" AND wcaAppeal = \"Yes\" AND showRegulation29Page=\"Yes\"",
+    "PageShowCondition": "appeal.benefitType.code=\"ESA\" AND wcaAppeal = \"Yes\" AND showRegulation29Page=\"Yes\" AND writeFinalDecisionSevereYesNo != \"Yes\"",
     "ShowSummaryChangeOption": "Y"
   }
 ]
