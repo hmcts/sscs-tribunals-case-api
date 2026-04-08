@@ -35,6 +35,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
@@ -193,6 +194,7 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
     @ParameterizedTest
     @MethodSource("missingSelectionScenarios")
     void givenConfidentialityReferral_whenSelectionMissing_thenReturnsMustSelectPartyError(DynamicList selectedParty) {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
         sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(selectedParty);
 
@@ -204,9 +206,21 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
 
     @Test
     void givenConfidentialityReferral_whenSelectionPresent_thenDoesNotReturnMustSelectPartyError() {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
         sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
                 new DynamicList(new DynamicListItem("appellant", "Appellant"), Collections.emptyList()));
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(Collections.emptySet(), response.getErrors());
+    }
+
+    @Test
+    void givenConfidentialityReferralAndNonChildSupport_whenSelectionMissing_thenDoesNotReturnMustSelectPartyError() {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("PIP").build());
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(null);
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 

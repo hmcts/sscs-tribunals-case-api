@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADMIN_SEND_TO_INTERL
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_SEND_TO_INTERLOC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty.REP;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.REPRESENTATIVE;
+import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.isChildSupportAppeal;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -89,6 +90,7 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
             postponementRequestService.processPostponementRequest(sscsCaseData, uploadParty, Optional.empty());
         } else {
             if (cmOtherPartyConfidentialityEnabled
+                    && isChildSupportAppeal(sscsCaseData)
                     && isConfidentialityReferral(sscsCaseData)
                     && isSelectionMissing(sscsCaseData.getExtendedSscsCaseData().getSelectedConfidentialityParty())) {
                 preSubmitCallbackResponse.addError("Must select party");
