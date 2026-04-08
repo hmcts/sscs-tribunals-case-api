@@ -306,6 +306,7 @@ class ValidSendToInterlocAboutToSubmitHandlerTest {
     @ParameterizedTest
     @MethodSource("missingSelectionScenarios")
     void givenConfidentialityReferral_whenSelectionMissing_thenReturnsMustSelectPartyError(DynamicList selectedParty) {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
         sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(selectedParty);
 
@@ -317,9 +318,21 @@ class ValidSendToInterlocAboutToSubmitHandlerTest {
 
     @Test
     void givenConfidentialityReferral_whenSelectionPresent_thenDoesNotReturnMustSelectPartyError() {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
         sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
                 new DynamicList(new DynamicListItem("appellant", "Appellant"), Collections.emptyList()));
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(Collections.emptySet(), response.getErrors());
+    }
+
+    @Test
+    void givenConfidentialityReferralAndNonChildSupport_whenSelectionMissing_thenDoesNotReturnMustSelectPartyError() {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("PIP").build());
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(null);
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
