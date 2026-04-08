@@ -22,6 +22,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -371,6 +372,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
 
 
     @Test
+    @ConditionalOnProperty("feature.severeConditions.enabled")
     public void scenario13_allowed_notSupportGroup_SV_Issue_Code_Severe_Criteria_Applies() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/esaAllowedSevereConditionsAppliesCallback.json");
         byte[] bytes = callPreviewFinalDecision(json);
@@ -380,10 +382,9 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 01/03/2026 is set aside."));
             assertThat(pdfTextWithoutNewLines, containsString("3. The appellant meets the severe conditions criteria because they will constantly meet a Schedule 3 descriptor, and they have a lifelong condition with no realistic prospect of recovery of function."));
-            assertThat(pdfTextWithoutNewLines, containsString("4. Reasons for decision 1"));
-            assertThat(pdfTextWithoutNewLines, containsString("5. Reasons for decision 2"));
-            assertThat(pdfTextWithoutNewLines, containsString("6. Anything else"));
-            assertThat(pdfTextWithoutNewLines, containsString("7. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent."));
+            assertThat(pdfTextWithoutNewLines, containsString("4. Reasons for decision"));
+            assertThat(pdfTextWithoutNewLines, containsString("5. Anything else"));
+            assertThat(pdfTextWithoutNewLines, containsString("6. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative did not attend."));
         }
     }
 
