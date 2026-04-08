@@ -77,9 +77,7 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
 
             runAddOtherPartyDataEvent(caseWithState);
 
-            await()
-                .atMost(TIMEOUT, SECONDS)
-                .untilAsserted(() -> assertThatPartyAdded(findCaseById(caseWithState.getId().toString())));
+            await().atMost(TIMEOUT, SECONDS).untilAsserted(AddOtherPartyDataFunctionalTest.this::assertThatPartyAdded);
         }
 
     }
@@ -99,9 +97,7 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
 
             runAddOtherPartyDataEvent(caseDetails);
 
-            await()
-                .atMost(TIMEOUT, SECONDS)
-                .untilAsserted(() -> assertThatPartyAdded(findCaseById(caseDetails.getId().toString())));
+            await().atMost(TIMEOUT, SECONDS).untilAsserted(AddOtherPartyDataFunctionalTest.this::assertThatPartyAdded);
             assertThatPdfTextIsCorrect(getDocument(caseDetails.getId(), "addOtherPartyData"), getExpectedContent(caseDetails));
         }
 
@@ -123,12 +119,20 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
             });
     }
 
+    private void assertThatPartyAdded() {
         await().atMost(30, SECONDS).untilAsserted(() -> {
             var cdAfterEvent = findCaseById(ccdCaseId);
 
             assertThat(cdAfterEvent.getState()).isEqualTo(State.AWAIT_CONFIDENTIALITY_REQUIREMENTS.toString());
             assertThat(cdAfterEvent.getData().getExtendedSscsCaseData().getAwareOfAnyAdditionalOtherParties()).isEqualTo(
                 YesNo.YES);
+            final OtherParty otherParty = cdAfterEvent.getData().getOtherParties().getFirst().getValue();
+            assertThat(otherParty.getName().getTitle()).isEqualTo("Miss");
+            assertThat(otherParty.getName().getFirstName()).isEqualTo("Bella");
+            assertThat(otherParty.getName().getLastName()).isEqualTo("Kiki");
+            assertThat(otherParty.getAddress().getPostcode()).isEqualTo(POSTCODE);
+            assertThat(otherParty.getAddress().getTown()).isEqualTo(TOWN);
+            assertThat(otherParty.getAddress().getLine1()).isEqualTo(ADDRESS_LINE_1);
             assertThat(cdAfterEvent.getData().getOtherParties().getFirst().getValue().getName().getTitle()).isEqualTo("Miss");
             assertThat(cdAfterEvent.getData().getOtherParties().getFirst().getValue().getName().getFirstName()).isEqualTo(
                 "Bella");
@@ -138,8 +142,7 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
             assertThat(cdAfterEvent.getData().getOtherParties().getFirst().getValue().getAddress().getTown()).isEqualTo(TOWN);
             assertThat(cdAfterEvent.getData().getOtherParties().getFirst().getValue().getAddress().getLine1()).isEqualTo(
                 ADDRESS_LINE_1);
-            assertThat(cdAfterEvent.getData().getConfidentialityTab())
-                .contains("Other Party 1 | Bella Kiki | Undetermined |");
+            assertThat(cdAfterEvent.getData().getConfidentialityTab()).contains("Other Party 1 | Bella Kiki | Undetermined |");
         });
     }
 
