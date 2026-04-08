@@ -11,7 +11,7 @@
   "ucBenefitCode": "001",
   "ucIssueCode": "WC",
   "dlaIssueCode": "EI",
-  "ucSccIssueCode": "SV",
+  "sccIssueCode": "SV",
   "ucDisputeOption": "No",
   "ucJointPartyOnCase": "No",
   "ucJointPartyOnCase_Yes": "Yes",

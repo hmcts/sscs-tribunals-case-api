@@ -465,7 +465,7 @@ export class UploadResponse extends BaseStep {
     await this.uploadResponsePage.clickAddNewButton();
     await this.uploadResponsePage.selectUcIssueCode(
       uploadResponseTestdata.elementDisputedForLimitedWorkIssueCodes,
-      uploadResponseTestdata.ucSccIssueCode
+      uploadResponseTestdata.sccIssueCode
     );
     await this.homePage.delay(2000);
     await this.uploadResponsePage.continueSubmission();
@@ -483,6 +483,25 @@ export class UploadResponse extends BaseStep {
 
     await this.validateHistory(caseId);
 
+  }
+
+  async uploadResponseEsaAppealWcaAndSvIssueCode(caseId: string){
+    await this.loginUserWithCaseId(
+      credentials.dwpResponseWriter,
+      false,
+      caseId
+    );
+
+    await this.homePage.chooseEvent('Upload response');
+    await this.uploadResponsePage.verifyPageContent();
+    await this.uploadResponsePage.uploadDocs();
+    await this.uploadResponsePage.chooseAssistOption('No');
+     await this.uploadResponsePage.selectIssueCode(
+      uploadResponseTestdata.sccIssueCode
+    );
+    await this.uploadResponsePage.continueSubmission();
+    await this.checkYourAnswersPage.confirmAndSignOut();
+    await this.validateHistory(caseId);
   }
 
   async checkHmcEnvironment(request: APIRequestContext) {

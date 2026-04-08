@@ -312,9 +312,9 @@ export class WriteFinalDecision extends BaseStep {
   }
 
   async verifyAppealDormantAfterIssueFinalDecisionEvent() {
-    await this.verifyEndStateInHistoryTab('Dormant'); 
+    await this.verifyEndStateInHistoryTab('Dormant');
   }
-  
+
   async verifyFinalDecisionForAnAppeal() {
     await this.homePage.navigateToTab('Documents');
     await this.documentsTab.verifyPageContentByKeyValue(
@@ -411,7 +411,8 @@ export class WriteFinalDecision extends BaseStep {
   }
 
   async performWriteFinalDecisionForAESAAppealYesAwardGivenAndNoticeGenerated(
-    esaCaseId: string
+    esaCaseId: string,
+    appealAllowed = true
   ) {
     await this.loginUserWithCaseId(credentials.judge, false, esaCaseId);
     await this.homePage.chooseEvent('Write final decision');
@@ -462,11 +463,11 @@ export class WriteFinalDecision extends BaseStep {
     await this.writeFinalDecisionPage.submitContinueBtn();
 
     await this.writeFinalDecisionPage.verifyPageContentForReachingTheAwardPage();
-    await this.writeFinalDecisionPage.inputAndVerifyPageContentForSchedule2ReachingPageData();
+    await this.writeFinalDecisionPage.inputAndVerifyPageContentForSchedule2ReachingPageData(appealAllowed);
     await this.writeFinalDecisionPage.submitContinueBtn();
 
     await this.writeFinalDecisionPage.verifyPageContentForCognitiveTheAwardPage();
-    await this.writeFinalDecisionPage.inputAndVerifyPageContentForSchedule2CognitivePageData();
+    await this.writeFinalDecisionPage.inputAndVerifyPageContentForSchedule2CognitivePageData(appealAllowed);
     await this.writeFinalDecisionPage.submitContinueBtn();
 
     await this.writeFinalDecisionPage.inputAndVerifyPageContentForSchedule3Activities();
@@ -535,11 +536,11 @@ export class WriteFinalDecision extends BaseStep {
 
     await this.writeFinalDecisionPage.verifyPageContentForWorkCapabilityAssessmentPage();
     await this.writeFinalDecisionPage.inputAndVerifyPageContentForWorkCapabilityAssessmentPageData({
-        appealHasSvIssueCode: true,
-        appealAllowed: isAppealAllowed,
-        supportGroup: false,
-        isSccOnlyAppeal: sccAppeal,
-        isESACase: false,
+      appealHasSvIssueCode: true,
+      appealAllowed: isAppealAllowed,
+      supportGroup: false,
+      isSccOnlyAppeal: sccAppeal,
+      isESACase: false,
     });
     await this.writeFinalDecisionPage.submitContinueBtn();
     await this.writeFinalDecisionPage.submitContinueBtn();
@@ -553,9 +554,9 @@ export class WriteFinalDecision extends BaseStep {
     await this.writeFinalDecisionPage.submitContinueBtn();
 
     if (isAppealAllowed) {
-    await this.writeFinalDecisionPage.verifyPageContentForReassessTheAwardPage();
-    await this.writeFinalDecisionPage.inputPageContentForReassessTheAwardPage();
-    await this.writeFinalDecisionPage.submitContinueBtn();
+      await this.writeFinalDecisionPage.verifyPageContentForReassessTheAwardPage();
+      await this.writeFinalDecisionPage.inputPageContentForReassessTheAwardPage();
+      await this.writeFinalDecisionPage.submitContinueBtn();
     }
 
     await this.writeFinalDecisionPage.verifyPageContentForReasonForDecisionPage();
@@ -569,13 +570,116 @@ export class WriteFinalDecision extends BaseStep {
     await this.writeFinalDecisionPage.verifyPageContentForPreviewDecisionNoticePage(true);
     await this.writeFinalDecisionPage.submitContinueBtn();
 
-    await this.writeFinalDecisionPage.verifyPageContentForCheckYourAnswersPageForUcScc({
+    await this.writeFinalDecisionPage.verifyPageContentForCheckYourAnswersPageForScc({
       isAppealAllowed: isAppealAllowed,
       isSccOnlyAppeal: sccAppeal,
       doSccApply: sccApplies
     });
     await this.writeFinalDecisionPage.confirmSubmission();
     await this.verifyHistoryTabDetails('Write final decision');
+  }
+
+  async performWriteFinalDecisionForEsaAppealWithScc({
+    esaCaseId,
+    isAppealAllowed = true,
+    sccAppeal = true,
+    sccApplies = true
+  }: {
+    esaCaseId: string,
+    isAppealAllowed?: boolean,
+    sccAppeal?: boolean,
+    sccApplies?: boolean
+  }) {
+    await this.loginUserWithCaseId(credentials.judge, true, esaCaseId);
+    await this.homePage.chooseEvent('Write final decision');
+    await this.writeFinalDecisionPage.inputTypeOfAppealPageData(true, true, 'ESA');
+    await this.writeFinalDecisionPage.submitContinueBtn();
+
+    await this.writeFinalDecisionPage.verifyPageContentAllowedOrRefusedPage();
+    await this.writeFinalDecisionPage.appealAllowed(isAppealAllowed);
+    await this.writeFinalDecisionPage.submitContinueBtn();
+
+    await this.writeFinalDecisionPage.verifyPageContentTypeOfHearingPage();
+    await this.writeFinalDecisionPage.inputTypeOfHearingPageData(false);
+    await this.writeFinalDecisionPage.submitContinueBtn();
+
+    await this.writeFinalDecisionPage.verifyPageContentForPanelMembersPage('ESA');
+    await this.writeFinalDecisionPage.inputPageContentForPanelMembersPageData('ESA');
+    await this.writeFinalDecisionPage.submitContinueBtn();
+
+    await this.writeFinalDecisionPage.verifyPageContentForDecisionDatePage();
+    await this.writeFinalDecisionPage.inputTypePageContentForDecisionPageData();
+    await this.writeFinalDecisionPage.submitContinueBtn();
+
+    await this.writeFinalDecisionPage.verifyPageContentForWorkCapabilityAssessmentPage();
+    await this.writeFinalDecisionPage.inputAndVerifyPageContentForWorkCapabilityAssessmentPageData({
+      appealHasSvIssueCode: true,
+      appealAllowed: isAppealAllowed,
+      supportGroup: false,
+      isSccOnlyAppeal: sccAppeal,
+      isESACase: true,
+      includeStartDate: false
+    });
+    await this.writeFinalDecisionPage.submitContinueBtn();
+
+    await this.writeFinalDecisionPage.verifyPageContentForSchedule2ActivitiesPage();
+    await this.writeFinalDecisionPage.inputAndVerifyPageContentForSchedule2ActivitiesPageData(
+      'reaching',
+      'learningTasks'
+    );
+    await this.writeFinalDecisionPage.submitContinueBtn();
+
+    await this.writeFinalDecisionPage.verifyPageContentForReachingTheAwardPage();
+    await this.writeFinalDecisionPage.inputAndVerifyPageContentForSchedule2ReachingPageData(isAppealAllowed);
+    await this.writeFinalDecisionPage.submitContinueBtn();
+
+    await this.writeFinalDecisionPage.verifyPageContentForCognitiveTheAwardPage();
+    await this.writeFinalDecisionPage.inputAndVerifyPageContentForSchedule2CognitivePageData(isAppealAllowed);
+    await this.writeFinalDecisionPage.submitContinueBtn();
+
+    if (isAppealAllowed) {
+      await this.writeFinalDecisionPage.inputAndVerifyPageContentForSchedule3Activities();
+      await this.writeFinalDecisionPage.submitContinueBtn();
+    }
+    else{
+      await this.writeFinalDecisionPage.inputAndVerifyPageContentForRegulation29Page();
+      await this.writeFinalDecisionPage.submitContinueBtn();
+    }
+
+    await this.writeFinalDecisionPage.verifyPageContentForSevereConditionsCriteriaPage();
+    await this.writeFinalDecisionPage.inputAndVerifyPageContentForSevereConditionsCriteriaPageData(sccApplies);
+    await this.writeFinalDecisionPage.submitContinueBtn();
+
+    await this.writeFinalDecisionPage.verifyPageContentForBundleSectionReferencePage();
+    await this.writeFinalDecisionPage.inputPageContentForBundleSectionReferencePageData();
+    await this.writeFinalDecisionPage.submitContinueBtn();
+
+    if (isAppealAllowed) {
+      await this.writeFinalDecisionPage.verifyPageContentForReassessTheAwardPage();
+      await this.writeFinalDecisionPage.inputPageContentForReassessTheAwardPage();
+      await this.writeFinalDecisionPage.submitContinueBtn();
+    }
+
+    await this.writeFinalDecisionPage.verifyPageContentForReasonForDecisionPage();
+    await this.writeFinalDecisionPage.inputPageContentForReasonForDecisionPageData();
+    await this.writeFinalDecisionPage.submitContinueBtn();
+
+    await this.writeFinalDecisionPage.verifyPageContentForAnythingElseDecisionPage();
+    await this.writeFinalDecisionPage.inputPageContentForAnythingElsePageData();
+    await this.writeFinalDecisionPage.submitContinueBtn();
+
+    await this.writeFinalDecisionPage.verifyPageContentForPreviewDecisionNoticePage(true);
+    await this.writeFinalDecisionPage.submitContinueBtn();
+
+    await this.writeFinalDecisionPage.verifyPageContentForCheckYourAnswersPageForScc({
+      isAppealAllowed: isAppealAllowed,
+      isSccOnlyAppeal: sccAppeal,
+      doSccApply: sccApplies,
+      isEsaCase: true
+    });
+    await this.writeFinalDecisionPage.confirmSubmission();
+    await this.verifyHistoryTabDetails('Write final decision');
 
   }
+
 }
