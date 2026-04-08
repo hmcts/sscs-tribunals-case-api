@@ -369,11 +369,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '5.1.1'
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.3'
 
-<<<<<<< SSCSCI-2101
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: 'ff81873'
-=======
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '6.3.36'
->>>>>>> master
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: 'fe442a6'
 
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '8.0.0'
 
