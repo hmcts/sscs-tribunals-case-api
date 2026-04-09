@@ -205,7 +205,6 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             && isBenefitTypeWithConfidentialityTab(caseData)) {
             applyConfidentialityDecisionFromDirection(caseData);
             caseData.setInterlocReviewState(null);
-            return caseData;
         } else {
             caseData.setInterlocReviewState(null);
         }
