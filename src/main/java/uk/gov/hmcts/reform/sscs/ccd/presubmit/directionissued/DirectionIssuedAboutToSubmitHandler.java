@@ -26,8 +26,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -45,7 +43,6 @@ import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
 
 @Service
 @Slf4j
-@Order(Ordered.LOWEST_PRECEDENCE - 1)
 public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final FooterService footerService;
