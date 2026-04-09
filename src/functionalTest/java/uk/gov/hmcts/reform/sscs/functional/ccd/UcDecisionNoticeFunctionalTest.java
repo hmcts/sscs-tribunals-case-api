@@ -16,11 +16,11 @@ import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -283,7 +283,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
     }
 
     @Test
-    @ConditionalOnProperty("feature.severeConditions.enabled")
+    @EnabledIfEnvironmentVariable(named = "SEVERE_CONDITIONS_FEATURE", matches = "true")
     public void scenario13_allowed_WcaAppeal_SvIssueCode_SevereCriteriaApply() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedWcaAppealWithSvIssueCodeAndSevereCriteriaApply.json");
         json = json.replaceFirst("writeFinalDecisionSevereCriteriaApplyCondition", "Yes");
@@ -303,7 +303,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
     }
 
     @Test
-    @ConditionalOnProperty("feature.severeConditions.enabled")
+    @EnabledIfEnvironmentVariable(named = "SEVERE_CONDITIONS_FEATURE", matches = "true")
     public void scenario13_refused_WcaAppeal_SvIssueCode_SevereCriteriaDoNotApply() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedWcaAppealWithSvIssueCodeAndSevereCriteriaApply.json");
         json = json.replaceFirst("allowed", "refused");
@@ -324,7 +324,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
     }
 
     @Test
-    @ConditionalOnProperty("feature.severeConditions.enabled")
+    @EnabledIfEnvironmentVariable(named = "SEVERE_CONDITIONS_FEATURE", matches = "true")
     public void scenario4_allowed_WcaAppeal_SupportGroupOnly_Schedule7Activities_SevereCriteriaDoNotApply() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedIsSupportGroupSch7SelectionMadeCallback.json");
         json = json.replaceFirst("writeFinalDecisionSevereCriteriaApplyCondition", "No");
@@ -348,7 +348,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
     }
 
     @Test
-    @ConditionalOnProperty("feature.severeConditions.enabled")
+    @EnabledIfEnvironmentVariable(named = "SEVERE_CONDITIONS_FEATURE", matches = "true")
     public void scenario6_allowed_WcaAppeal_moreThan15Points_Schedule7_SevereCriteriaApply() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedNoSupportGroupMoreThan15PointsSch7SelectionSevereCriteria.json");
         byte[] bytes = callPreviewFinalDecision(json);
@@ -374,7 +374,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
     }
 
     @Test
-    @ConditionalOnProperty("feature.severeConditions.enabled")
+    @EnabledIfEnvironmentVariable(named = "SEVERE_CONDITIONS_FEATURE", matches = "true")
     public void scenario9_allowed_WcaAppeal_lessThan15Points_Sch8Para4_Schedule7_SevereCriteriaApply() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedNoSupportGroupLessThan15PointsSch8Para4Sch7SevereCriteria.json");
         byte[] bytes = callPreviewFinalDecision(json);
