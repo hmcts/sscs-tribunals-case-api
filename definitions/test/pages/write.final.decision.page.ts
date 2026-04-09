@@ -1771,7 +1771,7 @@ export class WriteFinalDecisionPages {
   }
 
   async inputAndVerifyPageContentForSchedule2ReachingPageData(appealAllowed: boolean) {
-    
+
     let optionValue = appealAllowed ? 'reaching3b' : 'reaching3d';
 
     await webActions.clickElementById(
@@ -1883,31 +1883,7 @@ export class WriteFinalDecisionPages {
     );
   }
 
-  async inputAndVerifyPageContentForRegulation29Page() {
-    await webActions.verifyPageLabel(
-      '.govuk-caption-l',
-      writeFinalDecisionData.eventNameCaptor
-    );
-    await webActions.verifyPageLabel(
-      'h1.govuk-heading-l',
-      writeFinalDecisionData.regulation29PageHeading
-    );
-    await webActions.verifyPageLabel(
-      '#doesRegulation29Apply span',
-      writeFinalDecisionData.doesRegulation29ApplyLabel
-    );
-    await webActions.verifyPageLabel(
-      "[for='doesRegulation29Apply_Yes']",
-      writeFinalDecisionData.yesLabel
-    );
-    await webActions.verifyPageLabel(
-      "[for='doesRegulation29Apply_No']",
-      writeFinalDecisionData.noLabel
-    );
-   await webActions.clickElementById('#doesRegulation29Apply_No');
-  }
-
-  async inputAndVerifyPageContentForSevereConditionsCriteriaPageData(sccConditionsApply: boolean) {
+  async inputAndVerifyPageContentForSevereConditionsCriteriaPageDataUcAppeal(sccConditionsApply: boolean) {
     await webActions.verifyPageLabel(
       "[for='writeFinalDecisionSevereCriteriaApply_Yes']",
       writeFinalDecisionData.yesLabel
@@ -1921,6 +1897,22 @@ export class WriteFinalDecisionPages {
 
     const choice = sccConditionsApply ? 'Yes' : 'No';
     await webActions.clickElementById(`#writeFinalDecisionSevereCriteriaApply_${choice}`);
+  }
+
+  async inputAndVerifyPageContentForSevereConditionsCriteriaPageDataEsaAppeal(sccConditionsApply: boolean) {
+    await webActions.verifyPageLabel(
+      "[for='esaWriteFinalDecisionSevereCriteriaApply_Yes']",
+      writeFinalDecisionData.yesLabel
+    );
+    await webActions.verifyPageLabel(
+      "[for='esaWriteFinalDecisionSevereCriteriaApply_No']",
+      writeFinalDecisionData.noLabel
+    );
+    await webActions.verifyElementVisibility('#esaWriteFinalDecisionSevereCriteriaApply_Yes');
+    await webActions.verifyElementVisibility('#esaWriteFinalDecisionSevereCriteriaApply_No');
+
+    const choice = sccConditionsApply ? 'Yes' : 'No';
+    await webActions.clickElementById(`#esaWriteFinalDecisionSevereCriteriaApply_${choice}`);
   }
 
   async verifyValueByLabelInCheckYourAnswersTable(label: string, expectedValue: string) {
@@ -1967,16 +1959,8 @@ export class WriteFinalDecisionPages {
     }
 
     if (isEsaCase) {
-
       expectedRows.push(
         { label: writeFinalDecisionData.whichEsaRegulationsApplyLabel, value: writeFinalDecisionData.esaRegulations2013Label },
-        { label: writeFinalDecisionData.schedule2ActivitiesPart1CheckYourAnswersLabel, value: writeFinalDecisionData.esaReachingCannotRaiseEitherArmLabel },
-        { label: writeFinalDecisionData.schedule2ActivitiesPart2CheckYourAnswersLabel, value: writeFinalDecisionData.esaLearning },
-        { label: writeFinalDecisionData.esaReachingCannotRaiseEitherArmLabel, value: writeFinalDecisionData.esaReaching3bLabel },
-        { label: writeFinalDecisionData.esaLearning, value: writeFinalDecisionData.esaLearning11bLabel },
-        { label: writeFinalDecisionData.esaSchedule3ActivitiesCheckYourAnswersLabel, value: writeFinalDecisionData.noneApply },
-        { label: writeFinalDecisionData.esaDoesRegulation35ApplyLabel, value: writeFinalDecisionData.noLabel }
-
       );
     }
 
@@ -1984,6 +1968,4 @@ export class WriteFinalDecisionPages {
       await this.verifyValueByLabelInCheckYourAnswersTable(label, value);
     }
   }
-
-
 }

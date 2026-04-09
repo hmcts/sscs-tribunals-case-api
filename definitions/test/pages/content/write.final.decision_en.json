@@ -181,16 +181,10 @@
   "doNotReassessLabel": "Do not reassess",
 
   "schedule2ActivitiesPageHeading": "Select Schedule 2 activities",
-  "schedule2ActivitiesLabel": "Part 1: Physical Disabilities (Optional)",
-  "schedule2ActivitiesPart1CheckYourAnswersLabel": "Part 1: Physical Disabilities",
   "schedule2ActivitiesPart2Label": "Part 2: Mental, cognitive and intellectual function assessment (Optional)",
-  "schedule2ActivitiesPart2CheckYourAnswersLabel": "Part 2: Mental, cognitive and intellectual function assessment",
+   "schedule2ActivitiesLabel": "Part 1: Physical Disabilities (Optional)",
 
-  "esaReaching3bLabel": "3b. Cannot raise either arm to top of head as if to put on a hat. (9 points)",
-  "esaNoneOfAboveApplyReachingLabel": "3d. None of the above apply. (0 points)",
-  "esaLearning11bLabel": "11b. Cannot learn anything beyond a simple task, such as setting an alarm clock. (9 points)",
-  "esaNoneOfAboveApplyLearningLabel": "11d. None of the above apply. (0 points)",
-
+  
   "esaMobilisingUnaidedLabel": "1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.",
   "esaTransferringFromOneSeatedPositionLabel": "2. Standing and sitting.",
   "esaReachingCannotRaiseEitherArmLabel": "3. Reaching.",
@@ -216,12 +210,7 @@
   "esaReachingTitle": "Physical Disabilities: Reaching",
   "esaCognitiveTitle": "Mental, cognitive and intellectual function assessment: Learning tasks",
   "esaSchedule3ActivitiesPageHeading": "Schedule 3 activities",
-  "esaSchedule3ActivitiesCheckYourAnswersLabel": "Do Schedule 3 activities apply?", 
-  "esaDoesRegulation35ApplyLabel": "Does regulation 35 apply?",
 
   "severeConditionsCriteriaPageHeading": "Severe Conditions Criteria",
-  "doSccApplyLabel": "Do the severe conditions criteria apply?",
-
-  "regulation29PageHeading": "Regulation 29",
-  "doesRegulation29ApplyLabel": "Does regulation 29 apply?"
+  "doSccApplyLabel": "Do the severe conditions criteria apply?"
 }

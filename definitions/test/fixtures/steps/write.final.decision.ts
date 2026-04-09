@@ -273,7 +273,7 @@ export class WriteFinalDecision extends BaseStep {
     await this.writeFinalDecisionPage.submitContinueBtn();
 
     await this.writeFinalDecisionPage.verifyPageContentForSevereConditionsCriteriaPage();
-    await this.writeFinalDecisionPage.inputAndVerifyPageContentForSevereConditionsCriteriaPageData(false);
+    await this.writeFinalDecisionPage.inputAndVerifyPageContentForSevereConditionsCriteriaPageDataUcAppeal(false);
     await this.writeFinalDecisionPage.submitContinueBtn();
 
     await this.writeFinalDecisionPage.verifyPageContentForBundleSectionReferencePage();
@@ -546,7 +546,7 @@ export class WriteFinalDecision extends BaseStep {
     await this.writeFinalDecisionPage.submitContinueBtn();
 
     await this.writeFinalDecisionPage.verifyPageContentForSevereConditionsCriteriaPage();
-    await this.writeFinalDecisionPage.inputAndVerifyPageContentForSevereConditionsCriteriaPageData(sccApplies);
+    await this.writeFinalDecisionPage.inputAndVerifyPageContentForSevereConditionsCriteriaPageDataUcAppeal(sccApplies);
     await this.writeFinalDecisionPage.submitContinueBtn();
 
     await this.writeFinalDecisionPage.verifyPageContentForBundleSectionReferencePage();
@@ -622,32 +622,8 @@ export class WriteFinalDecision extends BaseStep {
     });
     await this.writeFinalDecisionPage.submitContinueBtn();
 
-    await this.writeFinalDecisionPage.verifyPageContentForSchedule2ActivitiesPage();
-    await this.writeFinalDecisionPage.inputAndVerifyPageContentForSchedule2ActivitiesPageData(
-      'reaching',
-      'learningTasks'
-    );
-    await this.writeFinalDecisionPage.submitContinueBtn();
-
-    await this.writeFinalDecisionPage.verifyPageContentForReachingTheAwardPage();
-    await this.writeFinalDecisionPage.inputAndVerifyPageContentForSchedule2ReachingPageData(isAppealAllowed);
-    await this.writeFinalDecisionPage.submitContinueBtn();
-
-    await this.writeFinalDecisionPage.verifyPageContentForCognitiveTheAwardPage();
-    await this.writeFinalDecisionPage.inputAndVerifyPageContentForSchedule2CognitivePageData(isAppealAllowed);
-    await this.writeFinalDecisionPage.submitContinueBtn();
-
-    if (isAppealAllowed) {
-      await this.writeFinalDecisionPage.inputAndVerifyPageContentForSchedule3Activities();
-      await this.writeFinalDecisionPage.submitContinueBtn();
-    }
-    else{
-      await this.writeFinalDecisionPage.inputAndVerifyPageContentForRegulation29Page();
-      await this.writeFinalDecisionPage.submitContinueBtn();
-    }
-
     await this.writeFinalDecisionPage.verifyPageContentForSevereConditionsCriteriaPage();
-    await this.writeFinalDecisionPage.inputAndVerifyPageContentForSevereConditionsCriteriaPageData(sccApplies);
+    await this.writeFinalDecisionPage.inputAndVerifyPageContentForSevereConditionsCriteriaPageDataEsaAppeal(sccApplies);
     await this.writeFinalDecisionPage.submitContinueBtn();
 
     await this.writeFinalDecisionPage.verifyPageContentForBundleSectionReferencePage();
