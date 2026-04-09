@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -180,7 +181,8 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals("", response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode());
+        assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode())
+                .isEqualTo("");
     }
 
     @Test
