@@ -21,8 +21,11 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.APPELLANT;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.OTHER_PARTY;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -85,7 +88,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
     @BeforeEach
     public void setUp() {
         openMocks(this);
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, false);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, false, true);
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
 
         SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("myTest.doc").build()).build();
@@ -177,7 +180,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
     @Test
     void givenDirectionNoticeAlreadyExistsAndThenManuallyUploadANewNotice_thenIssueTheNewDocumentWithFooter() {
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, true);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, true, true);
         sscsCaseData.setPrePostHearing(PrePostHearing.PRE);
         sscsCaseData.getDocumentStaging().setPreviewDocument(null);
 
@@ -551,6 +554,211 @@ class DirectionIssuedAboutToSubmitHandlerTest {
     }
 
     @ParameterizedTest
+    @CsvSource({"confidentialityGrantedSendToAdmin,YES", "confidentialityRefusedSendToAdmin,NO"})
+    void givenDirectionTypeOfConfidentialityDecision_shouldUpdateAppellantConfidentiality(String directionType, YesNo expectedConfidentiality) {
+        callback.getCaseDetails().getCaseData().getAppeal()
+            .setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(directionType));
+        callback.getCaseDetails().getCaseData().getExtendedSscsCaseData()
+            .setSelectedConfidentialityParty(new DynamicList(APPELLANT.getCode()));
+        final LocalDateTime testStart = LocalDateTime.now();
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getData().getAppellant().isPresent());
+        assertEquals(expectedConfidentiality, response.getData().getAppellant().get().getConfidentialityRequired());
+        assertNotNull(response.getData().getAppellant().get().getConfidentialityRequiredChangedDate());
+        assertFalse(response.getData().getAppellant().get().getConfidentialityRequiredChangedDate().isBefore(testStart));
+    }
+
+    @ParameterizedTest
+    @CsvSource({"confidentialityGrantedSendToAdmin,YES", "confidentialityRefusedSendToAdmin,NO"})
+    void givenDirectionTypeOfConfidentialityDecisionForOtherParty_shouldUpdateOnlyReferredOtherParty(
+        String directionType, YesNo expectedConfidentiality) {
+        YesNo startingConfidentiality = expectedConfidentiality == YES ? NO : YES;
+        callback.getCaseDetails().getCaseData().getAppeal()
+            .setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(directionType));
+        callback.getCaseDetails().getCaseData().getExtendedSscsCaseData()
+            .setSelectedConfidentialityParty(new DynamicList(OTHER_PARTY.getCode() + "op1"));
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(NO);
+        callback.getCaseDetails().getCaseData().setOtherParties(List.of(
+            CcdValue.<OtherParty>builder().value(OtherParty.builder().id("op1").confidentialityRequired(startingConfidentiality).build()).build(),
+            CcdValue.<OtherParty>builder().value(OtherParty.builder().id("op2").confidentialityRequired(YES).build()).build()
+        ));
+        final LocalDateTime testStart = LocalDateTime.now();
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(NO, response.getData().getAppeal().getAppellant().getConfidentialityRequired());
+        assertEquals(expectedConfidentiality, response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequired());
+        assertNotNull(response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequiredChangedDate());
+        assertFalse(response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequiredChangedDate().isBefore(testStart));
+        assertEquals(YES, response.getData().getOtherParties().get(1).getValue().getConfidentialityRequired());
+        assertNull(response.getData().getOtherParties().get(1).getValue().getConfidentialityRequiredChangedDate());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"confidentialityGrantedSendToAdmin,YES", "confidentialityRefusedSendToAdmin,NO"})
+    void givenDirectionTypeOfConfidentialityDecisionForAdditionalOtherParty_shouldUpdateOnlySelectedAdditionalOtherParty(
+        String directionType, YesNo expectedConfidentiality) {
+        YesNo startingConfidentiality = expectedConfidentiality == YES ? NO : YES;
+        callback.getCaseDetails().getCaseData().getAppeal()
+            .setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(directionType));
+        callback.getCaseDetails().getCaseData().getExtendedSscsCaseData()
+            .setSelectedConfidentialityParty(new DynamicList(OTHER_PARTY.getCode() + "op2"));
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(NO);
+        callback.getCaseDetails().getCaseData().setOtherParties(List.of(
+            CcdValue.<OtherParty>builder().value(OtherParty.builder().id("op1").confidentialityRequired(NO).build()).build(),
+            CcdValue.<OtherParty>builder().value(OtherParty.builder().id("op2").confidentialityRequired(startingConfidentiality).build()).build(),
+            CcdValue.<OtherParty>builder().value(OtherParty.builder().id("op3").confidentialityRequired(NO).build()).build()
+        ));
+        final LocalDateTime testStart = LocalDateTime.now();
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(NO, response.getData().getAppeal().getAppellant().getConfidentialityRequired());
+        assertEquals(NO, response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequired());
+        assertNull(response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequiredChangedDate());
+        assertEquals(expectedConfidentiality, response.getData().getOtherParties().get(1).getValue().getConfidentialityRequired());
+        assertNotNull(response.getData().getOtherParties().get(1).getValue().getConfidentialityRequiredChangedDate());
+        assertFalse(response.getData().getOtherParties().get(1).getValue().getConfidentialityRequiredChangedDate().isBefore(testStart));
+        assertEquals(NO, response.getData().getOtherParties().get(2).getValue().getConfidentialityRequired());
+        assertNull(response.getData().getOtherParties().get(2).getValue().getConfidentialityRequiredChangedDate());
+    }
+
+    @Test
+    void givenConfidentialityDecisionForOneReferredParty_shouldNotUpdateNonReferredParties() {
+        callback.getCaseDetails().getCaseData().getAppeal()
+            .setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString()));
+        callback.getCaseDetails().getCaseData().getExtendedSscsCaseData()
+            .setSelectedConfidentialityParty(new DynamicList(OTHER_PARTY.getCode() + "op3"));
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(YES);
+        callback.getCaseDetails().getCaseData().setOtherParties(List.of(
+            CcdValue.<OtherParty>builder().value(OtherParty.builder().id("op1").confidentialityRequired(NO).build()).build(),
+            CcdValue.<OtherParty>builder().value(OtherParty.builder().id("op2").confidentialityRequired(YES).build()).build(),
+            CcdValue.<OtherParty>builder().value(OtherParty.builder().id("op3").confidentialityRequired(NO).build()).build()
+        ));
+        final LocalDateTime testStart = LocalDateTime.now();
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(YES, response.getData().getAppeal().getAppellant().getConfidentialityRequired());
+        assertEquals(NO, response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequired());
+        assertNull(response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequiredChangedDate());
+        assertEquals(YES, response.getData().getOtherParties().get(1).getValue().getConfidentialityRequired());
+        assertNull(response.getData().getOtherParties().get(1).getValue().getConfidentialityRequiredChangedDate());
+        assertEquals(YES, response.getData().getOtherParties().get(2).getValue().getConfidentialityRequired());
+        assertNotNull(response.getData().getOtherParties().get(2).getValue().getConfidentialityRequiredChangedDate());
+        assertFalse(response.getData().getOtherParties().get(2).getValue().getConfidentialityRequiredChangedDate().isBefore(testStart));
+    }
+
+    @Test
+    void givenOtherPartyRepresentativeIdSelected_shouldNotUpdateAnyOtherPartyConfidentiality() {
+        callback.getCaseDetails().getCaseData().getAppeal()
+            .setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(
+            new DynamicList(DirectionType.CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString()));
+        callback.getCaseDetails().getCaseData().getExtendedSscsCaseData()
+            .setSelectedConfidentialityParty(new DynamicList(OTHER_PARTY.getCode() + "rep-1"));
+
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(NO);
+        callback.getCaseDetails().getCaseData().setOtherParties(List.of(
+            CcdValue.<OtherParty>builder()
+                .value(OtherParty.builder()
+                    .id("op1")
+                    .confidentialityRequired(NO)
+                    .rep(Representative.builder().id("rep-1").build())
+                    .build())
+                .build(),
+            CcdValue.<OtherParty>builder()
+                .value(OtherParty.builder().id("op2").confidentialityRequired(YES).build())
+                .build()
+        ));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(NO, response.getData().getAppeal().getAppellant().getConfidentialityRequired());
+        assertNull(response.getData().getAppeal().getAppellant().getConfidentialityRequiredChangedDate());
+        assertEquals(NO, response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequired());
+        assertNull(response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequiredChangedDate());
+        assertEquals(YES, response.getData().getOtherParties().get(1).getValue().getConfidentialityRequired());
+        assertNull(response.getData().getOtherParties().get(1).getValue().getConfidentialityRequiredChangedDate());
+    }
+
+    @Test
+    void givenDirectionTypeOfConfidentialityDecisionForNonConfidentialityTabBenefit_shouldNotUpdateConfidentiality() {
+        callback.getCaseDetails().getCaseData().getAppeal()
+            .setBenefitType(BenefitType.builder().code("pip").build());
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(
+            new DynamicList(DirectionType.CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString()));
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(NO);
+        callback.getCaseDetails().getCaseData().setOtherParties(List.of(
+            CcdValue.<OtherParty>builder().value(OtherParty.builder().id("op1").confidentialityRequired(NO).build()).build()
+        ));
+        callback.getCaseDetails().getCaseData().getExtendedSscsCaseData()
+            .setSelectedConfidentialityParty(new DynamicList(OTHER_PARTY.getCode() + "op1"));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(NO, response.getData().getAppeal().getAppellant().getConfidentialityRequired());
+        assertNull(response.getData().getAppeal().getAppellant().getConfidentialityRequiredChangedDate());
+        assertEquals(NO, response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequired());
+        assertNull(response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequiredChangedDate());
+    }
+
+    @Test
+    void givenOtherPartySelectedWithoutId_shouldNotUpdateAnyPartyConfidentiality() {
+        callback.getCaseDetails().getCaseData().getAppeal()
+            .setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(
+            new DynamicList(DirectionType.CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString()));
+        callback.getCaseDetails().getCaseData().getExtendedSscsCaseData()
+            .setSelectedConfidentialityParty(new DynamicList(OTHER_PARTY.getCode()));
+
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(NO);
+        callback.getCaseDetails().getCaseData().setOtherParties(List.of(
+            CcdValue.<OtherParty>builder().value(OtherParty.builder().id("op1").confidentialityRequired(NO).build()).build(),
+            CcdValue.<OtherParty>builder().value(OtherParty.builder().id("op2").confidentialityRequired(YES).build()).build()
+        ));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(NO, response.getData().getAppeal().getAppellant().getConfidentialityRequired());
+        assertNull(response.getData().getAppeal().getAppellant().getConfidentialityRequiredChangedDate());
+        assertEquals(NO, response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequired());
+        assertNull(response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequiredChangedDate());
+        assertEquals(YES, response.getData().getOtherParties().get(1).getValue().getConfidentialityRequired());
+        assertNull(response.getData().getOtherParties().get(1).getValue().getConfidentialityRequiredChangedDate());
+    }
+
+    @Test
+    void givenConfidentialityDirectionWithoutTypeCode_shouldNotUpdateAnyPartyConfidentiality() {
+        callback.getCaseDetails().getCaseData().getAppeal()
+            .setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(""));
+        callback.getCaseDetails().getCaseData().getExtendedSscsCaseData()
+            .setSelectedConfidentialityParty(new DynamicList(OTHER_PARTY.getCode() + "op1"));
+
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(NO);
+        callback.getCaseDetails().getCaseData().setOtherParties(List.of(
+            CcdValue.<OtherParty>builder().value(OtherParty.builder().id("op1").confidentialityRequired(NO).build()).build(),
+            CcdValue.<OtherParty>builder().value(OtherParty.builder().id("op2").confidentialityRequired(YES).build()).build()
+        ));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(NO, response.getData().getAppeal().getAppellant().getConfidentialityRequired());
+        assertNull(response.getData().getAppeal().getAppellant().getConfidentialityRequiredChangedDate());
+        assertEquals(NO, response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequired());
+        assertNull(response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequiredChangedDate());
+        assertEquals(YES, response.getData().getOtherParties().get(1).getValue().getConfidentialityRequired());
+        assertNull(response.getData().getOtherParties().get(1).getValue().getConfidentialityRequiredChangedDate());
+    }
+
+    @ParameterizedTest
     @ValueSource(strings = {"file.png", "file.jpg", "file.doc"})
     void givenManuallyUploadedFileIsNotAPdf_thenAddAnErrorToResponse(String filename) {
         sscsCaseData.getDocumentStaging().setPreviewDocument(null);
@@ -706,7 +914,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
     @Test
     void shouldClearInterlocReferralReason() {
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, true);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, true, true);
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_CORRECTION_APPLICATION);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
