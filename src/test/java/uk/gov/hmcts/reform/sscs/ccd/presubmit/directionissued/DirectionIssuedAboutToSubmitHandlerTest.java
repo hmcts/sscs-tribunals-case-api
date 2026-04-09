@@ -88,7 +88,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
     @BeforeEach
     public void setUp() {
         openMocks(this);
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, false);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, false, true);
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
 
         SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("myTest.doc").build()).build();
@@ -180,7 +180,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
     @Test
     void givenDirectionNoticeAlreadyExistsAndThenManuallyUploadANewNotice_thenIssueTheNewDocumentWithFooter() {
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, true);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, true, true);
         sscsCaseData.setPrePostHearing(PrePostHearing.PRE);
         sscsCaseData.getDocumentStaging().setPreviewDocument(null);
 
@@ -914,7 +914,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
     @Test
     void shouldClearInterlocReferralReason() {
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, true);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, true, true);
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_CORRECTION_APPLICATION);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);

@@ -54,18 +54,22 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private final int dwpResponseDueDaysChildSupport;
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
+    @Value("${feature.cm-other-party-confidentiality.enabled}")
+    private final boolean cmOtherPartyConfidentialityEnabled;
 
     @Autowired
     public DirectionIssuedAboutToSubmitHandler(FooterService footerService,
                                                DwpAddressLookupService dwpAddressLookupService,
                                                @Value("${dwp.response.due.days}") int dwpResponseDueDays,
                                                @Value("${dwp.response.due.days-child-support}") int dwpResponseDueDaysChildSupport,
-                                               @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled) {
+                                               @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled,
+                                               @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
         this.footerService = footerService;
         this.dwpAddressLookupService = dwpAddressLookupService;
         this.dwpResponseDueDays = dwpResponseDueDays;
         this.dwpResponseDueDaysChildSupport = dwpResponseDueDaysChildSupport;
         this.isPostHearingsEnabled = isPostHearingsEnabled;
+        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
 
     @Override
@@ -197,7 +201,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         } else if (DirectionType.ISSUE_AND_SEND_TO_ADMIN.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION);
         } else if (isConfidentialityDirection(caseData.getDirectionTypeDl().getValue().getCode())) {
-            if (isBenefitTypeWithConfidentialityTab(caseData)) {
+            if (cmOtherPartyConfidentialityEnabled && isBenefitTypeWithConfidentialityTab(caseData)) {
                 applyConfidentialityDecisionFromDirection(caseData);
             }
             caseData.setInterlocReviewState(null);
