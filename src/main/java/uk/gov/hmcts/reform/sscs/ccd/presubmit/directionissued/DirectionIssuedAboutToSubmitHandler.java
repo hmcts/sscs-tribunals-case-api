@@ -200,10 +200,10 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             caseData.setInterlocReferralReason(REJECT_HEARING_RECORDING_REQUEST);
         } else if (DirectionType.ISSUE_AND_SEND_TO_ADMIN.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION);
-        } else if (isConfidentialityDirection(caseData.getDirectionTypeDl().getValue().getCode())) {
-            if (cmOtherPartyConfidentialityEnabled && isBenefitTypeWithConfidentialityTab(caseData)) {
-                applyConfidentialityDecisionFromDirection(caseData);
-            }
+        } else if (cmOtherPartyConfidentialityEnabled
+            && isConfidentialityDirection(caseData.getDirectionTypeDl().getValue().getCode())
+            && isBenefitTypeWithConfidentialityTab(caseData)) {
+            applyConfidentialityDecisionFromDirection(caseData);
             caseData.setInterlocReviewState(null);
             return caseData;
         } else {
