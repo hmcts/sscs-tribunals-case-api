@@ -674,14 +674,19 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(NO, response.getData().getAppeal().getAppellant().getConfidentialityRequired());
-        assertEquals(NO, response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequired());
-        assertNull(response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequiredChangedDate());
-        assertEquals(expectedConfidentiality, response.getData().getOtherParties().get(1).getValue().getConfidentialityRequired());
-        assertNotNull(response.getData().getOtherParties().get(1).getValue().getConfidentialityRequiredChangedDate());
-        assertFalse(response.getData().getOtherParties().get(1).getValue().getConfidentialityRequiredChangedDate().isBefore(testStart));
-        assertEquals(NO, response.getData().getOtherParties().get(2).getValue().getConfidentialityRequired());
-        assertNull(response.getData().getOtherParties().get(2).getValue().getConfidentialityRequiredChangedDate());
+        OtherParty firstOtherParty = response.getData().getOtherParties().getFirst().getValue();
+        OtherParty selectedOtherParty = response.getData().getOtherParties().get(1).getValue();
+        OtherParty thirdOtherParty = response.getData().getOtherParties().get(2).getValue();
+
+        assertThat(response.getData().getAppeal().getAppellant().getConfidentialityRequired()).isEqualTo(NO);
+        assertThat(firstOtherParty.getConfidentialityRequired()).isEqualTo(NO);
+        assertThat(firstOtherParty.getConfidentialityRequiredChangedDate()).isNull();
+        assertThat(selectedOtherParty.getConfidentialityRequired()).isEqualTo(expectedConfidentiality);
+        assertThat(selectedOtherParty.getConfidentialityRequiredChangedDate())
+            .isNotNull()
+            .isAfterOrEqualTo(testStart);
+        assertThat(thirdOtherParty.getConfidentialityRequired()).isEqualTo(NO);
+        assertThat(thirdOtherParty.getConfidentialityRequiredChangedDate()).isNull();
     }
 
     @Test
@@ -701,14 +706,19 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(YES, response.getData().getAppeal().getAppellant().getConfidentialityRequired());
-        assertEquals(NO, response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequired());
-        assertNull(response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequiredChangedDate());
-        assertEquals(YES, response.getData().getOtherParties().get(1).getValue().getConfidentialityRequired());
-        assertNull(response.getData().getOtherParties().get(1).getValue().getConfidentialityRequiredChangedDate());
-        assertEquals(YES, response.getData().getOtherParties().get(2).getValue().getConfidentialityRequired());
-        assertNotNull(response.getData().getOtherParties().get(2).getValue().getConfidentialityRequiredChangedDate());
-        assertFalse(response.getData().getOtherParties().get(2).getValue().getConfidentialityRequiredChangedDate().isBefore(testStart));
+        OtherParty firstOtherParty = response.getData().getOtherParties().getFirst().getValue();
+        OtherParty secondOtherParty = response.getData().getOtherParties().get(1).getValue();
+        OtherParty referredOtherParty = response.getData().getOtherParties().get(2).getValue();
+
+        assertThat(response.getData().getAppeal().getAppellant().getConfidentialityRequired()).isEqualTo(YES);
+        assertThat(firstOtherParty.getConfidentialityRequired()).isEqualTo(NO);
+        assertThat(firstOtherParty.getConfidentialityRequiredChangedDate()).isNull();
+        assertThat(secondOtherParty.getConfidentialityRequired()).isEqualTo(YES);
+        assertThat(secondOtherParty.getConfidentialityRequiredChangedDate()).isNull();
+        assertThat(referredOtherParty.getConfidentialityRequired()).isEqualTo(YES);
+        assertThat(referredOtherParty.getConfidentialityRequiredChangedDate())
+            .isNotNull()
+            .isAfterOrEqualTo(testStart);
     }
 
     @Test
@@ -736,12 +746,15 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(NO, response.getData().getAppeal().getAppellant().getConfidentialityRequired());
-        assertNull(response.getData().getAppeal().getAppellant().getConfidentialityRequiredChangedDate());
-        assertEquals(NO, response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequired());
-        assertNull(response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequiredChangedDate());
-        assertEquals(YES, response.getData().getOtherParties().get(1).getValue().getConfidentialityRequired());
-        assertNull(response.getData().getOtherParties().get(1).getValue().getConfidentialityRequiredChangedDate());
+        OtherParty firstOtherParty = response.getData().getOtherParties().getFirst().getValue();
+        OtherParty secondOtherParty = response.getData().getOtherParties().get(1).getValue();
+
+        assertThat(response.getData().getAppeal().getAppellant().getConfidentialityRequired()).isEqualTo(NO);
+        assertThat(response.getData().getAppeal().getAppellant().getConfidentialityRequiredChangedDate()).isNull();
+        assertThat(firstOtherParty.getConfidentialityRequired()).isEqualTo(NO);
+        assertThat(firstOtherParty.getConfidentialityRequiredChangedDate()).isNull();
+        assertThat(secondOtherParty.getConfidentialityRequired()).isEqualTo(YES);
+        assertThat(secondOtherParty.getConfidentialityRequiredChangedDate()).isNull();
     }
 
     @Test
@@ -759,10 +772,12 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(NO, response.getData().getAppeal().getAppellant().getConfidentialityRequired());
-        assertNull(response.getData().getAppeal().getAppellant().getConfidentialityRequiredChangedDate());
-        assertEquals(NO, response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequired());
-        assertNull(response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequiredChangedDate());
+        OtherParty firstOtherParty = response.getData().getOtherParties().getFirst().getValue();
+
+        assertThat(response.getData().getAppeal().getAppellant().getConfidentialityRequired()).isEqualTo(NO);
+        assertThat(response.getData().getAppeal().getAppellant().getConfidentialityRequiredChangedDate()).isNull();
+        assertThat(firstOtherParty.getConfidentialityRequired()).isEqualTo(NO);
+        assertThat(firstOtherParty.getConfidentialityRequiredChangedDate()).isNull();
     }
 
     @Test
@@ -782,12 +797,15 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(NO, response.getData().getAppeal().getAppellant().getConfidentialityRequired());
-        assertNull(response.getData().getAppeal().getAppellant().getConfidentialityRequiredChangedDate());
-        assertEquals(NO, response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequired());
-        assertNull(response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequiredChangedDate());
-        assertEquals(YES, response.getData().getOtherParties().get(1).getValue().getConfidentialityRequired());
-        assertNull(response.getData().getOtherParties().get(1).getValue().getConfidentialityRequiredChangedDate());
+        OtherParty firstOtherParty = response.getData().getOtherParties().getFirst().getValue();
+        OtherParty secondOtherParty = response.getData().getOtherParties().get(1).getValue();
+
+        assertThat(response.getData().getAppeal().getAppellant().getConfidentialityRequired()).isEqualTo(NO);
+        assertThat(response.getData().getAppeal().getAppellant().getConfidentialityRequiredChangedDate()).isNull();
+        assertThat(firstOtherParty.getConfidentialityRequired()).isEqualTo(NO);
+        assertThat(firstOtherParty.getConfidentialityRequiredChangedDate()).isNull();
+        assertThat(secondOtherParty.getConfidentialityRequired()).isEqualTo(YES);
+        assertThat(secondOtherParty.getConfidentialityRequiredChangedDate()).isNull();
     }
 
     @Test
@@ -806,12 +824,15 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(NO, response.getData().getAppeal().getAppellant().getConfidentialityRequired());
-        assertNull(response.getData().getAppeal().getAppellant().getConfidentialityRequiredChangedDate());
-        assertEquals(NO, response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequired());
-        assertNull(response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequiredChangedDate());
-        assertEquals(YES, response.getData().getOtherParties().get(1).getValue().getConfidentialityRequired());
-        assertNull(response.getData().getOtherParties().get(1).getValue().getConfidentialityRequiredChangedDate());
+        OtherParty firstOtherParty = response.getData().getOtherParties().getFirst().getValue();
+        OtherParty secondOtherParty = response.getData().getOtherParties().get(1).getValue();
+
+        assertThat(response.getData().getAppeal().getAppellant().getConfidentialityRequired()).isEqualTo(NO);
+        assertThat(response.getData().getAppeal().getAppellant().getConfidentialityRequiredChangedDate()).isNull();
+        assertThat(firstOtherParty.getConfidentialityRequired()).isEqualTo(NO);
+        assertThat(firstOtherParty.getConfidentialityRequiredChangedDate()).isNull();
+        assertThat(secondOtherParty.getConfidentialityRequired()).isEqualTo(YES);
+        assertThat(secondOtherParty.getConfidentialityRequiredChangedDate()).isNull();
     }
 
     @ParameterizedTest
