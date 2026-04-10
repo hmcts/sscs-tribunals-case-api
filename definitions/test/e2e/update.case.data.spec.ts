@@ -11,7 +11,7 @@ test.describe('Update case data test', async () => {
       caseId = await createCaseBasedOnCaseType('PIP');
     });
 
-    test('PIP Case - Update & Verify Joh Tiers/Duration', { tag: '@nightly-pipeline' }, async ({ createUpdateToCaseDataSteps }) => {
+    test('PIP Case - Update', { tag: '@nightly-pipeline' }, async ({ createUpdateToCaseDataSteps }) => {
         await createUpdateToCaseDataSteps.updateToNonIBCCaseDataEvent(caseId, updateData);
         await createUpdateToCaseDataSteps.verifyNonIBCAppealDetailsTab(updateData);
     });
