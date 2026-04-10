@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
 import static java.util.Collections.emptySet;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -565,10 +566,12 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertTrue(response.getData().getAppellant().isPresent());
-        assertEquals(expectedConfidentiality, response.getData().getAppellant().get().getConfidentialityRequired());
-        assertNotNull(response.getData().getAppellant().get().getConfidentialityRequiredChangedDate());
-        assertFalse(response.getData().getAppellant().get().getConfidentialityRequiredChangedDate().isBefore(testStart));
+        assertThat(response.getData().getAppellant()).isPresent();
+        Appellant updatedAppellant = response.getData().getAppellant().orElseThrow();
+        assertThat(updatedAppellant.getConfidentialityRequired()).isEqualTo(expectedConfidentiality);
+        assertThat(updatedAppellant.getConfidentialityRequiredChangedDate())
+            .isNotNull()
+            .isAfterOrEqualTo(testStart);
     }
 
     @ParameterizedTest
@@ -590,12 +593,65 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(NO, response.getData().getAppeal().getAppellant().getConfidentialityRequired());
-        assertEquals(expectedConfidentiality, response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequired());
-        assertNotNull(response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequiredChangedDate());
-        assertFalse(response.getData().getOtherParties().getFirst().getValue().getConfidentialityRequiredChangedDate().isBefore(testStart));
-        assertEquals(YES, response.getData().getOtherParties().get(1).getValue().getConfidentialityRequired());
-        assertNull(response.getData().getOtherParties().get(1).getValue().getConfidentialityRequiredChangedDate());
+        OtherParty referredParty = response.getData().getOtherParties().getFirst().getValue();
+        OtherParty nonReferredParty = response.getData().getOtherParties().get(1).getValue();
+
+        assertThat(response.getData().getAppeal().getAppellant().getConfidentialityRequired()).isEqualTo(NO);
+        assertThat(referredParty.getConfidentialityRequired()).isEqualTo(expectedConfidentiality);
+        assertThat(referredParty.getConfidentialityRequiredChangedDate())
+            .isNotNull()
+            .isAfterOrEqualTo(testStart);
+        assertThat(nonReferredParty.getConfidentialityRequired()).isEqualTo(YES);
+        assertThat(nonReferredParty.getConfidentialityRequiredChangedDate()).isNull();
+    }
+
+    @Test
+    void givenDirectionTypeOfConfidentialityDecisionForAppellantWhenValueUnchanged_shouldNotUpdateChangedDate() {
+        callback.getCaseDetails().getCaseData().getAppeal()
+            .setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(
+            new DynamicList(DirectionType.CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString()));
+        callback.getCaseDetails().getCaseData().getExtendedSscsCaseData()
+            .setSelectedConfidentialityParty(new DynamicList(APPELLANT.getCode()));
+
+        LocalDateTime existingChangedDate = LocalDateTime.now().minusDays(2);
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(YES);
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequiredChangedDate(existingChangedDate);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        Appellant updatedAppellant = response.getData().getAppellant().orElseThrow();
+        assertThat(updatedAppellant.getConfidentialityRequired()).isEqualTo(YES);
+        assertThat(updatedAppellant.getConfidentialityRequiredChangedDate()).isEqualTo(existingChangedDate);
+    }
+
+    @Test
+    void givenDirectionTypeOfConfidentialityDecisionForOtherPartyWhenValueUnchanged_shouldNotUpdateChangedDate() {
+        callback.getCaseDetails().getCaseData().getAppeal()
+            .setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(
+            new DynamicList(DirectionType.CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN.toString()));
+        callback.getCaseDetails().getCaseData().getExtendedSscsCaseData()
+            .setSelectedConfidentialityParty(new DynamicList(OTHER_PARTY.getCode() + "op1"));
+
+        OtherParty targetOtherParty = OtherParty.builder().id("op1").confidentialityRequired(NO).build();
+        LocalDateTime existingChangedDate = LocalDateTime.now().minusDays(2);
+        targetOtherParty.setConfidentialityRequiredChangedDate(existingChangedDate);
+
+        callback.getCaseDetails().getCaseData().setOtherParties(List.of(
+            CcdValue.<OtherParty>builder().value(targetOtherParty).build(),
+            CcdValue.<OtherParty>builder().value(OtherParty.builder().id("op2").confidentialityRequired(YES).build()).build()
+        ));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        OtherParty updatedTarget = response.getData().getOtherParties().getFirst().getValue();
+        OtherParty untouchedOtherParty = response.getData().getOtherParties().get(1).getValue();
+
+        assertThat(updatedTarget.getConfidentialityRequired()).isEqualTo(NO);
+        assertThat(updatedTarget.getConfidentialityRequiredChangedDate()).isEqualTo(existingChangedDate);
+        assertThat(untouchedOtherParty.getConfidentialityRequired()).isEqualTo(YES);
+        assertThat(untouchedOtherParty.getConfidentialityRequiredChangedDate()).isNull();
     }
 
     @ParameterizedTest
