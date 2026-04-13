@@ -183,7 +183,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
         EsaDecisionNoticeQuestionService esaDecisionNoticeQuestionService = new EsaDecisionNoticeQuestionService();
 
         final EsaWriteFinalDecisionPreviewDecisionService previewDecisionService = new EsaWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
-            esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
+            esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader, false);
 
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -225,7 +225,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
         when(esaDecisionNoticeOutcomeService.getBenefitType()).thenReturn("ESA");
 
         final EsaWriteFinalDecisionPreviewDecisionService previewDecisionService = new EsaWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
-            esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
+            esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader, false);
 
         when(generateFile.assemble(any())).thenReturn(URL);
         sscsCaseData.setWcaAppeal(NO);
