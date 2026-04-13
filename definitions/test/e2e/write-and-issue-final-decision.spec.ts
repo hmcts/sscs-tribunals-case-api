@@ -101,7 +101,7 @@ test.describe(
       );
       await issueFinalDecisionSteps.performIssueFinalDecisionForAnAppeal();
     });
-    test.skip("Issue Final Decision - SV issue code - 'Yes' notice generated - Appeal 'Allowed' - SCC appeal 'Yes' - SCC applies 'Yes'", async ({
+    test("Issue Final Decision - SV issue code - 'Yes' notice generated - Appeal 'Allowed' - SCC appeal 'Yes' - SCC applies 'Yes'", async ({
       uploadResponseSteps, issueFinalDecisionSteps
     }) => {
       let universalCreditCaseId = await createCaseBasedOnCaseType('UC');
@@ -112,7 +112,7 @@ test.describe(
       await issueFinalDecisionSteps.verifyAppealDormantAfterIssueFinalDecisionEvent();
 
     });
-    test.skip("Issue Final Decision - SV issue code - 'Yes' notice generated - Appeal 'Refused' - SCC appeal 'Yes' - SCC applies 'No'", async ({
+    test("Issue Final Decision - SV issue code - 'Yes' notice generated - Appeal 'Refused' - SCC appeal 'Yes' - SCC applies 'No'", async ({
       uploadResponseSteps, issueFinalDecisionSteps
     }) => {
       let universalCreditCaseId = await createCaseBasedOnCaseType('UC');
@@ -160,7 +160,7 @@ test.describe(
       await issueFinalDecisionSteps.verifyFinalDecisionForAnAppeal();
     });
 
-    test.skip("Issue Final Decision - 'Yes' notice generated - Appeal Allowed - SCC appeal 'Yes' - SCC apply 'Yes'", async ({
+    test("Issue Final Decision - 'Yes' notice generated - Appeal Allowed - SCC appeal 'Yes' - SCC apply 'Yes'", async ({
       uploadResponseSteps, issueFinalDecisionSteps
     }) => {
       let esaCaseId = await createCaseBasedOnCaseType('ESA');
@@ -175,7 +175,7 @@ test.describe(
       await issueFinalDecisionSteps.verifyAppealDormantAfterIssueFinalDecisionEvent();
     });
 
-    test.skip("Issue Final Decision - 'Yes' notice generated - Appeal Refused - SCC appeal 'Yes' - SCC apply 'No'", async ({
+    test("Issue Final Decision - 'Yes' notice generated - Appeal Refused - SCC appeal 'Yes' - SCC apply 'No'", async ({
       uploadResponseSteps, issueFinalDecisionSteps
     }) => {
       let esaCaseId = await createCaseBasedOnCaseType('ESA');
