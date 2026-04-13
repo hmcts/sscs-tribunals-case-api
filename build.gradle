@@ -368,7 +368,11 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'pdf-service-client', version: '8.0.2'
     implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '5.1.1'
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.3'
+<<<<<<< SSCSFT-137-based-on-144-with-136
     implementation group: 'com.github.hmcts', name: 'sscs-common', version: '0fd66d7'
+=======
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '6.3.38'
+>>>>>>> master
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '8.0.0'
 
     implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.2.1-RELEASE'
