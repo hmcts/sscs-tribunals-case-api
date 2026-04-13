@@ -67,11 +67,9 @@
     "wantsToAttend": true,
     "wantsSupport": true,
     "anythingElse": "Yes, this...",
-    "interpreterLanguageType": "An interpreter language",
-    "signLanguageType": "A sign language",
     "arrangements": {
-      "languageInterpreter": true,
-      "signLanguageInterpreter": true,
+      "languageInterpreter": false,
+      "signLanguageInterpreter": false,
       "hearingLoop": true,
       "accessibleHearingRoom": false,
       "other": true
