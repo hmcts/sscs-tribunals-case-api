@@ -2,7 +2,6 @@ import { test } from '../lib/steps.factory';
 import createCaseBasedOnCaseType from '../api/client/sscs/factory/appeal.type.factory';
 import { credentials } from '../config/config';
 import dateUtilsComponent from '../utils/DateUtilsComponent';
-import performAppealDormantOnCase from '../api/client/sscs/appeal.event';
 
 let caseId: string;
 
@@ -64,7 +63,6 @@ test.describe(
         );
         await manageDocumentsSteps.verifyFileInTab(tab, documentType, fileName);
         await issueFinalDecisionSteps.performIssueFinalDecisionForAnAppeal();
-        await performAppealDormantOnCase(pipCaseId);
       }
     );
   }
@@ -84,7 +82,6 @@ test.describe(
           taxCreditCaseId
         );
         await issueFinalDecisionSteps.performIssueFinalDecisionForAnAppeal();
-        await performAppealDormantOnCase(taxCreditCaseId);
       }
     );
   }
@@ -103,7 +100,6 @@ test.describe(
         universalCreditCaseId
       );
       await issueFinalDecisionSteps.performIssueFinalDecisionForAnAppeal();
-      await performAppealDormantOnCase(universalCreditCaseId);
     });
     test.skip("Issue Final Decision - SV issue code - 'Yes' notice generated - Appeal 'Allowed' - SCC appeal 'Yes' - SCC applies 'Yes'", async ({
       uploadResponseSteps, issueFinalDecisionSteps
