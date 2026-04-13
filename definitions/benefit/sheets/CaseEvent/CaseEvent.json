@@ -327,19 +327,6 @@
   {
     "LiveFrom": "01/01/2018",
     "CaseTypeID": "Benefit",
-    "ID": "adminSendToValidAppeal",
-    "Name": "Admin - send to Valid",
-    "DisplayOrder": 250,
-    "PreConditionState(s)": "appealCreated;dormantAppealState;postHearing;withUT;draft;draftArchived;hearing;incompleteApplication;incompleteApplicationInformationReqsted;interlocutoryReviewState;readyToList;responseReceived;voidState;withDwp;notListable;handlingError",
-    "PostConditionState": "validAppeal",
-    "ShowEventNotes": "Y",
-    "SecurityClassification": "Public",
-    "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/sendNotification",
-    "Publish": "N"
-  },
-  {
-    "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
     "ID": "adminSendToVoidState",
     "Name": "Admin - send to Void",
     "DisplayOrder": 260,

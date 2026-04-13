@@ -1,3 +1,15 @@
 [
+  {
+    "LiveFrom": "01/01/2018",
+    "CaseTypeID": "Benefit",
+    "ID": "adminSendToValidAppeal",
+    "Name": "Admin - send to Valid",
+    "DisplayOrder": 250,
+    "PreConditionState(s)": "appealCreated;dormantAppealState;postHearing;withUT;draft;draftArchived;hearing;incompleteApplication;incompleteApplicationInformationReqsted;interlocutoryReviewState;readyToList;responseReceived;voidState;withDwp;notListable;handlingError",
+    "PostConditionState": "validAppeal",
+    "ShowEventNotes": "Y",
+    "SecurityClassification": "Public",
+    "Publish": "N"
+  }
 ]
 
