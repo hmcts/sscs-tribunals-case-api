@@ -1,0 +1,8 @@
+ {
+    "appellantDetails": {
+      "nameDetails": {
+        "firstName": "firstname_updated",
+        "lastName": "lastname_updated"
+      }
+    }
+ }
