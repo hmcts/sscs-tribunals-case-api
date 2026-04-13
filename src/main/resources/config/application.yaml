@@ -284,7 +284,7 @@ feature:
     cm-other-party-confidentiality:
         enabled: ${CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED:false}
     severeConditions:
-        enabled: ${SEVERE_CONDITIONS_FEATURE:false}
+        enabled: ${SEVERE_CONDITIONS_FEATURE:true}
 
 idam:
     api:
