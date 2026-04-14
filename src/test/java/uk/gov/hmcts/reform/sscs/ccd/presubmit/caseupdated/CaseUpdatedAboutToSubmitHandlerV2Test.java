@@ -779,6 +779,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         when(venueService.getEpimsIdForVenue(venueB)).thenReturn(venueBEpimsId);
         when(venueService.getEpimsIdForVenue(venueA)).thenReturn(venueAEpimsId);
         when(venueService.getVenueDetailsForActiveVenueByEpimsId(venueBEpimsId)).thenReturn(VenueDetails.builder().venName(venueB).legacyVenue(venueA).build());
+        when(venueService.getVenueDetailsForActiveVenueByEpimsId(venueAEpimsId)).thenReturn(VenueDetails.builder().venName(venueA).build());
         when(airLookupService.lookupAirVenueNameByPostCode("AB12 00B", sscsCaseData.getAppeal().getBenefitType())).thenReturn(
                 venueB);
 
