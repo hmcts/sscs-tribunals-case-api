@@ -283,7 +283,6 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
     }
 
     @Test
-    @EnabledIfEnvironmentVariable(named = "SEVERE_CONDITIONS_FEATURE", matches = "true")
     public void scenario13_allowed_WcaAppeal_SvIssueCode_SevereCriteriaApply() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedWcaAppealWithSvIssueCodeAndSevereCriteriaApply.json");
         json = json.replaceFirst("writeFinalDecisionSevereCriteriaApplyCondition", "Yes");
@@ -303,7 +302,6 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
     }
 
     @Test
-    @EnabledIfEnvironmentVariable(named = "SEVERE_CONDITIONS_FEATURE", matches = "true")
     public void scenario13_refused_WcaAppeal_SvIssueCode_SevereCriteriaDoNotApply() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedWcaAppealWithSvIssueCodeAndSevereCriteriaApply.json");
         json = json.replaceFirst("allowed", "refused");
@@ -324,7 +322,6 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
     }
 
     @Test
-    @EnabledIfEnvironmentVariable(named = "SEVERE_CONDITIONS_FEATURE", matches = "true")
     public void scenario4_allowed_WcaAppeal_SupportGroupOnly_Schedule7Activities_SevereCriteriaDoNotApply() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedIsSupportGroupSch7SelectionMadeCallback.json");
         json = json.replaceFirst("writeFinalDecisionSevereCriteriaApplyCondition", "No");
@@ -348,7 +345,6 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
     }
 
     @Test
-    @EnabledIfEnvironmentVariable(named = "SEVERE_CONDITIONS_FEATURE", matches = "true")
     public void scenario6_allowed_WcaAppeal_moreThan15Points_Schedule7_SevereCriteriaApply() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedNoSupportGroupMoreThan15PointsSch7SelectionSevereCriteria.json");
         byte[] bytes = callPreviewFinalDecision(json);
@@ -374,7 +370,6 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
     }
 
     @Test
-    @EnabledIfEnvironmentVariable(named = "SEVERE_CONDITIONS_FEATURE", matches = "true")
     public void scenario9_allowed_WcaAppeal_lessThan15Points_Sch8Para4_Schedule7_SevereCriteriaApply() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedNoSupportGroupLessThan15PointsSch8Para4Sch7SevereCriteria.json");
         byte[] bytes = callPreviewFinalDecision(json);
