@@ -58,15 +58,21 @@ export class CreateUpdateToCaseDataPage {
     await this.page.getByLabel('MRN/Review Decision Notice Late Reason (Optional)').fill(mrnOrReviewDecisionNoticeDetails.lateReason);
   }
 
+  async updateAppellantDetails(formData: any): Promise<void> {
+    await this.page.locator('#appeal_appellant_name_firstName').fill(formData.appellantDetails.nameDetails.firstName);
+    await this.page.locator('#appeal_appellant_name_lastName').fill(formData.appellantDetails.nameDetails.lastName);
+    await webAction.clickButton('Submit');
+  }
+
   async enterAppellantDetails(appellantData): Promise<void> {
     await this.page.locator('#appeal_appellant_name_title').fill(appellantData.nameDetails.title);
     await this.page.locator('#appeal_appellant_name_firstName').fill(appellantData.nameDetails.firstName);
     await this.page.locator('#appeal_appellant_name_middleName').fill(appellantData.nameDetails.middleName);
     await this.page.locator('#appeal_appellant_name_lastName').fill(appellantData.nameDetails.lastName);
 
-    await this.page.getByRole('textbox', { name: 'Day Day Day' }).fill(appellantData.identityDetails.dob.split('-')[0]);
-    await this.page.getByRole('textbox', { name: 'Month Month Month' }).fill(appellantData.identityDetails.dob.split('-')[1]);
-    await this.page.getByRole('textbox', { name: 'Year Year Year' }).fill(appellantData.identityDetails.dob.split('-')[2]);
+    await this.page.locator('#mrnDate-day').fill(appellantData.identityDetails.dob.split('-')[0]);
+    await this.page.locator('#mrnDate-month').fill(appellantData.identityDetails.dob.split('-')[1]);
+    await this.page.locator('#mrnDate-year').fill(appellantData.identityDetails.dob.split('-')[2]);
     await this.page.locator('#appeal_appellant_identity_ibcaReference').fill(appellantData.identityDetails.ibcaReferenceNumber);
 
     await this.page.locator('#appeal_appellant_address_line1').fill(appellantData.addressDetails.line1);
