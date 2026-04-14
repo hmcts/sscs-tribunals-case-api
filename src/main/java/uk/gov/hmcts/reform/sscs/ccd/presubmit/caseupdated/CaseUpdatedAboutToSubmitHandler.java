@@ -633,7 +633,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     private boolean processingVenueIsLegacy(VenueDetails newVenue, String oldVenue) {
-        if (isEmpty(newVenue.getLegacyVenue()) || !Objects.equals(newVenue.getLegacyVenue(), oldVenue)) {
+        if (!isEmpty(newVenue.getLegacyVenue()) && Objects.equals(newVenue.getLegacyVenue(), oldVenue)) {
             String oldEpims = venueService.getEpimsIdForVenue(oldVenue);
             return nonNull(venueService.getVenueDetailsForActiveVenueByEpimsId(oldEpims));
         } else {
