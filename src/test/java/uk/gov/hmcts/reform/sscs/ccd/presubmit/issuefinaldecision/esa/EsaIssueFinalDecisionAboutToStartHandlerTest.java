@@ -295,7 +295,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
         var esaDecisionNoticeQuestionService = new EsaDecisionNoticeQuestionService();
 
         var finalDecisionPreviewService = new EsaWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
-            esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
+            esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader, false);
 
         var previewResponse = finalDecisionPreviewService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true);
 
@@ -348,7 +348,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
         var esaDecisionNoticeQuestionService = new EsaDecisionNoticeQuestionService();
 
         var finalDecisionPreviewService = new EsaWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
-            esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
+            esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader, false);
 
         var previewResponse = finalDecisionPreviewService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true);
 
@@ -415,7 +415,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
         var esaDecisionNoticeQuestionService = new EsaDecisionNoticeQuestionService();
 
         var finalDecisionPreviewService = new EsaWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
-            esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
+            esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader, false);
 
         var previewResponse = finalDecisionPreviewService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true);
 
@@ -468,7 +468,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
         var esaDecisionNoticeQuestionService = new EsaDecisionNoticeQuestionService();
 
         var finalDecisionPreviewService = new EsaWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
-            esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
+            esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader, false);
 
         var previewResponse = finalDecisionPreviewService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true);
 
