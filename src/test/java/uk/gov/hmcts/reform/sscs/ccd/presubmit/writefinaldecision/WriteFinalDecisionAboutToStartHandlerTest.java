@@ -109,7 +109,7 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("");
 
-        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, false, false);
+        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, false);
     }
 
     @ParameterizedTest
@@ -158,7 +158,7 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
         when(caseDetails.getState()).thenReturn(state);
         when(userDetailsService.getUserRoles(USER_AUTHORISATION)).thenReturn(List.of(UserRole.SALARIED_JUDGE.getValue()));
 
-        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true, false);
+        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertEquals(response.getErrors().size(), 0);
@@ -178,7 +178,7 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
 
     @Test
     public void givenStateIsDormantAndIsntSalariedJudge_thenThrowError() {
-        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true, false);
+        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
@@ -193,7 +193,7 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
 
     @Test
     public void givenStateIsDormantAndSalariedJudge_thenNoErrors() {
-        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true, false);
+        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
@@ -211,7 +211,7 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
     @ParameterizedTest
     @EnumSource(names = {"POST_HEARING", "DORMANT_APPEAL_STATE"})
     public void givenAWriteFinalDecisionEventForCorrectionWithPostHearingsEnabled_thenKeepData(State state) {
-        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true, false);
+        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
@@ -224,7 +224,7 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
 
     @Test
     public void givenAWriteFinalDecisionEventNotForCorrectionWithPostHearingsEnabled_thenDeleteData() {
-        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true, false);
+        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
@@ -283,7 +283,7 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
     @Test
     public void giveCorrectionInProgressAndDecisionIsUploaded_thenClearUploadedDecision() {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(NO);
-        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true, false);
+        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
@@ -296,7 +296,7 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
     @ParameterizedTest
     @ValueSource(booleans = {false, true})
     public void givenSevereConditionsEnabledOrDisabled_thenClearSevereConditionsFieldsAccordingly(boolean isSevereConditionsEnabled) {
-        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true, isSevereConditionsEnabled);
+        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionHasSVIssueCode(YES);
         sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereCriteriaApply(YES);
         sscsCaseData.getExtendedSscsCaseData().setEsaWriteFinalDecisionSevereCriteriaApply(YES);
