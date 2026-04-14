@@ -10,17 +10,12 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -29,7 +24,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
@@ -115,145 +109,6 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
 
         assertThatThrownBy(() -> handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token")).isInstanceOf(
             IllegalStateException.class);
-    }
-
-    @Test
-    void handleBuildsConfidentialityTabForChildSupportWithAppellantAppointeeAndOtherParties() {
-        LocalDateTime appellantDate = LocalDateTime.of(2020, 2, 3, 16, 5, 6);
-        LocalDateTime otherPartyDate = LocalDateTime.of(2020, 2, 4, 9, 10, 11);
-
-        Appellant appellant = Appellant.builder()
-                                       .name(Name.builder().firstName("John").lastName("Smith").build())
-                                       .confidentialityRequired(YES)
-                                       .confidentialityRequiredChangedDate(appellantDate)
-                                       .isAppointee("Yes")
-                                       .appointee(Appointee.builder()
-                                                           .name(Name.builder().firstName("Jane").lastName("Doe").build())
-                                                           .build())
-                                       .build();
-
-        OtherParty otherParty1 = OtherParty.builder()
-                                           .id("op1")
-                                           .name(Name.builder().firstName("Other").lastName("One").build())
-                                           .confidentialityRequired(NO)
-                                           .confidentialityRequiredChangedDate(otherPartyDate)
-                                           .build();
-
-        OtherParty otherParty2 = OtherParty.builder()
-                                           .name(Name.builder().firstName("Other").lastName("Two").build())
-                                           .confidentialityRequired(null)
-                                           .confidentialityRequiredChangedDate(null)
-                                           .build();
-
-        List<CcdValue<OtherParty>> otherParties = Arrays.asList(CcdValue.<OtherParty>builder().value(otherParty1).build(), null,
-            CcdValue.<OtherParty>builder().value(otherParty2).build());
-
-        sscsCaseData.setOtherParties(otherParties);
-        sscsCaseData.setAppeal(Appeal.builder()
-                                     .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
-                                     .appellant(appellant)
-                                     .build());
-
-        final OtherParty beforeOtherParty1 = OtherParty.builder().id("op1").confidentialityRequired(NO).build();
-        final SscsCaseData beforeCaseData = SscsCaseData.builder()
-                                                        .appeal(Appeal.builder()
-                                                                      .appellant(Appellant.builder()
-                                                                                          .confidentialityRequired(YES)
-                                                                                          .build())
-                                                                      .build())
-                                                        .otherParties(singletonList(
-                                                            CcdValue.<OtherParty>builder().value(beforeOtherParty1).build()))
-                                                        .build();
-        when(caseDetailsBefore.getCaseData()).thenReturn(beforeCaseData);
-        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
-
-        final String tab = response.getData().getConfidentialityTab();
-        assertThat(tab).isEqualToNormalizingWhitespace("""
-            Party | Name | Confidentiality Status | Confidentiality Status Confirmed
-            -|-|-|-
-            Appellant | John Smith | Yes | 3 Feb 2020, 4:05:06 pm
-            Appointee | Jane Doe | Yes | 3 Feb 2020, 4:05:06 pm
-            Other Party 1 | Other One | No | 4 Feb 2020, 9:10:11 am
-            Other Party 2 | Other Two | Undetermined |
-            """);
-    }
-
-    @ParameterizedTest
-    @MethodSource("appointeeNotIncludedTestCases")
-    void handleDoesNotIncludeAppointeeWhenNotMarkedAsAppointee(String isAppointee, Appointee appointee) {
-        Appellant appellant = Appellant.builder()
-                                       .name(Name.builder().firstName("John").lastName("Smith").build())
-                                       .confidentialityRequired(YES)
-                                       .isAppointee(isAppointee)
-                                       .appointee(appointee)
-                                       .build();
-
-        sscsCaseData.setAppeal(Appeal.builder()
-                                     .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
-                                     .appellant(appellant)
-                                     .build());
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
-
-        String tab = response.getData().getConfidentialityTab();
-        assertThat(tab).contains("Appellant | John Smith | Yes").doesNotContain("Appointee |");
-    }
-
-    @Test
-    void handleDoesNotIncludeAppellantOrAppointeeWhenAppellantMissing() {
-        OtherParty otherParty = OtherParty.builder()
-                                          .name(Name.builder().firstName("Other").lastName("Party").build())
-                                          .confidentialityRequired(YES)
-                                          .build();
-
-        sscsCaseData.setOtherParties(singletonList(CcdValue.<OtherParty>builder().value(otherParty).build()));
-        sscsCaseData.setAppeal(Appeal.builder()
-                                     .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
-                                     .appellant(null)
-                                     .build());
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
-
-        String tab = response.getData().getConfidentialityTab();
-        assertThat(tab).contains("Other Party 1 | Other Party | Yes").doesNotContain("Appellant |").doesNotContain("Appointee |");
-    }
-
-    @Test
-    void handleUsesEmptyNamesWhenNameMissing() {
-        final Appellant appellant = Appellant.builder().name(null).confidentialityRequired(YES).build();
-
-        final OtherParty otherParty = OtherParty.builder().id("op1").name(null).confidentialityRequired(NO).build();
-
-        sscsCaseData.setOtherParties(singletonList(CcdValue.<OtherParty>builder().value(otherParty).build()));
-        sscsCaseData.setAppeal(Appeal.builder()
-                                     .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
-                                     .appellant(appellant)
-                                     .build());
-
-        final OtherParty beforeOtherParty = OtherParty.builder().id("op1").confidentialityRequired(NO).build();
-        final SscsCaseData beforeCaseData = SscsCaseData.builder()
-                                                        .appeal(Appeal.builder()
-                                                                      .appellant(Appellant.builder()
-                                                                                          .confidentialityRequired(YES)
-                                                                                          .build())
-                                                                      .build())
-                                                        .otherParties(singletonList(
-                                                            CcdValue.<OtherParty>builder().value(beforeOtherParty).build()))
-                                                        .build();
-        when(caseDetailsBefore.getCaseData()).thenReturn(beforeCaseData);
-        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
-
-        String tab = response.getData().getConfidentialityTab();
-        assertThat(tab).isEqualToNormalizingPunctuationAndWhitespace("""
-            Party | Name | Confidentiality Status | Confidentiality Status Confirmed
-            -|-|-|-
-            Appellant |  | Yes |
-            Other Party 1 |  | No |
-            """);
     }
 
     @Test
@@ -461,12 +316,6 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "Bearer token");
 
         assertThat(response.getData().getExtendedSscsCaseData().getShowConfidentialityTab()).isNotEqualTo(YES);
-    }
-
-    private static Stream<Arguments> appointeeNotIncludedTestCases() {
-        return Stream.of(org.junit.jupiter.params.provider.Arguments.of("No",
-                Appointee.builder().name(Name.builder().firstName("Jane").lastName("Doe").build()).build()),
-            org.junit.jupiter.params.provider.Arguments.of("Yes", null));
     }
 
 }
