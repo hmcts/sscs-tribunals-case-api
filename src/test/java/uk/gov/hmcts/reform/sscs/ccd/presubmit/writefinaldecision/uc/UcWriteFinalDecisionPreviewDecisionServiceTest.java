@@ -2651,33 +2651,4 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertThat(12).isEqualTo(payload.getWriteFinalDecisionTemplateContent().getComponents().size());
         assertThat(LocalDate.of(2025, 10, 11)).isEqualTo(body.getUcCapabilityAssessmentStartDate());
     }
-
-    @Test
-    public void givenSevereCriteriaNotEnabled_willNotSetSevereCriteriaSentence() {
-        String endDate = "2018-11-10";
-        setCommonPreviewParams(sscsCaseData, endDate);
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
-        sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setSupportGroupOnlyAppeal("No");
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(List.of("mobilisingUnaided"));
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(List.of("schedule7MobilisingUnaided", "schedule7AppropriatenessOfBehaviour"));
-        sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereCriteriaApply(YES);
-
-        UcWriteFinalDecisionPreviewDecisionService ucWriteFinalDecisionPreviewDecisionService = new UcWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService, ucDecisionNoticeQuestionService, ucDecisionNoticeOutcomeService, documentConfiguration,
-                venueDataLoader);
-        final PreSubmitCallbackResponse<SscsCaseData> response = ucWriteFinalDecisionPreviewDecisionService.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
-
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10",
-                true, true, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
-
-        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
-
-        assertThat(body.getSevereCriteriaApplies()).isNull();
-    }
 }
