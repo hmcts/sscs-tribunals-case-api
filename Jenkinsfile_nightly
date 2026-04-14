@@ -125,15 +125,13 @@ withNightlyPipeline(type, product, component) {
                 reportDir            : "playwright-report",
                 reportFiles          : 'index.html',
                 reportName           : 'SSCS E2E Test Report'
-        ],
-        publishJson([
-                allowMissing         : true,
-                alwaysLinkToLastBuild: true,
-                keepAll              : true,
-                reportDir            : "playwright-report",
-                reportFiles          : 'test-results.json',
-                reportName           : 'SSCS E2E Test Results'
-        ]))
+        ])
+
+        archiveArtifacts(
+            artifacts: 'playwright-report/test-results.json', 
+            allowEmptyArchive: true
+        )
+        
         runAccessibilityTestsNightly()
         publishHTML([
                 allowMissing         : true,
