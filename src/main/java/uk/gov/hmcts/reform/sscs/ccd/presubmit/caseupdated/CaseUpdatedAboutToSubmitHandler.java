@@ -634,8 +634,13 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private boolean processingVenueIsLegacy(VenueDetails newVenue, String oldVenue) {
         if (!isEmpty(newVenue.getLegacyVenue()) && Objects.equals(newVenue.getLegacyVenue(), oldVenue)) {
-            String oldEpims = venueService.getEpimsIdForVenue(oldVenue);
-            return nonNull(venueService.getVenueDetailsForActiveVenueByEpimsId(oldEpims));
+            try {
+                String oldEpims = venueService.getEpimsIdForVenue(oldVenue);
+                return nonNull(venueService.getVenueDetailsForActiveVenueByEpimsId(oldEpims));
+            } catch (IllegalStateException e) {
+                log.info("Failed to retrieve venue details for legacy venue: {}", oldVenue);
+                return false;
+            }
         } else {
             return false;
         }
