@@ -5,7 +5,6 @@ import dateUtilsComponent from '../utils/DateUtilsComponent';
 
 let caseId: string;
 
-
 test.describe(
   'Issue Final Decision - PIP Appeal Type',
   { tag: '@nightly-pipeline' },
@@ -25,7 +24,7 @@ test.describe(
       async ({ issueFinalDecisionSteps, manageDocumentsSteps }) => {
         test.slow();
         let pipCaseId = await createCaseBasedOnCaseType('PIP');
-        
+
 
         //Write Draft decision and verify document is placed in internal tab
         await issueFinalDecisionSteps.performWriteFinalDecisionForAPIPAppealNoAwardAndNoticeGenerated(
@@ -36,18 +35,18 @@ test.describe(
 
         //Login as DWP Response Writer and verify internal tab is hidden
         await manageDocumentsSteps.loginUserWithCaseId(
-            credentials.dwpResponseWriter,
-            false,
-            caseId
+          credentials.dwpResponseWriter,
+          false,
+          pipCaseId
         );
         await manageDocumentsSteps.verifyInternalDocumentsTabHidden();
         await manageDocumentsSteps.signOut();
 
         //Login as Judge to issue final decision
         await manageDocumentsSteps.loginUserWithCaseId(
-                credentials.judge,
-                false,
-                pipCaseId
+          credentials.judge,
+          false,
+          pipCaseId
         );
         await issueFinalDecisionSteps.performIssueFinalDecisionForAnAppeal();
       }
@@ -64,7 +63,6 @@ test.describe(
         );
         await manageDocumentsSteps.verifyFileInTab(tab, documentType, fileName);
         await issueFinalDecisionSteps.performIssueFinalDecisionForAnAppeal();
-        // await performAppealDormantOnCase(pipCaseId);
       }
     );
   }
@@ -84,7 +82,6 @@ test.describe(
           taxCreditCaseId
         );
         await issueFinalDecisionSteps.performIssueFinalDecisionForAnAppeal();
-        // await performAppealDormantOnCase(taxCreditCaseId);
       }
     );
   }
@@ -103,8 +100,33 @@ test.describe(
         universalCreditCaseId
       );
       await issueFinalDecisionSteps.performIssueFinalDecisionForAnAppeal();
-      // await performAppealDormantOnCase(universalCreditCaseId);
     });
+    test("Issue Final Decision - SV issue code - 'Yes' notice generated - Appeal 'Allowed' - SCC appeal 'Yes' - SCC applies 'Yes'", async ({
+      uploadResponseSteps, issueFinalDecisionSteps
+    }) => {
+      let universalCreditCaseId = await createCaseBasedOnCaseType('UC');
+
+      await uploadResponseSteps.uploadResponseUcAppealWcaAndSvIssueCode(universalCreditCaseId)
+      await issueFinalDecisionSteps.performWriteFinalDecisionForUniversalCreditAppealWithScc({ universalCreditCaseId });
+      await issueFinalDecisionSteps.performIssueFinalDecisionForAnAppeal();
+      await issueFinalDecisionSteps.verifyAppealDormantAfterIssueFinalDecisionEvent();
+
+    });
+    test("Issue Final Decision - SV issue code - 'Yes' notice generated - Appeal 'Refused' - SCC appeal 'Yes' - SCC applies 'No'", async ({
+      uploadResponseSteps, issueFinalDecisionSteps
+    }) => {
+      let universalCreditCaseId = await createCaseBasedOnCaseType('UC');
+
+      await uploadResponseSteps.uploadResponseUcAppealWcaAndSvIssueCode(universalCreditCaseId)
+      await issueFinalDecisionSteps.performWriteFinalDecisionForUniversalCreditAppealWithScc({
+        universalCreditCaseId,
+        isAppealAllowed: false,
+        sccApplies: false
+      });
+      await issueFinalDecisionSteps.performIssueFinalDecisionForAnAppeal();
+      await issueFinalDecisionSteps.verifyAppealDormantAfterIssueFinalDecisionEvent();
+    });
+
   }
 );
 
@@ -136,6 +158,36 @@ test.describe(
       );
       await issueFinalDecisionSteps.performIssueFinalDecisionForAnAppeal();
       await issueFinalDecisionSteps.verifyFinalDecisionForAnAppeal();
+    });
+
+    test("Issue Final Decision - 'Yes' notice generated - Appeal Allowed - SCC appeal 'Yes' - SCC apply 'Yes'", async ({
+      uploadResponseSteps, issueFinalDecisionSteps
+    }) => {
+      let esaCaseId = await createCaseBasedOnCaseType('ESA');
+      await uploadResponseSteps.uploadResponseEsaAppealWcaAndSvIssueCode(esaCaseId)
+      await issueFinalDecisionSteps.performWriteFinalDecisionForEsaAppealWithScc({ 
+        esaCaseId,
+        isAppealAllowed: true,
+        sccAppeal: true,
+        sccApplies: true
+       });
+      await issueFinalDecisionSteps.performIssueFinalDecisionForAnAppeal();
+      await issueFinalDecisionSteps.verifyAppealDormantAfterIssueFinalDecisionEvent();
+    });
+
+    test("Issue Final Decision - 'Yes' notice generated - Appeal Refused - SCC appeal 'Yes' - SCC apply 'No'", async ({
+      uploadResponseSteps, issueFinalDecisionSteps
+    }) => {
+      let esaCaseId = await createCaseBasedOnCaseType('ESA');
+      await uploadResponseSteps.uploadResponseEsaAppealWcaAndSvIssueCode(esaCaseId)
+      await issueFinalDecisionSteps.performWriteFinalDecisionForEsaAppealWithScc({
+        esaCaseId,
+        isAppealAllowed: false,
+        sccAppeal: true,
+        sccApplies: false
+      });
+      await issueFinalDecisionSteps.performIssueFinalDecisionForAnAppeal();
+      await issueFinalDecisionSteps.verifyAppealDormantAfterIssueFinalDecisionEvent();
     });
   }
 );
