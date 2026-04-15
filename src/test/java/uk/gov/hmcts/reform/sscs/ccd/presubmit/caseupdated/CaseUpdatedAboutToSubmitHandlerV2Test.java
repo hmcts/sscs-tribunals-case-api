@@ -777,21 +777,16 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         String venueAEpimsId = "12346";
         callback.getCaseDetails().getCaseData().setProcessingVenue(venueA);
         when(venueService.getEpimsIdForVenue(venueB)).thenReturn(venueBEpimsId);
-        when(venueService.getEpimsIdForVenue(venueA)).thenReturn(venueAEpimsId);
         when(venueService.getVenueDetailsForActiveVenueByEpimsId(venueBEpimsId)).thenReturn(VenueDetails.builder().venName(venueB).legacyVenue(venueA).build());
-        when(venueService.getVenueDetailsForActiveVenueByEpimsId(venueAEpimsId)).thenReturn(VenueDetails.builder().venName(venueA).build());
         when(airLookupService.lookupAirVenueNameByPostCode("AB12 00B", sscsCaseData.getAppeal().getBenefitType())).thenReturn(
                 venueB);
 
-        when(refDataService.getCourtVenueRefDataByEpimsId(venueAEpimsId)).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("regionId").build());
 
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("AB12 00B");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(venueA, response.getData().getProcessingVenue());
-        assertNotNull(response.getData().getCaseManagementLocation());
-        assertEquals("regionId", response.getData().getCaseManagementLocation().getRegion());
     }
 
     @Test

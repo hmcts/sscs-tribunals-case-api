@@ -444,15 +444,14 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             String venueEpimsId = venueService.getEpimsIdForVenue(venue);
             VenueDetails newVenue = venueService.getVenueDetailsForActiveVenueByEpimsId(venueEpimsId);
             if (nonNull(newVenue)) {
-                if (!processingVenueIsLegacy(newVenue, sscsCaseData.getProcessingVenue())) {
+                if (isEmpty(newVenue.getLegacyVenue()) || !Objects.equals(newVenue.getLegacyVenue(), sscsCaseData.getProcessingVenue())) {
                     log.info("Processing venue requires updating for case {}: setting venue name to {} from {}",
                             caseDetails.getId(), venue, sscsCaseData.getProcessingVenue());
                     sscsCaseData.setProcessingVenue(venue);
                 } else {
-                    venue = sscsCaseData.getProcessingVenue();
-                    venueEpimsId = venueService.getEpimsIdForVenue(venue);
                     log.info("Legacy venue {} has not been updated for case {}",
                             venue, caseDetails.getId());
+                    return;
                 }
 
             }
@@ -629,20 +628,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             return Optional.empty();
         } else {
             return oldCaseDetails.getCaseData().getBenefitType();
-        }
-    }
-
-    private boolean processingVenueIsLegacy(VenueDetails newVenue, String oldVenue) {
-        if (!isEmpty(newVenue.getLegacyVenue()) && Objects.equals(newVenue.getLegacyVenue(), oldVenue)) {
-            try {
-                String oldEpims = venueService.getEpimsIdForVenue(oldVenue);
-                return nonNull(venueService.getVenueDetailsForActiveVenueByEpimsId(oldEpims));
-            } catch (IllegalStateException e) {
-                log.info("Failed to retrieve venue details for legacy venue: {}", oldVenue);
-                return false;
-            }
-        } else {
-            return false;
         }
     }
 
