@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 import static java.util.Arrays.asList;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getBenefitByCodeOrThrowException;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
@@ -43,6 +44,8 @@ public class NotificationService {
     private final NotificationHandler notificationHandler;
     private final OutOfHoursCalculator outOfHoursCalculator;
     private final NotificationConfig notificationConfig;
+    private final boolean covid19Feature;
+    private final boolean cmConfidentialityEnabled;
 
     @SuppressWarnings("squid:S107")
     @Autowired
@@ -54,7 +57,8 @@ public class NotificationService {
         OutOfHoursCalculator outOfHoursCalculator,
         NotificationConfig notificationConfig,
         SendNotificationService sendNotificationService,
-        @Value("${feature.covid19}") boolean covid19Feature) {
+        @Value("${feature.covid19}") boolean covid19Feature,
+        @Value("${feature.cm-other-party-confidentiality.enabled}") final boolean cmConfidentialityEnabled) {
 
         this.notificationFactory = notificationFactory;
         this.reminderService = reminderService;
@@ -64,11 +68,10 @@ public class NotificationService {
         this.notificationConfig = notificationConfig;
         this.sendNotificationService = sendNotificationService;
         this.covid19Feature = covid19Feature;
+        this.cmConfidentialityEnabled = cmConfidentialityEnabled;
     }
 
     private final SendNotificationService sendNotificationService;
-
-    private final boolean covid19Feature;
 
     public void manageNotificationAndSubscription(NotificationWrapper notificationWrapper, boolean fromReminderService) {
         NotificationEventType notificationType = notificationWrapper.getNotificationType();
@@ -113,6 +116,13 @@ public class NotificationService {
         } else if (notificationWrapper.getNotificationType().equals(DWP_UPLOAD_RESPONSE)) {
             log.info("Trigger second notification event for {}", UPDATE_OTHER_PARTY_DATA.getId());
             notificationWrapper.getSscsCaseDataWrapper().setNotificationEventType(UPDATE_OTHER_PARTY_DATA);
+            sendNotificationPerSubscription(notificationWrapper);
+        } else if (cmConfidentialityEnabled
+            && notificationWrapper.getNotificationType().equals(UPDATE_OTHER_PARTY_DATA)
+            && isNotEmpty(notificationWrapper.getSscsCaseDataWrapper().getNewSscsCaseData().getOtherParties())
+            && notificationWrapper.getSscsCaseDataWrapper().getNewSscsCaseData().getOtherParties().size() > 1) {
+            log.info("Trigger second notification event for {}", OTHER_PARTY_ADDED_TO_APPEAL.getId());
+            notificationWrapper.getSscsCaseDataWrapper().setNotificationEventType(OTHER_PARTY_ADDED_TO_APPEAL);
             sendNotificationPerSubscription(notificationWrapper);
         }
     }

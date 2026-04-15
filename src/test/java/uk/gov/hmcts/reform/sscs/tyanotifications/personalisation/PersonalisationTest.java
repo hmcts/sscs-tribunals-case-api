@@ -16,6 +16,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
+import static org.springframework.test.util.ReflectionTestUtils.setField;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.PIP;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getLongBenefitNameDescriptionWithOptionalAcronym;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
@@ -23,6 +24,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.ONLINE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.ORAL;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.PAPER;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.REGULAR;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.HMC_HEARING_TYPE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.SscsCaseDataUtils.getWelshDate;
@@ -56,6 +58,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMa
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPEAL_REF;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPEAL_RESPOND_DATE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPEAL_RESPOND_DATE_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPELLANT_CONFIDENTIALITY_REQUIRED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPELLANT_NAME;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPOINTEE_DESCRIPTION;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPOINTEE_NAME;
@@ -101,6 +104,8 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMa
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.MANAGE_EMAILS_LINK_LITERAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.NAME;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.OTHER_PARTY_NAME;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.OTHER_PARTY_NAMES;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.OTHER_PARTY_SIZE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.PANEL_COMPOSITION;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.PANEL_COMPOSITION_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.PARTY_TYPE;
@@ -163,6 +168,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SUBSCRIPTION_CREATED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SYA_APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.TCW_DECISION_APPEAL_TO_PROCEED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.UPDATE_OTHER_PARTY_DATA;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.VALID_APPEAL_CREATED;
 
 import java.time.Instant;
@@ -186,9 +192,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
@@ -520,12 +526,6 @@ public class PersonalisationTest {
             eq(hasDocmosisTemplate ? getExpectedTemplateName(notificationEventType, subscriptionType) : notificationEventType.getId()),
             any(Benefit.class), any(NotificationWrapper.class), eq(null)
         );
-    }
-
-    private String getExpectedTemplateName(NotificationEventType notificationEventType,
-                                           SubscriptionType subscriptionType) {
-        return notificationEventType.getId() + (subscriptionType == null ? "" :
-            "." + lowerCase(subscriptionType.name()));
     }
 
     @SuppressWarnings({"Indentation", "unused"})
@@ -2565,7 +2565,7 @@ public class PersonalisationTest {
 
     @Test
     public void whenPostHearingsIsTrueAndFinalDecisionIsSet_setFinalDecision() {
-        ReflectionTestUtils.setField(personalisation, "isPostHearingsEnabled", true);
+        setField(personalisation, "isPostHearingsEnabled", true);
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .regionalProcessingCenter(rpc)
@@ -2587,7 +2587,7 @@ public class PersonalisationTest {
 
     @Test
     public void whenPostHearingsIsTrueAndFinalDecisionIsNotSet_dontSetFinalDecision() {
-        ReflectionTestUtils.setField(personalisation, "isPostHearingsEnabled", true);
+        setField(personalisation, "isPostHearingsEnabled", true);
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .regionalProcessingCenter(rpc)
@@ -2604,6 +2604,192 @@ public class PersonalisationTest {
 
         assertTrue((boolean) result.get(IS_GRANTED));
         assertNull(result.get(FINAL_DECISION_DATE));
+    }
+
+    @ParameterizedTest(name = "{0} other parties -> OTHER_PARTY_SIZE = {1}")
+    @MethodSource("childSupportOtherPartySizeScenarios")
+    void givenChildSupportBenefitAndFeatureEnabled_thenSetsOtherPartySize(final List<CcdValue<OtherParty>> otherParties, final int expectedSize) {
+        setField(personalisation, "cmOtherPartyConfidentialityEnabled", true);
+        final SscsCaseData response = SscsCaseData.builder()
+                                                  .ccdCaseId(CASE_ID)
+                                                  .appeal(Appeal.builder()
+                                                                .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
+                                                                .appellant(Appellant.builder().name(name).build())
+                                                                .build())
+                                                  .otherParties(otherParties)
+                                                  .build();
+
+        final Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper.builder()
+                                                                                                 .newSscsCaseData(response)
+                                                                                                 .notificationEventType(UPDATE_OTHER_PARTY_DATA)
+                                                                                                 .build(),
+            new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT,
+                response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
+
+        assertThat(result).containsEntry(OTHER_PARTY_SIZE, expectedSize);
+    }
+
+    @ParameterizedTest(name = "parties {0} -> OTHER_PARTY_NAMES = \"{1}\"")
+    @MethodSource("childSupportOtherPartyNamesScenarios")
+    void givenChildSupportBenefitAndFeatureEnabled_thenSetsOtherPartyNames(final List<CcdValue<OtherParty>> otherParties, final String expectedNames) {
+        setField(personalisation, "cmOtherPartyConfidentialityEnabled", true);
+        final SscsCaseData response = SscsCaseData.builder()
+                                                  .ccdCaseId(CASE_ID)
+                                                  .appeal(Appeal.builder()
+                                                                .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
+                                                                .appellant(Appellant.builder().name(name).build())
+                                                                .build())
+                                                  .otherParties(otherParties)
+                                                  .build();
+
+        final Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper.builder()
+                                                                                                 .newSscsCaseData(response)
+                                                                                                 .notificationEventType(UPDATE_OTHER_PARTY_DATA)
+                                                                                                 .build(),
+            new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT,
+                response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
+
+        assertThat(result).containsEntry(OTHER_PARTY_NAMES, expectedNames);
+    }
+
+    @ParameterizedTest(name = "confidentialityRequired={0} -> APPELLANT_CONFIDENTIALITY_REQUIRED={1}")
+    @MethodSource("childSupportConfidentialityScenarios")
+    void givenChildSupportBenefitAndFeatureEnabled_thenSetsAppellantConfidentialityRequired(final YesNo confidentialityRequired,
+        final boolean expectedValue) {
+        setField(personalisation, "cmOtherPartyConfidentialityEnabled", true);
+        final SscsCaseData response = SscsCaseData.builder()
+                                                  .ccdCaseId(CASE_ID)
+                                                  .appeal(Appeal.builder()
+                                                                .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
+                                                                .appellant(Appellant.builder().name(name).confidentialityRequired(confidentialityRequired).build())
+                                                                .build())
+                                                  .otherParties(buildOtherParties("Alice Jones", "Bob Smith"))
+                                                  .build();
+
+        final Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper.builder()
+                                                                                                 .newSscsCaseData(response)
+                                                                                                 .notificationEventType(UPDATE_OTHER_PARTY_DATA)
+                                                                                                 .build(),
+            new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT,
+                response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
+
+        assertThat(result).containsEntry(APPELLANT_CONFIDENTIALITY_REQUIRED, expectedValue);
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("childSupportPersonalisationNotApplicableScenarios")
+    void givenChildSupportPersonalisationNotApplicable_thenDoesNotSetChildSupportKeys(
+        final String scenario, final String benefitCode, final List<CcdValue<OtherParty>> otherParties) {
+        setField(personalisation, "cmOtherPartyConfidentialityEnabled", true);
+        final SscsCaseData response = SscsCaseData.builder()
+                                                  .ccdCaseId(CASE_ID)
+                                                  .appeal(Appeal.builder()
+                                                                .benefitType(BenefitType.builder().code(benefitCode).build())
+                                                                .appellant(Appellant.builder().name(name).confidentialityRequired(YES).build())
+                                                                .build())
+                                                  .otherParties(otherParties)
+                                                  .build();
+
+        final Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper.builder()
+                                                                                                 .newSscsCaseData(response)
+                                                                                                 .notificationEventType(UPDATE_OTHER_PARTY_DATA)
+                                                                                                 .build(),
+            new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT,
+                response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
+
+        assertThat(result).doesNotContainKeys(OTHER_PARTY_SIZE, OTHER_PARTY_NAMES);
+    }
+
+    @Test
+    void givenChildSupportBenefitAndFeatureDisabled_thenDoesNotSetChildSupportPersonalisation() {
+        setField(personalisation, "cmOtherPartyConfidentialityEnabled", false);
+        final SscsCaseData response = SscsCaseData.builder()
+                                                  .ccdCaseId(CASE_ID)
+                                                  .appeal(Appeal.builder()
+                                                                .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
+                                                                .appellant(Appellant.builder().name(name).confidentialityRequired(YES).build())
+                                                                .build())
+                                                  .otherParties(buildOtherParties("Alice Jones", "Bob Smith"))
+                                                  .build();
+
+        final Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper.builder()
+                                                                                                 .newSscsCaseData(response)
+                                                                                                 .notificationEventType(UPDATE_OTHER_PARTY_DATA)
+                                                                                                 .build(),
+            new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT,
+                response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
+
+        assertThat(result).doesNotContainKeys(OTHER_PARTY_SIZE, OTHER_PARTY_NAMES, APPELLANT_CONFIDENTIALITY_REQUIRED);
+    }
+
+    private static Stream<Arguments> childSupportPersonalisationNotApplicableScenarios() {
+        return Stream.of(
+            Arguments.of("non-child-support benefit with other parties",
+                Benefit.PIP.getShortName(), buildOtherParties("Alice Jones", "Bob Smith")),
+            Arguments.of("child support benefit with no other parties",
+                Benefit.CHILD_SUPPORT.getShortName(), null)
+        );
+    }
+
+    private static Stream<Arguments> childSupportOtherPartySizeScenarios() {
+        return Stream.of(
+            Arguments.of(buildOtherParties("Alice Jones"), 0),
+            Arguments.of(buildOtherParties("Alice Jones", "Bob Smith"), 1),
+            Arguments.of(buildOtherParties("Alice Jones", "Bob Smith", "Carol White"), 2)
+        );
+    }
+
+    private static Stream<Arguments> childSupportOtherPartyNamesScenarios() {
+        return Stream.of(
+            Arguments.of(buildOtherParties("Alice Jones", "Bob Smith"), "Bob Smith"),
+            Arguments.of(buildOtherParties("Alice Jones", "Bob Smith", "Carol White"), "Bob Smith and Carol White"),
+            Arguments.of(buildOtherParties("Alice Jones", "Bob Smith", "Carol White", "Dan Brown"),
+                "Bob Smith, Carol White and Dan Brown")
+        );
+    }
+
+    private static Stream<Arguments> childSupportConfidentialityScenarios() {
+        return Stream.of(
+            Arguments.of(YES, true),
+            Arguments.of(NO, false),
+            Arguments.of(null, false)
+        );
+    }
+
+    private static List<CcdValue<OtherParty>> buildOtherParties(final String... fullNames) {
+        return Arrays.stream(fullNames)
+                     .map(PersonalisationTest::buildOtherParty)
+                     .toList();
+    }
+
+    private static CcdValue<OtherParty> buildOtherParty(final String fullName) {
+        final String[] parts = fullName.split(" ", 2);
+        final Name name = Name.builder().firstName(parts[0]).lastName(parts[1]).build();
+        return new CcdValue<>(OtherParty.builder().name(name).build());
+    }
+
+    private static Stream<Arguments> addOtherPartyDataScenarios() {
+        return Stream.of(Arguments.of("UC benefit with single other party in AWAIT_CONFIDENTIALITY_REQUIREMENTS state",
+                Benefit.UC.getShortName(), State.AWAIT_CONFIDENTIALITY_REQUIREMENTS, List.of(
+                    new CcdValue<>(OtherParty.builder().name(Name.builder().firstName("John").lastName("Smith").build()).build())),
+                true, "John Smith"),
+            Arguments.of("UC benefit with multiple other parties in AWAIT_CONFIDENTIALITY_REQUIREMENTS state",
+                Benefit.UC.getShortName(), State.AWAIT_CONFIDENTIALITY_REQUIREMENTS, List.of(new CcdValue<>(
+                        OtherParty.builder().name(Name.builder().firstName("First").lastName("Party").build()).build()),
+                    new CcdValue<>(
+                        OtherParty.builder().name(Name.builder().firstName("Second").lastName("Party").build()).build())), true,
+                "First Party"),
+            Arguments.of("PIP benefit with other party in AWAIT_CONFIDENTIALITY_REQUIREMENTS state", Benefit.PIP.name(),
+                State.AWAIT_CONFIDENTIALITY_REQUIREMENTS, List.of(new CcdValue<>(
+                    OtherParty.builder().name(Name.builder().firstName("John").lastName("Smith").build()).build())), false, null),
+            Arguments.of("UC benefit with other party in WITH_DWP state", Benefit.UC.getShortName(), State.WITH_DWP, List.of(
+                    new CcdValue<>(OtherParty.builder().name(Name.builder().firstName("John").lastName("Smith").build()).build())),
+                false, null), Arguments.of("UC benefit with null other parties in AWAIT_CONFIDENTIALITY_REQUIREMENTS state",
+                Benefit.UC.getShortName(), State.AWAIT_CONFIDENTIALITY_REQUIREMENTS, null, false, null));
+    }
+
+    private String getExpectedTemplateName(NotificationEventType notificationEventType, SubscriptionType subscriptionType) {
+        return notificationEventType.getId() + (subscriptionType == null ? "" : "." + lowerCase(subscriptionType.name()));
     }
 
     private Hearing createHearing(LocalDate hearingDate) {

@@ -5,6 +5,7 @@ import static java.util.Objects.nonNull;
 
 import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -61,7 +62,7 @@ public enum NotificationEventType {
     PROCESS_AUDIO_VIDEO_WELSH(EventType.PROCESS_AUDIO_VIDEO_WELSH, true, true, true, false, false, 0),
     PROVIDE_APPOINTEE_DETAILS(EventType.PROVIDE_APPOINTEE_DETAILS, true, true, true, true, false, 0),
     // Allow out of hours for this event as we rely on the case data to decide who to send to. It could get out of sync if we wait a few hours to send, for example they could try to reissue to 2 parties so this event would be triggered twice.
-    // If the reminder service looks the case up from CCD, the original request for whom to send the notification to will be lost and the second party would receive the notification twice.
+    // If the reminder service looks the case up from CCD, the original request for whom to send the notification to will be lost and the second party would receive the notification twice.,
     REISSUE_DOCUMENT(EventType.REISSUE_DOCUMENT, true, true, true, true, false, 0),
     REQUEST_FOR_INFORMATION(EventType.REQUEST_FOR_INFORMATION, true, true, true, false, false, 0),
     RESEND_APPEAL_CREATED(EventType.RESEND_APPEAL_CREATED, true, true, false, true, false, 0),
@@ -80,12 +81,15 @@ public enum NotificationEventType {
     SYA_APPEAL_CREATED(EventType.SYA_APPEAL_CREATED, true, true, false, true, false, 0),
     TCW_DECISION_APPEAL_TO_PROCEED(EventType.TCW_DECISION_APPEAL_TO_PROCEED, true, true, true, false, false, 0),
     UPDATE_OTHER_PARTY_DATA(EventType.UPDATE_OTHER_PARTY_DATA, true, true, true, true, false, 0),
+    OTHER_PARTY_ADDED_TO_APPEAL(EventType.UPDATE_OTHER_PARTY_DATA, false, false, false, true, false, 0),
     VALID_APPEAL_CREATED(EventType.VALID_APPEAL_CREATED, true, true, false, true, false, 240L),
 
     @JsonEnumDefaultValue
     DO_NOT_SEND(null);
 
     public static final String SUBSCRIPTION_OLD_ID = "subscriptionOld";
+
+    private static final Map<NotificationEventType, String> OVERRIDE_ID = Map.of(OTHER_PARTY_ADDED_TO_APPEAL, "otherPartyAddedToAppeal");
 
     private final EventType event;
     private boolean sendForOralCase;
@@ -131,6 +135,9 @@ public enum NotificationEventType {
         }
         if (isNull(event)) {
             return "";
+        }
+        if (OVERRIDE_ID.containsKey(this)) {
+            return OVERRIDE_ID.get(this);
         }
         return event.getCcdType();
     }

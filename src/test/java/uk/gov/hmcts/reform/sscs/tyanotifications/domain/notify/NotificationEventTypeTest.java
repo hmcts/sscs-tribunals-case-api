@@ -1,34 +1,21 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 
-public class NotificationEventTypeTest {
+class NotificationEventTypeTest {
     @Test
-    public void checkEventsWeDontHandle() {
+    void checkEventsWeDontHandle() {
         String event = "answers_submitted";
-        assertFalse(NotificationEventType.checkEvent(event));
+        assertThat(NotificationEventType.checkEvent(event)).isFalse();
     }
 
     @Test
-    public void checkEventWeDoHandle() {
-        String event = "confirmLapsed";
-        assertTrue(NotificationEventType.checkEvent(event));
-
-        event = "subscriptionCreated";
-        assertTrue(NotificationEventType.checkEvent(event));
-
-        event = "hearingReminder";
-        assertTrue(NotificationEventType.checkEvent(event));
-
-        event = "validAppealCreated";
-        assertTrue(NotificationEventType.checkEvent(event));
-
-        event = "actionHearingRecordingRequest";
-        assertTrue(NotificationEventType.checkEvent(event));
-
-
+    void checkEventWeDoHandle() {
+        final List<String> events = List.of("confirmLapsed", "subscriptionCreated", "hearingReminder", "validAppealCreated",
+            "actionHearingRecordingRequest");
+        events.forEach(event -> assertThat(NotificationEventType.checkEvent(event)).isTrue());
     }
 }
