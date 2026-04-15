@@ -221,7 +221,7 @@ Examples:
 ./bin/create-xlsx.sh benefit dev aat false prod true
 ```
 ```bash
-# Generate prod like CCD config for pr with WA turned off
+# Generate prod like CCD config for preview with WA turned off
 export CHANGE_ID=[pr_number]
 ./bin/create-xlsx.sh benefit dev pr false prod
 # Note: verify that the generated file has the correct pr number in the 'CaseEvent' Tab. The callback urls should look something like: https://sscs-tribunals-api-pr-5218.preview.platform.hmcts.net/ccdAboutToSubmit
