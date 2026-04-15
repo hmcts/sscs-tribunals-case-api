@@ -13,6 +13,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
+import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.APPELLANT;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.OTHER_PARTY;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
@@ -37,6 +38,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.reference.data.model.ConfidentialityType;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
@@ -52,6 +55,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private final DwpAddressLookupService dwpAddressLookupService;
     private final int dwpResponseDueDays;
     private final int dwpResponseDueDaysChildSupport;
+    private final IdamService idamService;
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
     @Value("${feature.cm-other-party-confidentiality.enabled}")
@@ -63,13 +67,15 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                                                @Value("${dwp.response.due.days}") int dwpResponseDueDays,
                                                @Value("${dwp.response.due.days-child-support}") int dwpResponseDueDaysChildSupport,
                                                @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled,
-                                               @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
+                                               @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled,
+                                               IdamService idamService) {
         this.footerService = footerService;
         this.dwpAddressLookupService = dwpAddressLookupService;
         this.dwpResponseDueDays = dwpResponseDueDays;
         this.dwpResponseDueDaysChildSupport = dwpResponseDueDaysChildSupport;
         this.isPostHearingsEnabled = isPostHearingsEnabled;
         this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
+        this.idamService = idamService;
     }
 
     @Override
@@ -106,6 +112,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             .map(SchedulingAndListingFields::getOverrideFields)
             .ifPresent(overrideFields -> overrideFields.setHmcHearingType(null));
         return validateDirectionType(caseData)
+            .or(() -> validateConfidentialityDirectionAccess(caseData, userAuthorisation))
             .or(() -> validateDirectionDueDate(caseData))
             .orElseGet(() -> validateForPdfAndCreateCallbackResponse(callback, caseDetails, caseData, documentTranslationStatus));
     }
@@ -140,6 +147,29 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             errorResponse.addError("Direction Type cannot be empty");
             return Optional.of(errorResponse);
         }
+        return Optional.empty();
+    }
+
+    private Optional<PreSubmitCallbackResponse<SscsCaseData>> validateConfidentialityDirectionAccess(
+        SscsCaseData caseData, String userAuthorisation) {
+        String directionTypeCode = Optional.ofNullable(caseData.getDirectionTypeDl())
+            .map(DynamicList::getValue)
+            .map(DynamicListItem::getCode)
+            .orElse(null);
+
+        if (!cmOtherPartyConfidentialityEnabled
+            || !isConfidentialityDirection(directionTypeCode)
+            || !isBenefitTypeWithConfidentialityTab(caseData)) {
+            return Optional.empty();
+        }
+
+        UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
+        if (!userDetails.hasRole(SUPER_USER)) {
+            PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
+            errorResponse.addError("Only super users can issue confidentiality decision directions.");
+            return Optional.of(errorResponse);
+        }
+
         return Optional.empty();
     }
 

@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.*;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
+import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,19 +18,23 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil;
 
 @Service
 public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private final boolean isPostHearingsEnabled;
     private final boolean cmDirectionTypesConfidentiality;
+    private final IdamService idamService;
 
     public DirectionIssuedAboutToStartHandler(
         @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled,
-        @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentiality
+        @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentiality,
+        IdamService idamService
     ) {
         this.isPostHearingsEnabled = isPostHearingsEnabled;
         this.cmDirectionTypesConfidentiality = cmOtherPartyConfidentiality;
+        this.idamService = idamService;
     }
 
     @Override
@@ -50,7 +55,8 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
 
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
-        setDirectionTypeDropDown(sscsCaseData);
+        final boolean hasSuperUserRole = idamService.getUserDetails(userAuthorisation).hasRole(SUPER_USER);
+        setDirectionTypeDropDown(sscsCaseData, hasSuperUserRole);
         setExtensionNextEventDropdown(callback.getCaseDetails().getState(), sscsCaseData);
         if (isPostHearingsEnabled) {
             sscsCaseData.setPrePostHearing(null);
@@ -65,7 +71,7 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
-    private void setDirectionTypeDropDown(SscsCaseData sscsCaseData) {
+    private void setDirectionTypeDropDown(SscsCaseData sscsCaseData, boolean hasSuperUserRole) {
 
         List<DynamicListItem> listOptions = new ArrayList<>();
 
@@ -74,6 +80,7 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
         listOptions.add(new DynamicListItem(ISSUE_AND_SEND_TO_ADMIN.toString(), ISSUE_AND_SEND_TO_ADMIN.getLabel()));
 
         if (cmDirectionTypesConfidentiality
+            && hasSuperUserRole
             && InterlocReferralReason.CONFIDENTIALITY.equals(sscsCaseData.getInterlocReferralReason())) {
             listOptions.add(new DynamicListItem(CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString(), CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.getLabel()));
             listOptions.add(new DynamicListItem(CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN.toString(), CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN.getLabel()));
