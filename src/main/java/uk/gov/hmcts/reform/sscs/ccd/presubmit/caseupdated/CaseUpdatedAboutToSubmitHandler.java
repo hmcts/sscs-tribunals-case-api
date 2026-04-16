@@ -450,11 +450,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                     sscsCaseData.setProcessingVenue(venue);
                 } else {
                     venue = sscsCaseData.getProcessingVenue();
-                    if (isNotEmpty(venue)) {
-                        venueEpimsId = venueService.getEpimsIdForVenue(venue);
-                        log.info("Legacy venue {} has not been updated for case {}",
-                                venue, caseDetails.getId());
-                    }
+                    venueEpimsId = venueService.getEpimsIdForVenue(venue);
+                    log.info("Legacy venue {} has not been updated for case {}",
+                            venue, caseDetails.getId());
                 }
 
             }
