@@ -1758,5 +1758,6 @@
   {"LiveFrom": "09/02/2026", "CaseTypeID": "Benefit", "CaseFieldID": "ftaResponseReviewRequired", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
   {"LiveFrom": "09/02/2026", "CaseTypeID": "Benefit", "CaseFieldID": "ftaResponseReviewRequired", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRU"},
   {"LiveFrom": "09/02/2026", "CaseTypeID": "Benefit", "CaseFieldID": "ftaResponseReviewRequired", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRU"},
+  {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "CaseFieldID": "confidentialityTab", "AccessProfile": "citizen", "CRUD": "CRUD"},
   {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "CaseFieldID": "confidentialityTab", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"}
 ]
