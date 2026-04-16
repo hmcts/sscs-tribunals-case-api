@@ -89,7 +89,7 @@ public enum NotificationEventType {
 
     public static final String SUBSCRIPTION_OLD_ID = "subscriptionOld";
 
-    // TODO - another param in the enum???
+    // Over-ride the notification ID where a single event can result in multiple different notifications
     private static final Map<NotificationEventType, String> OVERRIDE_ID = Map.of(OTHER_PARTY_ADDED_TO_APPEAL, "otherPartyAddedToAppeal");
 
     private final EventType event;

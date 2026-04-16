@@ -131,13 +131,13 @@ public class NotificationService {
             || emptyIfNull(notificationWrapper.getNewSscsCaseData().getOtherParties()).size() < 2) {
             return false;
         }
-        final Set<String> newParties = otherPartyFullNamesNoTitle(notificationWrapper.getNewSscsCaseData().getOtherParties());
-        final Set<String> previousParties = otherPartyFullNamesNoTitle(
+        final Set<String> newParties = getUniqueOtherPartyIds(notificationWrapper.getNewSscsCaseData().getOtherParties());
+        final Set<String> previousParties = getUniqueOtherPartyIds(
             Optional.ofNullable(notificationWrapper.getOldSscsCaseData()).map(SscsCaseData::getOtherParties).orElse(emptyList()));
         return !newParties.equals(previousParties);
     }
 
-    private Set<String> otherPartyFullNamesNoTitle(final List<CcdValue<OtherParty>> otherParties) {
+    private Set<String> getUniqueOtherPartyIds(final List<CcdValue<OtherParty>> otherParties) {
         return emptyIfNull(otherParties).stream()
             .map(CcdValue::getValue)
             .map(Entity::getId)

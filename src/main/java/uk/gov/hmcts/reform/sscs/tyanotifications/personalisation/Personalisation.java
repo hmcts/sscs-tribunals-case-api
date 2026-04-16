@@ -160,6 +160,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DIRECTION_ISSUED_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.EVIDENCE_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.JUDGE_DECISION_APPEAL_TO_PROCEED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.OTHER_PARTY_ADDED_TO_APPEAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PERMISSION_TO_APPEAL_REFUSED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.REVIEW_AND_SET_ASIDE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SUBSCRIPTION_CREATED;
@@ -189,6 +190,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -465,7 +467,9 @@ public class Personalisation<E extends NotificationWrapper> {
         }
 
         setConfidentialFields(ccdResponse, subscriptionWithType, personalisation);
-        if (cmOtherPartyConfidentialityEnabled && ccdResponse.isBenefitType(CHILD_SUPPORT)) {
+        if (cmOtherPartyConfidentialityEnabled
+            && ccdResponse.isBenefitType(CHILD_SUPPORT)
+            && OTHER_PARTY_ADDED_TO_APPEAL.equals(responseWrapper.getNotificationEventType())) {
             setOtherPartyConfidentialityFields(ccdResponse, ccdResponsePrevious, personalisation);
         }
 
@@ -632,19 +636,21 @@ public class Personalisation<E extends NotificationWrapper> {
     }
 
     private static List<CcdValue<OtherParty>> getNewlyAddedParties(SscsCaseData ccdResponse, SscsCaseData ccdResponsePrevious) {
-        final Set<String> previousOtherPartyIds = ccdResponsePrevious != null && isNotEmpty(
-            ccdResponsePrevious.getOtherParties()) ? ccdResponsePrevious
-                                                     .getOtherParties()
-                                                     .stream()
-                                                     .map(party -> party.getValue().getId())
-                                                     .collect(toSet()) : Set.of();
+        final Set<String> previousOtherPartyIds;
+        if (ccdResponsePrevious != null && isNotEmpty(ccdResponsePrevious.getOtherParties())) {
+            previousOtherPartyIds = ccdResponsePrevious.getOtherParties().stream()
+                .map(party -> party.getValue().getId())
+                .collect(toSet());
+        } else {
+            previousOtherPartyIds = Set.of();
+        }
 
-        return isNotEmpty(ccdResponse.getOtherParties()) ? ccdResponse
-                                                           .getOtherParties()
-                                                           .stream()
-                                                           .filter(
-                                                               party -> !previousOtherPartyIds.contains(party.getValue().getId()))
-                                                           .toList() : List.of();
+        if (CollectionUtils.isEmpty(ccdResponse.getOtherParties())) {
+            return List.of();
+        }
+        return ccdResponse.getOtherParties().stream()
+            .filter(party -> !previousOtherPartyIds.contains(party.getValue().getId()))
+            .toList();
     }
 
     private String getRequestOutcome(DatedRequestOutcome datedRequestOutcome) {

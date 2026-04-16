@@ -155,6 +155,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.JUDGE_DECISION_APPEAL_TO_PROCEED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.LIBERTY_TO_APPLY_GRANTED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.LIBERTY_TO_APPLY_REFUSED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.OTHER_PARTY_ADDED_TO_APPEAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PERMISSION_TO_APPEAL_GRANTED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PERMISSION_TO_APPEAL_REFUSED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.POSTPONEMENT;
@@ -166,7 +167,6 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SUBSCRIPTION_CREATED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SYA_APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.TCW_DECISION_APPEAL_TO_PROCEED;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.UPDATE_OTHER_PARTY_DATA;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.VALID_APPEAL_CREATED;
 
 import java.time.Instant;
@@ -887,7 +887,7 @@ class PersonalisationTest {
         List<Event> events = new ArrayList<>();
         events.add(Event.builder().value(EventDetails.builder().date(DATE).type(EventType.APPEAL_RECEIVED.getCcdType()).build()).build());
 
-        RegionalProcessingCenter rpc = RegionalProcessingCenter
+        rpc = RegionalProcessingCenter
             .builder()
             .name("GLASGOW")
             .phoneNumber(phone)
@@ -1070,7 +1070,7 @@ class PersonalisationTest {
             .subscribeSms("No")
             .build();
 
-        Subscriptions subscriptions = Subscriptions.builder().appellantSubscription(appellantSubscription).build();
+        subscriptions = Subscriptions.builder().appellantSubscription(appellantSubscription).build();
 
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
@@ -1203,8 +1203,8 @@ class PersonalisationTest {
 
         Map<String, Object> result = personalisation.setEventData(new HashMap<>(), response, APPEAL_RECEIVED);
 
-        assertThat(result.get(APPEAL_RESPOND_DATE))
-            .isEqualTo(LocalDate.now()
+        assertThat(result)
+            .containsEntry(APPEAL_RESPOND_DATE, LocalDate.now()
                 .plusDays(responsePeriod)
                 .format(DateTimeFormatter.ofPattern(RESPONSE_DATE_FORMAT)));
     }
@@ -1546,7 +1546,7 @@ class PersonalisationTest {
             .notificationEventType(HEARING_BOOKED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isNotNull();
-        assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isEqualTo("BBA3-DIR");
+        assertThat(result).containsEntry(HMC_HEARING_TYPE_LITERAL, "BBA3-DIR");
     }
 
     @Test
@@ -1575,7 +1575,7 @@ class PersonalisationTest {
             .notificationEventType(HEARING_BOOKED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isNotNull();
-        assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isEqualTo("BBA3-SUB");
+        assertThat(result).containsEntry(HMC_HEARING_TYPE_LITERAL, "BBA3-SUB");
     }
 
     @Test
@@ -1604,7 +1604,7 @@ class PersonalisationTest {
             .notificationEventType(HEARING_BOOKED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isNotNull();
-        assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isEqualTo("BBA3-DIR");
+        assertThat(result).containsEntry(HMC_HEARING_TYPE_LITERAL, "BBA3-DIR");
     }
 
     @Test
@@ -1632,7 +1632,7 @@ class PersonalisationTest {
             .notificationEventType(HEARING_BOOKED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isNotNull();
-        assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isEqualTo("BBA3-SUB");
+        assertThat(result).containsEntry(HMC_HEARING_TYPE_LITERAL, "BBA3-SUB");
     }
 
     @Test
@@ -1661,7 +1661,7 @@ class PersonalisationTest {
             .notificationEventType(HEARING_BOOKED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isNotNull();
-        assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isEqualTo("BBA3-SUB");
+        assertThat(result).containsEntry(HMC_HEARING_TYPE_LITERAL, "BBA3-SUB");
     }
 
     @Test
@@ -1691,7 +1691,7 @@ class PersonalisationTest {
 
     @Test
     void shouldPopulateRegionalProcessingCenterFromCcdCaseIfItsPresent() {
-        RegionalProcessingCenter rpc = RegionalProcessingCenter.builder()
+        rpc = RegionalProcessingCenter.builder()
             .name("LIVERPOOL").address1(ADDRESS1).address2(ADDRESS2).address3(ADDRESS3).address4(ADDRESS4).city(CITY).postcode(POSTCODE).build();
 
         SscsCaseData response = SscsCaseData.builder().regionalProcessingCenter(rpc).build();
@@ -2622,7 +2622,7 @@ class PersonalisationTest {
         final Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper
                 .builder()
                 .newSscsCaseData(response)
-                .notificationEventType(UPDATE_OTHER_PARTY_DATA)
+                .notificationEventType(OTHER_PARTY_ADDED_TO_APPEAL)
                 .build(),
             new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(),
                 response.getAppeal().getAppellant()));
@@ -2667,7 +2667,7 @@ class PersonalisationTest {
                 .builder()
                 .newSscsCaseData(newData)
                 .oldSscsCaseData(previousData)
-                .notificationEventType(UPDATE_OTHER_PARTY_DATA)
+                .notificationEventType(OTHER_PARTY_ADDED_TO_APPEAL)
                 .build(),
             new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, newData.getAppeal().getAppellant(),
                 newData.getAppeal().getAppellant()));
