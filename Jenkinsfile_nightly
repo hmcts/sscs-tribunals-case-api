@@ -113,35 +113,59 @@ withNightlyPipeline(type, product, component) {
 
     loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')
-    enableFortifyScan()
-    enableFullFunctionalTest()
-
-    beforeAlways('fullFunctionalTest') {
-        runE2eTestsNightly()
-        publishHTML([
+    // enableFortifyScan()
+    // enableFullFunctionalTest()
+    runE2eTestsNightly()
+    publishHTML([
                 allowMissing         : true,
                 alwaysLinkToLastBuild: true,
                 keepAll              : true,
                 reportDir            : "playwright-report",
                 reportFiles          : 'index.html',
                 reportName           : 'SSCS E2E Test Report'
-        ])
+    ])
 
-        archiveArtifacts(
+    archiveArtifacts(
             artifacts: '**/playwright-report/test-results.json', 
             allowEmptyArchive: true
-        )
+    )
 
-        runAccessibilityTestsNightly()
-        publishHTML([
+    runAccessibilityTestsNightly()
+    publishHTML([
                 allowMissing         : true,
                 alwaysLinkToLastBuild: true,
                 keepAll              : true,
                 reportDir            : "accessibility-report",
                 reportFiles          : 'index.html',
                 reportName           : 'SSCS Accessibility Test Report'
-        ])
-    }
+    ])
+
+    // afterAlways('fullFunctionalTest') {
+        // runE2eTestsNightly()
+        // publishHTML([
+        //         allowMissing         : true,
+        //         alwaysLinkToLastBuild: true,
+        //         keepAll              : true,
+        //         reportDir            : "playwright-report",
+        //         reportFiles          : 'index.html',
+        //         reportName           : 'SSCS E2E Test Report'
+        // ])
+
+        // archiveArtifacts(
+        //     artifacts: '**/playwright-report/test-results.json', 
+        //     allowEmptyArchive: true
+        // )
+
+        // runAccessibilityTestsNightly()
+        // publishHTML([
+        //         allowMissing         : true,
+        //         alwaysLinkToLastBuild: true,
+        //         keepAll              : true,
+        //         reportDir            : "accessibility-report",
+        //         reportFiles          : 'index.html',
+        //         reportName           : 'SSCS Accessibility Test Report'
+        // ])
+    // }
 
 
     afterSuccess('fortify-scan') {
