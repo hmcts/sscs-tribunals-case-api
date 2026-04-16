@@ -460,7 +460,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                     }
                 } else {
                     log.info("Legacy venue {} has not been updated for case {}",
-                            venue, caseDetails.getId());
+                            sscsCaseData.getProcessingVenue(), caseDetails.getId());
                 }
             }
         } else {
