@@ -149,6 +149,7 @@ public final class NotificationEventTypeLists {
         JOINT_PARTY_ADDED,
         LIBERTY_TO_APPLY_REQUEST,
         NON_COMPLIANT,
+        // TODO Do we need this? This isn't an event
         OTHER_PARTY_ADDED_TO_APPEAL,
         PERMISSION_TO_APPEAL_GRANTED,
         PERMISSION_TO_APPEAL_REFUSED,
@@ -458,6 +459,7 @@ public final class NotificationEventTypeLists {
         DWP_UPLOAD_RESPONSE,
         HEARING_BOOKED,
         HMCTS_APPEAL_LAPSED,
+        // TODO - Do we need this? This isn't an event
         OTHER_PARTY_ADDED_TO_APPEAL,
         POSTPONEMENT,
         ISSUE_ADJOURNMENT_NOTICE,

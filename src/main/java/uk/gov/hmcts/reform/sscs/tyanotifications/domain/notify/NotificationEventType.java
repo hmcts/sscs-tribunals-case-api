@@ -62,7 +62,7 @@ public enum NotificationEventType {
     PROCESS_AUDIO_VIDEO_WELSH(EventType.PROCESS_AUDIO_VIDEO_WELSH, true, true, true, false, false, 0),
     PROVIDE_APPOINTEE_DETAILS(EventType.PROVIDE_APPOINTEE_DETAILS, true, true, true, true, false, 0),
     // Allow out of hours for this event as we rely on the case data to decide who to send to. It could get out of sync if we wait a few hours to send, for example they could try to reissue to 2 parties so this event would be triggered twice.
-    // If the reminder service looks the case up from CCD, the original request for whom to send the notification to will be lost and the second party would receive the notification twice.,
+    // If the reminder service looks the case up from CCD, the original request for whom to send the notification to will be lost and the second party would receive the notification twice.
     REISSUE_DOCUMENT(EventType.REISSUE_DOCUMENT, true, true, true, true, false, 0),
     REQUEST_FOR_INFORMATION(EventType.REQUEST_FOR_INFORMATION, true, true, true, false, false, 0),
     RESEND_APPEAL_CREATED(EventType.RESEND_APPEAL_CREATED, true, true, false, true, false, 0),
@@ -89,6 +89,7 @@ public enum NotificationEventType {
 
     public static final String SUBSCRIPTION_OLD_ID = "subscriptionOld";
 
+    // TODO - another param in the enum???
     private static final Map<NotificationEventType, String> OVERRIDE_ID = Map.of(OTHER_PARTY_ADDED_TO_APPEAL, "otherPartyAddedToAppeal");
 
     private final EventType event;

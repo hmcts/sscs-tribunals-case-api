@@ -2608,46 +2608,54 @@ public class PersonalisationTest {
 
     @ParameterizedTest(name = "{0} other parties -> OTHER_PARTY_SIZE = {1}")
     @MethodSource("childSupportOtherPartySizeScenarios")
-    void givenChildSupportBenefitAndFeatureEnabled_thenSetsOtherPartySize(final List<CcdValue<OtherParty>> otherParties, final int expectedSize) {
+    void givenChildSupportBenefitAndFeatureEnabled_thenSetsOtherPartySize(final List<CcdValue<OtherParty>> otherParties,
+        final int expectedSize) {
         setField(personalisation, "cmOtherPartyConfidentialityEnabled", true);
-        final SscsCaseData response = SscsCaseData.builder()
-                                                  .ccdCaseId(CASE_ID)
-                                                  .appeal(Appeal.builder()
-                                                                .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
-                                                                .appellant(Appellant.builder().name(name).build())
-                                                                .build())
-                                                  .otherParties(otherParties)
-                                                  .build();
+        final SscsCaseData response = SscsCaseData
+            .builder()
+            .ccdCaseId(CASE_ID)
+            .appeal(Appeal
+                .builder()
+                .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
+                .appellant(Appellant.builder().name(name).build())
+                .build())
+            .otherParties(otherParties)
+            .build();
 
-        final Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper.builder()
-                                                                                                 .newSscsCaseData(response)
-                                                                                                 .notificationEventType(UPDATE_OTHER_PARTY_DATA)
-                                                                                                 .build(),
-            new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT,
-                response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
+        final Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper
+                .builder()
+                .newSscsCaseData(response)
+                .notificationEventType(UPDATE_OTHER_PARTY_DATA)
+                .build(),
+            new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(),
+                response.getAppeal().getAppellant()));
 
         assertThat(result).containsEntry(OTHER_PARTY_SIZE, expectedSize);
     }
 
     @ParameterizedTest(name = "parties {0} -> OTHER_PARTY_NAMES = \"{1}\"")
     @MethodSource("childSupportOtherPartyNamesScenarios")
-    void givenChildSupportBenefitAndFeatureEnabled_thenSetsOtherPartyNames(final List<CcdValue<OtherParty>> otherParties, final String expectedNames) {
+    void givenChildSupportBenefitAndFeatureEnabled_thenSetsOtherPartyNames(final List<CcdValue<OtherParty>> otherParties,
+        final String expectedNames) {
         setField(personalisation, "cmOtherPartyConfidentialityEnabled", true);
-        final SscsCaseData response = SscsCaseData.builder()
-                                                  .ccdCaseId(CASE_ID)
-                                                  .appeal(Appeal.builder()
-                                                                .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
-                                                                .appellant(Appellant.builder().name(name).build())
-                                                                .build())
-                                                  .otherParties(otherParties)
-                                                  .build();
+        final SscsCaseData response = SscsCaseData
+            .builder()
+            .ccdCaseId(CASE_ID)
+            .appeal(Appeal
+                .builder()
+                .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
+                .appellant(Appellant.builder().name(name).build())
+                .build())
+            .otherParties(otherParties)
+            .build();
 
-        final Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper.builder()
-                                                                                                 .newSscsCaseData(response)
-                                                                                                 .notificationEventType(UPDATE_OTHER_PARTY_DATA)
-                                                                                                 .build(),
-            new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT,
-                response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
+        final Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper
+                .builder()
+                .newSscsCaseData(response)
+                .notificationEventType(UPDATE_OTHER_PARTY_DATA)
+                .build(),
+            new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(),
+                response.getAppeal().getAppellant()));
 
         assertThat(result).containsEntry(OTHER_PARTY_NAMES, expectedNames);
     }
@@ -2657,45 +2665,51 @@ public class PersonalisationTest {
     void givenChildSupportBenefitAndFeatureEnabled_thenSetsAppellantConfidentialityRequired(final YesNo confidentialityRequired,
         final boolean expectedValue) {
         setField(personalisation, "cmOtherPartyConfidentialityEnabled", true);
-        final SscsCaseData response = SscsCaseData.builder()
-                                                  .ccdCaseId(CASE_ID)
-                                                  .appeal(Appeal.builder()
-                                                                .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
-                                                                .appellant(Appellant.builder().name(name).confidentialityRequired(confidentialityRequired).build())
-                                                                .build())
-                                                  .otherParties(buildOtherParties("Alice Jones", "Bob Smith"))
-                                                  .build();
+        final SscsCaseData response = SscsCaseData
+            .builder()
+            .ccdCaseId(CASE_ID)
+            .appeal(Appeal
+                .builder()
+                .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
+                .appellant(Appellant.builder().name(name).confidentialityRequired(confidentialityRequired).build())
+                .build())
+            .otherParties(buildOtherParties("Alice Jones", "Bob Smith"))
+            .build();
 
-        final Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper.builder()
-                                                                                                 .newSscsCaseData(response)
-                                                                                                 .notificationEventType(UPDATE_OTHER_PARTY_DATA)
-                                                                                                 .build(),
-            new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT,
-                response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
+        final Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper
+                .builder()
+                .newSscsCaseData(response)
+                .notificationEventType(UPDATE_OTHER_PARTY_DATA)
+                .build(),
+            new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(),
+                response.getAppeal().getAppellant()));
 
         assertThat(result).containsEntry(APPELLANT_CONFIDENTIALITY_REQUIRED, expectedValue);
     }
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("childSupportPersonalisationNotApplicableScenarios")
-    void givenChildSupportPersonalisationNotApplicable_thenDoesNotSetChildSupportKeys(
-        final String scenario, final String benefitCode, final List<CcdValue<OtherParty>> otherParties) {
+    void givenChildSupportPersonalisationNotApplicable_thenDoesNotSetChildSupportKeys(final String scenario,
+        final String benefitCode, final List<CcdValue<OtherParty>> otherParties) {
         setField(personalisation, "cmOtherPartyConfidentialityEnabled", true);
-        final SscsCaseData response = SscsCaseData.builder()
-                                                  .ccdCaseId(CASE_ID)
-                                                  .appeal(Appeal.builder()
-                                                                .benefitType(BenefitType.builder().code(benefitCode).build())
-                                                                .appellant(Appellant.builder().name(name).confidentialityRequired(YES).build())
-                                                                .build())
-                                                  .otherParties(otherParties)
-                                                  .build();
+        final SscsCaseData response = SscsCaseData
+            .builder()
+            .ccdCaseId(CASE_ID)
+            .appeal(Appeal
+                .builder()
+                .benefitType(BenefitType.builder().code(benefitCode).build())
+                .appellant(Appellant.builder().name(name).confidentialityRequired(YES).build())
+                .build())
+            .otherParties(otherParties)
+            .build();
 
-        final Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper.builder()
-                                                                                                 .newSscsCaseData(response)
-                                                                                                 .notificationEventType(UPDATE_OTHER_PARTY_DATA)
-                                                                                                 .build(),
-            new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT,
-                response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
+        final Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper
+                .builder()
+                .newSscsCaseData(response)
+                .notificationEventType(UPDATE_OTHER_PARTY_DATA)
+                .build(),
+            new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(),
+                response.getAppeal().getAppellant()));
 
         assertThat(result).doesNotContainKeys(OTHER_PARTY_SIZE, OTHER_PARTY_NAMES);
     }
@@ -2703,63 +2717,53 @@ public class PersonalisationTest {
     @Test
     void givenChildSupportBenefitAndFeatureDisabled_thenDoesNotSetChildSupportPersonalisation() {
         setField(personalisation, "cmOtherPartyConfidentialityEnabled", false);
-        final SscsCaseData response = SscsCaseData.builder()
-                                                  .ccdCaseId(CASE_ID)
-                                                  .appeal(Appeal.builder()
-                                                                .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
-                                                                .appellant(Appellant.builder().name(name).confidentialityRequired(YES).build())
-                                                                .build())
-                                                  .otherParties(buildOtherParties("Alice Jones", "Bob Smith"))
-                                                  .build();
+        final SscsCaseData response = SscsCaseData
+            .builder()
+            .ccdCaseId(CASE_ID)
+            .appeal(Appeal
+                .builder()
+                .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
+                .appellant(Appellant.builder().name(name).confidentialityRequired(YES).build())
+                .build())
+            .otherParties(buildOtherParties("Alice Jones", "Bob Smith"))
+            .build();
 
-        final Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper.builder()
-                                                                                                 .newSscsCaseData(response)
-                                                                                                 .notificationEventType(UPDATE_OTHER_PARTY_DATA)
-                                                                                                 .build(),
-            new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT,
-                response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
+        final Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper
+                .builder()
+                .newSscsCaseData(response)
+                .notificationEventType(UPDATE_OTHER_PARTY_DATA)
+                .build(),
+            new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(),
+                response.getAppeal().getAppellant()));
 
         assertThat(result).doesNotContainKeys(OTHER_PARTY_SIZE, OTHER_PARTY_NAMES, APPELLANT_CONFIDENTIALITY_REQUIRED);
     }
 
     private static Stream<Arguments> childSupportPersonalisationNotApplicableScenarios() {
-        return Stream.of(
-            Arguments.of("non-child-support benefit with other parties",
-                Benefit.PIP.getShortName(), buildOtherParties("Alice Jones", "Bob Smith")),
-            Arguments.of("child support benefit with no other parties",
-                Benefit.CHILD_SUPPORT.getShortName(), null)
-        );
+        return Stream.of(Arguments.of("non-child-support benefit with other parties", Benefit.PIP.getShortName(),
+                buildOtherParties("Alice Jones", "Bob Smith")),
+            Arguments.of("child support benefit with no other parties", Benefit.CHILD_SUPPORT.getShortName(), null));
     }
 
     private static Stream<Arguments> childSupportOtherPartySizeScenarios() {
-        return Stream.of(
-            Arguments.of(buildOtherParties("Alice Jones"), 0),
+        return Stream.of(Arguments.of(buildOtherParties("Alice Jones"), 0),
             Arguments.of(buildOtherParties("Alice Jones", "Bob Smith"), 1),
-            Arguments.of(buildOtherParties("Alice Jones", "Bob Smith", "Carol White"), 2)
-        );
+            Arguments.of(buildOtherParties("Alice Jones", "Bob Smith", "Carol White"), 2));
     }
 
     private static Stream<Arguments> childSupportOtherPartyNamesScenarios() {
-        return Stream.of(
-            Arguments.of(buildOtherParties("Alice Jones", "Bob Smith"), "Bob Smith"),
+        return Stream.of(Arguments.of(buildOtherParties("Alice Jones", "Bob Smith"), "Bob Smith"),
             Arguments.of(buildOtherParties("Alice Jones", "Bob Smith", "Carol White"), "Bob Smith and Carol White"),
             Arguments.of(buildOtherParties("Alice Jones", "Bob Smith", "Carol White", "Dan Brown"),
-                "Bob Smith, Carol White and Dan Brown")
-        );
+                "Bob Smith, Carol White and Dan Brown"));
     }
 
     private static Stream<Arguments> childSupportConfidentialityScenarios() {
-        return Stream.of(
-            Arguments.of(YES, true),
-            Arguments.of(NO, false),
-            Arguments.of(null, false)
-        );
+        return Stream.of(Arguments.of(YES, true), Arguments.of(NO, false), Arguments.of(null, false));
     }
 
     private static List<CcdValue<OtherParty>> buildOtherParties(final String... fullNames) {
-        return Arrays.stream(fullNames)
-                     .map(PersonalisationTest::buildOtherParty)
-                     .toList();
+        return Arrays.stream(fullNames).map(PersonalisationTest::buildOtherParty).toList();
     }
 
     private static CcdValue<OtherParty> buildOtherParty(final String fullName) {

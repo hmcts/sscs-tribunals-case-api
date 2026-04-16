@@ -603,6 +603,7 @@ public class Personalisation<E extends NotificationWrapper> {
             personalisation.put(APPELLANT_CONFIDENTIALITY_REQUIRED,
                 YesNo.YES == ccdResponse.getAppellantConfidentialityRequired().orElse(null));
             if (isNotEmpty(ccdResponse.getOtherParties())) {
+                // Discard the first other party as a notification will already have been sent via the add other party data event
                 final List<CcdValue<OtherParty>> otherParties = new ArrayList<>(ccdResponse.getOtherParties().subList(1, ccdResponse.getOtherParties().size()));
                 personalisation.put(OTHER_PARTY_SIZE, otherParties.size());
                 personalisation.put(OTHER_PARTY_NAMES, otherParties
