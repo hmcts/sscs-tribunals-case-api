@@ -116,7 +116,7 @@ withNightlyPipeline(type, product, component) {
     enableFortifyScan()
     enableFullFunctionalTest()
 
-    afterAlways('fullFunctionalTest') {
+    beforeAlways('fullFunctionalTest') {
         runE2eTestsNightly()
         publishHTML([
                 allowMissing         : true,
