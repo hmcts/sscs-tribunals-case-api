@@ -2048,7 +2048,48 @@ public class NotificationServiceTest {
     }
 
     @Test
-    public void givenCmConfidentialityEnabledAndUpdateOtherPartyDataWithMultipleOtherParties_thenTriggerOtherPartyAddedToAppealNotification() throws IOException {
+    @Parameters(method = "cmConfidentialityTestScenarios")
+    public void givenCmConfidentialityEnabledAndOtherPartyScenarios_thenHandleNotificationTypeAccordingly(
+        String scenarioName,
+        List<CcdValue<OtherParty>> oldParties,
+        List<CcdValue<OtherParty>> newParties,
+        SscsCaseData oldData,
+        NotificationEventType inputEventType,
+        NotificationEventType expectedEventType
+    ) throws IOException {
+        final SendNotificationService sendNotificationService = new SendNotificationService(
+            notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
+        final NotificationService cmConfidentialityService = new NotificationService(
+            factory, reminderService, notificationValidService, notificationHandler,
+            outOfHoursCalculator, notificationConfig, sendNotificationService, false, true);
+
+        final SscsCaseData.SscsCaseDataBuilder baseBuilder = getSscsCaseDataBuilder(
+            APPELLANT_WITH_ADDRESS, null,
+            SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build());
+
+        final SscsCaseData actualOldData = oldData != null ? oldData :
+            (oldParties != null ? baseBuilder.otherParties(oldParties).build() : null);
+        final SscsCaseData newData = baseBuilder.otherParties(newParties).build();
+
+        ccdNotificationWrapper = buildBaseWrapperWithCaseData(newData, actualOldData, inputEventType);
+
+        final Notification notification = new Notification(
+            Template.builder().docmosisTemplateId(LETTER_TEMPLATE_ID).emailTemplateId(null).smsTemplateId(null).build(),
+            Destination.builder().email("test@testing.com").sms("07823456746").build(),
+            new HashMap<>(), new Reference(), null);
+
+        given(factory.create(ccdNotificationWrapperCaptor.capture(), any())).willReturn(notification);
+        given(notificationValidService.isHearingTypeValidToSendNotification(any(SscsCaseData.class), any())).willReturn(true);
+        given(notificationValidService.isNotificationStillValidToSend(anyList(), any())).willReturn(true);
+        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(getCoversheet());
+
+        cmConfidentialityService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
+
+        assertThat(ccdNotificationWrapperCaptor.getValue().getNotificationType()).isEqualTo(expectedEventType);
+    }
+
+    @Test
+    public void givenCmConfidentialityEnabledAndOtherPartiesUnchangedById_thenDoNotTriggerOtherPartyAddedToAppeal() throws IOException {
         final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
         final NotificationService cmConfidentialityService = new NotificationService(factory, reminderService,
             notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, true);
@@ -2059,13 +2100,40 @@ public class NotificationServiceTest {
         given(factory.create(ccdNotificationWrapperCaptor.capture(), any())).willReturn(notification);
         given(notificationValidService.isHearingTypeValidToSendNotification(any(SscsCaseData.class), any())).willReturn(true);
         given(notificationValidService.isNotificationStillValidToSend(anyList(), any())).willReturn(true);
-
-        final byte[] sampleDirectionCoversheet = getCoversheet();
-        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(sampleDirectionCoversheet);
+        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(getCoversheet());
 
         cmConfidentialityService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
 
-        assertThat(ccdNotificationWrapperCaptor.getValue().getNotificationType()).isEqualTo(OTHER_PARTY_ADDED_TO_APPEAL);
+        assertThat(ccdNotificationWrapperCaptor.getValue().getNotificationType()).isEqualTo(UPDATE_OTHER_PARTY_DATA);
+    }
+
+    @Test
+    public void givenCmConfidentialityEnabledAndUpdateOtherPartyDataWithSingleOtherParty_thenDoNotTriggerOtherPartyAddedToAppeal() throws IOException {
+        final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
+        final NotificationService cmConfidentialityService = new NotificationService(factory, reminderService,
+            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, true);
+
+        final OtherParty singleOtherParty = OtherParty.builder()
+                                                      .id("1")
+                                                      .name(Name.builder().firstName("OP").lastName("One").build())
+                                                      .address(Address.builder().line1("line 1").postcode("TS1 1ST").build())
+                                                      .sendNewOtherPartyNotification(YesNo.YES)
+                                                      .build();
+        final SscsCaseData sscsCaseDataSingleOtherParty = getSscsCaseDataBuilder(APPELLANT_WITH_ADDRESS, null, SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build())
+            .otherParties(List.of(new CcdValue<>(singleOtherParty)))
+            .build();
+        final CcdNotificationWrapper wrapper = buildBaseWrapperWithCaseData(sscsCaseDataSingleOtherParty, UPDATE_OTHER_PARTY_DATA);
+
+        final Notification notification = new Notification(Template.builder().docmosisTemplateId(LETTER_TEMPLATE_ID).emailTemplateId(null).smsTemplateId(null).build(), Destination.builder().email("test@testing.com").sms("07823456746").build(), new HashMap<>(), new Reference(), null);
+        given(factory.create(any(), any())).willReturn(notification);
+        given(notificationValidService.isHearingTypeValidToSendNotification(any(SscsCaseData.class), any())).willReturn(true);
+        given(notificationValidService.isNotificationStillValidToSend(anyList(), any())).willReturn(true);
+        final byte[] sampleDirectionCoversheet = getCoversheet();
+        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(sampleDirectionCoversheet);
+
+        cmConfidentialityService.manageNotificationAndSubscription(wrapper, false);
+
+        assertThat(wrapper.getNotificationType()).isEqualTo(UPDATE_OTHER_PARTY_DATA);
     }
 
     @Test
@@ -2083,35 +2151,6 @@ public class NotificationServiceTest {
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
 
         assertThat(ccdNotificationWrapperCaptor.getValue().getNotificationType()).isEqualTo(UPDATE_OTHER_PARTY_DATA);
-    }
-
-    @Test
-    public void givenCmConfidentialityEnabledAndUpdateOtherPartyDataWithSingleOtherParty_thenDoNotTriggerOtherPartyAddedToAppeal() throws IOException {
-        final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
-        final NotificationService cmConfidentialityService = new NotificationService(factory, reminderService,
-            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, true);
-
-        final OtherParty singleOtherParty = OtherParty.builder()
-            .id("1")
-            .name(Name.builder().firstName("OP").lastName("One").build())
-            .address(Address.builder().line1("line 1").postcode("TS1 1ST").build())
-            .sendNewOtherPartyNotification(YesNo.YES)
-            .build();
-        final SscsCaseData sscsCaseDataSingleOtherParty = getSscsCaseDataBuilder(APPELLANT_WITH_ADDRESS, null, SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build())
-            .otherParties(List.of(new CcdValue<>(singleOtherParty)))
-            .build();
-        final CcdNotificationWrapper wrapper = buildBaseWrapperWithCaseData(sscsCaseDataSingleOtherParty, UPDATE_OTHER_PARTY_DATA);
-
-        final Notification notification = new Notification(Template.builder().docmosisTemplateId(LETTER_TEMPLATE_ID).emailTemplateId(null).smsTemplateId(null).build(), Destination.builder().email("test@testing.com").sms("07823456746").build(), new HashMap<>(), new Reference(), null);
-        given(factory.create(any(), any())).willReturn(notification);
-        given(notificationValidService.isHearingTypeValidToSendNotification(any(SscsCaseData.class), any())).willReturn(true);
-        given(notificationValidService.isNotificationStillValidToSend(anyList(), any())).willReturn(true);
-        final byte[] sampleDirectionCoversheet = getCoversheet();
-        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(sampleDirectionCoversheet);
-
-        cmConfidentialityService.manageNotificationAndSubscription(wrapper, false);
-
-        assertThat(wrapper.getNotificationType()).isEqualTo(UPDATE_OTHER_PARTY_DATA);
     }
 
     @Test
@@ -2445,6 +2484,50 @@ public class NotificationServiceTest {
         assertThat(logEvents).anyMatch(e -> e.getLevel().equals(logLevel));
         assertThat(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage().contains(errorMessage)).count()).isEqualTo(1);
         assertThat(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage().contains(ccdCaseId)).count()).isGreaterThanOrEqualTo(1);
+    }
+
+    @SuppressWarnings("unused")
+    private Object[] cmConfidentialityTestScenarios() {
+        final OtherParty existingParty = OtherParty.builder()
+                                                   .id("1")
+                                                   .name(Name.builder().firstName("OP").lastName("One").build())
+                                                   .address(Address.builder().line1("line 1").postcode("TS1 1ST").build())
+                                                   .sendNewOtherPartyNotification(YesNo.YES)
+                                                   .build();
+
+        final OtherParty newParty = OtherParty.builder()
+                                              .id("2")
+                                              .name(Name.builder().firstName("OP").lastName("Two").build())
+                                              .address(Address.builder().line1("line 2").postcode("TS2 2ST").build())
+                                              .sendNewOtherPartyNotification(YesNo.YES)
+                                              .build();
+
+        return new Object[]{
+            new Object[]{
+                "New other party added by ID with UPDATE_OTHER_PARTY_DATA event",
+                List.of(new CcdValue<>(existingParty)),
+                List.of(new CcdValue<>(existingParty), new CcdValue<>(newParty)),
+                null,
+                UPDATE_OTHER_PARTY_DATA,
+                OTHER_PARTY_ADDED_TO_APPEAL
+            },
+            new Object[]{
+                "Non UPDATE_OTHER_PARTY_DATA event with new other party",
+                List.of(new CcdValue<>(existingParty)),
+                List.of(new CcdValue<>(existingParty), new CcdValue<>(newParty)),
+                null,
+                ADMIN_APPEAL_WITHDRAWN,
+                ADMIN_APPEAL_WITHDRAWN
+            },
+            new Object[]{
+                "Null old data with multiple other parties",
+                null,
+                List.of(new CcdValue<>(existingParty), new CcdValue<>(newParty)),
+                null,
+                UPDATE_OTHER_PARTY_DATA,
+                OTHER_PARTY_ADDED_TO_APPEAL
+            }
+        };
     }
 
     private static void verifyErrorLogMessageNotLogged(Appender<ILoggingEvent> mockAppender, ArgumentCaptor<ILoggingEvent> captorLoggingEvent) {

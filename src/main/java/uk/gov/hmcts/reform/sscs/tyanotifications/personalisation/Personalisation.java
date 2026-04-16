@@ -7,6 +7,7 @@ import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
@@ -177,7 +178,6 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -185,6 +185,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -338,6 +339,8 @@ public class Personalisation<E extends NotificationWrapper> {
     protected Map<String, Object> create(final NotificationSscsCaseDataWrapper responseWrapper, final SubscriptionWithType subscriptionWithType) {
 
         SscsCaseData ccdResponse = responseWrapper.getNewSscsCaseData();
+        SscsCaseData ccdResponsePrevious = responseWrapper.getOldSscsCaseData();
+
         Map<String, Object> personalisation = new HashMap<>();
         Benefit benefit = null;
 
@@ -462,6 +465,9 @@ public class Personalisation<E extends NotificationWrapper> {
         }
 
         setConfidentialFields(ccdResponse, subscriptionWithType, personalisation);
+        if (cmOtherPartyConfidentialityEnabled && ccdResponse.isBenefitType(CHILD_SUPPORT)) {
+            setOtherPartyConfidentialityFields(ccdResponse, ccdResponsePrevious, personalisation);
+        }
 
         setHelplineTelephone(ccdResponse, personalisation);
         if (subscriptionWithType.getSubscriptionType() == OTHER_PARTY) {
@@ -599,27 +605,46 @@ public class Personalisation<E extends NotificationWrapper> {
             personalisation.put(OTHER_PARTY_NAME, ccdResponse.getJointParty().getName().getFullNameNoTitle());
             personalisation.put(CONFIDENTIALITY_OUTCOME, getRequestOutcome(ccdResponse.getConfidentialityRequestOutcomeAppellant()));
         }
-        if (cmOtherPartyConfidentialityEnabled && ccdResponse.isBenefitType(CHILD_SUPPORT)) {
-            personalisation.put(APPELLANT_CONFIDENTIALITY_REQUIRED,
-                YesNo.YES == ccdResponse.getAppellantConfidentialityRequired().orElse(null));
-            if (isNotEmpty(ccdResponse.getOtherParties())) {
-                // Discard the first other party as a notification will already have been sent via the add other party data event
-                final List<CcdValue<OtherParty>> otherParties = new ArrayList<>(ccdResponse.getOtherParties().subList(1, ccdResponse.getOtherParties().size()));
-                personalisation.put(OTHER_PARTY_SIZE, otherParties.size());
-                personalisation.put(OTHER_PARTY_NAMES, otherParties
-                    .stream()
-                    .map(party -> party.getValue().getName().getFullNameNoTitle())
-                    .collect(collectingAndThen(toList(), list -> {
-                        if (list.isEmpty()) {
-                            return "";
-                        } else if (list.size() == 1) {
-                            return list.getFirst();
-                        } else {
-                            return String.join(", ", list.subList(0, list.size() - 1)) + " and " + list.getLast();
-                        }
-                    })));
-            }
+    }
+
+    private void setOtherPartyConfidentialityFields(SscsCaseData ccdResponse, SscsCaseData ccdResponsePrevious,
+        Map<String, Object> personalisation) {
+
+        personalisation.put(APPELLANT_CONFIDENTIALITY_REQUIRED,
+            YesNo.YES == ccdResponse.getAppellantConfidentialityRequired().orElse(null));
+
+        final List<CcdValue<OtherParty>> otherParties = getNewlyAddedParties(ccdResponse, ccdResponsePrevious);
+        personalisation.put(OTHER_PARTY_SIZE, otherParties.size());
+        personalisation.put(OTHER_PARTY_NAMES, otherParties
+            .stream()
+            .map(party -> party.getValue().getName().getFullNameNoTitle())
+            .collect(collectingAndThen(toList(), Personalisation::formatCommaSeparatedList)));
+    }
+
+    private static String formatCommaSeparatedList(List<String> list) {
+        if (list.isEmpty()) {
+            return "";
+        } else if (list.size() == 1) {
+            return list.getFirst();
+        } else {
+            return String.join(", ", list.subList(0, list.size() - 1)) + " and " + list.getLast();
         }
+    }
+
+    private static List<CcdValue<OtherParty>> getNewlyAddedParties(SscsCaseData ccdResponse, SscsCaseData ccdResponsePrevious) {
+        final Set<String> previousOtherPartyIds = ccdResponsePrevious != null && isNotEmpty(
+            ccdResponsePrevious.getOtherParties()) ? ccdResponsePrevious
+                                                     .getOtherParties()
+                                                     .stream()
+                                                     .map(party -> party.getValue().getId())
+                                                     .collect(toSet()) : Set.of();
+
+        return isNotEmpty(ccdResponse.getOtherParties()) ? ccdResponse
+                                                           .getOtherParties()
+                                                           .stream()
+                                                           .filter(
+                                                               party -> !previousOtherPartyIds.contains(party.getValue().getId()))
+                                                           .toList() : List.of();
     }
 
     private String getRequestOutcome(DatedRequestOutcome datedRequestOutcome) {

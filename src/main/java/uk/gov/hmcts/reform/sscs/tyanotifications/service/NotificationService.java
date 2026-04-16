@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getBenefitByCodeOrThrowException;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
@@ -19,6 +19,7 @@ import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,14 +118,30 @@ public class NotificationService {
             log.info("Trigger second notification event for {}", UPDATE_OTHER_PARTY_DATA.getId());
             notificationWrapper.getSscsCaseDataWrapper().setNotificationEventType(UPDATE_OTHER_PARTY_DATA);
             sendNotificationPerSubscription(notificationWrapper);
-        } else if (cmConfidentialityEnabled
-            && notificationWrapper.getNotificationType().equals(UPDATE_OTHER_PARTY_DATA)
-            && isNotEmpty(notificationWrapper.getSscsCaseDataWrapper().getNewSscsCaseData().getOtherParties())
-            && notificationWrapper.getSscsCaseDataWrapper().getNewSscsCaseData().getOtherParties().size() > 1) {
+        } else if (shouldNotifyAppellantAboutAdditionalOtherParty(notificationWrapper)) {
             log.info("Trigger second notification event for {}", OTHER_PARTY_ADDED_TO_APPEAL.getId());
             notificationWrapper.getSscsCaseDataWrapper().setNotificationEventType(OTHER_PARTY_ADDED_TO_APPEAL);
             sendNotificationPerSubscription(notificationWrapper);
         }
+    }
+
+    private boolean shouldNotifyAppellantAboutAdditionalOtherParty(final NotificationWrapper notificationWrapper) {
+        if (!cmConfidentialityEnabled
+            || !notificationWrapper.getNotificationType().equals(UPDATE_OTHER_PARTY_DATA)
+            || emptyIfNull(notificationWrapper.getNewSscsCaseData().getOtherParties()).size() < 2) {
+            return false;
+        }
+        final Set<String> newParties = otherPartyFullNamesNoTitle(notificationWrapper.getNewSscsCaseData().getOtherParties());
+        final Set<String> previousParties = otherPartyFullNamesNoTitle(
+            Optional.ofNullable(notificationWrapper.getOldSscsCaseData()).map(SscsCaseData::getOtherParties).orElse(emptyList()));
+        return !newParties.equals(previousParties);
+    }
+
+    private Set<String> otherPartyFullNamesNoTitle(final List<CcdValue<OtherParty>> otherParties) {
+        return emptyIfNull(otherParties).stream()
+            .map(CcdValue::getValue)
+            .map(Entity::getId)
+            .collect(Collectors.toSet());
     }
 
     private void sendNotificationPerSubscription(NotificationWrapper notificationWrapper) {
