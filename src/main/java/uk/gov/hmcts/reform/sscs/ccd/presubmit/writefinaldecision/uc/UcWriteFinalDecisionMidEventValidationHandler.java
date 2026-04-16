@@ -18,15 +18,10 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 @Component
 public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDecisionMidEventValidationHandlerBase {
 
-    @Value("${feature.severeConditions.enabled}")
-    private final boolean isSevereConditionsEnabled;
-
     public UcWriteFinalDecisionMidEventValidationHandler(Validator validator,
                                                          DecisionNoticeService decisionNoticeService,
-                                                         @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled,
-                                                         @Value("${feature.severeConditions.enabled}") boolean isSevereConditionsEnabled) {
+                                                         @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled) {
         super(validator, decisionNoticeService, isPostHearingsEnabled);
-        this.isSevereConditionsEnabled = isSevereConditionsEnabled;
     }
 
     @Override
@@ -39,13 +34,12 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
         if (sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionSchedule7ActivitiesApply() == null) {
             sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
         }
-        if (isSevereConditionsEnabled) {
-            sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionHasSVIssueCode(setSevereCriteriaApplies(sscsCaseData));
-            if (!YES.equals(sscsCaseData.getSscsUcCaseData().getShowSchedule7ActivitiesPage()) || ("No").equals(sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionSchedule7ActivitiesApply())) {
-                sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(null);
-            }
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionHasSVIssueCode(setSevereCriteriaApplies(sscsCaseData));
 
+        if (!YES.equals(sscsCaseData.getSscsUcCaseData().getShowSchedule7ActivitiesPage()) || ("No").equals(sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionSchedule7ActivitiesApply())) {
+            sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(null);
         }
+
     }
 
     @Override

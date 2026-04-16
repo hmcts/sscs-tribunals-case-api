@@ -47,7 +47,6 @@ import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDecisionPreviewDecisionServiceTestBase {
 
     private static final String DD_MM_YYYY = "dd-MM-YYYY";
-    private static final boolean isSevereConditionsEnabled = false;
     protected UcDecisionNoticeOutcomeService ucDecisionNoticeOutcomeService;
     protected UcDecisionNoticeQuestionService ucDecisionNoticeQuestionService;
     protected VenueDataLoader venueDataLoader;
@@ -63,7 +62,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
     protected WriteFinalDecisionPreviewDecisionServiceBase createPreviewDecisionService(GenerateFile generateFile, UserDetailsService userDetailsService,
                                                                                         DocumentConfiguration documentConfiguration) {
         return new UcWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService, ucDecisionNoticeQuestionService, ucDecisionNoticeOutcomeService, documentConfiguration,
-            venueDataLoader, isSevereConditionsEnabled);
+            venueDataLoader);
     }
 
     @Override
@@ -2357,7 +2356,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         UcWriteFinalDecisionPreviewDecisionService ucWriteFinalDecisionPreviewDecisionService = new UcWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService, ucDecisionNoticeQuestionService, ucDecisionNoticeOutcomeService, documentConfiguration,
-                venueDataLoader, true); ;
+                venueDataLoader);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = ucWriteFinalDecisionPreviewDecisionService.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
@@ -2425,7 +2424,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereCriteriaApply(severeCriteriaApply);
 
         UcWriteFinalDecisionPreviewDecisionService ucWriteFinalDecisionPreviewDecisionService = new UcWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService, ucDecisionNoticeQuestionService, ucDecisionNoticeOutcomeService, documentConfiguration,
-                venueDataLoader, true); ;
+                venueDataLoader);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = ucWriteFinalDecisionPreviewDecisionService.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
@@ -2513,7 +2512,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereCriteriaApply(severeCriteriaApply);
 
         UcWriteFinalDecisionPreviewDecisionService ucWriteFinalDecisionPreviewDecisionService = new UcWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService, ucDecisionNoticeQuestionService, ucDecisionNoticeOutcomeService, documentConfiguration,
-                venueDataLoader, true); ;
+                venueDataLoader);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = ucWriteFinalDecisionPreviewDecisionService.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
@@ -2596,7 +2595,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1c");
 
         UcWriteFinalDecisionPreviewDecisionService ucWriteFinalDecisionPreviewDecisionService = new UcWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService, ucDecisionNoticeQuestionService, ucDecisionNoticeOutcomeService, documentConfiguration,
-                venueDataLoader, true); ;
+                venueDataLoader);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = ucWriteFinalDecisionPreviewDecisionService.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
@@ -2651,34 +2650,5 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertThat(UcScenario.SCENARIO_9).isEqualTo(templateContent.getScenario());
         assertThat(12).isEqualTo(payload.getWriteFinalDecisionTemplateContent().getComponents().size());
         assertThat(LocalDate.of(2025, 10, 11)).isEqualTo(body.getUcCapabilityAssessmentStartDate());
-    }
-
-    @Test
-    public void givenSevereCriteriaNotEnabled_willNotSetSevereCriteriaSentence() {
-        String endDate = "2018-11-10";
-        setCommonPreviewParams(sscsCaseData, endDate);
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
-        sscsCaseData.setWcaAppeal(YES);
-        sscsCaseData.setSupportGroupOnlyAppeal("No");
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(List.of("mobilisingUnaided"));
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(List.of("schedule7MobilisingUnaided", "schedule7AppropriatenessOfBehaviour"));
-        sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereCriteriaApply(YES);
-
-        UcWriteFinalDecisionPreviewDecisionService ucWriteFinalDecisionPreviewDecisionService = new UcWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService, ucDecisionNoticeQuestionService, ucDecisionNoticeOutcomeService, documentConfiguration,
-                venueDataLoader, false);
-        final PreSubmitCallbackResponse<SscsCaseData> response = ucWriteFinalDecisionPreviewDecisionService.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
-
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10",
-                true, true, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
-
-        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
-
-        assertThat(body.getSevereCriteriaApplies()).isNull();
     }
 }

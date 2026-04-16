@@ -48,7 +48,7 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
 
     @Override
     protected WriteFinalDecisionMidEventValidationHandlerBase createValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService, boolean isPostHearingsEnabled) {
-        return new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, isPostHearingsEnabled, false);
+        return new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, isPostHearingsEnabled);
     }
 
     @Override
@@ -280,8 +280,8 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
 
     @Test
     @Parameters({"SV, YES", "DD, NO"})
-    public void givenSevereConditionsEnabled_thenShouldSetHasSvIssueCode(String issueCode, YesNo expectedHasSvIssueCode) {
-        UcWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, true);
+    public void shouldSetHasSvIssueCode(String issueCode, YesNo expectedHasSvIssueCode) {
+        UcWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true);
 
         sscsCaseData.setElementsDisputedLimitedWork(List.of(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode(issueCode).build()).build()));
         handlerWithSevereConditions.setDefaultFields(sscsCaseData);
@@ -291,24 +291,13 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
 
     @Test
     @Parameters({"NO, Yes", "YES, No"})
-    public void givenSevereConditionsEnabledAndSchedule7DoesNotApply_thenShouldClearSchedule7Activities(YesNo showSchedule7ActivitiesPage, String ucWriteFinalDecisionSchedule7ActivitiesApply) {
+    public void givenSchedule7DoesNotApplyOrShouldNotBeShown_thenShouldClearSchedule7Activities(YesNo showSchedule7ActivitiesPage, String ucWriteFinalDecisionSchedule7ActivitiesApply) {
         sscsCaseData.getSscsUcCaseData().setShowSchedule7ActivitiesPage(showSchedule7ActivitiesPage);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(ucWriteFinalDecisionSchedule7ActivitiesApply);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(List.of("schedule7MobilisingUnaided"));
-        UcWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, true);
+        UcWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true);
         handlerWithSevereConditions.setDefaultFields(sscsCaseData);
 
         assertThat(sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionSchedule7ActivitiesQuestion()).isNull();
-    }
-
-    @Test
-    @Parameters({"SV", "DD"})
-    public void givenSevereConditionsNotEnabled_thenShouldNotSetHasSvIssueCode(String issueCode) {
-        UcWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, false);
-
-        sscsCaseData.setElementsDisputedLimitedWork(List.of(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode(issueCode).build()).build()));
-        handlerWithSevereConditions.setDefaultFields(sscsCaseData);
-
-        assertThat(sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionHasSVIssueCode()).isNull();
     }
 }
