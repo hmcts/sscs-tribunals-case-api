@@ -10,7 +10,8 @@ properties([
                         description: 'The URL you want to run these tests against'),
                 choice(name: 'ENV',
                         choices: ['aat', 'pr'],
-                        description: 'Select environment')
+                        description: 'Select environment'),
+                string(name: 'CHANGE_ID', defaultValue: '', description: 'The change ID for preview environment')
         ])
 ])
 
@@ -106,7 +107,7 @@ def setEnvVars(envName) {
     env.HEARINGS_ENABLED = "Yes"
 }
 
-def setPreviewEnvVars() {
+def setPreviewEnvVars(CHANGE_ID = env.CHANGE_ID) {
     env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.PREVIEW_BRANCH_WITH_LOCAL_CCD = true;
     env.TEST_E2E_URL_WEB = "https://xui-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
@@ -125,7 +126,7 @@ withNightlyPipeline(type, product, component) {
     env.TEST_URL = params.API_URL_TO_TEST
     env.POST_HEARINGS_FEATURE = false
     env.Rules = params.SecurityRules
-    (env.NONPROD_ENVIRONMENT_NAME == "pr")  setPreviewEnvVars() : setEnvVars(env.NONPROD_ENVIRONMENT_NAME)
+    (env.NONPROD_ENVIRONMENT_NAME == "pr") ? setPreviewEnvVars() : setEnvVars(env.NONPROD_ENVIRONMENT_NAME)
     env.TEST_E2E_URL_WEB = params.UI_URL_TO_TEST
     env.TEST_E2E_API_URI = params.API_URL_TO_TEST
 
