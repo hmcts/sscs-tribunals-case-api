@@ -247,6 +247,8 @@ public class Personalisation<E extends NotificationWrapper> {
     public static final String TEMPLATE_NAME_TEMPLATE_WITH_DIRECTION_TYPE = "%s.%s.%s";
     public static final String TEMPLATE_NAME_TEMPLATE = "%s.%s";
 
+    private static final Map<NotificationEventType, String> OVERRIDE_ID = Map.of(OTHER_PARTY_ADDED_TO_APPEAL, "otherPartyAddedToAppeal");
+
     @Autowired
     protected NotificationConfig config;
     private boolean sendSmsSubscriptionConfirmation;
@@ -940,6 +942,9 @@ public class Personalisation<E extends NotificationWrapper> {
         }
 
         if (EVENTS_WITH_SUBSCRIPTION_TYPE_DOCMOSIS_TEMPLATES.contains(notificationEventType)) {
+            if (OVERRIDE_ID.containsKey(notificationEventType)) {
+                return getSubscriptionTemplateName(OVERRIDE_ID.get(notificationEventType), subscriptionType);
+            }
             return getSubscriptionTemplateName(notificationEventType, subscriptionType);
         }
 
@@ -1001,6 +1006,13 @@ public class Personalisation<E extends NotificationWrapper> {
                                                       SubscriptionType subscriptionType) {
         return String.format(TEMPLATE_NAME_TEMPLATE,
             notificationEventType.getId(),
+            subscriptionType.name().toLowerCase());
+    }
+
+    private static String getSubscriptionTemplateName(String id,
+        SubscriptionType subscriptionType) {
+        return String.format(TEMPLATE_NAME_TEMPLATE,
+            id,
             subscriptionType.name().toLowerCase());
     }
 

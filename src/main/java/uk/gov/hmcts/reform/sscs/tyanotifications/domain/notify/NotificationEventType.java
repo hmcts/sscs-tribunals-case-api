@@ -5,7 +5,6 @@ import static java.util.Objects.nonNull;
 
 import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -89,9 +88,6 @@ public enum NotificationEventType {
 
     public static final String SUBSCRIPTION_OLD_ID = "subscriptionOld";
 
-    // Over-ride the notification ID where a single event can result in multiple different notifications
-    private static final Map<NotificationEventType, String> OVERRIDE_ID = Map.of(OTHER_PARTY_ADDED_TO_APPEAL, "otherPartyAddedToAppeal");
-
     private final EventType event;
     private boolean sendForOralCase;
     private boolean sendForPaperCase;
@@ -136,9 +132,6 @@ public enum NotificationEventType {
         }
         if (isNull(event)) {
             return "";
-        }
-        if (OVERRIDE_ID.containsKey(this)) {
-            return OVERRIDE_ID.get(this);
         }
         return event.getCcdType();
     }

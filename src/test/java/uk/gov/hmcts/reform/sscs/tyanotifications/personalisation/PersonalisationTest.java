@@ -617,6 +617,7 @@ class PersonalisationTest {
             new Object[]{ISSUE_FINAL_DECISION_WELSH, APPELLANT, ONLINE, false, false, false, true},
             new Object[]{ISSUE_FINAL_DECISION_WELSH, APPOINTEE, ONLINE, false, false, false, true},
             new Object[]{ISSUE_FINAL_DECISION_WELSH, REPRESENTATIVE, ONLINE, false, false, false, true},
+            new Object[]{OTHER_PARTY_ADDED_TO_APPEAL, APPELLANT, REGULAR, false, false, false, true},
             new Object[]{POSTPONEMENT, APPELLANT, ONLINE, true, true, false, true},
             new Object[]{POSTPONEMENT, APPELLANT, PAPER, true, true, false, true},
             new Object[]{POSTPONEMENT, APPELLANT, REGULAR, true, true, false, true},
@@ -2722,7 +2723,10 @@ class PersonalisationTest {
     }
 
     private String getExpectedTemplateName(NotificationEventType notificationEventType, SubscriptionType subscriptionType) {
-        return notificationEventType.getId() + (subscriptionType == null ? "" : "." + lowerCase(subscriptionType.name()));
+        final String id = notificationEventType == OTHER_PARTY_ADDED_TO_APPEAL
+            ? "otherPartyAddedToAppeal"
+            : notificationEventType.getId();
+        return id + (subscriptionType == null ? "" : "." + lowerCase(subscriptionType.name()));
     }
 
     private Hearing createHearing(LocalDate hearingDate) {

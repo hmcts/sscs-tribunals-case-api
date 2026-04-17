@@ -31,8 +31,13 @@ class NotificationEventTypeTest {
     @Test
     void checkEvent_eventsWeDoHandle_returnsTrue() {
         final List<String> events = List.of("confirmLapsed", "subscriptionCreated", "hearingReminder", "validAppealCreated",
-            "actionHearingRecordingRequest", "otherPartyAddedToAppeal");
+            "actionHearingRecordingRequest");
         events.forEach(event -> assertThat(checkEvent(event)).isTrue());
+    }
+
+    @Test
+    void checkEvent_otherPartyAddedToAppeal_returnsFalse() {
+        assertThat(checkEvent("otherPartyAddedToAppeal")).isFalse();
     }
 
     @Test
@@ -102,8 +107,15 @@ class NotificationEventTypeTest {
             Arguments.of(APPEAL_RECEIVED, true, true, null, false, false, true, 300L));
     }
 
+    @Test
+    void otherPartyAddedToAppeal_getId_returnsSameIdAsUpdateOtherPartyData() {
+        assertThat(OTHER_PARTY_ADDED_TO_APPEAL.getId()).isEqualTo(UPDATE_OTHER_PARTY_DATA.getId());
+    }
+
     private static Stream<Arguments> notificationEventTypeIdMappings() {
-        return Arrays.stream(NotificationEventType.values()).map(n -> Arguments.of(n.getId(), n));
+        return Arrays.stream(NotificationEventType.values())
+            .filter(n -> n != OTHER_PARTY_ADDED_TO_APPEAL)
+            .map(n -> Arguments.of(n.getId(), n));
     }
 
     private static Stream<Arguments> notificationEventTypeMappings() {
