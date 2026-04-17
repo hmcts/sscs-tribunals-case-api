@@ -645,7 +645,7 @@ public class Personalisation<E extends NotificationWrapper> {
     }
 
     private static String formatCommaSeparatedList(List<String> list) {
-        if (list.isEmpty()) {
+        if (CollectionUtils.isEmpty(list)) {
             return "";
         } else if (list.size() == 1) {
             return list.getFirst();
