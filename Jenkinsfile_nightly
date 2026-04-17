@@ -126,7 +126,11 @@ withNightlyPipeline(type, product, component) {
     env.TEST_URL = params.API_URL_TO_TEST
     env.POST_HEARINGS_FEATURE = false
     env.Rules = params.SecurityRules
-    (env.NONPROD_ENVIRONMENT_NAME == "pr") ? setPreviewEnvVars() : setEnvVars(env.NONPROD_ENVIRONMENT_NAME)
+    if (env.NONPROD_ENVIRONMENT_NAME == 'pr') {
+        setPreviewEnvVars()
+    } else {
+        setEnvVars(env.NONPROD_ENVIRONMENT_NAME)
+    }
     env.TEST_E2E_URL_WEB = params.UI_URL_TO_TEST
     env.TEST_E2E_API_URI = params.API_URL_TO_TEST
 
