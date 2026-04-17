@@ -55,8 +55,7 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
 
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
-        final boolean hasSuperUserRole = idamService.getUserDetails(userAuthorisation).hasRole(SUPER_USER);
-        setDirectionTypeDropDown(sscsCaseData, hasSuperUserRole);
+        setDirectionTypeDropDown(sscsCaseData, userAuthorisation);
         setExtensionNextEventDropdown(callback.getCaseDetails().getState(), sscsCaseData);
         if (isPostHearingsEnabled) {
             sscsCaseData.setPrePostHearing(null);
@@ -71,7 +70,8 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
-    private void setDirectionTypeDropDown(SscsCaseData sscsCaseData, boolean hasSuperUserRole) {
+    private void setDirectionTypeDropDown(SscsCaseData sscsCaseData, String userAuthorisation) {
+        final boolean hasSuperUserRole = idamService.getUserDetails(userAuthorisation).hasRole(SUPER_USER);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
 
