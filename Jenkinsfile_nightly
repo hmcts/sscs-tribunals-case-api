@@ -105,12 +105,27 @@ def setEnvVars(envName) {
     env.ENVIRONMENT = envName
     env.HEARINGS_ENABLED = "Yes"
 }
+
+def setPreviewEnvVars() {
+    env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.PREVIEW_BRANCH_WITH_LOCAL_CCD = true;
+    env.TEST_E2E_URL_WEB = "https://xui-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.TEST_E2E_API_URI = "https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.CCD_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.CORE_CASE_DATA_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.CCD_GW_API = "http://sscs-tribunals-api-pr-${CHANGE_ID}-ccd-api-gw"
+    env.CASE_DOCUMENT_AM_URL = "https://ccd-case-document-am-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.EM_STITCHING_API_URL = "https://em-stitching-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.ENVIRONMENT = "pr"
+}
+
+
     
 withNightlyPipeline(type, product, component) {
     env.TEST_URL = params.API_URL_TO_TEST
     env.POST_HEARINGS_FEATURE = false
     env.Rules = params.SecurityRules
-    setEnvVars(env.NONPROD_ENVIRONMENT_NAME)
+    (env.NONPROD_ENVIRONMENT_NAME == "pr")  setPreviewEnvVars() : setEnvVars(env.NONPROD_ENVIRONMENT_NAME)
     env.TEST_E2E_URL_WEB = params.UI_URL_TO_TEST
     env.TEST_E2E_API_URI = params.API_URL_TO_TEST
 
