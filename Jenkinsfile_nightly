@@ -127,8 +127,9 @@ withNightlyPipeline(type, product, component) {
                 reportName           : 'SSCS E2E Test Report'
         ])
 
+        // Playwright outputs reports under definitions/test/playwright-report when run from that folder
         archiveArtifacts(
-            artifacts: '**/playwright-report/test-results.json', 
+            artifacts: '**/definitions/test/playwright-report/test-results.json', 
             allowEmptyArchive: true
         )
 
