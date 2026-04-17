@@ -11,7 +11,7 @@ properties([
                 choice(name: 'ENV',
                         choices: ['aat', 'pr'],
                         description: 'Select environment'),
-                string(name: 'CHANGE_ID', defaultValue: '', description: 'The change ID for preview environment')
+                string(name: 'PR_NUMBER', defaultValue: '', description: 'The PR number for preview environment')
         ])
 ])
 
@@ -107,7 +107,7 @@ def setEnvVars(envName) {
     env.HEARINGS_ENABLED = "Yes"
 }
 
-def setPreviewEnvVars(CHANGE_ID = env.CHANGE_ID) {
+def setPreviewEnvVars(CHANGE_ID = params.PR_NUMBER) {
     env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.PREVIEW_BRANCH_WITH_LOCAL_CCD = true;
     env.TEST_E2E_URL_WEB = "https://xui-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
