@@ -38,6 +38,7 @@ import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 public class NotificationService {
     private static final List<String> PROCESS_AUDIO_VIDEO_ACTIONS_THAT_REQUIRES_NOTICE = asList("issueDirectionsNotice", "excludeEvidence", "admitEvidence");
     private static final String READY_TO_LIST = "readyToList";
+    private static final int MINIMUM_NUMBER_OTHER_PARTIES = 2;
 
     private final NotificationFactory notificationFactory;
     private final ReminderService reminderService;
@@ -128,17 +129,13 @@ public class NotificationService {
     private boolean shouldNotifyAppellantAboutAdditionalOtherParty(final NotificationWrapper notificationWrapper) {
         if (!cmConfidentialityEnabled
             || !notificationWrapper.getNotificationType().equals(UPDATE_OTHER_PARTY_DATA)
-            || lessThanTwoOtherParties(notificationWrapper)) {
+            || emptyIfNull(notificationWrapper.getNewSscsCaseData().getOtherParties()).size() < MINIMUM_NUMBER_OTHER_PARTIES) {
             return false;
         }
         final Set<String> newParties = getUniqueOtherPartyIds(notificationWrapper.getNewSscsCaseData().getOtherParties());
         final Set<String> previousParties = getUniqueOtherPartyIds(
             Optional.ofNullable(notificationWrapper.getOldSscsCaseData()).map(SscsCaseData::getOtherParties).orElse(emptyList()));
         return !newParties.equals(previousParties);
-    }
-
-    private static boolean lessThanTwoOtherParties(NotificationWrapper notificationWrapper) {
-        return emptyIfNull(notificationWrapper.getNewSscsCaseData().getOtherParties()).size() < 2;
     }
 
     private Set<String> getUniqueOtherPartyIds(final List<CcdValue<OtherParty>> otherParties) {
