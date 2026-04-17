@@ -128,13 +128,17 @@ public class NotificationService {
     private boolean shouldNotifyAppellantAboutAdditionalOtherParty(final NotificationWrapper notificationWrapper) {
         if (!cmConfidentialityEnabled
             || !notificationWrapper.getNotificationType().equals(UPDATE_OTHER_PARTY_DATA)
-            || emptyIfNull(notificationWrapper.getNewSscsCaseData().getOtherParties()).size() < 2) {
+            || lessThanTwoOtherParties(notificationWrapper)) {
             return false;
         }
         final Set<String> newParties = getUniqueOtherPartyIds(notificationWrapper.getNewSscsCaseData().getOtherParties());
         final Set<String> previousParties = getUniqueOtherPartyIds(
             Optional.ofNullable(notificationWrapper.getOldSscsCaseData()).map(SscsCaseData::getOtherParties).orElse(emptyList()));
         return !newParties.equals(previousParties);
+    }
+
+    private static boolean lessThanTwoOtherParties(NotificationWrapper notificationWrapper) {
+        return emptyIfNull(notificationWrapper.getNewSscsCaseData().getOtherParties()).size() < 2;
     }
 
     private Set<String> getUniqueOtherPartyIds(final List<CcdValue<OtherParty>> otherParties) {

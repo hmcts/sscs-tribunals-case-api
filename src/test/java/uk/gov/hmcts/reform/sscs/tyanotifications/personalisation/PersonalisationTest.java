@@ -2685,6 +2685,11 @@ class PersonalisationTest {
                 buildOtherParties("Alice Jones", "Bob Smith"),
                 2, "Alice Jones and Bob Smith"),
             Arguments.of(
+                "empty previous returns all current parties",
+                List.of(),
+                buildOtherParties("Alice Jones", "Bob Smith", "Carol White"),
+                3, "Alice Jones, Bob Smith and Carol White"),
+            Arguments.of(
                 "one existing party filtered out by ID, one new party kept",
                 buildOtherParties("Alice Jones"),
                 buildOtherParties("Alice Jones", "Bob Smith"),
