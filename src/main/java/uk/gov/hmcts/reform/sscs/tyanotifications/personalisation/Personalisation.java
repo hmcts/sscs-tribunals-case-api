@@ -627,17 +627,10 @@ public class Personalisation<E extends NotificationWrapper> {
             .collect(collectingAndThen(toList(), Personalisation::formatCommaSeparatedList)));
     }
 
-    private static String formatCommaSeparatedList(List<String> list) {
-        if (list.isEmpty()) {
-            return "";
-        } else if (list.size() == 1) {
-            return list.getFirst();
-        } else {
-            return String.join(", ", list.subList(0, list.size() - 1)) + " and " + list.getLast();
-        }
-    }
-
     private static List<CcdValue<OtherParty>> getNewlyAddedParties(SscsCaseData ccdResponse, SscsCaseData ccdResponsePrevious) {
+        if (CollectionUtils.isEmpty(ccdResponse.getOtherParties())) {
+            return List.of();
+        }
         final Set<String> previousOtherPartyIds;
         if (ccdResponsePrevious != null && isNotEmpty(ccdResponsePrevious.getOtherParties())) {
             previousOtherPartyIds = ccdResponsePrevious.getOtherParties().stream()
@@ -646,13 +639,19 @@ public class Personalisation<E extends NotificationWrapper> {
         } else {
             previousOtherPartyIds = Set.of();
         }
-
-        if (CollectionUtils.isEmpty(ccdResponse.getOtherParties())) {
-            return List.of();
-        }
         return ccdResponse.getOtherParties().stream()
             .filter(party -> !previousOtherPartyIds.contains(party.getValue().getId()))
             .toList();
+    }
+
+    private static String formatCommaSeparatedList(List<String> list) {
+        if (list.isEmpty()) {
+            return "";
+        } else if (list.size() == 1) {
+            return list.getFirst();
+        } else {
+            return String.join(", ", list.subList(0, list.size() - 1)) + " and " + list.getLast();
+        }
     }
 
     private String getRequestOutcome(DatedRequestOutcome datedRequestOutcome) {
