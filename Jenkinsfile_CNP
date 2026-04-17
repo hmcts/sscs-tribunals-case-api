@@ -276,10 +276,7 @@ def runE2eTests() {
             sh 'echo "Listing definitions/test/playwright-report:"; ls -la definitions/test/playwright-report || true'
 
             // Archive the whole Playwright report directory (captures html, screenshots, json, etc.)
-            archiveArtifacts(
-                artifacts: 'definitions/test/playwright-report/**', 
-                allowEmptyArchive: true
-            )
+            steps.archiveArtifacts allowEmptyArchive: true, artifacts: "definitions/test/playwright-report/**"
         }
     }
 }
