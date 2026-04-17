@@ -107,7 +107,7 @@ def setEnvVars(envName) {
     env.HEARINGS_ENABLED = "Yes"
 }
 
-def setPreviewEnvVars(CHANGE_ID = params.PR_NUMBER) {
+def setPreviewEnvVars(CHANGE_ID) {
     env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.PREVIEW_BRANCH_WITH_LOCAL_CCD = true;
     env.TEST_E2E_URL_WEB = "https://xui-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
@@ -127,7 +127,7 @@ withNightlyPipeline(type, product, component) {
     env.POST_HEARINGS_FEATURE = false
     env.Rules = params.SecurityRules
     if (env.NONPROD_ENVIRONMENT_NAME == 'pr') {
-        setPreviewEnvVars()
+        setPreviewEnvVars(params.PR_NUMBER)
     } else {
         setEnvVars(env.NONPROD_ENVIRONMENT_NAME)
     }
