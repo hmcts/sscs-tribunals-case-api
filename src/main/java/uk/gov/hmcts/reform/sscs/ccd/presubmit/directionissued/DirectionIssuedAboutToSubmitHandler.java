@@ -149,13 +149,16 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
     private Optional<PreSubmitCallbackResponse<SscsCaseData>> validateConfidentialityDirectionAccess(
         SscsCaseData caseData, String userAuthorisation) {
+        if (!cmOtherPartyConfidentialityEnabled) {
+            return Optional.empty();
+        }
+
         String directionTypeCode = Optional.ofNullable(caseData.getDirectionTypeDl())
             .map(DynamicList::getValue)
             .map(DynamicListItem::getCode)
             .orElse(null);
 
-        if (!cmOtherPartyConfidentialityEnabled
-            || !isConfidentialityDirection(directionTypeCode)
+        if (!isConfidentialityDirection(directionTypeCode)
             || !isBenefitTypeWithConfidentialityTab(caseData)) {
             return Optional.empty();
         }
