@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
 import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.groups.Tuple.tuple;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -605,16 +606,20 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        OtherParty referredParty = response.getData().getOtherParties().getFirst().getValue();
-        OtherParty nonReferredParty = response.getData().getOtherParties().get(1).getValue();
-
         assertThat(response.getData().getAppeal().getAppellant().getConfidentialityRequired()).isEqualTo(NO);
-        assertThat(referredParty.getConfidentialityRequired()).isEqualTo(expectedConfidentiality);
-        assertThat(referredParty.getConfidentialityRequiredChangedDate())
-            .isNotNull()
-            .isAfterOrEqualTo(testStart);
-        assertThat(nonReferredParty.getConfidentialityRequired()).isEqualTo(YES);
-        assertThat(nonReferredParty.getConfidentialityRequiredChangedDate()).isNull();
+        assertThat(response.getData().getOtherParties())
+            .extracting(
+                ccdValue -> ccdValue.getValue().getId(),
+                ccdValue -> ccdValue.getValue().getConfidentialityRequired(),
+                ccdValue -> {
+                    LocalDateTime changedDate = ccdValue.getValue().getConfidentialityRequiredChangedDate();
+                    return changedDate != null && !changedDate.isBefore(testStart);
+                }
+            )
+            .containsExactly(
+                tuple("op1", expectedConfidentiality, true),
+                tuple("op2", YES, false)
+            );
     }
 
     @Test
@@ -686,19 +691,21 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        OtherParty firstOtherParty = response.getData().getOtherParties().getFirst().getValue();
-        OtherParty selectedOtherParty = response.getData().getOtherParties().get(1).getValue();
-        OtherParty thirdOtherParty = response.getData().getOtherParties().get(2).getValue();
-
         assertThat(response.getData().getAppeal().getAppellant().getConfidentialityRequired()).isEqualTo(NO);
-        assertThat(firstOtherParty.getConfidentialityRequired()).isEqualTo(NO);
-        assertThat(firstOtherParty.getConfidentialityRequiredChangedDate()).isNull();
-        assertThat(selectedOtherParty.getConfidentialityRequired()).isEqualTo(expectedConfidentiality);
-        assertThat(selectedOtherParty.getConfidentialityRequiredChangedDate())
-            .isNotNull()
-            .isAfterOrEqualTo(testStart);
-        assertThat(thirdOtherParty.getConfidentialityRequired()).isEqualTo(NO);
-        assertThat(thirdOtherParty.getConfidentialityRequiredChangedDate()).isNull();
+        assertThat(response.getData().getOtherParties())
+            .extracting(
+                ccdValue -> ccdValue.getValue().getId(),
+                ccdValue -> ccdValue.getValue().getConfidentialityRequired(),
+                ccdValue -> {
+                    LocalDateTime changedDate = ccdValue.getValue().getConfidentialityRequiredChangedDate();
+                    return changedDate != null && !changedDate.isBefore(testStart);
+                }
+            )
+            .containsExactly(
+                tuple("op1", NO, false),
+                tuple("op2", expectedConfidentiality, true),
+                tuple("op3", NO, false)
+            );
     }
 
     @Test
@@ -718,19 +725,21 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        OtherParty firstOtherParty = response.getData().getOtherParties().getFirst().getValue();
-        OtherParty secondOtherParty = response.getData().getOtherParties().get(1).getValue();
-        OtherParty referredOtherParty = response.getData().getOtherParties().get(2).getValue();
-
         assertThat(response.getData().getAppeal().getAppellant().getConfidentialityRequired()).isEqualTo(YES);
-        assertThat(firstOtherParty.getConfidentialityRequired()).isEqualTo(NO);
-        assertThat(firstOtherParty.getConfidentialityRequiredChangedDate()).isNull();
-        assertThat(secondOtherParty.getConfidentialityRequired()).isEqualTo(YES);
-        assertThat(secondOtherParty.getConfidentialityRequiredChangedDate()).isNull();
-        assertThat(referredOtherParty.getConfidentialityRequired()).isEqualTo(YES);
-        assertThat(referredOtherParty.getConfidentialityRequiredChangedDate())
-            .isNotNull()
-            .isAfterOrEqualTo(testStart);
+        assertThat(response.getData().getOtherParties())
+            .extracting(
+                ccdValue -> ccdValue.getValue().getId(),
+                ccdValue -> ccdValue.getValue().getConfidentialityRequired(),
+                ccdValue -> {
+                    LocalDateTime changedDate = ccdValue.getValue().getConfidentialityRequiredChangedDate();
+                    return changedDate != null && !changedDate.isBefore(testStart);
+                }
+            )
+            .containsExactly(
+                tuple("op1", NO, false),
+                tuple("op2", YES, false),
+                tuple("op3", YES, true)
+            );
     }
 
     @Test
@@ -758,15 +767,18 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        OtherParty firstOtherParty = response.getData().getOtherParties().getFirst().getValue();
-        OtherParty secondOtherParty = response.getData().getOtherParties().get(1).getValue();
-
         assertThat(response.getData().getAppeal().getAppellant().getConfidentialityRequired()).isEqualTo(NO);
         assertThat(response.getData().getAppeal().getAppellant().getConfidentialityRequiredChangedDate()).isNull();
-        assertThat(firstOtherParty.getConfidentialityRequired()).isEqualTo(NO);
-        assertThat(firstOtherParty.getConfidentialityRequiredChangedDate()).isNull();
-        assertThat(secondOtherParty.getConfidentialityRequired()).isEqualTo(YES);
-        assertThat(secondOtherParty.getConfidentialityRequiredChangedDate()).isNull();
+        assertThat(response.getData().getOtherParties())
+            .extracting(
+                ccdValue -> ccdValue.getValue().getId(),
+                ccdValue -> ccdValue.getValue().getConfidentialityRequired(),
+                ccdValue -> ccdValue.getValue().getConfidentialityRequiredChangedDate()
+            )
+            .containsExactly(
+                tuple("op1", NO, null),
+                tuple("op2", YES, null)
+            );
     }
 
     @Test
@@ -826,15 +838,18 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        OtherParty firstOtherParty = response.getData().getOtherParties().getFirst().getValue();
-        OtherParty secondOtherParty = response.getData().getOtherParties().get(1).getValue();
-
         assertThat(response.getData().getAppeal().getAppellant().getConfidentialityRequired()).isEqualTo(NO);
         assertThat(response.getData().getAppeal().getAppellant().getConfidentialityRequiredChangedDate()).isNull();
-        assertThat(firstOtherParty.getConfidentialityRequired()).isEqualTo(NO);
-        assertThat(firstOtherParty.getConfidentialityRequiredChangedDate()).isNull();
-        assertThat(secondOtherParty.getConfidentialityRequired()).isEqualTo(YES);
-        assertThat(secondOtherParty.getConfidentialityRequiredChangedDate()).isNull();
+        assertThat(response.getData().getOtherParties())
+            .extracting(
+                ccdValue -> ccdValue.getValue().getId(),
+                ccdValue -> ccdValue.getValue().getConfidentialityRequired(),
+                ccdValue -> ccdValue.getValue().getConfidentialityRequiredChangedDate()
+            )
+            .containsExactly(
+                tuple("op1", NO, null),
+                tuple("op2", YES, null)
+            );
     }
 
     @Test
