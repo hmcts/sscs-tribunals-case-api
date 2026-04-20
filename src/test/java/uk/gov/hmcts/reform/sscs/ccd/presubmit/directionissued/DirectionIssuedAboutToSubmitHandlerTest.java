@@ -1125,6 +1125,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
                 cmOtherPartyConfidentialityFeatureFlag);
 
             callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(directionType));
+            callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
 
             var selectedConfidentialityParty = new DynamicList(new DynamicListItem("appellant", "Appellant (or Appointee)"), null);
 
@@ -1155,6 +1156,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
                     buildOtherParty(selectedPartyId, "Ozan", "Mo")));
 
             callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(directionType));
+            callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
 
             var selectedConfidentialityParty = new DynamicList(new DynamicListItem("otherParty" + selectedPartyId,"xx"), null);
 
