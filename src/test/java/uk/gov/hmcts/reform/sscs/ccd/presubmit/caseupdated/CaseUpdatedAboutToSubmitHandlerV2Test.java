@@ -848,6 +848,30 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         verify(refDataService, times(0)).getCourtVenueRefDataByEpimsId(venueEpimsId);
     }
 
+
+    @Test
+    void givenAnAppealWithProcessingVenue_thenDoNotUpdateIfNewVenueIsNull() {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIsAppointee("No");
+        String venueA = "VenueA";
+        callback.getCaseDetails().getCaseData().setProcessingVenue(venueA);
+        when(regionalProcessingCenterService.getByPostcode(eq("TEST"), anyBoolean())).thenReturn(
+                RegionalProcessingCenter.builder()
+                        .name("rpcName")
+                        .postcode("rpcPostcode")
+                        .epimsId("rpcEpimsId")
+                        .build());
+
+        when(airLookupService.lookupAirVenueNameByPostCode("TEST", sscsCaseData.getAppeal().getBenefitType())).thenReturn(
+                null);
+
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("TEST");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(venueA, response.getData().getProcessingVenue());
+        verify(refDataService, times(0)).getCourtVenueRefDataByEpimsId(any());
+    }
+
     @Test
     void givenAnAppealWithNewAppointeePostcode_thenUpdateProcessingVenueWithAppointeeVenue() {
         when(regionalProcessingCenterService.getByPostcode(eq("AB12 00B"), anyBoolean())).thenReturn(
