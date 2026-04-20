@@ -45,6 +45,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -849,8 +850,10 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     }
 
 
-    @Test
-    void givenAnAppealWithProcessingVenue_thenDoNotUpdateIfNewVenueIsNull() {
+    @ParameterizedTest
+    @NullSource
+    @EmptySource
+    void givenAnAppealWithProcessingVenue_thenDoNotUpdateIfNewVenueIsNull(String venue) {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIsAppointee("No");
         String venueA = "VenueA";
         callback.getCaseDetails().getCaseData().setProcessingVenue(venueA);
@@ -862,7 +865,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
                         .build());
 
         when(airLookupService.lookupAirVenueNameByPostCode("TEST", sscsCaseData.getAppeal().getBenefitType())).thenReturn(
-                null);
+                venue);
 
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("TEST");
 
