@@ -126,7 +126,7 @@ withNightlyPipeline(type, product, component) {
     env.TEST_URL = params.API_URL_TO_TEST
     env.POST_HEARINGS_FEATURE = false
     env.Rules = params.SecurityRules
-    if (env.ENVIRONMENT_TYPE == 'pr') {
+    if (params.ENVIRONMENT_TYPE == 'pr') {
         setPreviewEnvVars(params.PR_NUMBER)
     } else {
         setEnvVars(env.NONPROD_ENVIRONMENT_NAME)
