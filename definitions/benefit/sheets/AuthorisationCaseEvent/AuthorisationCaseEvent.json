@@ -81,6 +81,8 @@
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "adminUpdateEvent", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRU"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "adminUpdateEvent", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
   {"LiveFrom": "10/10/2022", "CaseTypeID": "Benefit", "CaseEventID": "adminUpdateEvent", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRU"},
+  {"LiveFrom": "16/03/2026", "CaseTypeID": "Benefit", "CaseEventID": "superUserFullEdit", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRU"},
+  {"LiveFrom": "16/03/2026", "CaseTypeID": "Benefit", "CaseEventID": "superUserFullEdit", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "amendDueDate", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "amendDueDate", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "amendDueDate", "AccessProfile": "caseworker-sscs-registrar", "CRUD": "CRUD"},
