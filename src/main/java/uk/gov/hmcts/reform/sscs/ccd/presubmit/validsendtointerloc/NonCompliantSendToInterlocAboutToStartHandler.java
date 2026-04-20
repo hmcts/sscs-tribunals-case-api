@@ -16,9 +16,6 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Component
 public class NonCompliantSendToInterlocAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    public NonCompliantSendToInterlocAboutToStartHandler() {
-    }
-
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");

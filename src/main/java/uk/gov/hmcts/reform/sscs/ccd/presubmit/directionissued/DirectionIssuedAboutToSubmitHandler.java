@@ -17,6 +17,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.APPELLANT;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.OTHER_PARTY;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 
 import java.time.LocalDate;
@@ -29,8 +30,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -70,10 +69,8 @@ import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
 
 @Service
 @Slf4j
-@Order(Ordered.LOWEST_PRECEDENCE - 1)
 public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private static final String OTHER_PARTY = "otherParty";
     private final FooterService footerService;
     private final DwpAddressLookupService dwpAddressLookupService;
     private final int dwpResponseDueDays;
@@ -175,10 +172,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
     private Optional<PreSubmitCallbackResponse<SscsCaseData>> validateConfidentialityDirectionAccess(
         SscsCaseData caseData, String userAuthorisation) {
-        String directionTypeCode = Optional.ofNullable(caseData.getDirectionTypeDl())
-            .map(DynamicList::getValue)
-            .map(DynamicListItem::getCode)
-            .orElse(null);
+        String directionTypeCode = getDirectionTypeCode(caseData);
 
         if (!cmOtherPartyConfidentialityEnabled
             || !isConfidentialityDirection(directionTypeCode)
@@ -423,10 +417,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     }
 
     private void applyConfidentialityDecisionFromDirection(SscsCaseData caseData) {
-        String directionType = Optional.ofNullable(caseData.getDirectionTypeDl())
-            .map(DynamicList::getValue)
-            .map(DynamicListItem::getCode)
-            .orElse(null);
+        String directionType = getDirectionTypeCode(caseData);
         if (isBlank(directionType)) {
             log.warn("Direction type is missing for confidentiality decision on case {}. No update applied.",
                 caseData.getCcdCaseId());
@@ -496,5 +487,12 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         }
 
         return otherPartyId.equals(otherParty.getId());
+    }
+
+    private static String getDirectionTypeCode(SscsCaseData caseData) {
+        return Optional.ofNullable(caseData.getDirectionTypeDl())
+                       .map(DynamicList::getValue)
+                       .map(DynamicListItem::getCode)
+                       .orElse(null);
     }
 }
