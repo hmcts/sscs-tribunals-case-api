@@ -286,5 +286,4 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         assertEquals(showWorkCapabilityPage, response.getData().getShowWorkCapabilityAssessmentPage());
     }
-
 }

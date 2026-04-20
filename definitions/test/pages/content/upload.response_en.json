@@ -11,7 +11,12 @@
   "ucBenefitCode": "001",
   "ucIssueCode": "WC",
   "dlaIssueCode": "EI",
+  "sccIssueCode": "SV",
   "ucDisputeOption": "No",
   "ucJointPartyOnCase": "No",
-  "ucJointPartyOnCase_Yes": "Yes"
+  "ucJointPartyOnCase_Yes": "Yes",
+
+  "elementDisputedForChildElementIssueCodes": "ChildElement",
+  "elementDisputedForLimitedWorkIssueCodes": "LimitedWork"
+
 }

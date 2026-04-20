@@ -1,10 +1,14 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
+import static java.util.Objects.nonNull;
+
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaTemplateComponentId;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
+import uk.gov.hmcts.reform.sscs.model.docassembly.Paragraph;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateContent;
 
@@ -108,6 +112,23 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
 
     public String getNoDescriptorFromSchedule3Regulation35NotApplied() {
         return "This is because no descriptor from Schedule 3 of the " + getUsageDependentBenefitTypeRegulationsString() + " applied. Regulation 35 did not apply.";
+    }
+
+
+    public void addSevereCriteriaApplyIfPresent(WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody) {
+        if (nonNull(writeFinalDecisionTemplateBody.getSevereCriteriaApplies())) {
+            addComponent(new Paragraph(EsaTemplateComponentId.SEVERE_CRITERIA_APPLY_PARAGRAPH.name(),
+                    getSevereCriteriaApplySentence(writeFinalDecisionTemplateBody.getSevereCriteriaApplies())));
+        }
+    }
+
+    private String getSevereCriteriaApplySentence(Boolean severeCriteriaApply) {
+        if (severeCriteriaApply) {
+            return "The appellant meets the severe conditions criteria because they will constantly meet a Schedule 3 descriptor,"
+                    + " and they have a lifelong condition with no realistic prospect of recovery of function.";
+        } else {
+            return "The appellant does not meet the severe conditions criteria.";
+        }
     }
 
     public abstract EsaScenario getScenario();
