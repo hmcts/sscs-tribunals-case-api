@@ -137,6 +137,7 @@ withPipeline(type, product, component) {
     env.DOCUMENT_MANAGEMENT_URL = "http://dm-store-aat.service.core-compute-aat.internal"
     env.TEST_DOCUMENT_MANAGEMENT_URL = "http://dm-store-aat.service.core-compute-aat.internal"
     env.PACT_BROKER_FULL_URL = "https://pact-broker.platform.hmcts.net"
+    env.CCD_DEF_PROD_LIKE = 'false'
 
     onMaster() {
         setAatEnvVars();
@@ -156,6 +157,10 @@ withPipeline(type, product, component) {
         } else {
             env.WORK_ALLOCATION_FEATURE_ENABLED = 'false'
             echo "Disabling Work Allocation"
+        }
+
+        if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "prod-like ccd").size() > 0) {
+            env.CCD_DEF_PROD_LIKE = 'true'
         }
 
         def tests = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "test-suite")
@@ -223,7 +228,13 @@ def runNotificationTests() {
 }
 
 def generateDefinitions() {
-    sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT} ${env.WORK_ALLOCATION_FEATURE_ENABLED}"
+    if (env.CCD_DEF_PROD_LIKE == 'true') {
+        sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT} ${env.WORK_ALLOCATION_FEATURE_ENABLED} prod"
+        echo "Generate prod-like CCD definition"
+    } else {
+        sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT} ${env.WORK_ALLOCATION_FEATURE_ENABLED}"
+    }
+
     steps.archiveArtifacts artifacts: "definitions/benefit/*.xlsx"
 
     sh "./bin/create-xlsx.sh bulkscan tag ${env.ENVIRONMENT}"
