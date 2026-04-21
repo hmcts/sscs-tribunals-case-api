@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
 import static java.time.LocalDateTime.now;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -533,11 +534,11 @@ class DirectionIssuedAboutToStartHandlerTest {
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(null);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals(3, response.getData().getDirectionTypeDl().getListItems().size());
-        assertFalse(response.getData().getDirectionTypeDl().getListItems().stream()
-                .anyMatch(item -> item.getCode().equals(CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString())));
+        assertThat(response.getData().getDirectionTypeDl().getListItems()).hasSize(3);
+        assertThat(response.getData().getDirectionTypeDl().getListItems())
+                .noneMatch(item -> item.getCode().equals(CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString()));
     }
 
     @ParameterizedTest
@@ -560,13 +561,13 @@ class DirectionIssuedAboutToStartHandlerTest {
 
         when(userDetails.getRoles()).thenReturn(List.of(roleValue));
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals(5, response.getData().getDirectionTypeDl().getListItems().size());
-        assertTrue(response.getData().getDirectionTypeDl().getListItems().stream()
-                           .anyMatch(item -> item.getCode().equals(CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString())));
-        assertTrue(response.getData().getDirectionTypeDl().getListItems().stream()
-                           .anyMatch(item -> item.getCode().equals(CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN.toString())));
+        assertThat(response.getData().getDirectionTypeDl().getListItems()).hasSize(5);
+        assertThat(response.getData().getDirectionTypeDl().getListItems())
+                .anyMatch(item -> item.getCode().equals(CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString()));
+        assertThat(response.getData().getDirectionTypeDl().getListItems())
+                .anyMatch(item -> item.getCode().equals(CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN.toString()));
     }
 
     @Test
@@ -576,11 +577,11 @@ class DirectionIssuedAboutToStartHandlerTest {
         when(idamService.getUserDetails(anyString())).thenReturn(userDetails);
         when(userDetails.getRoles()).thenReturn(List.of("caseworker"));
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals(3, response.getData().getDirectionTypeDl().getListItems().size());
-        assertFalse(response.getData().getDirectionTypeDl().getListItems().stream()
-                .anyMatch(item -> item.getCode().equals(CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString())));
+        assertThat(response.getData().getDirectionTypeDl().getListItems()).hasSize(3);
+        assertThat(response.getData().getDirectionTypeDl().getListItems())
+                .noneMatch(item -> item.getCode().equals(CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString()));
     }
 
     @Test
