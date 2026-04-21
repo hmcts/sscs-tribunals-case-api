@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.*;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
+import static uk.gov.hmcts.reform.sscs.idam.UserRole.TCW;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil;
 
 @Service
@@ -55,8 +57,7 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
 
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
-        final boolean hasSuperUserRole = idamService.getUserDetails(userAuthorisation).hasRole(SUPER_USER);
-        setDirectionTypeDropDown(sscsCaseData, hasSuperUserRole);
+        setDirectionTypeDropDown(sscsCaseData, userAuthorisation);
         setExtensionNextEventDropdown(callback.getCaseDetails().getState(), sscsCaseData);
         if (isPostHearingsEnabled) {
             sscsCaseData.setPrePostHearing(null);
@@ -71,7 +72,7 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
-    private void setDirectionTypeDropDown(SscsCaseData sscsCaseData, boolean hasSuperUserRole) {
+    private void setDirectionTypeDropDown(SscsCaseData sscsCaseData, String userAuthorisation) {
 
         List<DynamicListItem> listOptions = new ArrayList<>();
 
@@ -80,7 +81,7 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
         listOptions.add(new DynamicListItem(ISSUE_AND_SEND_TO_ADMIN.toString(), ISSUE_AND_SEND_TO_ADMIN.getLabel()));
 
         if (cmDirectionTypesConfidentiality
-            && hasSuperUserRole
+            && isAuthorisedToGrantConfidentiality(userAuthorisation)
             && InterlocReferralReason.CONFIDENTIALITY.equals(sscsCaseData.getInterlocReferralReason())) {
             listOptions.add(new DynamicListItem(CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString(), CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.getLabel()));
             listOptions.add(new DynamicListItem(CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN.toString(), CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN.getLabel()));
@@ -110,6 +111,15 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
 
 
         sscsCaseData.setDirectionTypeDl(new DynamicList(selectedValue, listOptions));
+    }
+
+    private boolean isAuthorisedToGrantConfidentiality(String userAuthorisation) {
+        final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
+        if (userDetails == null) {
+            return false;
+        }
+        final List<String> roles = userDetails.getRoles();
+        return roles != null && (roles.contains(SUPER_USER.getValue()) || roles.contains(TCW.getValue()));
     }
 
     private void setExtensionNextEventDropdown(State state, SscsCaseData sscsCaseData) {
