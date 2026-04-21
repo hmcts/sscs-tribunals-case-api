@@ -99,7 +99,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
     private static final String DOCUMENT_URL = "dm-store/documents/123";
     private static final String DOCUMENT_URL2 = "dm-store/documents/456";
     private static final String DUMMY_REGIONAL_CENTER = "dummyRegionalCenter";
-    public static final String OTHER_PARTY = "otherParty";
+    private static final String OTHER_PARTY = "otherParty";
 
     @Mock
     private FooterService footerService;
@@ -910,7 +910,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(directionType));
             callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(benefitTypeCode).build());
 
-            final var selectedConfidentialityParty = new DynamicList(new DynamicListItem("appellant", "Appellant (or Appointee)"), null);
+            var selectedConfidentialityParty = new DynamicList(new DynamicListItem("appellant", "Appellant (or Appointee)"), null);
 
             callback.getCaseDetails().getCaseData().setExtendedSscsCaseData(ExtendedSscsCaseData.builder()
                 .selectedConfidentialityParty(selectedConfidentialityParty)
@@ -918,7 +918,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
             when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().roles(List.of(SUPER_USER.getValue())).build());
 
-            final var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+            var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequired).hasValue(expectedConfidentialityRequired);
             assertThat(response.getData().getAppellant().orElseThrow(AssertionError::new).getConfidentialityRequiredChangedDate()).isAfterOrEqualTo(testStartDateTime);
@@ -935,12 +935,12 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
             callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(existingConfidentiality);
 
-            final var selectedConfidentialityParty = new DynamicList(new DynamicListItem("appellant", "Appellant (or Appointee)"), null);
+            var selectedConfidentialityParty = new DynamicList(new DynamicListItem("appellant", "Appellant (or Appointee)"), null);
             callback.getCaseDetails().getCaseData().setExtendedSscsCaseData(ExtendedSscsCaseData.builder()
                 .selectedConfidentialityParty(selectedConfidentialityParty)
                 .build());
 
-            final var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+            var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequired).hasValue(existingConfidentiality);
             assertThat(response.getData().getAppellant().orElseThrow(AssertionError::new).getConfidentialityRequiredChangedDate()).isNull();
@@ -960,7 +960,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, idamService, 35, 42, false,
                 cmOtherPartyConfidentialityFeatureFlag);
 
-            final var selectedPartyId = "666-666-666";
+            var selectedPartyId = "666-666-666";
 
             callback.getCaseDetails()
                 .getCaseData()
@@ -971,7 +971,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(directionType));
             callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(benefitTypeCode).build());
 
-            final var selectedConfidentialityParty = new DynamicList(new DynamicListItem(OTHER_PARTY + selectedPartyId, "xx"), null);
+            var selectedConfidentialityParty = new DynamicList(new DynamicListItem(OTHER_PARTY + selectedPartyId, "xx"), null);
 
             callback.getCaseDetails().getCaseData().setExtendedSscsCaseData(ExtendedSscsCaseData.builder()
                 .selectedConfidentialityParty(selectedConfidentialityParty)
@@ -979,9 +979,9 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
             when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().roles(List.of(SUPER_USER.getValue())).build());
 
-            final var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+            var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-            final var otherPartyUpdated = response.getData().getOtherParties().stream().filter(o -> o.getValue().getId().equals(selectedPartyId)).toList();
+            var otherPartyUpdated = response.getData().getOtherParties().stream().filter(o -> o.getValue().getId().equals(selectedPartyId)).toList();
 
             assertThat(otherPartyUpdated.size()).isEqualTo(1);
             assertThat(otherPartyUpdated.getFirst().getValue().getConfidentialityRequired()).isEqualTo(expectedConfidentialityRequired);
@@ -1005,7 +1005,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, idamService, 35, 42, false,
                 cmOtherPartyConfidentialityFeatureFlag);
 
-            final var selectedPartyId = "666-666-666";
+            var selectedPartyId = "666-666-666";
             callback.getCaseDetails().getCaseData().setOtherParties(List.of(
                 buildOtherParty("555-555-555", "Rubar", "Do"),
                 buildOtherParty(selectedPartyId, "Ozan", "Mo", existingConfidentiality)));
@@ -1013,14 +1013,14 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(directionType));
             callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
 
-            final var selectedConfidentialityParty = new DynamicList(new DynamicListItem(OTHER_PARTY + selectedPartyId, "xx"), null);
+            var selectedConfidentialityParty = new DynamicList(new DynamicListItem(OTHER_PARTY + selectedPartyId, "xx"), null);
             callback.getCaseDetails().getCaseData().setExtendedSscsCaseData(ExtendedSscsCaseData.builder()
                 .selectedConfidentialityParty(selectedConfidentialityParty)
                 .build());
 
-            final var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+            var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-            final var selected = response.getData().getOtherParties().stream()
+            var selected = response.getData().getOtherParties().stream()
                 .filter(o -> o.getValue().getId().equals(selectedPartyId)).toList();
             assertThat(selected.size()).isEqualTo(1);
             assertThat(selected.getFirst().getValue().getConfidentialityRequired()).isEqualTo(existingConfidentiality);
@@ -1039,12 +1039,12 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList("confidentialityGrantedSendToAdmin"));
             callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
 
-            final var selectedConfidentialityParty = new DynamicList(new DynamicListItem("other_party999-999-999", "Unknown"), null);
+            var selectedConfidentialityParty = new DynamicList(new DynamicListItem("other_party999-999-999", "Unknown"), null);
             callback.getCaseDetails().getCaseData().setExtendedSscsCaseData(ExtendedSscsCaseData.builder()
                 .selectedConfidentialityParty(selectedConfidentialityParty)
                 .build());
 
-            final var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+            var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
             response.getData().getOtherParties().forEach(o -> {
                 assertThat(o.getValue().getConfidentialityRequired()).isNull();
@@ -1064,12 +1064,12 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList("confidentialityGrantedSendToAdmin"));
             callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
 
-            final var selectedConfidentialityParty = new DynamicList(new DynamicListItem(OTHER_PARTY, "No ID"), null);
+            var selectedConfidentialityParty = new DynamicList(new DynamicListItem(OTHER_PARTY, "No ID"), null);
             callback.getCaseDetails().getCaseData().setExtendedSscsCaseData(ExtendedSscsCaseData.builder()
                 .selectedConfidentialityParty(selectedConfidentialityParty)
                 .build());
 
-            final var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+            var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
             response.getData().getOtherParties().forEach(o -> {
                 assertThat(o.getValue().getConfidentialityRequired()).isNull();
@@ -1097,7 +1097,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
                 .selectedConfidentialityParty(null)
                 .build());
 
-            final var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+            var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
             response.getData().getOtherParties().forEach(otherParty -> {
                 assertThat(otherParty.getValue().getConfidentialityRequired()).isNull();
@@ -1118,7 +1118,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             callback.getCaseDetails().getCaseData().setOtherParties(List.of());
             callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
 
-            final var selectedConfidentialityParty = new DynamicList(new DynamicListItem("other_party666-666-666", "Other Party Ozan"), null);
+            var selectedConfidentialityParty = new DynamicList(new DynamicListItem("other_party666-666-666", "Other Party Ozan"), null);
 
             callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(directionType));
 
@@ -1126,7 +1126,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
                 .selectedConfidentialityParty(selectedConfidentialityParty)
                 .build());
 
-            final var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+            var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
             assertThat(response.getData().getOtherParties().size()).isEqualTo(0);
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequired).isEmpty();
@@ -1144,7 +1144,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             callback.getCaseDetails().getCaseData().setOtherParties(null);
             callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
 
-            final var selectedConfidentialityParty = new DynamicList(new DynamicListItem("other_party666-666-666", "Other Party Ozan"), null);
+            var selectedConfidentialityParty = new DynamicList(new DynamicListItem("other_party666-666-666", "Other Party Ozan"), null);
 
             callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(directionType));
 
@@ -1152,7 +1152,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
                 .selectedConfidentialityParty(selectedConfidentialityParty)
                 .build());
 
-            final var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+            var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
             assertThat(response.getData().getOtherParties()).isNull();
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequired).isEmpty();
@@ -1174,13 +1174,13 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(directionType));
             callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
 
-            final var selectedConfidentialityParty = new DynamicList(new DynamicListItem("wrongPrefix666-666-666", "Other Party Ozan"), null);
+            var selectedConfidentialityParty = new DynamicList(new DynamicListItem("wrongPrefix666-666-666", "Other Party Ozan"), null);
 
             callback.getCaseDetails().getCaseData().setExtendedSscsCaseData(ExtendedSscsCaseData.builder()
                 .selectedConfidentialityParty(selectedConfidentialityParty)
                 .build());
 
-            final var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+            var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
             response.getData().getOtherParties().forEach(otherParty -> {
                 assertThat(otherParty.getValue().getConfidentialityRequired()).isNull();
@@ -1200,12 +1200,12 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("pip").build());
             callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(null);
 
-            final var selectedConfidentialityParty = new DynamicList(new DynamicListItem("appellant", "Appellant (or Appointee)"), null);
+            var selectedConfidentialityParty = new DynamicList(new DynamicListItem("appellant", "Appellant (or Appointee)"), null);
             callback.getCaseDetails().getCaseData().setExtendedSscsCaseData(ExtendedSscsCaseData.builder()
                 .selectedConfidentialityParty(selectedConfidentialityParty)
                 .build());
 
-            final var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+            var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
             assertThat(response.getErrors()).isEqualTo(Set.of());
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequired).isEmpty();

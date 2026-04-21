@@ -24,7 +24,6 @@ import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -213,8 +212,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         if (userDetails == null) {
             return false;
         }
-        final List<String> roles = userDetails.getRoles();
-        return roles != null && (userDetails.hasRole(SUPER_USER) || userDetails.hasRole(TCW) || userDetails.hasRole(JUDGE));
+        return userDetails.hasRole(SUPER_USER) || userDetails.hasRole(TCW) || userDetails.hasRole(JUDGE);
     }
 
     private Optional<PreSubmitCallbackResponse<SscsCaseData>> validateDirectionDueDate(SscsCaseData caseData) {
@@ -417,7 +415,6 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         }
 
         caseData = updateCaseForDirectionType(caseDetails, caseData, documentTranslationStatus);
-
 
         if (callback.getEvent() == EventType.DIRECTION_ISSUED) {
             footerService.createFooterAndAddDocToCase(url, caseData, DocumentType.DIRECTION_NOTICE,

@@ -88,7 +88,6 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
         } else {
             if (cmConfidentialityEnabled
                 && isConfidentialityReferral(sscsCaseData)
-                && sscsCaseData.getExtendedSscsCaseData() != null
                 && isSelectionMissing(sscsCaseData.getExtendedSscsCaseData().getSelectedConfidentialityParty())) {
                 preSubmitCallbackResponse.addError("Must select party");
                 return preSubmitCallbackResponse;

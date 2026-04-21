@@ -94,10 +94,11 @@ public class PartiesOnCaseUtil {
     public static DynamicList getSelectedConfidentialityPartyDropdown(SscsCaseData sscsCaseData) {
         List<DynamicListItem> listOptions = getPartiesOnCase(sscsCaseData);
 
-        DynamicList existingSelectedConfidentialityParty = sscsCaseData.getExtendedSscsCaseData().getSelectedConfidentialityParty();
-        DynamicListItem existingValue = existingSelectedConfidentialityParty != null
-                ? existingSelectedConfidentialityParty.getValue()
-                : null;
+        DynamicList existingSelectedConfidentialityParty = sscsCaseData
+            .getExtendedSscsCaseData()
+            .getSelectedConfidentialityParty();
+        DynamicListItem existingValue = existingSelectedConfidentialityParty
+            != null ? existingSelectedConfidentialityParty.getValue() : null;
 
         if (existingValue != null
                 && existingValue.getCode() != null

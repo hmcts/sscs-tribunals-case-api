@@ -624,7 +624,6 @@ class DirectionIssuedAboutToStartHandlerTest {
     void givenConfidentialityFlagAndNoExistingRoles_doNotPopulateConfidentialityDirections() {
         handler = new DirectionIssuedAboutToStartHandler(false, true, idamService);
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
-        when(userDetails.getRoles()).thenReturn(null);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 

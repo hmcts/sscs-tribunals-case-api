@@ -197,7 +197,28 @@ class PartiesOnCaseUtilTest {
 
     @Test
     void shouldReturnBlankSelectedValueWhenNoExistingSelectedConfidentialityParty() {
-        DynamicList dropdown = PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown(sscsCaseData);
+        final DynamicList dropdown = PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown(sscsCaseData);
+
+        assertThat(dropdown.getValue().getCode()).isEmpty();
+        assertThat(dropdown.getListItems()).isNotEmpty();
+    }
+
+    @Test
+    void shouldReturnBlankWhenExistingSelectionHasNullCode() {
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
+                new DynamicList(new DynamicListItem(null, "Appellant"), null));
+
+        final DynamicList dropdown = PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown(sscsCaseData);
+
+        assertThat(dropdown.getValue().getCode()).isEmpty();
+    }
+
+    @Test
+    void shouldReturnBlankWhenExistingSelectionCodeIsNoLongerInPartyList() {
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
+                new DynamicList(new DynamicListItem("staleOtherParty999", "Removed Party"), null));
+
+        final DynamicList dropdown = PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown(sscsCaseData);
 
         assertThat(dropdown.getValue().getCode()).isEmpty();
         assertThat(dropdown.getListItems()).isNotEmpty();
