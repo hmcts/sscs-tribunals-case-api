@@ -86,13 +86,11 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
     @Autowired
     public DirectionIssuedAboutToSubmitHandler(FooterService footerService,
-        DwpAddressLookupService dwpAddressLookupService,
-        IdamService idamService,
-        @Value("${dwp.response.due.days}") int dwpResponseDueDays,
-        @Value("${dwp.response.due.days-child-support}") int dwpResponseDueDaysChildSupport,
-        @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled,
-        @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled
-    ) {
+                                               DwpAddressLookupService dwpAddressLookupService,
+                                               IdamService idamService, @Value("${dwp.response.due.days}") int dwpResponseDueDays,
+                                               @Value("${dwp.response.due.days-child-support}") int dwpResponseDueDaysChildSupport,
+                                               @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled,
+                                               @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
         this.footerService = footerService;
         this.dwpAddressLookupService = dwpAddressLookupService;
         this.idamService = idamService;
@@ -112,31 +110,29 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     }
 
     @Override
-    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
-        String userAuthorisation) {
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
 
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData caseData = caseDetails.getCaseData();
 
-        SscsDocumentTranslationStatus documentTranslationStatus = caseData.isLanguagePreferenceWelsh()
-            && callback.getEvent() == EventType.DIRECTION_ISSUED ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
+        SscsDocumentTranslationStatus documentTranslationStatus = caseData.isLanguagePreferenceWelsh() && callback.getEvent() == EventType.DIRECTION_ISSUED ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
         log.info("DocumentTranslationStatus is {},  for case id : {}", documentTranslationStatus, caseData.getCcdCaseId());
         YesNo selectNextHmcHearingType = caseData.getExtendedSscsCaseData().getSelectNextHmcHearingType();
         if (isNoOrNull(selectNextHmcHearingType)) {
             Optional.ofNullable(caseData.getAppeal())
-                    .map(Appeal::getHearingOptions)
-                    .ifPresent(hearingOptions -> hearingOptions.setHmcHearingType(null));
+                .map(Appeal::getHearingOptions)
+                .ifPresent(hearingOptions -> hearingOptions.setHmcHearingType(null));
         } else {
             caseData.getAppeal()
-                    .setHearingOptions(Optional.ofNullable(caseData.getAppeal().getHearingOptions())
-                                               .map(HearingOptions::toBuilder)
-                                               .orElseGet(HearingOptions::builder)
-                                               .hmcHearingType(caseData.getHmcHearingType())
-                                               .build());
+                .setHearingOptions(Optional.ofNullable(caseData.getAppeal().getHearingOptions())
+                    .map(HearingOptions::toBuilder)
+                    .orElseGet(HearingOptions::builder)
+                    .hmcHearingType(caseData.getHmcHearingType())
+                    .build());
         }
         Optional.ofNullable(caseData.getSchedulingAndListingFields())
-                .map(SchedulingAndListingFields::getOverrideFields)
-                .ifPresent(overrideFields -> overrideFields.setHmcHearingType(null));
+            .map(SchedulingAndListingFields::getOverrideFields)
+            .ifPresent(overrideFields -> overrideFields.setHmcHearingType(null));
         return validateDirectionType(caseData)
             .or(() -> validateConfidentialityDirectionAccess(caseData, userAuthorisation))
             .or(() -> validateDirectionDueDate(caseData))
@@ -153,11 +149,8 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private void updateDwpRegionalCentre(SscsCaseData caseData) {
         Appeal appeal = caseData.getAppeal();
 
-        if (appeal != null && appeal.getBenefitType() != null && (appeal.getMrnDetails() == null
-            || appeal.getMrnDetails().getDwpIssuingOffice() == null
-            || appeal.getMrnDetails().getDwpIssuingOffice().isEmpty())) {
-            Optional<OfficeMapping> defaultOfficeMapping = dwpAddressLookupService.getDefaultDwpMappingByBenefitType(
-                appeal.getBenefitType().getCode());
+        if (appeal != null && appeal.getBenefitType() != null && (appeal.getMrnDetails() == null || appeal.getMrnDetails().getDwpIssuingOffice() == null || appeal.getMrnDetails().getDwpIssuingOffice().isEmpty())) {
+            Optional<OfficeMapping> defaultOfficeMapping = dwpAddressLookupService.getDefaultDwpMappingByBenefitType(appeal.getBenefitType().getCode());
             if (defaultOfficeMapping.isPresent()) {
                 String defaultDwpIssuingOffice = defaultOfficeMapping.get().getMapping().getCcd();
                 // set default dwp office and regional centre
@@ -169,14 +162,10 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                 log.info("Update Case {} default DWP Issuing Office {}", caseData.getCcdCaseId(), defaultDwpIssuingOffice);
             }
         }
-        if (appeal != null
-            && appeal.getBenefitType() != null
-            && appeal.getMrnDetails() != null
-            && appeal.getMrnDetails().getDwpIssuingOffice() != null) {
+        if (appeal != null && appeal.getBenefitType() != null && appeal.getMrnDetails() != null && appeal.getMrnDetails().getDwpIssuingOffice() != null) {
 
-            caseData.setDwpRegionalCentre(
-                dwpAddressLookupService.getDwpRegionalCenterByBenefitTypeAndOffice(appeal.getBenefitType().getCode(),
-                    appeal.getMrnDetails().getDwpIssuingOffice()));
+            caseData.setDwpRegionalCentre(dwpAddressLookupService.getDwpRegionalCenterByBenefitTypeAndOffice(appeal.getBenefitType().getCode(),
+                appeal.getMrnDetails().getDwpIssuingOffice()));
 
         }
     }
@@ -225,8 +214,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         return Optional.empty();
     }
 
-    private SscsCaseData updateCaseAfterExtensionRefused(SscsCaseData caseData, InterlocReviewState interlocReviewState,
-        State state) {
+    private SscsCaseData updateCaseAfterExtensionRefused(SscsCaseData caseData, InterlocReviewState interlocReviewState, State state) {
         caseData.setHmctsDwpState("sentToDwp");
         caseData.setDateSentToDwp(LocalDate.now().toString());
         caseData.setDwpDueDate(DateTimeUtils.generateDwpResponseDueDate(getResponseDueDays(caseData)));
@@ -237,8 +225,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     }
 
     @NotNull
-    private SscsCaseData updateCaseForDirectionType(CaseDetails<SscsCaseData> caseDetails, SscsCaseData caseData,
-        SscsDocumentTranslationStatus documentTranslationStatus) {
+    private SscsCaseData updateCaseForDirectionType(CaseDetails<SscsCaseData> caseDetails, SscsCaseData caseData, SscsDocumentTranslationStatus documentTranslationStatus) {
 
         if (DirectionType.PROVIDE_INFORMATION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData.setInterlocReviewState(AWAITING_INFORMATION);
@@ -250,18 +237,14 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             updateDwpRegionalCentre(caseData);
 
             // Set digital flag on legacy cases
-            if (caseData.getCreatedInGapsFrom() == null || VALID_APPEAL
-                .getId()
-                .equalsIgnoreCase(caseData.getCreatedInGapsFrom())) {
+            if (caseData.getCreatedInGapsFrom() == null || VALID_APPEAL.getId().equalsIgnoreCase(caseData.getCreatedInGapsFrom())) {
                 caseData.setCreatedInGapsFrom(READY_TO_LIST.getId());
             }
         } else if (DirectionType.REFUSE_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
             && ExtensionNextEvent.SEND_TO_LISTING.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())) {
             caseData = updateCaseAfterExtensionRefused(caseData, AWAITING_ADMIN_ACTION, State.RESPONSE_RECEIVED);
         } else if (DirectionType.REFUSE_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
-            && ExtensionNextEvent.SEND_TO_VALID_APPEAL
-            .toString()
-            .equals(caseData.getExtensionNextEventDl().getValue().getCode())) {
+            && ExtensionNextEvent.SEND_TO_VALID_APPEAL.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())) {
             caseData = updateCaseAfterExtensionRefused(caseData, null, State.WITH_DWP);
         } else if (DirectionType.GRANT_REINSTATEMENT.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData = updateCaseAfterReinstatementGranted(caseData, documentTranslationStatus);
@@ -273,9 +256,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         } else if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)
             && DirectionType.REFUSE_URGENT_HEARING.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData = updateCaseAfterUrgentHearingRefused(caseData);
-        } else if (DirectionType.REFUSE_HEARING_RECORDING_REQUEST
-            .toString()
-            .equals(caseData.getDirectionTypeDl().getValue().getCode())) {
+        } else if (DirectionType.REFUSE_HEARING_RECORDING_REQUEST.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION);
             caseData.setInterlocReferralReason(REJECT_HEARING_RECORDING_REQUEST);
         } else if (DirectionType.ISSUE_AND_SEND_TO_ADMIN.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
@@ -288,7 +269,6 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         } else {
             caseData.setInterlocReviewState(null);
         }
-
         return caseData;
     }
 
@@ -316,8 +296,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             updateStateIfInterLockReviewState(caseData);
             log.info("Case ID {} reinstatement granted on {}", caseData.getCcdCaseId(), LocalDate.now().toString());
         } else {
-            log.info("Case ID {} reinstatement granted held pending Direction Translation {}", caseData.getCcdCaseId(),
-                LocalDate.now().toString());
+            log.info("Case ID {} reinstatement granted held pending Direction Translation {}", caseData.getCcdCaseId(), LocalDate.now().toString());
         }
         return caseData;
     }
@@ -333,15 +312,13 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         return YesNo.isYes(caseData.getSendDirectionNoticeToFTA());
     }
 
-    private SscsCaseData updateCaseAfterReinstatementRefused(SscsCaseData caseData,
-        SscsDocumentTranslationStatus documentTranslationStatus) {
+    private SscsCaseData updateCaseAfterReinstatementRefused(SscsCaseData caseData, SscsDocumentTranslationStatus documentTranslationStatus) {
         if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
             caseData.setReinstatementOutcome(RequestOutcome.REFUSED);
             caseData.setDwpState(DwpState.REINSTATEMENT_REFUSED);
             log.info("Case ID {} reinstatement refused on {}", caseData.getCcdCaseId(), LocalDate.now().toString());
         } else {
-            log.info("Case ID {} reinstatement refused held pending Direction Translation {}", caseData.getCcdCaseId(),
-                LocalDate.now().toString());
+            log.info("Case ID {} reinstatement refused held pending Direction Translation {}", caseData.getCcdCaseId(), LocalDate.now().toString());
         }
         return caseData;
     }
@@ -374,8 +351,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
     @NotNull
     private PreSubmitCallbackResponse<SscsCaseData> validateForPdfAndCreateCallbackResponse(
-        Callback<SscsCaseData> callback, CaseDetails<SscsCaseData> caseDetails, SscsCaseData caseData,
-        SscsDocumentTranslationStatus documentTranslationStatus) {
+        Callback<SscsCaseData> callback, CaseDetails<SscsCaseData> caseDetails, SscsCaseData caseData, SscsDocumentTranslationStatus documentTranslationStatus) {
         final PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse =
             new PreSubmitCallbackResponse<>(caseData);
 
@@ -400,16 +376,15 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             return sscsCaseDataPreSubmitCallbackResponse;
         }
 
-        return buildResponse(callback, caseDetails, caseData, sscsCaseDataPreSubmitCallbackResponse, url,
-            documentTranslationStatus);
+        return buildResponse(callback, caseDetails, caseData, sscsCaseDataPreSubmitCallbackResponse, url, documentTranslationStatus);
     }
 
     private PreSubmitCallbackResponse<SscsCaseData> buildResponse(Callback<SscsCaseData> callback,
-        CaseDetails<SscsCaseData> caseDetails,
-        SscsCaseData caseData,
-        PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse,
-        DocumentLink url,
-        SscsDocumentTranslationStatus documentTranslationStatus) {
+                                                                  CaseDetails<SscsCaseData> caseDetails,
+                                                                  SscsCaseData caseData,
+                                                                  PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse,
+                                                                  DocumentLink url,
+                                                                  SscsDocumentTranslationStatus documentTranslationStatus) {
         if (isPostHearingsEnabled) {
             clearInterlocReferralReason(caseData);
         }
@@ -419,7 +394,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         if (callback.getEvent() == EventType.DIRECTION_ISSUED) {
             footerService.createFooterAndAddDocToCase(url, caseData, DocumentType.DIRECTION_NOTICE,
                 Optional.ofNullable(caseData.getDocumentStaging().getDateAdded()).orElse(LocalDate.now())
-                        .format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
+                    .format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
                 caseData.getDocumentStaging().getDateAdded(), null, documentTranslationStatus);
         }
 
@@ -436,8 +411,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             caseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION);
             caseData.setTranslationWorkOutstanding("Yes");
             clearBasicTransientFields(caseData);
-            log.info("Set the InterlocReviewState to {},  for case id : {}", caseData.getInterlocReviewState(),
-                caseData.getCcdCaseId());
+            log.info("Set the InterlocReviewState to {},  for case id : {}", caseData.getInterlocReviewState(), caseData.getCcdCaseId());
             log.info("Saved the new interloc direction document for case id: " + caseData.getCcdCaseId());
         }
 
