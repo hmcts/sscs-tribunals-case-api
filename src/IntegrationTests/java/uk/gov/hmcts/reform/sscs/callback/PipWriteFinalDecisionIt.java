@@ -583,7 +583,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 4, "Reason");
         assertIsParagraphWithText(components, 5,
             "This has been an oral (face to face) hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. John Smith, Jane Smith, David Jones, Sarah Jones, Billy Jones, Julia Jones, Bridget Jones, Adam Jones, Billy Beane and Clare Bennett respondents did not attend. The Tribunal considered the appeal bundle to page B7.");
-        Assert.assertEquals(5, components.size());
+        assertEquals(5, components.size());
     }
 
     @Test

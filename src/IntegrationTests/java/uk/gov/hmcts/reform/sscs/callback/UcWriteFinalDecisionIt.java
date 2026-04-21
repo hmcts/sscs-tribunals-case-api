@@ -321,16 +321,16 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertFalse(payload.isIndefinite());
         assertFalse(payload.isUcIsEntited());
         assertEquals("no award", payload.getUcAwardRate());
-        Assert.assertNotNull(payload.getUcSchedule6Descriptors());
+        assertNotNull(payload.getUcSchedule6Descriptors());
         assertEquals(0, payload.getUcSchedule6Descriptors().size());
         assertEquals(0, payload.getUcNumberOfPoints().intValue());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().getFirst());
+        assertEquals("My reasons for decision", payload.getReasonsForDecision().getFirst());
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         UcTemplateContent ucTemplateContent = (UcTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();
-        Assert.assertEquals(UcScenario.SCENARIO_1, ucTemplateContent.getScenario());
+        assertEquals(UcScenario.SCENARIO_1, ucTemplateContent.getScenario());
     }
 
     @Test

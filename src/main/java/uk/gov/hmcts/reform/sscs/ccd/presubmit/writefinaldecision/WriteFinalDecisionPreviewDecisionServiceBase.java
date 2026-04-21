@@ -10,11 +10,12 @@ import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getLastValidHearing;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -204,39 +205,43 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
     }
 
     private List<String> populateOtherPartyNames(SscsCaseData caseData, YesNo attended) {
-        List<String> names = new ArrayList<>();
-        List<String> respondents = new ArrayList<>();
+        var questions = caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions();
 
-        if (caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions() == null
-            || caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions().isEmpty()) {
+        if (questions == null || questions.isEmpty()) {
             return Collections.emptyList();
         }
 
-        var otherPartyAttendedQuestions = caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions();
+        // Pair index + value so we can still use Respondent.labelPrefixes
+        var filtered = IntStream.range(0, questions.size())
+            .mapToObj(i -> Map.entry(i, questions.get(i).getValue()))
+            .filter(entry -> entry.getValue().getAttendedOtherParty() == attended)
+            .toList();
 
-        // populate respondents
-        for (int i = 0; i < otherPartyAttendedQuestions.size(); i++) {
-            var otherParty = otherPartyAttendedQuestions.get(i).getValue();
-            var respondent = (i < MAX_NUM_OF_RESPONDENT) ? Respondent.labelPrefixes[i].toLowerCase() : "";
+        var names = filtered.stream()
+            .map(entry -> entry.getValue().getOtherPartyName())
+            .toList();
 
-            if (otherParty.getAttendedOtherParty() == attended) {
-                respondents.add(respondent);
-                names.add(otherParty.getOtherPartyName());
-            }
+        if (names.isEmpty()) {
+            return Collections.emptyList();
         }
-
-        var otherParties = new ArrayList<String>();
 
         if (names.size() < MAX_NUM_OF_RESPONDENT) {
-            for (int i = 0; i < names.size(); i++) {
-                otherParties.add(String.format("%s the %s respondent", names.get(i), respondents.get(i)));
-            }
-        } else {
-            otherParties.addAll(names.subList(0, names.size() - 1));
-            otherParties.add(names.getLast() + " respondents");
-        }
+            var respondents = filtered.stream()
+                .map(entry -> entry.getKey() < MAX_NUM_OF_RESPONDENT
+                    ? Respondent.labelPrefixes[entry.getKey()].toLowerCase()
+                    : "")
+                .toList();
 
-        return otherParties;
+            return IntStream.range(0, names.size())
+                .mapToObj(i -> String.format("%s the %s respondent", names.get(i), respondents.get(i)))
+                .toList();
+        } else {
+            return Stream.concat(
+                    names.subList(0, names.size() - 1).stream(),
+                    Stream.of(names.getLast() + " respondents")
+                )
+                .toList();
+        }
     }
 
     protected boolean isSetAside(SscsCaseData sscsCaseData, Outcome outcome) {
