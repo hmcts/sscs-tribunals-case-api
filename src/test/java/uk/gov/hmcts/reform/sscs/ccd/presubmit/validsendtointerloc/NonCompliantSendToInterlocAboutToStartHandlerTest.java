@@ -31,7 +31,7 @@ class NonCompliantSendToInterlocAboutToStartHandlerTest {
         CaseDetails<SscsCaseData> caseDetails =
                 new CaseDetails<>(1234L, "SSCS", State.WITH_DWP, caseData, now(), "Benefit");
         callback = new Callback<>(caseDetails, Optional.of(caseDetails), NON_COMPLIANT_SEND_TO_INTERLOC, false);
-        handler = new NonCompliantSendToInterlocAboutToStartHandler();
+        handler = new NonCompliantSendToInterlocAboutToStartHandler(false);
     }
 
     @Test
@@ -50,8 +50,25 @@ class NonCompliantSendToInterlocAboutToStartHandlerTest {
     void clearsDefaultSelectionForChildSupport() {
         callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
 
-        var response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        DynamicListItem selectedValue = response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue();
+        final var response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty()).isNull();
+    }
+
+    @Test
+    void givenFlagEnabled_doesNotSetSelectionForNonChildSupport() {
+        handler = new NonCompliantSendToInterlocAboutToStartHandler(true);
+
+        final var response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty()).isNull();
+    }
+
+    @Test
+    void givenFlagEnabled_setsEmptyDefaultSelectionForChildSupport() {
+        handler = new NonCompliantSendToInterlocAboutToStartHandler(true);
+        callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+
+        final var response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        final DynamicListItem selectedValue = response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue();
         assertThat(selectedValue.getCode()).isEmpty();
     }
 

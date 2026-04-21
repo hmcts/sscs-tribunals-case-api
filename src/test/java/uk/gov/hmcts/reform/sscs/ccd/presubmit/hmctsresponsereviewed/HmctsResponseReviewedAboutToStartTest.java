@@ -1,10 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.hmctsresponsereviewed;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -22,6 +18,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -66,7 +63,7 @@ class HmctsResponseReviewedAboutToStartTest {
     void setUp() {
         openMocks(this);
         dwpAddressLookupService = new DwpAddressLookupService();
-        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService);
+        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService, false);
 
         when(callback.getEvent()).thenReturn(EventType.HMCTS_RESPONSE_REVIEWED);
 
@@ -77,127 +74,124 @@ class HmctsResponseReviewedAboutToStartTest {
     }
 
     @Test
-    public void givenAValidEvent_thenReturnTrue() {
+    void givenAValidEvent_thenReturnTrue() {
         when(callback.getEvent()).thenReturn(EventType.HMCTS_RESPONSE_REVIEWED);
 
-        assertTrue(handler.canHandle(ABOUT_TO_START, callback));
+        assertThat(handler.canHandle(ABOUT_TO_START, callback)).isTrue();
     }
 
     @Test
-    public void givenANonResponseReviewedEvent_thenReturnFalse() {
+    void givenANonResponseReviewedEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
 
-        assertFalse(handler.canHandle(ABOUT_TO_START, callback));
+        assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
     }
 
     @Test
-    public void populateOriginatingAndPresentingOfficeDropdownsWhenHandlerFires_withCorrectSelectedOffice() {
+    void populateOriginatingAndPresentingOfficeDropdownsWhenHandlerFires_withCorrectSelectedOffice() {
         callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("PIP").build());
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals("DWP PIP (3)", response.getData().getDwpOriginatingOffice().getValue().getCode());
-        assertEquals("DWP PIP (3)", response.getData().getDwpPresentingOffice().getValue().getCode());
+        assertThat(response.getData().getDwpOriginatingOffice().getValue().getCode()).isEqualTo("DWP PIP (3)");
+        assertThat(response.getData().getDwpPresentingOffice().getValue().getCode()).isEqualTo("DWP PIP (3)");
     }
 
     @Test
-    public void givenMrnIsNull_populateOriginatingAndPresentingOfficeDropdownsWhenHandlerFires_withNoDefaultedSelectedOffice() {
+    void givenMrnIsNull_populateOriginatingAndPresentingOfficeDropdownsWhenHandlerFires_withNoDefaultedSelectedOffice() {
         callback.getCaseDetails().getCaseData().getAppeal().setMrnDetails(null);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertNull(response.getData().getDwpOriginatingOffice().getValue().getCode());
-        assertNull(response.getData().getDwpPresentingOffice().getValue().getCode());
+        assertThat(response.getData().getDwpOriginatingOffice().getValue().getCode()).isNull();
+        assertThat(response.getData().getDwpPresentingOffice().getValue().getCode()).isNull();
     }
 
     @Test
-    public void givenIbcaCase_populateBenefitAndIssueCodes() {
+    void givenIbcaCase_populateBenefitAndIssueCodes() {
         sscsCaseData.setBenefitCode("093");
         sscsCaseData.setIssueCode("RA");
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals("093", response.getData().getBenefitCodeIbcaOnly());
-        assertEquals("RA", response.getData().getIssueCodeIbcaOnly());
+        assertThat(response.getData().getBenefitCodeIbcaOnly()).isEqualTo("093");
+        assertThat(response.getData().getIssueCodeIbcaOnly()).isEqualTo("RA");
     }
 
     @Test
-    public void givenOriginatingAndPresentingOfficeHavePreviouslyBeenSet_thenDefaultToTheseOfficesAndNotTheOneSetInMrn() {
+    void givenOriginatingAndPresentingOfficeHavePreviouslyBeenSet_thenDefaultToTheseOfficesAndNotTheOneSetInMrn() {
         callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("PIP").build());
 
-        DynamicListItem value = new DynamicListItem("DWP PIP (4)", "DWP PIP (4)");
-        DynamicList originatingOfficeList = new DynamicList(value, Collections.singletonList(value));
+        final DynamicListItem value = new DynamicListItem("DWP PIP (4)", "DWP PIP (4)");
+        final DynamicList originatingOfficeList = new DynamicList(value, Collections.singletonList(value));
 
-        DynamicListItem value2 = new DynamicListItem("DWP PIP (5)", "DWP PIP (5)");
-        DynamicList presentingOfficeList = new DynamicList(value2, Collections.singletonList(value2));
+        final DynamicListItem value2 = new DynamicListItem("DWP PIP (5)", "DWP PIP (5)");
+        final DynamicList presentingOfficeList = new DynamicList(value2, Collections.singletonList(value2));
 
         callback.getCaseDetails().getCaseData().setDwpOriginatingOffice(originatingOfficeList);
         callback.getCaseDetails().getCaseData().setDwpPresentingOffice(presentingOfficeList);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals("DWP PIP (4)", response.getData().getDwpOriginatingOffice().getValue().getCode());
-        assertEquals("DWP PIP (5)", response.getData().getDwpPresentingOffice().getValue().getCode());
+        assertThat(response.getData().getDwpOriginatingOffice().getValue().getCode()).isEqualTo("DWP PIP (4)");
+        assertThat(response.getData().getDwpPresentingOffice().getValue().getCode()).isEqualTo("DWP PIP (5)");
     }
 
     @Test
-    public void defaultTheDwpOptionsToNo() {
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+    void defaultTheDwpOptionsToNo() {
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals("No", response.getData().getDwpIsOfficerAttending());
-        assertEquals("No", response.getData().getDwpUcb());
-        assertEquals("No", response.getData().getDwpPhme());
-        assertEquals("No", response.getData().getDwpComplexAppeal());
+        assertThat(response.getData().getDwpIsOfficerAttending()).isEqualTo("No");
+        assertThat(response.getData().getDwpUcb()).isEqualTo("No");
+        assertThat(response.getData().getDwpPhme()).isEqualTo("No");
+        assertThat(response.getData().getDwpComplexAppeal()).isEqualTo("No");
     }
 
     @Test
-    public void givenHmctsResponseReviewedEventIsTriggeredNonDigitalCase_thenDisplayError() {
+    void givenHmctsResponseReviewedEventIsTriggeredNonDigitalCase_thenDisplayError() {
         callback.getCaseDetails().getCaseData().setCreatedInGapsFrom("validAppeal");
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals("This event cannot be run for cases created in GAPS at valid appeal", response.getErrors().toArray()[0]);
+        assertThat(response.getErrors().toArray()[0]).isEqualTo("This event cannot be run for cases created in GAPS at valid appeal");
     }
 
     @Test
-    public void givenAListAssistCaseIfAHearingIsListedThenReturnError() {
+    void givenAListAssistCaseIfAHearingIsListedThenReturnError() {
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
 
         when(hearingsService.validationCheckForListedOrExceptionHearings(any(), any()))
                 .thenAnswer(invocation -> {
-                    PreSubmitCallbackResponse<SscsCaseData> response = invocation.getArgument(1);
+                    final PreSubmitCallbackResponse<SscsCaseData> response = invocation.getArgument(1);
                     response.addError(EXISTING_HEARING_ERROR);
                     return null;
                 });
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals(1, response.getErrors().size());
-        assertTrue(response.getErrors().contains(EXISTING_HEARING_ERROR));
+        assertThat(response.getErrors()).hasSize(1).contains(EXISTING_HEARING_ERROR);
     }
 
     @Test
-    public void giveWarningIfHearingInExceptionState() {
+    void giveWarningIfHearingInExceptionState() {
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
 
         when(hearingsService.validationCheckForListedOrExceptionHearings(any(), any()))
                 .thenAnswer(invocation -> {
-                    PreSubmitCallbackResponse<SscsCaseData> response = invocation.getArgument(1);
+                    final PreSubmitCallbackResponse<SscsCaseData> response = invocation.getArgument(1);
                     response.addWarning(REQUEST_FAILURE_WARNING);
                     return null;
                 });
 
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        assertEquals(1, response.getWarnings().size());
-        assertTrue(response.getWarnings().contains(REQUEST_FAILURE_WARNING));
+        assertThat(response.getWarnings()).hasSize(1).contains(REQUEST_FAILURE_WARNING);
     }
 
     @Test
-    public void givenResponseEventWithDwpDocumentsInCollection_thenPopulateLegacyFields() {
-        DwpDocument dwpResponseDocument = DwpDocument.builder().value(DwpDocumentDetails.builder().documentLink(DocumentLink.builder().documentFilename("dwpresponse").build()).documentType(DwpDocumentType.DWP_RESPONSE.getValue()).build()).build();
-        DwpDocument dwpAt38Document = DwpDocument.builder().value(DwpDocumentDetails.builder().documentLink(DocumentLink.builder().documentFilename("at38").build()).documentType(DwpDocumentType.AT_38.getValue()).build()).build();
-        DwpDocument dwpEvidenceDocument = DwpDocument.builder().value(DwpDocumentDetails.builder().documentLink(DocumentLink.builder().documentFilename("dwpevidence").build()).documentType(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue()).build()).build();
-        DwpDocument dwpAppendix12 = DwpDocument.builder().value(DwpDocumentDetails.builder().documentLink(DocumentLink.builder().documentFilename("dwpappendix12").build()).documentType(DwpDocumentType.APPENDIX_12.getValue()).build()).build();
-        DwpDocument dwpUcbDocument = DwpDocument.builder().value(DwpDocumentDetails.builder().documentLink(DocumentLink.builder().documentFilename("dwpucb").build()).documentType(DwpDocumentType.UCB.getValue()).build()).build();
-        List<DwpDocument> dwpDocuments = new ArrayList<>();
+    void givenResponseEventWithDwpDocumentsInCollection_thenPopulateLegacyFields() {
+        final DwpDocument dwpResponseDocument = DwpDocument.builder().value(DwpDocumentDetails.builder().documentLink(DocumentLink.builder().documentFilename("dwpresponse").build()).documentType(DwpDocumentType.DWP_RESPONSE.getValue()).build()).build();
+        final DwpDocument dwpAt38Document = DwpDocument.builder().value(DwpDocumentDetails.builder().documentLink(DocumentLink.builder().documentFilename("at38").build()).documentType(DwpDocumentType.AT_38.getValue()).build()).build();
+        final DwpDocument dwpEvidenceDocument = DwpDocument.builder().value(DwpDocumentDetails.builder().documentLink(DocumentLink.builder().documentFilename("dwpevidence").build()).documentType(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue()).build()).build();
+        final DwpDocument dwpAppendix12 = DwpDocument.builder().value(DwpDocumentDetails.builder().documentLink(DocumentLink.builder().documentFilename("dwpappendix12").build()).documentType(DwpDocumentType.APPENDIX_12.getValue()).build()).build();
+        final DwpDocument dwpUcbDocument = DwpDocument.builder().value(DwpDocumentDetails.builder().documentLink(DocumentLink.builder().documentFilename("dwpucb").build()).documentType(DwpDocumentType.UCB.getValue()).build()).build();
+        final List<DwpDocument> dwpDocuments = new ArrayList<>();
         dwpDocuments.add(dwpResponseDocument);
         dwpDocuments.add(dwpAt38Document);
         dwpDocuments.add(dwpEvidenceDocument);
@@ -206,32 +200,32 @@ class HmctsResponseReviewedAboutToStartTest {
 
         callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals("dwpresponse", response.getData().getDwpResponseDocument().getDocumentLink().getDocumentFilename());
-        assertEquals("at38", response.getData().getDwpAT38Document().getDocumentLink().getDocumentFilename());
-        assertEquals("dwpevidence", response.getData().getDwpEvidenceBundleDocument().getDocumentLink().getDocumentFilename());
-        assertEquals("dwpappendix12", response.getData().getAppendix12Doc().getDocumentLink().getDocumentFilename());
-        assertEquals("dwpucb", response.getData().getDwpUcbEvidenceDocument().getDocumentFilename());
+        assertThat(response.getData().getDwpResponseDocument().getDocumentLink().getDocumentFilename()).isEqualTo("dwpresponse");
+        assertThat(response.getData().getDwpAT38Document().getDocumentLink().getDocumentFilename()).isEqualTo("at38");
+        assertThat(response.getData().getDwpEvidenceBundleDocument().getDocumentLink().getDocumentFilename()).isEqualTo("dwpevidence");
+        assertThat(response.getData().getAppendix12Doc().getDocumentLink().getDocumentFilename()).isEqualTo("dwpappendix12");
+        assertThat(response.getData().getDwpUcbEvidenceDocument().getDocumentFilename()).isEqualTo("dwpucb");
     }
 
 
     @Test
-    public void givenResponseEventWithDwpDocumentsAndEditedInCollection_thenPopulateLegacyFields() {
-        DwpDocument dwpResponseDocument = DwpDocument.builder().value(DwpDocumentDetails.builder()
+    void givenResponseEventWithDwpDocumentsAndEditedInCollection_thenPopulateLegacyFields() {
+        final DwpDocument dwpResponseDocument = DwpDocument.builder().value(DwpDocumentDetails.builder()
                 .documentLink(DocumentLink.builder().documentFilename("dwpresponse").documentBinaryUrl("/responsebinaryurl").documentUrl("/responseurl").build())
                 .dwpEditedEvidenceReason("phme")
                 .editedDocumentLink(DocumentLink.builder().documentFilename("editedresponse").documentBinaryUrl("/responseeditedbinaryurl").documentUrl("/responseeditedurl").build()).documentType(DwpDocumentType.DWP_RESPONSE.getValue()).build()).build();
-        DwpDocument dwpAt38Document = DwpDocument.builder().value(DwpDocumentDetails.builder()
+        final DwpDocument dwpAt38Document = DwpDocument.builder().value(DwpDocumentDetails.builder()
                 .documentLink(DocumentLink.builder().documentFilename("at38").documentBinaryUrl("/binaryurl").documentUrl("/url").build()).documentType(DwpDocumentType.AT_38.getValue()).build()).build();
-        DwpDocument dwpEvidenceDocument = DwpDocument.builder().value(DwpDocumentDetails.builder()
+        final DwpDocument dwpEvidenceDocument = DwpDocument.builder().value(DwpDocumentDetails.builder()
                 .documentLink(DocumentLink.builder().documentFilename("dwpevidence").documentBinaryUrl("/evidencebinaryurl").documentUrl("/evidenceurl").build())
                 .dwpEditedEvidenceReason("phme")
                 .editedDocumentLink(DocumentLink.builder().documentFilename("editedevidence").documentBinaryUrl("/evidenceeditedbinaryurl").documentUrl("/evidenceeditedurl").build()).documentType(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue()).build()).build();
-        DwpDocument dwpAppendix12 = DwpDocument.builder().value(DwpDocumentDetails.builder().documentLink(DocumentLink.builder().documentFilename("dwpappendix12").build()).documentType(DwpDocumentType.APPENDIX_12.getValue()).build()).build();
-        DwpDocument dwpUcbDocument = DwpDocument.builder().value(DwpDocumentDetails.builder().documentLink(DocumentLink.builder().documentFilename("dwpucb").build()).documentType(DwpDocumentType.UCB.getValue()).build()).build();
+        final DwpDocument dwpAppendix12 = DwpDocument.builder().value(DwpDocumentDetails.builder().documentLink(DocumentLink.builder().documentFilename("dwpappendix12").build()).documentType(DwpDocumentType.APPENDIX_12.getValue()).build()).build();
+        final DwpDocument dwpUcbDocument = DwpDocument.builder().value(DwpDocumentDetails.builder().documentLink(DocumentLink.builder().documentFilename("dwpucb").build()).documentType(DwpDocumentType.UCB.getValue()).build()).build();
 
-        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        final List<DwpDocument> dwpDocuments = new ArrayList<>();
         dwpDocuments.add(dwpResponseDocument);
         dwpDocuments.add(dwpAt38Document);
         dwpDocuments.add(dwpEvidenceDocument);
@@ -240,15 +234,15 @@ class HmctsResponseReviewedAboutToStartTest {
 
         callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals("dwpresponse", response.getData().getDwpResponseDocument().getDocumentLink().getDocumentFilename());
-        assertEquals("at38", response.getData().getDwpAT38Document().getDocumentLink().getDocumentFilename());
-        assertEquals("dwpevidence", response.getData().getDwpEvidenceBundleDocument().getDocumentLink().getDocumentFilename());
-        assertEquals("editedresponse", response.getData().getDwpEditedResponseDocument().getDocumentLink().getDocumentFilename());
-        assertEquals("editedevidence", response.getData().getDwpEditedEvidenceBundleDocument().getDocumentLink().getDocumentFilename());
-        assertEquals("dwpappendix12", response.getData().getAppendix12Doc().getDocumentLink().getDocumentFilename());
-        assertEquals("dwpucb", response.getData().getDwpUcbEvidenceDocument().getDocumentFilename());
+        assertThat(response.getData().getDwpResponseDocument().getDocumentLink().getDocumentFilename()).isEqualTo("dwpresponse");
+        assertThat(response.getData().getDwpAT38Document().getDocumentLink().getDocumentFilename()).isEqualTo("at38");
+        assertThat(response.getData().getDwpEvidenceBundleDocument().getDocumentLink().getDocumentFilename()).isEqualTo("dwpevidence");
+        assertThat(response.getData().getDwpEditedResponseDocument().getDocumentLink().getDocumentFilename()).isEqualTo("editedresponse");
+        assertThat(response.getData().getDwpEditedEvidenceBundleDocument().getDocumentLink().getDocumentFilename()).isEqualTo("editedevidence");
+        assertThat(response.getData().getAppendix12Doc().getDocumentLink().getDocumentFilename()).isEqualTo("dwpappendix12");
+        assertThat(response.getData().getDwpUcbEvidenceDocument().getDocumentFilename()).isEqualTo("dwpucb");
     }
 
     private DwpDocument buildDocument(DwpDocumentType documentType, String filename, LocalDate dateAdded) {
@@ -267,15 +261,15 @@ class HmctsResponseReviewedAboutToStartTest {
 
     @ParameterizedTest
     @EnumSource(value = DwpDocumentType.class, names = {"AT_38", "APPENDIX_12", "DWP_EVIDENCE_BUNDLE", "DWP_RESPONSE", "UCB"})
-    public void givenResponseEventWithDwpDocumentsWithMultipleDates_thenPopulateLegacyFields(DwpDocumentType documentType) {
+    void givenResponseEventWithDwpDocumentsWithMultipleDates_thenPopulateLegacyFields(DwpDocumentType documentType) {
 
-        DwpDocument docAtStartOfToday = buildDocument(documentType, "file-startOfToday", LocalDate.now());
-        DwpDocument latestAtDoc = buildDocument(documentType, "file-latest", LocalDateTime.now());
-        DwpDocument doc10MinutesAgo = buildDocument(documentType, "file-latest", LocalDateTime.now().minusMinutes(10));
-        DwpDocument doc2DaysAgo = buildDocument(documentType, "file-2DaysAgo", LocalDate.now().minusDays(2));
-        DwpDocument docYesterday = buildDocument(documentType, "file-yesterday", LocalDateTime.now().minusDays(1));
+        final DwpDocument docAtStartOfToday = buildDocument(documentType, "file-startOfToday", LocalDate.now());
+        final DwpDocument latestAtDoc = buildDocument(documentType, "file-latest", LocalDateTime.now());
+        final DwpDocument doc10MinutesAgo = buildDocument(documentType, "file-latest", LocalDateTime.now().minusMinutes(10));
+        final DwpDocument doc2DaysAgo = buildDocument(documentType, "file-2DaysAgo", LocalDate.now().minusDays(2));
+        final DwpDocument docYesterday = buildDocument(documentType, "file-yesterday", LocalDateTime.now().minusDays(1));
 
-        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        final List<DwpDocument> dwpDocuments = new ArrayList<>();
         dwpDocuments.add(docAtStartOfToday);
         dwpDocuments.add(latestAtDoc);
         dwpDocuments.add(doc10MinutesAgo);
@@ -285,7 +279,7 @@ class HmctsResponseReviewedAboutToStartTest {
         callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
         callback.getCaseDetails().getCaseData().sortCollections();
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         DocumentLink documentLink = null;
         if (documentType == DwpDocumentType.AT_38) {
@@ -299,40 +293,57 @@ class HmctsResponseReviewedAboutToStartTest {
         } else if (documentType == DwpDocumentType.UCB) {
             documentLink = response.getData().getDwpUcbEvidenceDocument();
         }
-        assertNotNull(documentLink);
-        assertEquals("file-2DaysAgo", documentLink.getDocumentFilename());
+        assertThat(documentLink).isNotNull();
+        assertThat(documentLink.getDocumentFilename()).isEqualTo("file-2DaysAgo");
     }
 
     @Test
-    public void populatesSelectWhoReviewsCaseDropDown() {
+    void populatesSelectWhoReviewsCaseDropDown() {
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        List<DynamicListItem> listOptions = new ArrayList<>();
+        final List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()));
         listOptions.add(new DynamicListItem(REVIEW_BY_JUDGE.getId(), REVIEW_BY_JUDGE.getLabel()));
-        DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
-        assertEquals(expected, response.getData().getSelectWhoReviewsCase());
+        final DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
+        assertThat(response.getData().getSelectWhoReviewsCase()).isEqualTo(expected);
     }
 
     @Test
-    public void givenChildSupport_thenSelectedConfidentialityPartyHasNoDefaultSelection() {
-        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService);
+    void givenFlagEnabledAndChildSupport_thenSelectedConfidentialityPartyHasNoDefaultSelection() {
+        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService, true);
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals("", response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode());
+        assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode()).isEmpty();
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "false, childSupport",
+        "true, PIP"
+    })
+    void givenVariousFlagAndBenefitCombinations_whenNotChildSupportWithFlagEnabled_thenSelectedConfidentialityPartyIsNotSet(
+        boolean featureFlag, String benefitCode) {
+        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService, featureFlag);
+
+        String codeToUse = benefitCode.equals("PIP") ? Benefit.PIP.getShortName() : benefitCode;
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(codeToUse).build());
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty()).isNull();
     }
 
     @Test
-    public void givenNonChildSupport_thenSelectedConfidentialityPartyIsNotSet() {
-        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService);
+    void givenFlagDisabledAndNonChildSupport_thenSelectedConfidentialityPartyIsNotSet() {
+        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService, false);
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(Benefit.PIP.getShortName()).build());
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertNull(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty());
+        assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty()).isNull();
     }
 
 }
