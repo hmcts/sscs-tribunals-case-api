@@ -246,6 +246,8 @@ def setAatEnvVars() {
 def setPreviewEnvVars() {
     env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.PREVIEW_BRANCH_WITH_LOCAL_CCD = true;
+    // Keep Functional Test toggle selection aligned with preview deployment config.
+    env.CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED = 'true'
     env.TEST_E2E_URL_WEB = "https://xui-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.TEST_E2E_API_URI = "https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.CCD_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
