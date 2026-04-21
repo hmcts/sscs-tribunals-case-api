@@ -66,6 +66,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.ExceptionRecord;
@@ -1176,6 +1177,34 @@ public class SscsCaseValidatorTest {
         assertTrue(actualError.contains("person1_as_poa"));
         assertTrue(actualError.contains("person1_for_self"));
         assertTrue(actualError.contains("person1_for_person_under_18"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"A12112", "A11A12", "A12b12", "A12012"})
+    public void givenSscs8ContainValidIbcaReferenceWithFourthCharacterAsDigitOrNumber_thenDoNotAddAWarningOrError(String ibcaReference) {
+        Appellant appellant = buildAppellant(false);
+        appellant.getIdentity().setIbcaReference(ibcaReference);
+        ocrCaseData.put(IBC_ROLE_FOR_SELF, true);
+
+        CaseResponse response = validator
+                .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS8),
+                        false);
+
+        assertThat(response.getWarnings()).doesNotContain("person1_ibca_reference is invalid");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"A1211R", "A11A1F"})
+    public void givenSscs8ContainInValidIbcaReferenceWithFourthCharacterAsDigitOrNumber_thenAddAWarnings(String ibcaReference) {
+        Appellant appellant = buildAppellant(false);
+        appellant.getIdentity().setIbcaReference(ibcaReference);
+        ocrCaseData.put(IBC_ROLE_FOR_SELF, true);
+
+        CaseResponse response = validator
+                .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS8),
+                        false);
+
+        assertThat(response.getWarnings()).contains("person1_ibca_reference is invalid");
     }
 
     @Test
