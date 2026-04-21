@@ -15,13 +15,16 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
+import static uk.gov.hmcts.reform.sscs.idam.UserRole.JUDGE;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
+import static uk.gov.hmcts.reform.sscs.idam.UserRole.TCW;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.APPELLANT;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -93,11 +96,11 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     ) {
         this.footerService = footerService;
         this.dwpAddressLookupService = dwpAddressLookupService;
+        this.idamService = idamService;
         this.dwpResponseDueDays = dwpResponseDueDays;
         this.dwpResponseDueDaysChildSupport = dwpResponseDueDaysChildSupport;
         this.isPostHearingsEnabled = isPostHearingsEnabled;
         this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
-        this.idamService = idamService;
     }
 
     @Override
@@ -190,22 +193,29 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
     private Optional<PreSubmitCallbackResponse<SscsCaseData>> validateConfidentialityDirectionAccess(
         SscsCaseData caseData, String userAuthorisation) {
-        String directionTypeCode = getDirectionTypeCode(caseData);
-
         if (!cmOtherPartyConfidentialityEnabled
-            || !isConfidentialityDirection(directionTypeCode)
+            || !isConfidentialityDirection(getDirectionTypeCode(caseData))
             || !isBenefitTypeWithConfidentialityTab(caseData)) {
             return Optional.empty();
         }
 
-        UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
-        if (!userDetails.hasRole(SUPER_USER)) {
+        if (!isAuthorisedToGrantConfidentiality(userAuthorisation)) {
             PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
-            errorResponse.addError("Only super users can issue confidentiality decision directions.");
+            errorResponse.addError("User not authorised to issue confidentiality decision directions.");
             return Optional.of(errorResponse);
         }
 
         return Optional.empty();
+    }
+
+    private boolean isAuthorisedToGrantConfidentiality(String userAuthorisation) {
+        final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
+        if (userDetails == null) {
+            return false;
+        }
+        final List<String> roles = userDetails.getRoles();
+        return roles != null && (roles.contains(SUPER_USER.getValue()) || roles.contains(TCW.getValue()) || roles.contains(
+            JUDGE.getValue()));
     }
 
     private Optional<PreSubmitCallbackResponse<SscsCaseData>> validateDirectionDueDate(SscsCaseData caseData) {

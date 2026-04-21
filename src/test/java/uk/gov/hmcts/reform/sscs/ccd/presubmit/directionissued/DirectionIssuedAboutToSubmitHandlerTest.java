@@ -97,6 +97,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
     private static final String DOCUMENT_URL = "dm-store/documents/123";
     private static final String DOCUMENT_URL2 = "dm-store/documents/456";
     private static final String DUMMY_REGIONAL_CENTER = "dummyRegionalCenter";
+    public static final String OTHER_PARTY = "otherParty";
 
     @Mock
     private FooterService footerService;
@@ -914,6 +915,8 @@ class DirectionIssuedAboutToSubmitHandlerTest {
                 .selectedConfidentialityParty(selectedConfidentialityParty)
                 .build());
 
+            when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().roles(List.of(SUPER_USER.getValue())).build());
+
             final var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequired).hasValue(expectedConfidentialityRequired);
@@ -967,11 +970,13 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(directionType));
             callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(benefitTypeCode).build());
 
-            final var selectedConfidentialityParty = new DynamicList(new DynamicListItem("otherParty" + selectedPartyId, "xx"), null);
+            final var selectedConfidentialityParty = new DynamicList(new DynamicListItem(OTHER_PARTY + selectedPartyId, "xx"), null);
 
             callback.getCaseDetails().getCaseData().setExtendedSscsCaseData(ExtendedSscsCaseData.builder()
                 .selectedConfidentialityParty(selectedConfidentialityParty)
                 .build());
+
+            when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().roles(List.of(SUPER_USER.getValue())).build());
 
             final var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -1007,7 +1012,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(directionType));
             callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
 
-            final var selectedConfidentialityParty = new DynamicList(new DynamicListItem("other_party" + selectedPartyId, "xx"), null);
+            final var selectedConfidentialityParty = new DynamicList(new DynamicListItem(OTHER_PARTY + selectedPartyId, "xx"), null);
             callback.getCaseDetails().getCaseData().setExtendedSscsCaseData(ExtendedSscsCaseData.builder()
                 .selectedConfidentialityParty(selectedConfidentialityParty)
                 .build());
@@ -1058,7 +1063,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList("confidentialityGrantedSendToAdmin"));
             callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
 
-            final var selectedConfidentialityParty = new DynamicList(new DynamicListItem("other_party", "No ID"), null);
+            final var selectedConfidentialityParty = new DynamicList(new DynamicListItem(OTHER_PARTY, "No ID"), null);
             callback.getCaseDetails().getCaseData().setExtendedSscsCaseData(ExtendedSscsCaseData.builder()
                 .selectedConfidentialityParty(selectedConfidentialityParty)
                 .build());
@@ -1218,7 +1223,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
             final var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-            assertThat(response.getErrors()).isEqualTo(Set.of("Only super users can issue confidentiality decision directions."));
+            assertThat(response.getErrors()).isEqualTo(Set.of("User not authorised to issue confidentiality decision directions."));
         }
     }
 

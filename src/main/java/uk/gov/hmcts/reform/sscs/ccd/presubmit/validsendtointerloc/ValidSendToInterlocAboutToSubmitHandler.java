@@ -86,8 +86,10 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
             UploadParty uploadParty = getUploadParty(sscsCaseData.getOriginalSender());
             postponementRequestService.processPostponementRequest(sscsCaseData, uploadParty, Optional.empty());
         } else {
-            if (cmConfidentialityEnabled && isConfidentialityReferral(sscsCaseData)
-                    && isSelectionMissing(sscsCaseData.getExtendedSscsCaseData().getSelectedConfidentialityParty())) {
+            if (cmConfidentialityEnabled
+                && isConfidentialityReferral(sscsCaseData)
+                && sscsCaseData.getExtendedSscsCaseData() != null
+                && isSelectionMissing(sscsCaseData.getExtendedSscsCaseData().getSelectedConfidentialityParty())) {
                 preSubmitCallbackResponse.addError("Must select party");
                 return preSubmitCallbackResponse;
             }
