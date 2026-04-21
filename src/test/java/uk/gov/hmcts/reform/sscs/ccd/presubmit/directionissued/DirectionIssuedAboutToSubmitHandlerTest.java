@@ -940,6 +940,8 @@ class DirectionIssuedAboutToSubmitHandlerTest {
                 .selectedConfidentialityParty(selectedConfidentialityParty)
                 .build());
 
+            when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().roles(List.of(SUPER_USER.getValue())).build());
+
             var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequired).hasValue(existingConfidentiality);
@@ -983,7 +985,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
             var otherPartyUpdated = response.getData().getOtherParties().stream().filter(o -> o.getValue().getId().equals(selectedPartyId)).toList();
 
-            assertThat(otherPartyUpdated.size()).isEqualTo(1);
+            assertThat(otherPartyUpdated).hasSize(1);
             assertThat(otherPartyUpdated.getFirst().getValue().getConfidentialityRequired()).isEqualTo(expectedConfidentialityRequired);
             assertThat(otherPartyUpdated.getFirst().getValue().getConfidentialityRequiredChangedDate()).isAfterOrEqualTo(testStartDateTime);
 
@@ -1018,11 +1020,13 @@ class DirectionIssuedAboutToSubmitHandlerTest {
                 .selectedConfidentialityParty(selectedConfidentialityParty)
                 .build());
 
+            when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().roles(List.of(SUPER_USER.getValue())).build());
+
             var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
             var selected = response.getData().getOtherParties().stream()
                 .filter(o -> o.getValue().getId().equals(selectedPartyId)).toList();
-            assertThat(selected.size()).isEqualTo(1);
+            assertThat(selected).hasSize(1);
             assertThat(selected.getFirst().getValue().getConfidentialityRequired()).isEqualTo(existingConfidentiality);
             assertThat(selected.getFirst().getValue().getConfidentialityRequiredChangedDate()).isNull();
         }
@@ -1068,6 +1072,8 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             callback.getCaseDetails().getCaseData().setExtendedSscsCaseData(ExtendedSscsCaseData.builder()
                 .selectedConfidentialityParty(selectedConfidentialityParty)
                 .build());
+
+            when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().roles(List.of(SUPER_USER.getValue())).build());
 
             var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -1118,7 +1124,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             callback.getCaseDetails().getCaseData().setOtherParties(List.of());
             callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
 
-            var selectedConfidentialityParty = new DynamicList(new DynamicListItem("other_party666-666-666", "Other Party Ozan"), null);
+            var selectedConfidentialityParty = new DynamicList(new DynamicListItem(OTHER_PARTY + "666-666-666", "Other Party Ozan"), null);
 
             callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(directionType));
 
@@ -1126,9 +1132,11 @@ class DirectionIssuedAboutToSubmitHandlerTest {
                 .selectedConfidentialityParty(selectedConfidentialityParty)
                 .build());
 
+            when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().roles(List.of(SUPER_USER.getValue())).build());
+
             var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-            assertThat(response.getData().getOtherParties().size()).isEqualTo(0);
+            assertThat(response.getData().getOtherParties()).isEmpty();
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequired).isEmpty();
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequiredChangedDate).isEmpty();
         }
@@ -1179,6 +1187,8 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             callback.getCaseDetails().getCaseData().setExtendedSscsCaseData(ExtendedSscsCaseData.builder()
                 .selectedConfidentialityParty(selectedConfidentialityParty)
                 .build());
+
+            when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().roles(List.of(SUPER_USER.getValue())).build());
 
             var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -1268,7 +1278,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
             final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-            assertThat(response.getErrors()).doesNotContain("User not authorised to issue confidentiality decision directions.");
+            assertThat(response.getErrors()).isEmpty();
         }
 
         @Test
@@ -1283,7 +1293,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
             final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-            assertThat(response.getErrors()).doesNotContain("User not authorised to issue confidentiality decision directions.");
+            assertThat(response.getErrors()).isEmpty();
         }
     }
 
@@ -1309,7 +1319,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
             var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-            assertThat(response.getData().getOtherParties().size()).isEqualTo(2);
+            assertThat(response.getData().getOtherParties()).hasSize(2);
             response.getData().getOtherParties().forEach(otherParty -> {
                 assertThat(otherParty.getValue().getConfidentialityRequired()).isNull();
                 assertThat(otherParty.getValue().getConfidentialityRequiredChangedDate()).isNull();

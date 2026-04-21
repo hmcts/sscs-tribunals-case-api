@@ -132,7 +132,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenSelectedConfidentialityParty_whenAboutToSubmit_thenValueIsPreserved() {
+    void givenSelectedConfidentialityParty_whenAboutToSubmit_thenValueIsPreserved() {
         DynamicListItem selectedParty = new DynamicListItem("appellant", "Appellant (or Appointee)");
         callback.getCaseDetails().getCaseData().setExtendedSscsCaseData(
                 ExtendedSscsCaseData.builder()
