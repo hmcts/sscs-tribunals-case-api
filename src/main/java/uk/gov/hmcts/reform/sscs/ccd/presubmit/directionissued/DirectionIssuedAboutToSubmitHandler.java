@@ -17,7 +17,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.APPELLANT;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.OTHER_PARTY;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 
 import java.time.LocalDate;
@@ -81,6 +80,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
     private final boolean cmOtherPartyConfidentialityEnabled;
+    private static final String OTHER_PARTY_PREFIX = "otherParty";
 
     @Autowired
     public DirectionIssuedAboutToSubmitHandler(FooterService footerService,
@@ -493,7 +493,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     }
 
     private boolean isOtherPartyReferral(String selectedConfidentialityPartyCode) {
-        return selectedConfidentialityPartyCode.startsWith(OTHER_PARTY);
+        return selectedConfidentialityPartyCode.startsWith(OTHER_PARTY_PREFIX);
     }
 
     private boolean isAppellantReferral(String selectedConfidentialityPartyCode) {
@@ -502,7 +502,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
     private void updateReferredOtherPartyConfidentiality(SscsCaseData caseData, YesNo confidentialityRequired,
         String selectedConfidentialityPartyCode) {
-        String otherPartyId = selectedConfidentialityPartyCode.substring(OTHER_PARTY.length());
+        String otherPartyId = selectedConfidentialityPartyCode.substring(OTHER_PARTY_PREFIX.length());
         if (CollectionUtils.isEmpty(caseData.getOtherParties())) {
             log.warn("Other party not found for confidentiality target '{}' as other parties list is empty. No confidentiality update applied for case {}",
                 selectedConfidentialityPartyCode, caseData.getCcdCaseId());

@@ -967,7 +967,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(directionType));
             callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(benefitTypeCode).build());
 
-            final var selectedConfidentialityParty = new DynamicList(new DynamicListItem("other_party" + selectedPartyId, "xx"), null);
+            final var selectedConfidentialityParty = new DynamicList(new DynamicListItem("otherParty" + selectedPartyId, "xx"), null);
 
             callback.getCaseDetails().getCaseData().setExtendedSscsCaseData(ExtendedSscsCaseData.builder()
                 .selectedConfidentialityParty(selectedConfidentialityParty)
