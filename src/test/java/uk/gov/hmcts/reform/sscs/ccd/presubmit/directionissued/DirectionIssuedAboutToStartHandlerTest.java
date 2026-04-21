@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
@@ -71,6 +72,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.idam.UserRole;
 import uk.gov.hmcts.reform.sscs.reference.data.model.ConfidentialityType;
 
 @ExtendWith(MockitoExtension.class)
@@ -94,7 +96,6 @@ class DirectionIssuedAboutToStartHandlerTest {
     void setUp() {
         handler = new DirectionIssuedAboutToStartHandler(false, false, idamService);
         lenient().when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
-        lenient().when(userDetails.hasRole(SUPER_USER)).thenReturn(true);
         sscsCaseData = SscsCaseData.builder()
                 .appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build())
                 .build();
@@ -206,7 +207,7 @@ class DirectionIssuedAboutToStartHandlerTest {
             CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN.getLabel()));
 
         when(idamService.getUserDetails(anyString())).thenReturn(userDetails);
-        when(userDetails.getRoles()).thenReturn(List.of(SUPER_USER.getValue(), TCW.getValue()));
+        when(userDetails.hasRole(SUPER_USER)).thenReturn(true);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
@@ -225,6 +226,8 @@ class DirectionIssuedAboutToStartHandlerTest {
         listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
         listOptions.add(new DynamicListItem(ISSUE_AND_SEND_TO_ADMIN.toString(), ISSUE_AND_SEND_TO_ADMIN.getLabel()));
 
+        when(userDetails.hasRole(any(UserRole.class))).thenReturn(false);
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
@@ -234,19 +237,19 @@ class DirectionIssuedAboutToStartHandlerTest {
 
     private static Stream<Arguments> authorisedRoles() {
         return Stream.of(
-            Arguments.of(SUPER_USER.getValue()),
-            Arguments.of(TCW.getValue()),
-            Arguments.of(JUDGE.getValue())
+            Arguments.of(SUPER_USER),
+            Arguments.of(TCW),
+            Arguments.of(JUDGE)
         );
     }
 
     @ParameterizedTest
     @MethodSource("authorisedRoles")
-    void givenConfidentialityReferralAndFeatureFlagEnabled_eachAuthorisedRoleAloneShowsConfidentialityOptions(final String role) {
+    void givenConfidentialityReferralAndFeatureFlagEnabled_eachAuthorisedRoleAloneShowsConfidentialityOptions(final UserRole role) {
         handler = new DirectionIssuedAboutToStartHandler(false, true, idamService);
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
         when(idamService.getUserDetails(anyString())).thenReturn(userDetails);
-        when(userDetails.getRoles()).thenReturn(List.of(role));
+        lenient().when(userDetails.hasRole(role)).thenReturn(true);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
@@ -261,36 +264,6 @@ class DirectionIssuedAboutToStartHandlerTest {
         handler = new DirectionIssuedAboutToStartHandler(false, true, idamService);
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
         when(idamService.getUserDetails(anyString())).thenReturn(null);
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getDirectionTypeDl().getListItems())
-            .hasSize(3)
-            .extracting(DynamicListItem::getCode)
-            .doesNotContain(CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString(), CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN.toString());
-    }
-
-    @Test
-    void givenConfidentialityReferralAndFeatureFlagEnabled_emptyRolesListDoesNotShowConfidentialityOptions() {
-        handler = new DirectionIssuedAboutToStartHandler(false, true, idamService);
-        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
-        when(idamService.getUserDetails(anyString())).thenReturn(userDetails);
-        when(userDetails.getRoles()).thenReturn(Collections.emptyList());
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getDirectionTypeDl().getListItems())
-            .hasSize(3)
-            .extracting(DynamicListItem::getCode)
-            .doesNotContain(CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString(), CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN.toString());
-    }
-
-    @Test
-    void givenConfidentialityReferralAndFeatureFlagEnabled_unrecognisedRoleDoesNotShowConfidentialityOptions() {
-        handler = new DirectionIssuedAboutToStartHandler(false, true, idamService);
-        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
-        when(idamService.getUserDetails(anyString())).thenReturn(userDetails);
-        when(userDetails.getRoles()).thenReturn(List.of("caseworker-sscs"));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
@@ -618,19 +591,11 @@ class DirectionIssuedAboutToStartHandlerTest {
         "TCW",
         "JUDGE"
     })
-    void givenConfidentialityFlagAndAuthorisedRole_populateConfidentialityDirections(String roleName) {
+    void givenConfidentialityFlagAndAuthorisedRole_populateConfidentialityDirections(UserRole roleName) {
         handler = new DirectionIssuedAboutToStartHandler(false, true, idamService);
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
         when(idamService.getUserDetails(anyString())).thenReturn(userDetails);
-
-        String roleValue = switch (roleName) {
-            case "SUPER_USER" -> SUPER_USER.getValue();
-            case "TCW" -> TCW.getValue();
-            case "JUDGE" -> JUDGE.getValue();
-            default -> throw new IllegalArgumentException("Unexpected role: " + roleName);
-        };
-
-        when(userDetails.getRoles()).thenReturn(List.of(roleValue));
+        lenient().when(userDetails.hasRole(roleName)).thenReturn(true);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
@@ -646,13 +611,26 @@ class DirectionIssuedAboutToStartHandlerTest {
         handler = new DirectionIssuedAboutToStartHandler(false, true, idamService);
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
         when(idamService.getUserDetails(anyString())).thenReturn(userDetails);
-        when(userDetails.getRoles()).thenReturn(List.of("caseworker"));
+        when(userDetails.hasRole(any(UserRole.class))).thenReturn(false);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getDirectionTypeDl().getListItems()).hasSize(3);
         assertThat(response.getData().getDirectionTypeDl().getListItems())
                 .noneMatch(item -> item.getCode().equals(CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString()));
+    }
+
+    @Test
+    void givenConfidentialityFlagAndNoExistingRoles_doNotPopulateConfidentialityDirections() {
+        handler = new DirectionIssuedAboutToStartHandler(false, true, idamService);
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
+        when(userDetails.getRoles()).thenReturn(null);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getDirectionTypeDl().getListItems()).hasSize(3);
+        assertThat(response.getData().getDirectionTypeDl().getListItems())
+            .noneMatch(item -> item.getCode().equals(CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString()));
     }
 
     @Test

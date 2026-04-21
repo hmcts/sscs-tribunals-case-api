@@ -120,8 +120,7 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
             return false;
         }
         final List<String> roles = userDetails.getRoles();
-        return roles != null && (roles.contains(SUPER_USER.getValue()) || roles.contains(TCW.getValue()) || roles.contains(
-            JUDGE.getValue()));
+        return roles != null && (userDetails.hasRole(SUPER_USER) || userDetails.hasRole(TCW) || userDetails.hasRole(JUDGE));
     }
 
     private void setExtensionNextEventDropdown(State state, SscsCaseData sscsCaseData) {

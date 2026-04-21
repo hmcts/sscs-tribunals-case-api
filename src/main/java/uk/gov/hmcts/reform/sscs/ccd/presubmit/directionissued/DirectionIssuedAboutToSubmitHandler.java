@@ -214,8 +214,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             return false;
         }
         final List<String> roles = userDetails.getRoles();
-        return roles != null && (roles.contains(SUPER_USER.getValue()) || roles.contains(TCW.getValue()) || roles.contains(
-            JUDGE.getValue()));
+        return roles != null && (userDetails.hasRole(SUPER_USER) || userDetails.hasRole(TCW) || userDetails.hasRole(JUDGE));
     }
 
     private Optional<PreSubmitCallbackResponse<SscsCaseData>> validateDirectionDueDate(SscsCaseData caseData) {

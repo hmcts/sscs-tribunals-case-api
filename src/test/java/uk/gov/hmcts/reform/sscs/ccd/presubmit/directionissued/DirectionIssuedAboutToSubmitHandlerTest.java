@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
 import static java.util.Collections.emptySet;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -27,7 +27,9 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.idam.UserRole.JUDGE;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
+import static uk.gov.hmcts.reform.sscs.idam.UserRole.TCW;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -1219,9 +1221,69 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList("confidentialityGrantedSendToAdmin"));
             callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
 
-            final var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+            final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
             assertThat(response.getErrors()).isEqualTo(Set.of("User not authorised to issue confidentiality decision directions."));
+        }
+
+        @Test
+        void givenIssueDirectionNotice_andIdamServiceReturnsNullUserDetails_thenReturnValidationError() {
+            handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, idamService, 35, 42, false,
+                cmOtherPartyConfidentialityFeatureFlag);
+
+            callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList("confidentialityGrantedSendToAdmin"));
+            callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
+
+            when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(null);
+
+            final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+            assertThat(response.getErrors()).isEqualTo(Set.of("User not authorised to issue confidentiality decision directions."));
+        }
+
+        @Test
+        void givenIssueDirectionNotice_andUserHasNonMatchingRoles_thenReturnValidationError() {
+            handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, idamService, 35, 42, false,
+                cmOtherPartyConfidentialityFeatureFlag);
+
+            callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList("confidentialityGrantedSendToAdmin"));
+            callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
+
+            when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().roles(List.of("caseworker-sscs")).build());
+
+            final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+            assertThat(response.getErrors()).isEqualTo(Set.of("User not authorised to issue confidentiality decision directions."));
+        }
+
+        @Test
+        void givenIssueDirectionNotice_andUserHasTcwRole_thenNoAuthorizationError() {
+            handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, idamService, 35, 42, false,
+                cmOtherPartyConfidentialityFeatureFlag);
+
+            callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList("confidentialityGrantedSendToAdmin"));
+            callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
+
+            when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().roles(List.of(TCW.getValue())).build());
+
+            final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+            assertThat(response.getErrors()).doesNotContain("User not authorised to issue confidentiality decision directions.");
+        }
+
+        @Test
+        void givenIssueDirectionNotice_andUserHasJudgeRole_thenNoAuthorizationError() {
+            handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, idamService, 35, 42, false,
+                cmOtherPartyConfidentialityFeatureFlag);
+
+            callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList("confidentialityGrantedSendToAdmin"));
+            callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
+
+            when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder().roles(List.of(JUDGE.getValue())).build());
+
+            final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+            assertThat(response.getErrors()).doesNotContain("User not authorised to issue confidentiality decision directions.");
         }
     }
 
