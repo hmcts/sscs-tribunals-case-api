@@ -512,7 +512,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
     private void updateReferredOtherPartyConfidentiality(SscsCaseData caseData, YesNo confidentialityRequired,
         String selectedConfidentialityPartyCode) {
-        String otherPartyId = selectedConfidentialityPartyCode.substring(OTHER_PARTY_PREFIX.length());
+        final String otherPartyId = selectedConfidentialityPartyCode.substring(OTHER_PARTY_PREFIX.length());
         if (CollectionUtils.isEmpty(caseData.getOtherParties())) {
             log.warn("Other party not found for confidentiality target '{}' as other parties list is empty. No confidentiality update applied for case {}",
                 selectedConfidentialityPartyCode, caseData.getCcdCaseId());
@@ -533,6 +533,6 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     }
 
     private boolean isMatchingOtherParty(OtherParty otherParty, String otherPartyId) {
-        return StringUtils.equals(otherPartyId, otherParty.getId());
+        return StringUtils.isNotBlank(otherPartyId) && StringUtils.equals(otherPartyId, otherParty.getId());
     }
 }

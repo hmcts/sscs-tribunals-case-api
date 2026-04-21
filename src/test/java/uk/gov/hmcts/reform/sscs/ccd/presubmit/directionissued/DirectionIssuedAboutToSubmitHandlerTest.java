@@ -140,7 +140,6 @@ class DirectionIssuedAboutToSubmitHandlerTest {
         handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, idamService, 35, 42, false, true);
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
         lenient().when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
-        lenient().when(userDetails.hasRole(SUPER_USER)).thenReturn(true);
 
         SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("myTest.doc").build()).build();
         List<SscsDocument> docs = new ArrayList<>();
@@ -1213,7 +1212,6 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
         @Test
         void givenIssueDirectionNotice_andUserIsNotSuperUser_thenReturnValidationError() {
-            when(userDetails.hasRole(SUPER_USER)).thenReturn(false);
 
             handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, idamService, 35, 42, false,
                 cmOtherPartyConfidentialityFeatureFlag);
