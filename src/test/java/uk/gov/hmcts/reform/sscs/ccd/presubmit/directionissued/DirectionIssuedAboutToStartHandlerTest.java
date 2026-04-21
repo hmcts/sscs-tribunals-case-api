@@ -30,6 +30,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.NO_FURTHER_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.SEND_TO_LISTING;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.SEND_TO_VALID_APPEAL;
+import static uk.gov.hmcts.reform.sscs.idam.UserRole.JUDGE;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.TCW;
 
@@ -524,6 +525,62 @@ class DirectionIssuedAboutToStartHandlerTest {
         assertEquals(2, response.getData().getExtensionNextEventDl().getListItems().size());
         assertEquals(NO, response.getData().getExtendedSscsCaseData().getSelectNextHmcHearingType());
         assertNull(response.getData().getHmcHearingType());
+    }
+
+    @Test
+    void givenConfidentialityFlagAndNullUserDetails_doNotPopulateConfidentialityDirections() {
+        handler = new DirectionIssuedAboutToStartHandler(false, true, idamService);
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
+        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertEquals(3, response.getData().getDirectionTypeDl().getListItems().size());
+        assertFalse(response.getData().getDirectionTypeDl().getListItems().stream()
+                .anyMatch(item -> item.getCode().equals(CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString())));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "SUPER_USER",
+        "TCW",
+        "JUDGE"
+    })
+    void givenConfidentialityFlagAndAuthorisedRole_populateConfidentialityDirections(String roleName) {
+        handler = new DirectionIssuedAboutToStartHandler(false, true, idamService);
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
+        when(idamService.getUserDetails(anyString())).thenReturn(userDetails);
+
+        String roleValue = switch (roleName) {
+            case "SUPER_USER" -> SUPER_USER.getValue();
+            case "TCW" -> TCW.getValue();
+            case "JUDGE" -> JUDGE.getValue();
+            default -> throw new IllegalArgumentException("Unexpected role: " + roleName);
+        };
+
+        when(userDetails.getRoles()).thenReturn(List.of(roleValue));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertEquals(5, response.getData().getDirectionTypeDl().getListItems().size());
+        assertTrue(response.getData().getDirectionTypeDl().getListItems().stream()
+                           .anyMatch(item -> item.getCode().equals(CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString())));
+        assertTrue(response.getData().getDirectionTypeDl().getListItems().stream()
+                           .anyMatch(item -> item.getCode().equals(CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN.toString())));
+    }
+
+    @Test
+    void givenConfidentialityFlagAndNoQualifyingRole_doNotPopulateConfidentialityDirections() {
+        handler = new DirectionIssuedAboutToStartHandler(false, true, idamService);
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
+        when(idamService.getUserDetails(anyString())).thenReturn(userDetails);
+        when(userDetails.getRoles()).thenReturn(List.of("caseworker"));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertEquals(3, response.getData().getDirectionTypeDl().getListItems().size());
+        assertFalse(response.getData().getDirectionTypeDl().getListItems().stream()
+                .anyMatch(item -> item.getCode().equals(CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString())));
     }
 
     @Test

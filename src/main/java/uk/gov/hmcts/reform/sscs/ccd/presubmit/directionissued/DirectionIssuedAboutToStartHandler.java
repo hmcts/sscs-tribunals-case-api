@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.*;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
+import static uk.gov.hmcts.reform.sscs.idam.UserRole.JUDGE;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.TCW;
 
@@ -119,7 +120,8 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
             return false;
         }
         final List<String> roles = userDetails.getRoles();
-        return roles != null && (roles.contains(SUPER_USER.getValue()) || roles.contains(TCW.getValue()));
+        return roles != null && (roles.contains(SUPER_USER.getValue()) || roles.contains(TCW.getValue()) || roles.contains(
+            JUDGE.getValue()));
     }
 
     private void setExtensionNextEventDropdown(State state, SscsCaseData sscsCaseData) {
