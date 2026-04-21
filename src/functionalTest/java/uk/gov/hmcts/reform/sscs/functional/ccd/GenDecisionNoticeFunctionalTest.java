@@ -81,10 +81,10 @@ public class GenDecisionNoticeFunctionalTest extends BaseFunctionTest {
             String pdfText = new PDFTextStripper().getText(document);
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
 
-            assertThat(pdfTextWithoutNewLines, allOf(is("1. The appeal is allowed."),
-                is("2. The decision made by the Secretary of State on 01/01/2026 is set aside."),
-                is("3. Decision"),
-                is("4. Reason")));
+            assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
+            assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 01/01/2026 is set aside."));
+            assertThat(pdfTextWithoutNewLines, containsString("3. Decision"));
+            assertThat(pdfTextWithoutNewLines, containsString("4. Reason"));
 
             if ("Yes".equalsIgnoreCase(isAppointeeOnCase)) {
                 assertThat(pdfTextWithoutNewLines, containsString("5. This has been an oral (face to face) hearing. "
