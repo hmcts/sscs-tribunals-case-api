@@ -135,7 +135,10 @@ else
     waExclusion="*-WA-*"
 fi
 
-if [ "$ENV" = "prod" ] || [ "$LIKE_PROD" = "prod" ]; then
+if [ "$ENV" = "prod" ] || { [ "$LIKE_PROD" = "prod" ] && [ "$ENV" != "pr" ]; }; then
+  excludedFilenamePatterns="-e *-nonprod.json,${shutteredExclusion},*-nonprod-*,*-WA-*,*preview.json"
+  CCD_DEF_PUBLISH="N"
+elif [ "$ENV" = "pr" ] && [ "$LIKE_PROD" = "prod" ]; then
   excludedFilenamePatterns="-e *-nonprod.json,${shutteredExclusion},*-nonprod-*,*-WA-*"
   CCD_DEF_PUBLISH="N"
 else
