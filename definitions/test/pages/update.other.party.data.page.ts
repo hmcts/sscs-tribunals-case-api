@@ -63,6 +63,9 @@ export class updateOtherPartyDataPage {
           .locator('#otherParties_0_address_inMainlandUk_Yes')
           .click(); //ToDo : Change to dynamic value
       }
+    await this.page
+      .locator('#otherParties_0_domesticViolenceMarker-No')
+      .click();
     await webAction.clickButton('Submit');
   }
 

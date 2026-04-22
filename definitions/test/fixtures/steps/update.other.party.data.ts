@@ -81,15 +81,14 @@ export class UpdateOtherPartyData extends BaseStep {
       'Postcode',
       addUpdateOtherPartyData.updateOtherPartyDataAddressPostCode
     );
-    await this.page
-      .getByRole('row', { name: 'Confidentiality Required No', exact: true })
-      .locator(`//tr[.='Confidentiality RequiredNo']`); // couldn't use the same method as other options for these 2 lines 58, 59
-    await this.page
-      .getByRole('row', {
-        name: 'Unacceptable Customer Behaviour No',
-        exact: true
-      })
-      .locator(`//span[.='Unacceptable Customer Behaviour']`);
+    await this.otherPartyDetailsTab.verifyPageContentByRoleWithLocator(
+      'Confidentiality Required',
+      'No'
+    );
+    await this.otherPartyDetailsTab.verifyPageContentByRoleWithLocator(
+      'Unacceptable Customer Behaviour',
+      'No'
+    );
     await this.otherPartyDetailsTab.verifyPageContentByKeyValue(
       'Role',
       addUpdateOtherPartyData.updateOtherPartyDataRole
@@ -106,6 +105,10 @@ export class UpdateOtherPartyData extends BaseStep {
       'Mobile Number',
       addUpdateSubscriptionData.updateSubscriptionMobileNumberotherParty
     );
+    await this.otherPartyDetailsTab.verifyPageContentByRoleWithLocator(
+      'DV marker?',
+      'No'
+      );
   }
 
   async performUpdateOtherPartyDataTaxCredit(caseId: string) {
