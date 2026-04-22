@@ -46,7 +46,7 @@ class ConfidentialityConfirmedAboutToSubmitHandler implements PreSubmitCallbackH
         }
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        var preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
+        var preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
         caseData.setDwpDueDate(LocalDate.now().plusDays(dwpResponseDueDaysChildSupport).toString());
         caseData.setDwpState(DwpState.UNREGISTERED);
         return preSubmitCallbackResponse;
