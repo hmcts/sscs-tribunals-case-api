@@ -24,6 +24,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import org.apache.commons.io.FileUtils;
@@ -32,6 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
+import org.awaitility.Awaitility;
 import org.awaitility.core.ConditionFactory;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
@@ -256,7 +258,7 @@ abstract class AbstractFunctionalTest {
     }
 
     void assertEventuallyInState(final long caseId, String state) {
-        defaultAwait().untilAsserted(
+        Awaitility.waitAtMost(Duration.ofSeconds(30)).untilAsserted(
             () -> assertThat(findCaseById(Long.toString(caseId)).getState()).isEqualTo(state));
     }
 
