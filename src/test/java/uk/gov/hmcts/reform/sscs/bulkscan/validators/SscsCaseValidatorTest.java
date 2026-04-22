@@ -1185,12 +1185,14 @@ public class SscsCaseValidatorTest {
         Appellant appellant = buildAppellant(false);
         appellant.getIdentity().setIbcaReference(ibcaReference);
         ocrCaseData.put(IBC_ROLE_FOR_SELF, true);
+        AppealReasons appealReasons = AppealReasons.builder().reasons(List.of(AppealReason.builder().value(AppealReasonDetails.builder().reason("some reason").description("some description").build()).build())).build();
 
         CaseResponse response = validator
-                .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS8),
+                .validateExceptionRecord(transformResponse, exceptionRecord,
+                        buildMinimumAppealDataWithBenefitTypeWithAppealReasons(INFECTED_BLOOD_COMPENSATION.getShortName(), appellant, true, FormType.SSCS8, appealReasons),
                         false);
 
-        assertThat(response.getWarnings()).doesNotContain("person1_ibca_reference is invalid");
+        assertThat(response.getWarnings()).isEmpty();
     }
 
     @ParameterizedTest
