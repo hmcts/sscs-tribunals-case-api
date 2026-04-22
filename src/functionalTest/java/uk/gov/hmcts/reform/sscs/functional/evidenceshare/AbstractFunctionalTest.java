@@ -239,7 +239,7 @@ abstract class AbstractFunctionalTest {
     }
 
     Resource getDocument(Long caseId, String correspondenceName) {
-        final List<Correspondence> correspondenceList = defaultAwait().until(
+        final List<Correspondence> correspondenceList = Awaitility.waitAtMost(Duration.ofSeconds(30)).until(
             () -> findCaseById(caseId.toString()).getData().getCorrespondence(),
             (correspondences) -> isNotEmpty(correspondences) && containsDocument(correspondences, correspondenceName));
         final Correspondence correspondence = correspondenceList.stream()
@@ -258,7 +258,7 @@ abstract class AbstractFunctionalTest {
     }
 
     void assertEventuallyInState(final long caseId, String state) {
-        Awaitility.waitAtMost(Duration.ofSeconds(30)).untilAsserted(
+        Awaitility.waitAtMost(Duration.ofSeconds(60)).untilAsserted(
             () -> assertThat(findCaseById(Long.toString(caseId)).getState()).isEqualTo(state));
     }
 

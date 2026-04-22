@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADD_OTHER_PARTY_DATA
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CONFIDENTIALITY_CONFIRMED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 
+import java.time.LocalDate;
 import java.util.List;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Nested;
@@ -77,7 +78,7 @@ class ConfidentialityConfirmedFunctionalTest extends AbstractFunctionalTest {
             await().atMost(30, SECONDS).untilAsserted(() -> {
                 var cdAfterEvent = findCaseById(ccdCaseId);
                 assertThat(cdAfterEvent.getState()).isEqualTo(State.WITH_DWP.toString());
-                assertThat(cdAfterEvent.getData().getInterlocReviewState()).isEqualTo(null);
+                assertThat(cdAfterEvent.getData().getDwpDueDate()).isEqualTo(LocalDate.now().plusDays(42).toString());
             });
         }
     }
