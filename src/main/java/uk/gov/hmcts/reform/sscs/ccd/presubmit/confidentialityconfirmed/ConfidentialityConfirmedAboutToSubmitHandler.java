@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.confidentialityconfirmed;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 
-import java.util.Objects;
+import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -17,9 +17,11 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Service
 class ConfidentialityConfirmedAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
+    private final int dwpResponseDueDaysChildSupport;
     private final boolean cmOtherPartyConfidentialityEnabled;
 
-    public ConfidentialityConfirmedAboutToSubmitHandler(@Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
+    public ConfidentialityConfirmedAboutToSubmitHandler(@Value("${dwp.response.due.days-child-support}") int dwpResponseDueDaysChildSupport, @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
+        this.dwpResponseDueDaysChildSupport = dwpResponseDueDaysChildSupport;
         this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
 
@@ -44,11 +46,8 @@ class ConfidentialityConfirmedAboutToSubmitHandler implements PreSubmitCallbackH
         }
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        var preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
-
-        if (Objects.nonNull(caseData.getInterlocReviewState())) {
-            caseData.setInterlocReviewState(null);
-        }
+        var preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
+        caseData.setDwpDueDate(LocalDate.now().plusDays(dwpResponseDueDaysChildSupport).toString());
         caseData.setDwpState(DwpState.UNREGISTERED);
         return preSubmitCallbackResponse;
     }

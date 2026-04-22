@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CONFIDENTIALITY_CONFIRMED;
 
+import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -45,7 +46,7 @@ class ConfidentialityConfirmedAboutToSubmitHandlerTest {
 
         @BeforeEach
         void setUp() {
-            handler = new ConfidentialityConfirmedAboutToSubmitHandler(true);
+            handler = new ConfidentialityConfirmedAboutToSubmitHandler(42, true);
         }
 
         @ParameterizedTest
@@ -55,9 +56,7 @@ class ConfidentialityConfirmedAboutToSubmitHandlerTest {
         }
 
         @ParameterizedTest
-        @EnumSource(value = Benefit.class, mode = EnumSource.Mode.EXCLUDE, names = {
-            "CHILD_SUPPORT"
-        })
+        @EnumSource(value = Benefit.class, mode = EnumSource.Mode.EXCLUDE, names = {"CHILD_SUPPORT"})
         void givenNonChildSupportBenefit_thenReturnFalse(Benefit benefit) {
             when(callback.getEvent()).thenReturn(CONFIDENTIALITY_CONFIRMED);
             when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -86,7 +85,7 @@ class ConfidentialityConfirmedAboutToSubmitHandlerTest {
         }
 
         @Test
-        void givenConfidentialityConfirmedEvent_thenClearInterlocReviewState() {
+        void givenConfidentialityConfirmedEvent_thenResetTheDwpDueDate() {
             var sscsCaseData = caseDataWithBenefit(CHILD_SUPPORT.getShortName());
             sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE);
 
@@ -96,7 +95,7 @@ class ConfidentialityConfirmedAboutToSubmitHandlerTest {
 
             PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-            assertThat(response.getData().getInterlocReviewState()).isNull();
+            assertThat(response.getData().getDwpDueDate()).isEqualTo(LocalDate.now().plusDays(42).toString());
             assertThat(response.getData().getDwpState()).isEqualTo(DwpState.UNREGISTERED);
         }
 
@@ -104,8 +103,8 @@ class ConfidentialityConfirmedAboutToSubmitHandlerTest {
         void throwsExceptionIfItCannotHandleTheAppeal() {
             when(callback.getEvent()).thenReturn(EventType.ADD_OTHER_PARTY_DATA);
 
-            assertThatThrownBy(() -> handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION))
-                .isInstanceOf(IllegalStateException.class);
+            assertThatThrownBy(() -> handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION)).isInstanceOf(
+                IllegalStateException.class);
         }
     }
 
@@ -114,7 +113,7 @@ class ConfidentialityConfirmedAboutToSubmitHandlerTest {
 
         @BeforeEach
         void setUp() {
-            handler = new ConfidentialityConfirmedAboutToSubmitHandler(false);
+            handler = new ConfidentialityConfirmedAboutToSubmitHandler(42, false);
         }
 
         @Test
@@ -123,16 +122,11 @@ class ConfidentialityConfirmedAboutToSubmitHandlerTest {
         }
     }
 
-
-
     private SscsCaseData caseDataWithBenefit(String benefitCode) {
-        return SscsCaseData.builder()
+        return SscsCaseData
+            .builder()
             .ccdCaseId("1234")
-            .appeal(Appeal.builder()
-                .benefitType(BenefitType.builder()
-                    .code(benefitCode)
-                    .build())
-                .build())
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefitCode).build()).build())
             .build();
     }
 }
