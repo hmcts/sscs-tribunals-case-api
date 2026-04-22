@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReissueArtifactUi;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -101,6 +102,8 @@ class ValidSendToInterlocAboutToSubmitHandlerTest {
                         .reissueFurtherEvidenceDocument(new DynamicList(new DynamicListItem(selectWhoReviewsCase.getId(),
                                 selectWhoReviewsCase.getLabel()), null)).build())
                 .build();
+        caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), VALID_SEND_TO_INTERLOC, false);
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -108,6 +111,9 @@ class ValidSendToInterlocAboutToSubmitHandlerTest {
         assertThat(response.getData().getInterlocReferralDate()).isEqualTo(LocalDate.now());
         assertThat(response.getData().getSelectWhoReviewsCase()).isNull();
         assertThat(response.getData().getDirectionDueDate()).isNull();
+        assertThat(response.getData().getInterlocReviewState()).isNotNull()
+            .extracting(InterlocReviewState::getCcdDefinition)
+            .isEqualTo(selectWhoReviewsCase.getId());
         verify(addNoteService).addNote(eq(USER_AUTHORISATION), eq(response.getData()), eq(null));
     }
 
@@ -135,10 +141,15 @@ class ValidSendToInterlocAboutToSubmitHandlerTest {
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
+        final UploadParty expectedUploadParty = originalSenderParty == PartyItemList.REPRESENTATIVE
+            ? UploadParty.REP
+            : UploadParty.fromValue(originalSenderParty.getCode());
+
         assertThat(response.getErrors()).isEmpty();
         assertThat(response.getData().getInterlocReferralDate()).isEqualTo(LocalDate.now());
         assertThat(response.getData().getSelectWhoReviewsCase()).isNull();
         assertThat(response.getData().getDirectionDueDate()).isNull();
+        verify(postponementRequestService).processPostponementRequest(any(), eq(expectedUploadParty), eq(Optional.empty()));
         verify(addNoteService).addNote(eq(USER_AUTHORISATION), eq(response.getData()), eq("Test Note"));
     }
 
@@ -175,34 +186,76 @@ class ValidSendToInterlocAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenFlagDisabledAndConfidentialityReferralWithNoPartySelected_thenNoPartyError() {
+    void givenSelectWhoReviewsCaseWithNullValue_thenReturnError() {
         sscsCaseData = sscsCaseData.toBuilder()
-                .interlocReferralReason(InterlocReferralReason.CONFIDENTIALITY)
-                .selectWhoReviewsCase(new DynamicList(
-                        new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()), null))
-                .build();
+            .selectWhoReviewsCase(new DynamicList(null, null))
+            .build();
         caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
         callback = new Callback<>(caseDetails, Optional.of(caseDetails), VALID_SEND_TO_INTERLOC, false);
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getErrors()).hasSize(1).contains("Must select who reviews the appeal.");
     }
 
     @Test
-    void givenFlagEnabledAndNonConfidentialityReferralWithNoPartySelected_thenNoPartyError() {
+    void givenSelectWhoReviewsCaseWithBlankCode_thenReturnError() {
+        sscsCaseData = sscsCaseData.toBuilder()
+            .selectWhoReviewsCase(new DynamicList(new DynamicListItem("", "label"), null))
+            .build();
+        caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), VALID_SEND_TO_INTERLOC, false);
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).hasSize(1).contains("Must select who reviews the appeal.");
+    }
+
+    @Test
+    void givenCmConfidentialityEnabledAndConfidentialityReferralAndMissingSelectedParty_thenReturnError() {
         handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService, true);
         sscsCaseData = sscsCaseData.toBuilder()
-                .interlocReferralReason(InterlocReferralReason.NONE)
-                .selectWhoReviewsCase(new DynamicList(
-                        new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()), null))
-                .build();
+            .interlocReferralReason(InterlocReferralReason.CONFIDENTIALITY)
+            .build();
+        caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), VALID_SEND_TO_INTERLOC, false);
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).hasSize(1).contains("Must select party");
+    }
+
+    @Test
+    void givenCmConfidentialityEnabledAndConfidentialityReferralAndPartySelected_thenSucceed() {
+        handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService, true);
+        sscsCaseData = sscsCaseData.toBuilder()
+            .interlocReferralReason(InterlocReferralReason.CONFIDENTIALITY)
+            .build();
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
+            new DynamicList(new DynamicListItem("appellant", "Appellant"), null)
+        );
         caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
         callback = new Callback<>(caseDetails, Optional.of(caseDetails), VALID_SEND_TO_INTERLOC, false);
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getInterlocReferralDate()).isEqualTo(LocalDate.now());
+    }
+
+    @Test
+    void givenCmConfidentialityEnabledAndNonConfidentialityReferral_thenNoPartyCheckRequired() {
+        handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService, true);
+        sscsCaseData = sscsCaseData.toBuilder()
+            .interlocReferralReason(InterlocReferralReason.COMPLEX_CASE)
+            .build();
+        caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), VALID_SEND_TO_INTERLOC, false);
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getInterlocReferralDate()).isEqualTo(LocalDate.now());
     }
 
     @Test
@@ -211,135 +264,6 @@ class ValidSendToInterlocAboutToSubmitHandlerTest {
 
         assertThatThrownBy(() -> handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION))
                 .isInstanceOf(IllegalStateException.class);
-    }
-
-    @Test
-    void givenSelectWhoReviewsCaseHasNullValue_thenReturnError() {
-        sscsCaseData = sscsCaseData.toBuilder()
-                .selectWhoReviewsCase(new DynamicList(null, null))
-                .build();
-        caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
-        callback = new Callback<>(caseDetails, Optional.of(caseDetails), VALID_SEND_TO_INTERLOC, false);
-
-        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).hasSize(1).contains("Must select who reviews the appeal.");
-    }
-
-    @Test
-    void givenSelectWhoReviewsCaseHasNullCode_thenReturnError() {
-        sscsCaseData = sscsCaseData.toBuilder()
-                .selectWhoReviewsCase(new DynamicList(new DynamicListItem(null, "label"), null))
-                .build();
-        caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
-        callback = new Callback<>(caseDetails, Optional.of(caseDetails), VALID_SEND_TO_INTERLOC, false);
-
-        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).hasSize(1).contains("Must select who reviews the appeal.");
-    }
-
-    @Test
-    void givenSelectWhoReviewsCaseHasBlankCode_thenReturnError() {
-        sscsCaseData = sscsCaseData.toBuilder()
-                .selectWhoReviewsCase(new DynamicList(new DynamicListItem("", ""), null))
-                .build();
-        caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
-        callback = new Callback<>(caseDetails, Optional.of(caseDetails), VALID_SEND_TO_INTERLOC, false);
-
-        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).hasSize(1).contains("Must select who reviews the appeal.");
-    }
-
-    @Test
-    void givenPostponementRequestInterlocSendToTcwAndOriginalSenderHasBlankCode_thenReturnError() {
-        sscsCaseData = sscsCaseData.toBuilder()
-                .selectWhoReviewsCase(new DynamicList(
-                        new DynamicListItem(POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId(),
-                                POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getLabel()), null))
-                .originalSender(new DynamicList(new DynamicListItem("", ""), null))
-                .build();
-        caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
-        callback = new Callback<>(caseDetails, Optional.of(caseDetails), VALID_SEND_TO_INTERLOC, false);
-
-        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).hasSize(1).contains("Must select original sender");
-    }
-
-    @Test
-    void givenFlagEnabledAndConfidentialityReferralWithBlankPartyCode_thenReturnPartyError() {
-        handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService, true);
-        sscsCaseData = sscsCaseData.toBuilder()
-                .interlocReferralReason(InterlocReferralReason.CONFIDENTIALITY)
-                .selectWhoReviewsCase(new DynamicList(
-                        new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()), null))
-                .build();
-        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
-                new DynamicList(new DynamicListItem("", ""), null));
-        caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
-        callback = new Callback<>(caseDetails, Optional.of(caseDetails), VALID_SEND_TO_INTERLOC, false);
-
-        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).hasSize(1).contains("Must select party");
-    }
-
-    @Test
-    void givenFlagEnabledAndConfidentialityReferralWithNoPartySelected_thenReturnError() {
-        handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService, true);
-        sscsCaseData = sscsCaseData.toBuilder()
-                                   .interlocReferralReason(InterlocReferralReason.CONFIDENTIALITY)
-                                   .selectWhoReviewsCase(new DynamicList(
-                                       new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()), null))
-                                   .build();
-        caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
-        callback = new Callback<>(caseDetails, Optional.of(caseDetails), VALID_SEND_TO_INTERLOC, false);
-
-        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).hasSize(1).contains("Must select party");
-    }
-
-    @Test
-    void givenFlagEnabledAndConfidentialityReferralWithValidPartySelected_thenNoPartyError() {
-        handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService, true);
-        sscsCaseData = sscsCaseData.toBuilder()
-                .interlocReferralReason(InterlocReferralReason.CONFIDENTIALITY)
-                .selectWhoReviewsCase(new DynamicList(
-                        new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()), null))
-                .build();
-        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
-                new DynamicList(new DynamicListItem("appellant", "Appellant"), null));
-        caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
-        callback = new Callback<>(caseDetails, Optional.of(caseDetails), VALID_SEND_TO_INTERLOC, false);
-
-        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).isEmpty();
-    }
-
-    @Test
-    void givenPostponementRequestInterlocSendToTcwWithRepresentativeSender_thenPassesRepToPostponementService() {
-        final SscsCaseData caseData = setupDataForPostponementRequestInterlocSendToTcw(PartyItemList.REPRESENTATIVE);
-        final CaseDetails<SscsCaseData> details = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, caseData, now(), "Benefit");
-        callback = new Callback<>(details, Optional.of(details), VALID_SEND_TO_INTERLOC, true);
-
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        verify(postponementRequestService).processPostponementRequest(eq(caseData), eq(UploadParty.REP), any());
-    }
-
-    @Test
-    void givenPostponementRequestInterlocSendToTcwWithAppellantSender_thenPassesAppellantToPostponementService() {
-        final SscsCaseData caseData = setupDataForPostponementRequestInterlocSendToTcw(PartyItemList.APPELLANT);
-        final CaseDetails<SscsCaseData> details = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, caseData, now(), "Benefit");
-        callback = new Callback<>(details, Optional.of(details), VALID_SEND_TO_INTERLOC, true);
-
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        verify(postponementRequestService).processPostponementRequest(eq(caseData), eq(UploadParty.APPELLANT), any());
     }
 
     private SscsCaseData setupDataForPostponementRequestInterlocSendToTcw(

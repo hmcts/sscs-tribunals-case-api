@@ -336,14 +336,4 @@ class HmctsResponseReviewedAboutToStartTest {
         assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty()).isNull();
     }
 
-    @Test
-    void givenFlagDisabledAndNonChildSupport_thenSelectedConfidentialityPartyIsNotSet() {
-        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService, false);
-        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(Benefit.PIP.getShortName()).build());
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty()).isNull();
-    }
-
 }

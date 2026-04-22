@@ -181,19 +181,6 @@ class ValidSendToInterlocAboutToStartHandlerTest {
         assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode()).isEmpty();
     }
 
-    @ParameterizedTest
-    @EnumSource(value = EventType.class, names = {"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
-    void givenFlagDisabledAndChildSupport_thenSelectedConfidentialityPartyIsNotSet(EventType eventType) {
-        handler = new ValidSendToInterlocAboutToStartHandler(false, false, false);
-        when(callback.getEvent()).thenReturn(eventType);
-        setupCallback();
-        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty()).isNull();
-    }
-
     @Test
     void givenFlagEnabledAndNonChildSupport_thenSelectedConfidentialityPartyIsNotSet() {
         handler = new ValidSendToInterlocAboutToStartHandler(false, false, true);

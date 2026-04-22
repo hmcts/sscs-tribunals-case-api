@@ -439,7 +439,6 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
     private static void updateAppellantConfidentiality(SscsCaseData caseData, YesNo confidentialityRequired) {
         caseData.getAppellant().ifPresent(appellant -> {
-
             setConfidentialityFields(confidentialityRequired, appellant);
             log.debug("Updated appellant confidentiality to {} for case id {}", confidentialityRequired, caseData.getCcdCaseId());
         });
