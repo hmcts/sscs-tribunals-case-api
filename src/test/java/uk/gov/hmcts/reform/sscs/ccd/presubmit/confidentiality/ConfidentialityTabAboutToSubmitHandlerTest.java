@@ -66,6 +66,7 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
     @ParameterizedTest
     @EnumSource(value = EventType.class, names = {
         "DWP_UPLOAD_RESPONSE",
+        "ADD_OTHER_PARTY_DATA",
         "UPDATE_OTHER_PARTY_DATA",
         "INCOMPLETE_APPLICATION_RECEIVED",
         "CASE_UPDATED",

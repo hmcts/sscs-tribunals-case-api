@@ -4,6 +4,7 @@ import static java.time.LocalDateTime.now;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ACTION_HEARING_RECORDING_REQUEST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADD_OTHER_PARTY_DATA;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CASE_UPDATED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DWP_UPLOAD_RESPONSE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INCOMPLETE_APPLICATION_RECEIVED;
@@ -42,6 +43,7 @@ public class ConfidentialityTabAboutToSubmitHandler implements PreSubmitCallback
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return cmOtherPartyConfidentialityEnabled && (callback.getEvent() == DWP_UPLOAD_RESPONSE
+            || callback.getEvent() == ADD_OTHER_PARTY_DATA
             || callback.getEvent() == UPDATE_OTHER_PARTY_DATA
             || callback.getEvent() == INCOMPLETE_APPLICATION_RECEIVED
             || callback.getEvent() == CASE_UPDATED
