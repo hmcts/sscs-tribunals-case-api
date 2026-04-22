@@ -87,6 +87,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.idam.UserRole;
 import uk.gov.hmcts.reform.sscs.model.dwp.Mapping;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.reference.data.model.ConfidentialityType;
@@ -1290,6 +1291,58 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequired).isEmpty();
             assertThat(response.getData().getInterlocReviewState()).isEqualTo(AWAITING_ADMIN_ACTION);
         }
+
+        @ParameterizedTest
+        @MethodSource("provideUserDetailsForUnauthorisedConfidentialityDirection")
+        void givenInvalidUserDetailsForConfidentialityDirection_thenReturnUnauthorisedError(UserDetails userDetails) {
+            handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, idamService, 35, 42, false,
+                true);
+
+            callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList("confidentialityGrantedSendToAdmin"));
+            callback
+                .getCaseDetails()
+                .getCaseData()
+                .getAppeal()
+                .setBenefitType(BenefitType.builder().code(CHILD_SUPPORT.getShortName()).build());
+            when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
+
+            final var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+            assertThat(response.getErrors()).containsExactly("User not authorised to issue confidentiality decision directions.");
+        }
+
+        private static Object[][] provideUserDetailsForUnauthorisedConfidentialityDirection() {
+            return new Object[][]{{null}, {UserDetails.builder().roles(List.of()).build()}};
+        }
+
+        @ParameterizedTest
+        @CsvSource({"TCW", "JUDGE"})
+        void givenUserHasTcwOrJudgeRole_thenConfidentialityDirectionIsAllowed(final UserRole role) {
+            handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, idamService, 35, 42, false,
+                true);
+
+            callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList("confidentialityGrantedSendToAdmin"));
+            callback
+                .getCaseDetails()
+                .getCaseData()
+                .getAppeal()
+                .setBenefitType(BenefitType.builder().code(CHILD_SUPPORT.getShortName()).build());
+            final var selectedConfidentialityParty = new DynamicList(new DynamicListItem("appellant", "Appellant (or Appointee)"),
+                null);
+            callback
+                .getCaseDetails()
+                .getCaseData()
+                .setExtendedSscsCaseData(
+                    ExtendedSscsCaseData.builder().selectedConfidentialityParty(selectedConfidentialityParty).build());
+            when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(
+                UserDetails.builder().roles(List.of(role.getValue())).build());
+
+            final var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+            assertThat(response.getErrors()).isEmpty();
+            assertThat(response.getData().getInterlocReviewState()).isEqualTo(AWAITING_ADMIN_ACTION);
+        }
+
     }
 
     @Nested
@@ -1316,6 +1369,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             assertThatConfidentialityFieldsNotSet(response);
             assertThat(response.getData().getInterlocReviewState()).isNull();
         }
+
     }
 
     private CcdValue<OtherParty> buildOtherParty(final String id, final String firstName, final String lastName) {
