@@ -21,6 +21,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REJECT_
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_ADMIN_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_INFORMATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.NONE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_TCW;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.WELSH_TRANSLATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
@@ -865,11 +866,12 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequired).hasValue(expectedConfidentialityRequired);
             assertThat(response.getData().getAppellant().orElseThrow(AssertionError::new).getConfidentialityRequiredChangedDate()).isAfterOrEqualTo(testStartDateTime);
+            assertThat(response.getData().getInterlocReviewState()).isEqualTo(AWAITING_ADMIN_ACTION);
         }
 
         @ParameterizedTest
         @CsvSource({"confidentialityGrantedSendToAdmin,YES", "confidentialityRefusedSendToAdmin,NO"})
-        void givenIssueDirectionNotice_andTheSelectedConfidentialityPartyIsOtherParty_thenUpdateTheSelectedOtherPartyConfidentialityOnly(String directionType, YesNo expectedConfidentialityRequired) {
+        void givenIssueDirectionNotice_andTheSelectedConfidentialityPartyIsOtherParty_thenUpdateTheSelectedOtherPartyConfidentialityOnlyAndInterlocReviewStateAsAwaitingAdminAction(String directionType, YesNo expectedConfidentialityRequired) {
             when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
 
             handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, false,
@@ -884,6 +886,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
                     buildOtherParty(selectedPartyId, "Ozan", "Mo")));
 
             callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(directionType));
+            callback.getCaseDetails().getCaseData().setInterlocReviewState(REVIEW_BY_TCW);
 
             var selectedConfidentialityParty = new DynamicList(new DynamicListItem("otherParty" + selectedPartyId,"xx"), null);
 
@@ -909,11 +912,12 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequired).isEmpty();
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequiredChangedDate).isEmpty();
+            assertThat(response.getData().getInterlocReviewState()).isEqualTo(AWAITING_ADMIN_ACTION);
         }
 
         @ParameterizedTest
         @CsvSource({"confidentialityGrantedSendToAdmin", "confidentialityRefusedSendToAdmin"})
-        void givenIssueDirectionNotice_andThereIsNoSelectedConfidentialityParty_thenDoNotUpdateConfidentiality(String directionType) {
+        void givenIssueDirectionNotice_andThereIsNoSelectedConfidentialityParty_thenDoNotUpdateConfidentialityAndInterlocReviewState(String directionType) {
             when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
 
             handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, false,
@@ -938,11 +942,12 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             });
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequired).isEmpty();
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequiredChangedDate).isEmpty();
+            assertThat(response.getData().getInterlocReviewState()).isEqualTo(callback.getCaseDetails().getCaseData().getInterlocReviewState());
         }
 
         @ParameterizedTest
         @CsvSource({"confidentialityGrantedSendToAdmin", "confidentialityRefusedSendToAdmin"})
-        void givenIssueDirectionNotice_andOneOfOtherPartyIsSelectedAsConfidentialityPartyButOtherPartiesFieldIsEmpty_thenDoNotUpdateConfidentiality(String directionType) {
+        void givenIssueDirectionNotice_andOneOfOtherPartyIsSelectedAsConfidentialityPartyButOtherPartiesFieldIsEmpty_thenDoNotUpdateConfidentialityAndInterlocReviewState(String directionType) {
             when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
 
             handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, false,
@@ -963,11 +968,12 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             assertThat(response.getData().getOtherParties().size()).isEqualTo(0);
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequired).isEmpty();
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequiredChangedDate).isEmpty();
+            assertThat(response.getData().getInterlocReviewState()).isEqualTo(callback.getCaseDetails().getCaseData().getInterlocReviewState());
         }
 
         @ParameterizedTest
         @CsvSource({"confidentialityGrantedSendToAdmin", "confidentialityRefusedSendToAdmin"})
-        void givenIssueDirectionNotice_andOneOfOtherPartyIsSelectedAsConfidentialityPartyButOtherPartiesFieldValueIsNull_thenDoNotUpdateConfidentiality(String directionType) {
+        void givenIssueDirectionNotice_andOneOfOtherPartyIsSelectedAsConfidentialityPartyButOtherPartiesFieldValueIsNull_thenDoNotUpdateConfidentialityAndInterlocReviewState(String directionType) {
             when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
 
             handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, false,
@@ -988,11 +994,12 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             assertThat(response.getData().getOtherParties()).isNull();
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequired).isEmpty();
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequiredChangedDate).isEmpty();
+            assertThat(response.getData().getInterlocReviewState()).isEqualTo(callback.getCaseDetails().getCaseData().getInterlocReviewState());
         }
 
         @ParameterizedTest
         @CsvSource({"confidentialityGrantedSendToAdmin", "confidentialityRefusedSendToAdmin"})
-        void givenIssueDirectionNotice_andTheSelectedConfidentialityPartyIdHasWrongPrefix_thenDoNotUpdateConfidentiality(String directionType) {
+        void givenIssueDirectionNotice_andTheSelectedConfidentialityPartyIdHasWrongPrefix_thenDoNotUpdateConfidentialityAndInterlocReviewState(String directionType) {
             when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
 
             handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, false,
@@ -1018,6 +1025,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             });
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequired).isEmpty();
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequiredChangedDate).isEmpty();
+            assertThat(response.getData().getInterlocReviewState()).isEqualTo(callback.getCaseDetails().getCaseData().getInterlocReviewState());
         }
     }
 
@@ -1026,7 +1034,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
         @ParameterizedTest
         @ValueSource(strings = {"confidentialityGrantedSendToAdmin", "confidentialityRefusedSendToAdmin"})
-        void givenIssueDirectionNotice_andCmOtherPartyConfidentialityFeatureFlagNotEnabled_thenDoNotUpdateAppellantConfidentiality(String directionType) {
+        void givenIssueDirectionNotice_andCmOtherPartyConfidentialityFeatureFlagNotEnabled_thenDoNotUpdateAppellantConfidentialityAndInterlockReviewState(String directionType) {
             boolean cmOtherPartyConfidentialityFeatureFlag = false;
 
             when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
@@ -1050,6 +1058,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             });
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequired).isEmpty();
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequiredChangedDate).isEmpty();
+            assertThat(response.getData().getInterlocReviewState()).isEqualTo(callback.getCaseDetails().getCaseData().getInterlocReviewState());
         }
     }
 
