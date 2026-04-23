@@ -18,6 +18,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -44,6 +45,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -777,20 +779,16 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         String venueAEpimsId = "12346";
         callback.getCaseDetails().getCaseData().setProcessingVenue(venueA);
         when(venueService.getEpimsIdForVenue(venueB)).thenReturn(venueBEpimsId);
-        when(venueService.getEpimsIdForVenue(venueA)).thenReturn(venueAEpimsId);
         when(venueService.getVenueDetailsForActiveVenueByEpimsId(venueBEpimsId)).thenReturn(VenueDetails.builder().venName(venueB).legacyVenue(venueA).build());
         when(airLookupService.lookupAirVenueNameByPostCode("AB12 00B", sscsCaseData.getAppeal().getBenefitType())).thenReturn(
                 venueB);
 
-        when(refDataService.getCourtVenueRefDataByEpimsId(venueAEpimsId)).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("regionId").build());
 
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("AB12 00B");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(venueA, response.getData().getProcessingVenue());
-        assertNotNull(response.getData().getCaseManagementLocation());
-        assertEquals("regionId", response.getData().getCaseManagementLocation().getRegion());
     }
 
     @Test
@@ -820,6 +818,8 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         assertEquals(venueB, response.getData().getProcessingVenue());
         assertNotNull(response.getData().getCaseManagementLocation());
+        verify(refDataService, times(1)).getCourtVenueRefDataByEpimsId(venueEpimsId);
+
     }
 
     @Test
@@ -841,13 +841,38 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         when(airLookupService.lookupAirVenueNameByPostCode("AB12 00B", sscsCaseData.getAppeal().getBenefitType())).thenReturn(
                 venueB);
 
-        when(refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId)).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("regionId").build());
-
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("AB12 00B");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(venueA, response.getData().getProcessingVenue());
+        verify(refDataService, times(0)).getCourtVenueRefDataByEpimsId(venueEpimsId);
+    }
+
+
+    @ParameterizedTest
+    @NullSource
+    @EmptySource
+    void givenAnAppealWithProcessingVenue_thenDoNotUpdateIfNewVenueIsNull(String venue) {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIsAppointee("No");
+        String venueA = "VenueA";
+        callback.getCaseDetails().getCaseData().setProcessingVenue(venueA);
+        when(regionalProcessingCenterService.getByPostcode(eq("TEST"), anyBoolean())).thenReturn(
+                RegionalProcessingCenter.builder()
+                        .name("rpcName")
+                        .postcode("rpcPostcode")
+                        .epimsId("rpcEpimsId")
+                        .build());
+
+        when(airLookupService.lookupAirVenueNameByPostCode("TEST", sscsCaseData.getAppeal().getBenefitType())).thenReturn(
+                venue);
+
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("TEST");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(venueA, response.getData().getProcessingVenue());
+        verify(refDataService, times(0)).getCourtVenueRefDataByEpimsId(any());
     }
 
     @Test
