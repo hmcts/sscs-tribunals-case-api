@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
+import static ch.qos.logback.classic.Level.ERROR;
+import static ch.qos.logback.classic.Level.INFO;
+import static ch.qos.logback.classic.Level.WARN;
 import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,6 +44,7 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -94,6 +98,7 @@ import uk.gov.hmcts.reform.sscs.reference.data.model.ConfidentialityType;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
+import uk.gov.hmcts.reform.sscs.util.LogCaptureExtension;
 
 class DirectionIssuedAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
@@ -101,33 +106,26 @@ class DirectionIssuedAboutToSubmitHandlerTest {
     private static final String DOCUMENT_URL2 = "dm-store/documents/456";
     private static final String DUMMY_REGIONAL_CENTER = "dummyRegionalCenter";
     private static final String OTHER_PARTY = "otherParty";
-
+    @RegisterExtension
+    private final LogCaptureExtension logCapture =
+        new LogCaptureExtension(DirectionIssuedAboutToSubmitHandler.class);
     @Mock
     private FooterService footerService;
-
     private DirectionIssuedAboutToSubmitHandler handler;
-
     @Mock
     private Callback<SscsCaseData> callback;
-
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
-
     @Mock
     private CaseDetails<SscsCaseData> caseDetailsBefore;
-
     @Mock
     private ServiceRequestExecutor serviceRequestExecutor;
-
     @Mock
     private DwpAddressLookupService dwpAddressLookupService;
-
     @Mock
     private IdamService idamService;
-
     @Mock
     private UserDetails userDetails;
-
     private SscsCaseData sscsCaseData;
 
     private SscsDocument expectedDocument;
@@ -140,11 +138,15 @@ class DirectionIssuedAboutToSubmitHandlerTest {
     @BeforeEach
     void setUp() {
         openMocks(this);
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, idamService, 35, 42, false, true);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, idamService, 35, 42, false,
+            true);
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
         lenient().when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
 
-        SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("myTest.doc").build()).build();
+        SscsDocument document = SscsDocument
+            .builder()
+            .value(SscsDocumentDetails.builder().documentFileName("myTest.doc").build())
+            .build();
         List<SscsDocument> docs = new ArrayList<>();
         docs.add(document);
 
@@ -187,8 +189,10 @@ class DirectionIssuedAboutToSubmitHandlerTest {
         when(caseDetailsBefore.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE);
         when(mockedResponse.getErrors()).thenReturn(emptySet());
 
-        when(dwpAddressLookupService.getDwpRegionalCenterByBenefitTypeAndOffice(anyString(), anyString())).thenReturn(DUMMY_REGIONAL_CENTER);
-        when(dwpAddressLookupService.getDefaultDwpMappingByBenefitType(anyString())).thenReturn(Optional.of(OfficeMapping.builder().isDefault(true).mapping(Mapping.builder().ccd("DWP PIP (1)").build()).build()));
+        when(dwpAddressLookupService.getDwpRegionalCenterByBenefitTypeAndOffice(anyString(), anyString())).thenReturn(
+            DUMMY_REGIONAL_CENTER);
+        when(dwpAddressLookupService.getDefaultDwpMappingByBenefitType(anyString())).thenReturn(
+            Optional.of(OfficeMapping.builder().isDefault(true).mapping(Mapping.builder().ccd("DWP PIP (1)").build()).build()));
     }
 
     @ParameterizedTest
@@ -226,14 +230,16 @@ class DirectionIssuedAboutToSubmitHandlerTest {
         assertNull(response.getData().getDocumentGeneration().getGenerateNotice());
         assertNull(response.getData().getDocumentStaging().getDateAdded());
 
-        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(DocumentType.DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
+        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
+            eq(DocumentType.DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
         assertNull(response.getData().getInterlocReviewState());
         assertEquals(DirectionType.APPEAL_TO_PROCEED.toString(), response.getData().getDirectionTypeDl().getValue().getCode());
     }
 
     @Test
     void givenDirectionNoticeAlreadyExistsAndThenManuallyUploadANewNotice_thenIssueTheNewDocumentWithFooter() {
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, idamService,35, 42, true, true);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, idamService, 35, 42, true,
+            true);
         sscsCaseData.setPrePostHearing(PrePostHearing.PRE);
         sscsCaseData.getDocumentStaging().setPreviewDocument(null);
 
@@ -257,7 +263,8 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(footerService).createFooterAndAddDocToCase(eq(theDocument.getDocumentLink()), any(), eq(DocumentType.DIRECTION_NOTICE), any(), eq(theDocument.getDocumentDateAdded()), eq(null), eq(null));
+        verify(footerService).createFooterAndAddDocToCase(eq(theDocument.getDocumentLink()), any(),
+            eq(DocumentType.DIRECTION_NOTICE), any(), eq(theDocument.getDocumentDateAdded()), eq(null), eq(null));
     }
 
     @Test
@@ -276,21 +283,10 @@ class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals("Direction Type cannot be empty", response.getErrors().toArray()[0]);
     }
 
-    @SuppressWarnings({"Indentation", "unused"})
-    private static Object[] getDirectionNoticeConfidentialMembers() {
-        return new Object[]{
-            new Object[]{ConfidentialityType.GENERAL.getCode(), false, DIRECTION_ACTION_REQUIRED},
-            new Object[]{ConfidentialityType.CONFIDENTIAL.getCode(), true, DIRECTION_ACTION_REQUIRED},
-            new Object[]{ConfidentialityType.CONFIDENTIAL.getCode(), false, null},
-            new Object[]{ConfidentialityType.GENERAL.getCode(), false, DIRECTION_ACTION_REQUIRED},
-            new Object[]{ConfidentialityType.CONFIDENTIAL.getCode(), true, DIRECTION_ACTION_REQUIRED},
-            new Object[]{ConfidentialityType.CONFIDENTIAL.getCode(), false, null},
-        };
-    }
-
     @ParameterizedTest
     @MethodSource("getDirectionNoticeConfidentialMembers")
-    void givenDirectionNoticeCheckFtaStateBasedOnConfidentiality(String confidentialityType, boolean isFtaChosen, DwpState newFtaState) {
+    void givenDirectionNoticeCheckFtaStateBasedOnConfidentiality(String confidentialityType, boolean isFtaChosen,
+        DwpState newFtaState) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         caseData.setConfidentialityType(confidentialityType);
         caseData.setSendDirectionNoticeToFTA(isFtaChosen ? YES : NO);
@@ -366,7 +362,8 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
     @ParameterizedTest
     @CsvSource({"pip, 35", "childSupport, 42"})
-    void givenDirectionTypeOfAppealToProceedWhenDwpIssuingOfficeIsNull_shouldSetDefaultDwpRegionalCentre(String benefitType, int expectedResponseDays) {
+    void givenDirectionTypeOfAppealToProceedWhenDwpIssuingOfficeIsNull_shouldSetDefaultDwpRegionalCentre(String benefitType,
+        int expectedResponseDays) {
         Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
         appeal.setBenefitType(BenefitType.builder().code(benefitType).build());
         appeal.setMrnDetails(MrnDetails.builder().build());
@@ -375,7 +372,8 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
     @ParameterizedTest
     @CsvSource({"pip, 35", "childSupport, 42"})
-    void givenDirectionTypeOfAppealToProceedWhenDwpIssuingOfficeIsEmpty_shouldSetDefaultDwpRegionalCentre(String benefitType, int expectedResponseDays) {
+    void givenDirectionTypeOfAppealToProceedWhenDwpIssuingOfficeIsEmpty_shouldSetDefaultDwpRegionalCentre(String benefitType,
+        int expectedResponseDays) {
         Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
         appeal.setBenefitType(BenefitType.builder().code(benefitType).build());
         appeal.setMrnDetails(MrnDetails.builder().dwpIssuingOffice("").build());
@@ -384,25 +382,12 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
     @ParameterizedTest
     @CsvSource({"pip, 35", "childSupport, 42"})
-    void givenDirectionTypeOfAppealToProceedWhenNoMrnDetails_shouldSetDefaultDwpRegionalCentre(String benefitType, int expectedResponseDays) {
+    void givenDirectionTypeOfAppealToProceedWhenNoMrnDetails_shouldSetDefaultDwpRegionalCentre(String benefitType,
+        int expectedResponseDays) {
         Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
         appeal.setBenefitType(BenefitType.builder().code(benefitType).build());
         appeal.setMrnDetails(null);
         assertDefaultRegionalCentre(expectedResponseDays);
-    }
-
-    private void assertDefaultRegionalCentre(int expectedResponseDays) {
-        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()));
-        when(caseDetailsBefore.getState()).thenReturn(State.WITH_DWP);
-        when(caseDetails.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertEquals(AWAITING_ADMIN_ACTION, response.getData().getInterlocReviewState());
-        assertNotNull(response.getData().getDateSentToDwp());
-        assertEquals(response.getData().getDwpDueDate(), LocalDate.now().plusDays(expectedResponseDays).toString());
-        assertEquals(DwpState.DIRECTION_ACTION_REQUIRED, response.getData().getDwpState());
-        assertEquals(DUMMY_REGIONAL_CENTER, response.getData().getDwpRegionalCentre());
     }
 
     @Test
@@ -416,10 +401,14 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
     @ParameterizedTest
     @CsvSource({"pip, 35", "childSupport, 42"})
-    void givenDirectionTypeOfRefuseExtensionAndExtensionNextEventIsSendToListing_setResponseReceivedStateAndInterlocStateToAwaitingAdminAction(String benefitType, int expectedResponseDays) {
+    void givenDirectionTypeOfRefuseExtensionAndExtensionNextEventIsSendToListing_setResponseReceivedStateAndInterlocStateToAwaitingAdminAction(
+        String benefitType, int expectedResponseDays) {
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_EXTENSION.toString()));
 
-        callback.getCaseDetails().getCaseData().setExtensionNextEventDl(new DynamicList(ExtensionNextEvent.SEND_TO_LISTING.toString()));
+        callback
+            .getCaseDetails()
+            .getCaseData()
+            .setExtensionNextEventDl(new DynamicList(ExtensionNextEvent.SEND_TO_LISTING.toString()));
 
         callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(benefitType).build());
 
@@ -430,9 +419,13 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
     @ParameterizedTest
     @CsvSource({"pip, 35", "childSupport, 42"})
-    void givenDirectionTypeOfRefuseExtensionAndExtensionNextEventIsSendToValidAppeal_setWithDwpStateAndDoNotSetInterlocState(String benefitType, int expectedResponseDays) {
+    void givenDirectionTypeOfRefuseExtensionAndExtensionNextEventIsSendToValidAppeal_setWithDwpStateAndDoNotSetInterlocState(
+        String benefitType, int expectedResponseDays) {
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_EXTENSION.toString()));
-        callback.getCaseDetails().getCaseData().setExtensionNextEventDl(new DynamicList(ExtensionNextEvent.SEND_TO_VALID_APPEAL.toString()));
+        callback
+            .getCaseDetails()
+            .getCaseData()
+            .setExtensionNextEventDl(new DynamicList(ExtensionNextEvent.SEND_TO_VALID_APPEAL.toString()));
         callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(benefitType).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -486,7 +479,10 @@ class DirectionIssuedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
         callback.getCaseDetails().getCaseData().setDwpState(DwpState.LAPSED);
 
-        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_REINSTATEMENT.toString()));
+        callback
+            .getCaseDetails()
+            .getCaseData()
+            .setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_REINSTATEMENT.toString()));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(State.DORMANT_APPEAL_STATE, response.getData().getState());
@@ -527,7 +523,10 @@ class DirectionIssuedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("yes");
 
 
-        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_REINSTATEMENT.toString()));
+        callback
+            .getCaseDetails()
+            .getCaseData()
+            .setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_REINSTATEMENT.toString()));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(State.DORMANT_APPEAL_STATE, response.getData().getState());
@@ -546,7 +545,10 @@ class DirectionIssuedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setUrgentHearingOutcome(RequestOutcome.IN_PROGRESS.getValue());
         callback.getCaseDetails().getCaseData().setDwpState(DwpState.LAPSED);
 
-        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.GRANT_URGENT_HEARING.toString()));
+        callback
+            .getCaseDetails()
+            .getCaseData()
+            .setDirectionTypeDl(new DynamicList(DirectionType.GRANT_URGENT_HEARING.toString()));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(State.INTERLOCUTORY_REVIEW_STATE, response.getData().getState());
@@ -565,7 +567,10 @@ class DirectionIssuedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpState(DwpState.LAPSED);
         callback.getCaseDetails().getCaseData().setUrgentCase("Yes");
 
-        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_URGENT_HEARING.toString()));
+        callback
+            .getCaseDetails()
+            .getCaseData()
+            .setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_URGENT_HEARING.toString()));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(State.DORMANT_APPEAL_STATE, response.getData().getState());
@@ -597,7 +602,10 @@ class DirectionIssuedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
         callback.getCaseDetails().getCaseData().setDwpState(DwpState.LAPSED);
 
-        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.ISSUE_AND_SEND_TO_ADMIN.toString()));
+        callback
+            .getCaseDetails()
+            .getCaseData()
+            .setDirectionTypeDl(new DynamicList(DirectionType.ISSUE_AND_SEND_TO_ADMIN.toString()));
         PreSubmitCallbackResponse<SscsCaseData> res = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(State.DORMANT_APPEAL_STATE, res.getData().getState());
@@ -643,7 +651,9 @@ class DirectionIssuedAboutToSubmitHandlerTest {
     @Test
     void shouldErrorWhenDirectionTypeIsProvideInformationAndNoDueDate() {
         sscsCaseData.setDirectionDueDate(null);
-        sscsCaseData.getDirectionTypeDl().setValue(new DynamicListItem(DirectionType.PROVIDE_INFORMATION.toString(), "appeal To Proceed"));
+        sscsCaseData
+            .getDirectionTypeDl()
+            .setValue(new DynamicListItem(DirectionType.PROVIDE_INFORMATION.toString(), "appeal To Proceed"));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(1, response.getErrors().size());
 
@@ -655,7 +665,10 @@ class DirectionIssuedAboutToSubmitHandlerTest {
         when(caseDetailsBefore.getState()).thenReturn(State.WITH_DWP);
         sscsCaseData.setLanguagePreferenceWelsh("Yes");
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_EXTENSION.toString()));
-        callback.getCaseDetails().getCaseData().setExtensionNextEventDl(new DynamicList(ExtensionNextEvent.SEND_TO_VALID_APPEAL.toString()));
+        callback
+            .getCaseDetails()
+            .getCaseData()
+            .setExtensionNextEventDl(new DynamicList(ExtensionNextEvent.SEND_TO_VALID_APPEAL.toString()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -667,7 +680,8 @@ class DirectionIssuedAboutToSubmitHandlerTest {
         assertNotNull(response.getData().getExtensionNextEventDl());
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()),
-            any(), eq(DocumentType.DIRECTION_NOTICE), any(), any(), eq(null), eq(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED));
+            any(), eq(DocumentType.DIRECTION_NOTICE), any(), any(), eq(null),
+            eq(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED));
 
         verifyNoInteractions(serviceRequestExecutor);
     }
@@ -701,9 +715,13 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
     @ParameterizedTest
     @CsvSource({"pip, 35", "childSupport, 42"})
-    void givenWelshDirectionTypeOfRefuseExtensionAndExtensionNextEventIsSendToListing_setResponseReceivedStateAndInterlocStateToAwaitingAdminAction(String benefitType, int expectedResponseDays) {
+    void givenWelshDirectionTypeOfRefuseExtensionAndExtensionNextEventIsSendToListing_setResponseReceivedStateAndInterlocStateToAwaitingAdminAction(
+        String benefitType, int expectedResponseDays) {
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_EXTENSION.toString()));
-        callback.getCaseDetails().getCaseData().setExtensionNextEventDl(new DynamicList(ExtensionNextEvent.SEND_TO_LISTING.toString()));
+        callback
+            .getCaseDetails()
+            .getCaseData()
+            .setExtensionNextEventDl(new DynamicList(ExtensionNextEvent.SEND_TO_LISTING.toString()));
         callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(benefitType).build());
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED_WELSH);
@@ -716,9 +734,13 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
     @ParameterizedTest
     @CsvSource({"pip, 35", "childSupport, 42"})
-    void givenWelshDirectionTypeOfRefuseExtensionAndExtensionNextEventIsSendToValidAppeal_setWithDwpStateAndDoNotSetInterlocState(String benefitType, int expectedResponseDays) {
+    void givenWelshDirectionTypeOfRefuseExtensionAndExtensionNextEventIsSendToValidAppeal_setWithDwpStateAndDoNotSetInterlocState(
+        String benefitType, int expectedResponseDays) {
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_EXTENSION.toString()));
-        callback.getCaseDetails().getCaseData().setExtensionNextEventDl(new DynamicList(ExtensionNextEvent.SEND_TO_VALID_APPEAL.toString()));
+        callback
+            .getCaseDetails()
+            .getCaseData()
+            .setExtensionNextEventDl(new DynamicList(ExtensionNextEvent.SEND_TO_VALID_APPEAL.toString()));
         callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(benefitType).build());
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED_WELSH);
@@ -762,22 +784,13 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
     @Test
     void shouldClearInterlocReferralReason() {
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, idamService, 35, 42, true, true);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, idamService, 35, 42, true,
+            true);
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_CORRECTION_APPLICATION);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getInterlocReferralReason());
-    }
-
-    private void assertValues(PreSubmitCallbackResponse<SscsCaseData> response, InterlocReviewState interlocReviewState,
-                              DwpState dwpState, State state, int expectedResponseDays) {
-        assertEquals(interlocReviewState, response.getData().getInterlocReviewState());
-        assertEquals(dwpState, response.getData().getDwpState());
-        assertEquals(state, response.getData().getState());
-        assertEquals("sentToDwp", response.getData().getHmctsDwpState());
-        assertEquals(LocalDate.now().toString(), response.getData().getDateSentToDwp());
-        assertEquals(LocalDate.now().plusDays(expectedResponseDays).toString(), response.getData().getDwpDueDate());
     }
 
     @Test
@@ -871,7 +884,8 @@ class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals(YES, response.getData().getExtendedSscsCaseData().getSelectNextHmcHearingType());
         assertEquals(hmcHearingType, response.getData().getHmcHearingType());
         assertEquals(hmcHearingType, response.getData().getAppeal().getHearingOptions().getHmcHearingType());
-        assertEquals(HearingOptions.builder().hmcHearingType(hmcHearingType).build(), response.getData().getAppeal().getHearingOptions());
+        assertEquals(HearingOptions.builder().hmcHearingType(hmcHearingType).build(),
+            response.getData().getAppeal().getHearingOptions());
     }
 
     @ParameterizedTest
@@ -885,8 +899,24 @@ class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals(YES, response.getData().getExtendedSscsCaseData().getSelectNextHmcHearingType());
         assertEquals(hmcHearingType, response.getData().getHmcHearingType());
         assertEquals(hmcHearingType, response.getData().getAppeal().getHearingOptions().getHmcHearingType());
-        HearingOptions expectedHearingOptions = HearingOptions.builder().agreeLessNotice("string").hmcHearingType(hmcHearingType).build();
+        HearingOptions expectedHearingOptions = HearingOptions
+            .builder()
+            .agreeLessNotice("string")
+            .hmcHearingType(hmcHearingType)
+            .build();
         assertEquals(expectedHearingOptions, response.getData().getAppeal().getHearingOptions());
+    }
+
+    @SuppressWarnings({"Indentation", "unused"})
+    private static Object[] getDirectionNoticeConfidentialMembers() {
+        return new Object[]{
+            new Object[]{ConfidentialityType.GENERAL.getCode(), false, DIRECTION_ACTION_REQUIRED},
+            new Object[]{ConfidentialityType.CONFIDENTIAL.getCode(), true, DIRECTION_ACTION_REQUIRED},
+            new Object[]{ConfidentialityType.CONFIDENTIAL.getCode(), false, null},
+            new Object[]{ConfidentialityType.GENERAL.getCode(), false, DIRECTION_ACTION_REQUIRED},
+            new Object[]{ConfidentialityType.CONFIDENTIAL.getCode(), true, DIRECTION_ACTION_REQUIRED},
+            new Object[]{ConfidentialityType.CONFIDENTIAL.getCode(), false, null},
+        };
     }
 
     private static void assertThatConfidentialityFieldsNotSet(PreSubmitCallbackResponse<SscsCaseData> response) {
@@ -1028,6 +1058,15 @@ class DirectionIssuedAboutToSubmitHandlerTest {
                 .getAppellant()
                 .orElseThrow(AssertionError::new)
                 .getConfidentialityRequiredChangedDate()).isAfterOrEqualTo(testStartDateTime);
+
+            final String ccdCaseId = callback.getCaseDetails().getCaseData().getCcdCaseId();
+            logCapture.assertLogContains("User has the following roles: [caseworker-sscs-superuser]", INFO);
+            logCapture.assertLogContains(
+                "Applying confidentiality decision for case id %s with direction type %s and selected party %s".formatted(
+                    ccdCaseId, directionType, "appellant"), INFO);
+            logCapture.assertLogContains(
+                "Updated appellant confidentiality to %s for case id %s".formatted(
+                    expectedConfidentialityRequired.getValue(), ccdCaseId), INFO);
         }
 
         @ParameterizedTest
@@ -1095,6 +1134,14 @@ class DirectionIssuedAboutToSubmitHandlerTest {
                 .isPresent()
                 .map(Appellant::getConfidentialityRequiredChangedDate)
                 .isEmpty();
+            final String ccdCaseId = callback.getCaseDetails().getCaseData().getCcdCaseId();
+            logCapture.assertLogContains("User has the following roles: [caseworker-sscs-superuser]", INFO);
+            logCapture.assertLogContains(
+                "Applying confidentiality decision for case id %s with direction type %s and selected party %s".formatted(
+                    ccdCaseId, directionType, "otherParty666-666-666"), INFO);
+            logCapture.assertLogContains(
+                "Updated other party confidentiality to %s for case id %s and other party id %s".formatted(
+                    expectedConfidentialityRequired.getValue(), ccdCaseId, "666-666-666"), INFO);
         }
 
         @Test
@@ -1128,6 +1175,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
                 .getAppellant()
                 .orElseThrow(AssertionError::new)
                 .getConfidentialityRequiredChangedDate()).isNull();
+            logCapture.assertLogContains("Users confidentiality status is not changed so not updating confidentiality required fields.", INFO);
         }
 
         @Test
@@ -1159,6 +1207,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             final var updatedParty = response.getData().getOtherParties().getFirst();
             assertThat(updatedParty.getValue().getConfidentialityRequired()).isEqualTo(YES);
             assertThat(updatedParty.getValue().getConfidentialityRequiredChangedDate()).isNull();
+            logCapture.assertLogContains("Users confidentiality status is not changed so not updating confidentiality required fields.", INFO);
         }
 
         @Test
@@ -1189,6 +1238,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             assertThat(response.getErrors()).isEmpty();
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequired).isEmpty();
             assertThat(response.getData().getInterlocReviewState()).isEqualTo(AWAITING_ADMIN_ACTION);
+            logCapture.assertLogContains("Other party not found for confidentiality target %s as other parties list is empty. No confidentiality update applied for case %s".formatted(OTHER_PARTY + "666-666-666", callback.getCaseDetails().getCaseData().getCcdCaseId()), WARN);
         }
 
         @Test
@@ -1225,6 +1275,10 @@ class DirectionIssuedAboutToSubmitHandlerTest {
                 assertThat(o.getValue().getConfidentialityRequiredChangedDate()).isNull();
             });
             assertThat(response.getData().getInterlocReviewState()).isEqualTo(AWAITING_ADMIN_ACTION);
+            final String ccdCaseId = callback.getCaseDetails().getCaseData().getCcdCaseId();
+            logCapture.assertLogContains(
+                "Applying confidentiality decision for case id %s with direction type %s and selected party %s".formatted(
+                    ccdCaseId, "confidentialityGrantedSendToAdmin", "otherParty"), INFO);
         }
 
         @Test
@@ -1257,6 +1311,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
                 assertThat(o.getValue().getConfidentialityRequiredChangedDate()).isNull();
             });
             assertThat(response.getData().getInterlocReviewState()).isEqualTo(AWAITING_ADMIN_ACTION);
+            logCapture.assertLogContains("Other party not found for confidentiality target %s. No confidentiality update applied for case %s".formatted(OTHER_PARTY, callback.getCaseDetails().getCaseData().getCcdCaseId()), WARN);
         }
 
         @Test
@@ -1290,6 +1345,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             });
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequired).isEmpty();
             assertThat(response.getData().getInterlocReviewState()).isEqualTo(AWAITING_ADMIN_ACTION);
+            logCapture.assertLogContains("Unrecognised confidentiality target 'unknownCode'. No confidentiality update applied for case %s".formatted(callback.getCaseDetails().getCaseData().getCcdCaseId()), WARN);
         }
 
         @ParameterizedTest
@@ -1309,14 +1365,17 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             final var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
             assertThat(response.getErrors()).containsExactly("User not authorised to issue confidentiality decision directions.");
-        }
 
-        private static Object[][] provideUserDetailsForUnauthorisedConfidentialityDirection() {
-            return new Object[][]{{null}, {UserDetails.builder().roles(List.of()).build()}};
+            if (userDetails == null) {
+                logCapture.assertLogContains("Could not retrieve user details from IDAM Service for user.", ERROR);
+            } else {
+                logCapture.assertLogContains("User has the following roles: %s".formatted(userDetails.getRoles()), INFO);
+                logCapture.assertLogContains("User not authorised to issue confidentiality decision directions.", ERROR);
+            }
         }
 
         @ParameterizedTest
-        @CsvSource({"TCW", "JUDGE"})
+        @CsvSource({"TCW", "JUDGE", "SUPER_USER"})
         void givenUserHasTcwOrJudgeRole_thenConfidentialityDirectionIsAllowed(final UserRole role) {
             handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, idamService, 35, 42, false,
                 true);
@@ -1341,6 +1400,12 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
             assertThat(response.getErrors()).isEmpty();
             assertThat(response.getData().getInterlocReviewState()).isEqualTo(AWAITING_ADMIN_ACTION);
+        }
+
+        private static Object[][] provideUserDetailsForUnauthorisedConfidentialityDirection() {
+            return new Object[][]{{null}, {UserDetails.builder().roles(List.of()).build()}, {UserDetails
+                .builder()
+                .roles(List.of("other")).build()}};
         }
 
     }
@@ -1370,6 +1435,30 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             assertThat(response.getData().getInterlocReviewState()).isNull();
         }
 
+    }
+
+    private void assertDefaultRegionalCentre(int expectedResponseDays) {
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()));
+        when(caseDetailsBefore.getState()).thenReturn(State.WITH_DWP);
+        when(caseDetails.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(AWAITING_ADMIN_ACTION, response.getData().getInterlocReviewState());
+        assertNotNull(response.getData().getDateSentToDwp());
+        assertEquals(response.getData().getDwpDueDate(), LocalDate.now().plusDays(expectedResponseDays).toString());
+        assertEquals(DwpState.DIRECTION_ACTION_REQUIRED, response.getData().getDwpState());
+        assertEquals(DUMMY_REGIONAL_CENTER, response.getData().getDwpRegionalCentre());
+    }
+
+    private void assertValues(PreSubmitCallbackResponse<SscsCaseData> response, InterlocReviewState interlocReviewState,
+        DwpState dwpState, State state, int expectedResponseDays) {
+        assertEquals(interlocReviewState, response.getData().getInterlocReviewState());
+        assertEquals(dwpState, response.getData().getDwpState());
+        assertEquals(state, response.getData().getState());
+        assertEquals("sentToDwp", response.getData().getHmctsDwpState());
+        assertEquals(LocalDate.now().toString(), response.getData().getDateSentToDwp());
+        assertEquals(LocalDate.now().plusDays(expectedResponseDays).toString(), response.getData().getDwpDueDate());
     }
 
     private CcdValue<OtherParty> buildOtherParty(final String id, final String firstName, final String lastName) {

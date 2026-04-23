@@ -73,7 +73,7 @@ class NonCompliantSendToInterlocAboutToStartHandlerTest {
     }
 
     @Test
-    void throwsIfCannotHandle() {
+    void throwsAnIllegalStateExceptionIfItIsNotAnNonCompliantSendToInterlocAboutToStartCallback() {
         Callback<SscsCaseData> wrongCallback =
                 new Callback<>(callback.getCaseDetails(), Optional.of(callback.getCaseDetails()), EventType.APPEAL_RECEIVED, false);
         assertThatThrownBy(() -> handler.handle(ABOUT_TO_START, wrongCallback, USER_AUTHORISATION))

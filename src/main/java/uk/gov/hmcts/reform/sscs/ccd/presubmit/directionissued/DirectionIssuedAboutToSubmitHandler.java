@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.Optional.ofNullable;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN;
@@ -27,7 +29,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,18 +120,18 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         log.info("DocumentTranslationStatus is {},  for case id : {}", documentTranslationStatus, caseData.getCcdCaseId());
         YesNo selectNextHmcHearingType = caseData.getExtendedSscsCaseData().getSelectNextHmcHearingType();
         if (isNoOrNull(selectNextHmcHearingType)) {
-            Optional.ofNullable(caseData.getAppeal())
+            ofNullable(caseData.getAppeal())
                 .map(Appeal::getHearingOptions)
                 .ifPresent(hearingOptions -> hearingOptions.setHmcHearingType(null));
         } else {
             caseData.getAppeal()
-                .setHearingOptions(Optional.ofNullable(caseData.getAppeal().getHearingOptions())
+                .setHearingOptions(ofNullable(caseData.getAppeal().getHearingOptions())
                     .map(HearingOptions::toBuilder)
                     .orElseGet(HearingOptions::builder)
                     .hmcHearingType(caseData.getHmcHearingType())
                     .build());
         }
-        Optional.ofNullable(caseData.getSchedulingAndListingFields())
+        ofNullable(caseData.getSchedulingAndListingFields())
             .map(SchedulingAndListingFields::getOverrideFields)
             .ifPresent(overrideFields -> overrideFields.setHmcHearingType(null));
         return validateDirectionType(caseData)
@@ -140,7 +141,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     }
 
     private static String getDirectionTypeCode(SscsCaseData caseData) {
-        return Optional.ofNullable(caseData.getDirectionTypeDl())
+        return ofNullable(caseData.getDirectionTypeDl())
                        .map(DynamicList::getValue)
                        .map(DynamicListItem::getCode)
                        .orElse(null);
@@ -188,6 +189,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         }
 
         if (!isAuthorisedToGrantConfidentiality(userAuthorisation)) {
+            log.error("User not authorised to issue confidentiality decision directions.");
             PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
             errorResponse.addError("User not authorised to issue confidentiality decision directions.");
             return Optional.of(errorResponse);
@@ -199,8 +201,10 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private boolean isAuthorisedToGrantConfidentiality(String userAuthorisation) {
         final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
         if (userDetails == null) {
+            log.error("Could not retrieve user details from IDAM Service for user.");
             return false;
         }
+        log.info("User has the following roles: {}", userDetails.getRoles());
         return userDetails.hasRole(SUPER_USER) || userDetails.hasRole(TCW) || userDetails.hasRole(JUDGE);
     }
 
@@ -393,7 +397,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         if (callback.getEvent() == EventType.DIRECTION_ISSUED) {
             footerService.createFooterAndAddDocToCase(url, caseData, DocumentType.DIRECTION_NOTICE,
-                Optional.ofNullable(caseData.getDocumentStaging().getDateAdded()).orElse(LocalDate.now())
+                ofNullable(caseData.getDocumentStaging().getDateAdded()).orElse(LocalDate.now())
                     .format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
                 caseData.getDocumentStaging().getDateAdded(), null, documentTranslationStatus);
         }
@@ -430,7 +434,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     }
 
     private static String getSelectedConfidentialityPartyCode(SscsCaseData caseData) {
-        return Optional.ofNullable(caseData.getExtendedSscsCaseData())
+        return ofNullable(caseData.getExtendedSscsCaseData())
                        .map(ExtendedSscsCaseData::getSelectedConfidentialityParty)
                        .map(DynamicList::getValue)
                        .map(DynamicListItem::getCode)
@@ -440,12 +444,13 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private static void updateAppellantConfidentiality(SscsCaseData caseData, YesNo confidentialityRequired) {
         caseData.getAppellant().ifPresent(appellant -> {
             setConfidentialityFields(confidentialityRequired, appellant);
-            log.debug("Updated appellant confidentiality to {} for case id {}", confidentialityRequired, caseData.getCcdCaseId());
+            log.info("Updated appellant confidentiality to {} for case id {}", confidentialityRequired, caseData.getCcdCaseId());
         });
     }
 
     private static void setConfidentialityFields(YesNo confidentialityRequired, Party party) {
         if (confidentialityRequired == party.getConfidentialityRequired()) {
+            log.info("Users confidentiality status is not changed so not updating confidentiality required fields.");
             return;
         }
         party.setConfidentialityRequired(confidentialityRequired);
@@ -453,10 +458,12 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     }
 
     private void applyConfidentialityDecisionFromDirection(SscsCaseData caseData) {
+        final String directionTypeCode = getDirectionTypeCode(caseData);
         final YesNo confidentialityRequired = CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN
             .toString()
-            .equals(getDirectionTypeCode(caseData)) ? YesNo.YES : YesNo.NO;
+            .equals(directionTypeCode) ? YesNo.YES : YesNo.NO;
         final String selectedConfidentialityPartyCode = getSelectedConfidentialityPartyCode(caseData);
+        log.info("Applying confidentiality decision for case id {} with direction type {} and selected party {}", caseData.getCcdCaseId(), directionTypeCode, selectedConfidentialityPartyCode);
         if (isNotBlank(selectedConfidentialityPartyCode)) {
             if (isOtherPartyReferral(selectedConfidentialityPartyCode)) {
                 updateReferredOtherPartyConfidentiality(caseData, confidentialityRequired, selectedConfidentialityPartyCode);
@@ -482,8 +489,8 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private void updateReferredOtherPartyConfidentiality(SscsCaseData caseData, YesNo confidentialityRequired,
         String selectedConfidentialityPartyCode) {
         final String otherPartyId = selectedConfidentialityPartyCode.substring(OTHER_PARTY_PREFIX.length());
-        if (CollectionUtils.isEmpty(caseData.getOtherParties())) {
-            log.warn("Other party not found for confidentiality target '{}' as other parties list is empty. No confidentiality update applied for case {}",
+        if (isEmpty(caseData.getOtherParties())) {
+            log.warn("Other party not found for confidentiality target {} as other parties list is empty. No confidentiality update applied for case {}",
                 selectedConfidentialityPartyCode, caseData.getCcdCaseId());
             return;
         }
@@ -494,11 +501,12 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             .filter(Objects::nonNull)
             .filter(otherParty -> isMatchingOtherParty(otherParty, otherPartyId))
             .findFirst()
-            .ifPresent(otherParty -> {
+            .ifPresentOrElse(otherParty -> {
                 setConfidentialityFields(confidentialityRequired, otherParty);
-                log.debug("Updated other party confidentiality to {} for case id {} and other party id {}",
+                log.info("Updated other party confidentiality to {} for case id {} and other party id {}",
                     confidentialityRequired, caseData.getCcdCaseId(), otherParty.getId());
-            });
+            }, () -> log.warn("Other party not found for confidentiality target {}. No confidentiality update applied for case {}",
+                selectedConfidentialityPartyCode, caseData.getCcdCaseId()));
     }
 
     private boolean isMatchingOtherParty(OtherParty otherParty, String otherPartyId) {
