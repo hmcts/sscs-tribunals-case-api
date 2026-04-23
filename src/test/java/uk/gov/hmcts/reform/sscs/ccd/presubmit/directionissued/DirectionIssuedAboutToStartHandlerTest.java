@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.APPEAL_TO_PROCEED;
@@ -27,6 +29,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.NO_FURTHER_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.SEND_TO_LISTING;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.SEND_TO_VALID_APPEAL;
+import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,6 +40,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -58,12 +62,20 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.reference.data.model.ConfidentialityType;
 
 @ExtendWith(MockitoExtension.class)
 public class DirectionIssuedAboutToStartHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
+
+    @Mock
+    private IdamService idamService;
+
+    @Mock
+    private UserDetails userDetails;
 
     private Callback<SscsCaseData> callback;
     private CaseDetails<SscsCaseData> caseDetails;
@@ -73,7 +85,9 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
     @BeforeEach
     public void setUp() {
-        handler = new DirectionIssuedAboutToStartHandler(false, false);
+        handler = new DirectionIssuedAboutToStartHandler(false, false, idamService);
+        lenient().when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
+        lenient().when(userDetails.hasRole(SUPER_USER)).thenReturn(true);
         sscsCaseData = SscsCaseData.builder()
                 .appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build())
                 .build();
@@ -172,7 +186,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
     @Test
     public void givenAppealWithConfidentialityReferralAndFeatureFlagEnabled_populateDirectionTypeDropdown() {
-        handler = new DirectionIssuedAboutToStartHandler(false, true);
+        handler = new DirectionIssuedAboutToStartHandler(false, true, idamService);
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
@@ -192,8 +206,26 @@ public class DirectionIssuedAboutToStartHandlerTest {
     }
 
     @Test
+    public void givenAppealWithConfidentialityReferralAndFeatureFlagEnabledAndNonSuperUser_doNotPopulateConfidentialityDirectionOptions() {
+        handler = new DirectionIssuedAboutToStartHandler(false, true, idamService);
+        when(userDetails.hasRole(SUPER_USER)).thenReturn(false);
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
+
+        List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
+        listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
+        listOptions.add(new DynamicListItem(ISSUE_AND_SEND_TO_ADMIN.toString(), ISSUE_AND_SEND_TO_ADMIN.getLabel()));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
+        assertEquals(expected, response.getData().getDirectionTypeDl());
+        assertEquals(3, response.getData().getDirectionTypeDl().getListItems().size());
+    }
+
+    @Test
     public void givenAppealWithConfidentialityReferralAndFeatureFlagDisabled_doNotPopulateDirectionTypeDropdown() {
-        handler = new DirectionIssuedAboutToStartHandler(false, false);
+        handler = new DirectionIssuedAboutToStartHandler(false, false, idamService);
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
@@ -210,7 +242,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
     @Test
     public void givenAppealWithoutConfidentialityReferralAndFeatureFlagEnaled_doNotPopulateDirectionTypeDropdown() {
-        handler = new DirectionIssuedAboutToStartHandler(false, true);
+        handler = new DirectionIssuedAboutToStartHandler(false, true, idamService);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
@@ -260,7 +292,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
     @Test
     public void givenAppealWithReinstatementRequest_populateDirectionTypeDropdown() {
-        handler = new DirectionIssuedAboutToStartHandler(false, false);
+        handler = new DirectionIssuedAboutToStartHandler(false, false, idamService);
         sscsCaseData.setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
@@ -351,7 +383,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
     @Test
     public void givenAppealWithHearingRecordingRequestOutstanding_populateDirectionTypeDropdownWithRefuseHearingRecordingRequest() {
-        handler = new DirectionIssuedAboutToStartHandler(false, false);
+        handler = new DirectionIssuedAboutToStartHandler(false, false, idamService);
         sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(YES);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
@@ -370,7 +402,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
     @Test
     public void givenAppealWithNoHearingRecordingRequestOutstanding_doNotPopulateDirectionTypeDropdownWithRefuseHearingRecordingRequest() {
-        handler = new DirectionIssuedAboutToStartHandler(false, false);
+        handler = new DirectionIssuedAboutToStartHandler(false, false, idamService);
         sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(NO);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
@@ -387,7 +419,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
     @Test
     public void givenAValidCallbackType_thenClearTheConfidentialityFields() {
-        handler = new DirectionIssuedAboutToStartHandler(false, false);
+        handler = new DirectionIssuedAboutToStartHandler(false, false, idamService);
         sscsCaseData.setConfidentialityType(ConfidentialityType.CONFIDENTIAL.getCode());
         sscsCaseData.setSendDirectionNoticeToFTA(YES);
         sscsCaseData.setSendDirectionNoticeToRepresentative(YES);
@@ -411,7 +443,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
     @Test
     public void givenAValidCallbackType_thenVerifyAllPartiesOnTheCase() {
-        handler = new DirectionIssuedAboutToStartHandler(false, false);
+        handler = new DirectionIssuedAboutToStartHandler(false, false, idamService);
 
         Appointee otherPartyAppointee = Appointee.builder()
                 .id("2").name(Name.builder().firstName("Henry").lastName("Smith").build()).build();
@@ -441,7 +473,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
     @Test
     public void givenAValidCallbackType_NoAdditionalPartiesForOtherParty() {
-        handler = new DirectionIssuedAboutToStartHandler(false, false);
+        handler = new DirectionIssuedAboutToStartHandler(false, false, idamService);
 
         CcdValue<OtherParty> otherParty = CcdValue.<OtherParty>builder()
                 .value(OtherParty.builder()
