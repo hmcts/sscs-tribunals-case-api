@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 
 import java.time.LocalDate;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
+@Slf4j
 @Service
 class ConfidentialityConfirmedAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
@@ -46,9 +48,10 @@ class ConfidentialityConfirmedAboutToSubmitHandler implements PreSubmitCallbackH
         }
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        var preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
-        caseData.setDwpDueDate(LocalDate.now().plusDays(dwpResponseDueDaysChildSupport).toString());
+        final String dwpDueDate = LocalDate.now().plusDays(dwpResponseDueDaysChildSupport).toString();
+        log.info("Setting dwp state to UNREGISTERED and dwp due date to {} for case id {}", dwpDueDate, callback.getCaseDetails().getId());
+        caseData.setDwpDueDate(dwpDueDate);
         caseData.setDwpState(DwpState.UNREGISTERED);
-        return preSubmitCallbackResponse;
+        return new PreSubmitCallbackResponse<>(caseData);
     }
 }

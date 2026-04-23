@@ -45,7 +45,7 @@ class ConfidentialityConfirmedFunctionalTest extends AbstractFunctionalTest {
     class CmToggleOn {
 
         @Test
-        @SneakyThrows
+
         void shouldTransitionToWithDwpStateWhenConfidentialityConfirmed() {
 
             final SscsCaseDetails caseWithState = createCaseFromEvent(Benefit.CHILD_SUPPORT,
@@ -57,7 +57,7 @@ class ConfidentialityConfirmedFunctionalTest extends AbstractFunctionalTest {
             });
 
             var otherParty = buildOtherParty("Mr", "Dummy", "User");
-            updateCcdCaseService.updateCaseV2(caseWithState.getId(), ADD_OTHER_PARTY_DATA.getCcdType(), idamService.getIdamTokens(), (cd) -> {
+            updateCcdCaseService.updateCaseV2(caseWithState.getId(), ADD_OTHER_PARTY_DATA.getCcdType(), idamService.getIdamTokens(), cd -> {
                 cd.getData().setOtherParties(List.of(new CcdValue<>(otherParty)));
                 cd.getData().getExtendedSscsCaseData().setAwareOfAnyAdditionalOtherParties(YesNo.YES);
                 cd.getData().setInterlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION);
@@ -70,7 +70,7 @@ class ConfidentialityConfirmedFunctionalTest extends AbstractFunctionalTest {
                 assertThat(cdAfterEvent.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.AWAITING_ADMIN_ACTION);
             });
 
-            updateCcdCaseService.updateCaseV2(caseWithState.getId(), CONFIDENTIALITY_CONFIRMED.getCcdType(), idamService.getIdamTokens(), (cd) -> {
+            updateCcdCaseService.updateCaseV2(caseWithState.getId(), CONFIDENTIALITY_CONFIRMED.getCcdType(), idamService.getIdamTokens(), cd -> {
                 cd.getData().getOtherParties().getFirst().getValue().setConfidentialityRequired(YesNo.YES);
                 return new UpdateCcdCaseService.UpdateResult("confidentiality confirmed", "confidentiality confirmed");
             });
