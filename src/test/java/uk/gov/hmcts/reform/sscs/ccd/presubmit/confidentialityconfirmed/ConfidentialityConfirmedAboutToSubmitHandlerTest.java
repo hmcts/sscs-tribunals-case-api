@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 class ConfidentialityConfirmedAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
+    private static final int CHILD_SUPPORT_DWP_DUE_DATE = 42;
 
     private ConfidentialityConfirmedAboutToSubmitHandler handler;
 
@@ -46,7 +47,7 @@ class ConfidentialityConfirmedAboutToSubmitHandlerTest {
 
         @BeforeEach
         void setUp() {
-            handler = new ConfidentialityConfirmedAboutToSubmitHandler(42, true);
+            handler = new ConfidentialityConfirmedAboutToSubmitHandler(CHILD_SUPPORT_DWP_DUE_DATE, true);
         }
 
         @ParameterizedTest
@@ -95,7 +96,7 @@ class ConfidentialityConfirmedAboutToSubmitHandlerTest {
 
             PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-            assertThat(response.getData().getDwpDueDate()).isEqualTo(LocalDate.now().plusDays(42).toString());
+            assertThat(response.getData().getDwpDueDate()).isEqualTo(LocalDate.now().plusDays(CHILD_SUPPORT_DWP_DUE_DATE).toString());
             assertThat(response.getData().getDwpState()).isEqualTo(DwpState.UNREGISTERED);
         }
 
@@ -113,7 +114,7 @@ class ConfidentialityConfirmedAboutToSubmitHandlerTest {
 
         @BeforeEach
         void setUp() {
-            handler = new ConfidentialityConfirmedAboutToSubmitHandler(42, false);
+            handler = new ConfidentialityConfirmedAboutToSubmitHandler(CHILD_SUPPORT_DWP_DUE_DATE, false);
         }
 
         @Test
