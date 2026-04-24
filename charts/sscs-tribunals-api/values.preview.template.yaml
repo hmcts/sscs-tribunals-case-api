@@ -7,8 +7,6 @@ java:
   readinessDelay: 45
   devmemoryRequests: 1Gi
   devmemoryLimits: 2Gi
-  devcpuRequests: 50m
-  devcpuLimits: 200m
   environment:
     MYA_LINK: http://sscs-cor-frontend-aat.service.core-compute-aat.internal/sign-in?tya=appeal_id
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
@@ -83,9 +81,9 @@ am-org-role-mapping-service:
     ingressHost: orm-${SERVICE_FQDN}
     releaseNameOverride: ${SERVICE_NAME}-am-org-role-mapping-service
     devmemoryRequests: 1024Mi
-    devcpuRequests: 50m
+    devcpuRequests: 250m
     devmemoryLimits: 2048Mi
-    devcpuLimits: 250m
+    devcpuLimits: 1500m
     secrets:
       SB_ACCESS_KEY:
         secretRef: sscs-sb-preview
@@ -262,8 +260,8 @@ xui-webapp:
   nodejs:
     devmemoryRequests: "512Mi"
     devmemoryLimits: "1Gi"
-    devcpuRequests: 50m
-    devcpuLimits: 250
+    devcpuRequests: "200m"
+    devcpuLimits: "1000m"
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
     image: hmctsprod.azurecr.io/xui/webapp:latest
@@ -599,8 +597,7 @@ ccd:
       disableKeyVaults: true
       devmemoryRequests: '1024Mi'
       devmemoryLimits: '2048Mi'
-      devcpuRequests: 50m
-      devcpuLimits: 250m
+      devcpuRequests: '500m'
       autoscaling:
         enabled: false
         minReplicas: 1
@@ -628,8 +625,7 @@ ccd:
       imagePullPolicy: Always
       devmemoryRequests: '1524Mi'
       devmemoryLimits: '2048Mi'
-      devcpuRequests: '50m'
-      devcpuLimits: 250m
+      devcpuRequests: '500m'
       environment:
         DATA_STORE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
         DATA_STORE_DB_USERNAME: hmcts
