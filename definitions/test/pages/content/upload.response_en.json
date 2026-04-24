@@ -14,7 +14,11 @@
   "childSupportIssueCode": "CP",
   "childSupportEditedEvidenceReason": "Confidentiality",
   "childSupportFtaState": "Appeal registered (FTA)",
+  "sccIssueCode": "SV",
   "ucDisputeOption": "No",
   "ucJointPartyOnCase": "No",
-  "ucJointPartyOnCase_Yes": "Yes"
+  "ucJointPartyOnCase_Yes": "Yes",
+  "elementDisputedForChildElementIssueCodes": "ChildElement",
+  "elementDisputedForLimitedWorkIssueCodes": "LimitedWork"
+
 }

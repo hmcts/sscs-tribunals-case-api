@@ -181,10 +181,10 @@ export class UploadResponsePage {
     await webActions.clickButton('Add new');
   }
 
-  async selectUcIssueCode(issueCode: string): Promise<void> {
+  async selectUcIssueCode(disputedElement: string ,issueCode: string): Promise<void> {
     await webActions.verifyPageLabel('h1.govuk-heading-l', 'Issue codes'); //Heading Text
     await webActions.chooseOptionByLabel(
-      '#elementsDisputedChildElement_0_issueCode',
+      `#elementsDisputed${disputedElement}_0_issueCode`,
       issueCode
     );
   }
