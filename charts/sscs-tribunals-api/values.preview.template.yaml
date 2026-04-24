@@ -7,7 +7,7 @@ java:
   readinessDelay: 45
   devmemoryRequests: 1Gi
   devmemoryLimits: 2Gi
-  devcpuRequests: 100m
+  devcpuRequests: 50m
   devcpuLimits: 300m
   environment:
     MYA_LINK: http://sscs-cor-frontend-aat.service.core-compute-aat.internal/sign-in?tya=appeal_id
