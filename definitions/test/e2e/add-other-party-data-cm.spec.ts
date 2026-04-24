@@ -22,7 +22,7 @@ test.describe('CM add other party data', () => {
   for (const user of users) {
     test(
       `${user.label} adds other party data to a Child Support appeal in Await Other Party Data and moves it to Await Confidentiality Requirements`,
-      { tag: '@nightly-pipeline' },
+      { tag: ['@nightly-pipeline', '@confidentiality'] },
       async ({ updateOtherPartyDataSteps }) => {
         test.slow();
         test.setTimeout(240000);
