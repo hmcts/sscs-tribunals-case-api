@@ -1,20 +1,22 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaTemplateContent;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
-public class EsaScenario8Test {
+class EsaScenario8Test {
 
     @Test
-    public void testScenario8() {
+    void testScenario8() {
 
         List<Descriptor> schedule2Descriptors =
-            Arrays.asList(Descriptor.builder()
+            Collections.singletonList(Descriptor.builder()
                 .activityQuestionValue("Mobilising Unaided")
                 .activityAnswerValue("1")
                 .activityAnswerLetter("c").activityAnswerPoints(9).build());
@@ -37,39 +39,41 @@ public class EsaScenario8Test {
 
         EsaTemplateContent content = EsaScenario.SCENARIO_8.getContent(body);
 
-        String expectedContent = "The appeal is allowed.\n"
-            + "\n"
-            + "The decision made by the Secretary of State on 20/09/2020 is set aside.\n"
-            + "\n"
-            + "Felix Sydney is to be treated as having limited capability for work and for work-related activity.\n"
-            + "\n"
-            + "This is because insufficient points were scored under Schedule 2 of the Employment and Support Allowance (ESA) Regulations 2008 to meet the threshold for the Work Capability Assessment and none of the Schedule 3 activities or descriptors were satisfied.\n"
-            + "\n"
-            + "Mobilising Unaided\tc.1\t9\n"
-            + "\n"
-            + "\n"
-            + "The tribunal applied regulations 29 and 35 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity.\n"
-            + "\n"
-            + "My first reasons\n"
-            + "\n"
-            + "My second reasons\n"
-            + "\n"
-            + "Something else\n"
-            + "\n"
-            + "This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
-            + "\n";
+        String expectedContent = """
+            The appeal is allowed.
 
-        Assert.assertEquals(10, content.getComponents().size());
+            The decision made by the Secretary of State on 20/09/2020 is set aside.
 
-        Assert.assertEquals(expectedContent, content.toString());
+            Felix Sydney is to be treated as having limited capability for work and for work-related activity.
+
+            This is because insufficient points were scored under Schedule 2 of the Employment and Support Allowance (ESA) Regulations 2008 to meet the threshold for the Work Capability Assessment and none of the Schedule 3 activities or descriptors were satisfied.
+
+            Mobilising Unaided\tc.1\t9
+
+
+            The tribunal applied regulations 29 and 35 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity.
+
+            My first reasons
+
+            My second reasons
+
+            Something else
+
+            This has been an oral (face to face) hearing. The following people attended: Felix Sydney the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page A1.
+
+            """;
+
+        assertEquals(10, content.getComponents().size());
+
+        assertEquals(expectedContent, content.toString());
 
     }
 
     @Test
-    public void testScenario8WhenNoSchedule2Descriptors() {
+    void testScenario8WhenNoSchedule2Descriptors() {
 
         List<Descriptor> schedule2Descriptors =
-            Arrays.asList();
+            List.of();
 
         WriteFinalDecisionTemplateBody body =
             WriteFinalDecisionTemplateBody.builder()
@@ -89,28 +93,30 @@ public class EsaScenario8Test {
 
         EsaTemplateContent content = EsaScenario.SCENARIO_8.getContent(body);
 
-        String expectedContent = "The appeal is allowed.\n"
-            + "\n"
-            + "The decision made by the Secretary of State on 20/09/2020 is set aside.\n"
-            + "\n"
-            + "Felix Sydney is to be treated as having limited capability for work and for work-related activity.\n"
-            + "\n"
-            + "This is because insufficient points were scored under Schedule 2 of the Employment and Support Allowance (ESA) Regulations 2008 to meet the threshold for the Work Capability Assessment and none of the Schedule 3 activities or descriptors were satisfied.\n"
-            + "\n"
-            + "The tribunal applied regulations 29 and 35 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity.\n"
-            + "\n"
-            + "My first reasons\n"
-            + "\n"
-            + "My second reasons\n"
-            + "\n"
-            + "Something else\n"
-            + "\n"
-            + "This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
-            + "\n";
+        String expectedContent = """
+            The appeal is allowed.
 
-        Assert.assertEquals(9, content.getComponents().size());
+            The decision made by the Secretary of State on 20/09/2020 is set aside.
 
-        Assert.assertEquals(expectedContent, content.toString());
+            Felix Sydney is to be treated as having limited capability for work and for work-related activity.
+
+            This is because insufficient points were scored under Schedule 2 of the Employment and Support Allowance (ESA) Regulations 2008 to meet the threshold for the Work Capability Assessment and none of the Schedule 3 activities or descriptors were satisfied.
+
+            The tribunal applied regulations 29 and 35 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity.
+
+            My first reasons
+
+            My second reasons
+
+            Something else
+
+            This has been an oral (face to face) hearing. The following people attended: Felix Sydney the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page A1.
+
+            """;
+
+        assertEquals(9, content.getComponents().size());
+
+        assertEquals(expectedContent, content.toString());
 
     }
 }
