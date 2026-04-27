@@ -191,6 +191,8 @@ em-ccdorc:
     image: hmctsprod.azurecr.io/em/ccdorc:latest
     releaseNameOverride: ${SERVICE_NAME}-em-ccdorc
     ingressHost: em-ccdorc-${SERVICE_FQDN}
+    devcpuRequests: 50m
+    devcpuLimits: 250
     environment:
       IDAM_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
       OPEN_ID_API_BASE_URI: https://idam-web-public.aat.platform.hmcts.net/o
@@ -216,6 +218,8 @@ em-stitching:
     image: hmctsprod.azurecr.io/em/stitching:latest
     releaseNameOverride: ${SERVICE_NAME}-em-stitching
     ingressHost: em-stitching-${SERVICE_FQDN}
+    devcpuRequests: 50m
+    devcpuLimits: 250
     environment:
       SPRING_DATASOURCE_HOST: '{{ tpl .Values.global.postgresHostname $}}'
       SPRING_DATASOURCE_NAME: "{{ tpl .Values.global.databaseNamePrefix $}}emstitch"
