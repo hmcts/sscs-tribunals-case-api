@@ -605,7 +605,8 @@ ccd:
       disableKeyVaults: true
       devmemoryRequests: '1024Mi'
       devmemoryLimits: '2048Mi'
-      devcpuRequests: '500m'
+      devcpuRequests: 50m
+      devcpuLimits: 250
       autoscaling:
         enabled: false
         minReplicas: 1
@@ -633,7 +634,8 @@ ccd:
       imagePullPolicy: Always
       devmemoryRequests: '1524Mi'
       devmemoryLimits: '2048Mi'
-      devcpuRequests: '500m'
+      devcpuRequests: 50m
+      devcpuLimits: 250
       environment:
         DATA_STORE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
         DATA_STORE_DB_USERNAME: hmcts
