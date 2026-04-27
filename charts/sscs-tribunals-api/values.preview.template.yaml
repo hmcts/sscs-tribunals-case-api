@@ -251,6 +251,8 @@ em-stitching:
 
 ccd-case-document-am-api:
   enabled: ${PREVIEW_BRANCH_WITH_LOCAL_CCD}
+  devcpuRequests: 50m
+  devcpuLimits: 250
   java:
     image: hmctsprod.azurecr.io/ccd/case-document-am-api:latest
     releaseNameOverride: ${SERVICE_NAME}-ccd-case-document-am-api
