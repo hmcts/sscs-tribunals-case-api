@@ -448,29 +448,24 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                     log.info("Processing venue requires updating for case {}: setting venue name to {} from {}",
                             caseDetails.getId(), venue, sscsCaseData.getProcessingVenue());
                     sscsCaseData.setProcessingVenue(venue);
+                    if (isNotEmpty(venue)) {
+                        CourtVenue courtVenue = refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId);
+
+                        sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
+                                .baseLocation(rpcEpimsId)
+                                .region(courtVenue.getRegionId()).build());
+
+                        log.info("Successfully updated case management location details for case {}. Processing venue {}, epimsId {}",
+                                caseDetails.getId(), venue, venueEpimsId);
+                    }
                 } else {
-                    venue = sscsCaseData.getProcessingVenue();
-                    venueEpimsId = venueService.getEpimsIdForVenue(venue);
                     log.info("Legacy venue {} has not been updated for case {}",
-                            venue, caseDetails.getId());
+                            sscsCaseData.getProcessingVenue(), caseDetails.getId());
                 }
-
-            }
-
-            if (isNotEmpty(venue)) {
-                CourtVenue courtVenue = refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId);
-
-                sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
-                    .baseLocation(rpcEpimsId)
-                    .region(courtVenue.getRegionId()).build());
-
-                log.info("Successfully updated case management location details for case {}. Processing venue {}, epimsId {}",
-                    caseDetails.getId(), venue, venueEpimsId);
-
             }
         } else {
             log.info("Processing venue has not changed or is null, skipping update for case {}, venue: {}",
-                caseDetails.getId(), venue);
+                    caseDetails.getId(), venue);
         }
     }
 
