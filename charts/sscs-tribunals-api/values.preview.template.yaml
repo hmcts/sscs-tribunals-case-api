@@ -84,7 +84,6 @@ am-org-role-mapping-service:
     devmemoryRequests: 1024Mi
     devmemoryLimits: 2048Mi
     devcpuRequests: 50m
-    devcpuLimits: 250m
     secrets:
       SB_ACCESS_KEY:
         secretRef: sscs-sb-preview
@@ -375,7 +374,6 @@ ccd:
       devmemoryRequests: 1024Mi
       devmemoryLimits: 2048Mi
       devcpuRequests: 50m
-      devcpuLimits: 250m
       keyVaults:
         am:
           resourceGroup: am
