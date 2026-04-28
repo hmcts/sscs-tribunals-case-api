@@ -40,10 +40,9 @@ export class SendToInterlocPage {
   }
 
   async selectReasonReferred(reasonReferred: string): Promise<void> {
-    await webAction.chooseOptionByLabel(
-      '#interlocReferralReason',
-      reasonReferred
-    );
+    const dropdown = this.page.locator('#interlocReferralReason');
+    await dropdown.selectOption({ label: reasonReferred });
+    await dropdown.blur();
   }
 
   async verifyReasonReferredOptions(options: string[]): Promise<void> {
