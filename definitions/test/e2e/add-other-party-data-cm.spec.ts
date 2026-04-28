@@ -24,11 +24,7 @@ test.describe('CM add other party data', () => {
       `${user.label} adds other party data to a Child Support appeal in Await Other Party Data and moves it to Await Confidentiality Requirements`,
       { tag: ['@nightly-pipeline', '@confidentiality'] },
       async ({ updateOtherPartyDataSteps }) => {
-        test.slow();
-        test.setTimeout(240000);
-
         const caseId = await createChildSupportCaseForCmConfidentiality();
-
         await updateOtherPartyDataSteps.addOtherPartyDataForAwaitOtherPartyData(
           caseId,
           user.credentials

@@ -90,7 +90,14 @@ async function createCaseFromPayload(dataPayload: any, incompleteOrNonCompliant:
     ? `${urls.tribunalsApiUri}/appeals`
     : `${urls.tribunalsApiUri}/api/appeals`;
 
+  const headers = { 'Content-Type': 'application/json' };
+  const s2sResponse = await apiContext.post(`${urls.s2sUrl}/testing-support/lease`, {
+    data: { microservice: 'sscs' }
+  });
+
+  headers['ServiceAuthorization'] = await s2sResponse.text();
   const response = await apiContext.post(apiUrl, {
+    headers,
     data: dataPayload
   });
   const respHeaders = response.headers();

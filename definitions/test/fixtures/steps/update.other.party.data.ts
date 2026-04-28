@@ -22,8 +22,11 @@ export class UpdateOtherPartyData extends BaseStep {
       : 'With FTA';
   }
 
-  private async waitForSummaryState(expectedState: string) {
-    for (let attempt = 0; attempt < 8; attempt++) {
+  private async waitForSummaryState(expectedState: string, timeoutMs: number = 60000) {
+    const intervalMs = 2000;
+    const deadline = Date.now() + timeoutMs;
+
+    while (Date.now() < deadline) {
       await this.homePage.navigateToTab('Summary');
       const summaryState = await this.page
         .locator('#summaryState')
@@ -34,7 +37,7 @@ export class UpdateOtherPartyData extends BaseStep {
         return;
       }
 
-      await this.homePage.delay(5000);
+      await this.homePage.delay(intervalMs);
       await this.homePage.reloadPage();
     }
 
@@ -52,39 +55,32 @@ export class UpdateOtherPartyData extends BaseStep {
 
     if (await confidentialityTab.isVisible().catch(() => false)) {
       await confidentialityTab.click();
-      await expect(
-        this.page.getByRole('columnheader', {
-          name: 'Confidentiality Status',
-          exact: true
-        })
-      ).toBeVisible();
+      await expect(this.confidentialityStatusHeader()).toBeVisible();
       return;
     }
 
     const caseUrl = this.page.url().split('#')[0];
     await this.page.goto(`${caseUrl}#Confidentiality`);
-    await expect(
-      this.page.getByRole('columnheader', {
-        name: 'Confidentiality Status',
-        exact: true
-      })
-    ).toBeVisible();
+    await expect(this.confidentialityStatusHeader()).toBeVisible();
   }
 
   private async getConfidentialityRowCells(rowIndex: number) {
     const table = this.page
       .locator('table:visible')
       .filter({
-        has: this.page.getByRole('columnheader', {
-          name: 'Confidentiality Status',
-          exact: true
-        })
+        has: this.confidentialityStatusHeader()
       })
       .last();
     const row = table.locator('tr').nth(rowIndex + 1);
     await expect(row).toBeVisible();
     const cellTexts = await row.locator('td').allTextContents();
     return cellTexts.map((text) => text.replace(/\s+/g, ' ').trim());
+  }
+
+  private confidentialityStatusHeader() {
+    return this.page.locator('th').filter(
+      {hasText: /^Confidentiality Status$/}
+    );
   }
 
   private getTodayLondonDate() {

@@ -26,7 +26,7 @@ test.describe('CM confidentiality send to interloc', () => {
     for (const user of users) {
       test(
         `Select Review by TCW shows confidentiality reasons for confidential ${appealType} appeal as ${user.label}`,
-        { tag: '@nightly-pipeline' },
+        { tag: ['@nightly-pipeline', '@confidentiality'] },
         async ({
           enhancedConfidentialitySteps,
           sendToInterlocSteps,
@@ -34,9 +34,6 @@ test.describe('CM confidentiality send to interloc', () => {
           readyToListSteps,
           uploadResponseSteps
         }) => {
-          test.slow();
-          test.setTimeout(360000);
-
           const caseId =
             appealType === 'CHILDSUPPORT'
               ? await createChildSupportCaseForCmConfidentiality()

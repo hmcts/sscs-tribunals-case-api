@@ -29,13 +29,9 @@ test.describe('CM confidentiality response reviewed', () => {
     for (const reviewer of reviewers) {
       test(
         `Response reviewed shows confidentiality reasons for confidential CHILDSUPPORT appeal as ${user.label} for ${reviewer}`,
-        { tag: '@nightly-pipeline' },
+        { tag: ['@nightly-pipeline', '@confidentiality'] },
         async ({ uploadResponseSteps }) => {
-          test.slow();
-          test.setTimeout(360000);
-
           const caseId = await createChildSupportCaseForCmConfidentiality();
-
           await uploadResponseSteps.prepareChildSupportCaseForResponseReviewed(
             caseId
           );
