@@ -336,13 +336,13 @@ export class UploadResponse extends BaseStep {
       uploadResponseTestdata.elementDisputedForChildElementIssueCodes,
       uploadResponseTestdata.ucIssueCode
     );
-    await this.homePage.delay(2000);
+    await expect(this.page.getByRole('button', { name: 'Continue' })).toBeEnabled();
     await this.uploadResponsePage.continueSubmission();
 
     await this.uploadResponsePage.chooseDisputeOption(
       uploadResponseTestdata.ucDisputeOption
     );
-    await this.homePage.delay(2000);
+    await expect(this.page.getByRole('button', { name: 'Continue' })).toBeEnabled();
     await this.uploadResponsePage.continueSubmission();
 
     await this.uploadResponsePage.isJPOnTheCase(

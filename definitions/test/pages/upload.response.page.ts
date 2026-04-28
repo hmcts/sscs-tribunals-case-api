@@ -113,12 +113,12 @@ export class UploadResponsePage {
       '#dwpEditedResponseDocument_documentLink',
       uploadResponseTestdata.testfileone
     );
-    await this.page.waitForTimeout(7000);
+    await this.page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
     await webActions.uploadFileUsingAFileChooser(
       '#dwpEditedEvidenceBundleDocument_documentLink',
       uploadResponseTestdata.testfilethree
     );
-    await this.page.waitForTimeout(7000);
+    await this.page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
     await this.selectIssueCode(uploadResponseTestdata.childSupportIssueCode);
     await this.chooseAssistOption('No');
     await webActions.clickElementById('#dwpUCB_No');

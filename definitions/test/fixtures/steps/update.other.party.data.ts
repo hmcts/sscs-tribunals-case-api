@@ -23,7 +23,6 @@ export class UpdateOtherPartyData extends BaseStep {
   }
 
   private async waitForSummaryState(expectedState: string, timeoutMs: number = 60000) {
-    const intervalMs = 2000;
     const deadline = Date.now() + timeoutMs;
 
     while (Date.now() < deadline) {
@@ -37,7 +36,6 @@ export class UpdateOtherPartyData extends BaseStep {
         return;
       }
 
-      await this.homePage.delay(intervalMs);
       await this.homePage.reloadPage();
     }
 
@@ -126,7 +124,7 @@ export class UpdateOtherPartyData extends BaseStep {
     for (let attempt = 1; attempt <= attempts; attempt++) {
       try {
         await this.page.getByRole('button', { name: 'Submit', exact: true }).click();
-        await this.homePage.delay(5000);
+        await this.page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
 
         const secondSubmit = this.page.getByRole('button', {
           name: 'Submit',
@@ -135,7 +133,7 @@ export class UpdateOtherPartyData extends BaseStep {
 
         if (await secondSubmit.isVisible().catch(() => false)) {
           await secondSubmit.click();
-          await this.homePage.delay(5000);
+          await this.page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
         }
 
         const concurrencyErrorVisible = await this.page
@@ -152,13 +150,15 @@ export class UpdateOtherPartyData extends BaseStep {
           throw lastError;
         }
 
-        await this.homePage.delay(10000);
+        await this.homePage.reloadPage();
+        await expect(this.homePage.summaryTab).toBeVisible();
       } catch (error) {
         lastError = error;
         if (attempt === attempts) {
           throw lastError;
         }
-        await this.homePage.delay(5000);
+        await this.homePage.reloadPage();
+        await expect(this.homePage.summaryTab).toBeVisible();
       }
     }
 
@@ -201,7 +201,6 @@ export class UpdateOtherPartyData extends BaseStep {
     );
     await this.eventNameAndDescriptionPage.confirmSubmission();
     await expect(this.homePage.summaryTab).toBeVisible();
-    await this.homePage.delay(3000);
 
     // Adding other party subscription
     await this.homePage.chooseEvent('Update subscription');
@@ -212,7 +211,6 @@ export class UpdateOtherPartyData extends BaseStep {
     );
     await this.eventNameAndDescriptionPage.confirmSubmission();
     await expect(this.homePage.summaryTab).toBeVisible();
-    await this.homePage.delay(3000);
 
     // Verifying History tab + end state
     await this.verifyHistoryTabDetails('Update subscription');
@@ -289,7 +287,6 @@ export class UpdateOtherPartyData extends BaseStep {
     );
     await this.eventNameAndDescriptionPage.confirmSubmission();
     await expect(this.homePage.summaryTab).toBeVisible();
-    await this.homePage.delay(3000);
 
     // Adding other party subscription
     await this.homePage.chooseEvent('Update subscription');
@@ -300,7 +297,6 @@ export class UpdateOtherPartyData extends BaseStep {
     );
     await this.eventNameAndDescriptionPage.confirmSubmission();
     await expect(this.homePage.summaryTab).toBeVisible();
-    await this.homePage.delay(3000);
 
     // Verifying History tab + end state
     await this.verifyHistoryTabDetails('Update subscription');
@@ -376,7 +372,6 @@ export class UpdateOtherPartyData extends BaseStep {
     );
     await this.eventNameAndDescriptionPage.confirmSubmission();
     await expect(this.homePage.summaryTab).toBeVisible();
-    await this.homePage.delay(3000);
 
     await this.homePage.chooseEvent('Update subscription');
     await this.updateOtherPartyDataPage.applyOtherPartiesSubscription();
@@ -386,7 +381,6 @@ export class UpdateOtherPartyData extends BaseStep {
     );
     await this.eventNameAndDescriptionPage.confirmSubmission();
     await expect(this.homePage.summaryTab).toBeVisible();
-    await this.homePage.delay(3000);
   }
 
   async addOtherPartyDataForAwaitOtherPartyData(caseId: string, user) {
@@ -574,7 +568,6 @@ export class UpdateOtherPartyData extends BaseStep {
         if (attempt === attempts) {
           throw lastError;
         }
-        await this.homePage.delay(2000);
         await this.homePage.reloadPage();
         await expect(this.homePage.summaryTab.first()).toBeVisible();
       }
