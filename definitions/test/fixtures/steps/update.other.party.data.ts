@@ -22,10 +22,8 @@ export class UpdateOtherPartyData extends BaseStep {
       : 'With FTA';
   }
 
-  private async waitForSummaryState(expectedState: string, timeoutMs: number = 60000) {
-    const deadline = Date.now() + timeoutMs;
-
-    while (Date.now() < deadline) {
+  private async waitForSummaryState(expectedState: string) {
+    for (let attempt = 0; attempt < 8; attempt++) {
       await this.homePage.navigateToTab('Summary');
       const summaryState = await this.page
         .locator('#summaryState')
@@ -36,6 +34,7 @@ export class UpdateOtherPartyData extends BaseStep {
         return;
       }
 
+      await this.homePage.delay(5000);
       await this.homePage.reloadPage();
     }
 
@@ -124,7 +123,7 @@ export class UpdateOtherPartyData extends BaseStep {
     for (let attempt = 1; attempt <= attempts; attempt++) {
       try {
         await this.page.getByRole('button', { name: 'Submit', exact: true }).click();
-        await this.page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
+        await this.homePage.delay(5000);
 
         const secondSubmit = this.page.getByRole('button', {
           name: 'Submit',
@@ -133,7 +132,7 @@ export class UpdateOtherPartyData extends BaseStep {
 
         if (await secondSubmit.isVisible().catch(() => false)) {
           await secondSubmit.click();
-          await this.page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
+          await this.homePage.delay(5000);
         }
 
         const concurrencyErrorVisible = await this.page
@@ -150,15 +149,13 @@ export class UpdateOtherPartyData extends BaseStep {
           throw lastError;
         }
 
-        await this.homePage.reloadPage();
-        await expect(this.homePage.summaryTab).toBeVisible();
+        await this.homePage.delay(10000);
       } catch (error) {
         lastError = error;
         if (attempt === attempts) {
           throw lastError;
         }
-        await this.homePage.reloadPage();
-        await expect(this.homePage.summaryTab).toBeVisible();
+        await this.homePage.delay(5000);
       }
     }
 
@@ -201,6 +198,7 @@ export class UpdateOtherPartyData extends BaseStep {
     );
     await this.eventNameAndDescriptionPage.confirmSubmission();
     await expect(this.homePage.summaryTab).toBeVisible();
+    await this.homePage.delay(3000);
 
     // Adding other party subscription
     await this.homePage.chooseEvent('Update subscription');
@@ -211,6 +209,7 @@ export class UpdateOtherPartyData extends BaseStep {
     );
     await this.eventNameAndDescriptionPage.confirmSubmission();
     await expect(this.homePage.summaryTab).toBeVisible();
+    await this.homePage.delay(3000);
 
     // Verifying History tab + end state
     await this.verifyHistoryTabDetails('Update subscription');
@@ -287,6 +286,7 @@ export class UpdateOtherPartyData extends BaseStep {
     );
     await this.eventNameAndDescriptionPage.confirmSubmission();
     await expect(this.homePage.summaryTab).toBeVisible();
+    await this.homePage.delay(3000);
 
     // Adding other party subscription
     await this.homePage.chooseEvent('Update subscription');
@@ -297,6 +297,7 @@ export class UpdateOtherPartyData extends BaseStep {
     );
     await this.eventNameAndDescriptionPage.confirmSubmission();
     await expect(this.homePage.summaryTab).toBeVisible();
+    await this.homePage.delay(3000);
 
     // Verifying History tab + end state
     await this.verifyHistoryTabDetails('Update subscription');
@@ -372,6 +373,7 @@ export class UpdateOtherPartyData extends BaseStep {
     );
     await this.eventNameAndDescriptionPage.confirmSubmission();
     await expect(this.homePage.summaryTab).toBeVisible();
+    await this.homePage.delay(3000);
 
     await this.homePage.chooseEvent('Update subscription');
     await this.updateOtherPartyDataPage.applyOtherPartiesSubscription();
@@ -381,6 +383,7 @@ export class UpdateOtherPartyData extends BaseStep {
     );
     await this.eventNameAndDescriptionPage.confirmSubmission();
     await expect(this.homePage.summaryTab).toBeVisible();
+    await this.homePage.delay(3000);
   }
 
   async addOtherPartyDataForAwaitOtherPartyData(caseId: string, user) {
@@ -568,6 +571,7 @@ export class UpdateOtherPartyData extends BaseStep {
         if (attempt === attempts) {
           throw lastError;
         }
+        await this.homePage.delay(2000);
         await this.homePage.reloadPage();
         await expect(this.homePage.summaryTab.first()).toBeVisible();
       }

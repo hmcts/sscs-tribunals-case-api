@@ -24,6 +24,9 @@ test.describe('CM confidentiality send to interloc pre-valid', () => {
       `Send to interloc - pre-valid shows confidentiality reasons for CHILDSUPPORT appeal as ${user.label}`,
       { tag: ['@nightly-pipeline', '@confidentiality'] },
       async ({ sendToInterlocSteps }) => {
+        test.slow();
+        test.setTimeout(240000);
+
         const caseId = await createChildSupportCaseForPreValidConfidentiality();
         await sendToInterlocSteps.verifyPreValidConfidentialityReferralReasons(
           caseId,

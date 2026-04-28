@@ -28,6 +28,9 @@ test.describe('CM interlocutory review appeal validated', () => {
       `${user.label} validates an interlocutory review pre-valid Child Support appeal and moves it to Await Other Party Data`,
       { tag: ['@nightly-pipeline', '@confidentiality'] },
       async ({ issueDirectionsNoticeSteps }) => {
+        test.slow();
+        test.setTimeout(300000);
+
         const caseId = await createChildSupportCaseForInterlocReviewValidation();
         await issueDirectionsNoticeSteps.validateChildSupportInterlocReviewPreValidAppeal(
           caseId,

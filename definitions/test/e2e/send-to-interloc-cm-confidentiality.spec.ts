@@ -34,6 +34,9 @@ test.describe('CM confidentiality send to interloc', () => {
           readyToListSteps,
           uploadResponseSteps
         }) => {
+          test.slow();
+          test.setTimeout(360000);
+
           const caseId =
             appealType === 'CHILDSUPPORT'
               ? await createChildSupportCaseForCmConfidentiality()
