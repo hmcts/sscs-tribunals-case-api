@@ -84,7 +84,7 @@ am-org-role-mapping-service:
     devmemoryRequests: 1024Mi
     devmemoryLimits: 2048Mi
     devcpuRequests: 50m
-    devcpuLimits: 150m
+    devcpuLimits: 250m
     secrets:
       SB_ACCESS_KEY:
         secretRef: sscs-sb-preview
@@ -148,7 +148,7 @@ aac-manage-case-assignment:
     image: hmctsprod.azurecr.io/aac/manage-case-assignment:latest
     ingressHost: aac-${SERVICE_FQDN}
     devcpuRequests: 50m
-    devcpuLimits: 150m
+    devcpuLimits: 250m
     environment:
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
@@ -191,7 +191,7 @@ em-ccdorc:
     releaseNameOverride: ${SERVICE_NAME}-em-ccdorc
     ingressHost: em-ccdorc-${SERVICE_FQDN}
     devcpuRequests: 50m
-    devcpuLimits: 150m
+    devcpuLimits: 250m
     environment:
       IDAM_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
       OPEN_ID_API_BASE_URI: https://idam-web-public.aat.platform.hmcts.net/o
@@ -218,7 +218,7 @@ em-stitching:
     releaseNameOverride: ${SERVICE_NAME}-em-stitching
     ingressHost: em-stitching-${SERVICE_FQDN}
     devcpuRequests: 50m
-    devcpuLimits: 150m
+    devcpuLimits: 250m
     environment:
       SPRING_DATASOURCE_HOST: '{{ tpl .Values.global.postgresHostname $}}'
       SPRING_DATASOURCE_NAME: "{{ tpl .Values.global.databaseNamePrefix $}}emstitch"
@@ -251,7 +251,7 @@ em-stitching:
 ccd-case-document-am-api:
   enabled: ${PREVIEW_BRANCH_WITH_LOCAL_CCD}
   devcpuRequests: 50m
-  devcpuLimits: 150m
+  devcpuLimits: 250m
   java:
     image: hmctsprod.azurecr.io/ccd/case-document-am-api:latest
     releaseNameOverride: ${SERVICE_NAME}-ccd-case-document-am-api
@@ -270,7 +270,7 @@ xui-webapp:
     devmemoryRequests: "512Mi"
     devmemoryLimits: "1Gi"
     devcpuRequests: 50m
-    devcpuLimits: 200m
+    devcpuLimits: 250m
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
     image: hmctsprod.azurecr.io/xui/webapp:latest
@@ -375,7 +375,7 @@ ccd:
       devmemoryRequests: 1024Mi
       devmemoryLimits: 2048Mi
       devcpuRequests: 50m
-      devcpuLimits: 150m
+      devcpuLimits: 250m
       keyVaults:
         am:
           resourceGroup: am
@@ -607,7 +607,7 @@ ccd:
       devmemoryRequests: '1024Mi'
       devmemoryLimits: '2048Mi'
       devcpuRequests: 50m
-      devcpuLimits: 150m
+      devcpuLimits: 250m
       autoscaling:
         enabled: false
         minReplicas: 1
@@ -636,7 +636,7 @@ ccd:
       devmemoryRequests: '1524Mi'
       devmemoryLimits: '2048Mi'
       devcpuRequests: 50m
-      devcpuLimits: 150m
+      devcpuLimits: 250m
       environment:
         DATA_STORE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
         DATA_STORE_DB_USERNAME: hmcts
