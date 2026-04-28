@@ -485,5 +485,20 @@
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
     "Publish": "N"
+  },
+  {
+    "LiveFrom": "24/02/2026",
+    "CaseTypeID": "Benefit",
+    "ID": "confidentialityConfirmed",
+    "Name": "Confidentiality Confirmed",
+    "Description": "Confidentiality Confirmed",
+    "DisplayOrder": 546,
+    "PreConditionState(s)": "awaitConfidentialityRequirements",
+    "PostConditionState": "withDwp",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
+    "SecurityClassification": "Public",
+    "EventEnablingCondition": "appeal.benefitType.code=\"childSupport\"",
+    "Publish": "N",
+    "ShowSummary": "N"
   }
 ]
