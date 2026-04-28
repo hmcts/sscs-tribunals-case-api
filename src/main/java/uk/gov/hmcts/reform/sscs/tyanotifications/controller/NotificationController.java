@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtil
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -31,6 +32,9 @@ public class NotificationController {
     private final CcdService ccdService;
     private final SscsCaseCallbackDeserializer deserializer;
     private final IdamService idamService;
+
+    @Value("${feature.cm-other-party-confidentiality.enabled}")
+    private boolean cmOtherPartyConfidentialityEnabled;
 
     @Autowired
     public NotificationController(NotificationService notificationService,
@@ -64,7 +68,7 @@ public class NotificationController {
 
             callback.getCaseDetails().getCreatedDate();
             authorisationService.authorise(serviceAuthHeader);
-            notificationService.manageNotificationAndSubscription(new CcdNotificationWrapper(notificationSscsCaseDataWrapper), false);
+            notificationService.manageNotificationAndSubscription(new CcdNotificationWrapper(notificationSscsCaseDataWrapper, cmOtherPartyConfidentialityEnabled), false);
         } catch (Exception e) {
             log.info("Exception thrown", e);
             throw e;

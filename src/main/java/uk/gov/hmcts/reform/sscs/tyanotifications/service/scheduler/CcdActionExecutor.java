@@ -19,13 +19,17 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.service.RetryNotificationServic
 
 public class CcdActionExecutor extends BaseActionExecutor<String> {
 
+    private final boolean cmOtherPartyConfidentialityEnabled;
+
     public CcdActionExecutor(NotificationService notificationService,
                              RetryNotificationService retryNotificationService,
                              CcdService ccdService,
                              UpdateCcdCaseService updateCcdCaseService,
                              IdamService idamService,
-                             SscsCaseCallbackDeserializer deserializer) {
+                             SscsCaseCallbackDeserializer deserializer,
+                             boolean cmOtherPartyConfidentialityEnabled) {
         super(notificationService, retryNotificationService, ccdService, updateCcdCaseService, idamService, deserializer);
+        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
 
     @Override
@@ -36,7 +40,7 @@ public class CcdActionExecutor extends BaseActionExecutor<String> {
 
     @Override
     protected NotificationWrapper getWrapper(NotificationSscsCaseDataWrapper wrapper, String payload) {
-        return new CcdNotificationWrapper(wrapper);
+        return new CcdNotificationWrapper(wrapper, cmOtherPartyConfidentialityEnabled);
     }
 
     @Override

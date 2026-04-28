@@ -23,18 +23,26 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseData
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.scheduler.CcdActionSerializer;
+import uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil;
 
 @Slf4j
 public class CcdNotificationWrapper implements NotificationWrapper {
 
     private final NotificationSscsCaseDataWrapper responseWrapper;
 
+    private final boolean cmOtherPartyConfidentialityEnabled;
+
     private boolean notificationEventTypeOverridden = false;
 
     private boolean languageSwitched = false;
 
     public CcdNotificationWrapper(NotificationSscsCaseDataWrapper responseWrapper) {
+        this(responseWrapper, false);
+    }
+
+    public CcdNotificationWrapper(NotificationSscsCaseDataWrapper responseWrapper, boolean cmOtherPartyConfidentialityEnabled) {
         this.responseWrapper = responseWrapper;
+        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
 
     @Override
@@ -285,7 +293,8 @@ public class CcdNotificationWrapper implements NotificationWrapper {
         boolean isValid = isValidSubscriptionOrIsMandatoryLetter(subscription, responseWrapper.getNotificationEventType())
             && (EVENTS_VALID_FOR_ALL_ENTITIES.contains(notificationEventType)
             || EVENTS_VALID_FOR_OTHER_PARTY.contains(notificationEventType)
-            || (UPDATE_OTHER_PARTY_DATA.equals(notificationEventType) && isSendNewOtherPartyNotification));
+            || (UPDATE_OTHER_PARTY_DATA.equals(notificationEventType) && isSendNewOtherPartyNotification
+                && !(cmOtherPartyConfidentialityEnabled && OtherPartyDataUtil.isValidBenefitTypeForConfidentiality(newSscsCaseData.getAppeal().getBenefitType()))));
         return canSendBasedOnConfidentiality(newSscsCaseData, notificationEventType, partyMember) && isValid;
     }
 
