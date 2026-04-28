@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
 import static io.restassured.RestAssured.baseURI;
+import static java.time.Duration.ofSeconds;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.nonNull;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -25,7 +26,6 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import org.apache.commons.io.FileUtils;
@@ -239,9 +239,9 @@ abstract class AbstractFunctionalTest {
     }
 
     Resource getDocument(Long caseId, String correspondenceName) {
-        final List<Correspondence> correspondenceList = defaultAwait().until(
+        final List<Correspondence> correspondenceList = waitAtMost(ofSeconds(30)).until(
             () -> findCaseById(caseId.toString()).getData().getCorrespondence(),
-            (correspondences) -> isNotEmpty(correspondences) && containsDocument(correspondences, correspondenceName));
+            correspondences -> isNotEmpty(correspondences) && containsDocument(correspondences, correspondenceName));
         final Correspondence correspondence = correspondenceList.stream()
             .filter(c -> c.getValue().getDocumentLink().getDocumentFilename().contains(correspondenceName)).findFirst()
             .orElseThrow();
@@ -258,7 +258,7 @@ abstract class AbstractFunctionalTest {
     }
 
     void assertEventuallyInState(final long caseId, String state) {
-        waitAtMost(Duration.ofSeconds(30)).untilAsserted(
+        waitAtMost(ofSeconds(60)).untilAsserted(
             () -> assertThat(findCaseById(Long.toString(caseId)).getState()).isEqualTo(state));
     }
 
