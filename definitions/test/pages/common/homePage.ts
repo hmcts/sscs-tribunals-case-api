@@ -163,6 +163,7 @@ export class HomePage {
     await expect(
       this.page.getByRole('button', { name: 'Go', exact: true })
     ).toBeEnabled();
+    await this.delay(5000);
     await webActions.clickSubmitButton();
     // await webActions.clickNextStepButton(this.submitNextStepButton);
     // await webActions.clickGoButton('Go');
