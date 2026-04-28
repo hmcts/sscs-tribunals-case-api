@@ -1,22 +1,26 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_SEND_TO_INTERLOC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty.REP;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.REPRESENTATIVE;
+import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.isChildSupportAppeal;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
@@ -31,13 +35,16 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
 
     private final PostponementRequestService postponementRequestService;
     private final AddNoteService addNoteService;
+    private final boolean cmOtherPartyConfidentialityEnabled;
 
 
     @Autowired
     public ValidSendToInterlocAboutToSubmitHandler(PostponementRequestService postponementRequestService,
-                                                   AddNoteService addNoteService) {
+                                                   AddNoteService addNoteService,
+                                                   @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
         this.postponementRequestService = postponementRequestService;
         this.addNoteService = addNoteService;
+        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
 
     @Override
@@ -82,6 +89,13 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
             UploadParty uploadParty = getUploadParty(sscsCaseData.getOriginalSender());
             postponementRequestService.processPostponementRequest(sscsCaseData, uploadParty, Optional.empty());
         } else {
+            if (cmOtherPartyConfidentialityEnabled
+                    && isChildSupportAppeal(sscsCaseData)
+                    && isConfidentialityReferral(sscsCaseData)
+                    && isSelectionMissing(sscsCaseData.getExtendedSscsCaseData().getSelectedConfidentialityParty())) {
+                preSubmitCallbackResponse.addError("Must select party");
+                return preSubmitCallbackResponse;
+            }
             InterlocReviewState interlocState = Arrays.stream(InterlocReviewState.values())
                 .filter(x -> x.getCcdDefinition().equals(sscsCaseData.getSelectWhoReviewsCase().getValue().getCode()))
                 .findFirst()
@@ -106,10 +120,20 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
                 ? REP : UploadParty.fromValue(originalSender.getValue().getCode());
     }
 
+    private boolean isConfidentialityReferral(SscsCaseData sscsCaseData) {
+        return InterlocReferralReason.CONFIDENTIALITY.equals(sscsCaseData.getInterlocReferralReason());
+    }
+
+    private boolean isSelectionMissing(DynamicList dynamicList) {
+        return dynamicList == null
+                || dynamicList.getValue() == null
+                || isBlank(dynamicList.getValue().getCode());
+    }
+
     private boolean isDynamicListEmpty(DynamicList originalSender) {
         return originalSender == null
                 || originalSender.getValue() == null
-                || originalSender.getValue().getCode() == null;
+                || isBlank(originalSender.getValue().getCode());
     }
 
 }

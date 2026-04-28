@@ -69,7 +69,7 @@ public class HmctsResponseReviewedAboutToStartTest {
     public void setUp() {
         openMocks(this);
         dwpAddressLookupService = new DwpAddressLookupService();
-        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService);
+        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService, true);
 
         when(callback.getEvent()).thenReturn(EventType.HMCTS_RESPONSE_REVIEWED);
 
@@ -319,4 +319,23 @@ public class HmctsResponseReviewedAboutToStartTest {
         assertEquals(expected, response.getData().getSelectWhoReviewsCase());
     }
 
+    @Test
+    public void givenChildSupport_thenSelectedConfidentialityPartyHasNoDefaultSelection() {
+        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService, true);
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertEquals("", response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode());
+    }
+
+    @Test
+    public void givenNonChildSupport_thenSelectedConfidentialityPartyIsNotSet() {
+        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService, true);
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(Benefit.PIP.getShortName()).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty());
+    }
 }
