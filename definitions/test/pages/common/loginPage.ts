@@ -38,19 +38,10 @@ export class LoginPage {
   ): Promise<void> {
     if (clearCacheFlag) await this.page.context().clearCookies();
 
-    const isConfidentiality = test.info().tags.includes('@confidentiality');
     const isLocalhost = this.page.url().includes('localhost');
-    if (isConfidentiality && isLocalhost) {
-      await webActions.inputField('[name="username"]', user.email);
-      await webActions.clickButton('Sign in');
-      const help = this.page.locator('a', { hasText: 'Get help' });
-      await expect(help).toBeVisible();
-      const acceptCookiesBtn = this.page.locator('button', { hasText: 'Accept analytics cookies' });
-      if (await acceptCookiesBtn.isVisible()) {
-        await acceptCookiesBtn.click();
-      }
-      await expect(help).toBeVisible();
-      return;
+    if (isLocalhost) {
+        await this.localLogin(user);
+        return;
     }
 
     await webActions.inputField('#username', user.email);
@@ -59,4 +50,34 @@ export class LoginPage {
     await webActions.delay(10000);
     await this.signOutBtn.isVisible();
   }
+
+    private async localLogin(user) {
+        let loginAttempts = 0;
+        const maxAttempts = 5;
+        const help = this.page.locator('a', {hasText: 'Get help'});
+
+        await webActions.inputField('[name="username"]', user.email);
+        await webActions.clickButton('Sign in');
+
+        while (loginAttempts < maxAttempts) {
+            try {
+                await expect(help).toBeVisible({timeout: 5000});
+                break;
+            } catch {
+                const usernameField = this.page.locator('[name="username"]');
+                if (await usernameField.isVisible({timeout: 2000})) {
+                    loginAttempts++;
+                    await webActions.inputField('[name="username"]', user.email);
+                    await webActions.clickButton('Sign in');
+                } else {
+                    break;
+                }
+            }
+        }
+        const acceptCookiesBtn = this.page.locator('button', {hasText: 'Accept analytics cookies'});
+        if (await acceptCookiesBtn.isVisible()) {
+            await acceptCookiesBtn.click();
+        }
+        await expect(help).toBeVisible();
+    }
 }
