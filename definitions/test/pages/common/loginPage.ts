@@ -78,7 +78,7 @@ export class LoginPage {
       await expect(this.signOutBtn).toBeVisible();
   }
 
-    private async localLogin(user) {
+    private async localLogin(user: { email: string; }) {
         let loginAttempts = 0;
         const maxAttempts = 5;
         const help = this.page.locator('a', {hasText: 'Get help'});
