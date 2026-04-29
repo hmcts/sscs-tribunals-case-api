@@ -52,7 +52,7 @@ am-org-role-mapping-service:
     ingressHost: orm-${SERVICE_FQDN}
     releaseNameOverride: ${SERVICE_NAME}-am-org-role-mapping-service
     devmemoryRequests: 1024Mi
-    devcpuRequests: 50m
+    devcpuRequests: 250m
     devmemoryLimits: 2048Mi
     devcpuLimits: 1500m
     secrets:
