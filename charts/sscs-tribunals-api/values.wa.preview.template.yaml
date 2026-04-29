@@ -5,6 +5,7 @@ tags:
 java:
   devmemoryRequests: 1Gi
   devmemoryLimits: 2Gi
+  devcpuRequests: 50m
   image: ${IMAGE_NAME}
   readinessDelay: 45
   environment:
@@ -51,7 +52,7 @@ am-org-role-mapping-service:
     ingressHost: orm-${SERVICE_FQDN}
     releaseNameOverride: ${SERVICE_NAME}-am-org-role-mapping-service
     devmemoryRequests: 1024Mi
-    devcpuRequests: 250m
+    devcpuRequests: 50m
     devmemoryLimits: 2048Mi
     devcpuLimits: 1500m
     secrets:
@@ -118,6 +119,7 @@ aac-manage-case-assignment:
     releaseNameOverride: ${SERVICE_NAME}-aac-manage-case-assignment
     image: hmctsprod.azurecr.io/aac/manage-case-assignment:latest
     ingressHost: aac-${SERVICE_FQDN}
+    devcpuRequests: 50m
     environment:
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
@@ -149,6 +151,8 @@ em-ccdorc:
     image: hmctsprod.azurecr.io/em/ccdorc:latest
     releaseNameOverride: ${SERVICE_NAME}-em-ccdorc
     ingressHost: em-ccdorc-${SERVICE_FQDN}
+    devcpuRequests: 50m
+    devcpuLimits: 250m
     environment:
       IDAM_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
       OPEN_ID_API_BASE_URI: https://idam-web-public.aat.platform.hmcts.net/o
