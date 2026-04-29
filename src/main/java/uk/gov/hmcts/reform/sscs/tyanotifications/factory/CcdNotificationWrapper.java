@@ -294,7 +294,9 @@ public class CcdNotificationWrapper implements NotificationWrapper {
             && (EVENTS_VALID_FOR_ALL_ENTITIES.contains(notificationEventType)
             || EVENTS_VALID_FOR_OTHER_PARTY.contains(notificationEventType)
             || (UPDATE_OTHER_PARTY_DATA.equals(notificationEventType) && isSendNewOtherPartyNotification
-                && !(cmOtherPartyConfidentialityEnabled && OtherPartyDataUtil.isValidBenefitTypeForConfidentiality(newSscsCaseData.getAppeal().getBenefitType()))));
+                && !(cmOtherPartyConfidentialityEnabled
+                    && newSscsCaseData.getAppeal() != null
+                    && OtherPartyDataUtil.isValidBenefitTypeForConfidentiality(newSscsCaseData.getAppeal().getBenefitType()))));
         return canSendBasedOnConfidentiality(newSscsCaseData, notificationEventType, partyMember) && isValid;
     }
 

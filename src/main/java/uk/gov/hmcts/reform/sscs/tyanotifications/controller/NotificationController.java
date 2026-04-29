@@ -32,21 +32,21 @@ public class NotificationController {
     private final CcdService ccdService;
     private final SscsCaseCallbackDeserializer deserializer;
     private final IdamService idamService;
-
-    @Value("${feature.cm-other-party-confidentiality.enabled}")
-    private boolean cmOtherPartyConfidentialityEnabled;
+    private final boolean cmOtherPartyConfidentialityEnabled;
 
     @Autowired
     public NotificationController(NotificationService notificationService,
                                   AuthorisationService authorisationService,
                                   CcdService ccdService,
                                   SscsCaseCallbackDeserializer deserializer,
-                                  IdamService idamService) {
+                                  IdamService idamService,
+                                  @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
         this.notificationService = notificationService;
         this.authorisationService = authorisationService;
         this.ccdService = ccdService;
         this.deserializer = deserializer;
         this.idamService = idamService;
+        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
 
     @PostMapping(value = "/sendNotification", produces = APPLICATION_JSON_VALUE)
