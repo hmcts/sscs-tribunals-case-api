@@ -11,6 +11,7 @@
     "RetainHiddenValue": "Yes",
     "CaseEventFieldLabel": "Select Party",
     "PageID": "1.0",
+    "PageLabel": "Hmcts review response",
     "ShowSummaryChangeOption": "Y"
   },
   {
