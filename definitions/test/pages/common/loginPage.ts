@@ -44,11 +44,38 @@ export class LoginPage {
         return;
     }
 
-    await webActions.inputField('#username', user.email);
-    await webActions.inputField('#password', user.password);
-    await webActions.clickButton('Sign in');
-    await webActions.delay(10000);
-    await this.signOutBtn.isVisible();
+      const maxAttempts = 3;
+      const usernameField = this.page.locator('#username');
+      const passwordField = this.page.locator('#password');
+      const signInButton = this.page.getByRole('button', {
+          name: 'Sign in',
+          exact: true
+      });
+
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+          await webActions.inputField('#username', user.email);
+          await webActions.inputField('#password', user.password);
+          await webActions.clickButton('Sign in');
+
+          const signedIn = await this.signOutBtn
+              .isVisible({ timeout: 10000 })
+              .catch(() => false);
+
+          if (signedIn) {
+              return;
+          }
+
+          const loginFormStillVisible =
+              await usernameField.isVisible({ timeout: 2000 }).catch(() => false) &&
+              await passwordField.isVisible({ timeout: 2000 }).catch(() => false) &&
+              await signInButton.isVisible({ timeout: 2000 }).catch(() => false);
+
+          if (!loginFormStillVisible) {
+              break;
+          }
+      }
+
+      await expect(this.signOutBtn).toBeVisible();
   }
 
     private async localLogin(user) {
