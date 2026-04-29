@@ -66,49 +66,49 @@ export class LoginPage {
       .isVisible({ timeout: 15000 })
       .catch(() => false);
 
-      if (signedIn) {
-          return;
-      }
+    if (signedIn) {
+      return;
+    }
 
-      const backAtLogin =
-          await usernameField.isVisible({ timeout: 3000 }).catch(() => false) &&
-          await passwordField.isVisible({ timeout: 3000 }).catch(() => false);
+    const backAtLogin =
+      await usernameField.isVisible({ timeout: 3000 }).catch(() => false) &&
+      await passwordField.isVisible({ timeout: 3000 }).catch(() => false);
 
-      if (!backAtLogin) {
-          break;
-      }
+    if (!backAtLogin) {
+      break;
+    }
   }
 
   await expect(this.signOutBtn).toBeVisible({ timeout: 15000 });
   }
 
-    private async localLogin(user: { email: string; }) {
-        let loginAttempts = 0;
-        const maxAttempts = 5;
-        const help = this.page.locator('a', {hasText: 'Get help'});
+  private async localLogin(user: { email: string; }) {
+    let loginAttempts = 0;
+    const maxAttempts = 5;
+    const help = this.page.locator('a', {hasText: 'Get help'});
 
-        await webActions.inputField('[name="username"]', user.email);
-        await webActions.clickButton('Sign in');
+    await webActions.inputField('[name="username"]', user.email);
+    await webActions.clickButton('Sign in');
 
-        while (loginAttempts < maxAttempts) {
-            try {
-                await expect(help).toBeVisible({timeout: 5000});
-                break;
-            } catch {
-                const usernameField = this.page.locator('[name="username"]');
-                if (await usernameField.isVisible({timeout: 2000})) {
-                    loginAttempts++;
-                    await webActions.inputField('[name="username"]', user.email);
-                    await webActions.clickButton('Sign in');
-                } else {
-                    break;
-                }
-            }
+    while (loginAttempts < maxAttempts) {
+      try {
+        await expect(help).toBeVisible({timeout: 5000});
+        break;
+      } catch {
+        const usernameField = this.page.locator('[name="username"]');
+        if (await usernameField.isVisible({timeout: 2000})) {
+          loginAttempts++;
+          await webActions.inputField('[name="username"]', user.email);
+          await webActions.clickButton('Sign in');
+        } else {
+          break;
         }
-        const acceptCookiesBtn = this.page.locator('button', {hasText: 'Accept analytics cookies'});
-        if (await acceptCookiesBtn.isVisible()) {
-            await acceptCookiesBtn.click();
-        }
-        await expect(help).toBeVisible();
+      }
     }
+    const acceptCookiesBtn = this.page.locator('button', {hasText: 'Accept analytics cookies'});
+    if (await acceptCookiesBtn.isVisible()) {
+      await acceptCookiesBtn.click();
+    }
+    await expect(help).toBeVisible();
+  }
 }
