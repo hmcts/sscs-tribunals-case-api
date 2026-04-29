@@ -617,7 +617,7 @@ public class CcdNotificationWrapperTest {
     public void givenUpdateOtherPartyDataEventAndCmFlagOnAndChildSupportCase_thenReturnEmptySubscription() {
         ccdNotificationWrapper = buildNotificationWrapperWithOtherPartyBenefitTypeAndFlag(UPDATE_OTHER_PARTY_DATA, buildOtherPartyData(true, false, false), "childSupport", true);
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getOtherPartySubscriptions(ccdNotificationWrapper.getNewSscsCaseData(), ccdNotificationWrapper.getNotificationType());
-        Assert.assertTrue(subsWithTypeList.isEmpty());
+        Assertions.assertThat(subsWithTypeList).isEmpty();
     }
 
     @Test
