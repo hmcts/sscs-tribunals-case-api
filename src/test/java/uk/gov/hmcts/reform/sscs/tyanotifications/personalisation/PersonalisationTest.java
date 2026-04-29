@@ -16,6 +16,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
+import static org.springframework.test.util.ReflectionTestUtils.setField;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.PIP;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getLongBenefitNameDescriptionWithOptionalAcronym;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
@@ -101,6 +102,8 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMa
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.MANAGE_EMAILS_LINK_LITERAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.NAME;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.OTHER_PARTY_NAME;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.OTHER_PARTY_NAMES;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.OTHER_PARTY_SIZE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.PANEL_COMPOSITION;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.PANEL_COMPOSITION_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.PARTY_TYPE;
@@ -152,6 +155,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.JUDGE_DECISION_APPEAL_TO_PROCEED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.LIBERTY_TO_APPLY_GRANTED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.LIBERTY_TO_APPLY_REFUSED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.OTHER_PARTY_ADDED_TO_APPEAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PERMISSION_TO_APPEAL_GRANTED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PERMISSION_TO_APPEAL_REFUSED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.POSTPONEMENT;
@@ -186,7 +190,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
@@ -207,7 +210,7 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.MessageAuthenticationServiceImpl;
 
 @Slf4j
-public class PersonalisationTest {
+class PersonalisationTest {
 
     private static final String CASE_ID = "54321";
     private static final String ADDRESS1 = "HM Courts & Tribunals Service";
@@ -240,7 +243,7 @@ public class PersonalisationTest {
     private EvidenceProperties evidenceProperties;
 
     @InjectMocks
-    public Personalisation<NotificationWrapper> personalisation;
+    Personalisation<NotificationWrapper> personalisation;
 
     @Spy
     private PersonalisationConfiguration personalisationConfiguration;
@@ -271,7 +274,7 @@ public class PersonalisationTest {
     private AutoCloseable autoCloseable;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         autoCloseable = openMocks(this);
         when(config.getTrackAppealLink()).thenReturn(Link.builder().linkUrl("http://tyalink.com/appeal_id").build());
         when(config.getMyaLink()).thenReturn(Link.builder().linkUrl("http://myalink.com/appeal_id").build());
@@ -375,7 +378,7 @@ public class PersonalisationTest {
         "REFUSE_REINSTATEMENT, directionIssued.refuseReinstatement, APPOINTEE",
         "REFUSE_HEARING_RECORDING_REQUEST, directionIssued.refuseHearingRecordingRequest, APPOINTEE"
     })
-    public void whenDirectionIssuedAndDirectionTypeShouldGenerateCorrectTemplate(DirectionType directionType,
+    void whenDirectionIssuedAndDirectionTypeShouldGenerateCorrectTemplate(DirectionType directionType,
                                                                                  String templateConfig,
                                                                                  SubscriptionType subscriptionType) {
 
@@ -408,7 +411,7 @@ public class PersonalisationTest {
         "JOINT_PARTY, refuseUrgentHearing, directionIssued.refuseUrgentHearing",
         "REPRESENTATIVE, refuseUrgentHearing, directionIssued.refuseUrgentHearing",
         "APPOINTEE, refuseUrgentHearing, directionIssued.refuseUrgentHearing"})
-    public void whenDirectionIssuedAndGrantOrRefuseUrgentHearingShouldGenerateCorrectTemplate(SubscriptionType subscriptionType, String directionTypeString, String templateConfig) {
+    void whenDirectionIssuedAndGrantOrRefuseUrgentHearingShouldGenerateCorrectTemplate(SubscriptionType subscriptionType, String directionTypeString, String templateConfig) {
 
         NotificationWrapper notificationWrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(SscsCaseData.builder()
@@ -439,7 +442,7 @@ public class PersonalisationTest {
         "JOINT_PARTY, refuseUrgentHearing, directionIssuedWelsh.refuseUrgentHearing",
         "REPRESENTATIVE, refuseUrgentHearing, directionIssuedWelsh.refuseUrgentHearing",
         "APPOINTEE, refuseUrgentHearing, directionIssuedWelsh.refuseUrgentHearing"})
-    public void whenDirectionIssuedWelshAndGrantOrRefuseUrgentHearingShouldGenerateCorrectTemplate(SubscriptionType subscriptionType, String directionTypeString, String templateConfig) {
+    void whenDirectionIssuedWelshAndGrantOrRefuseUrgentHearingShouldGenerateCorrectTemplate(SubscriptionType subscriptionType, String directionTypeString, String templateConfig) {
 
         NotificationWrapper notificationWrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(SscsCaseData.builder()
@@ -472,7 +475,7 @@ public class PersonalisationTest {
         "REFUSE_REINSTATEMENT, directionIssuedWelsh.refuseReinstatement, APPOINTEE",
         "REFUSE_HEARING_RECORDING_REQUEST, directionIssuedWelsh.refuseHearingRecordingRequest, APPOINTEE"
     })
-    public void whenDirectionIssuedWelshAndDirectionTypeShouldGenerateCorrectTemplate(DirectionType directionType,
+    void whenDirectionIssuedWelshAndDirectionTypeShouldGenerateCorrectTemplate(DirectionType directionType,
                                                                                       String templateConfig,
                                                                                       SubscriptionType subscriptionType) {
 
@@ -499,7 +502,7 @@ public class PersonalisationTest {
 
     @ParameterizedTest
     @MethodSource("generateNotificationTypeAndSubscriptionsScenarios")
-    public void givenSubscriptionType_shouldGenerateEmailAndSmsAndLetterTemplateNamesPerSubscription(
+    void givenSubscriptionType_shouldGenerateEmailAndSmsAndLetterTemplateNamesPerSubscription(
         NotificationEventType notificationEventType, SubscriptionType subscriptionType, HearingType hearingType,
         boolean hasEmailTemplate, boolean hasSmsTemplate, boolean hasLetterTemplate, boolean hasDocmosisTemplate) {
         NotificationWrapper notificationWrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
@@ -520,12 +523,6 @@ public class PersonalisationTest {
             eq(hasDocmosisTemplate ? getExpectedTemplateName(notificationEventType, subscriptionType) : notificationEventType.getId()),
             any(Benefit.class), any(NotificationWrapper.class), eq(null)
         );
-    }
-
-    private String getExpectedTemplateName(NotificationEventType notificationEventType,
-                                           SubscriptionType subscriptionType) {
-        return notificationEventType.getId() + (subscriptionType == null ? "" :
-            "." + lowerCase(subscriptionType.name()));
     }
 
     @SuppressWarnings({"Indentation", "unused"})
@@ -620,6 +617,7 @@ public class PersonalisationTest {
             new Object[]{ISSUE_FINAL_DECISION_WELSH, APPELLANT, ONLINE, false, false, false, true},
             new Object[]{ISSUE_FINAL_DECISION_WELSH, APPOINTEE, ONLINE, false, false, false, true},
             new Object[]{ISSUE_FINAL_DECISION_WELSH, REPRESENTATIVE, ONLINE, false, false, false, true},
+            new Object[]{OTHER_PARTY_ADDED_TO_APPEAL, APPELLANT, REGULAR, false, false, false, true},
             new Object[]{POSTPONEMENT, APPELLANT, ONLINE, true, true, false, true},
             new Object[]{POSTPONEMENT, APPELLANT, PAPER, true, true, false, true},
             new Object[]{POSTPONEMENT, APPELLANT, REGULAR, true, true, false, true},
@@ -674,7 +672,7 @@ public class PersonalisationTest {
         "taxCredit, judge and Financially Qualified Panel Member (if applicable), Tax Credit, Credyd Treth, Barnwr ac Aelod Panel sydd â chymhwyster i ddelio gyda materion Ariannol (os yw’n berthnasol), Tax Credit, Credyd Treth, sscs5",
         "infectedBloodCompensation,judge and if applicable a medical member and/or a financially qualified tribunal member, Infected Blood Compensation, Iawndal Gwaed Heintiedig, barnwr ac os yw’n berthnasol aelod meddygol a/neu aelod o’r tribiwnlys sy’n gymwys mewn materion ariannol, IBC, IGH, sscs8"
     })
-    public void customisePersonalisation(String benefitType,
+    void customisePersonalisation(String benefitType,
                                          String expectedPanelComposition,
                                          String expectedBenefitDesc,
                                          String welshExpectedBenefitDesc,
@@ -779,7 +777,7 @@ public class PersonalisationTest {
 
     @ParameterizedTest
     @CsvSource({", SSCS1", ", SSCS2", ", SSCS5", ", SSCS8", ","})
-    public void givenFormTypeWithNoBenefitType_customisePersonalisation(String benefitType, FormType formType) {
+    void givenFormTypeWithNoBenefitType_customisePersonalisation(String benefitType, FormType formType) {
         List<Event> events = new ArrayList<>();
         events.add(Event.builder().value(EventDetails.builder().date(DATE).type(EventType.APPEAL_RECEIVED.getCcdType()).build()).build());
 
@@ -864,7 +862,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void givenNoRpc_thenGivePhoneNumberBasedOnSc() {
+    void givenNoRpc_thenGivePhoneNumberBasedOnSc() {
         List<Event> events = new ArrayList<>();
         events.add(Event.builder().value(EventDetails.builder().date(DATE).type(EventType.APPEAL_RECEIVED.getCcdType()).build()).build());
 
@@ -886,11 +884,11 @@ public class PersonalisationTest {
 
     @ParameterizedTest
     @CsvSource({"readyToList,0300 790 6234", ",telephone"})
-    public void givenRpcAndReadyToList_thenGiveCorrectPhoneNumber(String createdInGapsFrom, String phone) {
+    void givenRpcAndReadyToList_thenGiveCorrectPhoneNumber(String createdInGapsFrom, String phone) {
         List<Event> events = new ArrayList<>();
         events.add(Event.builder().value(EventDetails.builder().date(DATE).type(EventType.APPEAL_RECEIVED.getCcdType()).build()).build());
 
-        RegionalProcessingCenter rpc = RegionalProcessingCenter
+        rpc = RegionalProcessingCenter
             .builder()
             .name("GLASGOW")
             .phoneNumber(phone)
@@ -916,7 +914,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void appealRefWillReturnCcdCaseIdWhenCaseReferenceIsNotSet() {
+    void appealRefWillReturnCcdCaseIdWhenCaseReferenceIsNotSet() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference(null)
             .regionalProcessingCenter(rpc)
@@ -934,7 +932,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void testCorrectionGrantedDwpState() {
+    void testCorrectionGrantedDwpState() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference(null)
             .dwpState(DwpState.CORRECTION_GRANTED)
@@ -951,7 +949,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void testCorrectionRefusedDwpState() {
+    void testCorrectionRefusedDwpState() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference(null)
             .dwpState(DwpState.CORRECTION_REFUSED)
@@ -968,7 +966,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void appealRefWillReturnCcdCaseIdWhenCreatedInGapsFromReadyToList() {
+    void appealRefWillReturnCcdCaseIdWhenCreatedInGapsFromReadyToList() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .regionalProcessingCenter(rpc)
@@ -987,7 +985,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void appealRefWillReturnCaseReferenceWhenCreatedInGapsFromValidAppeal() {
+    void appealRefWillReturnCaseReferenceWhenCreatedInGapsFromValidAppeal() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .regionalProcessingCenter(rpc)
@@ -1006,7 +1004,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void givenEvidenceReceivedNotification_customisePersonalisation() {
+    void givenEvidenceReceivedNotification_customisePersonalisation() {
         List<Event> events = new ArrayList<>();
         events.add(Event.builder().value(EventDetails.builder().date(DATE).type(EventType.APPEAL_RECEIVED.getCcdType()).build()).build());
 
@@ -1029,7 +1027,7 @@ public class PersonalisationTest {
             .subscribeSms("No")
             .build();
 
-        Subscriptions subscriptions = Subscriptions.builder().appellantSubscription(appellantSubscription).build();
+        subscriptions = Subscriptions.builder().appellantSubscription(appellantSubscription).build();
 
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
@@ -1050,7 +1048,7 @@ public class PersonalisationTest {
 
 
     @Test
-    public void givenEvidenceReceivedNotification_customisePersonalisation_welsh() {
+    void givenEvidenceReceivedNotification_customisePersonalisation_welsh() {
         List<Event> events = new ArrayList<>();
         events.add(Event.builder().value(EventDetails.builder().date(DATE).type(EventType.APPEAL_RECEIVED.getCcdType()).build()).build());
 
@@ -1073,7 +1071,7 @@ public class PersonalisationTest {
             .subscribeSms("No")
             .build();
 
-        Subscriptions subscriptions = Subscriptions.builder().appellantSubscription(appellantSubscription).build();
+        subscriptions = Subscriptions.builder().appellantSubscription(appellantSubscription).build();
 
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
@@ -1094,7 +1092,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void setAppealReceivedEventData() {
+    void setAppealReceivedEventData() {
         List<Event> events = new ArrayList<>();
         events.add(Event.builder().value(EventDetails.builder().date(DATE).type(EventType.APPEAL_RECEIVED.getCcdType()).build()).build());
 
@@ -1112,7 +1110,7 @@ public class PersonalisationTest {
 
 
     @Test
-    public void setAppealReceivedEventData_Welsh() {
+    void setAppealReceivedEventData_Welsh() {
         List<Event> events = new ArrayList<>();
         events.add(Event.builder().value(EventDetails.builder().date(DATE).type(EventType.APPEAL_RECEIVED.getCcdType()).build()).build());
 
@@ -1129,7 +1127,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void setAppealReceivedChildSupportEventData_Welsh() {
+    void setAppealReceivedChildSupportEventData_Welsh() {
         List<Event> events = new ArrayList<>();
         events.add(Event.builder().value(EventDetails.builder().date(DATE).type(EventType.APPEAL_RECEIVED.getCcdType()).build()).build());
 
@@ -1146,7 +1144,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void givenDigitalCaseWithDateSentToDwp_thenUseCaseSentToDwpDateForAppealRespondDate() {
+    void givenDigitalCaseWithDateSentToDwp_thenUseCaseSentToDwpDateForAppealRespondDate() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).build())
@@ -1160,7 +1158,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void givenDigitalCaseWithDateSentToDwp_thenUseCaseSentToDwpDateForAppealRespondDate_Welsh() {
+    void givenDigitalCaseWithDateSentToDwp_thenUseCaseSentToDwpDateForAppealRespondDate_Welsh() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).build())
@@ -1176,7 +1174,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void setAppealReceivedChildSupportEventData() {
+    void setAppealReceivedChildSupportEventData() {
         List<Event> events = new ArrayList<>();
         events.add(Event.builder().value(EventDetails.builder().date(DATE).type(EventType.APPEAL_RECEIVED.getCcdType()).build()).build());
 
@@ -1194,7 +1192,7 @@ public class PersonalisationTest {
 
     @ParameterizedTest
     @MethodSource("appealResponseDate")
-    public void givenDigitalCaseWithNoDateSentToDwp_thenUseTodaysDateForAppealRespondDate(
+    void givenDigitalCaseWithNoDateSentToDwp_thenUseTodaysDateForAppealRespondDate(
         Appeal appeal, int responsePeriod) {
 
         SscsCaseData response = SscsCaseData.builder()
@@ -1206,8 +1204,8 @@ public class PersonalisationTest {
 
         Map<String, Object> result = personalisation.setEventData(new HashMap<>(), response, APPEAL_RECEIVED);
 
-        assertThat(result.get(APPEAL_RESPOND_DATE))
-            .isEqualTo(LocalDate.now()
+        assertThat(result)
+            .containsEntry(APPEAL_RESPOND_DATE, LocalDate.now()
                 .plusDays(responsePeriod)
                 .format(DateTimeFormatter.ofPattern(RESPONSE_DATE_FORMAT)));
     }
@@ -1225,7 +1223,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void givenCaseWithCreatedDate_thenUseCreatedDate() {
+    void givenCaseWithCreatedDate_thenUseCreatedDate() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID)
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build())
@@ -1243,7 +1241,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void givenCaseWithCreatedDateSetToNull_thenUseTodaysDateForCreatedDate() {
+    void givenCaseWithCreatedDateSetToNull_thenUseTodaysDateForCreatedDate() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID)
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build())
@@ -1261,7 +1259,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void setJudgeDecisionAppealToProceedEventData() {
+    void setJudgeDecisionAppealToProceedEventData() {
         List<Event> events = new ArrayList<>();
         events.add(Event.builder().value(EventDetails.builder().date(DATE).type(JUDGE_DECISION_APPEAL_TO_PROCEED.getId()).build()).build());
 
@@ -1277,7 +1275,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void setTcwDecisionAppealToProceedEventData() {
+    void setTcwDecisionAppealToProceedEventData() {
         List<Event> events = new ArrayList<>();
         events.add(Event.builder().value(EventDetails.builder().date(DATE).type(TCW_DECISION_APPEAL_TO_PROCEED.getId()).build()).build());
 
@@ -1293,7 +1291,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void setEvidenceReceivedEventData() {
+    void setEvidenceReceivedEventData() {
         List<Document> documents = new ArrayList<>();
 
         Document doc = Document.builder().value(DocumentDetails.builder()
@@ -1317,7 +1315,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void setEvidenceReceivedEventDataWhenEvidenceIsEmpty() {
+    void setEvidenceReceivedEventDataWhenEvidenceIsEmpty() {
         Evidence evidence = Evidence.builder().documents(null).build();
 
         SscsCaseData response = SscsCaseData.builder()
@@ -1334,7 +1332,7 @@ public class PersonalisationTest {
 
     @ParameterizedTest
     @MethodSource("generateHearingNotificationTypeAndSubscriptionsScenarios")
-    public void givenHearingData_correctlySetTheHearingDetails(NotificationEventType hearingNotificationEventType,
+    void givenHearingData_correctlySetTheHearingDetails(NotificationEventType hearingNotificationEventType,
                                                                SubscriptionType subscriptionType) {
         LocalDate hearingDate = LocalDate.now().plusDays(7);
 
@@ -1365,7 +1363,7 @@ public class PersonalisationTest {
 
     @ParameterizedTest
     @MethodSource("generateHearingNotificationTypeAndSubscriptionsScenarios")
-    public void givenHearingData_correctlySetTheHearingDetails_welsh(NotificationEventType hearingNotificationEventType,
+    void givenHearingData_correctlySetTheHearingDetails_welsh(NotificationEventType hearingNotificationEventType,
                                                                      SubscriptionType subscriptionType) {
         LocalDate hearingDate = LocalDate.now().plusDays(7);
 
@@ -1408,7 +1406,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void givenOnlyOneDayUntilHearing_correctlySetTheDaysToHearingText() {
+    void givenOnlyOneDayUntilHearing_correctlySetTheDaysToHearingText() {
         LocalDate hearingDate = LocalDate.now().plusDays(1);
 
         Hearing hearing = createHearing(hearingDate);
@@ -1432,7 +1430,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void checkWelshDatesAreSet() {
+    void checkWelshDatesAreSet() {
         LocalDate hearingDate = LocalDate.now().plusDays(1);
 
         Hearing hearing = createHearing(hearingDate);
@@ -1458,7 +1456,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void checkWelshDataAreNotSet() {
+    void checkWelshDataAreNotSet() {
         LocalDate hearingDate = LocalDate.now().plusDays(1);
 
         Hearing hearing = createHearing(hearingDate);
@@ -1483,7 +1481,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void checkListAssistDataIsSet() {
+    void checkListAssistDataIsSet() {
         LocalDateTime hearingDate = LocalDateTime.now().plusDays(1);
 
         Hearing hearing = createListAssistHearing(hearingDate);
@@ -1524,7 +1522,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void shouldReturnOverrideFieldsDirectionHearingForFaceToFaceHearingBookedNotification() {
+    void shouldReturnOverrideFieldsDirectionHearingForFaceToFaceHearingBookedNotification() {
         LocalDateTime hearingDate = LocalDateTime.now().plusDays(1);
 
         Hearing hearing = createListAssistHearing(hearingDate);
@@ -1549,11 +1547,11 @@ public class PersonalisationTest {
             .notificationEventType(HEARING_BOOKED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isNotNull();
-        assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isEqualTo("BBA3-DIR");
+        assertThat(result).containsEntry(HMC_HEARING_TYPE_LITERAL, "BBA3-DIR");
     }
 
     @Test
-    public void shouldReturnOverrideFieldsSubstantiveHearingForFaceToFaceHearingBookedNotification() {
+    void shouldReturnOverrideFieldsSubstantiveHearingForFaceToFaceHearingBookedNotification() {
         LocalDateTime hearingDate = LocalDateTime.now().plusDays(1);
 
         Hearing hearing = createListAssistHearing(hearingDate);
@@ -1578,11 +1576,11 @@ public class PersonalisationTest {
             .notificationEventType(HEARING_BOOKED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isNotNull();
-        assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isEqualTo("BBA3-SUB");
+        assertThat(result).containsEntry(HMC_HEARING_TYPE_LITERAL, "BBA3-SUB");
     }
 
     @Test
-    public void shouldReturnDirectionHearingForFaceToFaceHearingBookedNotification() {
+    void shouldReturnDirectionHearingForFaceToFaceHearingBookedNotification() {
         LocalDateTime hearingDate = LocalDateTime.now().plusDays(1);
 
         Hearing hearing = createListAssistHearing(hearingDate);
@@ -1607,11 +1605,11 @@ public class PersonalisationTest {
             .notificationEventType(HEARING_BOOKED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isNotNull();
-        assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isEqualTo("BBA3-DIR");
+        assertThat(result).containsEntry(HMC_HEARING_TYPE_LITERAL, "BBA3-DIR");
     }
 
     @Test
-    public void shouldReturnSubstantiveAsNullHearingForFaceToFaceHearingBookedNotification() {
+    void shouldReturnSubstantiveAsNullHearingForFaceToFaceHearingBookedNotification() {
         LocalDateTime hearingDate = LocalDateTime.now().plusDays(1);
 
         Hearing hearing = createListAssistHearing(hearingDate);
@@ -1635,11 +1633,11 @@ public class PersonalisationTest {
             .notificationEventType(HEARING_BOOKED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isNotNull();
-        assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isEqualTo("BBA3-SUB");
+        assertThat(result).containsEntry(HMC_HEARING_TYPE_LITERAL, "BBA3-SUB");
     }
 
     @Test
-    public void shouldReturnSubstantiveHearingForFaceToFaceHearingBookedNotification() {
+    void shouldReturnSubstantiveHearingForFaceToFaceHearingBookedNotification() {
         LocalDateTime hearingDate = LocalDateTime.now().plusDays(1);
 
         Hearing hearing = createListAssistHearing(hearingDate);
@@ -1664,11 +1662,11 @@ public class PersonalisationTest {
             .notificationEventType(HEARING_BOOKED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isNotNull();
-        assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isEqualTo("BBA3-SUB");
+        assertThat(result).containsEntry(HMC_HEARING_TYPE_LITERAL, "BBA3-SUB");
     }
 
     @Test
-    public void handleNullEventWhenPopulatingEventData() {
+    void handleNullEventWhenPopulatingEventData() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).build())
@@ -1680,7 +1678,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void handleEmptyEventsWhenPopulatingEventData() {
+    void handleEmptyEventsWhenPopulatingEventData() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).build())
@@ -1693,8 +1691,8 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void shouldPopulateRegionalProcessingCenterFromCcdCaseIfItsPresent() {
-        RegionalProcessingCenter rpc = RegionalProcessingCenter.builder()
+    void shouldPopulateRegionalProcessingCenterFromCcdCaseIfItsPresent() {
+        rpc = RegionalProcessingCenter.builder()
             .name("LIVERPOOL").address1(ADDRESS1).address2(ADDRESS2).address3(ADDRESS3).address4(ADDRESS4).city(CITY).postcode(POSTCODE).build();
 
         SscsCaseData response = SscsCaseData.builder().regionalProcessingCenter(rpc).build();
@@ -1722,7 +1720,7 @@ public class PersonalisationTest {
         "true, yes, ibcLine3, ibcPostcode, false",
         "true, no, ibcLine3, ibcPostcode, false"
     })
-    public void shouldPopulateSendEvidenceAddressToDigitalAddressWhenOnTheDigitalJourney(boolean isIbc, String isScottish, String expectedLine3, String expectedPostcode, boolean scottishPoBoxFeature) {
+    void shouldPopulateSendEvidenceAddressToDigitalAddressWhenOnTheDigitalJourney(boolean isIbc, String isScottish, String expectedLine3, String expectedPostcode, boolean scottishPoBoxFeature) {
 
         SscsCaseData response = SscsCaseData.builder()
             .createdInGapsFrom(EventType.READY_TO_LIST.getCcdType())
@@ -1745,7 +1743,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void shouldNotPopulateRegionalProcessingCenterIfRpcCannotBeFound() {
+    void shouldNotPopulateRegionalProcessingCenterIfRpcCannotBeFound() {
 
         SscsCaseData response = SscsCaseData.builder().regionalProcessingCenter(null).build();
 
@@ -1764,7 +1762,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void shouldPopulateHearingContactDateFromCcdCaseIfPresent() {
+    void shouldPopulateHearingContactDateFromCcdCaseIfPresent() {
 
         NotificationSscsCaseDataWrapper wrapper = NotificationSscsCaseDataWrapper.builder().newSscsCaseData(SscsCaseData.builder().build()).build();
 
@@ -1778,7 +1776,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void shouldNotPopulateHearingContactDateFromCcdCaseIfNotPresent() {
+    void shouldNotPopulateHearingContactDateFromCcdCaseIfNotPresent() {
 
         NotificationSscsCaseDataWrapper wrapper = NotificationSscsCaseDataWrapper.builder().newSscsCaseData(SscsCaseData.builder().build()).build();
 
@@ -1792,7 +1790,7 @@ public class PersonalisationTest {
 
 
     @Test
-    public void shouldPopulateAppointeeSubscriptionPersonalisation() {
+    void shouldPopulateAppointeeSubscriptionPersonalisation() {
         final String tyaNumber = "tya";
         Name appointeeName = Name.builder().title("MR").firstName("George").lastName("Appointee").build();
         when(macService.generateToken(tyaNumber, PIP.name())).thenReturn("ZYX");
@@ -1844,7 +1842,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void shouldPopulateRepSubscriptionPersonalisation() {
+    void shouldPopulateRepSubscriptionPersonalisation() {
         final String tyaNumber = "tya";
         final String repTyaNumber = "repTya";
         when(macService.generateToken(repTyaNumber, PIP.name())).thenReturn("ZYX");
@@ -1896,7 +1894,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void shouldPopulateJointPartySubscriptionPersonalisation() {
+    void shouldPopulateJointPartySubscriptionPersonalisation() {
         final String tyaNumber = "tya";
         final String jointPartyTyaNumber = "jointPartyTya";
         when(macService.generateToken(jointPartyTyaNumber, PIP.name())).thenReturn("ZYX");
@@ -1956,7 +1954,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void shouldPopulateOtherPartySubscriptionPersonalisation() {
+    void shouldPopulateOtherPartySubscriptionPersonalisation() {
         final String tyaNumber = "tya";
         final String otherPartyTyaNumber = "otherPartyTya";
         when(macService.generateToken(otherPartyTyaNumber, PIP.name())).thenReturn("ZYX");
@@ -2014,7 +2012,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void shouldHandleNoSubscription() {
+    void shouldHandleNoSubscription() {
         when(macService.generateToken(EMPTY, PIP.name())).thenReturn("ZYX");
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference(null)
@@ -2031,12 +2029,12 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void getLatestInfoRequestDetailWhenNoneProvided() {
+    void getLatestInfoRequestDetailWhenNoneProvided() {
         assertNull(Personalisation.getLatestInfoRequestDetail(createResponseWithInfoRequests(null)));
     }
 
     @Test
-    public void getLatestInfoRequestDetailWhenOneProvided() {
+    void getLatestInfoRequestDetailWhenOneProvided() {
         String expected = "Request for information";
 
         List<AppellantInfoRequest> requests = Collections.singletonList(
@@ -2059,7 +2057,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void getLatestInfoRequestDetailWhenMultipleProvided() {
+    void getLatestInfoRequestDetailWhenMultipleProvided() {
         String expected = "Final request for information";
 
         List<AppellantInfoRequest> requests = Arrays.asList(
@@ -2098,7 +2096,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void trackYourAppealWillReturnMyaLinkWhenCreatedInGapsFromReadyToList() {
+    void trackYourAppealWillReturnMyaLinkWhenCreatedInGapsFromReadyToList() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .regionalProcessingCenter(rpc)
@@ -2120,7 +2118,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void trackYourAppealWillReturnTyaLinkWhenCreatedInGapsFromIsNotReadyToList() {
+    void trackYourAppealWillReturnTyaLinkWhenCreatedInGapsFromIsNotReadyToList() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .regionalProcessingCenter(rpc)
@@ -2143,7 +2141,7 @@ public class PersonalisationTest {
 
     @ParameterizedTest
     @CsvSource({"GRANTED", "REFUSED"})
-    public void givenConfidentialRequestForAppellant_thenSetConfidentialFields(RequestOutcome requestOutcome) {
+    void givenConfidentialRequestForAppellant_thenSetConfidentialFields(RequestOutcome requestOutcome) {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID)
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build())
@@ -2164,7 +2162,7 @@ public class PersonalisationTest {
 
     @ParameterizedTest
     @CsvSource({"GRANTED", "REFUSED"})
-    public void givenConfidentialRequestForJointParty_thenSetConfidentialFields(RequestOutcome requestOutcome) {
+    void givenConfidentialRequestForJointParty_thenSetConfidentialFields(RequestOutcome requestOutcome) {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID)
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build())
@@ -2187,7 +2185,7 @@ public class PersonalisationTest {
 
     @ParameterizedTest
     @CsvSource({"yes, 0300 790 6234", "no, 0300 123 1142"})
-    public void setHelplineTelephoneNumber_relevantToTheCaseCountry(String isScottish, String helpLineTelephone) {
+    void setHelplineTelephoneNumber_relevantToTheCaseCountry(String isScottish, String helpLineTelephone) {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID)
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build())
@@ -2203,7 +2201,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void shouldPopulateCorrectlyWithEntityAndParty() {
+    void shouldPopulateCorrectlyWithEntityAndParty() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID)
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build())
@@ -2233,7 +2231,7 @@ public class PersonalisationTest {
 
 
     @Test
-    public void shouldProvideCorrectValuesForPtaGrantedValues() {
+    void shouldProvideCorrectValuesForPtaGrantedValues() {
         String date1 = LocalDate.now().toString();
         String date2 = LocalDate.now().minusDays(10).toString();
         SscsDocumentDetails document1 = SscsDocumentDetails.builder()
@@ -2276,7 +2274,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void shouldProvideCorrectValuesForPtaRefusedValues() {
+    void shouldProvideCorrectValuesForPtaRefusedValues() {
         String date = LocalDate.now().toString();
         SscsDocumentDetails document1 = SscsDocumentDetails.builder()
             .documentType(DocumentType.FINAL_DECISION_NOTICE.getValue())
@@ -2307,7 +2305,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void givenASyaAppealWithHearingArrangements_setHearingArrangementsForTemplate() {
+    void givenASyaAppealWithHearingArrangements_setHearingArrangementsForTemplate() {
         List<String> arrangementList = new ArrayList<>();
 
         arrangementList.add("signLanguageInterpreter");
@@ -2341,7 +2339,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void givenASyaAppealWithHearingArrangements_setHearingArrangementsForTemplate_Welsh() {
+    void givenASyaAppealWithHearingArrangements_setHearingArrangementsForTemplate_Welsh() {
 
         List<String> arrangementList = new ArrayList<>();
 
@@ -2387,7 +2385,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void testSetAsideGrantedDwpState() {
+    void testSetAsideGrantedDwpState() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference(null)
             .dwpState(DwpState.SET_ASIDE_GRANTED)
@@ -2404,7 +2402,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void shouldProvideCorrectValuesForBundleCreatedForUT() {
+    void shouldProvideCorrectValuesForBundleCreatedForUT() {
         String date = LocalDate.now().toString();
         SscsDocumentDetails document1 = SscsDocumentDetails.builder()
             .documentType(DocumentType.FINAL_DECISION_NOTICE.getValue())
@@ -2435,7 +2433,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void givenReviewAndSetAside_setCorrectPtaDecisionDate() {
+    void givenReviewAndSetAside_setCorrectPtaDecisionDate() {
         String date = LocalDate.now().toString();
         String date2 = LocalDate.now().minusDays(20).toString();
         SscsDocumentDetails document1 = SscsDocumentDetails.builder()
@@ -2480,7 +2478,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void givenReviewAndSetAside_setCorrectPtaDecisionDateAndNoReviewAndSetAsideDocument_shouldNotHaveDecisionDate() {
+    void givenReviewAndSetAside_setCorrectPtaDecisionDateAndNoReviewAndSetAsideDocument_shouldNotHaveDecisionDate() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID)
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build())
@@ -2507,7 +2505,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void whenDwpStateIsLtaGranted_setIsGrantedToTrue() {
+    void whenDwpStateIsLtaGranted_setIsGrantedToTrue() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .regionalProcessingCenter(rpc)
@@ -2526,7 +2524,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void whenDwpStateIsLtaRefused_setIsGrantedToFalse() {
+    void whenDwpStateIsLtaRefused_setIsGrantedToFalse() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .regionalProcessingCenter(rpc)
@@ -2545,7 +2543,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void whenDwpStateIsCorrectionIssued_setIsGrantedToTrue() {
+    void whenDwpStateIsCorrectionIssued_setIsGrantedToTrue() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .regionalProcessingCenter(rpc)
@@ -2564,8 +2562,8 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void whenPostHearingsIsTrueAndFinalDecisionIsSet_setFinalDecision() {
-        ReflectionTestUtils.setField(personalisation, "isPostHearingsEnabled", true);
+    void whenPostHearingsIsTrueAndFinalDecisionIsSet_setFinalDecision() {
+        setField(personalisation, "isPostHearingsEnabled", true);
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .regionalProcessingCenter(rpc)
@@ -2586,8 +2584,8 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void whenPostHearingsIsTrueAndFinalDecisionIsNotSet_dontSetFinalDecision() {
-        ReflectionTestUtils.setField(personalisation, "isPostHearingsEnabled", true);
+    void whenPostHearingsIsTrueAndFinalDecisionIsNotSet_dontSetFinalDecision() {
+        setField(personalisation, "isPostHearingsEnabled", true);
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .regionalProcessingCenter(rpc)
@@ -2604,6 +2602,136 @@ public class PersonalisationTest {
 
         assertTrue((boolean) result.get(IS_GRANTED));
         assertNull(result.get(FINAL_DECISION_DATE));
+    }
+
+    @ParameterizedTest(name = "{0} other parties -> OTHER_PARTY_SIZE = {1}")
+    @MethodSource("childSupportOtherPartySizeScenarios")
+    void givenChildSupportBenefitAndFeatureEnabled_thenSetsOtherPartySize(final List<CcdValue<OtherParty>> otherParties,
+        final int expectedSize) {
+        setField(personalisation, "cmOtherPartyConfidentialityEnabled", true);
+        final SscsCaseData response = SscsCaseData
+            .builder()
+            .ccdCaseId(CASE_ID)
+            .appeal(Appeal
+                .builder()
+                .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
+                .appellant(Appellant.builder().name(name).build())
+                .build())
+            .otherParties(otherParties)
+            .build();
+
+        final Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper
+                .builder()
+                .newSscsCaseData(response)
+                .notificationEventType(OTHER_PARTY_ADDED_TO_APPEAL)
+                .build(),
+            new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(),
+                response.getAppeal().getAppellant()));
+
+        assertThat(result).containsEntry(OTHER_PARTY_SIZE, expectedSize);
+    }
+
+    private static Stream<Arguments> childSupportOtherPartySizeScenarios() {
+        return Stream.of(
+            Arguments.of(null, 0),
+            Arguments.of(List.of(), 0),
+            Arguments.of(buildOtherParties("Alice Jones"), 1),
+            Arguments.of(buildOtherParties("Alice Jones", "Bob Smith"), 2),
+            Arguments.of(buildOtherParties("Alice Jones", "Bob Smith", "Carol White"), 3));
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("childSupportWithPreviousOtherPartiesScenarios")
+    void givenChildSupportBenefitAndPreviousOtherParties_thenFiltersNewPartiesCorrectly(
+        final String scenario,
+        final List<CcdValue<OtherParty>> previousOtherParties,
+        final List<CcdValue<OtherParty>> newOtherParties,
+        final int expectedSize,
+        final String expectedNames) {
+        setField(personalisation, "cmOtherPartyConfidentialityEnabled", true);
+        final SscsCaseData newData = SscsCaseData
+            .builder()
+            .ccdCaseId(CASE_ID)
+            .appeal(Appeal
+                .builder()
+                .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
+                .appellant(Appellant.builder().name(name).build())
+                .build())
+            .otherParties(newOtherParties)
+            .build();
+        final SscsCaseData previousData = SscsCaseData
+            .builder()
+            .otherParties(previousOtherParties)
+            .build();
+
+        final Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper
+                .builder()
+                .newSscsCaseData(newData)
+                .oldSscsCaseData(previousData)
+                .notificationEventType(OTHER_PARTY_ADDED_TO_APPEAL)
+                .build(),
+            new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, newData.getAppeal().getAppellant(),
+                newData.getAppeal().getAppellant()));
+
+        assertThat(result).containsEntry(OTHER_PARTY_SIZE, expectedSize)
+            .containsEntry(OTHER_PARTY_NAMES, expectedNames);
+    }
+
+    private static Stream<Arguments> childSupportWithPreviousOtherPartiesScenarios() {
+        return Stream.of(
+            Arguments.of(
+                "empty previous returns all current parties",
+                List.of(),
+                buildOtherParties("Alice Jones", "Bob Smith"),
+                2, "Alice Jones and Bob Smith"),
+            Arguments.of(
+                "empty previous returns all current parties",
+                List.of(),
+                buildOtherParties("Alice Jones", "Bob Smith", "Carol White"),
+                3, "Alice Jones, Bob Smith and Carol White"),
+            Arguments.of(
+                "one existing party filtered out by ID, one new party kept",
+                buildOtherParties("Alice Jones"),
+                buildOtherParties("Alice Jones", "Bob Smith"),
+                1, "Bob Smith"),
+            Arguments.of(
+                "two existing parties filtered out by ID, one new party kept",
+                buildOtherParties("Alice Jones", "Bob Smith"),
+                buildOtherParties("Alice Jones", "Bob Smith", "Carol White"),
+                1, "Carol White"),
+            Arguments.of(
+                "all current parties are new, none in previous",
+                buildOtherParties("Carol White"),
+                buildOtherParties("Alice Jones", "Bob Smith"),
+                2, "Alice Jones and Bob Smith"),
+            Arguments.of(
+                "all current parties existed in previous, result is empty",
+                buildOtherParties("Alice Jones", "Bob Smith"),
+                buildOtherParties("Alice Jones", "Bob Smith"),
+                0, ""),
+            Arguments.of(
+                "empty new parties with non-empty previous returns empty result",
+                buildOtherParties("Alice Jones"),
+                List.of(),
+                0, "")
+        );
+    }
+
+    private static List<CcdValue<OtherParty>> buildOtherParties(final String... fullNames) {
+        return Arrays.stream(fullNames).map(PersonalisationTest::buildOtherParty).toList();
+    }
+
+    private static CcdValue<OtherParty> buildOtherParty(final String fullName) {
+        final String[] parts = fullName.split(" ", 2);
+        final Name name = Name.builder().firstName(parts[0]).lastName(parts[1]).build();
+        return new CcdValue<>(OtherParty.builder().id(fullName).name(name).build());
+    }
+
+    private String getExpectedTemplateName(NotificationEventType notificationEventType, SubscriptionType subscriptionType) {
+        final String id = notificationEventType == OTHER_PARTY_ADDED_TO_APPEAL
+            ? "otherPartyAddedToAppeal"
+            : notificationEventType.getId();
+        return id + (subscriptionType == null ? "" : "." + lowerCase(subscriptionType.name()));
     }
 
     private Hearing createHearing(LocalDate hearingDate) {

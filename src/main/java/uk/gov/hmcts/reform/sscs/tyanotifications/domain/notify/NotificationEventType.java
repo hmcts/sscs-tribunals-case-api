@@ -80,6 +80,7 @@ public enum NotificationEventType {
     SYA_APPEAL_CREATED(EventType.SYA_APPEAL_CREATED, true, true, false, true, false, 0),
     TCW_DECISION_APPEAL_TO_PROCEED(EventType.TCW_DECISION_APPEAL_TO_PROCEED, true, true, true, false, false, 0),
     UPDATE_OTHER_PARTY_DATA(EventType.UPDATE_OTHER_PARTY_DATA, true, true, true, true, false, 0),
+    OTHER_PARTY_ADDED_TO_APPEAL(EventType.UPDATE_OTHER_PARTY_DATA, false, false, false, true, false, 0),
     VALID_APPEAL_CREATED(EventType.VALID_APPEAL_CREATED, true, true, false, true, false, 240L),
 
     @JsonEnumDefaultValue
