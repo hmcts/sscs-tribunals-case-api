@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.sscs.bulkscan.BaseFunctionalTest.generateRandomNino;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_TEST_CASE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 
@@ -33,7 +34,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
         json = json.replace("MRN_DATE_TO_BE_REPLACED", "");
         json = json.replace("CREATED_IN_GAPS_FROM", State.VALID_APPEAL.getId());
-        json = json.replaceAll("NINO_TO_BE_REPLACED", getRandomNino());
+        json = json.replaceAll("NINO_TO_BE_REPLACED", generateRandomNino());
 
         simulateCcdCallback(json);
 
@@ -56,7 +57,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
         json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().toString());
         json = json.replace("CREATED_IN_GAPS_FROM", State.VALID_APPEAL.getId());
-        json = json.replaceAll("NINO_TO_BE_REPLACED", getRandomNino());
+        json = json.replaceAll("NINO_TO_BE_REPLACED", generateRandomNino());
 
         simulateCcdCallback(json);
 
@@ -84,7 +85,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
         json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().minusDays(31).toString());
         json = json.replace("CREATED_IN_GAPS_FROM", State.VALID_APPEAL.getId());
-        json = json.replaceAll("NINO_TO_BE_REPLACED", getRandomNino());
+        json = json.replaceAll("NINO_TO_BE_REPLACED", generateRandomNino());
 
         simulateCcdCallback(json);
 
@@ -111,7 +112,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
         json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().toString());
         json = json.replace("CREATED_IN_GAPS_FROM", State.READY_TO_LIST.getId());
-        json = json.replaceAll("NINO_TO_BE_REPLACED", getRandomNino());
+        json = json.replaceAll("NINO_TO_BE_REPLACED", generateRandomNino());
 
         simulateCcdCallback(json);
 

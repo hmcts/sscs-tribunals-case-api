@@ -12,6 +12,7 @@ import static org.awaitility.Awaitility.await;
 import static org.awaitility.Awaitility.waitAtMost;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
+import static uk.gov.hmcts.reform.sscs.bulkscan.BaseFunctionalTest.generateRandomNino;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DOCUMENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 
@@ -28,8 +29,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -88,10 +89,6 @@ abstract class AbstractFunctionalTest {
     @Autowired
     private ObjectMapper mapper;
 
-    static String getRandomNino() {
-        return RandomStringUtils.secure().nextAlphanumeric(9).toUpperCase();
-    }
-
     public void simulateCcdCallback(String json) {
 
         baseURI = StringUtils.isNotBlank(tcaInstance) ? tcaInstance : localInstance;
@@ -143,13 +140,22 @@ abstract class AbstractFunctionalTest {
         return createCaseWithState(eventType, benefit.getShortName(), benefit.getDescription(), null);
     }
 
+    SscsCaseDetails createCaseFromEvent(Benefit benefit, EventType eventType, Consumer<SscsCaseData> caseDataConsumer) {
+        return createCaseWithState(eventType, benefit.getShortName(), benefit.getDescription(), null, caseDataConsumer);
+    }
+
     SscsCaseDetails createCaseWithState(EventType eventType, String benefitType, String benefitDescription,
         String createdInGapsFrom) {
+        return createCaseWithState(eventType, benefitType, benefitDescription, createdInGapsFrom, caseData -> { });
+    }
+
+    SscsCaseDetails createCaseWithState(EventType eventType, String benefitType, String benefitDescription,
+        String createdInGapsFrom, Consumer<SscsCaseData> caseDataConsumer) {
         idamTokens = getIdamTokens();
 
-        SscsCaseData minimalCaseData = CaseDataUtils.buildMinimalCaseData();
+        final SscsCaseData minimalCaseData = CaseDataUtils.buildMinimalCaseData();
 
-        SscsCaseData caseData = minimalCaseData.toBuilder()
+        final SscsCaseData caseData = minimalCaseData.toBuilder()
             .createdInGapsFrom(createdInGapsFrom)
             .appeal(minimalCaseData.getAppeal().toBuilder()
                 .benefitType(BenefitType.builder()
@@ -160,8 +166,9 @@ abstract class AbstractFunctionalTest {
                 .build())
             .build();
 
+        caseDataConsumer.accept(caseData);
 
-        SscsCaseDetails caseDetails = ccdService.createCase(caseData, eventType.getCcdType(),
+        final SscsCaseDetails caseDetails = ccdService.createCase(caseData, eventType.getCcdType(),
             "Evidence share service created case",
             "Evidence share service case created for functional test", idamTokens);
         ccdCaseId = String.valueOf(caseDetails.getId());
@@ -196,7 +203,7 @@ abstract class AbstractFunctionalTest {
         String json = getJson(fileName);
         json = json.replace("CASE_ID_TO_BE_REPLACED", String.valueOf(caseDetails.getId()));
         json = json.replace("CREATED_IN_GAPS_FROM", State.READY_TO_LIST.getId());
-        json = json.replaceAll("NINO_TO_BE_REPLACED", getRandomNino());
+        json = json.replaceAll("NINO_TO_BE_REPLACED", generateRandomNino());
 
         json = uploadCaseDocument(EVIDENCE_DOCUMENT_PDF, EVIDENCE_DOCUMENT_TYPE, json);
         json = uploadCaseDocument(EXISTING_DOCUMENT_PDF, EXISTING_DOCUMENT_TYPE, json);
@@ -247,7 +254,7 @@ abstract class AbstractFunctionalTest {
             .orElseThrow();
         final String documentBinaryUrl = correspondence.getValue().getDocumentLink().getDocumentBinaryUrl();
         final ResponseEntity<Resource> resourceResponseEntity = documentDownloadClientApi.downloadBinary("oauth2Token",
-            getIdamTokens().getServiceAuthorization(),
+                getIdamTokens().getServiceAuthorization(),
             "caseworker,citizen", "sscs", URI.create(documentBinaryUrl).getPath());
         assertThat(resourceResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         return resourceResponseEntity.getBody();
