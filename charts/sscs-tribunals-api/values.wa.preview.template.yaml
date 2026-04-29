@@ -174,6 +174,8 @@ em-ccdorc:
 em-stitching:
   enabled: ${PREVIEW_BRANCH_WITH_LOCAL_CCD}
   java:
+    devcpuRequests: 50m
+    devcpuLimits: 250m
     image: hmctsprod.azurecr.io/em/stitching:latest
     releaseNameOverride: ${SERVICE_NAME}-em-stitching
     ingressHost: em-stitching-${SERVICE_FQDN}
@@ -211,6 +213,8 @@ ccd-case-document-am-api:
   java:
     image: hmctsprod.azurecr.io/ccd/case-document-am-api:latest
     releaseNameOverride: ${SERVICE_NAME}-ccd-case-document-am-api
+    devcpuRequests: 50m
+    devcpuLimits: 250m
     environment:
       CCD_DATA_STORE_API_BASE_URL: http://${SERVICE_NAME}-ccd-data-store-api
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
@@ -224,8 +228,8 @@ xui-webapp:
   nodejs:
     devmemoryRequests: "512Mi"
     devmemoryLimits: "1Gi"
-    devcpuRequests: "200m"
-    devcpuLimits: "1000m"
+    devcpuRequests: 50m
+    devcpuLimits: 250m
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
     image: hmctsprod.azurecr.io/xui/webapp:latest
@@ -331,7 +335,7 @@ ccd:
         CCD_DATA_STORE_URL: http://${SERVICE_NAME}-ccd-data-store-api
         RAS_ENV: pr
       devmemoryRequests: 1024Mi
-      devcpuRequests: 250m
+      devcpuRequests: 50m
       devmemoryLimits: 2048Mi
       devcpuLimits: 1500m
       keyVaults:
