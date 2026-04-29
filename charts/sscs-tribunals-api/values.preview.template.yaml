@@ -7,6 +7,7 @@ java:
   readinessDelay: 45
   devmemoryRequests: 1Gi
   devmemoryLimits: 2Gi
+  devcpuRequests: 150m
   environment:
     MYA_LINK: http://sscs-cor-frontend-aat.service.core-compute-aat.internal/sign-in?tya=appeal_id
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
@@ -81,9 +82,8 @@ am-org-role-mapping-service:
     ingressHost: orm-${SERVICE_FQDN}
     releaseNameOverride: ${SERVICE_NAME}-am-org-role-mapping-service
     devmemoryRequests: 1024Mi
-    devcpuRequests: 250m
     devmemoryLimits: 2048Mi
-    devcpuLimits: 1500m
+    devcpuRequests: 50m
     secrets:
       SB_ACCESS_KEY:
         secretRef: sscs-sb-preview
@@ -146,6 +146,8 @@ aac-manage-case-assignment:
     releaseNameOverride: ${SERVICE_NAME}-aac-manage-case-assignment
     image: hmctsprod.azurecr.io/aac/manage-case-assignment:latest
     ingressHost: aac-${SERVICE_FQDN}
+    devcpuRequests: 50m
+    devcpuLimits: 250m
     environment:
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
@@ -187,6 +189,8 @@ em-ccdorc:
     image: hmctsprod.azurecr.io/em/ccdorc:latest
     releaseNameOverride: ${SERVICE_NAME}-em-ccdorc
     ingressHost: em-ccdorc-${SERVICE_FQDN}
+    devcpuRequests: 50m
+    devcpuLimits: 250m
     environment:
       IDAM_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
       OPEN_ID_API_BASE_URI: https://idam-web-public.aat.platform.hmcts.net/o
@@ -212,6 +216,8 @@ em-stitching:
     image: hmctsprod.azurecr.io/em/stitching:latest
     releaseNameOverride: ${SERVICE_NAME}-em-stitching
     ingressHost: em-stitching-${SERVICE_FQDN}
+    devcpuRequests: 50m
+    devcpuLimits: 250m
     environment:
       SPRING_DATASOURCE_HOST: '{{ tpl .Values.global.postgresHostname $}}'
       SPRING_DATASOURCE_NAME: "{{ tpl .Values.global.databaseNamePrefix $}}emstitch"
@@ -243,6 +249,8 @@ em-stitching:
 
 ccd-case-document-am-api:
   enabled: ${PREVIEW_BRANCH_WITH_LOCAL_CCD}
+  devcpuRequests: 50m
+  devcpuLimits: 250m
   java:
     image: hmctsprod.azurecr.io/ccd/case-document-am-api:latest
     releaseNameOverride: ${SERVICE_NAME}-ccd-case-document-am-api
@@ -260,8 +268,8 @@ xui-webapp:
   nodejs:
     devmemoryRequests: "512Mi"
     devmemoryLimits: "1Gi"
-    devcpuRequests: "200m"
-    devcpuLimits: "1000m"
+    devcpuRequests: 50m
+    devcpuLimits: 250m
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
     image: hmctsprod.azurecr.io/xui/webapp:latest
@@ -364,9 +372,8 @@ ccd:
         CCD_DATA_STORE_URL: http://${SERVICE_NAME}-ccd-data-store-api
         RAS_ENV: pr
       devmemoryRequests: 1024Mi
-      devcpuRequests: 250m
       devmemoryLimits: 2048Mi
-      devcpuLimits: 1500m
+      devcpuRequests: 50m
       keyVaults:
         am:
           resourceGroup: am
@@ -597,7 +604,8 @@ ccd:
       disableKeyVaults: true
       devmemoryRequests: '1024Mi'
       devmemoryLimits: '2048Mi'
-      devcpuRequests: '500m'
+      devcpuRequests: 50m
+      devcpuLimits: 250m
       autoscaling:
         enabled: false
         minReplicas: 1
@@ -625,7 +633,8 @@ ccd:
       imagePullPolicy: Always
       devmemoryRequests: '1524Mi'
       devmemoryLimits: '2048Mi'
-      devcpuRequests: '500m'
+      devcpuRequests: 50m
+      devcpuLimits: 250m
       environment:
         DATA_STORE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
         DATA_STORE_DB_USERNAME: hmcts
