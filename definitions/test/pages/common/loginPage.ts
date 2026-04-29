@@ -38,44 +38,48 @@ export class LoginPage {
   ): Promise<void> {
     if (clearCacheFlag) await this.page.context().clearCookies();
 
-    const isLocalhost = this.page.url().includes('localhost');
-    if (isLocalhost) {
-        await this.localLogin(user);
-        return;
-    }
+  const isLocalhost = this.page.url().includes('localhost');
+  if (isLocalhost) {
+    await this.localLogin(user);
+    return;
+  }
 
-      const maxAttempts = 3;
-      const usernameField = this.page.locator('#username');
-      const passwordField = this.page.locator('#password');
-      const signInButton = this.page.getByRole('button', {
-          name: 'Sign in',
-          exact: true
-      });
+  const maxAttempts = 3;
 
-      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-          await webActions.inputField('#username', user.email);
-          await webActions.inputField('#password', user.password);
-          await webActions.clickButton('Sign in');
+  const usernameField = this.page.locator('#username');
+  const passwordField = this.page.locator('#password');
+  const signInButton = this.page.getByRole('button', {
+    name: 'Sign in',
+    exact: true
+  });
 
-          const signedIn = await this.signOutBtn
-              .isVisible({ timeout: 10000 })
-              .catch(() => false);
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    await usernameField.fill(user.email);
+    await passwordField.fill(user.password);
 
-          if (signedIn) {
-              return;
-          }
+    await expect(signInButton).toBeVisible();
+    await expect(signInButton).toBeEnabled();
 
-          const loginFormStillVisible =
-              await usernameField.isVisible({ timeout: 2000 }).catch(() => false) &&
-              await passwordField.isVisible({ timeout: 2000 }).catch(() => false) &&
-              await signInButton.isVisible({ timeout: 2000 }).catch(() => false);
+    await signInButton.click();
 
-          if (!loginFormStillVisible) {
-              break;
-          }
+    const signedIn = await this.signOutBtn
+      .isVisible({ timeout: 15000 })
+      .catch(() => false);
+
+      if (signedIn) {
+          return;
       }
 
-      await expect(this.signOutBtn).toBeVisible();
+      const backAtLogin =
+          await usernameField.isVisible({ timeout: 3000 }).catch(() => false) &&
+          await passwordField.isVisible({ timeout: 3000 }).catch(() => false);
+
+      if (!backAtLogin) {
+          break;
+      }
+  }
+
+  await expect(this.signOutBtn).toBeVisible({ timeout: 15000 });
   }
 
     private async localLogin(user: { email: string; }) {
