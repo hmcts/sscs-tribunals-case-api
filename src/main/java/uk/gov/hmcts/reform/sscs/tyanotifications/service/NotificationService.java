@@ -4,6 +4,7 @@ import static java.util.Arrays.asList;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getBenefitByCodeOrThrowException;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
@@ -16,6 +17,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationVali
 
 import java.time.ZonedDateTime;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -36,6 +38,8 @@ import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 public class NotificationService {
     private static final List<String> PROCESS_AUDIO_VIDEO_ACTIONS_THAT_REQUIRES_NOTICE = asList("issueDirectionsNotice", "excludeEvidence", "admitEvidence");
     private static final String READY_TO_LIST = "readyToList";
+    private static final EnumSet<NotificationEventType> SEND_TO_VALID_APPEAL = EnumSet.of(ADMIN_SEND_TO_VALID_APPEAL,
+        INTERLOC_VALID_APPEAL, VALID_APPEAL);
 
     private final NotificationFactory notificationFactory;
     private final ReminderService reminderService;
@@ -43,6 +47,9 @@ public class NotificationService {
     private final NotificationHandler notificationHandler;
     private final OutOfHoursCalculator outOfHoursCalculator;
     private final NotificationConfig notificationConfig;
+    private final SendNotificationService sendNotificationService;
+    private final boolean covid19Feature;
+    private final boolean cmOtherPartyConfidentialityEnabled;
 
     @SuppressWarnings("squid:S107")
     @Autowired
@@ -54,7 +61,8 @@ public class NotificationService {
         OutOfHoursCalculator outOfHoursCalculator,
         NotificationConfig notificationConfig,
         SendNotificationService sendNotificationService,
-        @Value("${feature.covid19}") boolean covid19Feature) {
+        @Value("${feature.covid19}") boolean covid19Feature,
+        @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
 
         this.notificationFactory = notificationFactory;
         this.reminderService = reminderService;
@@ -64,11 +72,8 @@ public class NotificationService {
         this.notificationConfig = notificationConfig;
         this.sendNotificationService = sendNotificationService;
         this.covid19Feature = covid19Feature;
+        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
-
-    private final SendNotificationService sendNotificationService;
-
-    private final boolean covid19Feature;
 
     public void manageNotificationAndSubscription(NotificationWrapper notificationWrapper, boolean fromReminderService) {
         NotificationEventType notificationType = notificationWrapper.getNotificationType();
@@ -113,6 +118,13 @@ public class NotificationService {
         } else if (notificationWrapper.getNotificationType().equals(DWP_UPLOAD_RESPONSE)) {
             log.info("Trigger second notification event for {}", UPDATE_OTHER_PARTY_DATA.getId());
             notificationWrapper.getSscsCaseDataWrapper().setNotificationEventType(UPDATE_OTHER_PARTY_DATA);
+            sendNotificationPerSubscription(notificationWrapper);
+        } else if (cmOtherPartyConfidentialityEnabled
+            && notificationWrapper.getNotificationType().equals(DIRECTION_ISSUED)
+            && notificationWrapper.getSscsCaseDataWrapper().getNewSscsCaseData().isBenefitType(CHILD_SUPPORT)
+            && isAppealToProceed(notificationWrapper)) {
+            log.info("Trigger second notification event for {} with {}", DIRECTION_ISSUED.getId(), DirectionType.APPEAL_TO_PROCEED.getLabel());
+            notificationWrapper.getSscsCaseDataWrapper().setNotificationEventType(NOTIFY_APPELLANT_VALID_APPEAL);
             sendNotificationPerSubscription(notificationWrapper);
         }
     }
@@ -231,7 +243,6 @@ public class NotificationService {
 
     private boolean isValidNotification(NotificationWrapper wrapper, SubscriptionWithType subscriptionWithType) {
         Subscription subscription = subscriptionWithType.getSubscription();
-
         return (isMandatoryLetterEventType(wrapper.getNotificationType())
             || isOkToSendNotification(wrapper, wrapper.getNotificationType(), subscription, notificationValidService));
     }
@@ -397,6 +408,13 @@ public class NotificationService {
             }
         }
 
+        boolean validAppealPostState = SEND_TO_VALID_APPEAL.contains(notificationType);
+        if ((cmOtherPartyConfidentialityEnabled && validAppealPostState && !notificationWrapper
+            .getNewSscsCaseData()
+            .isBenefitType(CHILD_SUPPORT)) || (!cmOtherPartyConfidentialityEnabled && validAppealPostState)) {
+            return false;
+        }
+
         log.info("Notification valid to send for case id {} and event {} in state {}",
             notificationWrapper.getCaseId(),
             notificationType.getId(),
@@ -407,6 +425,17 @@ public class NotificationService {
     private static boolean hasNonNullHearingDetails(HearingDetails oldHearingDetails, HearingDetails newHearingDetails) {
         return nonNull(oldHearingDetails) && nonNull(oldHearingDetails.getHearingId())
                 && nonNull(newHearingDetails) && nonNull(newHearingDetails.getHearingId());
+    }
+
+    private static boolean isAppealToProceed(NotificationWrapper notificationWrapper) {
+        return notificationWrapper.getSscsCaseDataWrapper().getNewSscsCaseData().getDirectionTypeDl() != null
+            && notificationWrapper
+            .getSscsCaseDataWrapper()
+            .getNewSscsCaseData()
+            .getDirectionTypeDl()
+            .getValue()
+            .getCode()
+            .equals(DirectionType.APPEAL_TO_PROCEED.toString());
     }
 
     private boolean isHearingBookedInformationTheSame(HearingDetails newHearing, HearingDetails oldHearing) {

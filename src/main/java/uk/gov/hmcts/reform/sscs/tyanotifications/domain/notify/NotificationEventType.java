@@ -19,6 +19,7 @@ public enum NotificationEventType {
     ADJOURNED(EventType.ADJOURNED, true, false, false, false, false, 0),
     ADMIN_APPEAL_WITHDRAWN(EventType.ADMIN_APPEAL_WITHDRAWN, true, true, true, false, false, 0),
     ADMIN_CORRECTION_HEADER(EventType.ADMIN_CORRECTION_HEADER, true, true, true, true, false, 0),
+    ADMIN_SEND_TO_VALID_APPEAL(EventType.ADMIN_SEND_TO_VALID_APPEAL, false, false, false, true, false, 0),
     APPEAL_DORMANT(EventType.DORMANT, true, true, false, false, false, 0),
     APPEAL_LAPSED(EventType.LAPSED_REVISED, true, true, false, false, false, 0),
     APPEAL_RECEIVED(EventType.APPEAL_RECEIVED, true, true, false, false, false, 300L),
@@ -43,6 +44,7 @@ public enum NotificationEventType {
     HEARING_BOOKED(EventType.HEARING_BOOKED, true, false, false, false, false, 0),
     HEARING_REMINDER(EventType.HEARING_REMINDER, true, false, false, false, true, 0),
     HMCTS_APPEAL_LAPSED(EventType.HMCTS_LAPSE_CASE, true, true, false, false, false, 0),
+    INTERLOC_VALID_APPEAL(EventType.INTERLOC_VALID_APPEAL, false, false, false, true, false, 0),
     ISSUE_ADJOURNMENT_NOTICE(EventType.ISSUE_ADJOURNMENT_NOTICE, true, true, true, false, false, 0),
     ISSUE_ADJOURNMENT_NOTICE_WELSH(EventType.ISSUE_ADJOURNMENT_NOTICE_WELSH, true, true, true, false, false, 0),
     ISSUE_FINAL_DECISION(EventType.ISSUE_FINAL_DECISION, true, true, true, false, false, 0),
@@ -53,6 +55,7 @@ public enum NotificationEventType {
     LIBERTY_TO_APPLY_GRANTED(EventType.LIBERTY_TO_APPLY_GRANTED, true, true, true, true, false, 0),
     LIBERTY_TO_APPLY_REFUSED(EventType.LIBERTY_TO_APPLY_REFUSED, true, true, true, true, false, 0),
     NON_COMPLIANT(EventType.NON_COMPLIANT, true, true, true, false, false, 0),
+    NOTIFY_APPELLANT_VALID_APPEAL(EventType.DIRECTION_ISSUED, false, false, false, true, false, 0),
     PERMISSION_TO_APPEAL_GRANTED(EventType.PERMISSION_TO_APPEAL_GRANTED, true, true, true, false, false, 0),
     PERMISSION_TO_APPEAL_REFUSED(EventType.PERMISSION_TO_APPEAL_REFUSED, true, true, true, false, false, 0),
     PERMISSION_TO_APPEAL_REQUEST(EventType.PERMISSION_TO_APPEAL_REQUEST, true, true, true, false, false, 0),
@@ -60,8 +63,8 @@ public enum NotificationEventType {
     PROCESS_AUDIO_VIDEO(EventType.PROCESS_AUDIO_VIDEO, true, true, true, false, false, 0),
     PROCESS_AUDIO_VIDEO_WELSH(EventType.PROCESS_AUDIO_VIDEO_WELSH, true, true, true, false, false, 0),
     PROVIDE_APPOINTEE_DETAILS(EventType.PROVIDE_APPOINTEE_DETAILS, true, true, true, true, false, 0),
-    // Allow out of hours for this event as we rely on the case data to decide who to send to. It could get out of sync if we wait a few hours to send, for example they could try to reissue to 2 parties so this event would be triggered twice.
-    // If the reminder service looks the case up from CCD, the original request for whom to send the notification to will be lost and the second party would receive the notification twice.
+    // Allow out of hours for this event as we rely on the case data to decide who to send to. It could get out of sync if we wait a few hours to send, for example they could try to reissue to 2 parties so this event would be triggered twice.,
+    // If the reminder service looks the case up from CCD, the original request for whom to send the notification to will be lost and the second party would receive the notification twice.,
     REISSUE_DOCUMENT(EventType.REISSUE_DOCUMENT, true, true, true, true, false, 0),
     REQUEST_FOR_INFORMATION(EventType.REQUEST_FOR_INFORMATION, true, true, true, false, false, 0),
     RESEND_APPEAL_CREATED(EventType.RESEND_APPEAL_CREATED, true, true, false, true, false, 0),
@@ -80,6 +83,7 @@ public enum NotificationEventType {
     SYA_APPEAL_CREATED(EventType.SYA_APPEAL_CREATED, true, true, false, true, false, 0),
     TCW_DECISION_APPEAL_TO_PROCEED(EventType.TCW_DECISION_APPEAL_TO_PROCEED, true, true, true, false, false, 0),
     UPDATE_OTHER_PARTY_DATA(EventType.UPDATE_OTHER_PARTY_DATA, true, true, true, true, false, 0),
+    VALID_APPEAL(EventType.VALID_APPEAL, false, false, false, true, false, 0),
     VALID_APPEAL_CREATED(EventType.VALID_APPEAL_CREATED, true, true, false, true, false, 240L),
 
     @JsonEnumDefaultValue

@@ -12,6 +12,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.REPRESENTATIVE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADJOURNED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADMIN_APPEAL_WITHDRAWN;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADMIN_SEND_TO_VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_DORMANT;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_LAPSED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_RECEIVED;
@@ -26,6 +27,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.HEARING_BOOKED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.HEARING_REMINDER;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.HMCTS_APPEAL_LAPSED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.INTERLOC_VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_ADJOURNMENT_NOTICE_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION;
@@ -38,6 +40,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SUBSCRIPTION_UPDATED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SYA_APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.UPDATE_OTHER_PARTY_DATA;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.VALID_APPEAL_CREATED;
 
 import java.util.Collections;
@@ -59,10 +62,10 @@ public class NotificationConfigTestIt extends AbstractNotificationConfigTest {
 
         Template template = getTemplate(eventType, subscriptionType, hearingType, hearingRoute, welsh, createdInGapsFrom);
 
-        assertThat(expectedEmailTemplateId).isEqualTo(template.getEmailTemplateId());
-        assertThat(expectedSmsTemplateId).isEqualTo(template.getSmsTemplateId());
-        assertThat(expectedLetterTemplateId).isEqualTo(template.getLetterTemplateId());
-        assertThat(expectedDocmosisTemplateId).isEqualTo(template.getDocmosisTemplateId());
+        assertThat(template.getEmailTemplateId()).isEqualTo(expectedEmailTemplateId);
+        assertThat(template.getSmsTemplateId()).isEqualTo(expectedSmsTemplateId);
+        assertThat(template.getLetterTemplateId()).isEqualTo(expectedLetterTemplateId);
+        assertThat(template.getDocmosisTemplateId()).isEqualTo(expectedDocmosisTemplateId);
     }
 
 
@@ -378,10 +381,10 @@ public class NotificationConfigTestIt extends AbstractNotificationConfigTest {
             new Object[]{UPDATE_OTHER_PARTY_DATA, true, OTHER_PARTY, ORAL, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00787-v2.docx"},
             new Object[]{UPDATE_OTHER_PARTY_DATA, true, OTHER_PARTY, PAPER, GAPS, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00787-v2.docx"},
 
-            new Object[]{VALID_APPEAL_CREATED, false, APPELLANT, ORAL, GAPS, null, "4917669f-d1b4-4748-851f-f10b90f27da3", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, null},
-            new Object[]{VALID_APPEAL_CREATED, false, APPELLANT, PAPER, GAPS, null, "4917669f-d1b4-4748-851f-f10b90f27da3", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, null},
-            new Object[]{VALID_APPEAL_CREATED, false, APPOINTEE, ORAL, GAPS, null, "362d9a85-e0e4-412b-b874-020c0464e2b4", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, null},
-            new Object[]{VALID_APPEAL_CREATED, false, APPOINTEE, PAPER, GAPS, null, "362d9a85-e0e4-412b-b874-020c0464e2b4", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, null},
+            new Object[]{VALID_APPEAL_CREATED, false, APPELLANT, ORAL, GAPS, null, "4917669f-d1b4-4748-851f-f10b90f27da3", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx"},
+            new Object[]{VALID_APPEAL_CREATED, false, APPELLANT, PAPER, GAPS, null, "4917669f-d1b4-4748-851f-f10b90f27da3", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx"},
+            new Object[]{VALID_APPEAL_CREATED, false, APPOINTEE, ORAL, GAPS, null, "362d9a85-e0e4-412b-b874-020c0464e2b4", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx"},
+            new Object[]{VALID_APPEAL_CREATED, false, APPOINTEE, PAPER, GAPS, null, "362d9a85-e0e4-412b-b874-020c0464e2b4", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx"},
             new Object[]{VALID_APPEAL_CREATED, false, REPRESENTATIVE, ORAL, GAPS, null, "652753bf-59b4-46eb-9c24-bd762338a098", List.of("a6c09fad-6265-4c7c-8b95-36245ffa5352"), null, null},
             new Object[]{VALID_APPEAL_CREATED, false, REPRESENTATIVE, PAPER, GAPS, null, "652753bf-59b4-46eb-9c24-bd762338a098", List.of("a6c09fad-6265-4c7c-8b95-36245ffa5352"), null, null},
             new Object[]{VALID_APPEAL_CREATED, true, APPELLANT, ORAL, GAPS, null, "8910e2d2-4332-4ef6-a4b5-025ffad4f17d", List.of("6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82","f41222ef-c05c-4682-9634-6b034a166368"), null, null},
@@ -698,16 +701,32 @@ public class NotificationConfigTestIt extends AbstractNotificationConfigTest {
             new Object[]{UPDATE_OTHER_PARTY_DATA, true, OTHER_PARTY, ORAL, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00787-v2.docx"},
             new Object[]{UPDATE_OTHER_PARTY_DATA, true, OTHER_PARTY, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00787-v2.docx"},
 
-            new Object[]{VALID_APPEAL_CREATED, false, APPELLANT, ORAL, LIST_ASSIST, null, "4917669f-d1b4-4748-851f-f10b90f27da3", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, null},
-            new Object[]{VALID_APPEAL_CREATED, false, APPELLANT, PAPER, LIST_ASSIST, null, "4917669f-d1b4-4748-851f-f10b90f27da3", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, null},
-            new Object[]{VALID_APPEAL_CREATED, false, APPOINTEE, ORAL, LIST_ASSIST, null, "362d9a85-e0e4-412b-b874-020c0464e2b4", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, null},
-            new Object[]{VALID_APPEAL_CREATED, false, APPOINTEE, PAPER, LIST_ASSIST, null, "362d9a85-e0e4-412b-b874-020c0464e2b4", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, null},
+            new Object[]{VALID_APPEAL_CREATED, false, APPELLANT, ORAL, LIST_ASSIST, null, "4917669f-d1b4-4748-851f-f10b90f27da3", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx"},
+            new Object[]{VALID_APPEAL_CREATED, false, APPELLANT, PAPER, LIST_ASSIST, null, "4917669f-d1b4-4748-851f-f10b90f27da3", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx"},
+            new Object[]{VALID_APPEAL_CREATED, false, APPOINTEE, ORAL, LIST_ASSIST, null, "362d9a85-e0e4-412b-b874-020c0464e2b4", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx"},
+            new Object[]{VALID_APPEAL_CREATED, false, APPOINTEE, PAPER, LIST_ASSIST, null, "362d9a85-e0e4-412b-b874-020c0464e2b4", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx"},
             new Object[]{VALID_APPEAL_CREATED, false, REPRESENTATIVE, ORAL, LIST_ASSIST, null, "652753bf-59b4-46eb-9c24-bd762338a098", List.of("a6c09fad-6265-4c7c-8b95-36245ffa5352"), null, null},
             new Object[]{VALID_APPEAL_CREATED, false, REPRESENTATIVE, PAPER, LIST_ASSIST, null, "652753bf-59b4-46eb-9c24-bd762338a098", List.of("a6c09fad-6265-4c7c-8b95-36245ffa5352"), null, null},
             new Object[]{VALID_APPEAL_CREATED, true, APPELLANT, ORAL, LIST_ASSIST, null, "8910e2d2-4332-4ef6-a4b5-025ffad4f17d", List.of("6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82","f41222ef-c05c-4682-9634-6b034a166368"), null, null},
             new Object[]{VALID_APPEAL_CREATED, true, APPELLANT, PAPER, LIST_ASSIST, null, "8910e2d2-4332-4ef6-a4b5-025ffad4f17d", List.of("6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82","f41222ef-c05c-4682-9634-6b034a166368"), null, null},
             new Object[]{VALID_APPEAL_CREATED, true, APPOINTEE, ORAL, LIST_ASSIST, null, "e0355abd-42a6-4f94-836b-ec7ee22631cc", List.of("6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82","f41222ef-c05c-4682-9634-6b034a166368"), null, null},
-            new Object[]{VALID_APPEAL_CREATED, true, APPOINTEE, PAPER, LIST_ASSIST, null, "e0355abd-42a6-4f94-836b-ec7ee22631cc", List.of("6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82","f41222ef-c05c-4682-9634-6b034a166368"), null, null}
+            new Object[]{VALID_APPEAL_CREATED, true, APPOINTEE, PAPER, LIST_ASSIST, null, "e0355abd-42a6-4f94-836b-ec7ee22631cc", List.of("6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82","f41222ef-c05c-4682-9634-6b034a166368"), null, null},
+
+            new Object[]{ADMIN_SEND_TO_VALID_APPEAL, false, null, ORAL, GAPS, null, null, List.of(), null, "TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx"},
+            new Object[]{ADMIN_SEND_TO_VALID_APPEAL, false, null, PAPER, GAPS, null, null, List.of(), null, "TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx"},
+            new Object[]{ADMIN_SEND_TO_VALID_APPEAL, true, null, ORAL, GAPS, null, null, List.of(), null, null},
+            new Object[]{ADMIN_SEND_TO_VALID_APPEAL, true, null, PAPER, GAPS, null, null, List.of(), null, null},
+
+            new Object[]{INTERLOC_VALID_APPEAL, false, null, ORAL, GAPS, null, null, List.of(), null, "TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx"},
+            new Object[]{INTERLOC_VALID_APPEAL, false, null, PAPER, GAPS, null, null, List.of(), null, "TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx"},
+            new Object[]{INTERLOC_VALID_APPEAL, true, null, ORAL, GAPS, null, null, List.of(), null, null},
+            new Object[]{INTERLOC_VALID_APPEAL, true, null, PAPER, GAPS, null, null, List.of(), null, null},
+
+            new Object[]{VALID_APPEAL, false, null, ORAL, GAPS, null, null, List.of(), null, "TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx"},
+            new Object[]{VALID_APPEAL, false, null, PAPER, GAPS, null, null, List.of(), null, "TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx"},
+            new Object[]{VALID_APPEAL, true, null, ORAL, GAPS, null, null, List.of(), null, null},
+            new Object[]{VALID_APPEAL, true, null, PAPER, GAPS, null, null, List.of(), null, null},
+
         };
     }
 }

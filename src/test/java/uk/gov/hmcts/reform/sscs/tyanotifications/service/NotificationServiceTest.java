@@ -2,8 +2,7 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -38,6 +37,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_LAPSED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_WITHDRAWN;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DIRECTION_ISSUED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DRAFT_TO_VALID_APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DWP_RESPONSE_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DWP_UPLOAD_RESPONSE;
@@ -45,6 +45,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.HEARING_REMINDER;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.NOTIFY_APPELLANT_VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.POSTPONEMENT;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PROCESS_AUDIO_VIDEO;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.REISSUE_DOCUMENT;
@@ -92,6 +93,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
@@ -141,7 +143,7 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis.PdfLetterServi
 @RunWith(JUnitParamsRunner.class)
 public class NotificationServiceTest {
 
-    static Appellant APPELLANT_WITH_ADDRESS = Appellant.builder()
+    static final Appellant APPELLANT_WITH_ADDRESS = Appellant.builder()
         .name(Name.builder().firstName("Ap").lastName("pellant").build())
         .address(Address.builder().line1("Appellant Line 1").town("Appellant Town").county("Appellant County").postcode("AP9 3LL").build())
         .build();
@@ -211,7 +213,7 @@ public class NotificationServiceTest {
     @Mock
     private Appender<ILoggingEvent> mockAppender;
     @Captor
-    private ArgumentCaptor captorLoggingEvent;
+    private ArgumentCaptor<?> captorLoggingEvent;
 
     @Captor
     private ArgumentCaptor<CcdNotificationWrapper> ccdNotificationWrapperCaptor;
@@ -298,10 +300,9 @@ public class NotificationServiceTest {
         then(factory).should(times(wantedNumberOfFactoryCreateCalls))
             .create(any(NotificationWrapper.class), subscriptionWithTypeCaptor.capture());
         List<SubscriptionType> actualSubscriptionTypes = subscriptionWithTypeCaptor.getAllValues().stream()
-            .map(SubscriptionWithType::getSubscriptionType).collect(Collectors.toList());
+            .map(SubscriptionWithType::getSubscriptionType).toList();
         if (expectedSubscriptionTypes != null) {
-            assertTrue(actualSubscriptionTypes.stream().allMatch(actualSubscriptionType ->
-                List.of(expectedSubscriptionTypes).contains(actualSubscriptionType)));
+            assertTrue(List.of(expectedSubscriptionTypes).containsAll(actualSubscriptionTypes));
         }
 
         then(notificationHandler).should(times(wantedNumberOfEmailNotificationsSent)).sendNotification(
@@ -662,7 +663,7 @@ public class NotificationServiceTest {
                 VALID_APPEAL_CREATED,
                 1,
                 0,
-                0,
+                1,
                 1,
                 Subscription.builder()
                     .tya(APPEAL_NUMBER)
@@ -678,7 +679,7 @@ public class NotificationServiceTest {
                 VALID_APPEAL_CREATED,
                 1,
                 1,
-                0,
+                1,
                 1,
                 Subscription.builder()
                     .tya(APPEAL_NUMBER)
@@ -696,7 +697,7 @@ public class NotificationServiceTest {
                 DRAFT_TO_VALID_APPEAL_CREATED,
                 1,
                 0,
-                0,
+                1,
                 1,
                 Subscription.builder()
                     .tya(APPEAL_NUMBER)
@@ -712,7 +713,7 @@ public class NotificationServiceTest {
                 DRAFT_TO_VALID_APPEAL_CREATED,
                 1,
                 1,
-                0,
+                1,
                 1,
                 Subscription.builder()
                     .tya(APPEAL_NUMBER)
@@ -1133,7 +1134,6 @@ public class NotificationServiceTest {
 
     @Test
     public void doNotSendSmsToGovNotifyWhenSmsTemplateIsBlank() throws Exception {
-        String smsTemplateId = null;
         Notification notification = new Notification(Template.builder().emailTemplateId("abc").smsTemplateId(null).build(), Destination.builder().email("test@testing.com").sms("07823456746").build(), new HashMap<>(), new Reference(), null);
         when(factory.create(ccdNotificationWrapper, getSubscriptionWithType(ccdNotificationWrapper))).thenReturn(notification);
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
@@ -1245,7 +1245,7 @@ public class NotificationServiceTest {
         verify(notificationHandler, never()).sendNotification(any(), any(), any(), any());
         ArgumentCaptor<ZonedDateTime> argument = ArgumentCaptor.forClass(ZonedDateTime.class);
         verify(notificationHandler).scheduleNotification(eq(ccdNotificationWrapper), argument.capture());
-        assertThat(argument.getValue().isBefore(ZonedDateTime.now().plusMinutes(6)), is(true));
+        assertThat(argument.getValue()).isBefore(ZonedDateTime.now().plusMinutes(6));
         verifyNoMoreInteractions(reminderService);
 
         verifyNoErrorsLogged(mockAppender, captorLoggingEvent);
@@ -1412,7 +1412,7 @@ public class NotificationServiceTest {
         SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
 
         final NotificationService notificationService = new NotificationService(factory, reminderService,
-            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false
+            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, false
         );
 
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
@@ -1578,7 +1578,7 @@ public class NotificationServiceTest {
         SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
 
         final NotificationService notificationService = new NotificationService(factory, reminderService,
-            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, true
+            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, true, false
         );
 
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
@@ -1675,7 +1675,7 @@ public class NotificationServiceTest {
         SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
 
         final NotificationService notificationService = new NotificationService(factory, reminderService,
-            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false
+            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, false
         );
 
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
@@ -2134,7 +2134,7 @@ public class NotificationServiceTest {
         SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
 
         final NotificationService notificationService = new NotificationService(factory, reminderService,
-            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false
+            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, false
         );
 
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
@@ -2165,7 +2165,7 @@ public class NotificationServiceTest {
         SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
 
         final NotificationService notificationService = new NotificationService(factory, reminderService,
-            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false
+            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, false
         );
         return notificationService;
     }
@@ -2499,5 +2499,153 @@ public class NotificationServiceTest {
         DynamicList sender = new DynamicList(new DynamicListItem("dwp1", "dwp1"), new ArrayList<>());
         SscsCaseData caseData = SscsCaseData.builder().ccdCaseId("1234").originalSender(sender).build();
         assertTrue(notificationService.isNotificationStillValidToSendSetAsideRequest(caseData, ADJOURNED));
+    }
+
+    @Test
+    public void givenDirectionIssuedForChildSupportWithAppealToProceed_whenCmFeatureEnabled_thenSendSecondNotificationToAppellant() {
+        final SscsCaseData caseData = getSscsCaseDataBuilder(APPELLANT_WITH_ADDRESS, Representative.builder().hasRepresentative("no").build(), null)
+            .appeal(Appeal.builder()
+                .hearingType(AppealHearingType.ORAL.name())
+                .hearingOptions(HearingOptions.builder().wantsToAttend(YES).build())
+                .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
+                .appellant(APPELLANT_WITH_ADDRESS)
+                .rep(Representative.builder().hasRepresentative("no").build())
+                .build())
+            .directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()))
+            .build();
+        final CcdNotificationWrapper wrapper = buildBaseWrapperWithCaseData(caseData, DIRECTION_ISSUED);
+
+        final Notification notification = new Notification(
+            Template.builder().emailTemplateId(EMAIL_TEMPLATE_ID).smsTemplateId(null).build(),
+            Destination.builder().email("test@testing.com").sms(null).build(),
+            new HashMap<>(), new Reference(), null);
+        given(factory.create(ccdNotificationWrapperCaptor.capture(), any())).willReturn(notification);
+
+        final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
+        final NotificationService serviceWithCmEnabled = new NotificationService(factory, reminderService,
+            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, true
+        );
+
+        serviceWithCmEnabled.manageNotificationAndSubscription(wrapper, false);
+
+        then(factory).should(times(2)).create(any(), any());
+        assertThat(ccdNotificationWrapperCaptor.getValue().getNotificationType()).isEqualTo(NOTIFY_APPELLANT_VALID_APPEAL);
+    }
+
+    @Test
+    @Parameters({
+        "false, CHILD_SUPPORT, APPEAL_TO_PROCEED",
+        "true, PIP, APPEAL_TO_PROCEED",
+        "true, PIP, PROVIDE_INFORMATION",
+        "true, CHILD_SUPPORT, PROVIDE_INFORMATION"
+    })
+    public void givenDirectionIssuedWithVariousScenarios_thenSendAppropriateNumberOfNotifications(
+        boolean cmFeatureEnabled, String benefitCode, String directionType) {
+
+        final SscsCaseData.SscsCaseDataBuilder caseDataBuilder = getSscsCaseDataBuilder(
+            APPELLANT_WITH_ADDRESS,
+            Representative.builder().hasRepresentative("no").build(),
+            null);
+
+        if (Benefit.CHILD_SUPPORT.name().equals(benefitCode)) {
+            caseDataBuilder.appeal(Appeal.builder()
+                                         .hearingType(AppealHearingType.ORAL.name())
+                                         .hearingOptions(HearingOptions.builder().wantsToAttend(YES).build())
+                                         .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
+                                         .appellant(APPELLANT_WITH_ADDRESS)
+                                         .rep(Representative.builder().hasRepresentative("no").build())
+                                         .build());
+        }
+
+        final SscsCaseData caseData = caseDataBuilder
+            .directionTypeDl(new DynamicList(DirectionType.valueOf(directionType).toString()))
+            .build();
+
+        final CcdNotificationWrapper wrapper = buildBaseWrapperWithCaseData(caseData, DIRECTION_ISSUED);
+
+        final Notification notification = new Notification(
+            Template.builder().emailTemplateId(EMAIL_TEMPLATE_ID).smsTemplateId(null).build(),
+            Destination.builder().email("test@testing.com").sms(null).build(),
+            new HashMap<>(), new Reference(), null);
+
+        given(factory.create(any(), any())).willReturn(notification);
+
+        final SendNotificationService sendNotificationService = new SendNotificationService(
+            notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
+
+        final NotificationService service = new NotificationService(
+            factory, reminderService, notificationValidService, notificationHandler,
+            outOfHoursCalculator, notificationConfig, sendNotificationService, false, cmFeatureEnabled
+        );
+
+        service.manageNotificationAndSubscription(wrapper, false);
+
+        then(factory).should(times(1)).create(any(), any());
+
+    }
+
+    @Test
+    @Parameters({
+        "ADMIN_SEND_TO_VALID_APPEAL, true",
+        "INTERLOC_VALID_APPEAL, true",
+        "VALID_APPEAL, true",
+        "ADMIN_SEND_TO_VALID_APPEAL, false",
+        "INTERLOC_VALID_APPEAL, false",
+        "VALID_APPEAL, false"
+    })
+    public void givenValidAppealEventNotification_whenCmEnabledOrDisabledAndNotChildSupport_shouldNotSendNotification(
+        final NotificationEventType eventType, boolean cmEnabled) {
+        final SscsCaseData caseData = getSscsCaseDataBuilder(APPELLANT_WITH_ADDRESS, null, null).build();
+        final CcdNotificationWrapper wrapper = buildBaseWrapperWithCaseData(caseData, eventType);
+
+        final SendNotificationService sendNotificationService = new SendNotificationService(
+            notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
+        final NotificationService service = new NotificationService(
+            factory, reminderService, notificationValidService, notificationHandler,
+            outOfHoursCalculator, notificationConfig, sendNotificationService, false, cmEnabled
+        );
+
+        service.manageNotificationAndSubscription(wrapper, false);
+    
+        then(factory).should(never()).create(any(), any());
+    }
+
+    @Test
+    @Parameters({
+        "ADMIN_SEND_TO_VALID_APPEAL",
+        "INTERLOC_VALID_APPEAL",
+        "VALID_APPEAL"
+    })
+    public void givenValidAppealEventNotification_whenCmEnabledAndChildSupport_shouldProceedWithNotification(
+        final NotificationEventType eventType) {
+        final SscsCaseData caseData = getSscsCaseDataBuilder(APPELLANT_WITH_ADDRESS, null, null)
+            .appeal(Appeal.builder()
+                .hearingType(AppealHearingType.ORAL.name())
+                .hearingOptions(HearingOptions.builder().wantsToAttend(YES).build())
+                .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
+                .appellant(APPELLANT_WITH_ADDRESS)
+                .rep(Representative.builder().hasRepresentative("no").build())
+                .build())
+            .build();
+        final CcdNotificationWrapper wrapper = buildBaseWrapperWithCaseData(caseData, eventType);
+
+        final Notification notification = new Notification(
+            Template.builder().emailTemplateId(EMAIL_TEMPLATE_ID).smsTemplateId(null).build(),
+            Destination.builder().email("test@testing.com").sms(null).build(),
+            new HashMap<>(), new Reference(), null);
+        given(factory.create(any(), any())).willReturn(notification);
+        given(notificationValidService.isHearingTypeValidToSendNotification(any(), any())).willReturn(true);
+        given(notificationValidService.isNotificationStillValidToSend(anyList(), any())).willReturn(true);
+
+        final SendNotificationService sendNotificationService = new SendNotificationService(
+            notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
+        final NotificationService service = new NotificationService(
+            factory, reminderService, notificationValidService, notificationHandler,
+            outOfHoursCalculator, notificationConfig, sendNotificationService, false, true
+        );
+
+        service.manageNotificationAndSubscription(wrapper, false);
+
+        then(factory).should(atLeastOnce()).create(any(), any());
     }
 }

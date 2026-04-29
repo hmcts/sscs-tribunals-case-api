@@ -152,6 +152,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DIRECTION_ISSUED_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.EVIDENCE_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.JUDGE_DECISION_APPEAL_TO_PROCEED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.NOTIFY_APPELLANT_VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PERMISSION_TO_APPEAL_REFUSED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.REVIEW_AND_SET_ASIDE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SUBSCRIPTION_CREATED;
@@ -188,6 +189,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AppellantInfoRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DatedRequestOutcome;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
@@ -867,10 +869,13 @@ public class Personalisation<E extends NotificationWrapper> {
             .map(DynamicListItem::getCode)
             .orElse(null);
 
-        if (nonNull(directionType)
-            && (DIRECTION_ISSUED.equals(notificationEventType)
-            || DIRECTION_ISSUED_WELSH.equals(notificationEventType))) {
-            return getSubscriptionTemplateNameWithDirection(notificationEventType, directionType, subscriptionType);
+        if (nonNull(directionType)) {
+            if (DIRECTION_ISSUED.equals(notificationEventType) || DIRECTION_ISSUED_WELSH.equals(notificationEventType)) {
+                return getSubscriptionTemplateNameWithDirection(notificationEventType, directionType, subscriptionType);
+            }
+            if (NOTIFY_APPELLANT_VALID_APPEAL.equals(notificationEventType) && DirectionType.APPEAL_TO_PROCEED.toString().equals(directionType)) {
+                return getSubscriptionTemplateNameWithDirection(notificationEventType, "appealToProceedNotifyValidAppeal", subscriptionType);
+            }
         }
 
         if (EVENTS_WITH_SUBSCRIPTION_TYPE_DOCMOSIS_TEMPLATES.contains(notificationEventType)) {
