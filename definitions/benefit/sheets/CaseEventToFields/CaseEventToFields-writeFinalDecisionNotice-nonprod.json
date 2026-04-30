@@ -87,7 +87,7 @@
     "PageDisplayOrder": 63,
     "PageFieldDisplayOrder": 1,
     "PageID": "severeCriteria",
-    "PageShowCondition": "writeFinalDecisionGenerateNotice=\"DoNotUse\"",
+    "FieldShowCondition": "writeFinalDecisionGenerateNotice=\"DoNotUse\"",
     "ShowSummaryChangeOption": "N",
     "RetainHiddenValue": "Yes"
   },
