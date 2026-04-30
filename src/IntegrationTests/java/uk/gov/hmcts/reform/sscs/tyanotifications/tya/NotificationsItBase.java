@@ -171,7 +171,7 @@ public class NotificationsItBase {
 
         setupNotificationService(sendNotificationService);
 
-        NotificationController controller = new NotificationController(service, authorisationService, ccdService, deserializer, idamService);
+        NotificationController controller = new NotificationController(service, authorisationService, ccdService, deserializer, idamService, false);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         String path = getClass().getClassLoader().getResource("json/ccdResponse.json").getFile();
         json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());

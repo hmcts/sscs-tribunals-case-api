@@ -39,6 +39,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DatedRequestOutcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
@@ -245,17 +246,28 @@ public class CcdNotificationWrapperTest {
     }
 
     private CcdNotificationWrapper buildNotificationWrapperWithOtherParty(NotificationEventType notificationEventType, List<CcdValue<OtherParty>> otherParties) {
+        return buildNotificationWrapperWithOtherPartyBenefitTypeAndFlag(notificationEventType, otherParties, null, false);
+    }
+
+    private CcdNotificationWrapper buildNotificationWrapperWithOtherPartyBenefitTypeAndFlag(
+        NotificationEventType notificationEventType,
+        List<CcdValue<OtherParty>> otherParties,
+        String benefitTypeCode,
+        boolean cmFlag) {
         Appointee appointee = Appointee.builder()
             .name(Name.builder().firstName("Ap").lastName("Pointee").build())
             .address(Address.builder().line1("Appointee Line 1").town("Appointee Town").county("Appointee County").postcode("AP9 0IN").build())
             .build();
+        Appeal.AppealBuilder appealBuilder = Appeal.builder()
+            .hearingType(ORAL)
+            .appellant(Appellant.builder().appointee(appointee).build());
+        if (benefitTypeCode != null) {
+            appealBuilder.benefitType(BenefitType.builder().code(benefitTypeCode).build());
+        }
         return new CcdNotificationWrapper(
             NotificationSscsCaseDataWrapper.builder()
                 .newSscsCaseData(SscsCaseData.builder().otherParties(otherParties)
-                    .appeal(Appeal.builder()
-                        .hearingType(ORAL)
-                        .appellant(Appellant.builder().appointee(appointee).build())
-                        .build())
+                    .appeal(appealBuilder.build())
                     .subscriptions(Subscriptions.builder()
                         .appellantSubscription(
                             Subscription.builder()
@@ -266,8 +278,7 @@ public class CcdNotificationWrapperTest {
                         .build())
                     .build())
                 .notificationEventType(notificationEventType)
-                .build());
-
+                .build(), cmFlag);
     }
 
     private List<CcdValue<OtherParty>> buildOtherPartyData(boolean sendNewOtherPartyNotification, boolean hasAppointee, boolean hasRep) {
@@ -600,6 +611,27 @@ public class CcdNotificationWrapperTest {
             .hasSize(2)
             .extracting(SubscriptionWithType::getPartyId)
             .containsOnly("2", "3");
+    }
+
+    @Test
+    public void givenUpdateOtherPartyDataEventAndCmFlagOnAndChildSupportCase_thenReturnEmptySubscription() {
+        ccdNotificationWrapper = buildNotificationWrapperWithOtherPartyBenefitTypeAndFlag(UPDATE_OTHER_PARTY_DATA, buildOtherPartyData(true, false, false), "childSupport", true);
+        List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getOtherPartySubscriptions(ccdNotificationWrapper.getNewSscsCaseData(), ccdNotificationWrapper.getNotificationType());
+        Assertions.assertThat(subsWithTypeList).isEmpty();
+    }
+
+    @Test
+    public void givenUpdateOtherPartyDataEventAndCmFlagOffAndChildSupportCase_thenReturnSubscription() {
+        ccdNotificationWrapper = buildNotificationWrapperWithOtherPartyBenefitTypeAndFlag(UPDATE_OTHER_PARTY_DATA, buildOtherPartyData(true, false, false), "childSupport", false);
+        List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getOtherPartySubscriptions(ccdNotificationWrapper.getNewSscsCaseData(), ccdNotificationWrapper.getNotificationType());
+        Assertions.assertThat(subsWithTypeList).hasSize(1);
+    }
+
+    @Test
+    public void givenUpdateOtherPartyDataEventAndCmFlagOnAndNonChildSupportCase_thenReturnSubscription() {
+        ccdNotificationWrapper = buildNotificationWrapperWithOtherPartyBenefitTypeAndFlag(UPDATE_OTHER_PARTY_DATA, buildOtherPartyData(true, false, false), "PIP", true);
+        List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getOtherPartySubscriptions(ccdNotificationWrapper.getNewSscsCaseData(), ccdNotificationWrapper.getNotificationType());
+        Assertions.assertThat(subsWithTypeList).hasSize(1);
     }
 
     @Test
