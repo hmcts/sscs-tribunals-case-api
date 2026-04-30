@@ -13,7 +13,7 @@ test.describe('CM validate appeal', () => {
   for (const role of roles) {
     test(
       `${role} validates an incomplete Child Support appeal and moves it to Await Other Party Data`,
-      { tag: ['@nightly-pipeline-cm', '@confidentiality'] },
+      { tag: ['@nightly-pipeline', '@confidentiality'] },
       async ({ validateAppealSteps }) => {
         const caseId = await createChildSupportCaseForPreValidConfidentiality();
         await validateAppealSteps.validateChildSupportIncompleteAppeal(

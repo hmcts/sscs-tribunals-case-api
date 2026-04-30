@@ -11,7 +11,7 @@ test.describe('CM confidentiality send to interloc pre-valid', () => {
 
     test(
       `Send to interloc - pre-valid shows confidentiality reasons for CHILDSUPPORT appeal as caseworker`,
-      { tag: ['@nightly-pipeline-cm', '@confidentiality'] },
+      { tag: ['@nightly-pipeline', '@confidentiality'] },
       async ({ sendToInterlocSteps }) => {
         test.slow();
 

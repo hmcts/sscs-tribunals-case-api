@@ -15,7 +15,7 @@ test.describe('CM confidentiality send to interloc', () => {
   for (const appealType of appealTypes) {
       test(
         `Select Review by TCW shows confidentiality reasons for confidential ${appealType} appeal as Caseworker`,
-        { tag: ['@nightly-pipeline-cm', '@confidentiality'] },
+        { tag: ['@nightly-pipeline', '@confidentiality'] },
         async ({
           enhancedConfidentialitySteps,
           sendToInterlocSteps,
