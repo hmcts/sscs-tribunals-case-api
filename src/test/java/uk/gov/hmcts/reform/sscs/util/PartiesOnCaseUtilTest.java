@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
@@ -181,6 +182,46 @@ class PartiesOnCaseUtilTest {
             Arguments.of(true, 2, true),
             Arguments.of(false, 1, false)
         );
+    }
+
+    @Test
+    void shouldPreserveExistingSelectedConfidentialityPartyWhenValueStillExists() {
+        final DynamicListItem existingValue = new DynamicListItem("representative", "Representative");
+        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative("yes").build());
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(new DynamicList(existingValue, new ArrayList<>()));
+
+        DynamicList dropdown = PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown(sscsCaseData);
+
+        assertThat(dropdown.getValue().getCode()).isEqualTo("representative");
+    }
+
+    @Test
+    void shouldReturnBlankSelectedValueWhenNoExistingSelectedConfidentialityParty() {
+        final DynamicList dropdown = PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown(sscsCaseData);
+
+        assertThat(dropdown.getValue().getCode()).isEmpty();
+        assertThat(dropdown.getListItems()).isNotEmpty();
+    }
+
+    @Test
+    void shouldReturnBlankWhenExistingSelectionHasNullCode() {
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
+                new DynamicList(new DynamicListItem(null, "Appellant"), null));
+
+        final DynamicList dropdown = PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown(sscsCaseData);
+
+        assertThat(dropdown.getValue().getCode()).isEmpty();
+    }
+
+    @Test
+    void shouldReturnBlankWhenExistingSelectionCodeIsNoLongerInPartyList() {
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
+                new DynamicList(new DynamicListItem("staleOtherParty999", "Removed Party"), null));
+
+        final DynamicList dropdown = PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown(sscsCaseData);
+
+        assertThat(dropdown.getValue().getCode()).isEmpty();
+        assertThat(dropdown.getListItems()).isNotEmpty();
     }
 
     private void setupOtherParties() {

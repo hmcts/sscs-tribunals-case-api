@@ -433,7 +433,6 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
     @Test
     public void shouldResetPanelComposition() {
-        handler = new HmctsResponseReviewedAboutToSubmitHandler(dwpDocumentService, panelCompService, addNoteService);
         var panelComposition = new PanelMemberComposition(List.of("84"));
         when(panelCompService.resetPanelCompositionIfStale(sscsCaseData, Optional.of(caseDetailsBefore)))
                 .thenReturn(panelComposition);

@@ -1,16 +1,14 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 
 import static java.time.LocalDateTime.now;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.PIP;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_SEND_TO_INTERLOC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
@@ -32,21 +30,25 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReissueArtifactUi;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.PostponementRequestService;
 
 @ExtendWith(MockitoExtension.class)
-public class ValidSendToInterlocAboutToSubmitHandlerTest {
+class ValidSendToInterlocAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
@@ -62,7 +64,7 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
     private ValidSendToInterlocAboutToSubmitHandler handler;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().build())
                 .selectWhoReviewsCase(
                         new DynamicList(new DynamicListItem("reviewByTcw", "Review by TCW"), null))
@@ -71,26 +73,26 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
         caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
         callback = new Callback<>(caseDetails, Optional.of(caseDetails), VALID_SEND_TO_INTERLOC, false);
 
-        handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService);
+        handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService, false);
     }
 
     @ParameterizedTest
     @CsvSource({"APPEAL_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
-    public void givenANonHandleEvidenceEvent_thenReturnFalse(EventType eventType) {
+    void givenANonHandleEvidenceEvent_thenReturnFalse(EventType eventType) {
         callback = new Callback<>(caseDetails, Optional.of(caseDetails), eventType, false);
 
-        assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
+        assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
 
     @ParameterizedTest
     @CsvSource({"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
-    public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
-        assertFalse(handler.canHandle(callbackType, callback));
+    void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
+        assertThat(handler.canHandle(callbackType, callback)).isFalse();
     }
 
     @ParameterizedTest
     @CsvSource({"REVIEW_BY_TCW", "REVIEW_BY_JUDGE"})
-    public void setsEvidenceHandledFlagToNoForDocumentSelected(SelectWhoReviewsCase selectWhoReviewsCase) {
+    void setsEvidenceHandledFlagToNoForDocumentSelected(SelectWhoReviewsCase selectWhoReviewsCase) {
         sscsCaseData = sscsCaseData.toBuilder()
                 .selectWhoReviewsCase(new DynamicList(
                         new DynamicListItem(selectWhoReviewsCase.getId(), selectWhoReviewsCase.getLabel()),
@@ -103,64 +105,72 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
                         .reissueFurtherEvidenceDocument(new DynamicList(new DynamicListItem(selectWhoReviewsCase.getId(),
                                 selectWhoReviewsCase.getLabel()), null)).build())
                 .build();
+        caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), VALID_SEND_TO_INTERLOC, false);
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(Collections.EMPTY_SET, response.getErrors());
-        assertEquals(LocalDate.now(), response.getData().getInterlocReferralDate());
-        assertNull(response.getData().getSelectWhoReviewsCase());
-        assertNull(response.getData().getDirectionDueDate());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getInterlocReferralDate()).isEqualTo(LocalDate.now());
+        assertThat(response.getData().getSelectWhoReviewsCase()).isNull();
+        assertThat(response.getData().getDirectionDueDate()).isNull();
+        assertThat(response.getData().getInterlocReviewState()).isNotNull()
+            .extracting(InterlocReviewState::getCcdDefinition)
+            .isEqualTo(selectWhoReviewsCase.getId());
         verify(addNoteService).addNote(eq(USER_AUTHORISATION), eq(response.getData()), eq(null));
     }
 
 
     @Test
-    public void givenPostponementRequestInterlocSendToTcw_thenReturnWarningMessageAboutPostponingHearing() {
+    void givenPostponementRequestInterlocSendToTcw_thenReturnWarningMessageAboutPostponingHearing() {
         var caseData = setupDataForPostponementRequestInterlocSendToTcw(PartyItemList.APPELLANT);
-        var caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, caseData, now(), "Benefit");
+        caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, caseData, now(), "Benefit");
         callback = new Callback<>(caseDetails, Optional.of(caseDetails), VALID_SEND_TO_INTERLOC, false);
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getWarnings().size(), is(1));
-        assertThat(response.getWarnings().iterator().next(),
-                is("Are you sure you want to postpone the hearing?"));
+        assertThat(response.getWarnings()).hasSize(1);
+        assertThat(response.getWarnings().iterator().next()).isEqualTo("Are you sure you want to postpone the hearing?");
     }
 
     @ParameterizedTest
     @CsvSource({"APPELLANT", "REPRESENTATIVE", "JOINT_PARTY"})
-    public void givenPostponementRequestInterlocSendToTcw_setsEvidenceHandledFlagToNoForDocumentSelected(
+    void givenPostponementRequestInterlocSendToTcw_setsEvidenceHandledFlagToNoForDocumentSelected(
             PartyItemList originalSenderParty) {
         var caseData = setupDataForPostponementRequestInterlocSendToTcw(originalSenderParty);
         caseData.setTempNoteDetail("Test Note");
-        var caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, caseData, now(), "Benefit");
+        caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, caseData, now(), "Benefit");
         callback = new Callback<>(caseDetails, Optional.of(caseDetails), VALID_SEND_TO_INTERLOC, true);
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(Collections.EMPTY_SET, response.getErrors());
-        assertEquals(LocalDate.now(), response.getData().getInterlocReferralDate());
-        assertNull(response.getData().getSelectWhoReviewsCase());
-        assertNull(response.getData().getDirectionDueDate());
+        final UploadParty expectedUploadParty = originalSenderParty == PartyItemList.REPRESENTATIVE
+            ? UploadParty.REP
+            : UploadParty.fromValue(originalSenderParty.getCode());
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getInterlocReferralDate()).isEqualTo(LocalDate.now());
+        assertThat(response.getData().getSelectWhoReviewsCase()).isNull();
+        assertThat(response.getData().getDirectionDueDate()).isNull();
+        verify(postponementRequestService).processPostponementRequest(any(), eq(expectedUploadParty), eq(Optional.empty()));
         verify(addNoteService).addNote(eq(USER_AUTHORISATION), eq(response.getData()), eq("Test Note"));
     }
 
     @ParameterizedTest
     @CsvSource({"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
-    public void returnAnErrorIfNoSelectWhoReviewsCaseSelected(EventType eventType) {
+    void returnAnErrorIfNoSelectWhoReviewsCaseSelected(EventType eventType) {
         sscsCaseData = sscsCaseData.toBuilder().selectWhoReviewsCase(null).build();
         caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
         callback = new Callback<>(caseDetails, Optional.of(caseDetails), eventType, true);
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(1, response.getErrors().size());
-        assertTrue(response.getErrors().contains("Must select who reviews the appeal."));
+        assertThat(response.getErrors()).hasSize(1).contains("Must select who reviews the appeal.");
     }
 
     @ParameterizedTest
     @CsvSource({"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
-    public void givenPostponementRequestInterlocSendToTcw_returnAnErrorIfNoOriginalSenderSelected(EventType eventType) {
+    void givenPostponementRequestInterlocSendToTcw_returnAnErrorIfNoOriginalSenderSelected(EventType eventType) {
         sscsCaseData = sscsCaseData.toBuilder().selectWhoReviewsCase(new DynamicList(
                         new DynamicListItem(POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId(),
                                 POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getLabel()),
@@ -175,21 +185,125 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(1, response.getErrors().size());
-        assertTrue(response.getErrors().contains("Must select original sender"));
+        assertThat(response.getErrors()).hasSize(1).contains("Must select original sender");
     }
 
     @Test
-    public void throwsExceptionIfItCannotHandleTheAppeal() {
+    void givenSelectWhoReviewsCaseWithNullValue_thenReturnError() {
+        sscsCaseData = sscsCaseData.toBuilder()
+            .selectWhoReviewsCase(new DynamicList(null, null))
+            .build();
+        caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), VALID_SEND_TO_INTERLOC, false);
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).hasSize(1).contains("Must select who reviews the appeal.");
+    }
+
+    @Test
+    void givenSelectWhoReviewsCaseWithBlankCode_thenReturnError() {
+        sscsCaseData = sscsCaseData.toBuilder()
+            .selectWhoReviewsCase(new DynamicList(new DynamicListItem("", "label"), null))
+            .build();
+        caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), VALID_SEND_TO_INTERLOC, false);
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).hasSize(1).contains("Must select who reviews the appeal.");
+    }
+
+    @Test
+    void givenCmConfidentialityEnabledAndConfidentialityReferralAndMissingSelectedParty_thenReturnError() {
+        handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService, true);
+        sscsCaseData = sscsCaseData.toBuilder()
+            .interlocReferralReason(InterlocReferralReason.CONFIDENTIALITY)
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code(CHILD_SUPPORT.getShortName()).build()).build())
+            .build();
+        caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), VALID_SEND_TO_INTERLOC, false);
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).hasSize(1).contains("Must select party");
+    }
+
+    @Test
+    void givenCmConfidentialityEnabledAndConfidentialityReferralAndUnsupportedBenefitType_thenDoNotReturnError() {
+        handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService, true);
+        sscsCaseData = sscsCaseData.toBuilder()
+                                   .interlocReferralReason(InterlocReferralReason.CONFIDENTIALITY)
+                                   .appeal(Appeal.builder().benefitType(BenefitType.builder().code(PIP.getShortName()).build()).build())
+                                   .build();
+        caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), VALID_SEND_TO_INTERLOC, false);
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void givenCmConfidentialityEnabledAndNotConfidentialityReferal_thenDoNotReturnError() {
+        handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService, true);
+        sscsCaseData = sscsCaseData.toBuilder()
+                                   .interlocReferralReason(InterlocReferralReason.NO_MRN)
+                                   .appeal(Appeal.builder().benefitType(BenefitType.builder().code(CHILD_SUPPORT.getShortName()).build()).build())
+                                   .build();
+        caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), VALID_SEND_TO_INTERLOC, false);
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void givenCmConfidentialityEnabledAndConfidentialityReferralAndPartySelected_thenSucceed() {
+        handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService, true);
+        sscsCaseData = sscsCaseData.toBuilder()
+            .interlocReferralReason(InterlocReferralReason.CONFIDENTIALITY)
+            .build();
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
+            new DynamicList(new DynamicListItem("appellant", "Appellant"), null)
+        );
+        caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), VALID_SEND_TO_INTERLOC, false);
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getInterlocReferralDate()).isEqualTo(LocalDate.now());
+    }
+
+    @Test
+    void givenCmConfidentialityEnabledAndNonConfidentialityReferral_thenNoPartyCheckRequired() {
+        handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService, true);
+        sscsCaseData = sscsCaseData.toBuilder()
+            .interlocReferralReason(InterlocReferralReason.COMPLEX_CASE)
+            .build();
+        caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), VALID_SEND_TO_INTERLOC, false);
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getInterlocReferralDate()).isEqualTo(LocalDate.now());
+    }
+
+    @Test
+    void throwsExceptionIfItCannotHandleTheAppeal() {
         callback = new Callback<>(caseDetails, Optional.of(caseDetails), APPEAL_RECEIVED, false);
 
-        assertThrows(IllegalStateException.class, () -> handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION));
+        assertThatThrownBy(() -> handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION))
+                .isInstanceOf(IllegalStateException.class);
     }
 
     private SscsCaseData setupDataForPostponementRequestInterlocSendToTcw(
             PartyItemList originalSenderParty) {
-        DynamicListItem value = new DynamicListItem(originalSenderParty.getCode(), originalSenderParty.getLabel());
-        DynamicList originalSender = new DynamicList(value, Collections.singletonList(value));
+        final DynamicListItem value = new DynamicListItem(originalSenderParty.getCode(), originalSenderParty.getLabel());
+        final DynamicList originalSender = new DynamicList(value, Collections.singletonList(value));
 
         return SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().build())
                 .selectWhoReviewsCase(
