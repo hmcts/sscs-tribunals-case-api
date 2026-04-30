@@ -6,6 +6,10 @@ import pipPayloadWelsh from '../../../data/payload/create-appeal/pip_sya_welsh.j
 import ucPayload from '../../../data/payload/create-appeal/uc_sya.json';
 import esaPayload from '../../../data/payload/create-appeal/esa_sya.json';
 import childSupportPayload from '../../../data/payload/create-appeal/child_support_sya.json';
+import childSupportCmConfidentialityPayload from '../../../data/payload/create-appeal/child_support_cm_confidentiality.json';
+import childSupportPreValidConfidentialityPayload from '../../../data/payload/create-appeal/child_support_prevalid_confidentiality.json';
+import childSupportInterlocReviewValidationPayload from '../../../data/payload/create-appeal/child_support_interloc_review_validation.json';
+import ucPreValidConfidentialityPayload from '../../../data/payload/create-appeal/uc_prevalid_confidentiality.json';
 import taxCreditPayload from '../../../data/payload/create-appeal/tax_credit_sya.json';
 import pipSandLPayload from '../../../data/payload/create-appeal/pip_sandl_sya.json';
 import dlaSandLPayload from '../../../data/payload/create-appeal/dla_sandl_sya.json';
@@ -75,6 +79,59 @@ async function createCaseBasedOnCaseType(caseType: string) {
   const respHeaders = response.headers();
   const locationUrl: string = respHeaders.location;
   return locationUrl.substring(locationUrl.lastIndexOf('/') + 1);
+}
+
+async function createCaseFromPayload(dataPayload: any, incompleteOrNonCompliant: boolean = false) {
+  const apiContext = await request.newContext({
+    baseURL: urls.tribunalsApiUri
+  });
+
+  const apiUrl = incompleteOrNonCompliant
+    ? `${urls.tribunalsApiUri}/appeals`
+    : `${urls.tribunalsApiUri}/api/appeals`;
+
+  const headers = { 'Content-Type': 'application/json' };
+  const s2sResponse = await apiContext.post(`${urls.s2sUrl}/testing-support/lease`, {
+    data: { microservice: 'sscs' }
+  });
+
+  headers['ServiceAuthorization'] = await s2sResponse.text();
+  const response = await apiContext.post(apiUrl, {
+    headers,
+    data: dataPayload
+  });
+  const respHeaders = response.headers();
+  const locationUrl: string = respHeaders.location;
+  return locationUrl.substring(locationUrl.lastIndexOf('/') + 1);
+}
+
+function clonePayload(payload: any) {
+  return JSON.parse(JSON.stringify(payload));
+}
+
+export async function createChildSupportCaseForCmConfidentiality() {
+  const payload = clonePayload(childSupportCmConfidentialityPayload);
+  payload.appellant.nino = StringUtilsComponent.getRandomNINumber();
+
+  return createCaseFromPayload(payload);
+}
+
+export async function createChildSupportCaseForPreValidConfidentiality() {
+  return createCaseFromPayload(
+    childSupportPreValidConfidentialityPayload,
+    true
+  );
+}
+
+export async function createChildSupportCaseForInterlocReviewValidation() {
+  const payload = clonePayload(childSupportInterlocReviewValidationPayload);
+  payload.appellant.nino = StringUtilsComponent.getRandomNINumber();
+
+  return createCaseFromPayload(payload, true);
+}
+
+export async function createUcCaseForPreValidConfidentiality() {
+  return createCaseFromPayload(ucPreValidConfidentialityPayload, true);
 }
 
 export default createCaseBasedOnCaseType;

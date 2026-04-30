@@ -12,11 +12,12 @@
   "ucIssueCode": "WC",
   "dlaIssueCode": "EI",
   "sccIssueCode": "SV",
+  "childSupportIssueCode": "CP",
+  "childSupportEditedEvidenceReason": "Confidentiality",
+  "childSupportFtaState": "Appeal registered (FTA)",
   "ucDisputeOption": "No",
   "ucJointPartyOnCase": "No",
   "ucJointPartyOnCase_Yes": "Yes",
-
   "elementDisputedForChildElementIssueCodes": "ChildElement",
   "elementDisputedForLimitedWorkIssueCodes": "LimitedWork"
-
 }

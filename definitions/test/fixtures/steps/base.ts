@@ -253,6 +253,7 @@ export abstract class BaseStep {
   ) {
     await this.loginPage.goToLoginPage();
     await this.loginPage.verifySuccessfulLoginForUser(user, clearCacheFlag);
+    await this.homePage.selectToViewTasksAndCasesIfRequired();
     await this.loginPage.goToCase(caseId);
   }
 

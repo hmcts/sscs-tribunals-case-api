@@ -76,7 +76,9 @@ def secrets = [
                 secret('test-e2e-ctsc-team-leader-nw-liverpool-username', 'TEST_CTSC_TEAM_LEADER_NW_LIVERPOOL_USERNAME'),
                 secret('test-e2e-ctsc-team-leader-nw-liverpool-password', 'TEST_CTSC_TEAM_LEADER_NW_LIVERPOOL_PASSWORD'),
                 secret('test-e2e-ctsc-admin-nw-liverpool-username', 'TEST_CTSC_ADMIN_NW_LIVERPOOL_USERNAME'),
-                secret('test-e2e-ctsc-admin-nw-liverpool-password', 'TEST_CTSC_ADMIN_NW_LIVERPOOL_PASSWORD')
+                secret('test-e2e-ctsc-admin-nw-liverpool-password', 'TEST_CTSC_ADMIN_NW_LIVERPOOL_PASSWORD'),
+                secret('test-e2e-legal-officer-username', 'TEST_LEGAL_OFFICER_USERNAME'),
+                secret('test-e2e-legal-officer-password', 'TEST_LEGAL_OFFICER_PASSWORD')
         ],
         's2s-${env}' : [
                 secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
@@ -254,7 +256,7 @@ def setPreviewEnvVars() {
     env.CASE_DOCUMENT_AM_URL = "https://ccd-case-document-am-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.EM_STITCHING_API_URL = "https://em-stitching-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.ENVIRONMENT = "pr"
-    env.CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED = true
+    env.CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED = false
 }
 
 def runE2eTests() {
