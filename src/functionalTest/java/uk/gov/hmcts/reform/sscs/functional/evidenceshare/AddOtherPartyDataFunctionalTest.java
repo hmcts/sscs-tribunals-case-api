@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
@@ -26,6 +27,8 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
     private static final String ADDRESS_LINE_1 = "3 XX Road";
     private static final String TOWN = "Town Test";
     private static final String ADD_OTHER_PARTY = "add other party";
+    private static final String LINE_1 = "first line";
+    private static final String COUNTY = "Derbyshire";
 
     @Autowired
     private IdamService idamService;
@@ -38,7 +41,8 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
     @EnabledIfEnvironmentVariable(named = "CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED", matches = "true")
     void shouldTransitionToCorrectStateWhenOtherPartyDataAddedToCase() {
 
-        final SscsCaseDetails caseWithState = createCaseFromEvent(Benefit.CHILD_SUPPORT, VALID_APPEAL_CREATED);
+        final SscsCaseDetails caseWithState = createCaseFromEvent(Benefit.CHILD_SUPPORT, VALID_APPEAL_CREATED,
+            this::addMinimalCaseData);
 
         defaultAwait().untilAsserted(() -> {
             var caseDetails = findCaseById(ccdCaseId);
@@ -77,5 +81,18 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
     private OtherParty buildOtherParty() {
         return OtherParty.builder().name(Name.builder().title("Miss").firstName("Bella").lastName("Kiki").build())
             .address(Address.builder().postcode(POSTCODE).line1(ADDRESS_LINE_1).town(TOWN).build()).build();
+    }
+
+    private void addMinimalCaseData(SscsCaseData data) {
+        data
+            .getAppeal()
+            .getAppellant()
+            .setAddress(Address.builder().line1(LINE_1).town(TOWN).county(COUNTY).postcode(POSTCODE).build());
+        data
+            .getAppeal()
+            .getRep()
+            .setAddress(Address.builder().line1(LINE_1).town(TOWN).county(COUNTY).postcode(POSTCODE).build());
+        data.getAppeal().getAppellant().getIdentity().setNino(getRandomNino());
+        data.setEvidencePresent("Yes");
     }
 }
