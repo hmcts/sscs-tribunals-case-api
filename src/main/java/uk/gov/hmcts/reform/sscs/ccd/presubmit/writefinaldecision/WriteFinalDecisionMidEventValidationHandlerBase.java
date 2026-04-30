@@ -86,7 +86,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
             preSubmitCallbackResponse.addWarning("Appellant is deceased. Copy the draft decision and amend offline, then upload the offline version.");
         }
 
-        if (isSevereConditionsEnabled && hasSvIssueCode(sscsCaseData) && isDecisionNoticeDateAfterSvIssueCodeEffectiveDate(sscsCaseData)) {
+        if (isSevereConditionsEnabled && hasSvIssueCode(sscsCaseData) && !isDecisionNoticeDateAfterSvIssueCodeEffectiveDate(sscsCaseData)) {
             preSubmitCallbackResponse.addError("You cannot write decision notice until resolved. Please ask admin to amend issue code to WC or SG and then proceed.");
         }
 
