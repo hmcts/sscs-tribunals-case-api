@@ -125,6 +125,27 @@ class PartiesOnCaseUtilTest {
     }
 
     @Test
+    void shouldExcludeRepresentativeOptionsFromSelectedConfidentialityPartyDropdown() {
+        sscsCaseData.getAppeal().setRep(Representative.builder().id("main-rep").hasRepresentative(YES.getValue()).build());
+        OtherParty otherParty = OtherParty.builder()
+            .id("1")
+            .name(Name.builder().firstName("Bo").lastName("Surname").build())
+            .rep(Representative.builder()
+                .id("2")
+                .hasRepresentative(YES.getValue())
+                .name(Name.builder().firstName("Harry").lastName("Rep").build())
+                .build())
+            .build();
+        sscsCaseData.setOtherParties(List.of(new CcdValue<>(otherParty)));
+
+        DynamicList response = PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown(sscsCaseData);
+
+        assertThat(response.getListItems()).extracting(DynamicListItem::getCode)
+            .contains(PartyItemList.APPELLANT.getCode(), PartyItemList.OTHER_PARTY.getCode() + "1")
+            .doesNotContain(PartyItemList.REPRESENTATIVE.getCode(), PartyItemList.OTHER_PARTY_REPRESENTATIVE.getCode() + "2");
+    }
+
+    @Test
     void willGetOtherPartyAndRepOnChildSupportAppeal() {
 
         OtherParty otherParty = OtherParty.builder()
