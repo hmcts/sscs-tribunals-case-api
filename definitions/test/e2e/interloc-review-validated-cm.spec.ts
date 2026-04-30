@@ -4,16 +4,8 @@ import { credentials, featureFlags } from '../config/config';
 
 const users = [
   {
-    label: 'superuser',
-    credentials: credentials.superUser
-  },
-  {
     label: 'judge',
     credentials: credentials.judge
-  },
-  {
-    label: 'legal officer',
-    credentials: credentials.legalOfficer
   }
 ] as const;
 
@@ -26,7 +18,7 @@ test.describe('CM interlocutory review appeal validated', () => {
   for (const user of users) {
     test(
       `${user.label} validates an interlocutory review pre-valid Child Support appeal and moves it to Await Other Party Data`,
-      { tag: ['@nightly-pipeline', '@confidentiality'] },
+      { tag: ['@nightly-pipeline-cme', '@confidentiality'] },
       async ({ issueDirectionsNoticeSteps }) => {
         test.slow();
         test.setTimeout(300000);

@@ -10,7 +10,7 @@ test.describe('CM child support confidentiality confirmation', () => {
 
   test(
     'FTA user completes the Child Support confidentiality workflow and moves the appeal to With FTA',
-    { tag: ['@nightly-pipeline', '@confidentiality'] },
+    { tag: ['@nightly-pipeline-cm', '@confidentiality'] },
     async ({ updateOtherPartyDataSteps }) => {
       test.slow();
       test.setTimeout(360000);

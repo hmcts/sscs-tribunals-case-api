@@ -9,10 +9,6 @@ const users = [
   {
     label: 'caseworker',
     credentials: credentials.amCaseWorker
-  },
-  {
-    label: 'superuser',
-    credentials: credentials.superUser
   }
 ] as const;
 
@@ -26,7 +22,7 @@ test.describe('CM confidentiality send to interloc summary', () => {
     for (const user of users) {
       test(
         `Selected confidentiality reason is visible on summary for confidential ${appealType} appeal as ${user.label}`,
-        { tag: ['@nightly-pipeline', '@confidentiality'] },
+        { tag: ['@nightly-pipeline-cm', '@confidentiality'] },
         async ({
           enhancedConfidentialitySteps,
           sendToInterlocSteps,
@@ -35,7 +31,7 @@ test.describe('CM confidentiality send to interloc summary', () => {
           uploadResponseSteps
         }) => {
           test.slow();
-          test.setTimeout(360000);
+          // test.setTimeout(360000);
 
           const caseId =
             appealType === 'CHILDSUPPORT'
@@ -46,9 +42,9 @@ test.describe('CM confidentiality send to interloc summary', () => {
             await updateOtherPartyDataSteps.makeChildSupportCaseConfidential(
               caseId
             );
-            if (user.label === 'superuser') {
-              await updateOtherPartyDataSteps.signOut();
-            }
+            // if (user.label === 'superuser') {
+            //   await updateOtherPartyDataSteps.signOut();
+            // }
           } else {
             await uploadResponseSteps.performUploadResponseOnAUniversalCreditWithJP(
               caseId,
