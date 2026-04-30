@@ -14,7 +14,7 @@ class DormantCaseFunctionalTest extends AbstractFunctionalTest {
     @Test
     void otherDetailsChangedTest() throws Exception {
         SscsCaseDetails createdCase = createCaseWithState(CREATE_TEST_CASE, "Child Support",
-            "Child Support", State.VALID_APPEAL.getId());
+            "Child Support", State.VALID_APPEAL.getId(), null);
         updateCaseEvent(DORMANT, createdCase);
 
         String json = getJson(UPDATE_OTHER_PARTY_DATA.getCcdType());
