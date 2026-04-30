@@ -94,5 +94,16 @@
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent",
     "PageID": "1.0",
     "Publish": "N"
+  },
+  {
+    "LiveFrom": "16/03/2026",
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "appeal",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "FieldShowCondition": "otherParties=\"DoNotShow\"",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "1.0"
   }
 ]
