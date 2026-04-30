@@ -92,7 +92,7 @@ public class PartiesOnCaseUtil {
     }
 
     public static DynamicList getSelectedConfidentialityPartyDropdown(SscsCaseData sscsCaseData) {
-        List<DynamicListItem> listOptions = getPartiesOnCase(sscsCaseData);
+        List<DynamicListItem> listOptions = getPartiesOnCaseForConfidentiality(sscsCaseData);
 
         DynamicList existingSelectedConfidentialityParty = sscsCaseData.getExtendedSscsCaseData().getSelectedConfidentialityParty();
         DynamicListItem existingValue = existingSelectedConfidentialityParty != null
@@ -106,6 +106,17 @@ public class PartiesOnCaseUtil {
         }
 
         return new DynamicList(new DynamicListItem("", ""), listOptions);
+    }
+
+    private static List<DynamicListItem> getPartiesOnCaseForConfidentiality(SscsCaseData sscsCaseData) {
+        List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions.add(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
+
+        if (isNotEmpty(sscsCaseData.getOtherParties())) {
+            addOtherPartiesToListOptions(sscsCaseData, listOptions, false);
+        }
+
+        return listOptions;
     }
 
     public static List<String> getAllOtherPartiesOnCase(SscsCaseData sscsCaseData) {
