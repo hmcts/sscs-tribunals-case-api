@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_SEND_TO_INTERLOC;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.CONFIDENTIALITY;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty.REP;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.REPRESENTATIVE;
 
@@ -18,8 +19,8 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
@@ -88,6 +89,7 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
             postponementRequestService.processPostponementRequest(sscsCaseData, uploadParty, Optional.empty());
         } else {
             if (cmConfidentialityEnabled
+                && sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT)
                 && isConfidentialityReferral(sscsCaseData)
                 && isSelectionMissing(sscsCaseData.getExtendedSscsCaseData().getSelectedConfidentialityParty())) {
                 preSubmitCallbackResponse.addError("Must select party");
@@ -113,7 +115,7 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
     }
 
     private boolean isConfidentialityReferral(SscsCaseData sscsCaseData) {
-        return InterlocReferralReason.CONFIDENTIALITY.equals(sscsCaseData.getInterlocReferralReason());
+        return CONFIDENTIALITY.equals(sscsCaseData.getInterlocReferralReason());
     }
 
     private UploadParty getUploadParty(DynamicList selectedParty) {
