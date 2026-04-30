@@ -290,13 +290,14 @@ public class CcdNotificationWrapper implements NotificationWrapper {
     }
 
     private boolean isNotificationEventValidToSendToOtherPartySubscription(Subscription subscription, boolean isSendNewOtherPartyNotification, SscsCaseData newSscsCaseData, NotificationEventType notificationEventType, String partyMember) {
+        boolean isSuppressedForConfidentiality = cmOtherPartyConfidentialityEnabled
+            && newSscsCaseData.getAppeal() != null
+            && OtherPartyDataUtil.isValidBenefitTypeForConfidentiality(newSscsCaseData.getAppeal().getBenefitType());
         boolean isValid = isValidSubscriptionOrIsMandatoryLetter(subscription, responseWrapper.getNotificationEventType())
             && (EVENTS_VALID_FOR_ALL_ENTITIES.contains(notificationEventType)
             || EVENTS_VALID_FOR_OTHER_PARTY.contains(notificationEventType)
             || (UPDATE_OTHER_PARTY_DATA.equals(notificationEventType) && isSendNewOtherPartyNotification
-                && !(cmOtherPartyConfidentialityEnabled
-                    && newSscsCaseData.getAppeal() != null
-                    && OtherPartyDataUtil.isValidBenefitTypeForConfidentiality(newSscsCaseData.getAppeal().getBenefitType()))));
+                && !isSuppressedForConfidentiality));
         return canSendBasedOnConfidentiality(newSscsCaseData, notificationEventType, partyMember) && isValid;
     }
 
