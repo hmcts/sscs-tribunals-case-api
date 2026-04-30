@@ -21,7 +21,7 @@ export class SendToInterloc extends BaseStep {
     await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
     await this.homePage.chooseEvent('Send to interloc');
 
-    let sendToInterlocPage = new SendToInterlocPage(this.page);
+    const sendToInterlocPage = new SendToInterlocPage(this.page);
     await sendToInterlocPage.verifyPageContent();
     await sendToInterlocPage.selectHearingType(
       sendToInterlocData.sendToInterlocHearingSelectValue
@@ -58,7 +58,7 @@ export class SendToInterloc extends BaseStep {
     );
     await this.homePage.chooseEvent('Send to interloc');
 
-    let sendToInterlocPage = new SendToInterlocPage(this.page);
+    const sendToInterlocPage = new SendToInterlocPage(this.page);
     await sendToInterlocPage.verifyPageContent();
     await sendToInterlocPage.selectHearingType(
       sendToInterlocData.sendToInterlocHearingSelectValue
@@ -91,7 +91,7 @@ export class SendToInterloc extends BaseStep {
     await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
     await this.homePage.chooseEvent('Send to interloc');
 
-    let sendToInterlocPage = new SendToInterlocPage(this.page);
+    const sendToInterlocPage = new SendToInterlocPage(this.page);
     await sendToInterlocPage.verifyPageContent();
     await sendToInterlocPage.selectHearingType(
       sendToInterlocData.sendToInterlocHearingSelectValue
@@ -124,7 +124,7 @@ export class SendToInterloc extends BaseStep {
     await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
     await this.homePage.chooseEvent('Send to interloc');
 
-    let sendToInterlocPage = new SendToInterlocPage(this.page);
+    const sendToInterlocPage = new SendToInterlocPage(this.page);
     await sendToInterlocPage.verifyPageContent();
     await sendToInterlocPage.selectHearingType(
       sendToInterlocData.sendToInterlocHearingSelectValue
@@ -157,7 +157,7 @@ export class SendToInterloc extends BaseStep {
     await this.loginUserWithCaseId(user, true, caseId);
     await this.homePage.chooseEvent('Send to interloc');
 
-    let sendToInterlocPage = new SendToInterlocPage(this.page);
+    const sendToInterlocPage = new SendToInterlocPage(this.page);
     await sendToInterlocPage.verifyPageContent();
     await sendToInterlocPage.selectHearingType(
       sendToInterlocData.sendToInterlocHearingSelectValue
@@ -181,7 +181,7 @@ export class SendToInterloc extends BaseStep {
     await this.loginUserWithCaseId(user, true, caseId);
     await this.homePage.chooseEvent('Send to interloc');
 
-    let sendToInterlocPage = new SendToInterlocPage(this.page);
+    const sendToInterlocPage = new SendToInterlocPage(this.page);
     await sendToInterlocPage.verifyPageContent();
     await sendToInterlocPage.selectHearingType(
       sendToInterlocData.sendToInterlocHearingSelectValue

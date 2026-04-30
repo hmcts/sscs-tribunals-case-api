@@ -426,7 +426,11 @@ export class UploadResponse extends BaseStep {
         .click();
       await expect(this.homePage.summaryTab).toBeVisible();
 
-      if (await this.page.getByText('Response received').isVisible()) {
+      const responseReceived = await this.page.getByText('Response received')
+        .waitFor({ state: 'visible', timeout: 15000 })
+        .then(() => true)
+        .catch(() => false);
+      if (responseReceived) {
         break;
       }
     }
