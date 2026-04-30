@@ -20,8 +20,9 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
 
     public EsaWriteFinalDecisionMidEventValidationHandler(Validator validator,
                                                           DecisionNoticeService decisionNoticeService,
-                                                          @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled) {
-        super(validator, decisionNoticeService, isPostHearingsEnabled);
+                                                          @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled,
+                                                          @Value("${feature.severeConditions.enabled}") boolean isSevereConditionsEnabled) {
+        super(validator, decisionNoticeService, isPostHearingsEnabled, isSevereConditionsEnabled);
     }
 
     @Override
@@ -33,6 +34,9 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
     protected void setDefaultFields(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply() == null) {
             sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
+        }
+        if (isSevereConditionsEnabled) {
+            sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecisionIsAfterSvDate(isDecisionNoticeDateAfterSvIssueCodeEffectiveDate(sscsCaseData) ? YES : NO);
         }
     }
 

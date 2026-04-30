@@ -21,7 +21,7 @@ public class PipWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
     public PipWriteFinalDecisionMidEventValidationHandler(Validator validator,
                                                           DecisionNoticeService decisionNoticeService,
                                                           @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled) {
-        super(validator, decisionNoticeService, isPostHearingsEnabled);
+        super(validator, decisionNoticeService, isPostHearingsEnabled, false);
     }
 
     @Override

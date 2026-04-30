@@ -1,10 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc;
 
-import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import jakarta.validation.Validator;
-import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -18,15 +16,12 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 @Component
 public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDecisionMidEventValidationHandlerBase {
 
-    @Value("${feature.severeConditions.enabled}")
-    private final boolean isSevereConditionsEnabled;
 
     public UcWriteFinalDecisionMidEventValidationHandler(Validator validator,
                                                          DecisionNoticeService decisionNoticeService,
                                                          @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled,
                                                          @Value("${feature.severeConditions.enabled}") boolean isSevereConditionsEnabled) {
-        super(validator, decisionNoticeService, isPostHearingsEnabled);
-        this.isSevereConditionsEnabled = isSevereConditionsEnabled;
+        super(validator, decisionNoticeService, isPostHearingsEnabled, isSevereConditionsEnabled);
     }
 
     @Override
@@ -40,11 +35,11 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
             sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
         }
         if (isSevereConditionsEnabled) {
-            sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionHasSVIssueCode(setSevereCriteriaApplies(sscsCaseData));
+            sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionHasSVIssueCode(hasUcSvIssueCode(sscsCaseData));
             if (!YES.equals(sscsCaseData.getSscsUcCaseData().getShowSchedule7ActivitiesPage()) || ("No").equals(sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionSchedule7ActivitiesApply())) {
                 sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(null);
             }
-
+            sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecisionIsAfterSvDate(isDecisionNoticeDateAfterSvIssueCodeEffectiveDate(sscsCaseData) ? YES : NO);
         }
     }
 
@@ -111,15 +106,5 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
             }
             sscsCaseData.setShowDwpReassessAwardPage(YesNo.NO);
         }
-    }
-
-    private YesNo setSevereCriteriaApplies(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getElementsDisputedLimitedWork() == null) {
-            return YesNo.NO;
-        }
-        return sscsCaseData.getElementsDisputedLimitedWork().stream()
-                .filter(elementDisputed -> nonNull(elementDisputed.getValue()))
-                .anyMatch(elementDisputed -> Objects.equals(elementDisputed.getValue().getIssueCode(), "SV"))
-                ? YesNo.YES : YesNo.NO;
     }
 }

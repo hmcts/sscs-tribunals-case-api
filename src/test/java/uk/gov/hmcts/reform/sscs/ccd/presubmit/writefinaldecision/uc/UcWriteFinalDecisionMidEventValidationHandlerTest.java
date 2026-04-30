@@ -47,7 +47,7 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
     }
 
     @Override
-    protected WriteFinalDecisionMidEventValidationHandlerBase createValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService, boolean isPostHearingsEnabled) {
+    protected WriteFinalDecisionMidEventValidationHandlerBase createValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService, boolean isPostHearingsEnabled, boolean isSevereConditionsEnabled) {
         return new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, isPostHearingsEnabled, false);
     }
 
@@ -302,6 +302,15 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
     }
 
     @Test
+    @Parameters({"2026-04-05, NO", "2026-04-06, YES"})
+    public void givenSevereConditionsEnabled_shouldSetWriteFinalDecisionDateOfDecisionIsAfterSvDate(String dateOfDecision, YesNo isDateOfDecisionAfterSvDate) {
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision(dateOfDecision);
+        UcWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, true);
+        handlerWithSevereConditions.setDefaultFields(sscsCaseData);
+        assertThat(isDateOfDecisionAfterSvDate).isEqualTo(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecisionIsAfterSvDate());
+    }
+
+    @Test
     @Parameters({"SV", "DD"})
     public void givenSevereConditionsNotEnabled_thenShouldNotSetHasSvIssueCode(String issueCode) {
         UcWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, false);
@@ -310,5 +319,28 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
         handlerWithSevereConditions.setDefaultFields(sscsCaseData);
 
         assertThat(sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionHasSVIssueCode()).isNull();
+    }
+
+    @Test
+    public void givenSevereConditionsCaseBeforeSvStartDate_thenShouldThrowError() {
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2026-04-05");
+        sscsCaseData.setElementsDisputedLimitedWork(List.of(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("SV").build()).build()));
+        UcWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, true);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handlerWithSevereConditions.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+        assertEquals("You cannot write decision notice until resolved. Please ask admin to amend issue code to WC or SG and then proceed.", response.getErrors().iterator().next());
+    }
+
+    @Test
+    public void givenSevereConditionsCaseAfterSvStartDate_thenShouldNotThrowError() {
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2026-04-06");
+        sscsCaseData.setElementsDisputedLimitedWork(List.of(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("SV").build()).build()));
+        UcWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, true);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handlerWithSevereConditions.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
     }
 }

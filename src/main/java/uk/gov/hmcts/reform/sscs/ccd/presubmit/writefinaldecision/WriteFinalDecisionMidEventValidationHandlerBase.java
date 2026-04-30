@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
+import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
@@ -10,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -18,12 +20,14 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Slf4j
+@RequiredArgsConstructor
 public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     public static final String CANT_UPLOAD_ERROR_MESSAGE = "Unable to generate the corrected decision notice due to the original being uploaded";
     private static final List<String> DEATH_OF_APPELLANT_WARNING_PAGES = Arrays.asList("typeOfAppeal", "previewDecisionNotice");
@@ -32,14 +36,8 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
     protected final DecisionNoticeService decisionNoticeService;
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
-
-    protected WriteFinalDecisionMidEventValidationHandlerBase(Validator validator,
-                                                              DecisionNoticeService decisionNoticeService,
-                                                              @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled) {
-        this.validator = validator;
-        this.decisionNoticeService = decisionNoticeService;
-        this.isPostHearingsEnabled = isPostHearingsEnabled;
-    }
+    @Value("${feature.severeConditions.enabled}")
+    protected final boolean isSevereConditionsEnabled;
 
     protected abstract String getBenefitType();
 
@@ -88,6 +86,10 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
             preSubmitCallbackResponse.addWarning("Appellant is deceased. Copy the draft decision and amend offline, then upload the offline version.");
         }
 
+        if (isSevereConditionsEnabled && hasSvIssueCode(sscsCaseData) && isDecisionNoticeDateAfterSvIssueCodeEffectiveDate(sscsCaseData)) {
+            preSubmitCallbackResponse.addError("You cannot write decision notice until resolved. Please ask admin to amend issue code to WC or SG and then proceed.");
+        }
+
         setShowSummaryOfOutcomePage(sscsCaseData, callback.getPageId());
         setShowWorkCapabilityAssessmentPage(sscsCaseData);
         setDwpReassessAwardPage(sscsCaseData, callback.getPageId());
@@ -120,4 +122,25 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
         return false;
     }
 
+    protected boolean isDecisionNoticeDateAfterSvIssueCodeEffectiveDate(SscsCaseData sscsCaseData) {
+        if (isNotBlank(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecision())) {
+            LocalDate dateOfDecision = LocalDate.parse(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecision());
+            return dateOfDecision.isAfter(LocalDate.of(2026, 04, 05));
+        }
+        return false;
+    }
+
+    protected YesNo hasUcSvIssueCode(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getElementsDisputedLimitedWork() == null) {
+            return YesNo.NO;
+        }
+        return sscsCaseData.getElementsDisputedLimitedWork().stream()
+                .filter(elementDisputed -> nonNull(elementDisputed.getValue()))
+                .anyMatch(elementDisputed -> Objects.equals(elementDisputed.getValue().getIssueCode(), "SV"))
+                ? YesNo.YES : YesNo.NO;
+    }
+
+    private boolean hasSvIssueCode(SscsCaseData sscsCaseData) {
+        return ("SV".equals(sscsCaseData.getIssueCode()) || hasUcSvIssueCode(sscsCaseData).toBoolean());
+    }
 }

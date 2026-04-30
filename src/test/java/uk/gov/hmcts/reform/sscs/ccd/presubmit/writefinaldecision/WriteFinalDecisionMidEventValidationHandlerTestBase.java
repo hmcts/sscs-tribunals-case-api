@@ -85,13 +85,13 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
             .buildValidatorFactory()
             .getValidator();
 
-    protected abstract WriteFinalDecisionMidEventValidationHandlerBase createValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService, boolean isPostHearingsEnabled);
+    protected abstract WriteFinalDecisionMidEventValidationHandlerBase createValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService, boolean isPostHearingsEnabled, boolean isSevereConditionsEnabled);
 
     @Before
     public void setUp() {
         openMocks(this);
 
-        handler = createValidationHandler(validator, decisionNoticeService, false);
+        handler = createValidationHandler(validator, decisionNoticeService, false, false);
 
         when(decisionNoticeService.getQuestionService(getBenefitType())).thenReturn(decisionNoticeQuestionService);
 
@@ -367,7 +367,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
 
     @Test
     public void whenCorrectionIsInProgressDecisionWasUploadedGenerateNoticeIsYes_thenThrowError() {
-        handler = createValidationHandler(validator, decisionNoticeService, true);
+        handler = createValidationHandler(validator, decisionNoticeService, true, false);
 
         when(caseDetails.getState()).thenReturn(State.POST_HEARING);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YesNo.YES);
@@ -381,7 +381,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
 
     @Test
     public void whenCorrectionIsInProgressDecisionWasGeneratedGenerateNoticeIsYes_thenDontThrowError() {
-        handler = createValidationHandler(validator, decisionNoticeService, true);
+        handler = createValidationHandler(validator, decisionNoticeService, true, false);
 
         when(caseDetails.getState()).thenReturn(State.POST_HEARING);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YesNo.NO);
@@ -394,7 +394,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
 
     @Test
     public void whenCorrectionIsInProgressDecisionWasUploadedGenerateNoticeIsNo_thenDontThrowError() {
-        handler = createValidationHandler(validator, decisionNoticeService, true);
+        handler = createValidationHandler(validator, decisionNoticeService, true, false);
 
         when(caseDetails.getState()).thenReturn(State.POST_HEARING);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YesNo.YES);

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -43,8 +44,8 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Override
-    protected WriteFinalDecisionMidEventValidationHandlerBase createValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService, boolean isPostHearingsEnabled) {
-        return new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, isPostHearingsEnabled);
+    protected WriteFinalDecisionMidEventValidationHandlerBase createValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService, boolean isPostHearingsEnabled, boolean isSevereConditionsEnabled) {
+        return new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, isPostHearingsEnabled, false);
     }
 
     @Override
@@ -285,5 +286,37 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertEquals(showWorkCapabilityPage, response.getData().getShowWorkCapabilityAssessmentPage());
+    }
+
+    @Test
+    @Parameters({"2026-04-05, NO", "2026-04-06, YES"})
+    public void givenSevereConditionsEnabled_shouldSetWriteFinalDecisionDateOfDecisionIsAfterSvDate(String dateOfDecision, YesNo isDateOfDecisionAfterSvDate) {
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision(dateOfDecision);
+        EsaWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, true);
+        handlerWithSevereConditions.setDefaultFields(sscsCaseData);
+        assertThat(isDateOfDecisionAfterSvDate).isEqualTo(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecisionIsAfterSvDate());
+    }
+
+    @Test
+    public void givenSevereConditionsCaseBeforeSvStartDate_thenShouldThrowError() {
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2026-04-05");
+        sscsCaseData.setIssueCode("SV");
+        EsaWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, true);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handlerWithSevereConditions.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+        assertEquals("You cannot write decision notice until resolved. Please ask admin to amend issue code to WC or SG and then proceed.", response.getErrors().iterator().next());
+    }
+
+    @Test
+    public void givenSevereConditionsCaseAfterSvStartDate_thenShouldNotThrowError() {
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2026-04-06");
+        sscsCaseData.setIssueCode("SV");
+        EsaWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, true);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handlerWithSevereConditions.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
     }
 }
