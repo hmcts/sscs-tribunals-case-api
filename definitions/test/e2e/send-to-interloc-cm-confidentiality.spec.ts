@@ -5,12 +5,6 @@ import createCaseBasedOnCaseType, {
 import { credentials, featureFlags } from '../config/config';
 
 const appealTypes = ['UC', 'CHILDSUPPORT'] as const;
-const users = [
-  {
-    label: 'caseworker',
-    credentials: credentials.amCaseWorker
-  }
-] as const;
 
 test.describe('CM confidentiality send to interloc', () => {
   test.skip(
@@ -19,9 +13,8 @@ test.describe('CM confidentiality send to interloc', () => {
   );
 
   for (const appealType of appealTypes) {
-    for (const user of users) {
       test(
-        `Select Review by TCW shows confidentiality reasons for confidential ${appealType} appeal as ${user.label}`,
+        `Select Review by TCW shows confidentiality reasons for confidential ${appealType} appeal as Caseworker`,
         { tag: ['@nightly-pipeline-cm', '@confidentiality'] },
         async ({
           enhancedConfidentialitySteps,
@@ -31,7 +24,6 @@ test.describe('CM confidentiality send to interloc', () => {
           uploadResponseSteps
         }) => {
           test.slow();
-          // test.setTimeout(360000);
 
           const caseId =
             appealType === 'CHILDSUPPORT'
@@ -42,9 +34,6 @@ test.describe('CM confidentiality send to interloc', () => {
             await updateOtherPartyDataSteps.makeChildSupportCaseConfidential(
               caseId
             );
-            // if (user.label === 'superuser') {
-            //   await updateOtherPartyDataSteps.signOut();
-            // }
           } else {
             await uploadResponseSteps.performUploadResponseOnAUniversalCreditWithJP(
               caseId,
@@ -53,31 +42,30 @@ test.describe('CM confidentiality send to interloc', () => {
             await enhancedConfidentialitySteps.prepareConfidentialCase(caseId);
           }
 
-          if (appealType === 'CHILDSUPPORT' && user.label === 'caseworker') {
+          if (appealType === 'CHILDSUPPORT') {
             await readyToListSteps.performReadyToListEvent(
               caseId,
               false,
-              user.credentials
+              credentials.amCaseWorker
             );
           } else {
             await readyToListSteps.loginUserWithCaseId(
-              user.credentials,
+              credentials.amCaseWorker,
               true,
               caseId
             );
             await readyToListSteps.performReadyToListEvent(
               caseId,
               false,
-              user.credentials
+              credentials.amCaseWorker
             );
           }
           await readyToListSteps.signOut();
           await sendToInterlocSteps.verifyConfidentialityReferralReasons(
             caseId,
-            user.credentials
+            credentials.amCaseWorker
           );
         }
       );
     }
-  }
 });
