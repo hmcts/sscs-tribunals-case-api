@@ -1,9 +1,7 @@
 package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.awaitility.Awaitility.await;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADD_OTHER_PARTY_DATA;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CONFIDENTIALITY_CONFIRMED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
@@ -51,7 +49,7 @@ class ConfidentialityConfirmedFunctionalTest extends AbstractFunctionalTest {
             final SscsCaseDetails caseWithState = createCaseFromEvent(Benefit.CHILD_SUPPORT,
                 VALID_APPEAL_CREATED);
 
-            await().atMost(30, SECONDS).untilAsserted(() -> {
+            defaultAwait().untilAsserted(() -> {
                 var caseDetails = findCaseById(ccdCaseId);
                 assertThat(caseDetails.getState()).isEqualTo(State.AWAIT_OTHER_PARTY_DATA.toString());
             });
@@ -64,7 +62,7 @@ class ConfidentialityConfirmedFunctionalTest extends AbstractFunctionalTest {
                 return new UpdateCcdCaseService.UpdateResult("add other party", "add other party");
             });
 
-            await().atMost(30, SECONDS).untilAsserted(() -> {
+            defaultAwait().untilAsserted(() -> {
                 var cdAfterEvent = findCaseById(ccdCaseId);
                 assertThat(cdAfterEvent.getState()).isEqualTo(State.AWAIT_CONFIDENTIALITY_REQUIREMENTS.toString());
                 assertThat(cdAfterEvent.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.AWAITING_ADMIN_ACTION);
@@ -75,7 +73,7 @@ class ConfidentialityConfirmedFunctionalTest extends AbstractFunctionalTest {
                 return new UpdateCcdCaseService.UpdateResult("confidentiality confirmed", "confidentiality confirmed");
             });
 
-            await().atMost(30, SECONDS).untilAsserted(() -> {
+            defaultAwait().untilAsserted(() -> {
                 var cdAfterEvent = findCaseById(ccdCaseId);
                 assertThat(cdAfterEvent.getState()).isEqualTo(State.WITH_DWP.toString());
                 assertThat(cdAfterEvent.getData().getDwpDueDate()).isEqualTo(LocalDate.now().plusDays(42).toString());
@@ -92,7 +90,7 @@ class ConfidentialityConfirmedFunctionalTest extends AbstractFunctionalTest {
             final SscsCaseDetails caseWithState = createCaseFromEvent(Benefit.CHILD_SUPPORT,
                 VALID_APPEAL_CREATED);
 
-            await().atMost(30, SECONDS).untilAsserted(() -> {
+            defaultAwait().untilAsserted(() -> {
                 var caseDetails = findCaseById(ccdCaseId);
                 assertThat(caseDetails.getState()).isNotEqualTo(State.AWAIT_OTHER_PARTY_DATA.toString());
                 assertThat(caseDetails.getState()).isNotEqualTo(State.AWAIT_CONFIDENTIALITY_REQUIREMENTS.toString());
