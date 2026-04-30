@@ -82,7 +82,7 @@
     "CaseEventID": "writeFinalDecision",
     "CaseFieldID": "writeFinalDecisionDateOfDecisionIsAfterSvDate",
     "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
+    "DisplayContext": "READONLY",
     "LiveFrom": "30/04/2026",
     "PageDisplayOrder": 63,
     "PageFieldDisplayOrder": 1,
@@ -114,7 +114,7 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "esaSevereCriteria",
     "PageLabel": "Severe Conditions Criteria",
-    "PageShowCondition":  "(showSchedule3ActivitiesPage = \"Yes\" AND esaWriteFinalDecisionSchedule3ActivitiesApply=\"Yes\" AND writeFinalDecisionAllowedOrRefused = \"allowed\" AND wcaAppeal = \"Yes\" AND writeFinalDecisionDateOfDecisionIsAfterSvDate= \"Yes\") OR (appeal.benefitType.code = \"ESA\" AND writeFinalDecisionSevereYesNo = \"Yes\")",
+    "PageShowCondition":  "(showSchedule3ActivitiesPage = \"Yes\" AND esaWriteFinalDecisionSchedule3ActivitiesApply=\"Yes\" AND writeFinalDecisionAllowedOrRefused = \"allowed\" AND wcaAppeal = \"Yes\") OR (appeal.benefitType.code = \"ESA\" AND writeFinalDecisionSevereYesNo = \"Yes\")",
     "ShowSummaryChangeOption": "Y"
   },
   {
