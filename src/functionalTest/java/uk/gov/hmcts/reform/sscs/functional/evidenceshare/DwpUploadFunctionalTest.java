@@ -37,7 +37,7 @@ class DwpUploadFunctionalTest extends AbstractFunctionalTest {
     void dwpUploadResponseEventSendsToReadyToList() throws IOException {
 
         SscsCaseDetails createdCase = createCaseWithState(CREATE_TEST_CASE, "UC", "Universal Credit",
-            READY_TO_LIST.getId());
+            READY_TO_LIST.getId(), null);
 
         //Get case into correct state without triggering any callbacks that cause race conditions
         updateCaseEvent(SEND_TO_DWP_OFFLINE, createdCase);

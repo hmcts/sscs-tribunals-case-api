@@ -22,7 +22,7 @@ public class DwpUploadResponseHandlerTest extends AbstractFunctionalTest {
     @Test
     public void givenSubmittedCallback_shouldTriggerReadyToListAndSetDwpState() throws Exception {
         SscsCaseDetails createdCase =
-                createCaseWithState(CREATE_TEST_CASE, "UC", "Universal Credit", READY_TO_LIST.getId());
+                createCaseWithState(CREATE_TEST_CASE, "UC", "Universal Credit", READY_TO_LIST.getId(), null);
 
         updateCaseEvent(SEND_TO_DWP_OFFLINE, createdCase);
 
