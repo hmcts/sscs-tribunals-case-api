@@ -59,7 +59,8 @@ class DwpUploadFunctionalTest extends AbstractFunctionalTest {
 
         defaultAwait().untilAsserted(() -> {
             SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
-            assertThat(caseDetails.getState()).isEqualTo("readyToList");
+            assertThat(caseDetails).isNotNull();
+            assertThat(caseDetails.getState()).isNotNull().isEqualTo("readyToList");
         });
     }
 
