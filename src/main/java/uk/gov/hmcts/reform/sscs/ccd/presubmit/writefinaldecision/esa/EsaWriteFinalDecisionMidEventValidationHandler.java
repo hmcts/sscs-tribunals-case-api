@@ -36,7 +36,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
             sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
         }
         if (isSevereConditionsEnabled) {
-            sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecisionIsAfterSvDate(isDecisionNoticeDateAfterSvIssueCodeEffectiveDate(sscsCaseData) ? YES : NO);
+            sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecisionIsAfterSvDate(isDecisionNoticeDateBlankOrAfterSvIssueCodeEffectiveDate(sscsCaseData) ? YES : NO);
         }
     }
 
