@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.factory;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
@@ -31,7 +32,6 @@ import java.util.Arrays;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -587,7 +587,7 @@ public class CcdNotificationWrapperTest {
     public void givenUpdateOtherPartyDataEventAndSendNotificationFlagIsSetInOtherPartyWithAppointee_thenReturnAllOtherPartySubscription() {
         ccdNotificationWrapper = buildNotificationWrapperWithOtherParty(UPDATE_OTHER_PARTY_DATA, buildOtherPartyData(true, true, true));
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getOtherPartySubscriptions(ccdNotificationWrapper.getNewSscsCaseData(), ccdNotificationWrapper.getNotificationType());
-        Assertions.assertThat(subsWithTypeList)
+        assertThat(subsWithTypeList)
             .hasSize(2)
             .extracting(SubscriptionWithType::getPartyId)
             .containsOnly("2", "3");
@@ -597,7 +597,7 @@ public class CcdNotificationWrapperTest {
     public void givenUpdateOtherPartyDataEventAndSendNotificationFlagIsSetInOtherPartyWithNoAppointee_thenReturnAllOtherPartySubscription() {
         ccdNotificationWrapper = buildNotificationWrapperWithOtherParty(UPDATE_OTHER_PARTY_DATA, buildOtherPartyData(true, false, true));
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getOtherPartySubscriptions(ccdNotificationWrapper.getNewSscsCaseData(), ccdNotificationWrapper.getNotificationType());
-        Assertions.assertThat(subsWithTypeList)
+        assertThat(subsWithTypeList)
             .hasSize(2)
             .extracting(SubscriptionWithType::getPartyId)
             .containsOnly("1", "3");
@@ -607,7 +607,7 @@ public class CcdNotificationWrapperTest {
     public void givenUpdateOtherPartyDataEventAndSendNotificationFlagIsSetInOtherPartyWithNoAppointee_thenReturnAllOtherPartySubscription2() {
         ccdNotificationWrapper = buildNotificationWrapperWithOtherParty(UPDATE_OTHER_PARTY_DATA, buildOtherPartyData(true, true, true));
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getOtherPartySubscriptions(ccdNotificationWrapper.getNewSscsCaseData(), ccdNotificationWrapper.getNotificationType());
-        Assertions.assertThat(subsWithTypeList)
+        assertThat(subsWithTypeList)
             .hasSize(2)
             .extracting(SubscriptionWithType::getPartyId)
             .containsOnly("2", "3");
@@ -617,21 +617,21 @@ public class CcdNotificationWrapperTest {
     public void givenUpdateOtherPartyDataEventAndCmFlagOnAndChildSupportCase_thenReturnEmptySubscription() {
         ccdNotificationWrapper = buildNotificationWrapperWithOtherPartyBenefitTypeAndFlag(UPDATE_OTHER_PARTY_DATA, buildOtherPartyData(true, false, false), "childSupport", true);
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getOtherPartySubscriptions(ccdNotificationWrapper.getNewSscsCaseData(), ccdNotificationWrapper.getNotificationType());
-        Assertions.assertThat(subsWithTypeList).isEmpty();
+        assertThat(subsWithTypeList).isEmpty();
     }
 
     @Test
     public void givenUpdateOtherPartyDataEventAndCmFlagOffAndChildSupportCase_thenReturnSubscription() {
         ccdNotificationWrapper = buildNotificationWrapperWithOtherPartyBenefitTypeAndFlag(UPDATE_OTHER_PARTY_DATA, buildOtherPartyData(true, false, false), "childSupport", false);
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getOtherPartySubscriptions(ccdNotificationWrapper.getNewSscsCaseData(), ccdNotificationWrapper.getNotificationType());
-        Assertions.assertThat(subsWithTypeList).hasSize(1);
+        assertThat(subsWithTypeList).hasSize(1);
     }
 
     @Test
     public void givenUpdateOtherPartyDataEventAndCmFlagOnAndNonChildSupportCase_thenReturnSubscription() {
         ccdNotificationWrapper = buildNotificationWrapperWithOtherPartyBenefitTypeAndFlag(UPDATE_OTHER_PARTY_DATA, buildOtherPartyData(true, false, false), "PIP", true);
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getOtherPartySubscriptions(ccdNotificationWrapper.getNewSscsCaseData(), ccdNotificationWrapper.getNotificationType());
-        Assertions.assertThat(subsWithTypeList).hasSize(1);
+        assertThat(subsWithTypeList).hasSize(1);
     }
 
     @Test
@@ -673,7 +673,7 @@ public class CcdNotificationWrapperTest {
         ccdNotificationWrapper.getNewSscsCaseData().setInformationFromPartySelected(new DynamicList(new DynamicListItem(PartyItemList.APPELLANT.getCode(), PartyItemList.APPELLANT.getLabel()), new ArrayList<>()));
 
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assertions.assertThat(subsWithTypeList)
+        assertThat(subsWithTypeList)
             .hasSize(2)
             .extracting(SubscriptionWithType::getPartyId)
             .contains("1");
