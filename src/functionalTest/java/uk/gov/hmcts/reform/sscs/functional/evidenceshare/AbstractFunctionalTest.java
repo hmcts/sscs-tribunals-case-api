@@ -157,6 +157,7 @@ abstract class AbstractFunctionalTest {
         if (consumer != null) {
             consumer.accept(minimalCaseData);
         }
+        minimalCaseData.getAppeal().getAppellant().getIdentity().setNino(getRandomNino());
 
         SscsCaseData caseData = minimalCaseData.toBuilder()
             .createdInGapsFrom(createdInGapsFrom)
@@ -168,8 +169,6 @@ abstract class AbstractFunctionalTest {
                 .receivedVia("Paper")
                 .build())
             .build();
-
-        minimalCaseData.getAppeal().getAppellant().getIdentity().setNino(getRandomNino());
 
         SscsCaseDetails caseDetails = ccdService.createCase(caseData, eventType.getCcdType(),
             "Evidence share service created case",
