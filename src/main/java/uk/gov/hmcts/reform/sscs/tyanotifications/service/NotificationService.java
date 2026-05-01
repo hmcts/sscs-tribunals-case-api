@@ -29,7 +29,6 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.*;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationFactory;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
-import uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
 @Service
@@ -305,7 +304,7 @@ public class NotificationService {
         if (UPDATE_OTHER_PARTY_DATA.equals(notificationType)
             && cmOtherPartyConfidentialityEnabled
             && notificationWrapper.getNewSscsCaseData().getAppeal() != null
-            && OtherPartyDataUtil.isValidBenefitTypeForConfidentiality(notificationWrapper.getNewSscsCaseData().getAppeal().getBenefitType())) {
+            && isCmOrUcCase(notificationWrapper.getNewSscsCaseData().getAppeal().getBenefitType())) {
             log.info("Suppressing HEF notification for CM/UC case id {}.", notificationWrapper.getCaseId());
             return false;
         }
@@ -433,6 +432,12 @@ public class NotificationService {
         var newHearingChannel = Optional.ofNullable(newHearing.getHearingChannel());
 
         return oldHearingChannel.equals(newHearingChannel);
+    }
+
+    private boolean isCmOrUcCase(BenefitType benefitType) {
+        return benefitType != null
+            && (Benefit.CHILD_SUPPORT.getShortName().equals(benefitType.getCode())
+                || Benefit.UC.getShortName().equals(benefitType.getCode()));
     }
 
     private boolean isDigitalCase(final NotificationWrapper notificationWrapper) {
