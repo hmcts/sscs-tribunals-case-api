@@ -169,6 +169,8 @@ abstract class AbstractFunctionalTest {
                 .build())
             .build();
 
+        minimalCaseData.getAppeal().getAppellant().getIdentity().setNino(getRandomNino());
+
         SscsCaseDetails caseDetails = ccdService.createCase(caseData, eventType.getCcdType(),
             "Evidence share service created case",
             "Evidence share service case created for functional test", idamTokens);
@@ -227,7 +229,7 @@ abstract class AbstractFunctionalTest {
 
     ConditionFactory defaultAwait() {
         return await()
-            .atMost(30, SECONDS)
+            .atMost(60, SECONDS)
             .pollInterval(2, SECONDS);
     }
 

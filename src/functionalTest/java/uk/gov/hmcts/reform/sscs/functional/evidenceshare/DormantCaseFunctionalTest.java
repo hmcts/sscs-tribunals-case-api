@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.DORMANT_APPEAL_STATE;
 
@@ -25,6 +25,6 @@ class DormantCaseFunctionalTest extends AbstractFunctionalTest {
 
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
 
-        assertEquals(DORMANT_APPEAL_STATE.toString(), caseDetails.getState());
+        assertThat(caseDetails.getState()).isEqualTo(DORMANT_APPEAL_STATE.toString());
     }
 }

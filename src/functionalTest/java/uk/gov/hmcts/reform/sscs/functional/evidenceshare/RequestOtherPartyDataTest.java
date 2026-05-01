@@ -57,7 +57,6 @@ class RequestOtherPartyDataTest extends AbstractFunctionalTest {
             .getAppeal()
             .getRep()
             .setAddress(Address.builder().line1(LINE_1).town(TOWN).county(COUNTY).postcode(POSTCODE).build());
-        data.getAppeal().getAppellant().getIdentity().setNino(getRandomNino());
         data.setEvidencePresent("Yes");
     }
 

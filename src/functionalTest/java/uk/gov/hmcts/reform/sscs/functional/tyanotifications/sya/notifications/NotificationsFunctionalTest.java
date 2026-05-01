@@ -454,7 +454,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
     @Test
     public void shouldSaveReasonableAdjustmentNotificationForAppellant() throws IOException {
         simulateCcdCallback(APPEAL_RECEIVED, BASE_PATH_TYAN + APPEAL_RECEIVED.getId() + "AppellantReasonableAdjustmentCallback.json");
-        await().pollInterval(ofSeconds(2)).atMost(ofSeconds(30)).until(() -> tryFetchNotificationsForTestCaseWithFlag(true, null, appealReceivedAppellantEmailId), hasSize(1));
+        defaultAwait().until(() -> tryFetchNotificationsForTestCaseWithFlag(true, null, appealReceivedAppellantEmailId), hasSize(1));
 
         SscsCaseData caseData = getSscsCaseDataWithReasonableAdjustmentsOutstanding();
 
@@ -466,7 +466,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
     @Test
     public void shouldSaveReasonableAdjustmentNotificationForAppellantAndRep() throws IOException {
         simulateCcdCallback(APPEAL_RECEIVED, BASE_PATH_TYAN + APPEAL_RECEIVED.getId() + "AppellantRepReasonableAdjustmentCallback.json");
-        await().pollInterval(ofSeconds(2)).atMost(ofSeconds(30)).until(() -> tryFetchNotificationsForTestCaseWithFlag(true, null, appealCreatedAppellantEmailId, appealCreatedAppellantSmsId), hasSize(2));
+        defaultAwait().until(() -> tryFetchNotificationsForTestCaseWithFlag(true, null, appealCreatedAppellantEmailId, appealCreatedAppellantSmsId), hasSize(2));
 
         SscsCaseData caseData = getSscsCaseDataWithReasonableAdjustmentsOutstanding();
 

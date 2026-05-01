@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.sscs.functional.tyanotifications;
 
 import static java.util.Arrays.asList;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -33,6 +35,7 @@ import junitparams.JUnitParamsRunner;
 import lombok.Getter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.awaitility.core.ConditionFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -372,6 +375,12 @@ public abstract class AbstractFunctionalTest {
                     .anySatisfy(body -> assertThat(body).contains(match))
             );
         }
+    }
+
+    public ConditionFactory defaultAwait() {
+        return await()
+            .atMost(30, SECONDS)
+            .pollInterval(2, SECONDS);
     }
 
     protected void delayInSeconds(int seconds) {
