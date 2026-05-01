@@ -2511,7 +2511,7 @@ public class NotificationServiceTest {
         assertTrue(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage().contains(ccdCaseId)).count() >= 1);
     }
 
-    protected static void verifyErrorLogMessageNotLogged(Appender<ILoggingEvent> mockAppender, ArgumentCaptor captorLoggingEvent, String errorText) {
+    private static void verifyErrorLogMessageNotLogged(Appender<ILoggingEvent> mockAppender, ArgumentCaptor captorLoggingEvent, String errorText) {
         verify(mockAppender, atLeast(0)).doAppend(
             (ILoggingEvent) captorLoggingEvent.capture()
         );
