@@ -145,8 +145,6 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
     }
 
     private boolean hasSvIssueCode(SscsCaseData sscsCaseData) {
-        log.info("issue code: {}", sscsCaseData.getIssueCode());
-        log.info("SV code equals: {}", ("SV").equals(sscsCaseData.getIssueCode()));
-        return (("SV").equals(sscsCaseData.getIssueCode()) || hasUcSvIssueCode(sscsCaseData).toBoolean());
+        return ((isNotBlank(sscsCaseData.getCaseCode()) && sscsCaseData.getCaseCode().contains("SV")) || hasUcSvIssueCode(sscsCaseData).toBoolean());
     }
 }

@@ -300,7 +300,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     @Test
     public void givenSevereConditionsCaseBeforeSvStartDate_thenShouldThrowError() {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2026-04-05");
-        sscsCaseData.setIssueCode("SV");
+        sscsCaseData.setCaseCode("051SV");
         EsaWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, true);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handlerWithSevereConditions.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -312,7 +312,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     @Test
     public void givenSevereConditionsCaseAfterSvStartDate_thenShouldNotThrowError() {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2026-04-06");
-        sscsCaseData.setIssueCode("SV");
+        sscsCaseData.setCaseCode("051SV");
         EsaWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, true);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handlerWithSevereConditions.handle(MID_EVENT, callback, USER_AUTHORISATION);
