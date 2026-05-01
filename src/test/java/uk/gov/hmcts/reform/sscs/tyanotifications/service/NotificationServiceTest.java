@@ -1493,7 +1493,8 @@ public class NotificationServiceTest {
     }
 
     @Test
-    public void givenUpdateOtherPartyDataEventAndCmFlagOnAndChildSupportCase_thenSuppressNotification() {
+    @Parameters({"childSupport", "UC"})
+    public void givenUpdateOtherPartyDataEventAndCmFlagOnAndCmOrUcCase_thenSuppressNotification(String benefitCode) {
         CcdNotificationWrapper wrapper = buildNotificationWrapperGivenNotificationTypeAndSubscriptions(
             UPDATE_OTHER_PARTY_DATA, null, null, null,
             List.of(CcdValue.<OtherParty>builder().value(OtherParty.builder()
@@ -1505,7 +1506,7 @@ public class NotificationServiceTest {
         wrapper.getNewSscsCaseData().setCcdCaseId("123456789");
         wrapper.getNewSscsCaseData().setAppeal(Appeal.builder()
             .hearingType(AppealHearingType.ORAL.name())
-            .benefitType(BenefitType.builder().code("childSupport").build())
+            .benefitType(BenefitType.builder().code(benefitCode).build())
             .appellant(Appellant.builder().build())
             .build());
 
@@ -1564,28 +1565,6 @@ public class NotificationServiceTest {
         getNotificationService(true).manageNotificationAndSubscription(wrapper, false);
 
         verifyErrorLogMessageNotLogged(mockAppender, captorLoggingEvent, "Suppressing HEF notification");
-    }
-
-    @Test
-    public void givenUpdateOtherPartyDataEventAndCmFlagOnAndUcCase_thenSuppressNotification() {
-        CcdNotificationWrapper wrapper = buildNotificationWrapperGivenNotificationTypeAndSubscriptions(
-            UPDATE_OTHER_PARTY_DATA, null, null, null,
-            List.of(CcdValue.<OtherParty>builder().value(OtherParty.builder()
-                .sendNewOtherPartyNotification(YesNo.YES)
-                .id("1")
-                .otherPartySubscription(Subscription.builder().email("other@party.com").subscribeEmail("Yes").build())
-                .build()).build())
-        );
-        wrapper.getNewSscsCaseData().setCcdCaseId("123456789");
-        wrapper.getNewSscsCaseData().setAppeal(Appeal.builder()
-            .hearingType(AppealHearingType.ORAL.name())
-            .benefitType(BenefitType.builder().code("UC").build())
-            .appellant(Appellant.builder().build())
-            .build());
-
-        getNotificationService(true).manageNotificationAndSubscription(wrapper, false);
-
-        verifyExpectedLogMessage(mockAppender, captorLoggingEvent, "123456789", "Suppressing HEF notification", Level.INFO);
     }
 
     @Test
