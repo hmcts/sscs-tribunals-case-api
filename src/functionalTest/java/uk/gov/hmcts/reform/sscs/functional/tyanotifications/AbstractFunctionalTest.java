@@ -272,7 +272,10 @@ public abstract class AbstractFunctionalTest {
         if (expectedCount == 0) {
             return client.getNotifications("", "letter", caseId.toString(), "").getNotifications();
         }
-        return fetchLetters();
+        return defaultAwait().until(
+            () -> client.getNotifications("", "letter", caseId.toString(), "").getNotifications(),
+            letters -> letters.size() >= expectedCount
+        );
     }
 
     public void assertNoNotificationSentForTestCase(String... unexpectedTemplateIds) throws NotificationClientException {

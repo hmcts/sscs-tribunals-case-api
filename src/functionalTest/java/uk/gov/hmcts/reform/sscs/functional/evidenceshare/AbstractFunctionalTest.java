@@ -151,12 +151,7 @@ abstract class AbstractFunctionalTest {
         idamTokens = getIdamTokens();
 
         SscsCaseData minimalCaseData = CaseDataUtils.buildMinimalCaseData();
-
-        if (consumer != null) {
-            consumer.accept(minimalCaseData);
-        }
         minimalCaseData.getAppeal().getAppellant().getIdentity().setNino(getRandomNino());
-
         SscsCaseData caseData = minimalCaseData.toBuilder()
             .createdInGapsFrom(createdInGapsFrom)
             .appeal(minimalCaseData.getAppeal().toBuilder()
@@ -167,6 +162,10 @@ abstract class AbstractFunctionalTest {
                 .receivedVia("Paper")
                 .build())
             .build();
+
+        if (consumer != null) {
+            consumer.accept(caseData);
+        }
 
         SscsCaseDetails caseDetails = ccdService.createCase(caseData, eventType.getCcdType(),
             "Evidence share service created case",
