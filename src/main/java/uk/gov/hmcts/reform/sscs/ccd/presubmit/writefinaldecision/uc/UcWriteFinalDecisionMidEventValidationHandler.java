@@ -39,7 +39,7 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
             if (!YES.equals(sscsCaseData.getSscsUcCaseData().getShowSchedule7ActivitiesPage()) || ("No").equals(sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionSchedule7ActivitiesApply())) {
                 sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(null);
             }
-            sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecisionIsAfterSvDate(isDecisionNoticeDateBlankOrAfterSvIssueCodeEffectiveDate(sscsCaseData) ? YES : NO);
+            sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecisionIsAfterSvDate(isDecisionNoticeDateBlankOrAfterSvStartDate(sscsCaseData) ? YES : NO);
         }
     }
 

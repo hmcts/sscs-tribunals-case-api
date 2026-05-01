@@ -86,11 +86,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
             preSubmitCallbackResponse.addWarning("Appellant is deceased. Copy the draft decision and amend offline, then upload the offline version.");
         }
 
-        log.info(("Is severe conditions enabled: {}"), isSevereConditionsEnabled);
-        log.info(("Has SV issue code: {}"), hasSvIssueCode(sscsCaseData));
-        log.info(("Is decision notice date blank or after SV issue code effective date: {}"), isDecisionNoticeDateBlankOrAfterSvIssueCodeEffectiveDate(sscsCaseData));
-
-        if (isSevereConditionsEnabled && hasSvIssueCode(sscsCaseData) && !isDecisionNoticeDateBlankOrAfterSvIssueCodeEffectiveDate(sscsCaseData)) {
+        if (isSevereConditionsEnabled && hasSvIssueCode(sscsCaseData) && !isDecisionNoticeDateBlankOrAfterSvStartDate(sscsCaseData)) {
             preSubmitCallbackResponse.addError("You cannot write decision notice until resolved. Please ask admin to amend issue code to WC or SG and then proceed.");
         }
 
@@ -126,7 +122,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
         return false;
     }
 
-    protected boolean isDecisionNoticeDateBlankOrAfterSvIssueCodeEffectiveDate(SscsCaseData sscsCaseData) {
+    protected boolean isDecisionNoticeDateBlankOrAfterSvStartDate(SscsCaseData sscsCaseData) {
         if (isNotBlank(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecision())) {
             LocalDate dateOfDecision = LocalDate.parse(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecision());
             return dateOfDecision.isAfter(LocalDate.of(2026, 04, 05));
