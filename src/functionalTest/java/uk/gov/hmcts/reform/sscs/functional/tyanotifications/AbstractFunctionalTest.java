@@ -224,9 +224,9 @@ public abstract class AbstractFunctionalTest {
                 }
             } else {
 
-                secondsLeft -= 5;
+                secondsLeft -= 1;
 
-                delayInSeconds(5);
+                delayInSeconds(1);
 
                 allNotifications = client.getNotifications("", "", caseReference, "").getNotifications();
                 String allNotifTemplateIds = allNotifications.stream().map(notif ->
@@ -261,11 +261,27 @@ public abstract class AbstractFunctionalTest {
         int secondsLeft = maxSecondsToWaitForNotification;
 
         while (allNotifications.size() == 0 && secondsLeft > 0) {
-            delayInSeconds(5);
-            secondsLeft -= 5;
+            delayInSeconds(1);
+            secondsLeft -= 1;
             allNotifications = client.getNotifications("", "letter", caseId.toString(), "").getNotifications();
         }
         return allNotifications;
+    }
+
+    public List<Notification> fetchLetters(int expectedCount) throws NotificationClientException {
+        if (expectedCount == 0) {
+            return client.getNotifications("", "letter", caseId.toString(), "").getNotifications();
+        }
+        return fetchLetters();
+    }
+
+    public void assertNoNotificationSentForTestCase(String... unexpectedTemplateIds) throws NotificationClientException {
+        delayInSeconds(5);
+        final List<Notification> allNotifications = client.getNotifications("", "", caseReference, "").getNotifications();
+        final List<Notification> matching = allNotifications.stream()
+            .filter(n -> asList(unexpectedTemplateIds).contains(n.getTemplateId().toString()))
+            .toList();
+        assertThat(matching).isEmpty();
     }
 
     protected void simulateWelshCcdCallback(NotificationEventType eventType) throws IOException {
