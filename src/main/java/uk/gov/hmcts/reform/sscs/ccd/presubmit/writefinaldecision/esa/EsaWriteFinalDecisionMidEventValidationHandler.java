@@ -18,10 +18,14 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 @Component
 public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDecisionMidEventValidationHandlerBase {
 
+    private final boolean isSevereConditionsEnabled;
+
     public EsaWriteFinalDecisionMidEventValidationHandler(Validator validator,
                                                           DecisionNoticeService decisionNoticeService,
-                                                          @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled) {
+                                                          @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled,
+                                                          @Value("${feature.severeConditions.enabled}") boolean isSevereConditionsEnabled) {
         super(validator, decisionNoticeService, isPostHearingsEnabled);
+        this.isSevereConditionsEnabled = isSevereConditionsEnabled;
     }
 
     @Override
@@ -86,6 +90,10 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
 
     @Override
     protected void setDwpReassessAwardPage(SscsCaseData sscsCaseData, String pageId) {
+        if (isSevereConditionsEnabled && YesNo.isYes(sscsCaseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply())) {
+            sscsCaseData.setShowDwpReassessAwardPage(YesNo.NO);
+            return;
+        }
         if (pageId != null && pageId.equals("workCapabilityAssessment")) {
             if (isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())
                 && sscsCaseData.isWcaAppeal()
