@@ -30,9 +30,6 @@ public class FilterNotificationsEventsHandler implements CallbackHandler {
     private static final int RETRY = 1;
     private final RetryNotificationService retryNotificationService;
 
-    @Value("${feature.cm-other-party-confidentiality.enabled}")
-    private boolean cmOtherPartyConfidentialityEnabled;
-
     @Value("${feature.postHearings.enabled}")
     private boolean isPostHearingsEnabled;
 
@@ -61,7 +58,7 @@ public class FilterNotificationsEventsHandler implements CallbackHandler {
                 callback.getNotificationEventType(), caseId, illegalStateException);
             throw illegalStateException;
         }
-        final CcdNotificationWrapper notificationWrapper = new CcdNotificationWrapper(callback, cmOtherPartyConfidentialityEnabled);
+        final CcdNotificationWrapper notificationWrapper = new CcdNotificationWrapper(callback);
         try {
             notificationService.manageNotificationAndSubscription(notificationWrapper, false);
         } catch (NotificationServiceException e) {

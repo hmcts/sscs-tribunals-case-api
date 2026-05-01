@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.*;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationFactory;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
+import uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
 @Service
@@ -54,7 +55,8 @@ public class NotificationService {
         OutOfHoursCalculator outOfHoursCalculator,
         NotificationConfig notificationConfig,
         SendNotificationService sendNotificationService,
-        @Value("${feature.covid19}") boolean covid19Feature) {
+        @Value("${feature.covid19}") boolean covid19Feature,
+        @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
 
         this.notificationFactory = notificationFactory;
         this.reminderService = reminderService;
@@ -64,11 +66,14 @@ public class NotificationService {
         this.notificationConfig = notificationConfig;
         this.sendNotificationService = sendNotificationService;
         this.covid19Feature = covid19Feature;
+        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
 
     private final SendNotificationService sendNotificationService;
 
     private final boolean covid19Feature;
+
+    private final boolean cmOtherPartyConfidentialityEnabled;
 
     public void manageNotificationAndSubscription(NotificationWrapper notificationWrapper, boolean fromReminderService) {
         NotificationEventType notificationType = notificationWrapper.getNotificationType();
@@ -297,6 +302,14 @@ public class NotificationService {
 
     private boolean isEventAllowedToProceedWithValidData(NotificationWrapper notificationWrapper,
                                                          NotificationEventType notificationType) {
+        if (UPDATE_OTHER_PARTY_DATA.equals(notificationType)
+            && cmOtherPartyConfidentialityEnabled
+            && notificationWrapper.getNewSscsCaseData().getAppeal() != null
+            && OtherPartyDataUtil.isValidBenefitTypeForConfidentiality(notificationWrapper.getNewSscsCaseData().getAppeal().getBenefitType())) {
+            log.info("Suppressing HEF notification for CM/UC case id {}.", notificationWrapper.getCaseId());
+            return false;
+        }
+
         if (REQUEST_FOR_INFORMATION.equals(notificationType)
             && !isYes(notificationWrapper.getNewSscsCaseData().getInformationFromAppellant())) {
             log.info("Request for Information with empty or no Information From Appellant for ccdCaseId {}.",

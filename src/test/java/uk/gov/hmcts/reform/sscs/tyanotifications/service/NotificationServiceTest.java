@@ -1412,7 +1412,7 @@ public class NotificationServiceTest {
         SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
 
         final NotificationService notificationService = new NotificationService(factory, reminderService,
-            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false
+            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, false
         );
 
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
@@ -1490,6 +1490,80 @@ public class NotificationServiceTest {
         getNotificationService().manageNotificationAndSubscription(wrapper, false);
 
         verifyNoErrorsLogged(mockAppender, captorLoggingEvent);
+    }
+
+    @Test
+    public void givenUpdateOtherPartyDataEventAndCmFlagOnAndChildSupportCase_thenSuppressNotification() {
+        CcdNotificationWrapper wrapper = buildNotificationWrapperGivenNotificationTypeAndSubscriptions(
+            UPDATE_OTHER_PARTY_DATA, null, null, null,
+            List.of(CcdValue.<OtherParty>builder().value(OtherParty.builder()
+                .sendNewOtherPartyNotification(YesNo.YES)
+                .id("1")
+                .otherPartySubscription(Subscription.builder().email("other@party.com").subscribeEmail("Yes").build())
+                .build()).build())
+        );
+        wrapper.getNewSscsCaseData().setCcdCaseId("123456789");
+        wrapper.getNewSscsCaseData().setAppeal(Appeal.builder()
+            .hearingType(AppealHearingType.ORAL.name())
+            .benefitType(BenefitType.builder().code("childSupport").build())
+            .appellant(Appellant.builder().build())
+            .build());
+
+        getNotificationService(true).manageNotificationAndSubscription(wrapper, false);
+
+        verifyExpectedLogMessage(mockAppender, captorLoggingEvent, "123456789", "Suppressing HEF notification", Level.INFO);
+    }
+
+    @Test
+    public void givenUpdateOtherPartyDataEventAndCmFlagOffAndChildSupportCase_thenDoNotSuppressNotification() {
+        CcdNotificationWrapper wrapper = buildNotificationWrapperGivenNotificationTypeAndSubscriptions(
+            UPDATE_OTHER_PARTY_DATA, null, null, null,
+            List.of(CcdValue.<OtherParty>builder().value(OtherParty.builder()
+                .sendNewOtherPartyNotification(YesNo.YES)
+                .id("1")
+                .otherPartySubscription(Subscription.builder().email("other@party.com").subscribeEmail("Yes").build())
+                .build()).build())
+        );
+        wrapper.getNewSscsCaseData().setAppeal(Appeal.builder()
+            .hearingType(AppealHearingType.ORAL.name())
+            .benefitType(BenefitType.builder().code("childSupport").build())
+            .appellant(Appellant.builder().build())
+            .build());
+        given(factory.create(any(NotificationWrapper.class), any(SubscriptionWithType.class)))
+            .willReturn(new Notification(
+                Template.builder().emailTemplateId(EMAIL_TEMPLATE_ID).smsTemplateId(List.of(SMS_TEMPLATE_ID)).build(),
+                Destination.builder().email(EMAIL).sms(SMS_MOBILE).build(),
+                new HashMap<>(), new Reference(), null));
+
+        getNotificationService(false).manageNotificationAndSubscription(wrapper, false);
+
+        verifyErrorLogMessageNotLogged(mockAppender, captorLoggingEvent, "Suppressing HEF notification");
+    }
+
+    @Test
+    public void givenUpdateOtherPartyDataEventAndCmFlagOnAndNonChildSupportCase_thenDoNotSuppressNotification() {
+        CcdNotificationWrapper wrapper = buildNotificationWrapperGivenNotificationTypeAndSubscriptions(
+            UPDATE_OTHER_PARTY_DATA, null, null, null,
+            List.of(CcdValue.<OtherParty>builder().value(OtherParty.builder()
+                .sendNewOtherPartyNotification(YesNo.YES)
+                .id("1")
+                .otherPartySubscription(Subscription.builder().email("other@party.com").subscribeEmail("Yes").build())
+                .build()).build())
+        );
+        wrapper.getNewSscsCaseData().setAppeal(Appeal.builder()
+            .hearingType(AppealHearingType.ORAL.name())
+            .benefitType(BenefitType.builder().code("PIP").build())
+            .appellant(Appellant.builder().build())
+            .build());
+        given(factory.create(any(NotificationWrapper.class), any(SubscriptionWithType.class)))
+            .willReturn(new Notification(
+                Template.builder().emailTemplateId(EMAIL_TEMPLATE_ID).smsTemplateId(List.of(SMS_TEMPLATE_ID)).build(),
+                Destination.builder().email(EMAIL).sms(SMS_MOBILE).build(),
+                new HashMap<>(), new Reference(), null));
+
+        getNotificationService(true).manageNotificationAndSubscription(wrapper, false);
+
+        verifyErrorLogMessageNotLogged(mockAppender, captorLoggingEvent, "Suppressing HEF notification");
     }
 
     @Test
@@ -1578,7 +1652,7 @@ public class NotificationServiceTest {
         SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
 
         final NotificationService notificationService = new NotificationService(factory, reminderService,
-            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, true
+            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, true, false
         );
 
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
@@ -1675,7 +1749,7 @@ public class NotificationServiceTest {
         SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
 
         final NotificationService notificationService = new NotificationService(factory, reminderService,
-            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false
+            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, false
         );
 
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
@@ -2134,7 +2208,7 @@ public class NotificationServiceTest {
         SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
 
         final NotificationService notificationService = new NotificationService(factory, reminderService,
-            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false
+            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, false
         );
 
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
@@ -2162,12 +2236,15 @@ public class NotificationServiceTest {
     }
 
     private NotificationService getNotificationService() {
+        return getNotificationService(false);
+    }
+
+    private NotificationService getNotificationService(boolean cmOtherPartyConfidentialityEnabled) {
         SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
 
-        final NotificationService notificationService = new NotificationService(factory, reminderService,
-            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false
+        return new NotificationService(factory, reminderService,
+            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, cmOtherPartyConfidentialityEnabled
         );
-        return notificationService;
     }
 
     private CcdNotificationWrapper buildWrapperWithDocuments(NotificationEventType eventType, String fileUrl, Appellant appellant, Representative rep, String documentType) {
@@ -2434,7 +2511,7 @@ public class NotificationServiceTest {
         assertTrue(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage().contains(ccdCaseId)).count() >= 1);
     }
 
-    private static void verifyErrorLogMessageNotLogged(Appender<ILoggingEvent> mockAppender, ArgumentCaptor captorLoggingEvent, String errorText) {
+    protected static void verifyErrorLogMessageNotLogged(Appender<ILoggingEvent> mockAppender, ArgumentCaptor captorLoggingEvent, String errorText) {
         verify(mockAppender, atLeast(0)).doAppend(
             (ILoggingEvent) captorLoggingEvent.capture()
         );

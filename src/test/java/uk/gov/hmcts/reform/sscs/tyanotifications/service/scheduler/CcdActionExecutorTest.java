@@ -87,7 +87,7 @@ public class CcdActionExecutorTest {
 
         final SscsCaseCallbackDeserializer deserializer = new SscsCaseCallbackDeserializer(mapper);
 
-        ccdActionExecutor = new CcdActionExecutor(notificationService, retryNotificationService, ccdService, updateCcdCaseService, idamService, deserializer, false);
+        ccdActionExecutor = new CcdActionExecutor(notificationService, retryNotificationService, ccdService, updateCcdCaseService, idamService, deserializer);
 
         caseDetails = SscsCaseDetails.builder().id(456L).caseTypeId("123").state("appealCreated").build();
 

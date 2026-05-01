@@ -23,26 +23,18 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseData
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.scheduler.CcdActionSerializer;
-import uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil;
 
 @Slf4j
 public class CcdNotificationWrapper implements NotificationWrapper {
 
     private final NotificationSscsCaseDataWrapper responseWrapper;
 
-    private final boolean cmOtherPartyConfidentialityEnabled;
-
     private boolean notificationEventTypeOverridden = false;
 
     private boolean languageSwitched = false;
 
     public CcdNotificationWrapper(NotificationSscsCaseDataWrapper responseWrapper) {
-        this(responseWrapper, false);
-    }
-
-    public CcdNotificationWrapper(NotificationSscsCaseDataWrapper responseWrapper, boolean cmOtherPartyConfidentialityEnabled) {
         this.responseWrapper = responseWrapper;
-        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
 
     @Override
@@ -289,18 +281,11 @@ public class CcdNotificationWrapper implements NotificationWrapper {
         return canSendBasedOnConfidentiality(newSscsCaseData, notificationEventType, ConfidentialityPartyMembers.JOINT_PARTY.getCode()) && isValid;
     }
 
-    private boolean isHefSuppressedForConfidentiality(SscsCaseData newSscsCaseData) {
-        return cmOtherPartyConfidentialityEnabled
-            && newSscsCaseData.getAppeal() != null
-            && OtherPartyDataUtil.isValidBenefitTypeForConfidentiality(newSscsCaseData.getAppeal().getBenefitType());
-    }
-
     private boolean isNotificationEventValidToSendToOtherPartySubscription(Subscription subscription, boolean isSendNewOtherPartyNotification, SscsCaseData newSscsCaseData, NotificationEventType notificationEventType, String partyMember) {
         boolean isValid = isValidSubscriptionOrIsMandatoryLetter(subscription, responseWrapper.getNotificationEventType())
             && (EVENTS_VALID_FOR_ALL_ENTITIES.contains(notificationEventType)
             || EVENTS_VALID_FOR_OTHER_PARTY.contains(notificationEventType)
-            || (UPDATE_OTHER_PARTY_DATA.equals(notificationEventType) && isSendNewOtherPartyNotification
-                && !isHefSuppressedForConfidentiality(newSscsCaseData)));
+            || (UPDATE_OTHER_PARTY_DATA.equals(notificationEventType) && isSendNewOtherPartyNotification));
         return canSendBasedOnConfidentiality(newSscsCaseData, notificationEventType, partyMember) && isValid;
     }
 

@@ -6,7 +6,6 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtil
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -32,21 +31,18 @@ public class NotificationController {
     private final CcdService ccdService;
     private final SscsCaseCallbackDeserializer deserializer;
     private final IdamService idamService;
-    private final boolean cmOtherPartyConfidentialityEnabled;
 
     @Autowired
     public NotificationController(NotificationService notificationService,
                                   AuthorisationService authorisationService,
                                   CcdService ccdService,
                                   SscsCaseCallbackDeserializer deserializer,
-                                  IdamService idamService,
-                                  @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
+                                  IdamService idamService) {
         this.notificationService = notificationService;
         this.authorisationService = authorisationService;
         this.ccdService = ccdService;
         this.deserializer = deserializer;
         this.idamService = idamService;
-        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
 
     @PostMapping(value = "/sendNotification", produces = APPLICATION_JSON_VALUE)
@@ -68,7 +64,7 @@ public class NotificationController {
 
             callback.getCaseDetails().getCreatedDate();
             authorisationService.authorise(serviceAuthHeader);
-            notificationService.manageNotificationAndSubscription(new CcdNotificationWrapper(notificationSscsCaseDataWrapper, cmOtherPartyConfidentialityEnabled), false);
+            notificationService.manageNotificationAndSubscription(new CcdNotificationWrapper(notificationSscsCaseDataWrapper), false);
         } catch (Exception e) {
             log.info("Exception thrown", e);
             throw e;

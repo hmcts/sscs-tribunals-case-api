@@ -88,9 +88,6 @@ import uk.gov.service.notify.NotificationClient;
 @EnableAsync
 public class TribunalsCaseApiApplication implements CommandLineRunner {
 
-    @Value("${feature.cm-other-party-confidentiality.enabled}")
-    private boolean cmOtherPartyConfidentialityEnabled;
-
     @Value("${appeal.email.host}")
     private String emailHost;
 
@@ -266,7 +263,7 @@ public class TribunalsCaseApiApplication implements CommandLineRunner {
                                   IdamService idamService,
                                   SscsCaseCallbackDeserializer deserializer) {
         // Had to wire these up like this Spring will not wire up CcdActionExecutor otherwise.
-        CcdActionExecutor ccdActionExecutor = new CcdActionExecutor(notificationService, retryNotificationService, ccdService, updateCcdCaseService, idamService, deserializer, cmOtherPartyConfidentialityEnabled);
+        CcdActionExecutor ccdActionExecutor = new CcdActionExecutor(notificationService, retryNotificationService, ccdService, updateCcdCaseService, idamService, deserializer);
         return new JobMapper(List.of(
             new JobMapping<>(payload -> !payload.contains("onlineHearingId"), ccdActionDeserializer, ccdActionExecutor)
         ));
