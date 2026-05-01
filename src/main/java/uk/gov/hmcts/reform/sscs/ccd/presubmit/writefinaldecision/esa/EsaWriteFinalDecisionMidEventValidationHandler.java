@@ -90,7 +90,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
 
     @Override
     protected void setDwpReassessAwardPage(SscsCaseData sscsCaseData, String pageId) {
-        if (isSevereConditionsEnabled && YesNo.isYes(sscsCaseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply())) {
+        if (isSevereConditionsEnabled && YesNo.isYes(sscsCaseData.getExtendedSscsCaseData().getEsaWriteFinalDecisionSevereCriteriaApply())) {
             sscsCaseData.setShowDwpReassessAwardPage(YesNo.NO);
             return;
         }
