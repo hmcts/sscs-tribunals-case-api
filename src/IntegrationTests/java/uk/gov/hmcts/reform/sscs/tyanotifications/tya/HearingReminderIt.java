@@ -98,7 +98,7 @@ public class HearingReminderIt {
 
     @Before
     public void setup() throws NotificationClientException {
-        controller = new NotificationController(notificationService, authorisationService, ccdService, deserializer, idamService, false);
+        controller = new NotificationController(notificationService, authorisationService, ccdService, deserializer, idamService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
 
         when(client.sendEmail(any(), any(), any(), any()))
