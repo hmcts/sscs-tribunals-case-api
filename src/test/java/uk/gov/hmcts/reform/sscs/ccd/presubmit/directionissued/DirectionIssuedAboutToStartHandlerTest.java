@@ -12,6 +12,8 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.PIP;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.APPEAL_TO_PROCEED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN;
@@ -54,6 +56,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
@@ -184,9 +187,7 @@ class DirectionIssuedAboutToStartHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
-        assertEquals(expected, response.getData().getDirectionTypeDl());
-        assertEquals(5, response.getData().getDirectionTypeDl().getListItems().size());
+        assertThat(response.getData().getDirectionTypeDl().getListItems()).containsExactlyElementsOf(listOptions);
     }
 
     @Test
@@ -205,45 +206,50 @@ class DirectionIssuedAboutToStartHandlerTest {
 
         when(idamService.getUserDetails(anyString())).thenReturn(userDetails);
         when(userDetails.hasRole(SUPER_USER)).thenReturn(true);
+        callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(CHILD_SUPPORT.getShortName()).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
-        assertEquals(expected, response.getData().getDirectionTypeDl());
-        assertEquals(5, response.getData().getDirectionTypeDl().getListItems().size());
+        assertThat(response.getData().getDirectionTypeDl().getListItems()).containsExactlyElementsOf(listOptions);
     }
 
-    @Test
-    void givenAppealWithConfidentialityReferralAndFeatureFlagDisabled_doNotPopulateDirectionTypeDropdown() {
-        handler = new DirectionIssuedAboutToStartHandler(false, false, idamService);
-        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("provideConfidentialityReferralTestCases")
+    void givenAppealWithConfidentialityReferral_doNotPopulateDirectionTypeDropdown(
+        String scenario, boolean featureFlagEnabled, InterlocReferralReason referralReason,
+        String benefitCode, boolean hasSuperUser) {
+        handler = new DirectionIssuedAboutToStartHandler(false, featureFlagEnabled, idamService);
+        sscsCaseData.setInterlocReferralReason(referralReason);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
         listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
         listOptions.add(new DynamicListItem(ISSUE_AND_SEND_TO_ADMIN.toString(), ISSUE_AND_SEND_TO_ADMIN.getLabel()));
 
+        if (hasSuperUser) {
+            when(idamService.getUserDetails(anyString())).thenReturn(userDetails);
+            when(userDetails.hasRole(SUPER_USER)).thenReturn(true);
+        }
+
+        if (benefitCode != null) {
+            callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(
+                BenefitType.builder().code(benefitCode).build());
+        }
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
-        assertEquals(expected, response.getData().getDirectionTypeDl());
-        assertEquals(3, response.getData().getDirectionTypeDl().getListItems().size());
+        assertThat(response.getData().getDirectionTypeDl().getListItems()).containsExactlyElementsOf(listOptions);
     }
 
-    @Test
-    void givenAppealWithoutConfidentialityReferralAndFeatureFlagEnaled_doNotPopulateDirectionTypeDropdown() {
-        handler = new DirectionIssuedAboutToStartHandler(false, true, idamService);
-
-        List<DynamicListItem> listOptions = new ArrayList<>();
-        listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
-        listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
-        listOptions.add(new DynamicListItem(ISSUE_AND_SEND_TO_ADMIN.toString(), ISSUE_AND_SEND_TO_ADMIN.getLabel()));
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
-        assertEquals(expected, response.getData().getDirectionTypeDl());
-        assertEquals(3, response.getData().getDirectionTypeDl().getListItems().size());
+    private static Stream<Arguments> provideConfidentialityReferralTestCases() {
+        return Stream.of(
+            Arguments.of("confidentiality referral with feature flag enabled and not supported benefit",
+                true, InterlocReferralReason.CONFIDENTIALITY, PIP.getShortName(), true),
+            Arguments.of("confidentiality referral with feature flag disabled",
+                false, InterlocReferralReason.CONFIDENTIALITY, null, false),
+            Arguments.of("no confidentiality referral with feature flag enabled",
+                true, null, CHILD_SUPPORT.getShortName(), true)
+        );
     }
 
     @Test
@@ -523,6 +529,7 @@ class DirectionIssuedAboutToStartHandlerTest {
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
         when(idamService.getUserDetails(anyString())).thenReturn(userDetails);
         lenient().when(userDetails.hasRole(roleName)).thenReturn(true);
+        callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(CHILD_SUPPORT.getShortName()).build());
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
