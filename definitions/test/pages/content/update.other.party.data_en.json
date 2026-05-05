@@ -9,10 +9,10 @@
     "updateOtherPartyDataAddressCountry": "United Kingdom",
     "updateOtherPartyDataAddressPostCode": "TS2 2ST",
     "updateOtherPartyDataConfidentiality": "No",
+    "updateOtherPartyDataConfidentialityYes": "Yes",
     "updateOtherPartyDataBehaviour": "No",
     "updateOtherPartyDataRole": "Paying parent",
     "updateOtherPartyDataLivingInUK": "Yes",
-
     "updateOtherPartyDataDropdownValue" : "Paying parent"
 
 }
