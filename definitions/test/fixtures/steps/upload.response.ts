@@ -3,11 +3,13 @@ import { BaseStep } from './base';
 import { credentials, environment } from '../../config/config';
 import createCaseBasedOnCaseType from '../../api/client/sscs/factory/appeal.type.factory';
 import { StepsHelper } from '../../helpers/stepsHelper';
+import sendToInterlocData from '../../pages/content/send.to.interloc_en.json';
 
 const responseReviewedTestData = require('../../pages/content/response.reviewed_en.json');
 const uploadResponseTestdata = require('../../pages/content/upload.response_en.json');
 const ucbTestData = require('../../pages/content/update.ucb_en.json');
 const listingRequirementsTestData = require('../../pages/content/listing.requirements.json');
+const eventTestData = require('../../pages/content/event.name.event.description_en.json');
 
 export class UploadResponse extends BaseStep {
   private static caseId: string;
@@ -24,6 +26,37 @@ export class UploadResponse extends BaseStep {
     super(page);
     this.page = page;
     this.stepsHelper = new StepsHelper(this.page);
+  }
+
+  private async chooseFirstAvailableEvent(eventNames: string[]) {
+    const availableOptions = (
+      await this.page.locator('#next-step option').allTextContents()
+    )
+      .map((option) => option.trim())
+      .filter((option) => option !== '');
+
+    const eventName = eventNames.find((candidate) =>
+      availableOptions.includes(candidate)
+    );
+
+    if (!eventName) {
+      throw new Error(
+        `None of the expected events are available: ${eventNames.join(', ')}`
+      );
+    }
+
+    await this.homePage.chooseEvent(eventName);
+    return eventName;
+  }
+
+  private async isEventAvailable(eventName: string) {
+    const availableOptions = (
+      await this.page.locator('#next-step option').allTextContents()
+    )
+      .map((option) => option.trim())
+      .filter((option) => option !== '');
+
+    return availableOptions.includes(eventName);
   }
 
   async validateHistory(caseId: string, needsToLogin: boolean = true) {
@@ -278,7 +311,10 @@ export class UploadResponse extends BaseStep {
     );
   }
 
-  async performUploadResponseOnAUniversalCreditWithJP(ucCaseId: string) {
+  async performUploadResponseOnAUniversalCreditWithJP(
+    ucCaseId: string,
+    validateHistoryAfterUpload: boolean = true
+  ) {
     // let ucCaseId = await createCaseBasedOnCaseType("UC");
     await this.loginUserWithCaseId(
       credentials.dwpResponseWriter,
@@ -316,7 +352,117 @@ export class UploadResponse extends BaseStep {
     await this.uploadResponsePage.enterJPDetails();
     await this.checkYourAnswersPage.confirmAndSignOut();
 
-    await this.validateHistory(ucCaseId);
+    if (validateHistoryAfterUpload) {
+      await this.validateHistory(ucCaseId);
+    }
+  }
+
+  async prepareChildSupportCaseForResponseReviewed(caseId: string) {
+    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
+    await this.homePage.chooseEvent('Update to case data');
+    await this.page
+      .getByRole('textbox', { name: 'Child maintenance number' })
+      .fill('00123');
+    await this.page
+      .getByRole('group', { name: 'Confidentiality Status' })
+      .getByLabel('No')
+      .check();
+    await this.page.getByRole('button', { name: 'Submit', exact: true }).click();
+    await this.eventNameAndDescriptionPage.inputData(
+      eventTestData.eventSummaryInput,
+      eventTestData.eventDescriptionInput
+    );
+    await this.eventNameAndDescriptionPage.confirmSubmission();
+    await expect(this.homePage.summaryTab).toBeVisible();
+
+    const otherPartyEventName = await this.chooseFirstAvailableEvent([
+      'Add other party data',
+      'Update other party data'
+    ]);
+    await this.updateOtherPartyDataPage.verifyPageContent(otherPartyEventName);
+    await this.updateOtherPartyDataPage.applyOtherPartyData();
+    await this.eventNameAndDescriptionPage.inputData(
+      eventTestData.eventSummaryInput,
+      eventTestData.eventDescriptionInput
+    );
+    await this.eventNameAndDescriptionPage.confirmSubmission();
+    await expect(this.homePage.summaryTab).toBeVisible();
+
+    await this.homePage.chooseEvent('Update subscription');
+    await this.updateOtherPartyDataPage.applyOtherPartiesSubscription();
+    await this.eventNameAndDescriptionPage.inputData(
+      eventTestData.eventSummaryInput,
+      eventTestData.eventDescriptionInput
+    );
+    await this.eventNameAndDescriptionPage.confirmSubmission();
+    await expect(this.homePage.summaryTab).toBeVisible();
+
+    if (await this.isEventAvailable('Ready to list')) {
+      await this.homePage.chooseEvent('Ready to list');
+      await this.eventNameAndDescriptionPage.verifyPageContent('Ready to list');
+      await this.eventNameAndDescriptionPage.inputData(
+        eventTestData.eventSummaryInput,
+        eventTestData.eventDescriptionInput
+      );
+      await this.eventNameAndDescriptionPage.confirmSubmission();
+      await expect(this.homePage.summaryTab).toBeVisible();
+    }
+
+    await this.homePage.signOut();
+
+    await this.loginUserWithCaseId(
+      credentials.dwpResponseWriter,
+      false,
+      caseId
+    );
+    for (let attempt = 0; attempt < 2; attempt++) {
+      await this.homePage.chooseEvent('Upload response');
+      await this.uploadResponsePage.verifyPageContent();
+      await this.uploadResponsePage.uploadChildSupportConfidentialDocs();
+      await this.uploadResponsePage.continueSubmission();
+      await this.uploadResponsePage.addChildSupportOtherParty();
+      await this.page
+        .getByRole('button', { name: 'Submit', exact: true })
+        .click();
+      await expect(this.homePage.summaryTab).toBeVisible();
+
+      const responseReceived = await this.page.getByText('Response received')
+        .waitFor({ state: 'visible', timeout: 15000 })
+        .then(() => true)
+        .catch(() => false);
+      if (responseReceived) {
+        break;
+      }
+    }
+    await this.homePage.signOut();
+  }
+
+  async verifyChildSupportResponseReviewedConfidentialityReferralReasons(
+    caseId: string,
+    user,
+    reviewer: string
+  ) {
+    await this.loginUserWithCaseId(user, false, caseId);
+    await this.homePage.navigateToTab('Summary');
+    await this.summaryTab.verifyPresenceOfText('Response received');
+
+    await this.homePage.chooseEvent('Response reviewed');
+    await this.responseReviewedPage.verifyPageContent(
+      responseReviewedTestData.captionValue,
+      responseReviewedTestData.headingValue
+    );
+    await this.responseReviewedPage.chooseInterlocOption('Yes');
+    await this.responseReviewedPage.selectCaseReview(reviewer);
+    await this.responseReviewedPage.verifyReasonReferredOptions([
+      sendToInterlocData.sendToInterlocConfidentialityReasonValue,
+      sendToInterlocData.sendToInterlocReviewConfidentialityRequestValue
+    ]);
+    await this.responseReviewedPage.selectReasonReferred(
+      sendToInterlocData.sendToInterlocConfidentialityReasonValue
+    );
+    await this.responseReviewedPage.verifySelectedReasonReferred(
+      sendToInterlocData.sendToInterlocConfidentialityReasonValue
+    );
   }
 
   async verifyErrorsScenariosInUploadResponse() {
