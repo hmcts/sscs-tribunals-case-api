@@ -221,6 +221,23 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         assertThat(response.getData().getShowDwpReassessAwardPage()).isEqualTo(NO);
     }
 
+
+    @Test
+    public void givenEsaCaseWithWcaAppealFlowAndSevereConditionsFalse_thenShowDwpReassessAwardPage() {
+
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        sscsCaseData.setWcaAppeal(YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getExtendedSscsCaseData().setEsaWriteFinalDecisionSevereCriteriaApply(NO);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getPageId()).thenReturn("workCapabilityAssessment");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getShowDwpReassessAwardPage()).isEqualTo(YES);
+    }
+
     @Test
     @Parameters({"STANDARD_RATE, STANDARD_RATE",})
     @Override
