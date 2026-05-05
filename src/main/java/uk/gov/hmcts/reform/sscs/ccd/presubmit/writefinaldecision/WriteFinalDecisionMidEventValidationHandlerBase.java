@@ -86,7 +86,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
             preSubmitCallbackResponse.addWarning("Appellant is deceased. Copy the draft decision and amend offline, then upload the offline version.");
         }
 
-        if (isSevereConditionsEnabled && hasSvIssueCode(sscsCaseData) && !isDecisionNoticeDateBlankOrAfterSvStartDate(sscsCaseData)) {
+        if (isSevereConditionsEnabled && hasSvIssueCode(sscsCaseData) && !isFinalDecisionDateOfDecisionBlankOrAfterSvStartDate(sscsCaseData)) {
             preSubmitCallbackResponse.addError("You cannot write decision notice until resolved. Please ask admin to amend issue code to WC or SG and then proceed.");
         }
 
@@ -122,7 +122,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
         return false;
     }
 
-    protected boolean isDecisionNoticeDateBlankOrAfterSvStartDate(SscsCaseData sscsCaseData) {
+    protected boolean isFinalDecisionDateOfDecisionBlankOrAfterSvStartDate(SscsCaseData sscsCaseData) {
         if (isNotBlank(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecision())) {
             LocalDate dateOfDecision = LocalDate.parse(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecision());
             return dateOfDecision.isAfter(LocalDate.of(2026, 04, 05));
