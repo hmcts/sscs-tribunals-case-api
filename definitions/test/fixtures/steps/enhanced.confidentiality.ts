@@ -14,17 +14,37 @@ export class EnhancedConfidentiality extends BaseStep {
     this.page = page;
   }
 
+  private async withConcurrencyRetry(action: () => Promise<void>, maxAttempts: number = 3): Promise<void> {
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        await action();
+        return;
+      } catch (error) {
+        const concurrencyError = await this.page
+            .getByText('another action happened at the same time')
+            .waitFor({ state: 'visible', timeout: 2000 })
+            .then(() => true)
+            .catch(() => false);
+        if (!concurrencyError || attempt === maxAttempts) {
+          throw error;
+        }
+        await this.page.getByRole('link', { name: 'Cancel' }).click();
+        await this.homePage.delay(2000);
+      }
+    }
+  }
+
   async requestForConfidentiality() {
-    await this.homePage.chooseEvent(actionFurtherEvidenceTestdata.eventName);
-    await this.actionFurtherEvidencePage.submitActionFurtherEvidenceForConfRequest(
-      actionFurtherEvidenceTestdata.sender,
-      actionFurtherEvidenceTestdata.confDocType,
-      actionFurtherEvidenceTestdata.testfileone
-    );
-    await this.eventNameAndDescriptionPage.verifyPageContent(
-      actionFurtherEvidenceTestdata.eventName
-    );
-    await this.eventNameAndDescriptionPage.confirmSubmission();
+    await this.withConcurrencyRetry(async () => {
+      await this.homePage.chooseEvent(actionFurtherEvidenceTestdata.eventName);
+      await this.actionFurtherEvidencePage.submitActionFurtherEvidenceForConfRequest(
+        actionFurtherEvidenceTestdata.sender,
+        actionFurtherEvidenceTestdata.confDocType,
+        actionFurtherEvidenceTestdata.testfileone
+      );
+      await this.eventNameAndDescriptionPage.verifyPageContent(actionFurtherEvidenceTestdata.eventName);
+      await this.eventNameAndDescriptionPage.confirmSubmission();
+    });
   }
 
   async requestConfidentialityForJP() {
@@ -52,16 +72,14 @@ export class EnhancedConfidentiality extends BaseStep {
   }
 
   async grantConfidentialityForAppellant(caseId: string) {
-    await new Promise((f) => setTimeout(f, 2000)); //Delay required for the Case to be ready
     await this.homePage.signOut();
-    await new Promise((f) => setTimeout(f, 3000)); //Delay required for the Case to be ready
     await this.loginUserWithCaseId(credentials.judge, false, caseId);
-    await this.homePage.chooseEvent(
-      reviewConfidentialityTestdata.eventNameCaptor
-    );
-    await this.reviewConfidentialityPage.verifyPageContentForReviewConfPage();
-    await this.reviewConfidentialityPage.selectGrantConfidentialityForAppellant();
-    await this.reviewConfidentialityPage.confirmSubmission();
+    await this.withConcurrencyRetry(async () => {
+      await this.homePage.chooseEvent(reviewConfidentialityTestdata.eventNameCaptor);
+      await this.reviewConfidentialityPage.verifyPageContentForReviewConfPage();
+      await this.reviewConfidentialityPage.selectGrantConfidentialityForAppellant();
+      await this.reviewConfidentialityPage.confirmSubmission();
+    });
   }
 
   async confidentialityDecisionForParties(caseId: string) {
@@ -103,6 +121,13 @@ export class EnhancedConfidentiality extends BaseStep {
     await new Promise((f) => setTimeout(f, 2000)); //Delay required for the Case to be ready
     await this.homePage.signOut();
     await new Promise((f) => setTimeout(f, 3000)); //Delay required for the Case to be ready
+  }
+
+  async prepareConfidentialCase(caseId: string) {
+    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
+    await this.requestForConfidentiality();
+    await this.grantConfidentialityForAppellant(caseId);
+    await this.verifyConfidentialityFlag();
   }
 
   async uploadSupplementaryCorrespondence(caseId: string) {

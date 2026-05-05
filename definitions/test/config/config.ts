@@ -2,6 +2,45 @@ import path from 'path';
 const fs = require('fs');
 const yaml = require('js-yaml');
 
+const isEnabled = (value?: string) =>
+  ['true', '1', 'yes', 'on'].includes((value || '').trim().toLowerCase());
+
+const isPreviewTarget = () => {
+  const targetUrl =
+    process.env.TEST_E2E_URL_WEB || process.env.TEST_E2E_API_URI || '';
+
+  return (
+    environment.name === 'pr' ||
+    targetUrl.includes('.preview.platform.hmcts.net')
+  );
+};
+
+const getCmOtherPartyConfidentialityFlag = () => {
+  const chartConfigPath = path.resolve(
+    __dirname,
+    isPreviewTarget()
+      ? '../../../charts/sscs-tribunals-api/values.preview.template.yaml'
+      : '../../../charts/sscs-tribunals-api/values.yaml'
+  );
+
+  try {
+    const chartConfig = yaml.load(fs.readFileSync(chartConfigPath, 'utf8')) as {
+      java?: { environment?: { CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED?: boolean } };
+    };
+
+    const value =
+      chartConfig?.java?.environment?.CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED;
+
+    if (typeof value === 'boolean') {
+      return value;
+    }
+  } catch (error) {
+    // Fall back to env if chart config cannot be read in the local test workspace.
+  }
+
+  return isEnabled(process.env.CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED);
+};
+
 export const urls = {
   tribunalsApiUri: process.env.TEST_E2E_API_URI || '',
   xuiUrl: process.env.TEST_E2E_URL_WEB || '',
@@ -18,6 +57,10 @@ const versionFilePath = path.resolve(__dirname, '../../benefit/VERSION.yaml');
 export const environment = {
   name: process.env.ENVIRONMENT ?? '',
   aatDefVersion: yaml.load(fs.readFileSync(versionFilePath, 'utf8'))
+};
+
+export const featureFlags = {
+  cmOtherPartyConfidentialityEnabled: getCmOtherPartyConfidentialityFlag()
 };
 
 export const credentials = {
@@ -48,6 +91,10 @@ export const credentials = {
   judge: {
     email: process.env.TEST_JUDGE_USERNAME,
     password: process.env.TEST_JUDGE_PASSWORD
+  },
+  legalOfficer: {
+    email: process.env.TEST_LEGAL_OFFICER_USERNAME,
+    password: process.env.TEST_LEGAL_OFFICER_PASSWORD
   },
   seniorJudge: {
     email: process.env.SENIOR_JUDGE_USERNAME,
