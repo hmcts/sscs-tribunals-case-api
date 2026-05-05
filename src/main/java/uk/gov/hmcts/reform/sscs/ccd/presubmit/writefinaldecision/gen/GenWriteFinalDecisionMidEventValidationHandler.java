@@ -22,7 +22,7 @@ public class GenWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
     public GenWriteFinalDecisionMidEventValidationHandler(Validator validator,
                                                           DecisionNoticeService decisionNoticeService,
                                                           @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled) {
-        super(validator, decisionNoticeService, isPostHearingsEnabled, false);
+        super(validator, decisionNoticeService, isPostHearingsEnabled);
     }
 
     @Override

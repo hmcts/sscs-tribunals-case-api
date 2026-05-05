@@ -44,7 +44,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Override
-    protected WriteFinalDecisionMidEventValidationHandlerBase createValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService, boolean isPostHearingsEnabled, boolean isSevereConditionsEnabled) {
+    protected WriteFinalDecisionMidEventValidationHandlerBase createValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService, boolean isPostHearingsEnabled) {
         return new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, isPostHearingsEnabled, false);
     }
 
@@ -294,7 +294,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision(dateOfDecision);
         EsaWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, true);
         handlerWithSevereConditions.setDefaultFields(sscsCaseData);
-        assertThat(isDateOfDecisionAfterSvDate).isEqualTo(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecisionIsAfterSvDate());
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecisionIsAfterSvDate()).isEqualTo(isDateOfDecisionAfterSvDate);
     }
 
     @Test
@@ -305,8 +305,8 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         PreSubmitCallbackResponse<SscsCaseData> response = handlerWithSevereConditions.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertThat(1).isEqualTo(response.getErrors().size());
-        assertThat("You cannot write decision notice until resolved. Please ask admin to amend issue code to WC or SG and then proceed.").isEqualTo(response.getErrors().iterator().next());
+        assertThat(response.getErrors()).hasSize(1);
+        assertThat(response.getErrors().iterator().next()).isEqualTo("You cannot write decision notice until resolved. Please ask admin to amend issue code to WC or SG and then proceed.");
     }
 
     @Test
@@ -317,7 +317,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         PreSubmitCallbackResponse<SscsCaseData> response = handlerWithSevereConditions.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertThat(0).isEqualTo(response.getErrors().size());
+        assertThat(response.getErrors()).isEmpty();
     }
 
     @Test
@@ -328,7 +328,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         PreSubmitCallbackResponse<SscsCaseData> response = handlerWithSevereConditions.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertThat(0).isEqualTo(response.getErrors().size());
+        assertThat(response.getErrors()).isEmpty();
     }
 
 }

@@ -16,12 +16,15 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 @Component
 public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDecisionMidEventValidationHandlerBase {
 
+    @Value("${feature.severeConditions.enabled}")
+    private final boolean isSevereConditionsEnabled;
 
     public UcWriteFinalDecisionMidEventValidationHandler(Validator validator,
                                                          DecisionNoticeService decisionNoticeService,
                                                          @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled,
                                                          @Value("${feature.severeConditions.enabled}") boolean isSevereConditionsEnabled) {
-        super(validator, decisionNoticeService, isPostHearingsEnabled, isSevereConditionsEnabled);
+        super(validator, decisionNoticeService, isPostHearingsEnabled);
+        this.isSevereConditionsEnabled = isSevereConditionsEnabled;
     }
 
     @Override
@@ -66,6 +69,11 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
 
     @Override
     protected void validateAwardTypes(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+
+        if (isSevereConditionsEnabled && hasSvIssueCode(sscsCaseData) && !isFinalDecisionDateOfDecisionBlankOrAfterSvStartDate(sscsCaseData)) {
+            preSubmitCallbackResponse.addError("You cannot write decision notice until resolved. Please ask admin to amend issue code to WC or SG and then proceed.");
+        }
+
         if ("Yes".equalsIgnoreCase(sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionSchedule7ActivitiesApply())) {
             if (sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionSchedule7ActivitiesQuestion() == null
                 || sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionSchedule7ActivitiesQuestion().isEmpty()) {
