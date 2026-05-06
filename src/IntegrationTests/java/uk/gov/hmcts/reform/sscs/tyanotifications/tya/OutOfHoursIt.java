@@ -43,6 +43,7 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobScheduler;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
+import uk.gov.hmcts.reform.sscs.service.BusinessEventLogger;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationConfig;
@@ -159,7 +160,7 @@ public class OutOfHoursIt {
         when(outOfHoursCalculator.getStartOfNextInHoursPeriod()).thenReturn(zoned);
         when(outOfHoursCalculator.isItOutOfHours()).thenReturn(true);
 
-        notificationHandler = new NotificationHandler(outOfHoursCalculator, jobScheduler, jobGroupGenerator);
+        notificationHandler = new NotificationHandler(outOfHoursCalculator, jobScheduler, jobGroupGenerator, mock(BusinessEventLogger.class));
 
         NotificationSender sender = new NotificationSender(notificationClient, null, bulkPrintService, notificationTestRecipients, markdownTransformationService, saveCorrespondenceAsyncService, false);
         SendNotificationService sendNotificationService = new SendNotificationService(sender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
