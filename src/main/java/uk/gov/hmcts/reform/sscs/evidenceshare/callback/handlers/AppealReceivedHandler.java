@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
@@ -23,18 +22,14 @@ public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
 
     private final DispatchPriority dispatchPriority;
 
-    private final CcdService ccdService;
-
     private final UpdateCcdCaseService updateCcdCaseService;
 
     private final IdamService idamService;
 
     @Autowired
-    public AppealReceivedHandler(CcdService ccdService,
-                                 UpdateCcdCaseService updateCcdCaseService,
+    public AppealReceivedHandler(UpdateCcdCaseService updateCcdCaseService,
                                  IdamService idamService) {
         this.dispatchPriority = DispatchPriority.LATEST;
-        this.ccdService = ccdService;
         this.updateCcdCaseService = updateCcdCaseService;
         this.idamService = idamService;
     }
@@ -48,7 +43,8 @@ public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
             && (callback.getEvent() == EventType.VALID_APPEAL_CREATED
             || callback.getEvent() == EventType.DRAFT_TO_VALID_APPEAL_CREATED
             || callback.getEvent() == EventType.VALID_APPEAL
-            || callback.getEvent() == EventType.INTERLOC_VALID_APPEAL)
+            || callback.getEvent() == EventType.INTERLOC_VALID_APPEAL
+            || callback.getEvent() == EventType.CONFIDENTIALITY_CONFIRMED)
             && READY_TO_LIST.getId().equals(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom());
     }
 
