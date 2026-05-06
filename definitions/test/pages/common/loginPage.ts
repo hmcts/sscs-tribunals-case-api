@@ -1,4 +1,5 @@
-import { expect, Locator, Page } from '@playwright/test';
+import { expect, Locator, Page, test } from '@playwright/test';
+import { urls } from '../../config/config';
 import { WebAction } from '../../common/web.action';
 
 let webActions: WebAction;
@@ -8,12 +9,14 @@ export class LoginPage {
   readonly pageTitle: Locator;
   readonly mainPageTitle: Locator;
   readonly signOutBtn: Locator;
+  readonly crownCopyrightLink: Locator;
 
   constructor(page: Page) {
     this.page = page;
     this.pageTitle = page.locator('h3');
     this.mainPageTitle = page.locator('h1');
     this.signOutBtn = page.locator("//li/a[normalize-space()='Sign out']");
+    this.crownCopyrightLink = page.locator('a', { hasText: '© Crown copyright' });
     webActions = new WebAction(this.page);
   }
 
@@ -34,10 +37,78 @@ export class LoginPage {
     clearCacheFlag?: boolean
   ): Promise<void> {
     if (clearCacheFlag) await this.page.context().clearCookies();
-    await webActions.inputField('#username', user.email);
-    await webActions.inputField('#password', user.password);
+
+  const isLocalhost = this.page.url().includes('localhost');
+  if (isLocalhost) {
+    await this.localLogin(user);
+    return;
+  }
+
+  const maxAttempts = 3;
+
+  const usernameField = this.page.locator('#username');
+  const passwordField = this.page.locator('#password');
+  const signInButton = this.page.getByRole('button', {
+    name: 'Sign in',
+    exact: true
+  });
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    await usernameField.fill(user.email);
+    await passwordField.fill(user.password);
+
+    await expect(signInButton).toBeVisible();
+    await expect(signInButton).toBeEnabled();
+
+    await signInButton.click();
+
+    const signedIn = await this.signOutBtn
+      .isVisible({ timeout: 15000 })
+      .catch(() => false);
+
+    if (signedIn) {
+      return;
+    }
+
+    const backAtLogin =
+      await usernameField.isVisible({ timeout: 3000 }).catch(() => false) &&
+      await passwordField.isVisible({ timeout: 3000 }).catch(() => false);
+
+    if (!backAtLogin) {
+      break;
+    }
+  }
+
+  await expect(this.signOutBtn).toBeVisible({ timeout: 15000 });
+  }
+
+  private async localLogin(user: { email: string; }) {
+    let loginAttempts = 0;
+    const maxAttempts = 5;
+    const help = this.page.locator('a', {hasText: 'Get help'});
+
+    await webActions.inputField('[name="username"]', user.email);
     await webActions.clickButton('Sign in');
-    await webActions.delay(10000);
-    await this.signOutBtn.isVisible();
+
+    while (loginAttempts < maxAttempts) {
+      try {
+        await expect(help).toBeVisible({timeout: 5000});
+        break;
+      } catch {
+        const usernameField = this.page.locator('[name="username"]');
+        if (await usernameField.isVisible({timeout: 2000})) {
+          loginAttempts++;
+          await webActions.inputField('[name="username"]', user.email);
+          await webActions.clickButton('Sign in');
+        } else {
+          break;
+        }
+      }
+    }
+    const acceptCookiesBtn = this.page.locator('button', {hasText: 'Accept analytics cookies'});
+    if (await acceptCookiesBtn.isVisible()) {
+      await acceptCookiesBtn.click();
+    }
+    await expect(help).toBeVisible();
   }
 }
