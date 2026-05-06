@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -55,8 +56,8 @@ class ConfidentialityConfirmedMidEventHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = Benefit.class, mode = EnumSource.Mode.EXCLUDE, names = {"CHILD_SUPPORT"})
-    void givenNonChildSupportBenefit_thenReturnFalse(Benefit benefit) {
+    @EnumSource(value = Benefit.class, mode = EnumSource.Mode.EXCLUDE, names = {"CHILD_SUPPORT", "UC"})
+    void givenNonSupportedBenefit_thenReturnFalse(Benefit benefit) {
         when(callback.getEvent()).thenReturn(CONFIDENTIALITY_CONFIRMED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseDataWithBenefit(benefit.getShortName()));
@@ -72,9 +73,10 @@ class ConfidentialityConfirmedMidEventHandlerTest {
         assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
     }
 
-    @Test
-    void givenConfidentialityConfirmedEventAndChildSupportBenefit_thenReturnTrue() {
-        var sscsCaseData = caseDataWithBenefit(CHILD_SUPPORT.getShortName());
+    @ParameterizedTest
+    @ValueSource(strings = {"CHILD_SUPPORT", "UC"})
+    void givenConfidentialityConfirmedEventAndSupportedBenefit_thenReturnTrue(Benefit benefit) {
+        var sscsCaseData = caseDataWithBenefit(benefit.getShortName());
 
         when(callback.getEvent()).thenReturn(CONFIDENTIALITY_CONFIRMED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);

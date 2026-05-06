@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.confidentialityconfirmed;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -37,7 +38,7 @@ class ConfidentialityConfirmedMidEventHandler implements PreSubmitCallbackHandle
             return false;
         }
 
-        return callback.getCaseDetails().getCaseData().isBenefitType(CHILD_SUPPORT);
+        return callback.getCaseDetails().getCaseData().isBenefitType(CHILD_SUPPORT) || callback.getCaseDetails().getCaseData().isBenefitType(UC);
     }
 
     @Override

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.confidentialityconfirmed;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 
 import java.time.LocalDate;
 import lombok.extern.slf4j.Slf4j;
@@ -19,10 +20,15 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Service
 class ConfidentialityConfirmedAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
+    private final int dwpResponseDueDays;
     private final int dwpResponseDueDaysChildSupport;
     private final boolean cmOtherPartyConfidentialityEnabled;
 
-    public ConfidentialityConfirmedAboutToSubmitHandler(@Value("${dwp.response.due.days-child-support}") int dwpResponseDueDaysChildSupport, @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
+    public ConfidentialityConfirmedAboutToSubmitHandler(
+        @Value("${dwp.response.due.days}") int dwpResponseDueDays,
+        @Value("${dwp.response.due.days-child-support}") int dwpResponseDueDaysChildSupport,
+        @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
+        this.dwpResponseDueDays = dwpResponseDueDays;
         this.dwpResponseDueDaysChildSupport = dwpResponseDueDaysChildSupport;
         this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
@@ -38,18 +44,24 @@ class ConfidentialityConfirmedAboutToSubmitHandler implements PreSubmitCallbackH
             return false;
         }
 
-        return callback.getCaseDetails().getCaseData().isBenefitType(CHILD_SUPPORT);
+        return callback.getCaseDetails().getCaseData().isBenefitType(CHILD_SUPPORT) || callback
+            .getCaseDetails()
+            .getCaseData()
+            .isBenefitType(UC);
     }
 
     @Override
-    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
+        String userAuthorisation) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        final String dwpDueDate = LocalDate.now().plusDays(dwpResponseDueDaysChildSupport).toString();
-        log.info("Setting dwp state to UNREGISTERED and dwp due date to {} for case id {}", dwpDueDate, callback.getCaseDetails().getId());
+        final String dwpDueDate = caseData.isBenefitType(CHILD_SUPPORT)
+            ? LocalDate.now().plusDays(dwpResponseDueDaysChildSupport).toString() : LocalDate.now().plusDays(dwpResponseDueDays).toString();
+        log.info("Setting dwp state to UNREGISTERED and dwp due date to {} for case id {}", dwpDueDate,
+            callback.getCaseDetails().getId());
         caseData.setDwpDueDate(dwpDueDate);
         caseData.setDwpState(DwpState.UNREGISTERED);
         return new PreSubmitCallbackResponse<>(caseData);
