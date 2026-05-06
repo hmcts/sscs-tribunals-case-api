@@ -16,7 +16,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -77,7 +76,7 @@ class ConfidentialityConfirmedAboutToSubmitHandlerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"CHILD_SUPPORT", "UC"})
+    @EnumSource(value = Benefit.class, names = {"CHILD_SUPPORT", "UC"})
     void givenConfidentialityConfirmedEventAndSupportedBenefit_thenReturnTrue(Benefit benefit) {
         var sscsCaseData = caseDataWithBenefit(benefit.getShortName());
 
