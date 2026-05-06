@@ -46,7 +46,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
     @Override
     protected WriteFinalDecisionMidEventValidationHandlerBase createValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService, boolean isPostHearingsEnabled) {
-        return new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, isPostHearingsEnabled, true);
+        return new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, isPostHearingsEnabled, false);
     }
 
     @Override
@@ -216,7 +216,10 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(callback.getPageId()).thenReturn("workCapabilityAssessment");
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        EsaWriteFinalDecisionMidEventValidationHandler severeConditionsHandler = new EsaWriteFinalDecisionMidEventValidationHandler(
+                validator, decisionNoticeService, true, true);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = severeConditionsHandler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getShowDwpReassessAwardPage()).isEqualTo(NO);
     }
@@ -233,7 +236,10 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(callback.getPageId()).thenReturn("workCapabilityAssessment");
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        EsaWriteFinalDecisionMidEventValidationHandler severeConditionsHandler = new EsaWriteFinalDecisionMidEventValidationHandler(
+                validator, decisionNoticeService, true, true);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = severeConditionsHandler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getShowDwpReassessAwardPage()).isEqualTo(YES);
     }
