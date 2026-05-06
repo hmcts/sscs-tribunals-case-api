@@ -500,7 +500,7 @@ tasks.register('runAndPublishConsumerPactTests', Test) {
     testClassesDirs = sourceSets.contractTest.output.classesDirs
     classpath = sourceSets.contractTest.runtimeClasspath
 }
-
+println "PACT_BROKER_FULL_URL = " + System.getenv("PACT_BROKER_FULL_URL")
 pact {
     broker {
         pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
@@ -521,12 +521,14 @@ runAndPublishConsumerPactTests.finalizedBy pactPublish
 //    'git rev-parse --verify --short HEAD'.execute().text.trim()
 //}
 def getCheckedOutGitCommitHash() {
+    println "Getting git hash..."
     def stdout = new ByteArrayOutputStream()
     exec {
         commandLine 'git', 'rev-parse', '--verify', '--short', 'HEAD'
         standardOutput = stdout
         ignoreExitValue = true
     }
+    println "Git hash resolved"
     return stdout.toString().trim()
 }
 
