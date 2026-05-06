@@ -182,8 +182,8 @@ export class IssueDirectionPage {
   }
 
   async confirmSubmission(): Promise<void> {
-    await this.page.waitForTimeout(3000);
-    await webActions.clickSubmitButton();
+    await webActions.waitForSpinnerToDisappear()
+    await webActions.clickButton('Submit');
     await this.page.waitForTimeout(3000);
   }
 
