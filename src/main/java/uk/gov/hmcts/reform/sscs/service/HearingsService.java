@@ -65,6 +65,7 @@ public class HearingsService {
     private final HearingServiceConsumer hearingServiceConsumer;
     private final HearingsMapping hearingsMapping;
     private final OverridesMapping overridesMapping;
+    private final BusinessEventLogger businessEventLogger;
 
 
     // Leaving blank for now until a future change is scoped and completed, then we can add the case states back in
@@ -155,6 +156,9 @@ public class HearingsService {
 
         log.info("Received Create Hearing Request Response for Case ID {}, Hearing State {} and Response:\n{}",
                 caseId, wrapper.getHearingState().getState(), hmcUpdateResponse.toString());
+
+        businessEventLogger.logHearingsEvent("createHearing", caseId,
+                String.valueOf(hmcUpdateResponse.getHearingRequestId()), "success");
 
         hearingResponseUpdate(wrapper, hmcUpdateResponse);
     }
@@ -282,6 +286,8 @@ public class HearingsService {
                     String.format("The case with Case id: %s could not be updated using updateCaseV2 with status %s, %s",
                             caseId, e.status(), e));
             log.error(exc.getMessage(), exc);
+            businessEventLogger.logHearingsEvent("hearingResponseUpdate", caseId,
+                    String.valueOf(hearingRequestId), "failure");
             throw exc;
         }
 
