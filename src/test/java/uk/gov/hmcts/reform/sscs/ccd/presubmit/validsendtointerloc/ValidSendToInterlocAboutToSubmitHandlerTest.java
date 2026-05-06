@@ -227,6 +227,18 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
         assertEquals(Collections.emptySet(), response.getErrors());
     }
 
+    @Test
+    void givenConfidentialityReferralAndChildSupport_whenFlagOffAndSelectionMissing_thenDoesNotReturnMustSelectPartyError() {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(null);
+        var handlerWithFlagOff = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService, false);
+
+        var response = handlerWithFlagOff.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(Collections.emptySet(), response.getErrors());
+    }
+
     private static Stream<Arguments> missingSelectionScenarios() {
         return Stream.of(
                 Arguments.of((DynamicList) null),
