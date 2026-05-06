@@ -125,6 +125,14 @@ class PartiesOnCaseUtilTest {
     }
 
     @Test
+    void shouldReturnOnlyAppellantWhenNoOtherPartiesInSelectedConfidentialityPartyDropdown() {
+        DynamicList response = PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown(sscsCaseData);
+
+        assertThat(response.getListItems()).extracting(DynamicListItem::getCode)
+            .containsExactly(PartyItemList.APPELLANT.getCode());
+    }
+
+    @Test
     void shouldExcludeRepresentativeOptionsFromSelectedConfidentialityPartyDropdown() {
         sscsCaseData.getAppeal().setRep(Representative.builder().id("main-rep").hasRepresentative(YES.getValue()).build());
         OtherParty otherParty = OtherParty.builder()
