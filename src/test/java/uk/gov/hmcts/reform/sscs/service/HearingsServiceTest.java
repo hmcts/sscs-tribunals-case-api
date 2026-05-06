@@ -129,6 +129,8 @@ class HearingsServiceTest {
     private ArgumentCaptor<Consumer<SscsCaseDetails>> caseDataConsumerCaptor;
     @Mock
     private OverridesMapping overridesMapping;
+    @Mock
+    private BusinessEventLogger businessEventLogger;
 
     @InjectMocks
     private HearingsService hearingsService;

@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.jobscheduler.model.Job;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobScheduler;
+import uk.gov.hmcts.reform.sscs.service.BusinessEventLogger;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationClientRuntimeException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
@@ -43,6 +44,8 @@ public class NotificationHandlerTest {
     @Mock
     private JobGroupGenerator jobGroupGenerator;
     @Mock
+    private BusinessEventLogger businessEventLogger;
+    @Mock
     private NotificationWrapper notificationWrapper;
     @Mock
     private NotificationHandler.SendNotification sendNotification;
@@ -56,7 +59,7 @@ public class NotificationHandlerTest {
 
     @Before
     public void setUp() {
-        underTest = new NotificationHandler(outOfHoursCalculator, jobScheduler, jobGroupGenerator);
+        underTest = new NotificationHandler(outOfHoursCalculator, jobScheduler, jobGroupGenerator, businessEventLogger);
 
         Logger logger = (Logger) LoggerFactory.getLogger(NotificationHandler.class.getName());
         logger.addAppender(mockAppender);
