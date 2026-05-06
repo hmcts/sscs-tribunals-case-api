@@ -44,10 +44,8 @@ class ConfidentialityConfirmedAboutToSubmitHandler implements PreSubmitCallbackH
             return false;
         }
 
-        return callback.getCaseDetails().getCaseData().isBenefitType(CHILD_SUPPORT) || callback
-            .getCaseDetails()
-            .getCaseData()
-            .isBenefitType(UC);
+        final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        return caseData.isBenefitType(CHILD_SUPPORT) || caseData.isBenefitType(UC);
     }
 
     @Override

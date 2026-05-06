@@ -38,7 +38,8 @@ class ConfidentialityConfirmedMidEventHandler implements PreSubmitCallbackHandle
             return false;
         }
 
-        return callback.getCaseDetails().getCaseData().isBenefitType(CHILD_SUPPORT) || callback.getCaseDetails().getCaseData().isBenefitType(UC);
+        final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        return caseData.isBenefitType(CHILD_SUPPORT) || caseData.isBenefitType(UC);
     }
 
     @Override
@@ -47,7 +48,7 @@ class ConfidentialityConfirmedMidEventHandler implements PreSubmitCallbackHandle
             throw new IllegalStateException("Cannot handle callback");
         }
 
-        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
         var preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
         boolean otherPartyConfidentialityMissing = Optional.ofNullable(caseData.getOtherParties())
