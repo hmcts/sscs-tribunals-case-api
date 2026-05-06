@@ -94,11 +94,16 @@ public class OtherPartyDataUtil {
     }
 
     public static YesNo isConfidential(final SscsCaseData sscsCaseData) {
-        if (isValidBenefitTypeForConfidentiality(sscsCaseData.getAppeal().getBenefitType())) {
-            if ((sscsCaseData.getAppeal().getAppellant() != null
-                    && sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired() != null
-                    && isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired()))
-                    || otherPartyHasConfidentiality(sscsCaseData)) {
+        return isConfidential(sscsCaseData, false);
+    }
+
+    public static YesNo isConfidential(final SscsCaseData sscsCaseData, final boolean cmOtherPartyConfidentialityEnabled) {
+        var appeal = sscsCaseData.getAppeal();
+        if (isValidBenefitTypeForConfidentiality(appeal.getBenefitType(), cmOtherPartyConfidentialityEnabled)) {
+            if ((appeal.getAppellant() != null
+                && appeal.getAppellant().getConfidentialityRequired() != null
+                && isYes(appeal.getAppellant().getConfidentialityRequired()))
+                || otherPartyHasConfidentiality(sscsCaseData)) {
                 return YES;
             }
         }
@@ -106,10 +111,21 @@ public class OtherPartyDataUtil {
     }
 
     public static boolean isValidBenefitTypeForConfidentiality(final BenefitType benefitType) {
-        return benefitType != null
-                && (Arrays.stream(Benefit.values())
-                .anyMatch(b -> (SscsType.SSCS2.equals(b.getSscsType()) || SscsType.SSCS5.equals(b.getSscsType()))
-                && b.getShortName().equals(benefitType.getCode())));
+        return isValidBenefitTypeForConfidentiality(benefitType, false);
+    }
+
+    public static boolean isValidBenefitTypeForConfidentiality(final BenefitType benefitType, final boolean cmOtherPartyConfidentialityEnabled) {
+        if (benefitType == null) {
+            return false;
+        }
+
+        var validBenefit = Arrays.stream(Benefit.values())
+            .anyMatch(b -> (SscsType.SSCS2.equals(b.getSscsType()) || SscsType.SSCS5.equals(b.getSscsType()))
+                && b.getShortName().equals(benefitType.getCode()));
+
+        return cmOtherPartyConfidentialityEnabled
+            ? validBenefit || Benefit.UC.getShortName().equals(benefitType.getCode())
+            : validBenefit;
     }
 
     public static boolean isOtherPartyPresent(SscsCaseData sscsCaseData) {
