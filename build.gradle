@@ -206,6 +206,7 @@ repositories {
     maven {
         url 'https://repo.spring.io/libs-milestone'
     }
+    gradlePluginPortal()
 }
 
 project.tasks.named('pitest') {
