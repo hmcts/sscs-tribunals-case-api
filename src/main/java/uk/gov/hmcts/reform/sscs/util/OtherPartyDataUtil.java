@@ -37,6 +37,14 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
 public class OtherPartyDataUtil {
 
+    private static final Set<String> VALID_CONFIDENTIALITY_BENEFITS =
+        Arrays.stream(Benefit.values())
+            .filter(benefit ->
+                SscsType.SSCS2.equals(benefit.getSscsType())
+                    || SscsType.SSCS5.equals(benefit.getSscsType()))
+            .map(Benefit::getShortName)
+            .collect(Collectors.toSet());
+
     private OtherPartyDataUtil() {
     }
 
@@ -114,18 +122,18 @@ public class OtherPartyDataUtil {
         return isValidBenefitTypeForConfidentiality(benefitType, false);
     }
 
-    public static boolean isValidBenefitTypeForConfidentiality(final BenefitType benefitType, final boolean cmOtherPartyConfidentialityEnabled) {
+    public static boolean isValidBenefitTypeForConfidentiality(
+        final BenefitType benefitType,
+        final boolean cmOtherPartyConfidentialityEnabled) {
         if (benefitType == null) {
             return false;
         }
 
-        var validBenefit = Arrays.stream(Benefit.values())
-            .anyMatch(b -> (SscsType.SSCS2.equals(b.getSscsType()) || SscsType.SSCS5.equals(b.getSscsType()))
-                && b.getShortName().equals(benefitType.getCode()));
+        String benefitCode = benefitType.getCode();
 
-        return cmOtherPartyConfidentialityEnabled
-            ? validBenefit || Benefit.UC.getShortName().equals(benefitType.getCode())
-            : validBenefit;
+        return VALID_CONFIDENTIALITY_BENEFITS.contains(benefitCode)
+            || (cmOtherPartyConfidentialityEnabled
+            && Benefit.UC.getShortName().equals(benefitCode));
     }
 
     public static boolean isOtherPartyPresent(SscsCaseData sscsCaseData) {

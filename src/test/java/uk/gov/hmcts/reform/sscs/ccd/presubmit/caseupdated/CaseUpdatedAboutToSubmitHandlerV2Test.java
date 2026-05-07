@@ -2047,7 +2047,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     }
 
     @Nested
-    class WhenCmOtherPartyConfidentialityDisabled {
+    class CmOtherPartyConfidentialityDisabled {
         @BeforeEach
         void beforeEach() {
             handler = createNewCaseHandler(false);
@@ -2093,7 +2093,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     }
 
     @Nested
-    class WhenCmOtherPartyConfidentialityEnabled {
+    class CmOtherPartyConfidentialityEnabled {
 
         static Stream<Benefit> benefits() {
             return Stream.of(Benefit.CHILD_SUPPORT, Benefit.TAX_CREDIT, Benefit.GUARDIANS_ALLOWANCE,
