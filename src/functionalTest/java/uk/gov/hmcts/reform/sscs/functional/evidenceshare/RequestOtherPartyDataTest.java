@@ -2,10 +2,9 @@ package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -24,13 +23,12 @@ class RequestOtherPartyDataTest extends AbstractFunctionalTest {
     @EnabledIfEnvironmentVariable(named = CM_CONF_ENABLED, matches = "true")
     class CmToggleOn {
 
-        @ParameterizedTest
-        @CsvSource({"CHILD_SUPPORT,awaitOtherPartyData"})
+        @Test
         @SneakyThrows
-        void shouldTransitionForValidAppealCreated(Benefit benefit, String expectedState) {
-            final SscsCaseDetails caseWithState = createCaseFromEvent(benefit, EventType.VALID_APPEAL_CREATED,
+        void shouldTransitionForValidAppealCreated() {
+            final SscsCaseDetails caseWithState = createCaseFromEvent(Benefit.CHILD_SUPPORT, EventType.VALID_APPEAL_CREATED,
                 RequestOtherPartyDataTest.this::addMinimalCaseData);
-            assertEventuallyInState(caseWithState.getId(), expectedState);
+            assertEventuallyInState(caseWithState.getId(), "awaitOtherPartyData");
         }
     }
 
@@ -38,13 +36,12 @@ class RequestOtherPartyDataTest extends AbstractFunctionalTest {
     @DisabledIfEnvironmentVariable(named = CM_CONF_ENABLED, matches = "true")
     class CmToggleOff {
 
-        @ParameterizedTest
-        @CsvSource({"CHILD_SUPPORT,withDwp"})
+        @Test
         @SneakyThrows
-        void shouldTransitionForValidAppealCreated(Benefit benefit, String expectedState) {
-            SscsCaseDetails caseWithState = createCaseFromEvent(benefit, EventType.VALID_APPEAL_CREATED,
+        void shouldTransitionForValidAppealCreated() {
+            SscsCaseDetails caseWithState = createCaseFromEvent(Benefit.CHILD_SUPPORT, EventType.VALID_APPEAL_CREATED,
                 RequestOtherPartyDataTest.this::addMinimalCaseData);
-            assertEventuallyInState(caseWithState.getId(), expectedState);
+            assertEventuallyInState(caseWithState.getId(), "withDwp");
         }
     }
 
