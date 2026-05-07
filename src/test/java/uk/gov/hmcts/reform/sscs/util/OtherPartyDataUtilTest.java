@@ -366,25 +366,22 @@ public class OtherPartyDataUtilTest {
     @ParameterizedTest
     @MethodSource("benefitsWithSsCsType2And5")
     void givenBenefitWithSsCsType2And5_thenReturnTrue(Benefit benefit) {
-        var benefitType = BenefitType.builder().code(benefit.getShortName()).description(benefit.getDescription()).build();
-
-        assertThat(isValidBenefitTypeForConfidentiality(benefitType)).isTrue();
+        assertThat(isValidBenefitTypeForConfidentiality(buildBenefitType(benefit))).isTrue();
     }
 
     @Test
     void givenBenefitTypesUniversalCredit_thenReturnFalse() {
-        var benefit = Benefit.UC;
-        var benefitType = BenefitType.builder().code(benefit.getShortName()).description(benefit.getDescription()).build();
-
-        assertThat(isValidBenefitTypeForConfidentiality(benefitType)).isFalse();
+        assertThat(isValidBenefitTypeForConfidentiality(buildBenefitType(Benefit.UC))).isFalse();
     }
 
     @Test
     void givenBenefitTypesUniversalCreditAndCmFlagEnabled_thenReturnTrue() {
-        var benefit = Benefit.UC;
-        var benefitType = BenefitType.builder().code(benefit.getShortName()).description(benefit.getDescription()).build();
+        assertThat(isValidBenefitTypeForConfidentiality(buildBenefitType(Benefit.UC), true)).isTrue();
+    }
 
-        assertThat(isValidBenefitTypeForConfidentiality(benefitType, true)).isTrue();
+    @Test
+    void givenBenefitTypesUniversalCreditAndCmFlagDisabled_thenReturnFalse() {
+        assertThat(isValidBenefitTypeForConfidentiality(buildBenefitType(Benefit.UC), false)).isFalse();
     }
 
     static Stream<Benefit> benefitsWithSsCsType2And5() {
@@ -441,7 +438,7 @@ public class OtherPartyDataUtilTest {
 
     private SscsCaseData buildSscsCaseData(Benefit benefit, YesNo confidentialityRequired) {
         var benefitType = benefit != null
-            ? BenefitType.builder().code(benefit.getShortName()).description(benefit.getDescription()).build()
+            ? buildBenefitType(benefit)
             : null;
         return SscsCaseData.builder()
             .ccdCaseId("ccdId")
@@ -467,4 +464,7 @@ public class OtherPartyDataUtilTest {
             .build();
     }
 
+    private static BenefitType buildBenefitType(Benefit benefit) {
+        return BenefitType.builder().code(benefit.getShortName()).description(benefit.getDescription()).build();
+    }
 }
