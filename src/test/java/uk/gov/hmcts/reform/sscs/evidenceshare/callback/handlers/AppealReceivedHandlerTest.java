@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CONFIDENTIALITY_CONFIRMED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DECISION_ISSUED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INTERLOC_VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
@@ -43,7 +44,7 @@ class AppealReceivedHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new AppealReceivedHandler(updateCcdCaseService, idamService, false);
+        handler = new AppealReceivedHandler(updateCcdCaseService, idamService, true);
     }
 
     @ParameterizedTest
@@ -108,5 +109,24 @@ class AppealReceivedHandlerTest {
     @Test
     void shouldReturnLatestPriority() {
         assertThat(handler.getPriority()).isEqualTo(DispatchPriority.LATEST);
+    }
+
+    @Test
+    void givenConfidentialityConfirmedAndCmFlagIsOff_thenCanHandleReturnsFalse() {
+        final AppealReceivedHandler handlerWithFlagOff = new AppealReceivedHandler(updateCcdCaseService, idamService, false);
+
+        assertThat(handlerWithFlagOff.canHandle(SUBMITTED,
+            buildTestCallbackForGivenData(SscsCaseData.builder().createdInGapsFrom(READY_TO_LIST.getId()).build(),
+                INTERLOCUTORY_REVIEW_STATE, CONFIDENTIALITY_CONFIRMED))).isFalse();
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = EventType.class, names = {"VALID_APPEAL_CREATED", "DRAFT_TO_VALID_APPEAL_CREATED", "VALID_APPEAL", "INTERLOC_VALID_APPEAL"})
+    void givenExistingAppealEventAndCmFlagIsOff_thenCanHandleReturnsTrue(EventType eventType) {
+        final AppealReceivedHandler handlerWithFlagOff = new AppealReceivedHandler(updateCcdCaseService, idamService, false);
+
+        assertThat(handlerWithFlagOff.canHandle(SUBMITTED,
+            buildTestCallbackForGivenData(SscsCaseData.builder().createdInGapsFrom(READY_TO_LIST.getId()).build(),
+                INTERLOCUTORY_REVIEW_STATE, eventType))).isTrue();
     }
 }
