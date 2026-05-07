@@ -43,7 +43,7 @@ class AppealReceivedHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new AppealReceivedHandler(updateCcdCaseService, idamService);
+        handler = new AppealReceivedHandler(updateCcdCaseService, idamService, false);
     }
 
     @ParameterizedTest
