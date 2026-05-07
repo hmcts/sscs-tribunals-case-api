@@ -147,17 +147,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
     @BeforeEach
     void setUp() {
-        handler = new CaseUpdatedAboutToSubmitHandler(
-                regionalProcessingCenterService,
-                associatedCaseLinkHelper,
-                airLookupService,
-                new DwpAddressLookupService(),
-                idamService,
-                refDataService,
-                venueService,
-                hearingDurationsService,
-                panelCompositionService,
-            false);
+        handler = createNewCaseHandler(false);
 
         sscsCaseData = SscsCaseData.builder()
                 .ccdCaseId("ccdId")
@@ -2048,22 +2038,58 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         when(panelCompositionService.resetPanelCompositionIfStale(sscsCaseData, Optional.of(caseDetailsBefore)))
                 .thenReturn(panelMemberComposition);
         when(panelCompositionService.isBenefitIssueCodeValid(any(), any())).thenReturn(true);
-        handler = new CaseUpdatedAboutToSubmitHandler(
-                regionalProcessingCenterService,
-                associatedCaseLinkHelper,
-                airLookupService,
-                new DwpAddressLookupService(),
-                idamService,
-                refDataService,
-                venueService,
-                hearingDurationsService,
-                panelCompositionService,
-            false);
+        handler = createNewCaseHandler(false);
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNotNull(response.getData().getPanelMemberComposition());
         assertEquals(panelMemberComposition, response.getData().getPanelMemberComposition());
+    }
+
+    @Nested
+    class WhenCmOtherPartyConfidentialityDisabled {
+        @BeforeEach
+        void beforeEach() {
+            handler = createNewCaseHandler(false);
+        }
+
+        @Test
+        void givenUniversalCreditBenefitTypeWithoutOtherPartiesAndFeatureToggleIsNotEnabled_thenCaseConfidentialNull() {
+            callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(Benefit.UC.getShortName());
+            callback.getCaseDetails()
+                .getCaseData()
+                .getAppeal()
+                .getBenefitType()
+                .setDescription(Benefit.UC.getDescription());
+            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
+                USER_AUTHORISATION);
+
+            assertNull(response.getData().getIsConfidentialCase());
+        }
+
+        @Test
+        void givenUniversalCreditBenefitTypeWithOtherPartiesAndFeatureToggleIsNotEnabled_thenCaseConfidentialNull() {
+            callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(Benefit.UC.getShortName());
+            callback.getCaseDetails()
+                .getCaseData()
+                .getAppeal()
+                .getBenefitType()
+                .setDescription(Benefit.UC.getDescription());
+            List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
+            CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder()
+                .value(OtherParty.builder().confidentialityRequired(NO).build())
+                .build();
+            otherPartyList.add(ccdValue);
+            CcdValue<OtherParty> ccdValue1 = CcdValue.<OtherParty>builder()
+                .value(OtherParty.builder().confidentialityRequired(YES).build())
+                .build();
+            otherPartyList.add(ccdValue1);
+            callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
+            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
+                USER_AUTHORISATION);
+
+            assertNull(response.getData().getIsConfidentialCase());
+        }
     }
 
     @Nested
@@ -2077,17 +2103,8 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         }
 
         @BeforeEach
-        void createNewCaseHandler() {
-            handler = new CaseUpdatedAboutToSubmitHandler(
-                regionalProcessingCenterService,
-                associatedCaseLinkHelper,
-                airLookupService,
-                new DwpAddressLookupService(),
-                idamService,
-                refDataService,
-                venueService,
-                hearingDurationsService,
-                panelCompositionService, true);
+        void beforeEach() {
+            handler = createNewCaseHandler(true);
         }
 
         @ParameterizedTest
@@ -2188,4 +2205,16 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         }
     }
 
+    private CaseUpdatedAboutToSubmitHandler createNewCaseHandler(boolean cmOtherPartyConfidentialityEnabled) {
+        return new CaseUpdatedAboutToSubmitHandler(
+            regionalProcessingCenterService,
+            associatedCaseLinkHelper,
+            airLookupService,
+            new DwpAddressLookupService(),
+            idamService,
+            refDataService,
+            venueService,
+            hearingDurationsService,
+            panelCompositionService, cmOtherPartyConfidentialityEnabled);
+    }
 }
