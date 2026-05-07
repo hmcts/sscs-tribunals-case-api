@@ -200,13 +200,22 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven {
-        url 'https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1'
+        name = "hmctsLib"
+        url = uri("https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1")
+        content {
+            includeGroupByRegex("com\\.github\\.hmcts(\\..*)?")
+        }
+    }
+
+    gradlePluginPortal {
+        content {
+            excludeGroupByRegex("com\\.github\\.hmcts(\\..*)?")
+        }
     }
     // Requires authentication, if it gets here the library cannot be found!
     maven {
         url 'https://repo.spring.io/libs-milestone'
     }
-    gradlePluginPortal()
 }
 
 project.tasks.named('pitest') {
