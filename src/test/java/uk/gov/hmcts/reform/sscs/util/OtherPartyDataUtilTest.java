@@ -14,11 +14,10 @@ import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.updateOtherPartie
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import org.assertj.core.api.Assertions;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
@@ -69,11 +68,11 @@ public class OtherPartyDataUtilTest {
         otherParties.forEach(otherPartyCcdValue -> otherPartyCcdValue.getValue()
             .setSendNewOtherPartyNotification(sendNewOtherPartyNotification(otherPartyCcdValue)));
 
-        Assertions.assertThat(otherParties).hasSize(1).extracting(CcdValue::getValue).anySatisfy((OtherParty otherParty) -> {
-            Assertions.assertThat(otherParty.getId()).hasSize(UUID_SIZE);
-            Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
-            Assertions.assertThat(otherParty.getAppointee().getId()).hasSize(UUID_SIZE);
-            Assertions.assertThat(otherParty.getRep().getId()).hasSize(UUID_SIZE);
+        assertThat(otherParties).hasSize(1).extracting(CcdValue::getValue).anySatisfy((OtherParty otherParty) -> {
+            assertThat(otherParty.getId()).hasSize(UUID_SIZE);
+            assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+            assertThat(otherParty.getAppointee().getId()).hasSize(UUID_SIZE);
+            assertThat(otherParty.getRep().getId()).hasSize(UUID_SIZE);
         });
     }
 
@@ -85,18 +84,18 @@ public class OtherPartyDataUtilTest {
         otherParties.forEach(otherPartyCcdValue -> otherPartyCcdValue.getValue()
             .setSendNewOtherPartyNotification(sendNewOtherPartyNotification(otherPartyCcdValue)));
 
-        Assertions.assertThat(otherParties).hasSize(3).extracting(CcdValue::getValue).anySatisfy((OtherParty otherParty) -> {
-            Assertions.assertThat(otherParty.getId()).isEqualTo(ID_1);
-            Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+        assertThat(otherParties).hasSize(3).extracting(CcdValue::getValue).anySatisfy((OtherParty otherParty) -> {
+            assertThat(otherParty.getId()).isEqualTo(ID_1);
+            assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
 
         }).anySatisfy((OtherParty otherParty) -> {
-            Assertions.assertThat(otherParty.getId()).isEqualTo(ID_2);
-            Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(NO);
+            assertThat(otherParty.getId()).isEqualTo(ID_2);
+            assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(NO);
         }).anySatisfy((OtherParty otherParty) -> {
-            Assertions.assertThat(otherParty.getId()).isNotEqualTo(ID_1).isNotEqualTo(ID_2).hasSize(UUID_SIZE);
-            Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
-            Assertions.assertThat(otherParty.getAppointee().getId()).hasSize(UUID_SIZE);
-            Assertions.assertThat(otherParty.getRep().getId()).hasSize(UUID_SIZE);
+            assertThat(otherParty.getId()).isNotEqualTo(ID_1).isNotEqualTo(ID_2).hasSize(UUID_SIZE);
+            assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+            assertThat(otherParty.getAppointee().getId()).hasSize(UUID_SIZE);
+            assertThat(otherParty.getRep().getId()).hasSize(UUID_SIZE);
         });
     }
 
@@ -108,19 +107,19 @@ public class OtherPartyDataUtilTest {
         otherParties.forEach(otherPartyCcdValue -> otherPartyCcdValue.getValue()
             .setSendNewOtherPartyNotification(sendNewOtherPartyNotification(otherPartyCcdValue)));
 
-        Assertions.assertThat(otherParties).hasSize(3).extracting(CcdValue::getValue).anySatisfy((OtherParty otherParty) -> {
-            Assertions.assertThat(otherParty.getId()).isEqualTo(ID_1);
-            Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
-            Assertions.assertThat(otherParty.getAppointee().getId()).isEqualTo(ID_3);
-            Assertions.assertThat(otherParty.getRep().getId()).isEqualTo(ID_4);
+        assertThat(otherParties).hasSize(3).extracting(CcdValue::getValue).anySatisfy((OtherParty otherParty) -> {
+            assertThat(otherParty.getId()).isEqualTo(ID_1);
+            assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+            assertThat(otherParty.getAppointee().getId()).isEqualTo(ID_3);
+            assertThat(otherParty.getRep().getId()).isEqualTo(ID_4);
         }).anySatisfy((OtherParty otherParty) -> {
-            Assertions.assertThat(otherParty.getId()).isEqualTo(ID_2);
-            Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+            assertThat(otherParty.getId()).isEqualTo(ID_2);
+            assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
         }).anySatisfy((OtherParty otherParty) -> {
-            Assertions.assertThat(otherParty.getId()).isNotEqualTo(ID_1).isNotEqualTo(ID_2).hasSize(UUID_SIZE);
-            Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
-            Assertions.assertThat(otherParty.getAppointee().getId()).hasSize(UUID_SIZE);
-            Assertions.assertThat(otherParty.getRep().getId()).hasSize(UUID_SIZE);
+            assertThat(otherParty.getId()).isNotEqualTo(ID_1).isNotEqualTo(ID_2).hasSize(UUID_SIZE);
+            assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+            assertThat(otherParty.getAppointee().getId()).hasSize(UUID_SIZE);
+            assertThat(otherParty.getRep().getId()).hasSize(UUID_SIZE);
         });
     }
 
@@ -132,19 +131,19 @@ public class OtherPartyDataUtilTest {
         otherParties.forEach(otherPartyCcdValue -> otherPartyCcdValue.getValue()
             .setSendNewOtherPartyNotification(sendNewOtherPartyNotification(otherPartyCcdValue)));
 
-        Assertions.assertThat(otherParties).hasSize(3).extracting(CcdValue::getValue).anySatisfy((OtherParty otherParty) -> {
-            Assertions.assertThat(otherParty.getId()).isEqualTo(ID_1);
-            Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
-            Assertions.assertThat(otherParty.getAppointee().getId()).isEqualTo(ID_3);
-            Assertions.assertThat(otherParty.getRep().getId()).isEqualTo(ID_4);
+        assertThat(otherParties).hasSize(3).extracting(CcdValue::getValue).anySatisfy((OtherParty otherParty) -> {
+            assertThat(otherParty.getId()).isEqualTo(ID_1);
+            assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+            assertThat(otherParty.getAppointee().getId()).isEqualTo(ID_3);
+            assertThat(otherParty.getRep().getId()).isEqualTo(ID_4);
         }).anySatisfy((OtherParty otherParty) -> {
-            Assertions.assertThat(otherParty.getId()).isEqualTo(ID_2);
-            Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
-            Assertions.assertThat(otherParty.getAppointee().getId()).hasSize(UUID_SIZE);
-            Assertions.assertThat(otherParty.getRep().getId()).hasSize(UUID_SIZE);
+            assertThat(otherParty.getId()).isEqualTo(ID_2);
+            assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+            assertThat(otherParty.getAppointee().getId()).hasSize(UUID_SIZE);
+            assertThat(otherParty.getRep().getId()).hasSize(UUID_SIZE);
         }).anySatisfy((OtherParty otherParty) -> {
-            Assertions.assertThat(otherParty.getId()).isNotEqualTo(ID_1).isNotEqualTo(ID_2).hasSize(UUID_SIZE);
-            Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+            assertThat(otherParty.getId()).isNotEqualTo(ID_1).isNotEqualTo(ID_2).hasSize(UUID_SIZE);
+            assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
         });
     }
 
@@ -291,10 +290,15 @@ public class OtherPartyDataUtilTest {
     }
 
     @ParameterizedTest
-    @EnumSource(names = {"CHILD_SUPPORT", "TAX_CREDIT", "GUARDIANS_ALLOWANCE",
-        "TAX_FREE_CHILDCARE", "HOME_RESPONSIBILITIES_PROTECTION", "CHILD_BENEFIT",
-        "THIRTY_HOURS_FREE_CHILDCARE", "GUARANTEED_MINIMUM_PENSION",
-        "NATIONAL_INSURANCE_CREDITS"})
+    @MethodSource("benefitsWithSsCsType2And5")
+    void givenACaseAppellantConfidentialityIsRequired_thenCaseConfidentialYes(Benefit benefit) {
+        var caseData = buildSscsCaseData(benefit, YES);
+
+        assertThat(isConfidential(caseData,false)).isEqualTo(YES);
+    }
+
+    @ParameterizedTest
+    @MethodSource("benefitsWithSsCsType2And5")
     void givenACaseWithOtherPartyButConfidentialityIsNotRequired_thenCaseConfidentialNull(Benefit benefit) {
         var caseData = buildSscsCaseData(benefit);
         caseData.setOtherParties(List.of(buildOtherParty("otherparty-1", true, null)));
@@ -303,10 +307,7 @@ public class OtherPartyDataUtilTest {
     }
 
     @ParameterizedTest
-    @EnumSource(names = {"CHILD_SUPPORT", "TAX_CREDIT", "GUARDIANS_ALLOWANCE",
-        "TAX_FREE_CHILDCARE", "HOME_RESPONSIBILITIES_PROTECTION", "CHILD_BENEFIT",
-        "THIRTY_HOURS_FREE_CHILDCARE", "GUARANTEED_MINIMUM_PENSION",
-        "NATIONAL_INSURANCE_CREDITS"})
+    @MethodSource("benefitsWithSsCsType2And5")
     void givenACaseWithOtherPartyConfidentialityYesAndCmFlagEnabled_thenCaseConfidentialYes(Benefit benefit) {
         var caseData = buildSscsCaseData(benefit);
         caseData.setOtherParties(List.of(buildOtherParty("otherparty-1", true, YES)));
@@ -362,6 +363,37 @@ public class OtherPartyDataUtilTest {
         assertThat(isConfidential(caseData,false)).isNull();
     }
 
+    @ParameterizedTest
+    @MethodSource("benefitsWithSsCsType2And5")
+    void givenBenefitWithSsCsType2And5_thenReturnTrue(Benefit benefit) {
+        var benefitType = BenefitType.builder().code(benefit.getShortName()).description(benefit.getDescription()).build();
+
+        assertThat(isValidBenefitTypeForConfidentiality(benefitType)).isTrue();
+    }
+
+    @Test
+    void givenBenefitTypesUniversalCredit_thenReturnFalse() {
+        var benefit = Benefit.UC;
+        var benefitType = BenefitType.builder().code(benefit.getShortName()).description(benefit.getDescription()).build();
+
+        assertThat(isValidBenefitTypeForConfidentiality(benefitType)).isFalse();
+    }
+
+    @Test
+    void givenBenefitTypesUniversalCreditAndCmFlagEnabled_thenReturnTrue() {
+        var benefit = Benefit.UC;
+        var benefitType = BenefitType.builder().code(benefit.getShortName()).description(benefit.getDescription()).build();
+
+        assertThat(isValidBenefitTypeForConfidentiality(benefitType, true)).isTrue();
+    }
+
+    static Stream<Benefit> benefitsWithSsCsType2And5() {
+        return Stream.of(Benefit.CHILD_SUPPORT, Benefit.TAX_CREDIT, Benefit.GUARDIANS_ALLOWANCE,
+            Benefit.TAX_FREE_CHILDCARE, Benefit.HOME_RESPONSIBILITIES_PROTECTION, Benefit.CHILD_BENEFIT,
+            Benefit.THIRTY_HOURS_FREE_CHILDCARE, Benefit.GUARANTEED_MINIMUM_PENSION,
+            Benefit.NATIONAL_INSURANCE_CREDITS);
+    }
+
     private static CcdValue<OtherParty> buildOtherParty(String id) {
         return buildOtherParty(id, true);
     }
@@ -404,6 +436,10 @@ public class OtherPartyDataUtilTest {
     }
 
     private SscsCaseData buildSscsCaseData(Benefit benefit) {
+        return buildSscsCaseData(benefit, null);
+    }
+
+    private SscsCaseData buildSscsCaseData(Benefit benefit, YesNo confidentialityRequired) {
         var benefitType = benefit != null
             ? BenefitType.builder().code(benefit.getShortName()).description(benefit.getDescription()).build()
             : null;
@@ -416,6 +452,7 @@ public class OtherPartyDataUtilTest {
                     .address(Address.builder().line1("Line1").line2("Line2").postcode("CM120NS").build())
                     .identity(Identity.builder().nino("AB223344B").dob("1995-12-20").build())
                     .isAppointee("Yes")
+                    .confidentialityRequired(confidentialityRequired)
                     .appointee(Appointee.builder()
                         .address(Address.builder().line1("123 the Street").postcode("CM120NS").build())
                         .build()).build())
