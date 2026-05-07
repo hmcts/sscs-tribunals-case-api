@@ -3,8 +3,12 @@ package uk.gov.hmcts.reform.sscs.util;
 import static java.time.LocalDateTime.now;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsType.SSCS2;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsType.SSCS5;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
@@ -20,7 +24,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +34,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Entity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
@@ -40,10 +42,9 @@ public class OtherPartyDataUtil {
     private static final Set<String> VALID_CONFIDENTIALITY_BENEFITS =
         Arrays.stream(Benefit.values())
             .filter(benefit ->
-                SscsType.SSCS2.equals(benefit.getSscsType())
-                    || SscsType.SSCS5.equals(benefit.getSscsType()))
+                SSCS2.equals(benefit.getSscsType()) || SSCS5.equals(benefit.getSscsType()))
             .map(Benefit::getShortName)
-            .collect(Collectors.toSet());
+            .collect(toSet());
 
     private OtherPartyDataUtil() {
     }
@@ -98,7 +99,7 @@ public class OtherPartyDataUtil {
         return before.stream()
             .map(CcdValue::getValue)
             .map(Entity::getId)
-            .collect(Collectors.toSet());
+            .collect(toSet());
     }
 
     public static YesNo isConfidential(final SscsCaseData sscsCaseData) {
@@ -125,6 +126,7 @@ public class OtherPartyDataUtil {
     public static boolean isValidBenefitTypeForConfidentiality(
         final BenefitType benefitType,
         final boolean cmOtherPartyConfidentialityEnabled) {
+
         if (benefitType == null) {
             return false;
         }
@@ -137,7 +139,7 @@ public class OtherPartyDataUtil {
     }
 
     public static boolean isOtherPartyPresent(SscsCaseData sscsCaseData) {
-        return sscsCaseData.getOtherParties() != null && sscsCaseData.getOtherParties().size() > 0;
+        return sscsCaseData.getOtherParties() != null && !sscsCaseData.getOtherParties().isEmpty();
     }
 
     private static boolean otherPartyHasConfidentiality(SscsCaseData sscsCaseData) {
@@ -234,7 +236,7 @@ public class OtherPartyDataUtil {
 
             return !before.stream()
                     .map(o -> o.getValue().getId())
-                    .collect(Collectors.toSet())
+                    .collect(toSet())
                     .containsAll(after.stream()
                             .map(o -> o.getValue().getId())
                             .toList());
@@ -247,7 +249,7 @@ public class OtherPartyDataUtil {
         return isNull(otherParties) ? null : otherParties.stream()
             .filter(otherPartyCcdValue -> nonNull(otherPartyCcdValue.getValue()))
             .map(OtherPartyDataUtil::clearRoleForOtherParty)
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     public static boolean roleExistsForOtherParties(final List<CcdValue<OtherParty>> otherParties) {
@@ -267,7 +269,7 @@ public class OtherPartyDataUtil {
     public static boolean otherPartyWantsToAttendHearing(final List<CcdValue<OtherParty>> otherParties) {
         return emptyIfNull(otherParties).stream()
             .filter(otherPartyCcdValue -> nonNull(otherPartyCcdValue.getValue()))
-            .map(otherParty -> otherParty.getValue())
+            .map(CcdValue::getValue)
             .filter(otherParty -> nonNull(otherParty.getHearingOptions()))
             .anyMatch(otherPartyHearing ->
                     otherPartyHearing.getHearingOptions().isWantsToAttendHearing().equals(Boolean.TRUE));
@@ -282,7 +284,7 @@ public class OtherPartyDataUtil {
     public static boolean isSscs2Case(String benefitTypeCode) {
         return Optional.ofNullable(benefitTypeCode)
             .filter(b -> Benefit.findBenefitByShortName(b)
-            .filter(benefit -> benefit.getSscsType().equals(SscsType.SSCS2)).isPresent())
+            .filter(benefit -> benefit.getSscsType().equals(SSCS2)).isPresent())
             .isPresent();
     }
 

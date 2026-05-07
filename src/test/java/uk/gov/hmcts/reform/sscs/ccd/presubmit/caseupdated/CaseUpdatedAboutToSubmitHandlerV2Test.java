@@ -37,9 +37,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
@@ -52,8 +52,6 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -108,9 +106,6 @@ import uk.gov.hmcts.reform.sscs.service.VenueService;
 @Slf4j
 @ExtendWith(MockitoExtension.class)
 public class CaseUpdatedAboutToSubmitHandlerV2Test {
-
-    @Captor
-    private ArgumentCaptor<Consumer<SscsCaseDetails>> caseDetailsCaptor;
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
@@ -770,7 +765,6 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         String venueA = "VenueA";
         String venueB = "VenueB";
         String venueBEpimsId = "12345";
-        String venueAEpimsId = "12346";
         callback.getCaseDetails().getCaseData().setProcessingVenue(venueA);
         when(venueService.getEpimsIdForVenue(venueB)).thenReturn(venueBEpimsId);
         when(venueService.getVenueDetailsForActiveVenueByEpimsId(venueBEpimsId)).thenReturn(VenueDetails.builder().venName(venueB).legacyVenue(venueA).build());
@@ -1930,7 +1924,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         sscsCaseData.getAppeal().setHearingOptions(hearingOptions);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         String language = sscsCaseData.getAppeal().getHearingOptions().getLanguages();
 
@@ -2064,7 +2058,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
             PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
                 USER_AUTHORISATION);
 
-            assertNull(response.getData().getIsConfidentialCase());
+            Assertions.assertThat(response.getData().getIsConfidentialCase()).isNull();
         }
 
         @Test
@@ -2088,7 +2082,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
             PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
                 USER_AUTHORISATION);
 
-            assertNull(response.getData().getIsConfidentialCase());
+            Assertions.assertThat(response.getData().getIsConfidentialCase()).isNull();
         }
     }
 
@@ -2116,7 +2110,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
             PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
                 USER_AUTHORISATION);
 
-            assertEquals(YES, response.getData().getIsConfidentialCase());
+            Assertions.assertThat(response.getData().getIsConfidentialCase()).isEqualTo(YES);
         }
 
         @ParameterizedTest
@@ -2128,7 +2122,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
             PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
                 USER_AUTHORISATION);
 
-            assertNull(response.getData().getIsConfidentialCase());
+            Assertions.assertThat(response.getData().getIsConfidentialCase()).isNull();
         }
 
         @ParameterizedTest
@@ -2146,12 +2140,12 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
             PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
                 USER_AUTHORISATION);
 
-            assertEquals(YES, response.getData().getIsConfidentialCase());
+            Assertions.assertThat(response.getData().getIsConfidentialCase()).isEqualTo(YES);
         }
 
         @ParameterizedTest
         @MethodSource("benefits")
-        void givenACaseOtherPartyConfidentialityYes_thenCaseConfidentialYesf(Benefit benefit) {
+        void givenACaseOtherPartyConfidentialityYes_thenCaseConfidentialYes(Benefit benefit) {
             callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(benefit.getShortName());
             callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefit.getDescription());
             List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
@@ -2163,7 +2157,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
             PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
                 USER_AUTHORISATION);
 
-            assertEquals(YES, response.getData().getIsConfidentialCase());
+            Assertions.assertThat(response.getData().getIsConfidentialCase()).isEqualTo(YES);
         }
 
         @ParameterizedTest
@@ -2180,7 +2174,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
             PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
                 USER_AUTHORISATION);
 
-            assertNull(response.getData().getIsConfidentialCase());
+            Assertions.assertThat(response.getData().getIsConfidentialCase()).isNull();
         }
 
         @ParameterizedTest
@@ -2201,7 +2195,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
             PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
                 USER_AUTHORISATION);
 
-            assertEquals(YES, response.getData().getIsConfidentialCase());
+            Assertions.assertThat(response.getData().getIsConfidentialCase()).isEqualTo(YES);
         }
     }
 
