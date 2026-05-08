@@ -83,7 +83,7 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
 
         if (cmDirectionTypesConfidentiality
             && isAuthorisedToGrantConfidentiality(userAuthorisation)
-            && sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT)
+            && (sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT) || sscsCaseData.isBenefitType(Benefit.UC))
             && InterlocReferralReason.CONFIDENTIALITY.equals(sscsCaseData.getInterlocReferralReason())) {
             listOptions.add(new DynamicListItem(CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString(), CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.getLabel()));
             listOptions.add(new DynamicListItem(CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN.toString(), CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN.getLabel()));
