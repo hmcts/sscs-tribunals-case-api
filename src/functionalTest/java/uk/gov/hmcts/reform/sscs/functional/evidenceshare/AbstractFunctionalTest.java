@@ -265,7 +265,7 @@ abstract class AbstractFunctionalTest {
     }
 
     void assertEventuallyInState(final long caseId, String state) {
-        defaultAwait().untilAsserted(
+        waitAtMost(ofSeconds(60)).untilAsserted(
             () -> assertThat(findCaseById(Long.toString(caseId)).getState()).isEqualTo(state));
     }
 

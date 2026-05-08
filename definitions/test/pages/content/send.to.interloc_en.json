@@ -17,6 +17,8 @@
   "sendToInterlocHearingSelectValue": "Pre Hearing",
   "sendToInterlocCaseReviewSelectValue": "Review by TCW",
   "sendToInterlocReasonReferredValue": "Advice on how to proceed",
+  "sendToInterlocConfidentialityReasonValue": "Confidentiality",
+  "sendToInterlocReviewConfidentialityRequestValue": "UC JP ONLY - Review confidentiality request",
   "sendToInterlocReferralReasonOver300Pages": "Over 300 pages",
   "sendToInterlocReferralReasonComplexCase": "Complex Case",
   "sendToInterlocCaseReviewSelectValueJudge": "Review by Judge"

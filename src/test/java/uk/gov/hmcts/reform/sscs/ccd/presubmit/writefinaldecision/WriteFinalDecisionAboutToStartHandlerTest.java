@@ -299,6 +299,7 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
         handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true, isSevereConditionsEnabled);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionHasSVIssueCode(YES);
         sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereCriteriaApply(YES);
+        sscsCaseData.getExtendedSscsCaseData().setEsaWriteFinalDecisionSevereCriteriaApply(YES);
         sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(YES);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -309,10 +310,12 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
         if (isSevereConditionsEnabled) {
             assertThat(response.getData().getSscsUcCaseData().getUcWriteFinalDecisionHasSVIssueCode()).isNull();
             assertThat(response.getData().getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply()).isNull();
+            assertThat(response.getData().getExtendedSscsCaseData().getEsaWriteFinalDecisionSevereCriteriaApply()).isNull();
             assertThat(response.getData().getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo()).isNull();
         } else {
             assertThat(response.getData().getSscsUcCaseData().getUcWriteFinalDecisionHasSVIssueCode()).isEqualTo(YES);
             assertThat(response.getData().getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply()).isEqualTo(YES);
+            assertThat(response.getData().getExtendedSscsCaseData().getEsaWriteFinalDecisionSevereCriteriaApply()).isEqualTo(YES);
             assertThat(response.getData().getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo()).isEqualTo(YES);
         }
     }

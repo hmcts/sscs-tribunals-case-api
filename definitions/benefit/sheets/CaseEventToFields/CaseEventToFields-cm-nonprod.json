@@ -82,5 +82,17 @@
     "FieldShowCondition": "addDocuments = \"Yes\"",
     "PageLabel": " ",
     "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "LiveFrom": "24/02/2026",
+    "CaseEventID": "confidentialityConfirmed",
+    "CaseFieldID": "confidentialityConfirmedLabel",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent",
+    "PageID": "1.0",
+    "Publish": "N"
   }
 ]

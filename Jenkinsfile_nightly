@@ -79,6 +79,8 @@ def secrets = [
                 secret('test-e2e-ctsc-team-leader-nw-liverpool-password', 'TEST_CTSC_TEAM_LEADER_NW_LIVERPOOL_PASSWORD'),
                 secret('test-e2e-ctsc-admin-nw-liverpool-username', 'TEST_CTSC_ADMIN_NW_LIVERPOOL_USERNAME'),
                 secret('test-e2e-ctsc-admin-nw-liverpool-password', 'TEST_CTSC_ADMIN_NW_LIVERPOOL_PASSWORD'),
+                secret('test-e2e-legal-officer-username', 'TEST_LEGAL_OFFICER_USERNAME'),
+                secret('test-e2e-legal-officer-password', 'TEST_LEGAL_OFFICER_PASSWORD')
         ]
 ]
 
@@ -126,6 +128,11 @@ withNightlyPipeline(type, product, component) {
                 reportFiles          : 'index.html',
                 reportName           : 'SSCS E2E Test Report'
         ])
+        archiveArtifacts(
+            artifacts: '**/definitions/test/playwright-report/**', 
+            allowEmptyArchive: true
+        )
+
         runAccessibilityTestsNightly()
         publishHTML([
                 allowMissing         : true,
@@ -150,7 +157,7 @@ def runE2eTestsNightly() {
         } catch (Error) {
             unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
         } finally {
-            steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'definitions/test/playwright-report/**'
+            steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/definitions/test/playwright-report/**'
         }
     }
 }
@@ -162,7 +169,7 @@ def runAccessibilityTestsNightly() {
         } catch (Error) {
             unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
         } finally {
-            steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'definitions/test/accessibility-report/**'
+            steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/definitions/test/accessibility-report/**'
         }
     }
 }

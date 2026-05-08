@@ -759,7 +759,7 @@ public class SscsCaseValidator implements CaseValidator {
     private void checkAppellantIbcaReference(Appellant appellant, String personType) {
         if (appellant != null && appellant.getIdentity() != null && appellant.getIdentity().getIbcaReference() != null) {
             if (!String.join("", appellant.getIdentity().getIbcaReference().split(" ")).matches(
-                "^[A-z]\\d{2}[A-z]\\d{2}$")) {
+                "^[A-Za-z]\\d{2}[A-Za-z0-9]\\d{2}$")) {
                 warnings.add(getMessageByCallbackType(callbackType, personType,
                     getWarningMessageName(personType, appellant) + IBCA_REFERENCE, IS_INVALID));
             }
