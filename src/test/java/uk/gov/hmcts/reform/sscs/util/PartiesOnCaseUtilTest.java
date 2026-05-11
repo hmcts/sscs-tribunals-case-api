@@ -2,9 +2,14 @@ package uk.gov.hmcts.reform.sscs.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.PIP;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.addOtherPartiesToListOptions;
+import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.isChildSupportAppeal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -222,6 +227,26 @@ class PartiesOnCaseUtilTest {
 
         assertThat(dropdown.getValue().getCode()).isEmpty();
         assertThat(dropdown.getListItems()).isNotEmpty();
+    }
+
+    @ParameterizedTest
+    @MethodSource("confidentialityEnabledBenefitTypes")
+    void givenConfidentialityEnabledBenefit_isChildSupportAppealReturnsTrue(String benefitShortName) {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(benefitShortName).build());
+        assertTrue(isChildSupportAppeal(sscsCaseData));
+    }
+
+    @Test
+    void givenNonConfidentialityEnabledBenefit_isChildSupportAppealReturnsFalse() {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(PIP.getShortName()).build());
+        assertFalse(isChildSupportAppeal(sscsCaseData));
+    }
+
+    private static Stream<Arguments> confidentialityEnabledBenefitTypes() {
+        return Stream.of(
+            Arguments.of(CHILD_SUPPORT.getShortName()),
+            Arguments.of(UC.getShortName())
+        );
     }
 
     private void setupOtherParties() {
