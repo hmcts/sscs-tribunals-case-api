@@ -1,0 +1,482 @@
+{
+  "case_details": {
+    "id": 1773160433858623,
+    "jurisdiction": "SSCS",
+    "state": "notListable",
+    "case_data": {
+      "caseReference": "AB123456",
+      "caseCreated": "2026-03-10",
+      "region": "BRADFORD",
+      "appeal": {
+        "mrnDetails": {
+          "dwpIssuingOffice": "Child Maintenance Service Group",
+          "mrnDate": "2026-03-10",
+          "mrnLateReason": "sorry I am late",
+          "mrnMissingReason": "sorry I am missing"
+        },
+        "appellant": {
+          "id": "2210f4ad-3859-497e-a49d-57d7e6d99025",
+          "identity": {
+            "dob": "2001-03-10",
+            "nino": "AB123456C"
+          },
+          "name": {
+            "title": "Mr",
+            "firstName": "Willie",
+            "lastName": "Miller"
+          },
+          "address": {
+            "line1": "Buckingham Palace",
+            "town": "London",
+            "county": "Greater London",
+            "postcode": "TS1 1ST",
+            "country": "United Kingdom"
+          },
+          "contact": {
+            "email": "hmctspentet1@mailinator.com",
+            "phone": "07398785050",
+            "mobile": "07398785051"
+          },
+          "organisation": null,
+          "isAppointee": "Yes",
+          "appointee": {
+            "id": "bc6a74d0-f8eb-42b0-9517-2eafd1bcfc8b",
+            "identity": {
+              "dob": "1991-03-10",
+              "nino": "AB123478C"
+            },
+            "name": {
+              "title": "Mr",
+              "firstName": "Alex",
+              "lastName": "McLeish"
+            },
+            "address": {
+              "line1": "Buckingham Palace",
+              "town": "London",
+              "county": "Greater London",
+              "postcode": "TS1 1ST",
+              "country": "United Kingdom"
+            },
+            "contact": {
+              "email": "hmctspentet1@mailinator.com",
+              "phone": "07398785050",
+              "mobile": "07398785051"
+            },
+            "organisation": null
+          },
+          "role": {
+            "name": "Paying parent"
+          },
+          "confidentialityRequired": "Yes",
+          "isAddressSameAsAppointee": "Yes"
+        },
+        "benefitType": {
+          "code": "childSupport",
+          "description": "Child Support"
+        },
+        "hearingOptions": {
+          "wantsToAttend": "Yes",
+          "languageInterpreter": "Yes",
+          "languages": null,
+          "arrangements": [],
+          "excludeDates": []
+        },
+        "appealReasons": {
+          "reasons": []
+        },
+        "rep": {
+          "id": "f4bbfd93-5dcb-4e9f-9bcf-1d653e528749",
+          "identity": {
+            "dob": "1991-03-10",
+            "nino": "AB123478C"
+          },
+          "name": {
+            "title": "Mr",
+            "firstName": "Dougie",
+            "lastName": "Bell"
+          },
+          "address": {
+            "line1": "Buckingham Palace",
+            "town": "London",
+            "county": "Greater London",
+            "postcode": "TS1 1ST",
+            "country": "United Kingdom"
+          },
+          "contact": {
+            "email": "hmctspentet1@mailinator.com",
+            "phone": "07398785050",
+            "mobile": "07398785051"
+          },
+          "organisation": null,
+          "hasRepresentative": "Yes"
+        },
+        "signer": null,
+        "hearingType": "oral",
+        "hearingSubtype": {
+          "wantsHearingTypeTelephone": "Yes",
+          "hearingTelephoneNumber": "0777665421",
+          "wantsHearingTypeVideo": "No",
+          "wantsHearingTypeFaceToFace": "No"
+        },
+        "receivedVia": "Online"
+      },
+      "evidencePresent": "No",
+      "poAttendanceConfirmed": "No",
+      "tribunalDirectPoToAttend": "No",
+      "otherPartySelection": [
+        {
+          "value": {
+            "otherPartiesList": {
+              "value": {
+                "code": "otherParty5ca5ee17-9d0e-48de-962e-2c1513d68519",
+                "label": "Other party 1 - Fred 1 Theotherparty 1"
+              },
+              "list_items": [
+                {
+                  "code": "otherParty5ca5ee17-9d0e-48de-962e-2c1513d68519",
+                  "label": "Other party 1 - Fred 1 Theotherparty 1"
+                },
+                {
+                  "code": "otherParty78198f40-5a01-448b-bf3f-088bdbc45989",
+                  "label": "Other party 2 - Fred 2 Theotherparty 2"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "addDocuments": "No",
+      "caseCode": "022DD",
+      "benefitCode": "022",
+      "issueCode": "DD",
+      "dwpIsOfficerAttending": "No",
+      "associatedCase": [
+        {
+          "value": {
+            "CaseReference": "1773058928296186"
+          }
+        },
+        {
+          "value": {
+            "CaseReference": "1772668726392366"
+          }
+        },
+        {
+          "value": {
+            "CaseReference": "1773075321189743"
+          }
+        },
+        {
+          "value": {
+            "CaseReference": "1772722456027567"
+          }
+        },
+        {
+          "value": {
+            "CaseReference": "1772799289227820"
+          }
+        },
+        {
+          "value": {
+            "CaseReference": "1772805385483926"
+          }
+        },
+        {
+          "value": {
+            "CaseReference": "1773068928677012"
+          }
+        },
+        {
+          "value": {
+            "CaseReference": "1772722645293542"
+          }
+        },
+        {
+          "value": {
+            "CaseReference": "1772652297968192"
+          }
+        },
+        {
+          "value": {
+            "CaseReference": "1772805411366699"
+          }
+        }
+      ],
+      "linkedCasesBoolean": "Yes",
+      "otherParties": [
+        {
+          "value": {
+            "id": "5ca5ee17-9d0e-48de-962e-2c1513d68519",
+            "name": {
+              "title": "Mr",
+              "firstName": "Fred 1",
+              "lastName": "Theotherparty 1"
+            },
+            "address": {
+              "line1": "other party address line 1",
+              "line2": "other party address line 2",
+              "town": "other party town",
+              "postcode": "AB1 1BB"
+            },
+            "contact": {
+              "email": "hmctspentet1@mailinator.com",
+              "phone": "0330 765453",
+              "mobile": "0777134526"
+            },
+            "role": {
+              "name": "Receiving parent"
+            },
+            "confidentialityRequired": "No",
+            "confidentialityRequiredChangedDate": "2026-03-10T16:35:05.721959",
+            "unacceptableCustomerBehaviour": "No",
+            "hearingOptions": {
+              "wantsToAttend": "No",
+              "languages": null,
+              "arrangements": [],
+              "excludeDates": []
+            },
+            "hearingSubtype": {
+              "wantsHearingTypeTelephone": "No",
+              "wantsHearingTypeVideo": "Yes"
+            },
+            "otherPartySubscription": {
+              "wantSmsNotifications": null,
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "subscribeEmail": null,
+              "subscribeSms": null,
+              "reason": null,
+              "lastLoggedIntoMya": null
+            },
+            "otherPartyAppointeeSubscription": {
+              "wantSmsNotifications": null,
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "subscribeEmail": null,
+              "subscribeSms": null,
+              "reason": null,
+              "lastLoggedIntoMya": null
+            },
+            "otherPartyRepresentativeSubscription": {
+              "wantSmsNotifications": null,
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "subscribeEmail": null,
+              "subscribeSms": null,
+              "reason": null,
+              "lastLoggedIntoMya": null
+            },
+            "sendNewOtherPartyNotification": "No",
+            "reasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "appointeeReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "repReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            }
+          }
+        },
+        {
+          "value": {
+            "id": "78198f40-5a01-448b-bf3f-088bdbc45989",
+            "name": {
+              "title": "Mr",
+              "firstName": "Fred 2",
+              "lastName": "Theotherparty 2"
+            },
+            "address": {
+              "line1": "other party address line 1",
+              "line2": "other party address line 2",
+              "town": "other party town",
+              "postcode": "AB1 1BB"
+            },
+            "contact": {
+              "email": "hmctspentet1@mailinator.com",
+              "phone": "0330 765453",
+              "mobile": "0777134526"
+            },
+            "role": {
+              "name": "Receiving parent"
+            },
+            "confidentialityRequired": "No",
+            "confidentialityRequiredChangedDate": "2026-03-10T16:35:22.09551",
+            "unacceptableCustomerBehaviour": "No",
+            "hearingOptions": {
+              "wantsToAttend": "No",
+              "languages": null,
+              "arrangements": [],
+              "excludeDates": []
+            },
+            "hearingSubtype": {
+              "wantsHearingTypeTelephone": "No",
+              "wantsHearingTypeVideo": "Yes"
+            },
+            "otherPartySubscription": {
+              "wantSmsNotifications": null,
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "subscribeEmail": null,
+              "subscribeSms": null,
+              "reason": null,
+              "lastLoggedIntoMya": null
+            },
+            "otherPartyAppointeeSubscription": {
+              "wantSmsNotifications": null,
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "subscribeEmail": null,
+              "subscribeSms": null,
+              "reason": null,
+              "lastLoggedIntoMya": null
+            },
+            "otherPartyRepresentativeSubscription": {
+              "wantSmsNotifications": null,
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "subscribeEmail": null,
+              "subscribeSms": null,
+              "reason": null,
+              "lastLoggedIntoMya": null
+            },
+            "sendNewOtherPartyNotification": "Yes",
+            "reasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "appointeeReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "repReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            }
+          }
+        }
+      ],
+      "isScottishCase": "No",
+      "isConfidentialCase": "Yes",
+      "preWorkAllocation": "Yes",
+      "caseNameHmctsInternal": "Willie Miller",
+      "caseNameHmctsRestricted": "Willie Miller",
+      "caseNamePublic": "Willie Miller",
+      "ogdType": "DWP",
+      "caseManagementCategory": {
+        "value": {
+          "code": "childSupport",
+          "label": "Child Support"
+        },
+        "list_items": [
+          {
+            "code": "childSupport",
+            "label": "Child Support"
+          }
+        ]
+      },
+      "CaseAccessCategory": "childSupport",
+      "addedDocuments": null,
+      "jointPartyId": "e1ddd1a1-991b-4246-a546-a895436adacc",
+      "workBasketHearingDate": null,
+      "workBasketHearingDateIssued": null,
+      "workBasketHearingEpimsId": null,
+      "setAside": {},
+      "correction": {},
+      "statementOfReasons": {
+        "action": null,
+        "requestFormat": null
+      },
+      "permissionToAppeal": {
+        "action": null,
+        "requestFormat": null
+      },
+      "libertyToApply": {
+        "action": null,
+        "requestFormat": null
+      },
+      "sendToFirstTier": {
+        "action": null,
+        "decisionDocument": null
+      },
+      "confidentialityTab": "Party | Name | Confidentiality Status | Confidentiality Status Confirmed\n-|-|-|-\nAppellant | Willie Miller | Yes | \r\nAppointee | Alex McLeish | Yes | \r\nOther Party 1 | Fred 1 Theotherparty 1 | No | 10 Mar 2026, 4:35:05 pm\r\nOther Party 2 | Fred 2 Theotherparty 2 | No | 10 Mar 2026, 4:35:22 pm\r\n\n",
+      "subscriptions": {
+        "appellantSubscription": {
+          "wantSmsNotifications": null,
+          "tya": null,
+          "email": null,
+          "mobile": null,
+          "subscribeEmail": null,
+          "subscribeSms": null,
+          "reason": null,
+          "lastLoggedIntoMya": null
+        },
+        "supporterSubscription": {
+          "wantSmsNotifications": null,
+          "tya": null,
+          "email": null,
+          "mobile": null,
+          "subscribeEmail": null,
+          "subscribeSms": null,
+          "reason": null,
+          "lastLoggedIntoMya": null
+        },
+        "representativeSubscription": {
+          "wantSmsNotifications": null,
+          "tya": null,
+          "email": null,
+          "mobile": null,
+          "subscribeEmail": null,
+          "subscribeSms": null,
+          "reason": null,
+          "lastLoggedIntoMya": null
+        },
+        "appointeeSubscription": {
+          "wantSmsNotifications": null,
+          "tya": null,
+          "email": null,
+          "mobile": null,
+          "subscribeEmail": null,
+          "subscribeSms": null,
+          "reason": null,
+          "lastLoggedIntoMya": null
+        },
+        "jointPartySubscription": {
+          "wantSmsNotifications": null,
+          "tya": null,
+          "email": null,
+          "mobile": null,
+          "subscribeEmail": null,
+          "subscribeSms": null,
+          "reason": null,
+          "lastLoggedIntoMya": null
+        }
+      },
+      "presentingOfficersDetails": {
+        "name": {
+          "title": null,
+          "firstName": null,
+          "lastName": null
+        },
+        "contact": {
+          "email": null,
+          "phone": null,
+          "mobile": null
+        }
+      },
+      "otherPartyUCB": "No"
+    },
+    "created_date": "2026-03-10T16:33:53.83823",
+    "case_type_id": "Benefit"
+  },
+  "event_id": "issueHearingEnquiryForm"
+}

@@ -180,6 +180,7 @@
         "region": "1"
       },
       "processingVenue": "Coventry (CMCB)",
+      "isScottishCase": "No",
       "createdInGapsFrom": "readyToList",
       "issueCode": "DD"
     }

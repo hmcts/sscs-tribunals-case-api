@@ -136,6 +136,7 @@
   "workCapabilitiesAssessmentPageHeading": "Work capability assessment",
   "isThisAWCAAppeal": "Is this a WCA appeal?",
   "isThisASupportGroupOnlyAppealLabel": "Is this a support group only appeal?",
+  "isThisASccOnlyAppealLabel": "Is this a severe conditions criteria only appeal?",
   "whichEsaRegulationsApplyLabel": "Which ESA Regulations apply?",
   "esaRegulations2008Label": "2008",
   "esaRegulations2013Label": "2013",
@@ -180,9 +181,10 @@
   "doNotReassessLabel": "Do not reassess",
 
   "schedule2ActivitiesPageHeading": "Select Schedule 2 activities",
-  "schedule2ActivitiesLabel": "Part 1: Physical Disabilities (Optional)",
   "schedule2ActivitiesPart2Label": "Part 2: Mental, cognitive and intellectual function assessment (Optional)",
+   "schedule2ActivitiesLabel": "Part 1: Physical Disabilities (Optional)",
 
+  
   "esaMobilisingUnaidedLabel": "1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.",
   "esaTransferringFromOneSeatedPositionLabel": "2. Standing and sitting.",
   "esaReachingCannotRaiseEitherArmLabel": "3. Reaching.",
@@ -207,5 +209,8 @@
 
   "esaReachingTitle": "Physical Disabilities: Reaching",
   "esaCognitiveTitle": "Mental, cognitive and intellectual function assessment: Learning tasks",
-  "esaSchedule3ActivitiesPageHeading": "Schedule 3 activities"
+  "esaSchedule3ActivitiesPageHeading": "Schedule 3 activities",
+
+  "severeConditionsCriteriaPageHeading": "Severe Conditions Criteria",
+  "doSccApplyLabel": "Do the severe conditions criteria apply?"
 }

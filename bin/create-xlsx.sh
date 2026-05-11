@@ -135,7 +135,10 @@ else
     waExclusion="*-WA-*"
 fi
 
-if [ "$ENV" = "prod" ] || [ "$LIKE_PROD" = "prod" ]; then
+if [ "$ENV" = "prod" ] || { [ "$LIKE_PROD" = "prod" ] && [ "$ENV" != "pr" ]; }; then
+  excludedFilenamePatterns="-e *-nonprod.json,${shutteredExclusion},*-nonprod-*,*-WA-*,*preview.json"
+  CCD_DEF_PUBLISH="N"
+elif [ "$ENV" = "pr" ] && [ "$LIKE_PROD" = "prod" ]; then
   excludedFilenamePatterns="-e *-nonprod.json,${shutteredExclusion},*-nonprod-*,*-WA-*"
   CCD_DEF_PUBLISH="N"
 else
@@ -143,6 +146,8 @@ else
 fi
 
 echo "$excludedFilenamePatterns"
+
+az acr login --name hmctsprod --subscription 8999dec3-0104-4a27-94ee-6588559729d1
 
 docker run --rm --name json2xlsx \
   -v "${RUN_DIR}/definitions/${TYPE}:/tmp/json" \
@@ -158,5 +163,5 @@ docker run --rm --name json2xlsx \
   -e "CCD_DEF_ENV=${UPPERCASE_ENV}" \
   -e "CCD_DEF_VERSION=${CCD_DEF_VERSION}" \
   -e "CCD_DEF_PUBLISH=${CCD_DEF_PUBLISH}" \
-  hmctspublic.azurecr.io/ccd/definition-processor:latest \
+  hmctsprod.azurecr.io/ccd/definition-processor:latest \
   json2xlsx -D /tmp/json/sheets "$excludedFilenamePatterns" -o "/tmp/output/${ccdDefinitionFile}"

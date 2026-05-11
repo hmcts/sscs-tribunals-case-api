@@ -26,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -130,23 +131,27 @@ abstract class AbstractFunctionalTest {
     }
 
     void createNonDigitalCaseWithEvent() {
-        createCaseWithState(EventType.CREATE_TEST_CASE, "PIP", "Personal Independence Payment", State.VALID_APPEAL.getId());
+        createCaseWithState(EventType.CREATE_TEST_CASE, "PIP", "Personal Independence Payment", State.VALID_APPEAL.getId(), null);
     }
 
     SscsCaseDetails createDigitalCaseWithEvent(EventType eventType) {
-        return createCaseWithState(eventType, "PIP", "Personal Independence Payment", State.READY_TO_LIST.getId());
+        return createCaseWithState(eventType, "PIP", "Personal Independence Payment", State.READY_TO_LIST.getId(), null);
     }
 
     SscsCaseDetails createCaseFromEvent(Benefit benefit, EventType eventType) {
-        return createCaseWithState(eventType, benefit.getShortName(), benefit.getDescription(), null);
+        return createCaseWithState(eventType, benefit.getShortName(), benefit.getDescription(), null, null);
+    }
+
+    SscsCaseDetails createCaseFromEvent(Benefit benefit, EventType eventType, Consumer<SscsCaseData> consumer) {
+        return createCaseWithState(eventType, benefit.getShortName(), benefit.getDescription(), null, consumer);
     }
 
     SscsCaseDetails createCaseWithState(EventType eventType, String benefitType, String benefitDescription,
-        String createdInGapsFrom) {
+        String createdInGapsFrom, Consumer<SscsCaseData> consumer) {
         idamTokens = getIdamTokens();
 
         SscsCaseData minimalCaseData = CaseDataUtils.buildMinimalCaseData();
-
+        minimalCaseData.getAppeal().getAppellant().getIdentity().setNino(getRandomNino());
         SscsCaseData caseData = minimalCaseData.toBuilder()
             .createdInGapsFrom(createdInGapsFrom)
             .appeal(minimalCaseData.getAppeal().toBuilder()
@@ -158,6 +163,9 @@ abstract class AbstractFunctionalTest {
                 .build())
             .build();
 
+        if (consumer != null) {
+            consumer.accept(caseData);
+        }
 
         SscsCaseDetails caseDetails = ccdService.createCase(caseData, eventType.getCcdType(),
             "Evidence share service created case",
@@ -217,7 +225,7 @@ abstract class AbstractFunctionalTest {
 
     ConditionFactory defaultAwait() {
         return await()
-            .atMost(15, SECONDS)
+            .atMost(60, SECONDS)
             .pollInterval(2, SECONDS);
     }
 
@@ -239,7 +247,7 @@ abstract class AbstractFunctionalTest {
     Resource getDocument(Long caseId, String correspondenceName) {
         final List<Correspondence> correspondenceList = defaultAwait().until(
             () -> findCaseById(caseId.toString()).getData().getCorrespondence(),
-            (correspondences) -> isNotEmpty(correspondences) && containsDocument(correspondences, correspondenceName));
+            correspondences -> isNotEmpty(correspondences) && containsDocument(correspondences, correspondenceName));
         final Correspondence correspondence = correspondenceList.stream()
             .filter(c -> c.getValue().getDocumentLink().getDocumentFilename().contains(correspondenceName)).findFirst()
             .orElseThrow();

@@ -46,12 +46,9 @@ public class TransformationController {
         return getSuccessfulTransformationResponse(serviceAuthHeader, exceptionRecord);
     }
 
-    private SuccessfulTransformationResponse getSuccessfulTransformationResponse(String serviceAuthHeader, ExceptionRecord exceptionRecord) {
-        String serviceName = authService.authenticate(serviceAuthHeader);
-        LOGGER.info("Request received to transform from service {}", serviceName);
-
-        authService.assertIsAllowedToHandleCallback(serviceName);
-
+    private SuccessfulTransformationResponse getSuccessfulTransformationResponse(String serviceAuthHeader,
+                                                                                 ExceptionRecord exceptionRecord) {
+        authService.assertIsAllowedToHandleCallback(serviceAuthHeader);
         return handler.handle(exceptionRecord);
     }
 }

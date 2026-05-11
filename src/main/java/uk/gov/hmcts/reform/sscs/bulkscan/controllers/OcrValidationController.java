@@ -75,10 +75,7 @@ public class OcrValidationController {
             ));
         }
 
-        String serviceName = authService.authenticate(serviceAuthHeader);
-        logger.info("Request received to validate ocr data from service {}", serviceName);
-
-        authService.assertIsAllowedToHandleCallback(serviceName);
+        authService.assertIsAllowedToHandleCallback(serviceAuthHeader);
 
         CaseResponse result = handler.handleValidation(ExceptionRecord.builder().ocrDataFields(ocrDataValidationRequest.getOcrDataFields()).formType(formType).build());
 

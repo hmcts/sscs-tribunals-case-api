@@ -14,31 +14,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 import uk.gov.hmcts.reform.sscs.service.DocumentDownloadService;
 import uk.gov.hmcts.reform.sscs.service.TribunalsService;
 
 @RestController
 public class TyaController {
 
-    private TribunalsService tribunalsService;
-
-    private DocumentDownloadService documentDownloadService;
-
-    private final AuthorisationService authorisationService;
-
-
-    private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
+    private final TribunalsService tribunalsService;
+    private final DocumentDownloadService documentDownloadService;
 
     @Autowired
-    public TyaController(TribunalsService tribunalsService, DocumentDownloadService documentDownloadService, AuthorisationService authorisationService) {
+    public TyaController(TribunalsService tribunalsService, DocumentDownloadService documentDownloadService) {
         this.tribunalsService = tribunalsService;
         this.documentDownloadService = documentDownloadService;
-        this.authorisationService = authorisationService;
     }
 
     @Operation(summary = "getAppeal", description = "Returns an appeal given the CCD case id")
@@ -46,11 +37,8 @@ public class TyaController {
         @Content(schema = @Schema(implementation = String.class))})})
     @RequestMapping(value = "/appeals", method = GET, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getAppealByCaseId(
-            @RequestHeader(value = SERVICE_AUTHORIZATION) String serviceAuthorization,
             @RequestParam(value = "caseId") Long caseId,
             @RequestParam(value = "mya", required = false, defaultValue = "false") boolean mya) {
-        String serviceName = authorisationService.authenticate(serviceAuthorization);
-        authorisationService.allowOnlySscs(serviceName);
         return ok(tribunalsService.findAppeal(caseId, mya).toString());
     }
 
@@ -58,10 +46,7 @@ public class TyaController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Document", content = {
         @Content(schema = @Schema(implementation = Resource.class))})})
     @GetMapping(value = "/document", produces = APPLICATION_PDF_VALUE)
-    public ResponseEntity<Resource> getAppealDocument(@RequestHeader(value = SERVICE_AUTHORIZATION) String serviceAuthorization,
-                                                      @RequestParam(value = "url") String url) {
-        String serviceName = authorisationService.authenticate(serviceAuthorization);
-        authorisationService.allowOnlySscs(serviceName);
+    public ResponseEntity<Resource> getAppealDocument(@RequestParam(value = "url") String url) {
         return documentDownloadService.downloadFile(url);
     }
 }

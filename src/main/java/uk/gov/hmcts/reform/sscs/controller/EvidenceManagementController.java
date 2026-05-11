@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,7 +22,6 @@ import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.exception.EvidenceDocumentsMissingException;
 import uk.gov.hmcts.reform.sscs.exception.FileToPdfConversionException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.conversion.FileToPdfConversionService;
@@ -37,23 +35,18 @@ public class EvidenceManagementController {
     private final FileToPdfConversionService fileToPdfConversionService;
     private final boolean secureDocStoreEnabled;
     private final IdamService idamService;
-    private final AuthorisationService authorisationService;
-
-    private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
 
     @Autowired
     public EvidenceManagementController(EvidenceManagementService evidenceManagementService,
                                         EvidenceManagementSecureDocStoreService evidenceManagementSecureDocStoreService,
                                         FileToPdfConversionService fileToPdfConversionService,
                                         @Value("${feature.secure-doc-store.enabled:false}") boolean secureDocStoreEnabled,
-                                        IdamService idamService,
-                                        AuthorisationService authorisationService) {
+                                        IdamService idamService) {
         this.evidenceManagementService = evidenceManagementService;
         this.evidenceManagementSecureDocStoreService = evidenceManagementSecureDocStoreService;
         this.fileToPdfConversionService = fileToPdfConversionService;
         this.secureDocStoreEnabled = secureDocStoreEnabled;
         this.idamService = idamService;
-        this.authorisationService = authorisationService;
     }
 
     @Operation(summary = "Upload additional evidence converted to PDF",
@@ -70,12 +63,8 @@ public class EvidenceManagementController {
         produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<String> upload(
-            @RequestHeader(value = SERVICE_AUTHORIZATION) String serviceAuthorization,
             @RequestParam("file") List<MultipartFile> files
     ) throws JsonProcessingException {
-        String serviceName = authorisationService.authenticate(serviceAuthorization);
-        authorisationService.allowOnlySscs(serviceName);
-
         if (null == files || files.isEmpty()) {
             throw new EvidenceDocumentsMissingException();
         }

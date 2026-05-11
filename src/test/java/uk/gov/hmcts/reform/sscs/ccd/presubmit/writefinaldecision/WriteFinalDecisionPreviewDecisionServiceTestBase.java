@@ -26,6 +26,7 @@ import java.util.Map;
 import junitparams.JUnitParamsRunner;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -106,6 +107,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     protected abstract Map<LanguagePreference, Map<EventType, String>> getBenefitSpecificDocuments();
 
     @Before
+    @BeforeEach
     public void setUp() throws IOException {
         openMocks(this);
         final Map<EventType, String> englishEventTypeDocs = new HashMap<>();

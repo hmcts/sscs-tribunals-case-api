@@ -39,10 +39,10 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
 
     // Used for the scenario where case points start high but are lowered and regulation 29 question is skipped
     LOW_POINTS_REGULATION_29_UNSPECIFIED(EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN,
-        Arrays.asList(isWcaAppeal(TRUE), isSupportGroupOnly(NOT_TRUE, true), isRegulation29(UNSPECIFIED, false)), Optional.empty(), true, isRegulation29(SPECIFIED)),
+        Arrays.asList(isWcaAppeal(TRUE), isSupportGroupOnly(NOT_TRUE, true), isSevereConditions(FALSE),isRegulation29(UNSPECIFIED, false)), Optional.empty(), true, isRegulation29(SPECIFIED)),
     // Scenario 1
     LOW_POINTS_REGULATION_29_DOES_NOT_APPLY(EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN,
-        Arrays.asList(isWcaAppeal(TRUE), isSupportGroupOnly(NOT_TRUE, true), isRegulation29(FALSE)), Optional.of(AwardType.NO_AWARD), true, isRegulation35(UNSPECIFIED), isSchedule3ActivitiesAnswer(StringListPredicate.UNSPECIFIED)),
+        Arrays.asList(isWcaAppeal(TRUE), isSupportGroupOnly(NOT_TRUE, true), isSevereConditions(FALSE), isRegulation29(FALSE)), Optional.of(AwardType.NO_AWARD), true, isRegulation35(UNSPECIFIED), isSchedule3ActivitiesAnswer(StringListPredicate.UNSPECIFIED)),
     // SCENARIO_9
     LOW_POINTS_REGULATION_29_DOES_APPLY_REGULATION_35_UNSPECIFIED_NON_SUPPORT_GROUP_ONLY(EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN,
         Arrays.asList(isWcaAppeal(TRUE), isSupportGroupOnly(NOT_TRUE, true), isRegulation29(TRUE), isRegulation35(UNSPECIFIED)), Optional.of(AwardType.HIGHER_RATE),  true, isSchedule3ActivitiesAnswer(StringListPredicate.NOT_EMPTY)),
@@ -72,7 +72,8 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
         isWcaAppeal(TRUE), isRegulation35(TRUE), Optional.of(AwardType.HIGHER_RATE),  true, isRegulation29(UNSPECIFIED), isSupportGroupOnly(NOT_TRUE, true), isSchedule3ActivitiesAnswer(StringListPredicate.EMPTY)),
     // SCENARIO 10
     NON_WCA_APPEAL(EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN,
-            Arrays.asList(isWcaAppeal(FALSE)), Optional.empty(), false, isDwpReassessTheAward(UNSPECIFIED));
+            Arrays.asList(isWcaAppeal(FALSE)), Optional.empty(), false, isDwpReassessTheAward(UNSPECIFIED)),
+    SEVERE_CONDITIONS(EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN, Arrays.asList(isWcaAppeal(TRUE), isSevereConditions(TRUE)), Optional.empty(), true);
     List<YesNoFieldCondition> primaryConditions;
     List<FieldCondition> validationConditions;
 
@@ -127,6 +128,11 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
     static YesNoFieldCondition isWcaAppeal(Predicate<YesNo> predicate) {
         return new YesNoFieldCondition("Wca Appeal", predicate,
             sscsCaseData -> sscsCaseData.isWcaAppeal() ? YesNo.YES : YesNo.NO, false);
+    }
+
+    static YesNoFieldCondition isSevereConditions(Predicate<YesNo> predicate) {
+        return new YesNoFieldCondition("Severe Conditions", predicate,
+                sscsCaseData -> YesNo.isYes(sscsCaseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo())  ? YesNo.YES : YesNo.NO, false);
     }
 
     static YesNoFieldCondition isDwpReassessTheAward(Predicate<YesNo> predicate) {

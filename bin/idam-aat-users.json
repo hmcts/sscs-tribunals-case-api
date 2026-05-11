@@ -555,6 +555,20 @@
         "caseworker-sscs-superuser"
       ]
     }
+  },
+  {
+    "user": {
+      "id": "7e4e37f7-8177-4da3-87bc-bb663549713b",
+      "forename": "sscs",
+      "surname": "superuser",
+      "displayName": "sscs superuser",
+      "roleNames": [
+        "caseworker",
+        "caseworker-sscs",
+        "caseworker-sscs-superuser",
+        "caseworker-sscs-systemupdate"
+      ]
+    }
   }
 ]
 

@@ -29,6 +29,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.Evidence;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.EvidenceDescription;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.Statement;
+import uk.gov.hmcts.reform.sscs.service.AppellantStatementService;
 import uk.gov.hmcts.reform.sscs.service.coversheet.CoversheetService;
 import uk.gov.hmcts.reform.sscs.service.evidence.EvidenceUploadService;
 import uk.gov.hmcts.reform.sscs.thirdparty.documentmanagement.IllegalFileTypeException;
@@ -37,15 +39,18 @@ import uk.gov.hmcts.reform.sscs.thirdparty.documentmanagement.IllegalFileTypeExc
 @RestController
 @RequestMapping("/api/continuous-online-hearings")
 public class EvidenceUploadController {
+
     private final EvidenceUploadService evidenceUploadService;
     private final CoversheetService coversheetService;
+    private final AppellantStatementService appellantStatementService;
 
     @Autowired
     public EvidenceUploadController(
             EvidenceUploadService evidenceUploadService,
-            CoversheetService coversheetService) {
+            CoversheetService coversheetService, AppellantStatementService appellantStatementService) {
         this.evidenceUploadService = evidenceUploadService;
         this.coversheetService = coversheetService;
+        this.appellantStatementService = appellantStatementService;
     }
 
     @Operation(summary = "Upload evidence",
@@ -191,5 +196,27 @@ public class EvidenceUploadController {
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(new ByteArrayResource(pdfBytes))
         ).orElse(ResponseEntity.notFound().build());
+    }
+
+    @Operation(summary = "Upload COR personal statement",
+            description = "Uploads a personal statement for a COR appeal. You need to have an appeal in CCD. "
+                    + "The statement is saved as a piece of evidence for the case in CCD as a PDF."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Statement has been added to the appeal"),
+        @ApiResponse(responseCode = "404", description = "No online hearing found with online hearing id")
+    })
+    @PostMapping(
+            value = "/{identifier}/statement",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity uploadStatement(
+            @PathVariable("identifier") String identifier,
+            @RequestBody Statement statement) {
+        log.info("upload statement for caseId {} and tya code {}", identifier, statement.getTya());
+        return appellantStatementService
+                .handleAppellantStatement(identifier, statement)
+                .map(handled -> ResponseEntity.noContent().build())
+                .orElse(ResponseEntity.notFound().build());
     }
 }
