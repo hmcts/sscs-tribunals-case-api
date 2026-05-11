@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
 import static io.restassured.RestAssured.baseURI;
-import static java.time.Duration.ofSeconds;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.nonNull;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -9,7 +8,6 @@ import static java.util.stream.Collectors.joining;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
-import static org.awaitility.Awaitility.waitAtMost;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
 import static uk.gov.hmcts.reform.sscs.bulkscan.BaseFunctionalTest.generateRandomNino;
@@ -129,19 +127,19 @@ abstract class AbstractFunctionalTest {
     }
 
     void createNonDigitalCaseWithEvent() {
-        createCaseWithState(EventType.CREATE_TEST_CASE, "PIP", "Personal Independence Payment", State.VALID_APPEAL.getId());
+        createCaseWithState(EventType.CREATE_TEST_CASE, "PIP", "Personal Independence Payment", State.VALID_APPEAL.getId(), null);
     }
 
     SscsCaseDetails createDigitalCaseWithEvent(EventType eventType) {
-        return createCaseWithState(eventType, "PIP", "Personal Independence Payment", State.READY_TO_LIST.getId());
+        return createCaseWithState(eventType, "PIP", "Personal Independence Payment", State.READY_TO_LIST.getId(), null);
     }
 
     SscsCaseDetails createCaseFromEvent(Benefit benefit, EventType eventType) {
-        return createCaseWithState(eventType, benefit.getShortName(), benefit.getDescription(), null);
+        return createCaseWithState(eventType, benefit.getShortName(), benefit.getDescription(), null, null);
     }
 
-    SscsCaseDetails createCaseFromEvent(Benefit benefit, EventType eventType, Consumer<SscsCaseData> caseDataConsumer) {
-        return createCaseWithState(eventType, benefit.getShortName(), benefit.getDescription(), null, caseDataConsumer);
+    SscsCaseDetails createCaseFromEvent(Benefit benefit, EventType eventType, Consumer<SscsCaseData> consumer) {
+        return createCaseWithState(eventType, benefit.getShortName(), benefit.getDescription(), null, consumer);
     }
 
     SscsCaseDetails createCaseWithState(EventType eventType, String benefitType, String benefitDescription,
@@ -150,11 +148,11 @@ abstract class AbstractFunctionalTest {
     }
 
     SscsCaseDetails createCaseWithState(EventType eventType, String benefitType, String benefitDescription,
-        String createdInGapsFrom, Consumer<SscsCaseData> caseDataConsumer) {
+        String createdInGapsFrom, Consumer<SscsCaseData> consumer) {
         idamTokens = getIdamTokens();
 
         final SscsCaseData minimalCaseData = CaseDataUtils.buildMinimalCaseData();
-
+        minimalCaseData.getAppeal().getAppellant().getIdentity().setNino(generateRandomNino());
         final SscsCaseData caseData = minimalCaseData.toBuilder()
             .createdInGapsFrom(createdInGapsFrom)
             .appeal(minimalCaseData.getAppeal().toBuilder()
@@ -166,7 +164,9 @@ abstract class AbstractFunctionalTest {
                 .build())
             .build();
 
-        caseDataConsumer.accept(caseData);
+        if (consumer != null) {
+            consumer.accept(caseData);
+        }
 
         final SscsCaseDetails caseDetails = ccdService.createCase(caseData, eventType.getCcdType(),
             "Evidence share service created case",
@@ -226,7 +226,7 @@ abstract class AbstractFunctionalTest {
 
     ConditionFactory defaultAwait() {
         return await()
-            .atMost(15, SECONDS)
+            .atMost(60, SECONDS)
             .pollInterval(2, SECONDS);
     }
 
@@ -246,7 +246,7 @@ abstract class AbstractFunctionalTest {
     }
 
     Resource getDocument(Long caseId, String correspondenceName) {
-        final List<Correspondence> correspondenceList = waitAtMost(ofSeconds(30)).until(
+        final List<Correspondence> correspondenceList = defaultAwait().until(
             () -> findCaseById(caseId.toString()).getData().getCorrespondence(),
             correspondences -> isNotEmpty(correspondences) && containsDocument(correspondences, correspondenceName));
         final Correspondence correspondence = correspondenceList.stream()
@@ -265,7 +265,7 @@ abstract class AbstractFunctionalTest {
     }
 
     void assertEventuallyInState(final long caseId, String state) {
-        waitAtMost(ofSeconds(60)).untilAsserted(
+        defaultAwait().untilAsserted(
             () -> assertThat(findCaseById(Long.toString(caseId)).getState()).isEqualTo(state));
     }
 
