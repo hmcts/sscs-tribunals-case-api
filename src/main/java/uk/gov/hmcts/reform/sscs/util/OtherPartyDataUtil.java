@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.util;
 
-import static java.time.LocalDateTime.now;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
@@ -277,7 +276,7 @@ public class OtherPartyDataUtil {
                 if (nonNull(current.getConfidentialityRequired())
                     && (priorConfidentiality == null
                         || !Objects.equals(priorConfidentiality, current.getConfidentialityRequired()))) {
-                    current.setConfidentialityRequiredChangedDate(now());
+                    current.setConfidentialityRequiredChangedDate(DateTimeUtils.getLocalDateTime());
                 }
             });
     }
