@@ -148,6 +148,8 @@
     "DisplayContext": "MANDATORY",
     "LiveFrom": "19/11/2020",
     "FieldDisplayOrder": 16
+  },
+  {
     "CaseEventID": "addOtherPartyData",
     "CaseFieldID": "otherParties",
     "ListElementCode": "domesticViolenceMarker",
