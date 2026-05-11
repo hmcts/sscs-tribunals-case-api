@@ -1,8 +1,9 @@
 package uk.gov.hmcts.reform.sscs.functional.tyanotifications.handlers;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADMIN_APPEAL_WITHDRAWN;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.CASE_UPDATED;
 
@@ -56,27 +57,24 @@ public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTes
         simulateCcdCallback(ADMIN_APPEAL_WITHDRAWN, "tyanotifications/handlers/" + ADMIN_APPEAL_WITHDRAWN.getId() + subscription
             + "Callback.json");
 
-        delayInSeconds(5);
         List<Notification> notifications = tryFetchNotificationsForTestCase(emailId, smsId);
 
         assertEquals(expectedNumEmailNotifications, getNumberOfNotificationsForGivenEmailOrSmsTemplateId(notifications, emailId));
         assertEquals(expectedNumSmsNotifications, getNumberOfNotificationsForGivenEmailOrSmsTemplateId(notifications, smsId));
 
         if (checkFromCorrespondence) {
-            assertTrue(fetchLettersFromCase(expectedNumLetters, subscription));
+            fetchLettersFromCase(expectedNumLetters, subscription);
         } else {
             List<Notification> letterNotifications = fetchLetters();
             assertThat(letterNotifications).hasSize(expectedNumLetters);
         }
     }
 
-    private boolean fetchLettersFromCase(int expectedNumLetters, String subscription) {
-        do {
-            if (getNumberOfLetterCorrespondence(subscription) == expectedNumLetters) {
-                return true;
-            }
-            delayInSeconds(10);
-        } while (true);
+    private void fetchLettersFromCase(int expectedNumLetters, String subscription) {
+        await()
+            .atMost(120, SECONDS)
+            .pollInterval(10, SECONDS)
+            .untilAsserted(() -> assertThat(getNumberOfLetterCorrespondence(subscription)).isEqualTo(expectedNumLetters));
     }
 
     private void initialiseCcdCase() {
