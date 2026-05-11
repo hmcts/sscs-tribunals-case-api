@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDecisionMidEventValidationHandlerBase {
 
     private final boolean isSevereConditionsEnabled;
+    private static final String SEVERE_CONDITIONS_ISSUE_CODE = "SV";
 
     public EsaWriteFinalDecisionMidEventValidationHandler(Validator validator,
                                                           DecisionNoticeService decisionNoticeService,
@@ -90,7 +91,9 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
 
     @Override
     protected void setDwpReassessAwardPage(SscsCaseData sscsCaseData, String pageId) {
-        if (isSevereConditionsEnabled && YesNo.isYes(sscsCaseData.getExtendedSscsCaseData().getEsaWriteFinalDecisionSevereCriteriaApply())) {
+        if (isSevereConditionsEnabled
+                && (YesNo.isYes(sscsCaseData.getExtendedSscsCaseData().getEsaWriteFinalDecisionSevereCriteriaApply())
+                || SEVERE_CONDITIONS_ISSUE_CODE.equals(sscsCaseData.getIssueCode()))) {
             sscsCaseData.setShowDwpReassessAwardPage(YesNo.NO);
             return;
         }

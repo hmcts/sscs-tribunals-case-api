@@ -15,7 +15,6 @@ public class Scenario13Content extends UcTemplateContent {
         addReasonsIfPresent(writeFinalDecisionTemplateBody);
         addAnythingElseIfPresent(writeFinalDecisionTemplateBody);
         addHearingType(writeFinalDecisionTemplateBody);
-        addRecommendationIfPresent(writeFinalDecisionTemplateBody);
     }
 
     @Override

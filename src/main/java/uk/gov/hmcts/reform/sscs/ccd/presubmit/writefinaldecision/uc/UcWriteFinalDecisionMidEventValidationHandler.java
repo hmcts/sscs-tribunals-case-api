@@ -102,7 +102,9 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
 
     @Override
     protected void setDwpReassessAwardPage(SscsCaseData sscsCaseData, String pageId) {
-        if (isSevereConditionsEnabled && YesNo.isYes(sscsCaseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply())) {
+        if (isSevereConditionsEnabled
+                && (YesNo.isYes(sscsCaseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply())
+                || YesNo.isYes(setSevereCriteriaApplies(sscsCaseData)))) {
             sscsCaseData.setShowDwpReassessAwardPage(YesNo.NO);
             return;
         }
