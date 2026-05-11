@@ -1,24 +1,27 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.scenarios;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipTemplateContent;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
-public class PipScenarioNotConsideredEnhancedRateTest {
+class PipScenarioNotConsideredEnhancedRateTest {
 
     @Test
-    public void testScenario() {
+    void testScenario() {
 
         List<Descriptor> mobilityDescriptors =
-                Arrays.asList(Descriptor.builder()
-                                .activityQuestionNumber("12")
-                                .activityQuestionValue("12.Moving Around")
-                                .activityAnswerValue("Can stand and then move more than 1 metre but no more than 20 metres, either aided or unaided.")
-                                .activityAnswerLetter("e").activityAnswerPoints(12).build());
+            Collections.singletonList(Descriptor.builder()
+                .activityQuestionNumber("12")
+                .activityQuestionValue("12.Moving Around")
+                .activityAnswerValue(
+                    "Can stand and then move more than 1 metre but no more than 20 metres, either aided or unaided.")
+                .activityAnswerLetter("e").activityAnswerPoints(12).build());
 
         WriteFinalDecisionTemplateBody body =
                 WriteFinalDecisionTemplateBody.builder()
@@ -45,31 +48,33 @@ public class PipScenarioNotConsideredEnhancedRateTest {
         PipTemplateContent content = PipScenario.SCENARIO_NOT_CONSIDERED_AWARD.getContent(body);
 
 
-        String expectedContent = "The appeal is refused.\n"
-            + "\n"
-            + "The decision made by the Secretary of State on 20/09/2020 is confirmed.\n"
-            + "\n"
-            + "Only the mobility component was in issue on this appeal and the daily living component was not considered.\n"
-            + "\n"
-            + "Felix Sydney is entitled to the mobility component at the enhanced rate from 17/12/2020 for an indefinite period.\n"
-            + "\n"
-            + "Felix Sydney is severely limited in their ability to mobilise. They score 12 points. They satisfy the following descriptors:\n"
-            + "\n"
-            + "12.Moving Around\te.Can stand and then move more than 1 metre but no more than 20 metres, either aided or unaided.\t12\n"
-            + "\n"
-            + "\n"
-            + "My first reasons\n"
-            + "\n"
-            + "My second reasons\n"
-            + "\n"
-            + "Something else\n"
-            + "\n"
-            + "This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative did not attend.\n"
-            + "\n";
+        String expectedContent = """
+            The appeal is refused.
 
-        Assert.assertEquals(10, content.getComponents().size());
+            The decision made by the Secretary of State on 20/09/2020 is confirmed.
 
-        Assert.assertEquals(expectedContent, content.toString());
+            Only the mobility component was in issue on this appeal and the daily living component was not considered.
+
+            Felix Sydney is entitled to the mobility component at the enhanced rate from 17/12/2020 for an indefinite period.
+
+            Felix Sydney is severely limited in their ability to mobilise. They score 12 points. They satisfy the following descriptors:
+
+            12.Moving Around\te.Can stand and then move more than 1 metre but no more than 20 metres, either aided or unaided.\t12
+
+
+            My first reasons
+
+            My second reasons
+
+            Something else
+
+            This has been an oral (face to face) hearing. The following people attended: Felix Sydney the appellant. A representative from the First Tier Agency did not attend. The Tribunal considered the appeal bundle to page A1.
+
+            """;
+
+        assertEquals(10, content.getComponents().size());
+
+        assertEquals(expectedContent, content.toString());
 
     }
 
