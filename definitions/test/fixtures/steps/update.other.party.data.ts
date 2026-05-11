@@ -244,14 +244,14 @@ export class UpdateOtherPartyData extends BaseStep {
       'Postcode',
       addUpdateOtherPartyData.updateOtherPartyDataAddressPostCode
     );
-    await expect(
-      this.page.locator(
-        `//tr[.//th[normalize-space()="Unacceptable Customer Behaviour"] and .//td[normalize-space()="${addUpdateOtherPartyData.updateOtherPartyDataBehaviour}"]]`
-      ).first()
-    ).toBeVisible();
-    await this.page
-      .getByRole('row', { name: 'Confidentiality Required No', exact: true })
-      .locator(`//tr[.='Confidentiality RequiredNo']`);
+    await this.otherPartyDetailsTab.verifyPageContentByRoleWithLocator(
+      'Confidentiality Required',
+      'No'
+    );
+    await this.otherPartyDetailsTab.verifyPageContentByRoleWithLocator(
+      'Unacceptable Customer Behaviour',
+      'No'
+    );
     await this.otherPartyDetailsTab.verifyPageContentByKeyValue(
       'Role',
       addUpdateOtherPartyData.updateOtherPartyDataRole
@@ -268,6 +268,10 @@ export class UpdateOtherPartyData extends BaseStep {
       'Mobile Number',
       addUpdateSubscriptionData.updateSubscriptionMobileNumberotherParty
     );
+    await this.otherPartyDetailsTab.verifyPageContentByRoleWithLocator(
+      'DV marker?',
+      'No'
+      );
   }
 
   async performUpdateOtherPartyDataTaxCredit(caseId: string) {
