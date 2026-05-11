@@ -20,10 +20,7 @@ import junitparams.converters.Nullable;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ElementDisputed;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ElementDisputedDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionMidEventValidationHandlerBase;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionMidEventValidationHandlerTestBase;
@@ -368,5 +365,41 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
         handlerWithSevereConditions.setDefaultFields(sscsCaseData);
 
         assertThat(sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionHasSVIssueCode()).isNull();
+    }
+
+    @Test
+    public void givenSvIssueCode_WhenNoWriteFinalDecisionSevereYesNo_thenDisplayError() {
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        sscsCaseData.setElementsDisputedLimitedWork(List.of(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("SV").build()).build()));
+        sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(NO);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
+
+        UcWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, true);
+        handlerWithSevereConditions.setDefaultFields(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handlerWithSevereConditions.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+        assertEquals("This is a severe conditions criteria only appeal. Please select yes to this question.", response.getErrors().iterator().next());
+    }
+
+    @Test
+    @Parameters({
+        "SV, YES",
+        "CE, NO",
+        "CE, YES"
+    })
+    public void givenConditionsNotMet_shouldNotDisplaySevereConditionsError(String issueCode, String isCaseSevereCondition) {
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(YesNo.valueOf(isCaseSevereCondition));
+        sscsCaseData.setElementsDisputedLimitedWork(List.of(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode(issueCode).build()).build()));
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
+        UcWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, true);
+        handlerWithSevereConditions.setDefaultFields(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handlerWithSevereConditions.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(0, response.getErrors().size());
     }
 }

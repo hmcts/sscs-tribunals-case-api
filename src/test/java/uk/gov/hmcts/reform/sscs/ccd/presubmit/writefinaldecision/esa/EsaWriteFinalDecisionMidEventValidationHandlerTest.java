@@ -346,4 +346,41 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         assertEquals(showWorkCapabilityPage, response.getData().getShowWorkCapabilityAssessmentPage());
     }
+
+    @Test
+    public void givenSvIssueCode_WhenNoWriteFinalDecisionSevereYesNo_thenDisplayError() {
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(NO);
+        sscsCaseData.setIssueCode("SV");
+        EsaWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new EsaWriteFinalDecisionMidEventValidationHandler(
+                validator, decisionNoticeService, true, true);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handlerWithSevereConditions.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+        assertEquals("This is a severe conditions criteria only appeal. Please select yes to this question.", response.getErrors().iterator().next());
+    }
+
+    @Test
+    @Parameters({
+        "SV, YES",
+        "CE, NO",
+        "CE, YES",
+    })
+    public void givenConditionsNotMet_shouldNotDisplaySevereConditionsError(String issueCode, String isCaseSevereCondition) {
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(YesNo.valueOf(isCaseSevereCondition));
+        sscsCaseData.setIssueCode(issueCode);
+        EsaWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new EsaWriteFinalDecisionMidEventValidationHandler(
+                validator, decisionNoticeService, true, true);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handlerWithSevereConditions.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(0, response.getErrors().size());
+    }
 }
