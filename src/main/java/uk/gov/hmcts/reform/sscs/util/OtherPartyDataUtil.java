@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDateTime;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -276,7 +277,7 @@ public class OtherPartyDataUtil {
                 if (nonNull(current.getConfidentialityRequired())
                     && (priorConfidentiality == null
                         || !Objects.equals(priorConfidentiality, current.getConfidentialityRequired()))) {
-                    current.setConfidentialityRequiredChangedDate(DateTimeUtils.getLocalDateTime());
+                    current.setConfidentialityRequiredChangedDate(getLocalDateTime());
                 }
             });
     }
