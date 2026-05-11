@@ -34,7 +34,7 @@ import uk.gov.hmcts.reform.sscs.functional.mya.CitizenIdamService;
 public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
 
     @Autowired
-    protected ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
     // The Scenarios are defined https://tools.hmcts.net/confluence/display/SSCS/ESA+DN+template+content+-+judges+input
     @Test
@@ -54,7 +54,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("5. Reasons for decision 1"));
             assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("7. Anything else."));
-            assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent."));
+            assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a video hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7."));
             assertThat(pdfTextWithoutNewLines, not(containsString("9.")));
         }
     }
@@ -94,7 +94,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("6. The tribunal applied Schedule 9, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work-related activity."));
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else"));
-            assertThat(pdfTextWithoutNewLines, containsString("9. This has been an oral (face to face) hearing. Joe Bloggs the appellant attended the hearing today and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative did not attend."));
+            assertThat(pdfTextWithoutNewLines, containsString("9. This has been an oral (face to face) hearing. The following people attended: Joe Bloggs the appellant. A representative from the First Tier Agency did not attend. The Tribunal considered the appeal bundle to page B7."));
             assertThat(pdfTextWithoutNewLines, containsString("10. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal recommends that the Department does not reassess Joe Bloggs within 3 months from today's date."));
             assertThat(pdfTextWithoutNewLines, not(containsString("11.")));
         }
@@ -139,7 +139,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("15 points"));
             assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision"));
             assertThat(pdfTextWithoutNewLines, containsString("7. Anything else"));
-            assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative did not attend."));
+            assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a telephone hearing. The following people attended: Joe Bloggs the appellant. A representative from the First Tier Agency did not attend. The Tribunal considered the appeal bundle to page B7."));
             assertThat(pdfTextWithoutNewLines, containsString("9. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal makes no recommendation as to when the Department should reassess Joe Bloggs."));
             assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
         }
@@ -163,7 +163,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("6. The tribunal applied Schedule 9, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work-related activity."));
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else"));
-            assertThat(pdfTextWithoutNewLines, containsString("9. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative did not attend."));
+            assertThat(pdfTextWithoutNewLines, containsString("9. This has been a remote hearing in the form of a telephone hearing. The following people attended: Joe Bloggs the appellant. A representative from the First Tier Agency did not attend. The Tribunal considered the appeal bundle to page B7."));
             assertThat(pdfTextWithoutNewLines, containsString("10. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal makes no recommendation as to when the Department should reassess Joe Bloggs."));
             assertThat(pdfTextWithoutNewLines, not(containsString("11.")));
         }
@@ -259,7 +259,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("4. Reasons for decision 1"));
             assertThat(pdfTextWithoutNewLines, containsString("5. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("6. Anything else."));
-            assertThat(pdfTextWithoutNewLines, containsString("7. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent."));
+            assertThat(pdfTextWithoutNewLines, containsString("7. This has been a remote hearing in the form of a telephone hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7."));
             assertThat(pdfTextWithoutNewLines, not(containsString("8.")));
         }
     }
@@ -277,7 +277,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("4. Reasons for decision 1"));
             assertThat(pdfTextWithoutNewLines, containsString("5. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("6. Anything else."));
-            assertThat(pdfTextWithoutNewLines, containsString("7. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent."));
+            assertThat(pdfTextWithoutNewLines, containsString("7. This has been a remote hearing in the form of a telephone hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7."));
             assertThat(pdfTextWithoutNewLines, not(containsString("8.")));
         }
     }
