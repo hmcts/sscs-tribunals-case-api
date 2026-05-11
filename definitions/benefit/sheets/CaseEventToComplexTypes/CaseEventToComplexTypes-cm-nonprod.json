@@ -148,5 +148,39 @@
     "DisplayContext": "MANDATORY",
     "LiveFrom": "19/11/2020",
     "FieldDisplayOrder": 16
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "domesticViolenceMarker",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "16/03/2026",
+    "FieldShowCondition": "appeal.benefitType.code=\"childSupport\"",
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "updateOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "domesticViolenceMarker",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "16/03/2026",
+    "FieldShowCondition": "appeal.benefitType.code=\"childSupport\"",
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "appeal",
+    "ListElementCode": "benefitType",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "16/03/2026",
+    "PageID": "1.0",
+    "FieldShowCondition": "otherParties=\"DoNotShow\""
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "appeal",
+    "ListElementCode": "benefitType.code",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "16/03/2026",
+    "PageID": "1.0",
+    "FieldShowCondition": "otherParties=\"DoNotShow\""
   }
 ]
