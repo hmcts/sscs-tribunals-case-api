@@ -1896,6 +1896,10 @@ pdf-service:
             permissionToAppealGranted: 'TB-SCS-GNO-ENG-00012.docx'
             libertyToApplyGranted: 'TB-SCS-GNO-ENG-00012.docx'
             libertyToApplyRefused: 'TB-SCS-GNO-ENG-00012.docx'
+            adminSendToValidAppeal: 'TB-SCS-GNO-ENG-00012.docx'
+            interlocValidAppeal: 'TB-SCS-GNO-ENG-00012.docx'
+            validAppeal: 'TB-SCS-GNO-ENG-00012.docx'
+            appealToProceedNotifyValidAppeal: 'TB-SCS-GNO-ENG-00012.docx'
         welsh:
             adminCorrectionHeader: 'TB-SCS-GNO-WEL-00479.docx'
             appealReceived: 'TB-SCS-GNO-WEL-00479.docx'
