@@ -127,7 +127,9 @@ export class updateOtherPartyDataPage {
       .getByRole('group', { name: /Agree less notice/i })
       .getByLabel('Yes')
       .check();
-
+    await this.page
+      .locator('#otherParties_0_domesticViolenceMarker-No')
+      .click();
     await webAction.clickButton('Submit');
   }
 
@@ -166,8 +168,10 @@ export class updateOtherPartyDataPage {
     await this.page
       .locator('#otherParties_0_role_name')
       .selectOption({ label: addUpdateOtherPartyData.updateOtherPartyDataDropdownValue });
+    await this.page
+      .locator('#otherParties_0_domesticViolenceMarker-No')
+      .click();
     await this.page.locator('#awareOfAnyAdditionalOtherParties_No').click();
-
     await webAction.clickButton('Submit');
   }
 
