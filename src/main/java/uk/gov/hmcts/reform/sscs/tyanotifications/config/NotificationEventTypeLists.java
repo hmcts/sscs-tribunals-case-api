@@ -313,6 +313,7 @@ public final class NotificationEventTypeLists {
 
     public static final Set<NotificationEventType> EVENTS_VALID_FOR_APPOINTEE = EnumSet.of(
         ADMIN_CORRECTION_HEADER,
+        ADD_OTHER_PARTY_DATA,
         APPEAL_RECEIVED,
         CORRECTION_GRANTED,
         CORRECTION_REFUSED,
