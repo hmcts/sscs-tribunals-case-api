@@ -553,12 +553,6 @@ export class WriteFinalDecision extends BaseStep {
     await this.writeFinalDecisionPage.inputPageContentForBundleSectionReferencePageData();
     await this.writeFinalDecisionPage.submitContinueBtn();
 
-    if (isAppealAllowed) {
-      await this.writeFinalDecisionPage.verifyPageContentForReassessTheAwardPage();
-      await this.writeFinalDecisionPage.inputPageContentForReassessTheAwardPage();
-      await this.writeFinalDecisionPage.submitContinueBtn();
-    }
-
     await this.writeFinalDecisionPage.verifyPageContentForReasonForDecisionPage();
     await this.writeFinalDecisionPage.inputPageContentForReasonForDecisionPageData();
     await this.writeFinalDecisionPage.submitContinueBtn();
@@ -629,12 +623,6 @@ export class WriteFinalDecision extends BaseStep {
     await this.writeFinalDecisionPage.verifyPageContentForBundleSectionReferencePage();
     await this.writeFinalDecisionPage.inputPageContentForBundleSectionReferencePageData();
     await this.writeFinalDecisionPage.submitContinueBtn();
-
-    if (isAppealAllowed) {
-      await this.writeFinalDecisionPage.verifyPageContentForReassessTheAwardPage();
-      await this.writeFinalDecisionPage.inputPageContentForReassessTheAwardPage();
-      await this.writeFinalDecisionPage.submitContinueBtn();
-    }
 
     await this.writeFinalDecisionPage.verifyPageContentForReasonForDecisionPage();
     await this.writeFinalDecisionPage.inputPageContentForReasonForDecisionPageData();
