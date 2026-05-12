@@ -184,9 +184,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
         sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
                 new DynamicList(new DynamicListItem("appellant", "Appellant"), List.of()));
 
-        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        Assertions.assertThat(response.getErrors()).isEmpty();
+        Assertions.assertThat(handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION).getErrors()).isEmpty();
     }
 
     @Test
@@ -196,9 +194,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
         sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(null);
 
-        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        Assertions.assertThat(response.getErrors()).isEmpty();
+        Assertions.assertThat(handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION).getErrors()).isEmpty();
     }
 
     @Test
