@@ -273,7 +273,7 @@ export class WriteFinalDecision extends BaseStep {
     await this.writeFinalDecisionPage.submitContinueBtn();
 
     await this.writeFinalDecisionPage.verifyPageContentForSevereConditionsCriteriaPage();
-    await this.writeFinalDecisionPage.inputAndVerifyPageContentForSevereConditionsCriteriaPageDataUcAppeal(false);
+    await this.writeFinalDecisionPage.inputAndVerifyPageContentForSevereConditionsCriteriaPageDataUcAppeal(true);
     await this.writeFinalDecisionPage.submitContinueBtn();
 
     await this.writeFinalDecisionPage.verifyPageContentForBundleSectionReferencePage();
@@ -543,7 +543,7 @@ export class WriteFinalDecision extends BaseStep {
       isESACase: false,
     });
     await this.writeFinalDecisionPage.submitContinueBtn();
-    await this.writeFinalDecisionPage.submitContinueBtn();
+    // await this.writeFinalDecisionPage.submitContinueBtn();
 
     await this.writeFinalDecisionPage.verifyPageContentForSevereConditionsCriteriaPage();
     await this.writeFinalDecisionPage.inputAndVerifyPageContentForSevereConditionsCriteriaPageDataUcAppeal(sccApplies);
