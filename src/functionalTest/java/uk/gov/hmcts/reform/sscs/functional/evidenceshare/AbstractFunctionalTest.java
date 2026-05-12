@@ -143,7 +143,7 @@ abstract class AbstractFunctionalTest {
     }
 
     SscsCaseDetails createCaseWithState(EventType eventType, String benefitType, String benefitDescription,
-        String createdInGapsFrom) {
+        String createdInGapsFrom, Consumer<SscsCaseData> consumer) {
         return createCaseWithState(eventType, benefitType, benefitDescription, createdInGapsFrom, caseData -> { });
     }
 

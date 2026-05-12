@@ -94,4 +94,16 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
             .setAddress(Address.builder().line1(LINE_1).town(TOWN).county(COUNTY).postcode(POSTCODE).build());
         data.setEvidencePresent("Yes");
     }
+
+    private void addMinimalCaseData(SscsCaseData data) {
+        data
+            .getAppeal()
+            .getAppellant()
+            .setAddress(Address.builder().line1(LINE_1).town(TOWN).county(COUNTY).postcode(POSTCODE).build());
+        data
+            .getAppeal()
+            .getRep()
+            .setAddress(Address.builder().line1(LINE_1).town(TOWN).county(COUNTY).postcode(POSTCODE).build());
+        data.setEvidencePresent("Yes");
+    }
 }
