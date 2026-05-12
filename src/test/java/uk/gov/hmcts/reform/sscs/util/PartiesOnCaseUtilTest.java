@@ -245,6 +245,7 @@ class PartiesOnCaseUtilTest {
         addOtherPartiesToListOptions(caseData, listOptions, includeRepresentatives);
 
         assertThat(listOptions).hasSize(expectedSize);
+        assertThat(listOptions).isNotEmpty();
         assertThat(listOptions.getFirst().getCode()).isEqualTo(PartyItemList.OTHER_PARTY.getCode() + "1");
         assertThat(
             listOptions.stream().anyMatch(item -> item.getCode().startsWith(PartyItemList.OTHER_PARTY_REPRESENTATIVE.getCode())))
