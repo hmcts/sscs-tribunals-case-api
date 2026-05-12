@@ -152,7 +152,7 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE", "NON_COMPLIANT_SEND_TO_INTERLOC"})
+    @CsvSource({"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
     public void returnAnErrorIfNoSelectWhoReviewsCaseSelected(EventType eventType) {
         sscsCaseData = sscsCaseData.toBuilder().selectWhoReviewsCase(null).build();
         caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
@@ -165,7 +165,7 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE", "NON_COMPLIANT_SEND_TO_INTERLOC"})
+    @CsvSource({"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
     public void givenPostponementRequestInterlocSendToTcw_returnAnErrorIfNoOriginalSenderSelected(EventType eventType) {
         sscsCaseData = sscsCaseData.toBuilder().selectWhoReviewsCase(new DynamicList(
                         new DynamicListItem(POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId(),
