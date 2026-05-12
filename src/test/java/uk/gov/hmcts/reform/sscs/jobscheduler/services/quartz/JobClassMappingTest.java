@@ -1,43 +1,42 @@
 package uk.gov.hmcts.reform.sscs.jobscheduler.services.quartz;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobPayloadSerializer;
 
-public class JobClassMappingTest {
+class JobClassMappingTest {
 
     private JobPayloadSerializer<String> jobPayloadSerializer;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         jobPayloadSerializer = mock(JobPayloadSerializer.class);
     }
 
     @Test
-    public void mappingCanHandlePayloadByClass() {
+    void mappingCanHandlePayloadByClass() {
         JobClassMapping<String> jobMapping = new JobClassMapping<>(String.class, jobPayloadSerializer);
 
         boolean canHandle = jobMapping.canHandle(String.class);
 
-        assertThat(canHandle, is(true));
+        assertThat(canHandle).isTrue();
     }
 
     @Test
-    public void mappingCannotHandlePayloadByClass() {
+    void mappingCannotHandlePayloadByClass() {
         JobClassMapping<String> jobMapping = new JobClassMapping<>(String.class, jobPayloadSerializer);
 
         boolean canHandle = jobMapping.canHandle(Integer.class);
 
-        assertThat(canHandle, is(false));
+        assertThat(canHandle).isFalse();
     }
 
     @Test
-    public void serialize() {
+    void serialize() {
         JobClassMapping<String> jobMapping = new JobClassMapping<>(String.class, jobPayloadSerializer);
 
         String payload = "payload";
