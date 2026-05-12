@@ -214,7 +214,7 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(Collections.emptySet(), response.getErrors());
+        org.assertj.core.api.Assertions.assertThat(response.getErrors()).isEmpty();
     }
 
     @Test
@@ -237,7 +237,7 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
 
         var response = handlerWithFlagOff.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(Collections.emptySet(), response.getErrors());
+        org.assertj.core.api.Assertions.assertThat(response.getErrors()).isEmpty();
     }
 
     @Test
@@ -253,7 +253,7 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(Collections.emptySet(), response.getErrors());
+        org.assertj.core.api.Assertions.assertThat(response.getErrors()).isEmpty();
         assertNull(response.getData().getSelectWhoReviewsCase());
         assertEquals(LocalDate.now(), response.getData().getInterlocReferralDate());
         assertNull(response.getData().getDirectionDueDate());
