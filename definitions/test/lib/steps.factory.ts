@@ -53,6 +53,7 @@ import { UpdateListingRequirement } from '../fixtures/steps/update.listing.requi
 import { CommunicateWithFta } from '../fixtures/steps/communicate-with-fta';
 import { Adjournment } from '../fixtures/steps/adjournment';
 import { AmendElements } from '../fixtures/steps/amend.elements';
+import { ValidateAppeal } from '../fixtures/steps/validate.appeal';
 import { CtscReviewIncompleteAppeal } from '../fixtures/steps/work-allocation/ctsc.review.incomplete.appeal';
 import { CtscActionUnprocessedCorrespondence } from '../fixtures/steps/work-allocation/ctsc.action.unprocessed.correspondence';
 import { CtscReviewFtaResponse } from '../fixtures/steps/work-allocation/ctsc.review.fta.response';
@@ -114,6 +115,7 @@ type MyStepsFixtures = {
   communicateWithFtaSteps: CommunicateWithFta;
   adjournmentSteps: Adjournment;
   amendElementSteps: AmendElements;
+  validateAppealSteps: ValidateAppeal;
   reviewIncompleteAppealSteps: CtscReviewIncompleteAppeal;
   ctscActionUnprocessedCorrespondenceSteps: CtscActionUnprocessedCorrespondence;
   ctscReviewFtaResponseSteps: CtscReviewFtaResponse;
@@ -436,6 +438,10 @@ export const test = stepsFactory.extend<MyStepsFixtures>({
   amendElementSteps: async ({ page }, use) => {
     const amendElementSteps = new AmendElements(page);
     await use(amendElementSteps);
+  },
+  validateAppealSteps: async ({ page }, use) => {
+    const validateAppealSteps = new ValidateAppeal(page);
+    await use(validateAppealSteps);
   },
   reviewIncompleteAppealSteps: async ({ page }, use) => {
     const reviewIncompleteAppealSteps = new CtscReviewIncompleteAppeal(page);

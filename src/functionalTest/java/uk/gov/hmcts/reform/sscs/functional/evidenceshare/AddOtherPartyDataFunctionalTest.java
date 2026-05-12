@@ -33,7 +33,6 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 @EnabledIfEnvironmentVariable(named = "CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED", matches = "true")
 class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
 
-    private static final int TIMEOUT = 30;
     private static final String POSTCODE = "TS1 1ST";
     private static final String ADDRESS_LINE_1 = "10 Coverfield Lane";
     private static final String ADDRESS_LINE_2 = "Glen Close";
@@ -70,14 +69,14 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
 
             final SscsCaseDetails caseWithState = createCaseFromEvent(Benefit.CHILD_SUPPORT, VALID_APPEAL_CREATED,
                 AddOtherPartyDataFunctionalTest::updateCase);
-            await().atMost(TIMEOUT, SECONDS).untilAsserted(() -> {
+            defaultAwait().untilAsserted(() -> {
                 final var caseDetails = findCaseById(caseWithState.getId().toString());
                 assertThat(caseDetails.getState()).isEqualTo(State.AWAIT_OTHER_PARTY_DATA.toString());
             });
 
             runAddOtherPartyDataEvent(caseWithState);
 
-            await().atMost(TIMEOUT, SECONDS).untilAsserted(AddOtherPartyDataFunctionalTest.this::assertThatPartyAdded);
+            defaultAwait().untilAsserted(AddOtherPartyDataFunctionalTest.this::assertThatPartyAdded);
         }
 
     }
@@ -90,14 +89,13 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
             final SscsCaseDetails caseDetails = createCaseFromEvent(Benefit.UC, VALID_APPEAL_CREATED,
                 AddOtherPartyDataFunctionalTest::updateCase);
 
-            await()
-                .atMost(TIMEOUT, SECONDS)
+            defaultAwait()
                 .untilAsserted(() -> assertThat(findCaseById(caseDetails.getId().toString()).getState()).isEqualTo(
                     State.WITH_DWP.toString()));
 
             runAddOtherPartyDataEvent(caseDetails);
 
-            await().atMost(TIMEOUT, SECONDS).untilAsserted(AddOtherPartyDataFunctionalTest.this::assertThatPartyAdded);
+            defaultAwait().untilAsserted(AddOtherPartyDataFunctionalTest.this::assertThatPartyAdded);
             assertThatPdfTextIsCorrect(getDocument(caseDetails.getId(), "addOtherPartyData"), getExpectedContent(caseDetails));
         }
 
@@ -142,7 +140,7 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
             assertThat(cdAfterEvent.getData().getOtherParties().getFirst().getValue().getAddress().getTown()).isEqualTo(TOWN);
             assertThat(cdAfterEvent.getData().getOtherParties().getFirst().getValue().getAddress().getLine1()).isEqualTo(
                 ADDRESS_LINE_1);
-            assertThat(cdAfterEvent.getData().getExtendedSscsCaseData().getConfidentialityTab())
+            assertThat(cdAfterEvent.getData().getConfidentialityTab())
                 .contains("Other Party 1 | Bella Kiki | Undetermined |");
         });
     }
