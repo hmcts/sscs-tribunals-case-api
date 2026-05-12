@@ -70,8 +70,8 @@ abstract class AbstractFunctionalTest {
     private static final String EVIDENCE_DOCUMENT_TYPE = "EVIDENCE_DOCUMENT";
     private static final String EXISTING_DOCUMENT_PDF = "existing-document.pdf";
     private static final String EXISTING_DOCUMENT_TYPE = "EXISTING_DOCUMENT";
+    private static final String LOCAL_INSTANCE = "http://localhost:8008";
     private final String tcaInstance = System.getenv("TEST_URL");
-    private final String localInstance = "http://localhost:8008";
 
     String ccdCaseId;
 
@@ -89,7 +89,7 @@ abstract class AbstractFunctionalTest {
 
     public void simulateCcdCallback(String json) {
 
-        baseURI = StringUtils.isNotBlank(tcaInstance) ? tcaInstance : localInstance;
+        baseURI = StringUtils.isNotBlank(tcaInstance) ? tcaInstance : LOCAL_INSTANCE;
 
         final String callbackUrl = baseURI + "/testing-support/send";
 
@@ -109,7 +109,7 @@ abstract class AbstractFunctionalTest {
 
         // Again, need to pass in the correct autorization tokens so that they are fed to the Test Controller
 
-        baseURI = StringUtils.isNotBlank(tcaInstance) ? tcaInstance : localInstance;
+        baseURI = StringUtils.isNotBlank(tcaInstance) ? tcaInstance : LOCAL_INSTANCE;
 
         final String callbackUrl = baseURI + "/testing-support/send";
 
@@ -140,11 +140,6 @@ abstract class AbstractFunctionalTest {
 
     SscsCaseDetails createCaseFromEvent(Benefit benefit, EventType eventType, Consumer<SscsCaseData> consumer) {
         return createCaseWithState(eventType, benefit.getShortName(), benefit.getDescription(), null, consumer);
-    }
-
-    SscsCaseDetails createCaseWithState(EventType eventType, String benefitType, String benefitDescription,
-        String createdInGapsFrom, Consumer<SscsCaseData> consumer) {
-        return createCaseWithState(eventType, benefitType, benefitDescription, createdInGapsFrom, caseData -> { });
     }
 
     SscsCaseDetails createCaseWithState(EventType eventType, String benefitType, String benefitDescription,
