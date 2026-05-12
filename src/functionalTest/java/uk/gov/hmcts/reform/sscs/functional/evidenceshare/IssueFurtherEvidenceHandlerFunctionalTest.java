@@ -7,21 +7,11 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED
 import java.io.IOException;
 import java.util.List;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctionalTest {
-
-    @BeforeEach
-    void slowDownTests() throws InterruptedException {
-        // we have a problem with functional tests failing randomly. It was noticed that there are frequent connection failures,
-        //  so maybe the tests run before the corresponding services are spun up. This method introduces a delay before tests
-        //  to try and give the environment a bit more time to cope.
-
-        Thread.sleep(5000);
-    }
 
     @Test
     @Disabled("test failing due to 409 conflict error - documents generated during test are already duplicate that needs to be amended before sent to bulk print.")
