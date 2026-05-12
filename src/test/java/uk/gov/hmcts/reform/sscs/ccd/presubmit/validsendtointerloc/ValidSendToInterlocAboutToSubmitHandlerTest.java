@@ -358,6 +358,20 @@ class ValidSendToInterlocAboutToSubmitHandlerTest {
         assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
+    @Test
+    void givenNonCompliantEvent_whenSubmitted_thenSetsReferralDateAndAddsNoteWithoutReviewerValidation() {
+        sscsCaseData.setTempNoteDetail("Non compliant note");
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), NON_COMPLIANT_SEND_TO_INTERLOC, false);
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(Collections.emptySet(), response.getErrors());
+        assertNull(response.getData().getSelectWhoReviewsCase());
+        assertEquals(LocalDate.now(), response.getData().getInterlocReferralDate());
+        assertNull(response.getData().getDirectionDueDate());
+        verify(addNoteService).addNote(eq(USER_AUTHORISATION), eq(response.getData()), eq("Non compliant note"));
+    }
+
     private static Stream<Arguments> missingSelectionScenarios() {
         return Stream.of(
                 Arguments.of((DynamicList) null),
