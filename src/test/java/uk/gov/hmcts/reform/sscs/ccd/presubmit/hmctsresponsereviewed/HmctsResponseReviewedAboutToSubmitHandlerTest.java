@@ -186,7 +186,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assertions.assertThat(response.getErrors()).doesNotContain("Must select party");
+        Assertions.assertThat(response.getErrors()).isEmpty();
     }
 
     @Test
@@ -198,7 +198,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assertions.assertThat(response.getErrors()).doesNotContain("Must select party");
+        Assertions.assertThat(response.getErrors()).isEmpty();
     }
 
     @Test
