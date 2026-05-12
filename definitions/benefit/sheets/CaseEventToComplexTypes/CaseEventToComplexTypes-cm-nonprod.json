@@ -139,17 +139,6 @@
     "PageID": "1.0"
   },
   {
-    "CaseEventID": "caseUpdated",
-    "CaseFieldID": "appeal",
-    "CaseTypeID": "Benefit",
-    "ListElementCode": "appellant.confidentialityRequired",
-    "ID": "appealAppellantConfidentiality",
-    "FieldShowCondition": "appeal.benefitType.code=\"childSupport\" OR appeal.benefitType.code=\"taxCredit\" OR appeal.benefitType.code=\"guardiansAllowance\" OR appeal.benefitType.code=\"taxFreeChildcare\" OR appeal.benefitType.code=\"homeResponsibilitiesProtection\" OR appeal.benefitType.code=\"childBenefit\" OR appeal.benefitType.code=\"thirtyHoursFreeChildcare\" OR appeal.benefitType.code=\"guaranteedMinimumPension\" OR appeal.benefitType.code=\"nationalInsuranceCredits\" OR (otherParties!=\"\" AND appeal.benefitType.code=\"UC\")",
-    "DisplayContext": "MANDATORY",
-    "LiveFrom": "19/11/2020",
-    "FieldDisplayOrder": 16
-  },
-  {
     "CaseEventID": "addOtherPartyData",
     "CaseFieldID": "otherParties",
     "ListElementCode": "domesticViolenceMarker",
@@ -184,5 +173,26 @@
     "LiveFrom": "16/03/2026",
     "PageID": "1.0",
     "FieldShowCondition": "otherParties=\"DoNotShow\""
+  },
+  {
+    "CaseEventID": "caseUpdated",
+    "CaseFieldID": "otherParties",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "05/05/2026",
+    "FieldShowCondition": "appeal =\"DO_NOT_SHOW\"",
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "caseUpdated",
+    "CaseFieldID": "appeal",
+    "CaseTypeID": "Benefit",
+    "ListElementCode": "appellant.confidentialityRequired",
+    "ID": "appealAppellantConfidentiality",
+    "FieldShowCondition": "(otherParties!=\"\" AND appeal.benefitType.code=\"UC\") OR appeal.benefitType.code=\"childSupport\" OR appeal.benefitType.code=\"taxCredit\" OR appeal.benefitType.code=\"guardiansAllowance\" OR appeal.benefitType.code=\"taxFreeChildcare\" OR appeal.benefitType.code=\"homeResponsibilitiesProtection\" OR appeal.benefitType.code=\"childBenefit\" OR appeal.benefitType.code=\"thirtyHoursFreeChildcare\" OR appeal.benefitType.code=\"guaranteedMinimumPension\" OR appeal.benefitType.code=\"nationalInsuranceCredits\"",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "05/05/2026",
+    "FieldDisplayOrder": 16,
+    "PageID": "1.0"
   }
 ]
