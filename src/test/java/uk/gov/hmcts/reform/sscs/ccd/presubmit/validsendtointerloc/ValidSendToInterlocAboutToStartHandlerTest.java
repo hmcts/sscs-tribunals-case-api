@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT_SEND_TO_INTERLOC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_SEND_TO_INTERLOC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW;
@@ -60,7 +61,6 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
     }
 
     private void setupCallback() {
-        when(callback.getEvent()).thenReturn(VALID_SEND_TO_INTERLOC);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
@@ -79,10 +79,10 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = EventType.class, names = {"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
+    @EnumSource(value = EventType.class, names = {"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE", "NON_COMPLIANT_SEND_TO_INTERLOC"})
     void populatesSelectWhoReviewsCaseDropDown(EventType eventType) {
-        when(callback.getEvent()).thenReturn(eventType);
         setupCallback();
+        when(callback.getEvent()).thenReturn(eventType);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()));
@@ -95,12 +95,12 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = EventType.class, names = {"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
+    @EnumSource(value = EventType.class, names = {"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE", "NON_COMPLIANT_SEND_TO_INTERLOC"})
     public void givenPostponementsFeatureOn_populatesSelectWhoReviewsCaseDropDown(EventType eventType) {
         ReflectionTestUtils.setField(handler, "postponementsFeature", true);
 
-        when(callback.getEvent()).thenReturn(eventType);
         setupCallback();
+        when(callback.getEvent()).thenReturn(eventType);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()));
@@ -115,6 +115,7 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
 
     @Test
     public void givenAValidSendToInterlocRequestWithRep_thenPopulateDropdownWithPartiesOnCase() {
+        when(callback.getEvent()).thenReturn(VALID_SEND_TO_INTERLOC);
         setupCallback();
         sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative("Yes").build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -133,6 +134,7 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
 
     @Test
     public void givenAValidSendToInterlocRequestWithJointParty_thenPopulateDropdownWithPartiesOnCase() {
+        when(callback.getEvent()).thenReturn(VALID_SEND_TO_INTERLOC);
         setupCallback();
         sscsCaseData.getJointParty().setHasJointParty(YES);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -151,6 +153,7 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
 
     @Test
     public void givenAValidSendToInterlocRequestWithJointPartyAndRep_thenPopulateDropdownWithPartiesOnCase() {
+        when(callback.getEvent()).thenReturn(VALID_SEND_TO_INTERLOC);
         setupCallback();
         sscsCaseData.getJointParty().setHasJointParty(YES);
         sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative("Yes").build());
@@ -172,11 +175,11 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = EventType.class, names = {"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
+    @EnumSource(value = EventType.class, names = {"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE", "NON_COMPLIANT_SEND_TO_INTERLOC"})
     void givenChildSupport_thenSelectedConfidentialityPartyHasNoDefaultSelection(EventType eventType) {
         handler = new ValidSendToInterlocAboutToStartHandler(false, false, true);
-        when(callback.getEvent()).thenReturn(eventType);
         setupCallback();
+        when(callback.getEvent()).thenReturn(eventType);
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -186,7 +189,14 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
     }
 
     @Test
+    void canHandleReturnsTrueForNonCompliantSendToInterloc() {
+        when(callback.getEvent()).thenReturn(NON_COMPLIANT_SEND_TO_INTERLOC);
+        assertThat(handler.canHandle(ABOUT_TO_START, callback)).isTrue();
+    }
+
+    @Test
     void givenNonChildSupport_thenSelectedConfidentialityPartyIsNotSet() {
+        when(callback.getEvent()).thenReturn(VALID_SEND_TO_INTERLOC);
         setupCallback();
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("PIP").build());
 

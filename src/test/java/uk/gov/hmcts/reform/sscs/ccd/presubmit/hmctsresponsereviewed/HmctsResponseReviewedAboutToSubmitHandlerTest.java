@@ -95,7 +95,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
                 new CaseDetails<>(1234L, "SSCS", RESPONSE_RECEIVED, sscsCaseDataBefore, now(), "Benefit");
         callback = new Callback<>(caseDetails, Optional.of(caseDetailsBefore), HMCTS_RESPONSE_REVIEWED, false);
 
-        handler = new HmctsResponseReviewedAboutToSubmitHandler(dwpDocumentService, panelCompService, addNoteService);
+        handler = new HmctsResponseReviewedAboutToSubmitHandler(dwpDocumentService, panelCompService, addNoteService, true);
     }
 
     @Test
@@ -164,6 +164,41 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
         for (String error : response.getErrors()) {
             assertEquals("Issue code cannot be set to the default value of DD", error);
         }
+    }
+
+    @Test
+    void givenChildSupportConfidentialityAndNoSelectedParty_thenReturnsMustSelectPartyError() {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(null);
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        Assertions.assertThat(response.getErrors()).contains("Must select party");
+    }
+
+    @Test
+    void givenChildSupportConfidentialityAndSelectedPartyPresent_thenNoMustSelectPartyError() {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
+                new DynamicList(new DynamicListItem("appellant", "Appellant"), List.of()));
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        Assertions.assertThat(response.getErrors()).doesNotContain("Must select party");
+    }
+
+    @Test
+    void givenChildSupportConfidentialityAndFlagOff_thenNoMustSelectPartyError() {
+        handler = new HmctsResponseReviewedAboutToSubmitHandler(dwpDocumentService, panelCompService, addNoteService, false);
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(null);
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        Assertions.assertThat(response.getErrors()).doesNotContain("Must select party");
     }
 
     @Test
@@ -433,7 +468,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
     @Test
     public void shouldResetPanelComposition() {
-        handler = new HmctsResponseReviewedAboutToSubmitHandler(dwpDocumentService, panelCompService, addNoteService);
+        handler = new HmctsResponseReviewedAboutToSubmitHandler(dwpDocumentService, panelCompService, addNoteService, true);
         var panelComposition = new PanelMemberComposition(List.of("84"));
         when(panelCompService.resetPanelCompositionIfStale(sscsCaseData, Optional.of(caseDetailsBefore)))
                 .thenReturn(panelComposition);
