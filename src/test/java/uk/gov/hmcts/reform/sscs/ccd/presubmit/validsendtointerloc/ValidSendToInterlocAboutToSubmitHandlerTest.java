@@ -10,6 +10,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.PIP;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT_SEND_TO_INTERLOC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_SEND_TO_INTERLOC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW;
@@ -349,6 +350,12 @@ class ValidSendToInterlocAboutToSubmitHandlerTest {
         var response = handlerWithFlagOff.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(Collections.emptySet(), response.getErrors());
+    }
+
+    @Test
+    void canHandleReturnsTrueForNonCompliantSendToInterloc() {
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), NON_COMPLIANT_SEND_TO_INTERLOC, false);
+        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
     private static Stream<Arguments> missingSelectionScenarios() {
