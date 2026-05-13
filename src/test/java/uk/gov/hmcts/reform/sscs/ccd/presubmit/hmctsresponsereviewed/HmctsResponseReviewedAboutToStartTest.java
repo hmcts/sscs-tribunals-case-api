@@ -337,22 +337,30 @@ class HmctsResponseReviewedAboutToStartTest {
     }
 
     @Test
-    public void givenChildSupport_thenSelectedConfidentialityPartyHasNoDefaultSelection() {
+    void givenFlagEnabledAndChildSupport_thenSelectedConfidentialityPartyHasNoDefaultSelection() {
         handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService, true);
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals("", response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode());
+        assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode()).isEmpty();
     }
 
-    @Test
-    public void givenNonChildSupport_thenSelectedConfidentialityPartyIsNotSet() {
-        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService, true);
-        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(Benefit.PIP.getShortName()).build());
+    @ParameterizedTest
+    @CsvSource({
+        "false, childSupport",
+        "true, PIP"
+    })
+    void givenVariousFlagAndBenefitCombinations_whenNotChildSupportWithFlagEnabled_thenSelectedConfidentialityPartyIsNotSet(
+        boolean featureFlag, String benefitCode) {
+        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService, featureFlag);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        String codeToUse = benefitCode.equals("PIP") ? Benefit.PIP.getShortName() : benefitCode;
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(codeToUse).build());
 
-        assertNull(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty());
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty()).isNull();
     }
+
 }

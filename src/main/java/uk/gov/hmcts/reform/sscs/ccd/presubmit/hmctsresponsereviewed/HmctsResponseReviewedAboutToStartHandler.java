@@ -46,10 +46,10 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
 
     public HmctsResponseReviewedAboutToStartHandler(DwpAddressLookupService service,
                                                     HearingsService hearingsService,
-                                                    @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
+        @Value("${feature.cm-other-party-confidentiality.enabled}") final boolean cmConfidentialityEnabled) {
         this.service = service;
         this.hearingsService = hearingsService;
-        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
+        this.cmConfidentialityEnabled = cmConfidentialityEnabled;
     }
 
     @Override
