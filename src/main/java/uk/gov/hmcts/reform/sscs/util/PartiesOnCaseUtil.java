@@ -120,6 +120,7 @@ public class PartiesOnCaseUtil {
         return listOptions;
     }
 
+
     public static List<String> getAllOtherPartiesOnCase(SscsCaseData sscsCaseData) {
         List<String> otherParties = new ArrayList<>();
         if (sscsCaseData.getOtherParties() != null && sscsCaseData.getOtherParties().size() > 0) {

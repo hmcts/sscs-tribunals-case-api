@@ -307,14 +307,14 @@ class ValidSendToInterlocAboutToSubmitHandlerTest {
     @ParameterizedTest
     @MethodSource("missingSelectionScenarios")
     void givenConfidentialityReferral_whenSelectionMissing_thenReturnsMustSelectPartyError(DynamicList selectedParty) {
+        handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService, true);
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
         sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(selectedParty);
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getErrors().size(), is(1));
-        assertTrue(response.getErrors().contains("Must select party"));
+        assertThat(response.getErrors()).hasSize(1).contains("Must select party");
     }
 
     @Test
@@ -326,7 +326,7 @@ class ValidSendToInterlocAboutToSubmitHandlerTest {
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        org.assertj.core.api.Assertions.assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getErrors()).isEmpty();
     }
 
     @Test
@@ -337,7 +337,7 @@ class ValidSendToInterlocAboutToSubmitHandlerTest {
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(Collections.emptySet(), response.getErrors());
+        assertThat(response.getErrors()).isEmpty();
     }
 
     @Test
@@ -349,13 +349,13 @@ class ValidSendToInterlocAboutToSubmitHandlerTest {
 
         var response = handlerWithFlagOff.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        org.assertj.core.api.Assertions.assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getErrors()).isEmpty();
     }
 
     @Test
     void canHandleReturnsTrueForNonCompliantSendToInterloc() {
         callback = new Callback<>(caseDetails, Optional.of(caseDetails), NON_COMPLIANT_SEND_TO_INTERLOC, false);
-        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
+        assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isTrue();
     }
 
     @Test
@@ -365,10 +365,10 @@ class ValidSendToInterlocAboutToSubmitHandlerTest {
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        org.assertj.core.api.Assertions.assertThat(response.getErrors()).isEmpty();
-        assertNull(response.getData().getSelectWhoReviewsCase());
-        assertEquals(LocalDate.now(), response.getData().getInterlocReferralDate());
-        assertNull(response.getData().getDirectionDueDate());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getSelectWhoReviewsCase()).isNull();
+        assertThat(response.getData().getInterlocReferralDate()).isEqualTo(LocalDate.now());
+        assertThat(response.getData().getDirectionDueDate()).isNull();
         verify(addNoteService).addNote(eq(USER_AUTHORISATION), eq(response.getData()), eq("Non compliant note"));
     }
 

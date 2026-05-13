@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT_SEND_TO_INTERLOC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_SEND_TO_INTERLOC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW;
@@ -58,6 +57,7 @@ class ValidSendToInterlocAboutToStartHandlerTest {
     }
 
     private void setupCallback() {
+        when(callback.getEvent()).thenReturn(VALID_SEND_TO_INTERLOC);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
@@ -76,10 +76,10 @@ class ValidSendToInterlocAboutToStartHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = EventType.class, names = {"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE", "NON_COMPLIANT_SEND_TO_INTERLOC"})
+    @EnumSource(value = EventType.class, names = {"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
     void populatesSelectWhoReviewsCaseDropDown(EventType eventType) {
-        setupCallback();
         when(callback.getEvent()).thenReturn(eventType);
+        setupCallback();
 
         final List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()));
@@ -96,8 +96,8 @@ class ValidSendToInterlocAboutToStartHandlerTest {
     void givenPostponementsFeatureOn_populatesSelectWhoReviewsCaseDropDown(EventType eventType) {
         ReflectionTestUtils.setField(handler, "postponementsFeature", true);
 
-        setupCallback();
         when(callback.getEvent()).thenReturn(eventType);
+        setupCallback();
 
         final List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()));
@@ -203,33 +203,36 @@ class ValidSendToInterlocAboutToStartHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = EventType.class, names = {"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE", "NON_COMPLIANT_SEND_TO_INTERLOC"})
-    void givenChildSupport_thenSelectedConfidentialityPartyHasNoDefaultSelection(EventType eventType) {
+    @EnumSource(value = EventType.class, names = {"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
+    void givenFlagEnabledAndChildSupport_thenSelectedConfidentialityPartyHasNoDefaultSelection(EventType eventType) {
         handler = new ValidSendToInterlocAboutToStartHandler(false, false, true);
-        setupCallback();
         when(callback.getEvent()).thenReturn(eventType);
+        setupCallback();
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode())
-                .isEqualTo("");
+        assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode()).isEmpty();
     }
 
     @Test
-    void canHandleReturnsTrueForNonCompliantSendToInterloc() {
-        when(callback.getEvent()).thenReturn(NON_COMPLIANT_SEND_TO_INTERLOC);
-        assertThat(handler.canHandle(ABOUT_TO_START, callback)).isTrue();
-    }
-
-    @Test
-    void givenNonChildSupport_thenSelectedConfidentialityPartyIsNotSet() {
-        when(callback.getEvent()).thenReturn(VALID_SEND_TO_INTERLOC);
+    void givenFlagEnabledAndNonChildSupport_thenSelectedConfidentialityPartyIsNotSet() {
+        handler = new ValidSendToInterlocAboutToStartHandler(false, false, true);
         setupCallback();
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("PIP").build());
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertNull(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty());
+        assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty()).isNull();
+    }
+
+    @Test
+    void givenFlagDisabledAndNonChildSupport_thenSelectedConfidentialityPartyIsNotSet() {
+        setupCallback();
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("PIP").build());
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty()).isNull();
     }
 }
