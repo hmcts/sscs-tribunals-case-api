@@ -20,7 +20,7 @@ if [ "$environment" = "aat" ]; then
     RAS_URL="http://am-role-assignment-service-aat.service.core-compute-aat.internal"
 fi
 
-curl --silent --show-error -X POST "${RAS_URL}/am/role-assignments" \
+curl --http1.1 --silent --show-error -X POST "${RAS_URL}/am/role-assignments" \
   -H "accept: application/vnd.uk.gov.hmcts.role-assignment-service.create-assignments+json;charset=UTF-8;version=1.0" \
   -H "Authorization: Bearer ${SSCS_SYSTEM_USER_TOKEN}" \
   -H "ServiceAuthorization: Bearer ${S2S_TOKEN}" \
