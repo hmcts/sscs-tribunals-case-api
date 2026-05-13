@@ -44,14 +44,6 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
         this.cmConfidentialityEnabled = cmConfidentialityEnabled;
     }
 
-    public HmctsResponseReviewedAboutToStartHandler(DwpAddressLookupService service,
-                                                    HearingsService hearingsService,
-        @Value("${feature.cm-other-party-confidentiality.enabled}") final boolean cmConfidentialityEnabled) {
-        this.service = service;
-        this.hearingsService = hearingsService;
-        this.cmConfidentialityEnabled = cmConfidentialityEnabled;
-    }
-
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");

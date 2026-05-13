@@ -201,38 +201,4 @@ class ValidSendToInterlocAboutToStartHandlerTest {
 
         assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty()).isNull();
     }
-
-    @ParameterizedTest
-    @EnumSource(value = EventType.class, names = {"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
-    void givenFlagEnabledAndChildSupport_thenSelectedConfidentialityPartyHasNoDefaultSelection(EventType eventType) {
-        handler = new ValidSendToInterlocAboutToStartHandler(false, false, true);
-        when(callback.getEvent()).thenReturn(eventType);
-        setupCallback();
-        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode()).isEmpty();
-    }
-
-    @Test
-    void givenFlagEnabledAndNonChildSupport_thenSelectedConfidentialityPartyIsNotSet() {
-        handler = new ValidSendToInterlocAboutToStartHandler(false, false, true);
-        setupCallback();
-        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("PIP").build());
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty()).isNull();
-    }
-
-    @Test
-    void givenFlagDisabledAndNonChildSupport_thenSelectedConfidentialityPartyIsNotSet() {
-        setupCallback();
-        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("PIP").build());
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty()).isNull();
-    }
 }
