@@ -123,6 +123,7 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
             sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(null);
             sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereCriteriaApply(null);
             sscsCaseData.getExtendedSscsCaseData().setEsaWriteFinalDecisionSevereCriteriaApply(null);
+            sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecisionIsAfterSvDate(null);
         }
         finalDecisionCaseData.setOtherPartyAttendedQuestions(new ArrayList<>());
 
