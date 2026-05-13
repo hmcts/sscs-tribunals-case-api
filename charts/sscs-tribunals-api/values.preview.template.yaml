@@ -636,7 +636,7 @@ ccd:
       devmemoryRequests: '1524Mi'
       devmemoryLimits: '2048Mi'
       devcpuRequests: 50m
-      devcpuLimits: 250m
+      devcpuLimits: 500m
       environment:
         DATA_STORE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
         DATA_STORE_DB_USERNAME: hmcts
