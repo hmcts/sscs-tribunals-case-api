@@ -34,14 +34,14 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
 
     private final DwpAddressLookupService service;
     private final HearingsService hearingsService;
-    private final boolean cmOtherPartyConfidentialityEnabled;
+    private final boolean cmConfidentialityEnabled;
 
     public HmctsResponseReviewedAboutToStartHandler(DwpAddressLookupService service,
                                                     HearingsService hearingsService,
-                                                    @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
+        @Value("${feature.cm-other-party-confidentiality.enabled}") final boolean cmConfidentialityEnabled) {
         this.service = service;
         this.hearingsService = hearingsService;
-        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
+        this.cmConfidentialityEnabled = cmConfidentialityEnabled;
     }
 
     @Override
@@ -66,7 +66,7 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
         setDefaultFieldValues(sscsCaseData);
         setDwpDocuments(sscsCaseData);
         setSelectWhoReviewsCase(sscsCaseData);
-        if (cmOtherPartyConfidentialityEnabled && isChildSupportAppeal(sscsCaseData)) {
+        if (cmConfidentialityEnabled && isChildSupportAppeal(sscsCaseData)) {
             sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
                     getSelectedConfidentialityPartyDropdown(sscsCaseData));
         }

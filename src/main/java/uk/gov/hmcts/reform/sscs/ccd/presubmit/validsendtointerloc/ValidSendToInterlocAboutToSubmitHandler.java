@@ -1,27 +1,27 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT_SEND_TO_INTERLOC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_SEND_TO_INTERLOC;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.CONFIDENTIALITY;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty.REP;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.REPRESENTATIVE;
-import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.isChildSupportAppeal;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
@@ -36,16 +36,15 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
 
     private final PostponementRequestService postponementRequestService;
     private final AddNoteService addNoteService;
-    private final boolean cmOtherPartyConfidentialityEnabled;
+    private final boolean cmConfidentialityEnabled;
 
 
     @Autowired
     public ValidSendToInterlocAboutToSubmitHandler(PostponementRequestService postponementRequestService,
-                                                   AddNoteService addNoteService,
-                                                   @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
+                                                   AddNoteService addNoteService, @Value("${feature.cm-other-party-confidentiality.enabled}") final boolean cmConfidentialityEnabled) {
         this.postponementRequestService = postponementRequestService;
         this.addNoteService = addNoteService;
-        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
+        this.cmConfidentialityEnabled = cmConfidentialityEnabled;
     }
 
     @Override
@@ -68,7 +67,7 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
 
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        if (callback.getEvent() != NON_COMPLIANT_SEND_TO_INTERLOC && isDynamicListEmpty(sscsCaseData.getSelectWhoReviewsCase())) {
+        if (callback.getEvent() != NON_COMPLIANT_SEND_TO_INTERLOC && isSelectionMissing(sscsCaseData.getSelectWhoReviewsCase())) {
             PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
             preSubmitCallbackResponse.addError("Must select who reviews the appeal.");
             return preSubmitCallbackResponse;
@@ -80,7 +79,7 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
                                                                           SscsCaseData sscsCaseData, String userAuth) {
         var preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
         if (callback.getEvent() != NON_COMPLIANT_SEND_TO_INTERLOC && isPostponementRequestInterlocSendToTcw(sscsCaseData)) {
-            if (isDynamicListEmpty(sscsCaseData.getOriginalSender())) {
+            if (isSelectionMissing(sscsCaseData.getOriginalSender())) {
                 preSubmitCallbackResponse.addError("Must select original sender");
                 return preSubmitCallbackResponse;
             }
@@ -91,10 +90,10 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
             UploadParty uploadParty = getUploadParty(sscsCaseData.getOriginalSender());
             postponementRequestService.processPostponementRequest(sscsCaseData, uploadParty, Optional.empty());
         } else {
-            if (cmOtherPartyConfidentialityEnabled
-                    && isChildSupportAppeal(sscsCaseData)
-                    && isConfidentialityReferral(sscsCaseData)
-                    && isSelectionMissing(sscsCaseData.getExtendedSscsCaseData().getSelectedConfidentialityParty())) {
+            if (cmConfidentialityEnabled
+                && sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT)
+                && isConfidentialityReferral(sscsCaseData)
+                && isSelectionMissing(sscsCaseData.getExtendedSscsCaseData().getSelectedConfidentialityParty())) {
                 preSubmitCallbackResponse.addError("Must select party");
                 return preSubmitCallbackResponse;
             }
@@ -125,25 +124,19 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
                 .equals(sscsCaseData.getSelectWhoReviewsCase().getValue().getCode());
     }
 
-    private UploadParty getUploadParty(DynamicList originalSender) {
-        return REPRESENTATIVE.getCode().equals(originalSender.getValue().getCode())
-                ? REP : UploadParty.fromValue(originalSender.getValue().getCode());
+    private boolean isConfidentialityReferral(SscsCaseData sscsCaseData) {
+        return CONFIDENTIALITY.equals(sscsCaseData.getInterlocReferralReason());
     }
 
-    private boolean isConfidentialityReferral(SscsCaseData sscsCaseData) {
-        return InterlocReferralReason.CONFIDENTIALITY.equals(sscsCaseData.getInterlocReferralReason());
+    private UploadParty getUploadParty(DynamicList selectedParty) {
+        return REPRESENTATIVE.getCode().equals(selectedParty.getValue().getCode())
+                ? REP : UploadParty.fromValue(selectedParty.getValue().getCode());
     }
 
     private boolean isSelectionMissing(DynamicList dynamicList) {
         return dynamicList == null
                 || dynamicList.getValue() == null
-                || isBlank(dynamicList.getValue().getCode());
-    }
-
-    private boolean isDynamicListEmpty(DynamicList originalSender) {
-        return originalSender == null
-                || originalSender.getValue() == null
-                || isBlank(originalSender.getValue().getCode());
+                || StringUtils.isBlank(dynamicList.getValue().getCode());
     }
 
 }
