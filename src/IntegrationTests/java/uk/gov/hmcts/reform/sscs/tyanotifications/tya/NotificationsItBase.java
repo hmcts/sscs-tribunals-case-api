@@ -198,7 +198,7 @@ public class NotificationsItBase {
     }
 
     private void setupNotificationService(SendNotificationService sendNotificationService) {
-        service = new NotificationService(factory, reminderService, notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, false);
+        service = new NotificationService(factory, reminderService, notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, true);
     }
 
     protected NotificationService getNotificationService() {

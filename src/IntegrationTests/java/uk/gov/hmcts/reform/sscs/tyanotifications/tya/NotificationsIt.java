@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.atMost;
 import static org.mockito.Mockito.atMostOnce;
 import static org.mockito.Mockito.eq;
@@ -70,7 +71,9 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.quartz.SchedulerException;
 import org.springframework.http.HttpStatus;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DatedRequestOutcome;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
@@ -5213,6 +5216,21 @@ public class NotificationsIt extends NotificationsItBase {
     private void updateJsonForPaperHearing() throws IOException {
         json = updateEmbeddedJson(json, "No", "case_details", "case_data", "appeal", "hearingOptions", "wantsToAttend");
         json = updateEmbeddedJson(json, "paper", "case_details", "case_data", "appeal", "hearingType");
+    }
+
+    @Test
+    public void givenUpdateOtherPartyDataEvent_whenMoreThanOneOtherParty_thenLetterNotificationSent() throws Exception {
+        String updatedJson = updateEmbeddedJson(json, "updateOtherPartyData", "event_id");
+        updatedJson = updateEmbeddedJson(updatedJson, "childSupport", "case_details", "case_data", "appeal", "benefitType",
+            "code");
+        updatedJson = updateEmbeddedJson(updatedJson,
+            List.of(CcdValue.<OtherParty>builder().value(OtherParty.builder().build()).build(),
+                CcdValue.<OtherParty>builder().value(OtherParty.builder().build()).build()), "case_details", "case_data",
+            "otherParties");
+
+        getResponse(getRequestWithAuthHeader(updatedJson));
+
+        verify(notificationClient, atLeastOnce()).sendPrecompiledLetterWithInputStream(any(), any());
     }
 
 }

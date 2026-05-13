@@ -329,6 +329,7 @@ public final class NotificationEventTypeLists {
         JOINT_PARTY_ADDED,
         JUDGE_DECISION_APPEAL_TO_PROCEED,
         NON_COMPLIANT,
+        // OTHER_PARTY_ADDED_TO_APPEAL,
         PROVIDE_APPOINTEE_DETAILS,
         RESEND_APPEAL_CREATED,
         SET_ASIDE_GRANTED,
