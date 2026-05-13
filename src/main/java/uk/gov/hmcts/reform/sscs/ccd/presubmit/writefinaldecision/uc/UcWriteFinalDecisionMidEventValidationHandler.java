@@ -1,10 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc;
 
-import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import jakarta.validation.Validator;
-import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -40,11 +38,11 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
             sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
         }
         if (isSevereConditionsEnabled) {
-            sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionHasSVIssueCode(setSevereCriteriaApplies(sscsCaseData));
+            sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionHasSVIssueCode(hasUcSvIssueCode(sscsCaseData));
             if (!YES.equals(sscsCaseData.getSscsUcCaseData().getShowSchedule7ActivitiesPage()) || ("No").equals(sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionSchedule7ActivitiesApply())) {
                 sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(null);
             }
-
+            sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecisionIsAfterSvDate(isFinalDecisionDateOfDecisionBlankOrAfterSvStartDate(sscsCaseData) ? YES : NO);
         }
     }
 
@@ -74,6 +72,9 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
         if (isSevereConditionsEnabled) {
             if (isYes(sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionHasSVIssueCode()) && NO.equals(sscsCaseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo())) {
                 preSubmitCallbackResponse.addError("This is a severe conditions criteria only appeal. Please select yes to this question.");
+            }
+            if (hasSvIssueCode(sscsCaseData) && !isFinalDecisionDateOfDecisionBlankOrAfterSvStartDate(sscsCaseData)) {
+                preSubmitCallbackResponse.addError("You cannot write decision notice until resolved. Please ask admin to amend issue code to WC or SG and then proceed.");
             }
         }
 
@@ -117,15 +118,5 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
             }
             sscsCaseData.setShowDwpReassessAwardPage(YesNo.NO);
         }
-    }
-
-    private YesNo setSevereCriteriaApplies(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getElementsDisputedLimitedWork() == null) {
-            return YesNo.NO;
-        }
-        return sscsCaseData.getElementsDisputedLimitedWork().stream()
-                .filter(elementDisputed -> nonNull(elementDisputed.getValue()))
-                .anyMatch(elementDisputed -> Objects.equals(elementDisputed.getValue().getIssueCode(), "SV"))
-                ? YesNo.YES : YesNo.NO;
     }
 }
