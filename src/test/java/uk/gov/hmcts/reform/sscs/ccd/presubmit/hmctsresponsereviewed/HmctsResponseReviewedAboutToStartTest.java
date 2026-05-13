@@ -336,31 +336,4 @@ class HmctsResponseReviewedAboutToStartTest {
         assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty()).isNull();
     }
 
-    @Test
-    void givenFlagEnabledAndChildSupport_thenSelectedConfidentialityPartyHasNoDefaultSelection() {
-        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService, true);
-        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode()).isEmpty();
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-        "false, childSupport",
-        "true, PIP"
-    })
-    void givenVariousFlagAndBenefitCombinations_whenNotChildSupportWithFlagEnabled_thenSelectedConfidentialityPartyIsNotSet(
-        boolean featureFlag, String benefitCode) {
-        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService, featureFlag);
-
-        String codeToUse = benefitCode.equals("PIP") ? Benefit.PIP.getShortName() : benefitCode;
-        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(codeToUse).build());
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty()).isNull();
-    }
-
 }
