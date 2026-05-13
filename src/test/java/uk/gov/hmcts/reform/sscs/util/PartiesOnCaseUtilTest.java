@@ -261,13 +261,12 @@ class PartiesOnCaseUtilTest {
 
     @Test
     void shouldPreserveExistingSelectedConfidentialityPartyWhenValueStillExists() {
-        final DynamicListItem existingValue = new DynamicListItem("representative", "Representative");
-        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative("yes").build());
+        final DynamicListItem existingValue = new DynamicListItem("appellant", "Appellant");
         sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(new DynamicList(existingValue, new ArrayList<>()));
 
         DynamicList dropdown = PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown(sscsCaseData);
 
-        assertThat(dropdown.getValue().getCode()).isEqualTo("representative");
+        assertThat(dropdown.getValue().getCode()).isEqualTo("appellant");
     }
 
     @Test
