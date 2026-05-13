@@ -607,7 +607,6 @@ ccd:
       devmemoryRequests: '1024Mi'
       devmemoryLimits: '2048Mi'
       devcpuRequests: 50m
-      devcpuLimits: 250m
       autoscaling:
         enabled: false
         minReplicas: 1
