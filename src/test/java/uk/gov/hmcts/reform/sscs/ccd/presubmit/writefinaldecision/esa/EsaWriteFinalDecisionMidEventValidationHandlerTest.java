@@ -206,6 +206,64 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Test
+    public void givenEsaCaseWithWcaAppealFlowAndSevereConditionsTrue_thenDoNotShowDwpReassessAwardPage() {
+
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        sscsCaseData.setWcaAppeal(YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getExtendedSscsCaseData().setEsaWriteFinalDecisionSevereCriteriaApply(YES);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getPageId()).thenReturn("workCapabilityAssessment");
+
+        EsaWriteFinalDecisionMidEventValidationHandler severeConditionsHandler = new EsaWriteFinalDecisionMidEventValidationHandler(
+                validator, decisionNoticeService, true, true);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = severeConditionsHandler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getShowDwpReassessAwardPage()).isEqualTo(NO);
+    }
+
+    @Test
+    public void givenEsaCaseWithWcaAppealFlowAndSvIssueCode_thenDoNotShowDwpReassessAwardPage() {
+
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        sscsCaseData.setWcaAppeal(YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.setIssueCode("SV");
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getPageId()).thenReturn("workCapabilityAssessment");
+
+        EsaWriteFinalDecisionMidEventValidationHandler severeConditionsHandler = new EsaWriteFinalDecisionMidEventValidationHandler(
+                validator, decisionNoticeService, true, true);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = severeConditionsHandler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getShowDwpReassessAwardPage()).isEqualTo(NO);
+    }
+
+
+    @Test
+    public void givenEsaCaseWithWcaAppealFlowAndSevereConditionsFalse_thenShowDwpReassessAwardPage() {
+
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        sscsCaseData.setWcaAppeal(YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getExtendedSscsCaseData().setEsaWriteFinalDecisionSevereCriteriaApply(NO);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getPageId()).thenReturn("workCapabilityAssessment");
+
+        EsaWriteFinalDecisionMidEventValidationHandler severeConditionsHandler = new EsaWriteFinalDecisionMidEventValidationHandler(
+                validator, decisionNoticeService, true, true);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = severeConditionsHandler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getShowDwpReassessAwardPage()).isEqualTo(YES);
+    }
+
+    @Test
     @Parameters({"STANDARD_RATE, STANDARD_RATE",})
     @Override
     public void shouldExhibitBenefitSpecificBehaviourWhenAnAnAwardIsGivenAndNoActivitiesSelected(AwardType dailyLiving, AwardType mobility) {

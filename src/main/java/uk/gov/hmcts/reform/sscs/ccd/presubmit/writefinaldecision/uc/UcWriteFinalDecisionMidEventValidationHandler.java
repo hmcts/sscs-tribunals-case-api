@@ -109,6 +109,12 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
 
     @Override
     protected void setDwpReassessAwardPage(SscsCaseData sscsCaseData, String pageId) {
+        if (isSevereConditionsEnabled
+                && (YesNo.isYes(sscsCaseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply())
+                || YesNo.isYes(hasUcSvIssueCode(sscsCaseData)))) {
+            sscsCaseData.setShowDwpReassessAwardPage(YesNo.NO);
+            return;
+        }
         if (pageId != null && pageId.equals("workCapabilityAssessment")) {
             if (isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())
                     && sscsCaseData.isWcaAppeal()
