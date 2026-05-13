@@ -267,13 +267,14 @@ export class WriteFinalDecision extends BaseStep {
       includeStartDate: true
     });
     await this.writeFinalDecisionPage.submitContinueBtn();
+    await this.writeFinalDecisionPage.submitContinueBtn();
 
     await this.writeFinalDecisionPage.verifyPageContentForSchedule7ActivitiesPage();
     await this.writeFinalDecisionPage.inputAndVerifyPageContentForSchedule7ActivitiesPageData();
     await this.writeFinalDecisionPage.submitContinueBtn();
 
     await this.writeFinalDecisionPage.verifyPageContentForSevereConditionsCriteriaPage();
-    await this.writeFinalDecisionPage.inputAndVerifyPageContentForSevereConditionsCriteriaPageDataUcAppeal(false);
+    await this.writeFinalDecisionPage.inputAndVerifyPageContentForSevereConditionsCriteriaPageDataUcAppeal(true);
     await this.writeFinalDecisionPage.submitContinueBtn();
 
     await this.writeFinalDecisionPage.verifyPageContentForBundleSectionReferencePage();

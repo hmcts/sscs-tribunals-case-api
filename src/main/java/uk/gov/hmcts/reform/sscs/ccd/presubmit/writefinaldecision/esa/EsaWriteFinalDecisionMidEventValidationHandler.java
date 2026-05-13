@@ -40,6 +40,9 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
         if (sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply() == null) {
             sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
         }
+        if (isSevereConditionsEnabled) {
+            sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecisionIsAfterSvDate(isFinalDecisionDateOfDecisionBlankOrAfterSvStartDate(sscsCaseData) ? YES : NO);
+        }
     }
 
     @Override
@@ -64,6 +67,9 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
         if (isSevereConditionsEnabled) {
             if (Issue.SV.name().equals(sscsCaseData.getIssueCode()) && NO.equals(sscsCaseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo())) {
                 preSubmitCallbackResponse.addError("This is a severe conditions criteria only appeal. Please select yes to this question.");
+            }
+            if (hasSvIssueCode(sscsCaseData) && !isFinalDecisionDateOfDecisionBlankOrAfterSvStartDate(sscsCaseData)) {
+                preSubmitCallbackResponse.addError("You cannot write decision notice until resolved. Please ask admin to amend issue code to WC or SG and then proceed.");
             }
         }
 
