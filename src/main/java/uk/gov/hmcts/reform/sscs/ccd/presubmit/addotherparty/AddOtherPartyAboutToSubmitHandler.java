@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.addotherparty;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -14,7 +13,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
-@Slf4j
 class AddOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final boolean cmOtherPartyConfidentialityEnabled;
@@ -42,7 +40,7 @@ class AddOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHandler<Sscs
             throw new IllegalStateException("Cannot handle callback");
         }
 
-        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         caseData.setDwpDueDate(null);
         caseData.setHmctsDwpState(null);
 

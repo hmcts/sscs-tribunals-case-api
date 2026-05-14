@@ -51,7 +51,6 @@ class AddOtherPartyAboutToSubmitHandlerTest {
 
     @Test
     void shouldThrowExceptionIfCallbackTypeIsNull() {
-        handler = new AddOtherPartyAboutToSubmitHandler(true);
         assertThatThrownBy(() -> handler.canHandle(null, callback))
             .isInstanceOf(NullPointerException.class)
             .hasMessage("callbackType must not be null");
@@ -59,7 +58,6 @@ class AddOtherPartyAboutToSubmitHandlerTest {
 
     @Test
     void shouldThrowExceptionIfCallbackIsNull() {
-        handler = new AddOtherPartyAboutToSubmitHandler(true);
         assertThatThrownBy(() -> handler.canHandle(ABOUT_TO_SUBMIT, null))
             .isInstanceOf(NullPointerException.class)
             .hasMessage("callback must not be null");
@@ -74,15 +72,12 @@ class AddOtherPartyAboutToSubmitHandlerTest {
 
     @Test
     void shouldReturnFalseWhenCallbackTypeIsNotAboutToSubmit() {
-        handler = new AddOtherPartyAboutToSubmitHandler(true);
-
         assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
         assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
     }
 
     @Test
     void shouldReturnFalseWhenEventIsNotAddOtherPartyData() {
-        handler = new AddOtherPartyAboutToSubmitHandler(true);
         when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
 
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
@@ -90,17 +85,9 @@ class AddOtherPartyAboutToSubmitHandlerTest {
 
     @Test
     void shouldReturnFalseWhenBenefitTypeIsNotUc() {
-        handler = new AddOtherPartyAboutToSubmitHandler(true);
         sscsCaseData.getAppeal().getBenefitType().setCode("PIP");
 
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
-    }
-
-    @Test
-    void shouldReturnTrueWhenAllConditionsMet() {
-        handler = new AddOtherPartyAboutToSubmitHandler(true);
-
-        assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isTrue();
     }
 
     @Test
