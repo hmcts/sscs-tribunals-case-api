@@ -372,6 +372,21 @@ class ValidSendToInterlocAboutToSubmitHandlerTest {
         verify(addNoteService).addNote(eq(USER_AUTHORISATION), eq(response.getData()), eq("Non compliant note"));
     }
 
+    @Test
+    void givenNonCompliantEvent_whenSelectWhoReviewsCaseIsNull_thenStillSetsReferralDate() {
+        sscsCaseData = sscsCaseData.toBuilder().selectWhoReviewsCase(null).build();
+        sscsCaseData.setTempNoteDetail("Non compliant note");
+        caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), NON_COMPLIANT_SEND_TO_INTERLOC, false);
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getSelectWhoReviewsCase()).isNull();
+        assertThat(response.getData().getInterlocReferralDate()).isEqualTo(LocalDate.now());
+        assertThat(response.getData().getDirectionDueDate()).isNull();
+    }
+
     private static Stream<Arguments> missingSelectionScenarios() {
         return Stream.of(
                 Arguments.of((DynamicList) null),

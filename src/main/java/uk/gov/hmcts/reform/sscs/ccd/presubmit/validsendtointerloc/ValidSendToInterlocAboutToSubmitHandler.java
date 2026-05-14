@@ -67,7 +67,8 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
 
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        if (isSelectionMissing(sscsCaseData.getSelectWhoReviewsCase())) {
+        if (callback.getEvent() != NON_COMPLIANT_SEND_TO_INTERLOC
+                && isSelectionMissing(sscsCaseData.getSelectWhoReviewsCase())) {
             PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
             preSubmitCallbackResponse.addError("Must select who reviews the appeal.");
             return preSubmitCallbackResponse;
@@ -78,6 +79,23 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
     private PreSubmitCallbackResponse<SscsCaseData> processSendToInterloc(Callback<SscsCaseData> callback,
                                                                           SscsCaseData sscsCaseData, String userAuth) {
         var preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+
+        if (callback.getEvent() == NON_COMPLIANT_SEND_TO_INTERLOC) {
+            if (cmConfidentialityEnabled
+                && sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT)
+                && isConfidentialityReferral(sscsCaseData)
+                && isSelectionMissing(sscsCaseData.getExtendedSscsCaseData().getSelectedConfidentialityParty())) {
+                preSubmitCallbackResponse.addError("Must select party");
+                return preSubmitCallbackResponse;
+            }
+            sscsCaseData.setSelectWhoReviewsCase(null);
+            log.info("Setting interloc referral date to {}  for caseId {}", LocalDate.now(), sscsCaseData.getCcdCaseId());
+            sscsCaseData.setInterlocReferralDate(LocalDate.now());
+            sscsCaseData.setDirectionDueDate(null);
+            addNoteService.addNote(userAuth, sscsCaseData, sscsCaseData.getTempNoteDetail());
+            return preSubmitCallbackResponse;
+        }
+
         if (isPostponementRequestInterlocSendToTcw(sscsCaseData)) {
             if (isSelectionMissing(sscsCaseData.getOriginalSender())) {
                 preSubmitCallbackResponse.addError("Must select original sender");
@@ -95,14 +113,6 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
                 && isConfidentialityReferral(sscsCaseData)
                 && isSelectionMissing(sscsCaseData.getExtendedSscsCaseData().getSelectedConfidentialityParty())) {
                 preSubmitCallbackResponse.addError("Must select party");
-                return preSubmitCallbackResponse;
-            }
-            if (callback.getEvent() == NON_COMPLIANT_SEND_TO_INTERLOC) {
-                sscsCaseData.setSelectWhoReviewsCase(null);
-                log.info("Setting interloc referral date to {}  for caseId {}", LocalDate.now(), sscsCaseData.getCcdCaseId());
-                sscsCaseData.setInterlocReferralDate(LocalDate.now());
-                sscsCaseData.setDirectionDueDate(null);
-                addNoteService.addNote(userAuth, sscsCaseData, sscsCaseData.getTempNoteDetail());
                 return preSubmitCallbackResponse;
             }
             InterlocReviewState interlocState = Arrays.stream(InterlocReviewState.values())
