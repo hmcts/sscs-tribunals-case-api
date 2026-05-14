@@ -33,10 +33,11 @@
     "FieldShowCondition": "interlocReferralReason=\"confidentiality\" AND appeal.benefitType.code=\"childSupport\"",
     "LiveFrom": "19/02/2026",
     "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 5,
+    "PageFieldDisplayOrder": 2,
     "RetainHiddenValue": "Yes",
     "CaseEventFieldLabel": "Select Party",
     "PageID": "1.0",
+    "PageLabel": "Admin - Send to Interloc",
     "ShowSummaryChangeOption": "Y"
   },
   {
@@ -62,6 +63,7 @@
     "RetainHiddenValue": "Yes",
     "CaseEventFieldLabel": "Select Party",
     "PageID": "1.0",
+    "PageLabel": "Send to Interloc - Pre-Valid",
     "ShowSummaryChangeOption": "Y"
   },
   {
@@ -87,6 +89,7 @@
     "RetainHiddenValue": "Yes",
     "CaseEventFieldLabel": "Select Party",
     "PageID": "1.0",
+    "PageLabel": "Send to Interloc",
     "ShowSummaryChangeOption": "Y"
   },
   {
