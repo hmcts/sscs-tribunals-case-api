@@ -11,7 +11,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.7'
     id 'com.gorylenko.gradle-git-properties' version '2.5.0'
     id 'com.github.ben-manes.versions' version '0.53.0'
-    id 'org.owasp.dependencycheck' version '12.1.3'
+    id 'org.owasp.dependencycheck' version '12.2.2'
     id 'au.com.dius.pact' version '4.6.19'
     id 'com.github.hmcts.rse-cft-lib' version '0.19.1856'
     id 'info.solidsoft.pitest' version '1.15.0'
@@ -303,50 +303,9 @@ dependencyManagement {
             mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2025.0.2'
         }
 
-        // CVE-2025-66168, CVE-2026-34197, CVE-2026-40466, CVE-2026-41044, CVE-2026-39304, CVE-2026-41043, CVE-2026-33227
-        //dependency group: 'org.apache.activemq', name: 'activemq-client', version: '6.2.5'
-
         // CVE-2023-36415, CVE-2024-35255
         dependency group: 'com.azure', name: 'azure-identity', version: '1.18.3'
         dependency group: 'com.microsoft.azure', name: 'msal4j', version: '1.24.1'
-
-        // CVE-2025-48924
-        //dependency group: 'org.apache.commons', name: 'commons-lang3', version: '3.20.0'
-
-        // CVE-2026-41417
-//        dependencySet(group: 'io.netty', version: '4.2.13.Final') {
-//            entry 'netty-buffer'
-//            entry 'netty-codec'
-//            entry 'netty-codec-dns'
-//            entry 'netty-codec-http'
-//            entry 'netty-codec-http2'
-//            entry 'netty-codec-socks'
-//            entry 'netty-common'
-//            entry 'netty-handler'
-//            entry 'netty-handler-proxy'
-//            entry 'netty-resolver'
-//            entry 'netty-resolver-dns'
-//            entry 'netty-resolver-dns-classes-macos'
-//            entry 'netty-resolver-dns-native-macos'
-//            entry 'netty-transport'
-//            entry 'netty-transport-classes-epoll'
-//            entry 'netty-transport-classes-kqueue'
-//            entry 'netty-transport-native-epoll'
-//            entry 'netty-transport-native-kqueue'
-//            entry 'netty-transport-native-unix-common'
-//        }
-
-        // CVE-2026-34478, CVE-2026-34479, CVE-2026-34480, CVE-2025-68161, CVE-2026-34477
-//        dependencySet(group: 'org.apache.logging.log4j', version: '2.26.0') {
-//            entry 'log4j-api'
-//            entry 'log4j-core'
-//        }
-
-        // CVE-2020-29582
-//        dependencySet(group: 'com.squareup.okio', version: '3.17.0') {
-//            entry 'okio'
-//            entry 'okio-jvm'
-//        }
     }
 }
 
