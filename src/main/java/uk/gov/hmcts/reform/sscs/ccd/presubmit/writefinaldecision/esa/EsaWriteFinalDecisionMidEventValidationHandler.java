@@ -19,8 +19,8 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 @Component
 public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDecisionMidEventValidationHandlerBase {
 
-    @Value("${feature.severeConditions.enabled}")
     private final boolean isSevereConditionsEnabled;
+    private static final String SEVERE_CONDITIONS_ISSUE_CODE = "SV";
 
     public EsaWriteFinalDecisionMidEventValidationHandler(Validator validator,
                                                           DecisionNoticeService decisionNoticeService,
@@ -39,6 +39,9 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
     protected void setDefaultFields(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply() == null) {
             sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
+        }
+        if (isSevereConditionsEnabled) {
+            sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecisionIsAfterSvDate(isFinalDecisionDateOfDecisionBlankOrAfterSvStartDate(sscsCaseData) ? YES : NO);
         }
     }
 
@@ -64,6 +67,9 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
         if (isSevereConditionsEnabled) {
             if (Issue.SV.name().equals(sscsCaseData.getIssueCode()) && NO.equals(sscsCaseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo())) {
                 preSubmitCallbackResponse.addError("This is a severe conditions criteria only appeal. Please select yes to this question.");
+            }
+            if (hasSvIssueCode(sscsCaseData) && !isFinalDecisionDateOfDecisionBlankOrAfterSvStartDate(sscsCaseData)) {
+                preSubmitCallbackResponse.addError("You cannot write decision notice until resolved. Please ask admin to amend issue code to WC or SG and then proceed.");
             }
         }
 
@@ -98,6 +104,12 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
 
     @Override
     protected void setDwpReassessAwardPage(SscsCaseData sscsCaseData, String pageId) {
+        if (isSevereConditionsEnabled
+                && (YesNo.isYes(sscsCaseData.getExtendedSscsCaseData().getEsaWriteFinalDecisionSevereCriteriaApply())
+                || SEVERE_CONDITIONS_ISSUE_CODE.equals(sscsCaseData.getIssueCode()))) {
+            sscsCaseData.setShowDwpReassessAwardPage(YesNo.NO);
+            return;
+        }
         if (pageId != null && pageId.equals("workCapabilityAssessment")) {
             if (isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())
                 && sscsCaseData.isWcaAppeal()

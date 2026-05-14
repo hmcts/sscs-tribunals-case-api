@@ -301,6 +301,7 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
         sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereCriteriaApply(YES);
         sscsCaseData.getExtendedSscsCaseData().setEsaWriteFinalDecisionSevereCriteriaApply(YES);
         sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecisionIsAfterSvDate(YES);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
@@ -312,11 +313,13 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
             assertThat(response.getData().getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply()).isNull();
             assertThat(response.getData().getExtendedSscsCaseData().getEsaWriteFinalDecisionSevereCriteriaApply()).isNull();
             assertThat(response.getData().getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo()).isNull();
+            assertThat(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecisionIsAfterSvDate()).isNull();
         } else {
             assertThat(response.getData().getSscsUcCaseData().getUcWriteFinalDecisionHasSVIssueCode()).isEqualTo(YES);
             assertThat(response.getData().getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply()).isEqualTo(YES);
             assertThat(response.getData().getExtendedSscsCaseData().getEsaWriteFinalDecisionSevereCriteriaApply()).isEqualTo(YES);
             assertThat(response.getData().getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo()).isEqualTo(YES);
+            assertThat(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecisionIsAfterSvDate()).isEqualTo(YES);
         }
     }
 
