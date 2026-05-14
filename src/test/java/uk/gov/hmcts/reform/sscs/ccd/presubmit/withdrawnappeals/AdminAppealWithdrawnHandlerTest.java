@@ -99,6 +99,7 @@ public class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
                 "jointPartyId",
                 "appeal.appellant.appointee.id",
                 "appeal.appellant.id",
+                "appeal.showConfidentialityOption",
                 "appeal.rep.id",
                 "appeal.hearingOptions",
                 "correction",

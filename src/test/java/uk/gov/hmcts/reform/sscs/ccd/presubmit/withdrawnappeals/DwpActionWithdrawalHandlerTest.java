@@ -66,6 +66,7 @@ public class DwpActionWithdrawalHandlerTest extends AdminAppealWithdrawnBase {
                 "appeal.appellant.id",
                 "appeal.rep.id",
                 "appeal.hearingOptions",
+                "appeal.showConfidentialityOption",
                 "correction",
                 "correctionBodyContent",
                 "bodyContent",
