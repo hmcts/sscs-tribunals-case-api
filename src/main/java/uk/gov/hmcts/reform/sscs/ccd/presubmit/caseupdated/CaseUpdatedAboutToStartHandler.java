@@ -35,13 +35,6 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 @Service
 @Slf4j
 public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-    private static final List<Benefit> VALID_CONFIDENTIALITY_BENEFITS =
-        List.of(Benefit.CHILD_SUPPORT, Benefit.TAX_CREDIT,
-            Benefit.GUARDIANS_ALLOWANCE, Benefit.TAX_FREE_CHILDCARE,
-            Benefit.HOME_RESPONSIBILITIES_PROTECTION, Benefit.CHILD_BENEFIT,
-            Benefit.THIRTY_HOURS_FREE_CHILDCARE, Benefit.GUARANTEED_MINIMUM_PENSION,
-            Benefit.NATIONAL_INSURANCE_CREDITS);
-
     private final DynamicListLanguageUtil utils;
 
     private final VerbalLanguagesService verbalLanguagesService;
@@ -100,24 +93,16 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
             setupUkPortsOfEntry(sscsCaseData);
         }
 
-        sscsCaseData.getAppeal().setShowConfidentialityOption(showAppellantConfidentialityOption(sscsCaseData));
+        sscsCaseData.getAppeal().setIsOtherPartyAddedForUniversalCredit(isOtherPartyAddedForUniversalCredit(sscsCaseData));
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
-    private YesNo showAppellantConfidentialityOption(SscsCaseData sscsCaseData) {
+    private YesNo isOtherPartyAddedForUniversalCredit(SscsCaseData sscsCaseData) {
         var benefitCode = sscsCaseData.getAppeal().getBenefitType().getCode();
 
-        var isAValidBenefit = VALID_CONFIDENTIALITY_BENEFITS.stream()
-            .anyMatch(b -> equalsIgnoreCase(b.getShortName(), benefitCode));
-
-        if (isAValidBenefit) {
-            return YES;
-        } else if (cmOtherPartyConfidentialityEnabled && equalsIgnoreCase(Benefit.UC.getShortName(), benefitCode)) {
-            return isOtherPartyPresent(sscsCaseData) ? YES : NO;
-        }
-
-        return NO;
+        return cmOtherPartyConfidentialityEnabled && equalsIgnoreCase(Benefit.UC.getShortName(), benefitCode)
+            && isOtherPartyPresent(sscsCaseData) ? YES : NO;
     }
 
     private void setupBenefitSelection(SscsCaseData sscsCaseData) {

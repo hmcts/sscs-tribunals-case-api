@@ -85,7 +85,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTestV1 {
         "jointPartyId",
         "appeal.appellant.appointee.id",
         "appeal.appellant.id",
-        "appeal.showConfidentialityOption",
+        "appeal.isOtherPartyAddedForUniversalCredit",
         "appeal.rep.id",
         "subscriptions.appellantSubscription.tya",
         "subscriptions.appointeeSubscription.tya",

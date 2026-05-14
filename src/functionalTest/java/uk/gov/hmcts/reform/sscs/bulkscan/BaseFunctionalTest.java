@@ -224,7 +224,7 @@ public class BaseFunctionalTest {
                 "case_creation_details.case_data.appeal.appellant.id",
                 "case_creation_details.case_data.appeal.rep.id",
                 "case_creation_details.case_data.appeal.appellant.appointee.id",
-                "case_creation_details.case_data.appeal.showConfidentialityOption"
+                "case_creation_details.case_data.appeal.isOtherPartyAddedForUniversalCredit"
             )
             .withFailMessage("Expected: %s%nActual: %s".formatted(expectedJson, actualJson)
             )
