@@ -11,8 +11,9 @@ import static uk.gov.hmcts.reform.sscs.util.SscsUtil.INVALID_BENEFIT_ISSUE_CODE;
 
 import java.util.ArrayList;
 import java.util.List;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -29,13 +30,20 @@ import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 
 @Component
 @Slf4j
-@AllArgsConstructor
 public class DwpUploadResponseMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     public static final String APPENDIX_12_DOC_NOT_FOR_SSCS5_CONFIDENTIALITY =
             "An Appendix 12 document cannot be uploaded with Confidentiality documents";
 
     private final PanelCompositionService panelCompositionService;
+    private final boolean cmOtherPartyConfidentialityEnabled;
+
+    @Autowired
+    public DwpUploadResponseMidEventHandler(PanelCompositionService panelCompositionService,
+                                            @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
+        this.panelCompositionService = panelCompositionService;
+        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -59,7 +67,9 @@ public class DwpUploadResponseMidEventHandler implements PreSubmitCallbackHandle
         var response = new PreSubmitCallbackResponse<>(sscsCaseData);
         response.addErrors(validateBenefitIssueCodeV2(sscsCaseData));
         validatePostponementRequests(sscsCaseData, response);
-        forceToAddOtherPartyOnSscs2Case(sscsCaseData, response);
+        if (!cmOtherPartyConfidentialityEnabled) {
+            forceToAddOtherPartyOnSscs2Case(sscsCaseData, response);
+        }
         validateBenefitCode(sscsCaseData, response);
         validateDwpFurtherInfo(sscsCaseData, response);
 
