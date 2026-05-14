@@ -38,7 +38,6 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
     private final AddNoteService addNoteService;
     private final boolean cmConfidentialityEnabled;
 
-
     @Autowired
     public ValidSendToInterlocAboutToSubmitHandler(PostponementRequestService postponementRequestService,
                                                    AddNoteService addNoteService, @Value("${feature.cm-other-party-confidentiality.enabled}") final boolean cmConfidentialityEnabled) {
@@ -81,10 +80,7 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
         var preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         if (callback.getEvent() == NON_COMPLIANT_SEND_TO_INTERLOC) {
-            if (cmConfidentialityEnabled
-                && sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT)
-                && isConfidentialityReferral(sscsCaseData)
-                && isSelectionMissing(sscsCaseData.getExtendedSscsCaseData().getSelectedConfidentialityParty())) {
+            if (isConfidentialitySelectionMissing(sscsCaseData)) {
                 preSubmitCallbackResponse.addError("Must select party");
                 return preSubmitCallbackResponse;
             }
@@ -108,10 +104,7 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
             UploadParty uploadParty = getUploadParty(sscsCaseData.getOriginalSender());
             postponementRequestService.processPostponementRequest(sscsCaseData, uploadParty, Optional.empty());
         } else {
-            if (cmConfidentialityEnabled
-                && sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT)
-                && isConfidentialityReferral(sscsCaseData)
-                && isSelectionMissing(sscsCaseData.getExtendedSscsCaseData().getSelectedConfidentialityParty())) {
+            if (isConfidentialitySelectionMissing(sscsCaseData)) {
                 preSubmitCallbackResponse.addError("Must select party");
                 return preSubmitCallbackResponse;
             }
@@ -132,6 +125,13 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
     private boolean isPostponementRequestInterlocSendToTcw(SscsCaseData sscsCaseData) {
         return SelectWhoReviewsCase.POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId()
                 .equals(sscsCaseData.getSelectWhoReviewsCase().getValue().getCode());
+    }
+
+    private boolean isConfidentialitySelectionMissing(SscsCaseData sscsCaseData) {
+        return cmConfidentialityEnabled
+                && sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT)
+                && isConfidentialityReferral(sscsCaseData)
+                && isSelectionMissing(sscsCaseData.getExtendedSscsCaseData().getSelectedConfidentialityParty());
     }
 
     private boolean isConfidentialityReferral(SscsCaseData sscsCaseData) {
