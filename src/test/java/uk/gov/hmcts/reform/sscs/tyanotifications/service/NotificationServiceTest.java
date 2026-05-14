@@ -2055,7 +2055,8 @@ public class NotificationServiceTest {
         List<CcdValue<OtherParty>> newParties,
         SscsCaseData oldData,
         NotificationEventType inputEventType,
-        NotificationEventType expectedEventType
+        NotificationEventType expectedEventType,
+        String benefitTypeCode
     ) throws IOException {
         final SendNotificationService sendNotificationService = new SendNotificationService(
             notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
@@ -2070,6 +2071,7 @@ public class NotificationServiceTest {
         final SscsCaseData actualOldData = oldData != null ? oldData :
             (oldParties != null ? baseBuilder.otherParties(oldParties).build() : null);
         final SscsCaseData newData = baseBuilder.otherParties(newParties).build();
+        newData.getAppeal().getBenefitType().setCode(benefitTypeCode);
 
         ccdNotificationWrapper = buildBaseWrapperWithCaseData(newData, actualOldData, inputEventType);
 
@@ -2509,7 +2511,8 @@ public class NotificationServiceTest {
                 List.of(new CcdValue<>(existingParty), new CcdValue<>(newParty)),
                 null,
                 UPDATE_OTHER_PARTY_DATA,
-                OTHER_PARTY_ADDED_TO_APPEAL
+                OTHER_PARTY_ADDED_TO_APPEAL,
+                Benefit.CHILD_SUPPORT.getShortName()
             },
             new Object[]{
                 "Non UPDATE_OTHER_PARTY_DATA event with new other party",
@@ -2517,7 +2520,8 @@ public class NotificationServiceTest {
                 List.of(new CcdValue<>(existingParty), new CcdValue<>(newParty)),
                 null,
                 ADMIN_APPEAL_WITHDRAWN,
-                ADMIN_APPEAL_WITHDRAWN
+                ADMIN_APPEAL_WITHDRAWN,
+                Benefit.CHILD_SUPPORT.getShortName()
             },
             new Object[]{
                 "Null old data with multiple other parties",
@@ -2525,7 +2529,17 @@ public class NotificationServiceTest {
                 List.of(new CcdValue<>(existingParty), new CcdValue<>(newParty)),
                 null,
                 UPDATE_OTHER_PARTY_DATA,
-                OTHER_PARTY_ADDED_TO_APPEAL
+                OTHER_PARTY_ADDED_TO_APPEAL,
+                Benefit.CHILD_SUPPORT.getShortName()
+            },
+            new Object[]{
+                "Non-childSupport benefit type is not notified for other party added",
+                List.of(new CcdValue<>(existingParty)),
+                List.of(new CcdValue<>(existingParty), new CcdValue<>(newParty)),
+                null,
+                UPDATE_OTHER_PARTY_DATA,
+                UPDATE_OTHER_PARTY_DATA,
+                Benefit.UC.getShortName()
             }
         };
     }

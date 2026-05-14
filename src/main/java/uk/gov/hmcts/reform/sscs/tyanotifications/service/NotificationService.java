@@ -5,6 +5,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getBenefitByCodeOrThrowException;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
@@ -128,6 +129,7 @@ public class NotificationService {
 
     private boolean shouldNotifyAppellantAboutAdditionalOtherParty(final NotificationWrapper notificationWrapper) {
         if (!cmConfidentialityEnabled
+            || !notificationWrapper.getNewSscsCaseData().isBenefitType(CHILD_SUPPORT)
             || !notificationWrapper.getNotificationType().equals(UPDATE_OTHER_PARTY_DATA)
             || emptyIfNull(notificationWrapper.getNewSscsCaseData().getOtherParties()).size() < MINIMUM_NUMBER_OTHER_PARTIES) {
             return false;
