@@ -99,7 +99,7 @@ public class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
                 "jointPartyId",
                 "appeal.appellant.appointee.id",
                 "appeal.appellant.id",
-                "appeal.isOtherPartyAddedForUniversalCredit",
+                "appeal.isOtherPartyAddedForChildMaintUCCase",
                 "appeal.rep.id",
                 "appeal.hearingOptions",
                 "correction",

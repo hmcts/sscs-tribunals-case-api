@@ -84,7 +84,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTestV2 {
     public static final String[] IGNORED_PATHS = {
         "jointPartyId",
         "appeal.appellant.appointee.id",
-        "appeal.isOtherPartyAddedForUniversalCredit",
+        "appeal.isOtherPartyAddedForChildMaintUCCase",
         "appeal.appellant.id",
         "appeal.rep.id",
         "subscriptions.appellantSubscription.tya",

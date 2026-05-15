@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
@@ -17,14 +16,12 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
@@ -93,16 +90,12 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
             setupUkPortsOfEntry(sscsCaseData);
         }
 
-        sscsCaseData.getAppeal().setIsOtherPartyAddedForUniversalCredit(isOtherPartyAddedForUniversalCredit(sscsCaseData));
+        if (cmOtherPartyConfidentialityEnabled) {
+            sscsCaseData.getAppeal()
+                .setIsOtherPartyAddedForChildMaintUCCase(isOtherPartyPresent(sscsCaseData) ? YES : NO);
+        }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
-    }
-
-    private YesNo isOtherPartyAddedForUniversalCredit(SscsCaseData sscsCaseData) {
-        var benefitCode = sscsCaseData.getAppeal().getBenefitType().getCode();
-
-        return cmOtherPartyConfidentialityEnabled && equalsIgnoreCase(Benefit.UC.getShortName(), benefitCode)
-            && isOtherPartyPresent(sscsCaseData) ? YES : NO;
     }
 
     private void setupBenefitSelection(SscsCaseData sscsCaseData) {
