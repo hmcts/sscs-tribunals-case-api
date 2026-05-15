@@ -75,7 +75,7 @@ public class DwpUploadResponseMidEventHandlerTest {
         caseDetailsBefore =
                 new CaseDetails<>(1234L, "SSCS", READY_TO_LIST, sscsCaseDataBefore, now(), "Benefit");
         callback = new Callback<>(caseDetails, Optional.of(caseDetailsBefore), DWP_UPLOAD_RESPONSE, false);
-        handler = new DwpUploadResponseMidEventHandler(panelCompositionService, false);
+        handler = new DwpUploadResponseMidEventHandler(panelCompositionService);
     }
 
     @Test
@@ -137,22 +137,6 @@ public class DwpUploadResponseMidEventHandlerTest {
 
         assertEquals(1, response.getErrors().size());
         assertEquals("Please provide other party details", response.getErrors().toArray()[0]);
-    }
-
-    @Test
-    public void testMidEventHandlerOnSscs2_WhenNoOtherPartyAndFlagOnThenNoError() {
-        handler = new DwpUploadResponseMidEventHandler(panelCompositionService, true);
-        callback.getCaseDetails().getCaseData().setBenefitCode("022");
-        callback.getCaseDetails().getCaseData().setIssueCode("CC");
-        callback.getCaseDetails().getCaseData().setDwpFurtherInfo("Yes");
-        callback.getCaseDetails().getCaseData().setOtherParties(List.of());
-        callback.getCaseDetails().getCaseData()
-                .setAppeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build()).build());
-        when(panelCompositionService.isBenefitIssueCodeValid(any(), any())).thenReturn(true);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors(), is(empty()));
     }
 
     @Test
