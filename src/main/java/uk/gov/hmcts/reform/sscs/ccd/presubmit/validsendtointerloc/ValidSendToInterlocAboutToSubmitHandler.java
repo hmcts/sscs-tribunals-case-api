@@ -114,6 +114,13 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
                 .equals(sscsCaseData.getSelectWhoReviewsCase().getValue().getCode());
     }
 
+    private boolean isConfidentialitySelectionMissing(SscsCaseData sscsCaseData) {
+        return cmConfidentialityEnabled
+                && (sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT) || sscsCaseData.isBenefitType(Benefit.UC))
+                && isConfidentialityReferral(sscsCaseData)
+                && isSelectionMissing(sscsCaseData.getExtendedSscsCaseData().getSelectedConfidentialityParty());
+    }
+
     private boolean isConfidentialityReferral(SscsCaseData sscsCaseData) {
         return CONFIDENTIALITY.equals(sscsCaseData.getInterlocReferralReason());
     }
