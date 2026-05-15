@@ -28,24 +28,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ReissueArtifactUi;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
@@ -218,12 +207,13 @@ class ValidSendToInterlocAboutToSubmitHandlerTest {
         assertThat(response.getErrors()).hasSize(1).contains("Must select who reviews the appeal.");
     }
 
-    @Test
-    void givenCmConfidentialityEnabledAndConfidentialityReferralAndMissingSelectedParty_thenReturnError() {
+    @ParameterizedTest
+    @EnumSource(value = Benefit.class, names = {"UC","CHILD_SUPPORT"})
+    void givenCmConfidentialityEnabledAndConfidentialityReferralAndMissingSelectedParty_thenReturnError(Benefit benefit) {
         handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService, true);
         sscsCaseData = sscsCaseData.toBuilder()
             .interlocReferralReason(InterlocReferralReason.CONFIDENTIALITY)
-            .appeal(Appeal.builder().benefitType(BenefitType.builder().code(CHILD_SUPPORT.getShortName()).build()).build())
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefit.getShortName()).build()).build())
             .build();
         caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
         callback = new Callback<>(caseDetails, Optional.of(caseDetails), VALID_SEND_TO_INTERLOC, false);

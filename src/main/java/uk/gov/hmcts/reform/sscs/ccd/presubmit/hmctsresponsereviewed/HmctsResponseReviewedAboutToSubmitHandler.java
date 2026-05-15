@@ -6,6 +6,7 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.PHE_REQUEST;
 
 import java.time.LocalDate;
@@ -113,13 +114,13 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
 
     private void validateInterlocReferralReason(SscsCaseData sscsCaseData,
                                                 PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if (sscsCaseData.isBenefitType(CHILD_SUPPORT)
+        if (sscsCaseData.isBenefitType(CHILD_SUPPORT) // does this get changed?
             && sscsCaseData.getInterlocReferralReason() == PHE_REQUEST) {
             preSubmitCallbackResponse.addError("PHE request' is not a valid selection for child support cases");
         }
 
         if (cmOtherPartyConfidentialityEnabled
-                && sscsCaseData.isBenefitType(CHILD_SUPPORT)
+                && (sscsCaseData.isBenefitType(CHILD_SUPPORT) || sscsCaseData.isBenefitType(UC))
                 && sscsCaseData.getInterlocReferralReason() == InterlocReferralReason.CONFIDENTIALITY
                 && isSelectionMissing(sscsCaseData.getExtendedSscsCaseData().getSelectedConfidentialityParty())) {
             preSubmitCallbackResponse.addError("Must select party");
