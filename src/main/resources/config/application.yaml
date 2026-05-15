@@ -282,7 +282,7 @@ feature:
     hearings-case-updateV2:
         enabled: ${HEARINGS_CASE_UPDATE_V2_ENABLED:false}
     cm-other-party-confidentiality:
-        enabled: ${CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED:false}
+        enabled: ${CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED:true}
     severeConditions:
         enabled: ${SEVERE_CONDITIONS_FEATURE:false}
 
