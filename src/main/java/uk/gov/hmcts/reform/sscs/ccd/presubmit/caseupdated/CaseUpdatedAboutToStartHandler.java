@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPresent;
@@ -90,7 +91,7 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
             setupUkPortsOfEntry(sscsCaseData);
         }
 
-        if (cmOtherPartyConfidentialityEnabled) {
+        if (cmOtherPartyConfidentialityEnabled && sscsCaseData.isBenefitType(UC)) {
             sscsCaseData.getAppeal()
                 .setIsOtherPartyAddedForChildMaintUCCase(isOtherPartyPresent(sscsCaseData) ? YES : NO);
         }
