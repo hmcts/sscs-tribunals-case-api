@@ -112,7 +112,8 @@
     "signer": "Joe Bloggs",
     "hearingSubtype": {},
     "hearingType": "paper",
-    "receivedVia": "Online"
+    "receivedVia": "Online",
+    "isOtherPartyAddedForChildMaintUCCase": null
   },
   "subscriptions": {
     "appellantSubscription": {
