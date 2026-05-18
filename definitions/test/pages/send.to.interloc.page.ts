@@ -45,6 +45,10 @@ export class SendToInterlocPage {
     await dropdown.blur();
   }
 
+  async selectPartyConfidentiality(partyConfidentiality: string): Promise<void> {
+    await webAction.chooseOptionByLabel('#selectedConfidentialityParty', partyConfidentiality);
+  }
+
   async verifyReasonReferredOptions(options: string[]): Promise<void> {
     await webAction.clickElementById('#interlocReferralReason');
 
