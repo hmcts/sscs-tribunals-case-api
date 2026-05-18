@@ -100,6 +100,60 @@ export class UploadResponsePage {
     await this.page.waitForTimeout(10000);
   }
 
+  async uploadChildSupportConfidentialDocs(): Promise<void> {
+    await this.uploadDocs();
+    await this.selectEvidenceReason(
+      uploadResponseTestdata.childSupportEditedEvidenceReason
+    );
+    await webActions.inputField(
+      '#dwpEditedResponseDocument_documentFileName',
+      'test'
+    );
+    await webActions.uploadFileUsingAFileChooser(
+      '#dwpEditedResponseDocument_documentLink',
+      uploadResponseTestdata.testfileone
+    );
+    await this.page.waitForTimeout(7000);
+    await webActions.uploadFileUsingAFileChooser(
+      '#dwpEditedEvidenceBundleDocument_documentLink',
+      uploadResponseTestdata.testfilethree
+    );
+    await this.page.waitForTimeout(7000);
+    await this.selectIssueCode(uploadResponseTestdata.childSupportIssueCode);
+    await this.chooseAssistOption('No');
+    await webActions.clickElementById('#dwpUCB_No');
+
+    if (await this.page.locator('#dwpState').count()) {
+      await webActions.chooseOptionByLabel(
+        '#dwpState',
+        uploadResponseTestdata.childSupportFtaState
+      );
+    } else if (await this.page.locator('#dynamicDwpState').count()) {
+      await webActions.chooseOptionByLabel(
+        '#dynamicDwpState',
+        uploadResponseTestdata.childSupportFtaState
+      );
+    }
+  }
+
+  async addChildSupportOtherParty(): Promise<void> {
+    await this.clickAddNewButton();
+    await this.page.locator('#otherParties_1_name_title').fill('Mr');
+    await this.page.locator('#otherParties_1_name_firstName').fill('Test');
+    await this.page.locator('#otherParties_1_name_lastName').fill('Test');
+    await this.page.locator('#otherParties_1_address_line1').fill('Test');
+    await this.page.locator('#otherParties_1_address_town').fill('Test');
+    await this.page.locator('#otherParties_1_address_postcode').fill('BN19SA');
+    await this.page.locator('#otherParties_1_confidentialityRequired_No').check();
+    await this.page
+      .locator('#otherParties_1_unacceptableCustomerBehaviour_No')
+      .check();
+    await this.page
+      .locator('#otherParties_1_role_name')
+      .selectOption({ label: 'Paying parent' });
+    await webActions.clickButton('Continue');
+  }
+
   async verifyDocMissingErrorMsg(): Promise<void> {
     //await webActions.screenshot();
     await webActions.verifyElementVisibility('#errors');

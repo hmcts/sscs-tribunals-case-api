@@ -1274,15 +1274,29 @@
   },
   {
     "CaseEventID": "writeFinalDecision",
+    "CaseFieldID": "writeFinalDecisionDateOfDecisionIsAfterSvDate",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "30/04/2026",
+    "PageDisplayOrder": 63,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "severeCriteria",
+    "PageLabel": "Severe Conditions Criteria",
+    "FieldShowCondition": "writeFinalDecisionGenerateNotice=\"DoNotUse\"",
+    "ShowSummaryChangeOption": "N",
+    "RetainHiddenValue": "Yes"
+  },
+  {
+    "CaseEventID": "writeFinalDecision",
     "CaseFieldID": "writeFinalDecisionSevereCriteriaApply",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "17/03/2026",
     "PageDisplayOrder": 63,
-    "PageFieldDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
     "PageID": "severeCriteria",
     "PageLabel": "Severe Conditions Criteria",
-    "PageShowCondition":  "(showSchedule7ActivitiesPage = \"Yes\" AND ucWriteFinalDecisionSchedule7ActivitiesApply = \"Yes\" AND ucWriteFinalDecisionSchedule7ActivitiesQuestion !=\"\" AND writeFinalDecisionAllowedOrRefused = \"allowed\") OR (appeal.benefitType.code = \"UC\" AND writeFinalDecisionSevereYesNo = \"Yes\")",
+    "PageShowCondition":  "(showSchedule7ActivitiesPage = \"Yes\" AND ucWriteFinalDecisionSchedule7ActivitiesApply = \"Yes\" AND ucWriteFinalDecisionSchedule7ActivitiesQuestion !=\"\" AND writeFinalDecisionAllowedOrRefused = \"allowed\" AND writeFinalDecisionDateOfDecisionIsAfterSvDate=\"Yes\") OR (appeal.benefitType.code = \"UC\" AND writeFinalDecisionSevereYesNo = \"Yes\")",
     "ShowSummaryChangeOption": "Y"
   },
   {
@@ -1295,7 +1309,7 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "esaSevereCriteria",
     "PageLabel": "Severe Conditions Criteria",
-    "PageShowCondition":  "(showSchedule3ActivitiesPage = \"Yes\" AND esaWriteFinalDecisionSchedule3ActivitiesApply=\"Yes\" AND writeFinalDecisionAllowedOrRefused = \"allowed\" AND wcaAppeal = \"Yes\") OR (appeal.benefitType.code = \"ESA\" AND writeFinalDecisionSevereYesNo = \"Yes\")",
+    "PageShowCondition":  "(showSchedule3ActivitiesPage = \"Yes\" AND esaWriteFinalDecisionSchedule3ActivitiesApply=\"Yes\" AND writeFinalDecisionAllowedOrRefused = \"allowed\" AND wcaAppeal = \"Yes\" AND writeFinalDecisionDateOfDecisionIsAfterSvDate=\"Yes\") OR (appeal.benefitType.code = \"ESA\" AND writeFinalDecisionSevereYesNo = \"Yes\")",
     "ShowSummaryChangeOption": "Y"
   },
   {

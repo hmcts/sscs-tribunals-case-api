@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -264,8 +265,9 @@ public class CreateCaseMidEventHandlerTest {
         assertThat(response.getWarnings()).contains(IBCA_REFERENCE_VALIDATION_ERROR);
     }
 
-    @Test
-    void shouldNotReturnErrorsOnMidEventForIbcaCase() {
+    @ParameterizedTest
+    @ValueSource(strings = {"A12112", "A11A12", "A12b12", "A12012"})
+    void shouldNotReturnErrorsOnMidEventForIbcaCase(String ibcaReference) {
         SscsCaseData caseData = SscsCaseData.builder()
                 .appeal(Appeal.builder()
                         .appellant(Appellant.builder()
@@ -281,7 +283,7 @@ public class CreateCaseMidEventHandlerTest {
                                         .inMainlandUk(NO)
                                         .build()
                                 )
-                                .identity(Identity.builder().ibcaReference("E24A45").build())
+                                .identity(Identity.builder().ibcaReference(ibcaReference).build())
                                 .build()
                         )
                         .rep(Representative.builder().build())
