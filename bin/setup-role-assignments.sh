@@ -26,7 +26,7 @@ function send_curl_request() {
   local payload=$(cat "${json_file}")
   local url="https://orm-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net/am/testing-support/createOrgMapping?userType=${user_type}"
 
-  curl --http1.1 --insecure --show-error --fail "${url}" \
+  curl --http1.1 --tlsv1.2 --insecure --show-error --fail "${url}" \
   --connect-timeout 10 \
   --max-time 60 \
   -H "Connection: close" \
