@@ -42,7 +42,7 @@ class AddOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHandler<Sscs
 
         final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         caseData.setDwpDueDate(null);
-        caseData.setHmctsDwpState(null);
+        caseData.setDwpState(null);
 
         return new PreSubmitCallbackResponse<>(caseData);
     }

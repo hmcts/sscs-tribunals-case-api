@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.VALIDITY_CHALLENGE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADD_OTHER_PARTY_DATA;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 
@@ -102,12 +103,12 @@ class AddOtherPartyAboutToSubmitHandlerTest {
     @Test
     void shouldClearDwpDueDateAndHmctsDwpState() {
         sscsCaseData.setDwpDueDate("2026-01-01");
-        sscsCaseData.setHmctsDwpState("someState");
+        sscsCaseData.setDwpState(VALIDITY_CHALLENGE);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getDwpDueDate()).isNull();
-        assertThat(response.getData().getHmctsDwpState()).isNull();
+        assertThat(response.getData().getDwpState()).isNull();
     }
 
 }
