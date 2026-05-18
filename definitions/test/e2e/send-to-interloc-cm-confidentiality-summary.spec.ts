@@ -61,10 +61,17 @@ test.describe('CM confidentiality send to interloc summary', () => {
             );
           }
           await readyToListSteps.signOut();
-          await sendToInterlocSteps.submitConfidentialityReferralAndVerifySummary(
-            caseId,
-            credentials.amCaseWorker
-          );
+
+          if (appealType === 'CHILDSUPPORT') {
+            await sendToInterlocSteps.submitConfidentialityReferralChildSupportAndVerifySummary(
+              caseId,
+              credentials.amCaseWorker);
+          } else {
+            await sendToInterlocSteps.submitConfidentialityReferralAndVerifySummary(
+              caseId,
+              credentials.amCaseWorker
+            );
+          }
         }
       );
     }
