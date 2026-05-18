@@ -372,8 +372,7 @@ ccd:
         CCD_DATA_STORE_URL: http://${SERVICE_NAME}-ccd-data-store-api
         RAS_ENV: pr
       devmemoryRequests: 2048Mi
-      devmemoryLimits: 2048Mi
-      devcpuRequests: 100m
+      devcpuRequests: 50m
       keyVaults:
         am:
           resourceGroup: am

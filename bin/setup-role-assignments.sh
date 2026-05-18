@@ -30,7 +30,7 @@ function send_curl_request() {
   -H 'Content-Type: application/json' \
   -H "Authorization: Bearer ${IDAM_TOKEN}" \
   -H "ServiceAuthorization: ${S2S_TOKEN}" \
-  -d "${payload}" \
+  -d "${payload}"
 }
 
 send_curl_request "${BASEDIR}/staff-idam-ids.json" "CASEWORKER"
