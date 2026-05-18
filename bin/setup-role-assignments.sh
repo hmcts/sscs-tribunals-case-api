@@ -27,9 +27,6 @@ function send_curl_request() {
   local url="https://orm-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net/am/testing-support/createOrgMapping?userType=${user_type}"
 
   curl --http1.1 --insecure --show-error --retry 3 --retry-delay 2 --fail "${url}" \
-  --connect-timeout 10 \
-  --max-time 60 \
-  -H "Connection: close" \
   -H 'Content-Type: application/json' \
   -H "Authorization: Bearer ${IDAM_TOKEN}" \
   -H "ServiceAuthorization: ${S2S_TOKEN}" \
