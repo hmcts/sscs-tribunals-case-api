@@ -18,7 +18,6 @@ import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -148,12 +147,7 @@ public class BulkPrintService implements PrintService {
             for (int i = 1; i < documents.size(); i++) {
                 if (documents.get(i) != null) {
                     if (bundledLetter.getNumberOfPages() % 2 != 0) {
-                        final PDPage blankPage = new PDPage(PDRectangle.A4);
-                        try (PDPageContentStream contents = new PDPageContentStream(bundledLetter, blankPage)) {
-                            contents.beginText();
-                            contents.endText();
-                        }
-                        bundledLetter.addPage(blankPage);
+                        bundledLetter.addPage(new PDPage(PDRectangle.A4));
                     }
                     try (PDDocument loadDoc = Loader.loadPDF(documents.get(i))) {
                         merger.appendDocument(bundledLetter, loadDoc);
