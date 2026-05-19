@@ -68,7 +68,8 @@ export class SendToInterlocPage {
   }
 
   async selectSelectedParty(): Promise<void> {
-    await webAction.chooseOptionByIndex('#selectedConfidentialityParty', 1);
+    await this.page.waitForLoadState();
+    await webAction.chooseOptionByIndex('#selectedConfidentialityParty', 3);
   }
 
   async confirmSubmission(): Promise<void> {
