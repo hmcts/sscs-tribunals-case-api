@@ -130,6 +130,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.REPRESENTATIVE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ACTION_POSTPONEMENT_REQUEST;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ACTION_POSTPONEMENT_REQUEST_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADD_OTHER_PARTY_DATA;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADJOURNED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADMIN_APPEAL_WITHDRAWN;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_DORMANT;
@@ -155,6 +156,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.JUDGE_DECISION_APPEAL_TO_PROCEED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.LIBERTY_TO_APPLY_GRANTED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.LIBERTY_TO_APPLY_REFUSED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.NOTIFY_APPELLANT_VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.OTHER_PARTY_ADDED_TO_APPEAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PERMISSION_TO_APPEAL_GRANTED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PERMISSION_TO_APPEAL_REFUSED;
@@ -177,7 +179,14 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
@@ -191,7 +200,51 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AppellantInfo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AppellantInfoRequest;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DatedRequestOutcome;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Document;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Event;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Evidence;
+import uk.gov.hmcts.reform.sscs.ccd.domain.FormType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingStatus;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InfoRequests;
+import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFinalDecisionCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Venue;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
@@ -223,38 +276,7 @@ class PersonalisationTest {
     private static final String PHONE_WELSH = "0300 303 5170";
     private static final String PHONE_IBC = "0300 131 2850";
     private static final String DATE = "2018-07-01T14:01:18.243";
-
-    @Mock
-    private NotificationConfig config;
-
-    @Mock
-    private HearingContactDateExtractor hearingContactDateExtractor;
-
-    @Mock
-    private MessageAuthenticationServiceImpl macService;
-
-    @Mock
-    private RegionalProcessingCenterService regionalProcessingCenterService;
-
-    @Mock
-    private NotificationDateConverterUtil notificationDateConverterUtil;
-
-    @Mock
-    private EvidenceProperties evidenceProperties;
-
-    @InjectMocks
-    Personalisation<NotificationWrapper> personalisation;
-
-    @Spy
-    private PersonalisationConfiguration personalisationConfiguration;
-
-    protected Subscriptions subscriptions;
-
-    protected Name name;
-
-    private RegionalProcessingCenter rpc;
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
-
     private final String evidenceAddressLine1 = "line1";
     private final String evidenceAddressLine2 = "line2";
     private final String evidenceAddressLine3 = "line3";
@@ -271,6 +293,25 @@ class PersonalisationTest {
     private final String evidenceAddressTelephoneWelsh = PHONE_WELSH;
     private final String evidenceAddressTelephoneIbc = PHONE_IBC;
     private final EvidenceProperties.EvidenceAddress evidenceAddress = new EvidenceProperties.EvidenceAddress();
+    protected Subscriptions subscriptions;
+    protected Name name;
+    @Mock
+    private NotificationConfig config;
+    @Mock
+    private HearingContactDateExtractor hearingContactDateExtractor;
+    @Mock
+    private MessageAuthenticationServiceImpl macService;
+    @Mock
+    private RegionalProcessingCenterService regionalProcessingCenterService;
+    @Mock
+    private NotificationDateConverterUtil notificationDateConverterUtil;
+    @Mock
+    private EvidenceProperties evidenceProperties;
+    @InjectMocks
+    private Personalisation<NotificationWrapper> personalisation;
+    @Spy
+    private PersonalisationConfiguration personalisationConfiguration;
+    private RegionalProcessingCenter rpc;
     private AutoCloseable autoCloseable;
 
     @BeforeEach
@@ -342,31 +383,6 @@ class PersonalisationTest {
     void tearDown() throws Exception {
         autoCloseable.close();
     }
-
-    private static Map<String, String> getWelshMap() {
-        Map<String, String> welshMap = new HashMap<>();
-        welshMap.put(PersonalisationKey.LANGUAGE_INTERPRETER.name(), "Dehonglydd iaith arwyddion: ");
-        welshMap.put(PersonalisationKey.SIGN_INTERPRETER.name(), "Dehonglydd iaith arwyddion: ");
-        welshMap.put(PersonalisationKey.HEARING_LOOP.name(), "Dolen glyw: ");
-        welshMap.put(PersonalisationKey.DISABLED_ACCESS.name(), "Mynediad i bobl anab: ");
-        welshMap.put(PersonalisationKey.OTHER_ARRANGEMENTS.name(), "Unrhyw drefniadau eraill: ");
-        welshMap.put(PersonalisationKey.REQUIRED.name(), "Gofynnol");
-        welshMap.put(PersonalisationKey.NOT_REQUIRED.name(), "Dim yn ofynnol");
-        return welshMap;
-    }
-
-    private static Map<String, String> getEnglishMap() {
-        Map<String, String> englishMap = new HashMap<>();
-        englishMap.put(PersonalisationKey.LANGUAGE_INTERPRETER.name(), "Language interpreter: ");
-        englishMap.put(PersonalisationKey.SIGN_INTERPRETER.name(), "Sign interpreter: ");
-        englishMap.put(PersonalisationKey.HEARING_LOOP.name(), "Hearing loop: ");
-        englishMap.put(PersonalisationKey.DISABLED_ACCESS.name(), "Disabled access: ");
-        englishMap.put(PersonalisationKey.OTHER_ARRANGEMENTS.name(), "Any other arrangements: ");
-        englishMap.put(PersonalisationKey.REQUIRED.name(), "Required");
-        englishMap.put(PersonalisationKey.NOT_REQUIRED.name(), "Not required");
-        return englishMap;
-    }
-
 
     @ParameterizedTest
     @CsvSource({"APPEAL_TO_PROCEED, directionIssued.appealToProceed, APPELLANT",
@@ -496,6 +512,87 @@ class PersonalisationTest {
             eq(DIRECTION_ISSUED_WELSH.getId()),
             eq(DIRECTION_ISSUED_WELSH.getId()),
             eq(templateConfig + "." + lowerCase(subscriptionType.toString())),
+            any(Benefit.class), any(NotificationWrapper.class), eq(null)
+        );
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "APPELLANT, directionIssued.appealToProceedNotifyValidAppeal.appellant",
+        "APPOINTEE, directionIssued.appealToProceedNotifyValidAppeal.appointee"
+    })
+    void whenNotifyAppellantValidAppealWithAppealToProceedDirection_shouldGenerateDocmosisTemplateUnderValidAppeal(
+            SubscriptionType subscriptionType, String expectedDocmosisTemplate) {
+
+        final NotificationWrapper notificationWrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
+            .newSscsCaseData(SscsCaseData.builder()
+                .directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()))
+                .appeal(Appeal.builder()
+                    .hearingType(ONLINE.getValue())
+                    .build())
+                .build())
+            .notificationEventType(NOTIFY_APPELLANT_VALID_APPEAL)
+            .build());
+
+        personalisation.getTemplate(notificationWrapper, PIP, subscriptionType);
+
+        verify(config).getTemplate(
+            eq(NOTIFY_APPELLANT_VALID_APPEAL.getId()),
+            eq(NOTIFY_APPELLANT_VALID_APPEAL.getId()),
+            eq(NOTIFY_APPELLANT_VALID_APPEAL.getId()),
+            eq(expectedDocmosisTemplate),
+            any(Benefit.class), any(NotificationWrapper.class), eq(null)
+        );
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "PROVIDE_INFORMATION",
+        "GRANT_EXTENSION",
+        "REFUSE_EXTENSION"
+    })
+    void whenNotifyAppellantValidAppealWithNonAppealToProceedDirection_shouldFallBackToEventId(DirectionType directionType) {
+
+        final NotificationWrapper notificationWrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
+            .newSscsCaseData(SscsCaseData.builder()
+                .directionTypeDl(new DynamicList(directionType.toString()))
+                .appeal(Appeal.builder()
+                    .hearingType(ONLINE.getValue())
+                    .build())
+                .build())
+            .notificationEventType(NOTIFY_APPELLANT_VALID_APPEAL)
+            .build());
+
+        personalisation.getTemplate(notificationWrapper, PIP, SubscriptionType.APPELLANT);
+
+        verify(config).getTemplate(
+            eq(NOTIFY_APPELLANT_VALID_APPEAL.getId()),
+            eq(NOTIFY_APPELLANT_VALID_APPEAL.getId()),
+            eq(NOTIFY_APPELLANT_VALID_APPEAL.getId()),
+            eq(NOTIFY_APPELLANT_VALID_APPEAL.getId()),
+            any(Benefit.class), any(NotificationWrapper.class), eq(null)
+        );
+    }
+
+    @Test
+    void whenNotifyAppellantValidAppealWithNoDirectionTypeDl_shouldFallBackToEventId() {
+
+        final NotificationWrapper notificationWrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
+            .newSscsCaseData(SscsCaseData.builder()
+                .appeal(Appeal.builder()
+                    .hearingType(ONLINE.getValue())
+                    .build())
+                .build())
+            .notificationEventType(NOTIFY_APPELLANT_VALID_APPEAL)
+            .build());
+
+        personalisation.getTemplate(notificationWrapper, PIP, SubscriptionType.APPELLANT);
+
+        verify(config).getTemplate(
+            eq(NOTIFY_APPELLANT_VALID_APPEAL.getId()),
+            eq(NOTIFY_APPELLANT_VALID_APPEAL.getId()),
+            eq(NOTIFY_APPELLANT_VALID_APPEAL.getId()),
+            eq(NOTIFY_APPELLANT_VALID_APPEAL.getId()),
             any(Benefit.class), any(NotificationWrapper.class), eq(null)
         );
     }
@@ -1210,18 +1307,6 @@ class PersonalisationTest {
                 .format(DateTimeFormatter.ofPattern(RESPONSE_DATE_FORMAT)));
     }
 
-    private static Stream<Arguments> appealResponseDate() {
-        return Stream.of(
-            Arguments.of(Appeal.builder()
-                .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
-                .build(), MAX_DWP_RESPONSE_DAYS_CHILD_SUPPORT),
-            Arguments.of(null, MAX_DWP_RESPONSE_DAYS),
-            Arguments.of(Appeal.builder().build(), MAX_DWP_RESPONSE_DAYS),
-            Arguments.of(Appeal.builder().benefitType(BenefitType.builder().build()).build(), MAX_DWP_RESPONSE_DAYS),
-            Arguments.of(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.ESA.getShortName()).build()).build(), MAX_DWP_RESPONSE_DAYS)
-        );
-    }
-
     @Test
     void givenCaseWithCreatedDate_thenUseCreatedDate() {
         SscsCaseData response = SscsCaseData.builder()
@@ -1392,17 +1477,6 @@ class PersonalisationTest {
         assertEquals("The venue, 12 The Road Avenue, Village, Aberdeen, Aberdeenshire, TS3 3ST", result.get(VENUE_ADDRESS_LITERAL));
         assertEquals("http://www.googlemaps.com/aberdeenvenue", result.get(VENUE_MAP_LINK_LITERAL));
         assertEquals("in 7 days", result.get(DAYS_TO_HEARING_LITERAL));
-    }
-
-    @SuppressWarnings({"Indentation", "unused"})
-    private static Object[] generateHearingNotificationTypeAndSubscriptionsScenarios() {
-        return new Object[]{
-            new Object[]{HEARING_BOOKED, APPELLANT},
-            new Object[]{HEARING_BOOKED, APPOINTEE},
-
-            new Object[]{HEARING_REMINDER, APPELLANT},
-            new Object[]{HEARING_REMINDER, APPOINTEE},
-        };
     }
 
     @Test
@@ -2732,6 +2806,99 @@ class PersonalisationTest {
             ? "otherPartyAddedToAppeal"
             : notificationEventType.getId();
         return id + (subscriptionType == null ? "" : "." + lowerCase(subscriptionType.name()));
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("addOtherPartyDataScenarios")
+    void givenAddOtherPartyDataScenarios_thenSetsOtherPartyNameCorrectly(String scenario, String benefitCode, State state,
+        List<CcdValue<OtherParty>> otherParties, boolean shouldContainOtherPartyName, String expectedOtherPartyName) {
+
+        final SscsCaseData response = SscsCaseData
+            .builder()
+            .ccdCaseId(CASE_ID)
+            .appeal(Appeal
+                .builder()
+                .benefitType(BenefitType.builder().code(benefitCode).build())
+                .appellant(Appellant.builder().name(name).build())
+                .build())
+            .otherParties(otherParties)
+            .build();
+
+        final Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper
+                .builder()
+                .newSscsCaseData(response)
+                .notificationEventType(ADD_OTHER_PARTY_DATA)
+                .state(state)
+                .build(),
+            new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(),
+                response.getAppeal().getAppellant()));
+
+        if (shouldContainOtherPartyName) {
+            assertThat(result).containsEntry(OTHER_PARTY_NAME, expectedOtherPartyName);
+        } else {
+            assertThat(result).doesNotContainKey(OTHER_PARTY_NAME);
+        }
+    }
+
+    private static Map<String, String> getWelshMap() {
+        Map<String, String> welshMap = new HashMap<>();
+        welshMap.put(PersonalisationKey.LANGUAGE_INTERPRETER.name(), "Dehonglydd iaith arwyddion: ");
+        welshMap.put(PersonalisationKey.SIGN_INTERPRETER.name(), "Dehonglydd iaith arwyddion: ");
+        welshMap.put(PersonalisationKey.HEARING_LOOP.name(), "Dolen glyw: ");
+        welshMap.put(PersonalisationKey.DISABLED_ACCESS.name(), "Mynediad i bobl anab: ");
+        welshMap.put(PersonalisationKey.OTHER_ARRANGEMENTS.name(), "Unrhyw drefniadau eraill: ");
+        welshMap.put(PersonalisationKey.REQUIRED.name(), "Gofynnol");
+        welshMap.put(PersonalisationKey.NOT_REQUIRED.name(), "Dim yn ofynnol");
+        return welshMap;
+    }
+
+    private static Map<String, String> getEnglishMap() {
+        Map<String, String> englishMap = new HashMap<>();
+        englishMap.put(PersonalisationKey.LANGUAGE_INTERPRETER.name(), "Language interpreter: ");
+        englishMap.put(PersonalisationKey.SIGN_INTERPRETER.name(), "Sign interpreter: ");
+        englishMap.put(PersonalisationKey.HEARING_LOOP.name(), "Hearing loop: ");
+        englishMap.put(PersonalisationKey.DISABLED_ACCESS.name(), "Disabled access: ");
+        englishMap.put(PersonalisationKey.OTHER_ARRANGEMENTS.name(), "Any other arrangements: ");
+        englishMap.put(PersonalisationKey.REQUIRED.name(), "Required");
+        englishMap.put(PersonalisationKey.NOT_REQUIRED.name(), "Not required");
+        return englishMap;
+    }
+
+    private static Stream<Arguments> appealResponseDate() {
+        return Stream.of(Arguments.of(
+                Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build()).build(),
+                MAX_DWP_RESPONSE_DAYS_CHILD_SUPPORT), Arguments.of(null, MAX_DWP_RESPONSE_DAYS),
+            Arguments.of(Appeal.builder().build(), MAX_DWP_RESPONSE_DAYS),
+            Arguments.of(Appeal.builder().benefitType(BenefitType.builder().build()).build(), MAX_DWP_RESPONSE_DAYS),
+            Arguments.of(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.ESA.getShortName()).build()).build(),
+                MAX_DWP_RESPONSE_DAYS));
+    }
+
+    @SuppressWarnings({"Indentation", "unused"})
+    private static Object[] generateHearingNotificationTypeAndSubscriptionsScenarios() {
+        return new Object[]{new Object[]{HEARING_BOOKED, APPELLANT}, new Object[]{HEARING_BOOKED, APPOINTEE},
+
+            new Object[]{HEARING_REMINDER, APPELLANT}, new Object[]{HEARING_REMINDER, APPOINTEE},};
+    }
+
+    private static Stream<Arguments> addOtherPartyDataScenarios() {
+        return Stream.of(Arguments.of("UC benefit with single other party in AWAIT_CONFIDENTIALITY_REQUIREMENTS state",
+                Benefit.UC.getShortName(), State.AWAIT_CONFIDENTIALITY_REQUIREMENTS, List.of(
+                    new CcdValue<>(OtherParty.builder().name(Name.builder().firstName("John").lastName("Smith").build()).build())),
+                true, "John Smith"),
+            Arguments.of("UC benefit with multiple other parties in AWAIT_CONFIDENTIALITY_REQUIREMENTS state",
+                Benefit.UC.getShortName(), State.AWAIT_CONFIDENTIALITY_REQUIREMENTS, List.of(new CcdValue<>(
+                        OtherParty.builder().name(Name.builder().firstName("First").lastName("Party").build()).build()),
+                    new CcdValue<>(
+                        OtherParty.builder().name(Name.builder().firstName("Second").lastName("Party").build()).build())), true,
+                "First Party"),
+            Arguments.of("PIP benefit with other party in AWAIT_CONFIDENTIALITY_REQUIREMENTS state", Benefit.PIP.name(),
+                State.AWAIT_CONFIDENTIALITY_REQUIREMENTS, List.of(new CcdValue<>(
+                    OtherParty.builder().name(Name.builder().firstName("John").lastName("Smith").build()).build())), false, null),
+            Arguments.of("UC benefit with other party in WITH_DWP state", Benefit.UC.getShortName(), State.WITH_DWP, List.of(
+                    new CcdValue<>(OtherParty.builder().name(Name.builder().firstName("John").lastName("Smith").build()).build())),
+                false, null), Arguments.of("UC benefit with null other parties in AWAIT_CONFIDENTIALITY_REQUIREMENTS state",
+                Benefit.UC.getShortName(), State.AWAIT_CONFIDENTIALITY_REQUIREMENTS, null, false, null));
     }
 
     private Hearing createHearing(LocalDate hearingDate) {
