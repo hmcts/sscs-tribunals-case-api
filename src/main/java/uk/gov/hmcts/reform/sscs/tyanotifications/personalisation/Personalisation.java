@@ -5,14 +5,17 @@ import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getBenefitByCodeOrThrowException;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getLongBenefitNameDescriptionWithOptionalAcronym;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelComposition.JUDGE_DOCTOR_AND_DISABILITY_EXPERT_IF_APPLICABLE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.AWAIT_CONFIDENTIALITY_REQUIREMENTS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.YES;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsDetailsMapping.getHearingType;
@@ -447,7 +450,7 @@ public class Personalisation<E extends NotificationWrapper> {
             personalisation.put(PersonalisationMappingConstants.JOINT_PARTY, "Yes");
         }
 
-        setConfidentialFields(ccdResponse, subscriptionWithType, personalisation);
+        setConfidentialFields(ccdResponse, subscriptionWithType, personalisation, responseWrapper.getState());
 
         setHelplineTelephone(ccdResponse, personalisation);
         if (subscriptionWithType.getSubscriptionType() == OTHER_PARTY) {
@@ -576,14 +579,18 @@ public class Personalisation<E extends NotificationWrapper> {
         }
     }
 
-    private void setConfidentialFields(SscsCaseData ccdResponse, SubscriptionWithType subscriptionWithType, Map<String, Object> personalisation) {
+    private void setConfidentialFields(SscsCaseData ccdResponse, SubscriptionWithType subscriptionWithType, Map<String, Object> personalisation,
+        State state) {
         if (subscriptionWithType.getSubscriptionType().equals(JOINT_PARTY) && null != ccdResponse.getConfidentialityRequestOutcomeJointParty()) {
             personalisation.put(OTHER_PARTY_NAME, ccdResponse.getAppeal().getAppellant().getName().getFullNameNoTitle());
             personalisation.put(CONFIDENTIALITY_OUTCOME, getRequestOutcome(ccdResponse.getConfidentialityRequestOutcomeJointParty()));
-
         } else if (subscriptionWithType.getSubscriptionType().equals(APPELLANT) && null != ccdResponse.getJointParty().getName() && null != ccdResponse.getConfidentialityRequestOutcomeAppellant()) {
             personalisation.put(OTHER_PARTY_NAME, ccdResponse.getJointParty().getName().getFullNameNoTitle());
             personalisation.put(CONFIDENTIALITY_OUTCOME, getRequestOutcome(ccdResponse.getConfidentialityRequestOutcomeAppellant()));
+        } else if (state == AWAIT_CONFIDENTIALITY_REQUIREMENTS
+            && ccdResponse.isBenefitType(UC)
+            && isNotEmpty(ccdResponse.getOtherParties())) {
+            ofNullable(ccdResponse.getOtherParties().getFirst().getValue().getName()).map(Name::getFullNameNoTitle).ifPresent(name -> personalisation.put(OTHER_PARTY_NAME, name));
         }
     }
 
