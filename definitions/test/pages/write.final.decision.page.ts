@@ -1239,13 +1239,6 @@ export class WriteFinalDecisionPages {
     );
 
     await webActions.verifyTextVisibility(
-      writeFinalDecisionData.whenShouldFTAReAssessTheAwardLabel
-    );
-    await webActions.verifyTextVisibility(
-      writeFinalDecisionData.reassessWithin3MonthsLabel
-    );
-
-    await webActions.verifyTextVisibility(
       writeFinalDecisionData.reasonsForDecisionLabel
     );
     await webActions.verifyTextVisibility(
@@ -1950,13 +1943,6 @@ export class WriteFinalDecisionPages {
       { label: writeFinalDecisionData.reasonsForDecisionLabel, value: writeFinalDecisionData.reasonsForDecisionInput },
       { label: writeFinalDecisionData.checkYourAnswersAnythingElse, value: writeFinalDecisionData.anythingElseInput }
     ]
-
-    if (isAppealAllowed) {
-      expectedRows.push({
-        label: writeFinalDecisionData.whenShouldFTAReAssessTheAwardLabel,
-        value: writeFinalDecisionData.reassessWithin3MonthsLabel
-      });
-    }
 
     if (isEsaCase) {
       expectedRows.push(
