@@ -4,6 +4,7 @@ import static java.util.Arrays.asList;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getBenefitByCodeOrThrowException;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
@@ -54,7 +55,8 @@ public class NotificationService {
         OutOfHoursCalculator outOfHoursCalculator,
         NotificationConfig notificationConfig,
         SendNotificationService sendNotificationService,
-        @Value("${feature.covid19}") boolean covid19Feature) {
+        @Value("${feature.covid19}") boolean covid19Feature,
+        @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
 
         this.notificationFactory = notificationFactory;
         this.reminderService = reminderService;
@@ -64,11 +66,13 @@ public class NotificationService {
         this.notificationConfig = notificationConfig;
         this.sendNotificationService = sendNotificationService;
         this.covid19Feature = covid19Feature;
+        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
 
     private final SendNotificationService sendNotificationService;
 
     private final boolean covid19Feature;
+    private final boolean cmOtherPartyConfidentialityEnabled;
 
     public void manageNotificationAndSubscription(NotificationWrapper notificationWrapper, boolean fromReminderService) {
         NotificationEventType notificationType = notificationWrapper.getNotificationType();
@@ -397,10 +401,19 @@ public class NotificationService {
             }
         }
 
+        if (cmOtherPartyConfidentialityEnabled && ADD_OTHER_PARTY_DATA.equals(notificationType) && (!notificationWrapper.getNewSscsCaseData().isBenefitType(UC)
+            || State.AWAIT_CONFIDENTIALITY_REQUIREMENTS != notificationWrapper.getSscsCaseDataWrapper().getState())) {
+            log.debug(
+                "Cannot complete notification {} as benefit type is not UC or state is not awaiting confidentiality requirements for caseId {}.",
+                notificationType.getId(), notificationWrapper.getCaseId());
+            return false;
+        }
+
         log.info("Notification valid to send for case id {} and event {} in state {}",
             notificationWrapper.getCaseId(),
             notificationType.getId(),
             notificationWrapper.getSscsCaseDataWrapper().getState());
+
         return true;
     }
 
