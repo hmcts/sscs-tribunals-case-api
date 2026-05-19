@@ -114,7 +114,7 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
 
     private void validateInterlocReferralReason(SscsCaseData sscsCaseData,
                                                 PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if (sscsCaseData.isBenefitType(CHILD_SUPPORT) // does this get changed?
+        if (sscsCaseData.isBenefitType(CHILD_SUPPORT)
             && sscsCaseData.getInterlocReferralReason() == PHE_REQUEST) {
             preSubmitCallbackResponse.addError("PHE request' is not a valid selection for child support cases");
         }

@@ -9,15 +9,11 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT_SEND_T
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 class NonCompliantSendToInterlocAboutToStartHandlerTest {
 
@@ -62,10 +58,11 @@ class NonCompliantSendToInterlocAboutToStartHandlerTest {
         assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty()).isNull();
     }
 
-    @Test
-    void givenFlagEnabled_setsEmptyDefaultSelectionForChildSupport() {
+    @ParameterizedTest
+    @EnumSource(value = Benefit.class, names = {"UC", "CHILD_SUPPORT"})
+    void givenFlagEnabled_setsEmptyDefaultSelectionForChildSupport(Benefit benefit) {
         handler = new NonCompliantSendToInterlocAboutToStartHandler(true);
-        callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(benefit.getShortName()).build());
 
         final var response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         final DynamicListItem selectedValue = response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue();
