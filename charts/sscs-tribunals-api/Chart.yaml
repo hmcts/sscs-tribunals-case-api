@@ -1,7 +1,7 @@
 apiVersion: v2
 name: sscs-tribunals-api
 home: https://github.com/hmcts/sscs-tribunals-case-api
-version: 0.0.225
+version: 0.0.226
 description: SSCS Tribunals Case API
 maintainers:
   - name: HMCTS SSCS Team
@@ -23,7 +23,7 @@ dependencies:
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: xui-webapp.enabled
   - name: ccd
-    version: 9.2.2
+    version: 9.2.3
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: ccd.enabled
     tags:
