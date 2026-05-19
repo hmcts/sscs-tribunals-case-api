@@ -67,6 +67,10 @@ export class SendToInterlocPage {
     ).toHaveText(reasonReferred);
   }
 
+  async selectSelectedParty(): Promise<void> {
+    await webAction.chooseOptionByIndex('#selectedConfidentialityParty', 1);
+  }
+
   async confirmSubmission(): Promise<void> {
     await webAction.clickButton('Submit');
   }

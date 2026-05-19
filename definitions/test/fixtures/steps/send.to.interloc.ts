@@ -192,6 +192,9 @@ export class SendToInterloc extends BaseStep {
     await sendToInterlocPage.selectReasonReferred(
       sendToInterlocData.sendToInterlocConfidentialityReasonValue
     );
+
+    await sendToInterlocPage.selectSelectedParty();
+
     await sendToInterlocPage.confirmSubmission();
 
     await this.eventNameAndDescriptionPage.verifyPageContent(
