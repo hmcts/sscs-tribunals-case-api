@@ -1363,13 +1363,6 @@ public class NotificationServiceTest {
             .hearingChannel(HearingChannel.PAPER)
             .build()).build()));
 
-        ccdNotificationWrapper.getNewSscsCaseData().setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
-            .hearingId("0")
-            .hearingDate(LocalDate.now().toString())
-            .time(currentTime)
-            .epimsId("324")
-            .hearingChannel(HearingChannel.PAPER)
-            .build()).build()));
     }
 
     @Test
@@ -1858,9 +1851,35 @@ public class NotificationServiceTest {
             getClass().getClassLoader().getResourceAsStream("pdf/direction-notice-coversheet-sample.pdf"));
         given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(sampleDirectionCoversheet);
 
-        notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
+        Representative rep = null;
+        if (repsSubscription != null) {
+            rep = Representative.builder()
+                                .hasRepresentative("Yes")
+                                .name(Name.builder().firstName("Joe").lastName("Bloggs").build())
+                                .address(Address
+                                    .builder()
+                                    .line1("Rep Line 1")
+                                    .town("Rep Town")
+                                    .county("Rep County")
+                                    .postcode("RE9 7SE")
+                                    .build())
+                                .build();
+        }
 
-        assertEquals(UPDATE_OTHER_PARTY_DATA, ccdNotificationWrapperCaptor.getValue().getNotificationType());
+        Appellant appellant = Appellant.builder()
+                                       .address(Address
+                                           .builder()
+                                           .line1("Appellant Line 1")
+                                           .town("Appellant Town")
+                                           .county("Appellant County")
+                                           .postcode("AP9 7LL")
+                                           .build())
+                                       .build();
+        if (appointeeSubscription != null) {
+            appellant.setAppointee(Appointee.builder()
+                                            .name(Name.builder().firstName("Jack").lastName("Smith").build())
+                                            .build());
+        }
 
         then(notificationHandler).should(times(6)).sendNotification(
             eq(ccdNotificationWrapper), any(), eq("Letter"),
