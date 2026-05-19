@@ -1,13 +1,13 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.tya;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atMost;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPELLANT_NAME;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.NAME;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.REPRESENTATIVE_NAME;
@@ -17,13 +17,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.FileUtils;
 import org.apache.pdfbox.io.IOUtils;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.quartz.Scheduler;
@@ -35,8 +31,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -68,17 +62,10 @@ import uk.gov.service.notify.SendEmailResponse;
 import uk.gov.service.notify.SendLetterResponse;
 import uk.gov.service.notify.SendSmsResponse;
 
-@RunWith(JUnitParamsRunner.class)
 @SpringBootTest
 @ActiveProfiles("integration")
 @AutoConfigureMockMvc
 public class NotificationsItBase {
-    // Below rules are needed to use the junitParamsRunner together with SpringRunner
-    @ClassRule
-    public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
-
-    @Rule
-    public final SpringMethodRule springMethodRule = new SpringMethodRule();
 
     protected MockMvc mockMvc;
 
@@ -163,8 +150,9 @@ public class NotificationsItBase {
 
     protected NotificationService service;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
+        openMocks(this);
         NotificationSender sender = new NotificationSender(notificationClient, null, bulkPrintService, notificationTestRecipients, markdownTransformationService, saveCorrespondenceAsyncService, saveCorrespondence);
 
         SendNotificationService sendNotificationService = new SendNotificationService(sender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
@@ -198,7 +186,7 @@ public class NotificationsItBase {
     }
 
     private void setupNotificationService(SendNotificationService sendNotificationService) {
-        service = new NotificationService(factory, reminderService, notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, false);
+        service = new NotificationService(factory, reminderService, notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, true);
     }
 
     protected NotificationService getNotificationService() {
@@ -220,34 +208,38 @@ public class NotificationsItBase {
         ArgumentCaptor<Map<String, ?>> emailPersonalisationCaptor = ArgumentCaptor.forClass(Map.class);
         verify(notificationClient, times(wantedNumberOfSendEmailInvocations))
             .sendEmail(emailTemplateIdCaptor.capture(), any(), emailPersonalisationCaptor.capture(), any());
-        assertArrayEquals(expectedEmailTemplateIds.toArray(), emailTemplateIdCaptor.getAllValues().toArray());
+        assertThat(emailTemplateIdCaptor.getAllValues()).containsExactlyElementsOf(expectedEmailTemplateIds);
 
         if (0 < wantedNumberOfSendEmailInvocations) {
-            Map<String, ?> personalisation = emailPersonalisationCaptor.getValue();
+            final Map<String, ?> personalisation = emailPersonalisationCaptor.getValue();
             if (null != personalisation.get(REPRESENTATIVE_NAME)) {
-                assertEquals(expectedName, personalisation.get(REPRESENTATIVE_NAME));
+                assertThat(personalisation.get(REPRESENTATIVE_NAME)).isEqualTo(expectedName);
             } else {
-                assertEquals(expectedName, personalisation.get(NAME));
+                assertThat(personalisation.get(NAME)).isEqualTo(expectedName);
             }
-            assertEquals("Dexter Vasquez", personalisation.get(APPELLANT_NAME));
+            assertThat(personalisation.get(APPELLANT_NAME)).isEqualTo("Dexter Vasquez");
         }
     }
 
     protected void validateSmsNotifications(List<String> expectedSmsTemplateIds, int wantedNumberOfSendSmsInvocations) throws NotificationClientException {
-        ArgumentCaptor<String> smsTemplateIdCaptor = ArgumentCaptor.forClass(String.class);
+        final ArgumentCaptor<String> smsTemplateIdCaptor = ArgumentCaptor.forClass(String.class);
         verify(notificationClient, times(wantedNumberOfSendSmsInvocations))
             .sendSms(smsTemplateIdCaptor.capture(), any(), any(), any(), any());
-        assertArrayEquals(expectedSmsTemplateIds.toArray(), smsTemplateIdCaptor.getAllValues().toArray());
+        assertThat(smsTemplateIdCaptor.getAllValues()).containsExactlyElementsOf(expectedSmsTemplateIds);
     }
 
     protected void validateLetterNotifications(List<String> expectedLetterTemplateIds, int wantedNumberOfSendLetterInvocations, String expectedName) throws NotificationClientException {
-        ArgumentCaptor<Map<String, Object>> letterPersonalisationCaptor = ArgumentCaptor.forClass(Map.class);
-        ArgumentCaptor<String> letterTemplateIdCaptor = ArgumentCaptor.forClass(String.class);
+        @SuppressWarnings("unchecked")
+        final ArgumentCaptor<Map<String, Object>> letterPersonalisationCaptor = ArgumentCaptor.forClass(Map.class);
+        final ArgumentCaptor<String> letterTemplateIdCaptor = ArgumentCaptor.forClass(String.class);
         verify(notificationClient, atMost(wantedNumberOfSendLetterInvocations))
             .sendLetter(letterTemplateIdCaptor.capture(), letterPersonalisationCaptor.capture(), any());
-        assertArrayEquals(expectedLetterTemplateIds.stream().filter(f -> !(f.endsWith(".doc") || f.endsWith(".docx"))).toArray(), letterTemplateIdCaptor.getAllValues().toArray());
+        assertThat(letterTemplateIdCaptor.getAllValues())
+            .containsExactlyElementsOf(expectedLetterTemplateIds.stream()
+                .filter(f -> !(f.endsWith(".doc") || f.endsWith(".docx")))
+                .toList());
 
-        int expectedDocmosisLetters = expectedLetterTemplateIds.stream().filter(f -> f.endsWith(".doc") || f.endsWith(".docx")).toArray().length;
+        final int expectedDocmosisLetters = (int) expectedLetterTemplateIds.stream().filter(f -> f.endsWith(".doc") || f.endsWith(".docx")).count();
         if (expectedDocmosisLetters > 0) {
             verify(notificationClient, times(expectedDocmosisLetters)).sendPrecompiledLetterWithInputStream(any(), any());
         } else {
@@ -255,13 +247,13 @@ public class NotificationsItBase {
         }
 
         if (0 < wantedNumberOfSendLetterInvocations) {
-            Map<String, Object> personalisation = letterPersonalisationCaptor.getValue();
+            final Map<String, Object> personalisation = letterPersonalisationCaptor.getValue();
             if (null != personalisation.get(REPRESENTATIVE_NAME)) {
-                assertEquals(expectedName, personalisation.get(REPRESENTATIVE_NAME));
+                assertThat(personalisation.get(REPRESENTATIVE_NAME)).isEqualTo(expectedName);
             } else {
-                assertEquals(expectedName, personalisation.get(NAME));
+                assertThat(personalisation.get(NAME)).isEqualTo(expectedName);
             }
-            assertEquals("Dexter Vasquez", personalisation.get(APPELLANT_NAME));
+            assertThat(personalisation.get(APPELLANT_NAME)).isEqualTo("Dexter Vasquez");
         }
     }
 
