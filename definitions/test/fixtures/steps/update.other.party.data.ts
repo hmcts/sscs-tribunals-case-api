@@ -427,7 +427,6 @@ export class UpdateOtherPartyData extends BaseStep {
       town: 'Test1',
       postcode: 'BN19SA'
     });
-    await this.page.getByRole('button', { name: 'Submit', exact: true }).click();
     await this.waitForSummaryState('Await Confidentiality Requirements');
     await this.verifyConfidentialityRows([
       {
