@@ -913,6 +913,8 @@ notification:
             docmosisId: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome-v3.docx
         sORRefused:
             docmosisId: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome-v3.docx
+        addOtherPartyData:
+            docmosisId: TB-SCS-GNO-ENG-other-party-added-to-appeal.docx
         paper:
             responseReceived:
                 appellant:
@@ -1913,6 +1915,7 @@ pdf-service:
             interlocValidAppeal: 'TB-SCS-GNO-ENG-00012.docx'
             validAppeal: 'TB-SCS-GNO-ENG-00012.docx'
             appealToProceedNotifyValidAppeal: 'TB-SCS-GNO-ENG-00012.docx'
+            addOtherPartyData: 'TB-SCS-GNO-ENG-00012.docx'
         welsh:
             adminCorrectionHeader: 'TB-SCS-GNO-WEL-00479.docx'
             appealReceived: 'TB-SCS-GNO-WEL-00479.docx'
