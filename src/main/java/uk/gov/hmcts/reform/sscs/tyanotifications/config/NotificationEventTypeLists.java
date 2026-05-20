@@ -16,6 +16,7 @@ public final class NotificationEventTypeLists {
         ADJOURNED,
         ADMIN_APPEAL_WITHDRAWN,
         ADMIN_CORRECTION_HEADER,
+        ADMIN_SEND_TO_VALID_APPEAL,
         APPEAL_DORMANT,
         APPEAL_LAPSED,
         APPEAL_RECEIVED,
@@ -30,6 +31,7 @@ public final class NotificationEventTypeLists {
         DWP_RESPONSE_RECEIVED,
         DWP_UPLOAD_RESPONSE,
         EVIDENCE_RECEIVED,
+        INTERLOC_VALID_APPEAL,
         ISSUE_ADJOURNMENT_NOTICE,
         ISSUE_ADJOURNMENT_NOTICE_WELSH,
         ISSUE_FINAL_DECISION,
@@ -37,6 +39,7 @@ public final class NotificationEventTypeLists {
         LIBERTY_TO_APPLY_GRANTED,
         LIBERTY_TO_APPLY_REFUSED,
         NON_COMPLIANT,
+        NOTIFY_APPELLANT_VALID_APPEAL,
         DRAFT_TO_NON_COMPLIANT,
         PERMISSION_TO_APPEAL_GRANTED,
         PERMISSION_TO_APPEAL_REFUSED,
@@ -58,7 +61,8 @@ public final class NotificationEventTypeLists {
         JOINT_PARTY_ADDED,
         ACTION_HEARING_RECORDING_REQUEST,
         ACTION_POSTPONEMENT_REQUEST_WELSH,
-        UPDATE_OTHER_PARTY_DATA
+        UPDATE_OTHER_PARTY_DATA,
+        VALID_APPEAL
     );
 
     // TODO move to EVENTS_TO_HANDLE when feature.postHearings.enabled removed
@@ -123,6 +127,7 @@ public final class NotificationEventTypeLists {
         ACTION_POSTPONEMENT_REQUEST_WELSH,
         ADMIN_APPEAL_WITHDRAWN,
         ADMIN_CORRECTION_HEADER,
+        ADMIN_SEND_TO_VALID_APPEAL,
         APPEAL_LAPSED,
         APPEAL_RECEIVED,
         APPEAL_WITHDRAWN,
@@ -140,6 +145,7 @@ public final class NotificationEventTypeLists {
         DWP_UPLOAD_RESPONSE,
         HEARING_BOOKED,
         HMCTS_APPEAL_LAPSED,
+        INTERLOC_VALID_APPEAL,
         ISSUE_ADJOURNMENT_NOTICE,
         ISSUE_ADJOURNMENT_NOTICE_WELSH,
         ISSUE_FINAL_DECISION,
@@ -149,6 +155,7 @@ public final class NotificationEventTypeLists {
         JOINT_PARTY_ADDED,
         LIBERTY_TO_APPLY_REQUEST,
         NON_COMPLIANT,
+        NOTIFY_APPELLANT_VALID_APPEAL,
         PERMISSION_TO_APPEAL_GRANTED,
         PERMISSION_TO_APPEAL_REFUSED,
         PERMISSION_TO_APPEAL_REQUEST,
@@ -167,6 +174,8 @@ public final class NotificationEventTypeLists {
         STRUCK_OUT,
         STATEMENT_OF_REASONS_REQUEST,
         UPDATE_OTHER_PARTY_DATA,
+        VALID_APPEAL,
+        VALID_APPEAL_CREATED,
         ADD_OTHER_PARTY_DATA
     );
 
@@ -213,6 +222,7 @@ public final class NotificationEventTypeLists {
         ACTION_POSTPONEMENT_REQUEST_WELSH,
         ADMIN_APPEAL_WITHDRAWN,
         ADMIN_CORRECTION_HEADER,
+        ADMIN_SEND_TO_VALID_APPEAL,
         APPEAL_LAPSED,
         APPEAL_RECEIVED,
         APPEAL_WITHDRAWN,
@@ -229,6 +239,7 @@ public final class NotificationEventTypeLists {
         DWP_UPLOAD_RESPONSE,
         HEARING_BOOKED,
         HMCTS_APPEAL_LAPSED,
+        INTERLOC_VALID_APPEAL,
         ISSUE_ADJOURNMENT_NOTICE,
         ISSUE_ADJOURNMENT_NOTICE_WELSH,
         ISSUE_FINAL_DECISION,
@@ -238,6 +249,7 @@ public final class NotificationEventTypeLists {
         JOINT_PARTY_ADDED,
         LIBERTY_TO_APPLY_REQUEST,
         NON_COMPLIANT,
+        NOTIFY_APPELLANT_VALID_APPEAL,
         PERMISSION_TO_APPEAL_GRANTED,
         PERMISSION_TO_APPEAL_REFUSED,
         PERMISSION_TO_APPEAL_REQUEST,
@@ -257,6 +269,7 @@ public final class NotificationEventTypeLists {
         STATEMENT_OF_REASONS_REQUEST,
         STRUCK_OUT,
         UPDATE_OTHER_PARTY_DATA,
+        VALID_APPEAL,
         VALID_APPEAL_CREATED,
         ADD_OTHER_PARTY_DATA
     );
@@ -313,6 +326,7 @@ public final class NotificationEventTypeLists {
 
     public static final Set<NotificationEventType> EVENTS_VALID_FOR_APPOINTEE = EnumSet.of(
         ADMIN_CORRECTION_HEADER,
+        ADMIN_SEND_TO_VALID_APPEAL,
         ADD_OTHER_PARTY_DATA,
         APPEAL_RECEIVED,
         CORRECTION_GRANTED,
@@ -323,13 +337,15 @@ public final class NotificationEventTypeLists {
         DWP_APPEAL_LAPSED,
         DWP_RESPONSE_RECEIVED,
         HMCTS_APPEAL_LAPSED,
+        INTERLOC_VALID_APPEAL,
         ISSUE_FINAL_DECISION,
         ISSUE_FINAL_DECISION_WELSH,
-        LIBERTY_TO_APPLY_GRANTED,
-        LIBERTY_TO_APPLY_REFUSED,
         JOINT_PARTY_ADDED,
         JUDGE_DECISION_APPEAL_TO_PROCEED,
+        LIBERTY_TO_APPLY_GRANTED,
+        LIBERTY_TO_APPLY_REFUSED,
         NON_COMPLIANT,
+        NOTIFY_APPELLANT_VALID_APPEAL,
         PROVIDE_APPOINTEE_DETAILS,
         RESEND_APPEAL_CREATED,
         SET_ASIDE_GRANTED,
@@ -339,6 +355,7 @@ public final class NotificationEventTypeLists {
         SYA_APPEAL_CREATED,
         SUBSCRIPTION_UPDATED,
         TCW_DECISION_APPEAL_TO_PROCEED,
+        VALID_APPEAL,
         VALID_APPEAL_CREATED
     );
 
