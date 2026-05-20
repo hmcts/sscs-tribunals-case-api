@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
@@ -21,6 +22,7 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +43,7 @@ public class NotificationService {
     private static final String READY_TO_LIST = "readyToList";
     private static final EnumSet<NotificationEventType> SEND_TO_VALID_APPEAL = EnumSet.of(ADMIN_SEND_TO_VALID_APPEAL,
         INTERLOC_VALID_APPEAL, VALID_APPEAL);
+    private static final int MINIMUM_NUMBER_OTHER_PARTIES = 2;
 
     private final NotificationFactory notificationFactory;
     private final ReminderService reminderService;
@@ -120,6 +123,10 @@ public class NotificationService {
             log.info("Trigger second notification event for {}", UPDATE_OTHER_PARTY_DATA.getId());
             notificationWrapper.getSscsCaseDataWrapper().setNotificationEventType(UPDATE_OTHER_PARTY_DATA);
             sendNotificationPerSubscription(notificationWrapper);
+        } else if (shouldNotifyAppellantAboutAdditionalOtherParty(notificationWrapper)) {
+            log.info("Trigger second notification event for {}", OTHER_PARTY_ADDED_TO_APPEAL.getId());
+            notificationWrapper.getSscsCaseDataWrapper().setNotificationEventType(OTHER_PARTY_ADDED_TO_APPEAL);
+            sendNotificationPerSubscription(notificationWrapper);
         } else if (cmOtherPartyConfidentialityEnabled
             && notificationWrapper.getNotificationType().equals(DIRECTION_ISSUED)
             && notificationWrapper.getSscsCaseDataWrapper().getNewSscsCaseData().isBenefitType(CHILD_SUPPORT)
@@ -128,6 +135,26 @@ public class NotificationService {
             notificationWrapper.getSscsCaseDataWrapper().setNotificationEventType(NOTIFY_APPELLANT_VALID_APPEAL);
             sendNotificationPerSubscription(notificationWrapper);
         }
+    }
+
+    private boolean shouldNotifyAppellantAboutAdditionalOtherParty(final NotificationWrapper notificationWrapper) {
+        if (!cmOtherPartyConfidentialityEnabled
+            || !notificationWrapper.getNewSscsCaseData().isBenefitType(CHILD_SUPPORT)
+            || !notificationWrapper.getNotificationType().equals(UPDATE_OTHER_PARTY_DATA)
+            || emptyIfNull(notificationWrapper.getNewSscsCaseData().getOtherParties()).size() < MINIMUM_NUMBER_OTHER_PARTIES) {
+            return false;
+        }
+        final Set<String> newParties = getUniqueOtherPartyIds(notificationWrapper.getNewSscsCaseData().getOtherParties());
+        final Set<String> previousParties = getUniqueOtherPartyIds(
+            Optional.ofNullable(notificationWrapper.getOldSscsCaseData()).map(SscsCaseData::getOtherParties).orElse(emptyList()));
+        return !newParties.equals(previousParties);
+    }
+
+    private Set<String> getUniqueOtherPartyIds(final List<CcdValue<OtherParty>> otherParties) {
+        return emptyIfNull(otherParties).stream()
+            .map(CcdValue::getValue)
+            .map(Entity::getId)
+            .collect(Collectors.toSet());
     }
 
     private void sendNotificationPerSubscription(NotificationWrapper notificationWrapper) {

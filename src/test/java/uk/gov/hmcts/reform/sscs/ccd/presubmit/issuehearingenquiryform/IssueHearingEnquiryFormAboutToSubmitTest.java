@@ -103,9 +103,10 @@ class IssueHearingEnquiryFormAboutToSubmitTest {
             when(callback.getCaseDetails()).thenReturn(caseDetails);
             when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "userAuthorisation");
+            final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, "userAuthorisation");
 
-            assertThat(response.getData().getDirectionDueDate()).isEqualTo(now().plusDays(21).toString());
+            assertThat(response.getData().getDirectionDueDate())
+                .isEqualTo(now().plusDays(IssueHearingEnquiryFormAboutToSubmit.getHearingResponseExpectedByDays()).toString());
             assertThat(response.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.HEF_ISSUED);
         }
 
@@ -114,5 +115,10 @@ class IssueHearingEnquiryFormAboutToSubmitTest {
             assertThatThrownBy(() -> handler.handle(ABOUT_TO_START, callback, "userAuthorisation")).isExactlyInstanceOf(
                 IllegalStateException.class).hasMessage("Cannot handle callback.");
         }
+    }
+
+    @Test
+    void getHearingResponseExpectedByDays_returns21() {
+        assertThat(IssueHearingEnquiryFormAboutToSubmit.getHearingResponseExpectedByDays()).isEqualTo(21);
     }
 }

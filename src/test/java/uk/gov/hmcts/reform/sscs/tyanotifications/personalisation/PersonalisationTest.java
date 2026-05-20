@@ -16,6 +16,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
+import static org.springframework.test.util.ReflectionTestUtils.setField;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.PIP;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getLongBenefitNameDescriptionWithOptionalAcronym;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
@@ -101,6 +102,8 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMa
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.MANAGE_EMAILS_LINK_LITERAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.NAME;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.OTHER_PARTY_NAME;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.OTHER_PARTY_NAMES;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.OTHER_PARTY_SIZE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.PANEL_COMPOSITION;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.PANEL_COMPOSITION_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.PARTY_TYPE;
@@ -154,6 +157,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.LIBERTY_TO_APPLY_GRANTED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.LIBERTY_TO_APPLY_REFUSED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.NOTIFY_APPELLANT_VALID_APPEAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.OTHER_PARTY_ADDED_TO_APPEAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PERMISSION_TO_APPEAL_GRANTED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PERMISSION_TO_APPEAL_REFUSED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.POSTPONEMENT;
@@ -195,7 +199,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
@@ -619,6 +622,141 @@ class PersonalisationTest {
         );
     }
 
+    @SuppressWarnings({"Indentation", "unused"})
+    private static Object[] generateNotificationTypeAndSubscriptionsScenarios() {
+        return new Object[]{
+            new Object[]{ACTION_POSTPONEMENT_REQUEST, APPELLANT, REGULAR, false, false, false, true},
+            new Object[]{ACTION_POSTPONEMENT_REQUEST, APPOINTEE, REGULAR, false, false, false, true},
+            new Object[]{ACTION_POSTPONEMENT_REQUEST, JOINT_PARTY, REGULAR, false, false, false, true},
+            new Object[]{ACTION_POSTPONEMENT_REQUEST, REPRESENTATIVE, REGULAR, false, false, false, true},
+            new Object[]{ACTION_POSTPONEMENT_REQUEST_WELSH, APPELLANT, REGULAR, false, false, false, true},
+            new Object[]{ACTION_POSTPONEMENT_REQUEST_WELSH, APPOINTEE, REGULAR, false, false, false, true},
+            new Object[]{ACTION_POSTPONEMENT_REQUEST_WELSH, JOINT_PARTY, REGULAR, false, false, false, true},
+            new Object[]{ACTION_POSTPONEMENT_REQUEST_WELSH, REPRESENTATIVE, REGULAR, false, false, false, true},
+            new Object[]{ADJOURNED, APPELLANT, ONLINE, true, true, false, false},
+            new Object[]{ADJOURNED, APPELLANT, PAPER, true, true, false, false},
+            new Object[]{ADJOURNED, APPELLANT, REGULAR, true, true, false, false},
+            new Object[]{ADJOURNED, REPRESENTATIVE, ONLINE, true, true, false, false},
+            new Object[]{ADJOURNED, REPRESENTATIVE, PAPER, true, true, false, false},
+            new Object[]{ADJOURNED, REPRESENTATIVE, REGULAR, true, true, false, false},
+            new Object[]{ADMIN_APPEAL_WITHDRAWN, APPELLANT, ONLINE, true, true, false, true},
+            new Object[]{ADMIN_APPEAL_WITHDRAWN, APPELLANT, PAPER, true, true, false, true},
+            new Object[]{ADMIN_APPEAL_WITHDRAWN, APPELLANT, REGULAR, true, true, false, true},
+            new Object[]{ADMIN_APPEAL_WITHDRAWN, REPRESENTATIVE, ONLINE, true, true, false, true},
+            new Object[]{ADMIN_APPEAL_WITHDRAWN, REPRESENTATIVE, PAPER, true, true, false, true},
+            new Object[]{ADMIN_APPEAL_WITHDRAWN, REPRESENTATIVE, REGULAR, true, true, false, true},
+            new Object[]{APPEAL_DORMANT, APPELLANT, ORAL, true, true, false, false},
+            new Object[]{APPEAL_DORMANT, APPELLANT, PAPER, true, true, false, false},
+            new Object[]{APPEAL_DORMANT, REPRESENTATIVE, ORAL, true, true, false, false},
+            new Object[]{APPEAL_DORMANT, REPRESENTATIVE, PAPER, true, true, false, false},
+            new Object[]{APPEAL_LAPSED, APPELLANT, ONLINE, true, true, false, true},
+            new Object[]{APPEAL_LAPSED, APPELLANT, PAPER, true, true, false, true},
+            new Object[]{APPEAL_LAPSED, APPELLANT, REGULAR, true, true, false, true},
+            new Object[]{APPEAL_LAPSED, APPOINTEE, ONLINE, true, true, false, true},
+            new Object[]{APPEAL_LAPSED, APPOINTEE, PAPER, true, true, false, true},
+            new Object[]{APPEAL_LAPSED, APPOINTEE, REGULAR, true, true, false, true},
+            new Object[]{APPEAL_RECEIVED, APPELLANT, ONLINE, true, true, true, true},
+            new Object[]{APPEAL_RECEIVED, APPELLANT, PAPER, true, true, true, true},
+            new Object[]{APPEAL_RECEIVED, APPELLANT, REGULAR, true, true, true, true},
+            new Object[]{APPEAL_RECEIVED, APPOINTEE, ONLINE, true, true, true, true},
+            new Object[]{APPEAL_RECEIVED, APPOINTEE, PAPER, true, true, true, true},
+            new Object[]{APPEAL_RECEIVED, APPOINTEE, REGULAR, true, true, true, true},
+            new Object[]{APPEAL_RECEIVED, REPRESENTATIVE, ONLINE, true, true, true, true},
+            new Object[]{APPEAL_RECEIVED, REPRESENTATIVE, PAPER, true, true, true, true},
+            new Object[]{APPEAL_RECEIVED, REPRESENTATIVE, REGULAR, true, true, true, true},
+            new Object[]{APPEAL_WITHDRAWN, APPELLANT, ONLINE, true, true, false, true},
+            new Object[]{APPEAL_WITHDRAWN, APPELLANT, PAPER, true, true, false, true},
+            new Object[]{APPEAL_WITHDRAWN, APPELLANT, REGULAR, true, true, false, true},
+            new Object[]{APPEAL_WITHDRAWN, REPRESENTATIVE, ONLINE, true, true, false, true},
+            new Object[]{APPEAL_WITHDRAWN, REPRESENTATIVE, PAPER, true, true, false, true},
+            new Object[]{APPEAL_WITHDRAWN, REPRESENTATIVE, REGULAR, true, true, false, true},
+            new Object[]{DEATH_OF_APPELLANT, APPOINTEE, REGULAR, false, false, false, true},
+            new Object[]{DEATH_OF_APPELLANT, REPRESENTATIVE, REGULAR, false, false, false, true},
+            new Object[]{DECISION_ISSUED, APPELLANT, ONLINE, false, false, false, true},
+            new Object[]{DECISION_ISSUED, APPOINTEE, ONLINE, false, false, false, true},
+            new Object[]{DECISION_ISSUED, REPRESENTATIVE, ONLINE, false, false, false, true},
+            new Object[]{DECISION_ISSUED_WELSH, APPELLANT, ONLINE, false, false, false, true},
+            new Object[]{DECISION_ISSUED_WELSH, APPOINTEE, ONLINE, false, false, false, true},
+            new Object[]{DECISION_ISSUED_WELSH, REPRESENTATIVE, ONLINE, false, false, false, true},
+            new Object[]{DWP_RESPONSE_RECEIVED, APPELLANT, ONLINE, true, true, true, false},
+            new Object[]{DWP_RESPONSE_RECEIVED, APPELLANT, PAPER, true, true, true, false},
+            new Object[]{DWP_RESPONSE_RECEIVED, APPOINTEE, ONLINE, true, true, true, false},
+            new Object[]{DWP_RESPONSE_RECEIVED, APPOINTEE, PAPER, true, true, true, false},
+            new Object[]{DWP_RESPONSE_RECEIVED, REPRESENTATIVE, ONLINE, true, true, true, false},
+            new Object[]{DWP_RESPONSE_RECEIVED, REPRESENTATIVE, PAPER, true, true, true, false},
+            new Object[]{DWP_UPLOAD_RESPONSE, APPELLANT, ONLINE, true, true, false, true},
+            new Object[]{DWP_UPLOAD_RESPONSE, APPELLANT, PAPER, true, true, false, true},
+            new Object[]{DWP_UPLOAD_RESPONSE, APPOINTEE, ONLINE, true, true, false, true},
+            new Object[]{DWP_UPLOAD_RESPONSE, APPOINTEE, PAPER, true, true, false, true},
+            new Object[]{DWP_UPLOAD_RESPONSE, REPRESENTATIVE, ONLINE, true, true, false, true},
+            new Object[]{DWP_UPLOAD_RESPONSE, REPRESENTATIVE, PAPER, true, true, false, true},
+            new Object[]{EVIDENCE_RECEIVED, APPELLANT, ONLINE, true, true, true, false},
+            new Object[]{EVIDENCE_RECEIVED, APPELLANT, PAPER, true, true, true, false},
+            new Object[]{EVIDENCE_RECEIVED, APPELLANT, REGULAR, true, true, true, false},
+            new Object[]{EVIDENCE_RECEIVED, REPRESENTATIVE, ONLINE, true, true, true, false},
+            new Object[]{EVIDENCE_RECEIVED, REPRESENTATIVE, PAPER, true, true, true, false},
+            new Object[]{EVIDENCE_RECEIVED, REPRESENTATIVE, REGULAR, true, true, true, false},
+            new Object[]{HEARING_BOOKED, APPELLANT, ONLINE, true, true, false, true},
+            new Object[]{HEARING_BOOKED, APPELLANT, PAPER, true, true, false, true},
+            new Object[]{HEARING_BOOKED, APPELLANT, REGULAR, true, true, false, true},
+            new Object[]{HEARING_BOOKED, REPRESENTATIVE, ONLINE, true, true, false, true},
+            new Object[]{HEARING_BOOKED, REPRESENTATIVE, PAPER, true, true, false, true},
+            new Object[]{HEARING_BOOKED, REPRESENTATIVE, REGULAR, true, true, false, true},
+            new Object[]{ISSUE_ADJOURNMENT_NOTICE, APPELLANT, ONLINE, false, false, false, true},
+            new Object[]{ISSUE_ADJOURNMENT_NOTICE, APPOINTEE, ONLINE, false, false, false, true},
+            new Object[]{ISSUE_ADJOURNMENT_NOTICE, REPRESENTATIVE, ONLINE, false, false, false, true},
+            new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, APPELLANT, ONLINE, false, false, false, true},
+            new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, APPOINTEE, ONLINE, false, false, false, true},
+            new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, REPRESENTATIVE, ONLINE, false, false, false, true},
+            new Object[]{ISSUE_FINAL_DECISION, APPELLANT, ONLINE, false, false, false, true},
+            new Object[]{ISSUE_FINAL_DECISION, APPOINTEE, ONLINE, false, false, false, true},
+            new Object[]{ISSUE_FINAL_DECISION, REPRESENTATIVE, ONLINE, false, false, false, true},
+            new Object[]{ISSUE_FINAL_DECISION_WELSH, APPELLANT, ONLINE, false, false, false, true},
+            new Object[]{ISSUE_FINAL_DECISION_WELSH, APPOINTEE, ONLINE, false, false, false, true},
+            new Object[]{ISSUE_FINAL_DECISION_WELSH, REPRESENTATIVE, ONLINE, false, false, false, true},
+            new Object[]{OTHER_PARTY_ADDED_TO_APPEAL, APPELLANT, REGULAR, false, false, false, true},
+            new Object[]{POSTPONEMENT, APPELLANT, ONLINE, true, true, false, true},
+            new Object[]{POSTPONEMENT, APPELLANT, PAPER, true, true, false, true},
+            new Object[]{POSTPONEMENT, APPELLANT, REGULAR, true, true, false, true},
+            new Object[]{POSTPONEMENT, REPRESENTATIVE, ONLINE, true, true, false, true},
+            new Object[]{POSTPONEMENT, REPRESENTATIVE, PAPER, true, true, false, true},
+            new Object[]{POSTPONEMENT, REPRESENTATIVE, REGULAR, true, true, false, true},
+            new Object[]{PROVIDE_APPOINTEE_DETAILS, APPOINTEE, REGULAR, false, false, false, true},
+            new Object[]{PROVIDE_APPOINTEE_DETAILS, REPRESENTATIVE, REGULAR, false, false, false, true},
+            new Object[]{REQUEST_FOR_INFORMATION, APPELLANT, ONLINE, false, false, false, true},
+            new Object[]{REQUEST_FOR_INFORMATION, APPOINTEE, ONLINE, false, false, false, true},
+            new Object[]{REQUEST_FOR_INFORMATION, REPRESENTATIVE, ONLINE, false, false, false, true},
+            new Object[]{RESEND_APPEAL_CREATED, APPELLANT, ONLINE, true, true, false, false},
+            new Object[]{RESEND_APPEAL_CREATED, APPELLANT, PAPER, true, true, false, false},
+            new Object[]{RESEND_APPEAL_CREATED, APPELLANT, REGULAR, true, true, false, false},
+            new Object[]{RESEND_APPEAL_CREATED, REPRESENTATIVE, ONLINE, true, true, false, false},
+            new Object[]{RESEND_APPEAL_CREATED, REPRESENTATIVE, PAPER, true, true, false, false},
+            new Object[]{RESEND_APPEAL_CREATED, REPRESENTATIVE, REGULAR, true, true, false, false},
+            new Object[]{REVIEW_CONFIDENTIALITY_REQUEST, APPELLANT, REGULAR, false, false, false, true},
+            new Object[]{REVIEW_CONFIDENTIALITY_REQUEST, APPOINTEE, REGULAR, false, false, false, true},
+            new Object[]{REVIEW_CONFIDENTIALITY_REQUEST, JOINT_PARTY, REGULAR, false, false, false, true},
+            new Object[]{REVIEW_CONFIDENTIALITY_REQUEST, REPRESENTATIVE, REGULAR, false, false, false, true},
+            new Object[]{SYA_APPEAL_CREATED, APPELLANT, ONLINE, true, true, true, false},
+            new Object[]{SYA_APPEAL_CREATED, APPELLANT, PAPER, true, true, true, false},
+            new Object[]{SYA_APPEAL_CREATED, APPELLANT, REGULAR, true, true, true, false},
+            new Object[]{SYA_APPEAL_CREATED, APPOINTEE, ONLINE, true, true, true, false},
+            new Object[]{SYA_APPEAL_CREATED, APPOINTEE, PAPER, true, true, true, false},
+            new Object[]{SYA_APPEAL_CREATED, APPOINTEE, REGULAR, true, true, true, false},
+            new Object[]{SYA_APPEAL_CREATED, REPRESENTATIVE, ONLINE, true, true, true, false},
+            new Object[]{SYA_APPEAL_CREATED, REPRESENTATIVE, PAPER, true, true, true, false},
+            new Object[]{SYA_APPEAL_CREATED, REPRESENTATIVE, REGULAR, true, true, true, false},
+            new Object[]{VALID_APPEAL_CREATED, APPELLANT, ONLINE, true, true, true, true},
+            new Object[]{VALID_APPEAL_CREATED, APPELLANT, PAPER, true, true, true, true},
+            new Object[]{VALID_APPEAL_CREATED, APPELLANT, REGULAR, true, true, true, true},
+            new Object[]{VALID_APPEAL_CREATED, APPOINTEE, ONLINE, true, true, true, true},
+            new Object[]{VALID_APPEAL_CREATED, APPOINTEE, PAPER, true, true, true, true},
+            new Object[]{VALID_APPEAL_CREATED, APPOINTEE, REGULAR, true, true, true, true},
+            new Object[]{VALID_APPEAL_CREATED, REPRESENTATIVE, ONLINE, true, true, true, true},
+            new Object[]{VALID_APPEAL_CREATED, REPRESENTATIVE, PAPER, true, true, true, true},
+            new Object[]{VALID_APPEAL_CREATED, REPRESENTATIVE, REGULAR, true, true, true, true},
+        };
+    }
+
     @ParameterizedTest
     @CsvSource({
         "PIP,'judge, doctor and disability expert', Personal Independence Payment, Taliad Annibyniaeth Personol, 'barnwr, meddyg ac arbenigwr anableddau', PIP, PIP, sscs1",
@@ -847,7 +985,7 @@ class PersonalisationTest {
         List<Event> events = new ArrayList<>();
         events.add(Event.builder().value(EventDetails.builder().date(DATE).type(EventType.APPEAL_RECEIVED.getCcdType()).build()).build());
 
-        RegionalProcessingCenter rpc = RegionalProcessingCenter
+        rpc = RegionalProcessingCenter
             .builder()
             .name("GLASGOW")
             .phoneNumber(phone)
@@ -986,7 +1124,7 @@ class PersonalisationTest {
             .subscribeSms("No")
             .build();
 
-        Subscriptions subscriptions = Subscriptions.builder().appellantSubscription(appellantSubscription).build();
+        subscriptions = Subscriptions.builder().appellantSubscription(appellantSubscription).build();
 
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
@@ -1030,7 +1168,7 @@ class PersonalisationTest {
             .subscribeSms("No")
             .build();
 
-        Subscriptions subscriptions = Subscriptions.builder().appellantSubscription(appellantSubscription).build();
+        subscriptions = Subscriptions.builder().appellantSubscription(appellantSubscription).build();
 
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
@@ -1163,8 +1301,8 @@ class PersonalisationTest {
 
         Map<String, Object> result = personalisation.setEventData(new HashMap<>(), response, APPEAL_RECEIVED);
 
-        assertThat(result.get(APPEAL_RESPOND_DATE))
-            .isEqualTo(LocalDate.now()
+        assertThat(result)
+            .containsEntry(APPEAL_RESPOND_DATE, LocalDate.now()
                 .plusDays(responsePeriod)
                 .format(DateTimeFormatter.ofPattern(RESPONSE_DATE_FORMAT)));
     }
@@ -1483,7 +1621,7 @@ class PersonalisationTest {
             .notificationEventType(HEARING_BOOKED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isNotNull();
-        assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isEqualTo("BBA3-DIR");
+        assertThat(result).containsEntry(HMC_HEARING_TYPE_LITERAL, "BBA3-DIR");
     }
 
     @Test
@@ -1512,7 +1650,7 @@ class PersonalisationTest {
             .notificationEventType(HEARING_BOOKED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isNotNull();
-        assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isEqualTo("BBA3-SUB");
+        assertThat(result).containsEntry(HMC_HEARING_TYPE_LITERAL, "BBA3-SUB");
     }
 
     @Test
@@ -1541,7 +1679,7 @@ class PersonalisationTest {
             .notificationEventType(HEARING_BOOKED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isNotNull();
-        assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isEqualTo("BBA3-DIR");
+        assertThat(result).containsEntry(HMC_HEARING_TYPE_LITERAL, "BBA3-DIR");
     }
 
     @Test
@@ -1569,7 +1707,7 @@ class PersonalisationTest {
             .notificationEventType(HEARING_BOOKED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isNotNull();
-        assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isEqualTo("BBA3-SUB");
+        assertThat(result).containsEntry(HMC_HEARING_TYPE_LITERAL, "BBA3-SUB");
     }
 
     @Test
@@ -1598,7 +1736,7 @@ class PersonalisationTest {
             .notificationEventType(HEARING_BOOKED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isNotNull();
-        assertThat(result.get(HMC_HEARING_TYPE_LITERAL)).isEqualTo("BBA3-SUB");
+        assertThat(result).containsEntry(HMC_HEARING_TYPE_LITERAL, "BBA3-SUB");
     }
 
     @Test
@@ -1628,7 +1766,7 @@ class PersonalisationTest {
 
     @Test
     void shouldPopulateRegionalProcessingCenterFromCcdCaseIfItsPresent() {
-        RegionalProcessingCenter rpc = RegionalProcessingCenter.builder()
+        rpc = RegionalProcessingCenter.builder()
             .name("LIVERPOOL").address1(ADDRESS1).address2(ADDRESS2).address3(ADDRESS3).address4(ADDRESS4).city(CITY).postcode(POSTCODE).build();
 
         SscsCaseData response = SscsCaseData.builder().regionalProcessingCenter(rpc).build();
@@ -2499,7 +2637,7 @@ class PersonalisationTest {
 
     @Test
     void whenPostHearingsIsTrueAndFinalDecisionIsSet_setFinalDecision() {
-        ReflectionTestUtils.setField(personalisation, "isPostHearingsEnabled", true);
+        setField(personalisation, "isPostHearingsEnabled", true);
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .regionalProcessingCenter(rpc)
@@ -2521,7 +2659,7 @@ class PersonalisationTest {
 
     @Test
     void whenPostHearingsIsTrueAndFinalDecisionIsNotSet_dontSetFinalDecision() {
-        ReflectionTestUtils.setField(personalisation, "isPostHearingsEnabled", true);
+        setField(personalisation, "isPostHearingsEnabled", true);
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .regionalProcessingCenter(rpc)
@@ -2538,6 +2676,136 @@ class PersonalisationTest {
 
         assertTrue((boolean) result.get(IS_GRANTED));
         assertNull(result.get(FINAL_DECISION_DATE));
+    }
+
+    @ParameterizedTest(name = "{0} other parties -> OTHER_PARTY_SIZE = {1}")
+    @MethodSource("childSupportOtherPartySizeScenarios")
+    void givenChildSupportBenefitAndFeatureEnabled_thenSetsOtherPartySize(final List<CcdValue<OtherParty>> otherParties,
+        final int expectedSize) {
+        setField(personalisation, "cmOtherPartyConfidentialityEnabled", true);
+        final SscsCaseData response = SscsCaseData
+            .builder()
+            .ccdCaseId(CASE_ID)
+            .appeal(Appeal
+                .builder()
+                .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
+                .appellant(Appellant.builder().name(name).build())
+                .build())
+            .otherParties(otherParties)
+            .build();
+
+        final Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper
+                .builder()
+                .newSscsCaseData(response)
+                .notificationEventType(OTHER_PARTY_ADDED_TO_APPEAL)
+                .build(),
+            new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(),
+                response.getAppeal().getAppellant()));
+
+        assertThat(result).containsEntry(OTHER_PARTY_SIZE, expectedSize);
+    }
+
+    private static Stream<Arguments> childSupportOtherPartySizeScenarios() {
+        return Stream.of(
+            Arguments.of(null, 0),
+            Arguments.of(List.of(), 0),
+            Arguments.of(buildOtherParties("Alice Jones"), 1),
+            Arguments.of(buildOtherParties("Alice Jones", "Bob Smith"), 2),
+            Arguments.of(buildOtherParties("Alice Jones", "Bob Smith", "Carol White"), 3));
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("childSupportWithPreviousOtherPartiesScenarios")
+    void givenChildSupportBenefitAndPreviousOtherParties_thenFiltersNewPartiesCorrectly(
+        final String scenario,
+        final List<CcdValue<OtherParty>> previousOtherParties,
+        final List<CcdValue<OtherParty>> newOtherParties,
+        final int expectedSize,
+        final String expectedNames) {
+        setField(personalisation, "cmOtherPartyConfidentialityEnabled", true);
+        final SscsCaseData newData = SscsCaseData
+            .builder()
+            .ccdCaseId(CASE_ID)
+            .appeal(Appeal
+                .builder()
+                .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
+                .appellant(Appellant.builder().name(name).build())
+                .build())
+            .otherParties(newOtherParties)
+            .build();
+        final SscsCaseData previousData = SscsCaseData
+            .builder()
+            .otherParties(previousOtherParties)
+            .build();
+
+        final Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper
+                .builder()
+                .newSscsCaseData(newData)
+                .oldSscsCaseData(previousData)
+                .notificationEventType(OTHER_PARTY_ADDED_TO_APPEAL)
+                .build(),
+            new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, newData.getAppeal().getAppellant(),
+                newData.getAppeal().getAppellant()));
+
+        assertThat(result).containsEntry(OTHER_PARTY_SIZE, expectedSize)
+            .containsEntry(OTHER_PARTY_NAMES, expectedNames);
+    }
+
+    private static Stream<Arguments> childSupportWithPreviousOtherPartiesScenarios() {
+        return Stream.of(
+            Arguments.of(
+                "empty previous returns all current parties",
+                List.of(),
+                buildOtherParties("Alice Jones", "Bob Smith"),
+                2, "Alice Jones and Bob Smith"),
+            Arguments.of(
+                "empty previous returns all current parties",
+                List.of(),
+                buildOtherParties("Alice Jones", "Bob Smith", "Carol White"),
+                3, "Alice Jones, Bob Smith and Carol White"),
+            Arguments.of(
+                "one existing party filtered out by ID, one new party kept",
+                buildOtherParties("Alice Jones"),
+                buildOtherParties("Alice Jones", "Bob Smith"),
+                1, "Bob Smith"),
+            Arguments.of(
+                "two existing parties filtered out by ID, one new party kept",
+                buildOtherParties("Alice Jones", "Bob Smith"),
+                buildOtherParties("Alice Jones", "Bob Smith", "Carol White"),
+                1, "Carol White"),
+            Arguments.of(
+                "all current parties are new, none in previous",
+                buildOtherParties("Carol White"),
+                buildOtherParties("Alice Jones", "Bob Smith"),
+                2, "Alice Jones and Bob Smith"),
+            Arguments.of(
+                "all current parties existed in previous, result is empty",
+                buildOtherParties("Alice Jones", "Bob Smith"),
+                buildOtherParties("Alice Jones", "Bob Smith"),
+                0, ""),
+            Arguments.of(
+                "empty new parties with non-empty previous returns empty result",
+                buildOtherParties("Alice Jones"),
+                List.of(),
+                0, "")
+        );
+    }
+
+    private static List<CcdValue<OtherParty>> buildOtherParties(final String... fullNames) {
+        return Arrays.stream(fullNames).map(PersonalisationTest::buildOtherParty).toList();
+    }
+
+    private static CcdValue<OtherParty> buildOtherParty(final String fullName) {
+        final String[] parts = fullName.split(" ", 2);
+        final Name name = Name.builder().firstName(parts[0]).lastName(parts[1]).build();
+        return new CcdValue<>(OtherParty.builder().id(fullName).name(name).build());
+    }
+
+    private String getExpectedTemplateName(NotificationEventType notificationEventType, SubscriptionType subscriptionType) {
+        final String id = notificationEventType == OTHER_PARTY_ADDED_TO_APPEAL
+            ? "otherPartyAddedToAppeal"
+            : notificationEventType.getId();
+        return id + (subscriptionType == null ? "" : "." + lowerCase(subscriptionType.name()));
     }
 
     @ParameterizedTest(name = "{0}")
@@ -2596,11 +2864,6 @@ class PersonalisationTest {
         return englishMap;
     }
 
-    @SuppressWarnings({"Indentation", "unused"})
-    private static Object[] generateNotificationTypeAndSubscriptionsScenarios() {
-        return new Object[]{new Object[]{ACTION_POSTPONEMENT_REQUEST, APPELLANT, REGULAR, false, false, false, true}, new Object[]{ACTION_POSTPONEMENT_REQUEST, APPOINTEE, REGULAR, false, false, false, true}, new Object[]{ACTION_POSTPONEMENT_REQUEST, JOINT_PARTY, REGULAR, false, false, false, true}, new Object[]{ACTION_POSTPONEMENT_REQUEST, REPRESENTATIVE, REGULAR, false, false, false, true}, new Object[]{ACTION_POSTPONEMENT_REQUEST_WELSH, APPELLANT, REGULAR, false, false, false, true}, new Object[]{ACTION_POSTPONEMENT_REQUEST_WELSH, APPOINTEE, REGULAR, false, false, false, true}, new Object[]{ACTION_POSTPONEMENT_REQUEST_WELSH, JOINT_PARTY, REGULAR, false, false, false, true}, new Object[]{ACTION_POSTPONEMENT_REQUEST_WELSH, REPRESENTATIVE, REGULAR, false, false, false, true}, new Object[]{ADJOURNED, APPELLANT, ONLINE, true, true, false, false}, new Object[]{ADJOURNED, APPELLANT, PAPER, true, true, false, false}, new Object[]{ADJOURNED, APPELLANT, REGULAR, true, true, false, false}, new Object[]{ADJOURNED, REPRESENTATIVE, ONLINE, true, true, false, false}, new Object[]{ADJOURNED, REPRESENTATIVE, PAPER, true, true, false, false}, new Object[]{ADJOURNED, REPRESENTATIVE, REGULAR, true, true, false, false}, new Object[]{ADMIN_APPEAL_WITHDRAWN, APPELLANT, ONLINE, true, true, false, true}, new Object[]{ADMIN_APPEAL_WITHDRAWN, APPELLANT, PAPER, true, true, false, true}, new Object[]{ADMIN_APPEAL_WITHDRAWN, APPELLANT, REGULAR, true, true, false, true}, new Object[]{ADMIN_APPEAL_WITHDRAWN, REPRESENTATIVE, ONLINE, true, true, false, true}, new Object[]{ADMIN_APPEAL_WITHDRAWN, REPRESENTATIVE, PAPER, true, true, false, true}, new Object[]{ADMIN_APPEAL_WITHDRAWN, REPRESENTATIVE, REGULAR, true, true, false, true}, new Object[]{APPEAL_DORMANT, APPELLANT, ORAL, true, true, false, false}, new Object[]{APPEAL_DORMANT, APPELLANT, PAPER, true, true, false, false}, new Object[]{APPEAL_DORMANT, REPRESENTATIVE, ORAL, true, true, false, false}, new Object[]{APPEAL_DORMANT, REPRESENTATIVE, PAPER, true, true, false, false}, new Object[]{APPEAL_LAPSED, APPELLANT, ONLINE, true, true, false, true}, new Object[]{APPEAL_LAPSED, APPELLANT, PAPER, true, true, false, true}, new Object[]{APPEAL_LAPSED, APPELLANT, REGULAR, true, true, false, true}, new Object[]{APPEAL_LAPSED, APPOINTEE, ONLINE, true, true, false, true}, new Object[]{APPEAL_LAPSED, APPOINTEE, PAPER, true, true, false, true}, new Object[]{APPEAL_LAPSED, APPOINTEE, REGULAR, true, true, false, true}, new Object[]{APPEAL_RECEIVED, APPELLANT, ONLINE, true, true, true, true}, new Object[]{APPEAL_RECEIVED, APPELLANT, PAPER, true, true, true, true}, new Object[]{APPEAL_RECEIVED, APPELLANT, REGULAR, true, true, true, true}, new Object[]{APPEAL_RECEIVED, APPOINTEE, ONLINE, true, true, true, true}, new Object[]{APPEAL_RECEIVED, APPOINTEE, PAPER, true, true, true, true}, new Object[]{APPEAL_RECEIVED, APPOINTEE, REGULAR, true, true, true, true}, new Object[]{APPEAL_RECEIVED, REPRESENTATIVE, ONLINE, true, true, true, true}, new Object[]{APPEAL_RECEIVED, REPRESENTATIVE, PAPER, true, true, true, true}, new Object[]{APPEAL_RECEIVED, REPRESENTATIVE, REGULAR, true, true, true, true}, new Object[]{APPEAL_WITHDRAWN, APPELLANT, ONLINE, true, true, false, true}, new Object[]{APPEAL_WITHDRAWN, APPELLANT, PAPER, true, true, false, true}, new Object[]{APPEAL_WITHDRAWN, APPELLANT, REGULAR, true, true, false, true}, new Object[]{APPEAL_WITHDRAWN, REPRESENTATIVE, ONLINE, true, true, false, true}, new Object[]{APPEAL_WITHDRAWN, REPRESENTATIVE, PAPER, true, true, false, true}, new Object[]{APPEAL_WITHDRAWN, REPRESENTATIVE, REGULAR, true, true, false, true}, new Object[]{DEATH_OF_APPELLANT, APPOINTEE, REGULAR, false, false, false, true}, new Object[]{DEATH_OF_APPELLANT, REPRESENTATIVE, REGULAR, false, false, false, true}, new Object[]{DECISION_ISSUED, APPELLANT, ONLINE, false, false, false, true}, new Object[]{DECISION_ISSUED, APPOINTEE, ONLINE, false, false, false, true}, new Object[]{DECISION_ISSUED, REPRESENTATIVE, ONLINE, false, false, false, true}, new Object[]{DECISION_ISSUED_WELSH, APPELLANT, ONLINE, false, false, false, true}, new Object[]{DECISION_ISSUED_WELSH, APPOINTEE, ONLINE, false, false, false, true}, new Object[]{DECISION_ISSUED_WELSH, REPRESENTATIVE, ONLINE, false, false, false, true}, new Object[]{DWP_RESPONSE_RECEIVED, APPELLANT, ONLINE, true, true, true, false}, new Object[]{DWP_RESPONSE_RECEIVED, APPELLANT, PAPER, true, true, true, false}, new Object[]{DWP_RESPONSE_RECEIVED, APPOINTEE, ONLINE, true, true, true, false}, new Object[]{DWP_RESPONSE_RECEIVED, APPOINTEE, PAPER, true, true, true, false}, new Object[]{DWP_RESPONSE_RECEIVED, REPRESENTATIVE, ONLINE, true, true, true, false}, new Object[]{DWP_RESPONSE_RECEIVED, REPRESENTATIVE, PAPER, true, true, true, false}, new Object[]{DWP_UPLOAD_RESPONSE, APPELLANT, ONLINE, true, true, false, true}, new Object[]{DWP_UPLOAD_RESPONSE, APPELLANT, PAPER, true, true, false, true}, new Object[]{DWP_UPLOAD_RESPONSE, APPOINTEE, ONLINE, true, true, false, true}, new Object[]{DWP_UPLOAD_RESPONSE, APPOINTEE, PAPER, true, true, false, true}, new Object[]{DWP_UPLOAD_RESPONSE, REPRESENTATIVE, ONLINE, true, true, false, true}, new Object[]{DWP_UPLOAD_RESPONSE, REPRESENTATIVE, PAPER, true, true, false, true}, new Object[]{EVIDENCE_RECEIVED, APPELLANT, ONLINE, true, true, true, false}, new Object[]{EVIDENCE_RECEIVED, APPELLANT, PAPER, true, true, true, false}, new Object[]{EVIDENCE_RECEIVED, APPELLANT, REGULAR, true, true, true, false}, new Object[]{EVIDENCE_RECEIVED, REPRESENTATIVE, ONLINE, true, true, true, false}, new Object[]{EVIDENCE_RECEIVED, REPRESENTATIVE, PAPER, true, true, true, false}, new Object[]{EVIDENCE_RECEIVED, REPRESENTATIVE, REGULAR, true, true, true, false}, new Object[]{HEARING_BOOKED, APPELLANT, ONLINE, true, true, false, true}, new Object[]{HEARING_BOOKED, APPELLANT, PAPER, true, true, false, true}, new Object[]{HEARING_BOOKED, APPELLANT, REGULAR, true, true, false, true}, new Object[]{HEARING_BOOKED, REPRESENTATIVE, ONLINE, true, true, false, true}, new Object[]{HEARING_BOOKED, REPRESENTATIVE, PAPER, true, true, false, true}, new Object[]{HEARING_BOOKED, REPRESENTATIVE, REGULAR, true, true, false, true}, new Object[]{ISSUE_ADJOURNMENT_NOTICE, APPELLANT, ONLINE, false, false, false, true}, new Object[]{ISSUE_ADJOURNMENT_NOTICE, APPOINTEE, ONLINE, false, false, false, true}, new Object[]{ISSUE_ADJOURNMENT_NOTICE, REPRESENTATIVE, ONLINE, false, false, false, true}, new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, APPELLANT, ONLINE, false, false, false, true}, new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, APPOINTEE, ONLINE, false, false, false, true}, new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, REPRESENTATIVE, ONLINE, false, false, false, true}, new Object[]{ISSUE_FINAL_DECISION, APPELLANT, ONLINE, false, false, false, true}, new Object[]{ISSUE_FINAL_DECISION, APPOINTEE, ONLINE, false, false, false, true}, new Object[]{ISSUE_FINAL_DECISION, REPRESENTATIVE, ONLINE, false, false, false, true}, new Object[]{ISSUE_FINAL_DECISION_WELSH, APPELLANT, ONLINE, false, false, false, true}, new Object[]{ISSUE_FINAL_DECISION_WELSH, APPOINTEE, ONLINE, false, false, false, true}, new Object[]{ISSUE_FINAL_DECISION_WELSH, REPRESENTATIVE, ONLINE, false, false, false, true}, new Object[]{POSTPONEMENT, APPELLANT, ONLINE, true, true, false, true}, new Object[]{POSTPONEMENT, APPELLANT, PAPER, true, true, false, true}, new Object[]{POSTPONEMENT, APPELLANT, REGULAR, true, true, false, true}, new Object[]{POSTPONEMENT, REPRESENTATIVE, ONLINE, true, true, false, true}, new Object[]{POSTPONEMENT, REPRESENTATIVE, PAPER, true, true, false, true}, new Object[]{POSTPONEMENT, REPRESENTATIVE, REGULAR, true, true, false, true}, new Object[]{PROVIDE_APPOINTEE_DETAILS, APPOINTEE, REGULAR, false, false, false, true}, new Object[]{PROVIDE_APPOINTEE_DETAILS, REPRESENTATIVE, REGULAR, false, false, false, true}, new Object[]{REQUEST_FOR_INFORMATION, APPELLANT, ONLINE, false, false, false, true}, new Object[]{REQUEST_FOR_INFORMATION, APPOINTEE, ONLINE, false, false, false, true}, new Object[]{REQUEST_FOR_INFORMATION, REPRESENTATIVE, ONLINE, false, false, false, true}, new Object[]{RESEND_APPEAL_CREATED, APPELLANT, ONLINE, true, true, false, false}, new Object[]{RESEND_APPEAL_CREATED, APPELLANT, PAPER, true, true, false, false}, new Object[]{RESEND_APPEAL_CREATED, APPELLANT, REGULAR, true, true, false, false}, new Object[]{RESEND_APPEAL_CREATED, REPRESENTATIVE, ONLINE, true, true, false, false}, new Object[]{RESEND_APPEAL_CREATED, REPRESENTATIVE, PAPER, true, true, false, false}, new Object[]{RESEND_APPEAL_CREATED, REPRESENTATIVE, REGULAR, true, true, false, false}, new Object[]{REVIEW_CONFIDENTIALITY_REQUEST, APPELLANT, REGULAR, false, false, false, true}, new Object[]{REVIEW_CONFIDENTIALITY_REQUEST, APPOINTEE, REGULAR, false, false, false, true}, new Object[]{REVIEW_CONFIDENTIALITY_REQUEST, JOINT_PARTY, REGULAR, false, false, false, true}, new Object[]{REVIEW_CONFIDENTIALITY_REQUEST, REPRESENTATIVE, REGULAR, false, false, false, true}, new Object[]{SYA_APPEAL_CREATED, APPELLANT, ONLINE, true, true, true, false}, new Object[]{SYA_APPEAL_CREATED, APPELLANT, PAPER, true, true, true, false}, new Object[]{SYA_APPEAL_CREATED, APPELLANT, REGULAR, true, true, true, false}, new Object[]{SYA_APPEAL_CREATED, APPOINTEE, ONLINE, true, true, true, false}, new Object[]{SYA_APPEAL_CREATED, APPOINTEE, PAPER, true, true, true, false}, new Object[]{SYA_APPEAL_CREATED, APPOINTEE, REGULAR, true, true, true, false}, new Object[]{SYA_APPEAL_CREATED, REPRESENTATIVE, ONLINE, true, true, true, false}, new Object[]{SYA_APPEAL_CREATED, REPRESENTATIVE, PAPER, true, true, true, false}, new Object[]{SYA_APPEAL_CREATED, REPRESENTATIVE, REGULAR, true, true, true, false}, new Object[]{VALID_APPEAL_CREATED, APPELLANT, ONLINE, true, true, true, true}, new Object[]{VALID_APPEAL_CREATED, APPELLANT, PAPER, true, true, true, true}, new Object[]{VALID_APPEAL_CREATED, APPELLANT, REGULAR, true, true, true, true}, new Object[]{VALID_APPEAL_CREATED, APPOINTEE, ONLINE, true, true, true, true}, new Object[]{VALID_APPEAL_CREATED, APPOINTEE, PAPER, true, true, true, true}, new Object[]{VALID_APPEAL_CREATED, APPOINTEE, REGULAR, true, true, true, true}, new Object[]{VALID_APPEAL_CREATED, REPRESENTATIVE, ONLINE, true, true, true, true}, new Object[]{VALID_APPEAL_CREATED, REPRESENTATIVE, PAPER, true, true, true, true}, new Object[]{VALID_APPEAL_CREATED, REPRESENTATIVE, REGULAR, true, true, true, true},};
-    }
-
     private static Stream<Arguments> appealResponseDate() {
         return Stream.of(Arguments.of(
                 Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build()).build(),
@@ -2636,10 +2899,6 @@ class PersonalisationTest {
                     new CcdValue<>(OtherParty.builder().name(Name.builder().firstName("John").lastName("Smith").build()).build())),
                 false, null), Arguments.of("UC benefit with null other parties in AWAIT_CONFIDENTIALITY_REQUIREMENTS state",
                 Benefit.UC.getShortName(), State.AWAIT_CONFIDENTIALITY_REQUIREMENTS, null, false, null));
-    }
-
-    private String getExpectedTemplateName(NotificationEventType notificationEventType, SubscriptionType subscriptionType) {
-        return notificationEventType.getId() + (subscriptionType == null ? "" : "." + lowerCase(subscriptionType.name()));
     }
 
     private Hearing createHearing(LocalDate hearingDate) {

@@ -49,4 +49,8 @@ public class IssueHearingEnquiryFormAboutToSubmit implements PreSubmitCallbackHa
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
+    public static int getHearingResponseExpectedByDays() {
+        return HEF_RESPONSE_EXPECTED_BY_DAYS;
+    }
+
 }
