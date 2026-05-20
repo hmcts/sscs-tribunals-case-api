@@ -693,7 +693,7 @@ public class NotificationConfigTestIt extends AbstractNotificationConfigTest {
             new Object[]{SYA_APPEAL_CREATED, false, APPOINTEE, ORAL, LIST_ASSIST, null, "362d9a85-e0e4-412b-b874-020c0464e2b4", List.of("f41222ef-c05c-4682-9634-6b034a166368"), "747d026e-1bec-4e96-8a34-28f36e30bba5", null},
             new Object[]{SYA_APPEAL_CREATED, false, APPOINTEE, PAPER, LIST_ASSIST, null, "362d9a85-e0e4-412b-b874-020c0464e2b4", List.of("f41222ef-c05c-4682-9634-6b034a166368"), "747d026e-1bec-4e96-8a34-28f36e30bba5", null},
             new Object[]{SYA_APPEAL_CREATED, false, REPRESENTATIVE, ORAL, LIST_ASSIST, null, "652753bf-59b4-46eb-9c24-bd762338a098", List.of("a6c09fad-6265-4c7c-8b95-36245ffa5352"), "77ea8a2f-06df-4279-9c1f-0f23cb2d9bbf", null},
-            new Object[]{SYA_APPEAL_CREATED, true, APPELLANT, PAPER, LIST_ASSIST, null, "8910e2d2-4332-4ef6-a4b5-025ffad4f17d", List.of("6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82","f41222ef-c05c-4682-9634-6b034a166368"), "830ba7f1-9757-4833-8520-2f872de7be44", null},
+            new Object[]{SYA_APPEAL_CREATED, true, APPELLANT, PAPER, LIST_ASSIST, null, "8910e2d2-4332-4ef6-a4b5-025ffad4f17d", List.of("6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82","f41222ef-c05c-4682-9634-6b034a166368"), "830ba7f1-9757-4833-8520-2f872de7be44", "TB-SCS-GNO-WEL-Acknowledgment-of-Appeal.docx"},
             new Object[]{SYA_APPEAL_CREATED, true, REPRESENTATIVE, ORAL, LIST_ASSIST, null, "364bccc5-ffa6-495d-8035-e642d15114bf", List.of("f8391d2b-4d80-480e-87a9-816710f5650b","a6c09fad-6265-4c7c-8b95-36245ffa5352"), "89cbb9d8-3b7d-4766-b481-585832e8bd90", null},
 
             new Object[]{UPDATE_OTHER_PARTY_DATA, false, OTHER_PARTY, ORAL, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-ENG-00784-v2.docx"},
