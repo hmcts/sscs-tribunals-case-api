@@ -5,14 +5,17 @@ import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getBenefitByCodeOrThrowException;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getLongBenefitNameDescriptionWithOptionalAcronym;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelComposition.JUDGE_DOCTOR_AND_DISABILITY_EXPERT_IF_APPLICABLE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.AWAIT_CONFIDENTIALITY_REQUIREMENTS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.YES;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsDetailsMapping.getHearingType;
@@ -152,6 +155,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DIRECTION_ISSUED_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.EVIDENCE_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.JUDGE_DECISION_APPEAL_TO_PROCEED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.NOTIFY_APPELLANT_VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PERMISSION_TO_APPEAL_REFUSED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.REVIEW_AND_SET_ASIDE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SUBSCRIPTION_CREATED;
@@ -188,6 +192,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AppellantInfoRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DatedRequestOutcome;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
@@ -447,7 +452,7 @@ public class Personalisation<E extends NotificationWrapper> {
             personalisation.put(PersonalisationMappingConstants.JOINT_PARTY, "Yes");
         }
 
-        setConfidentialFields(ccdResponse, subscriptionWithType, personalisation);
+        setConfidentialFields(ccdResponse, subscriptionWithType, personalisation, responseWrapper.getState());
 
         setHelplineTelephone(ccdResponse, personalisation);
         if (subscriptionWithType.getSubscriptionType() == OTHER_PARTY) {
@@ -576,14 +581,18 @@ public class Personalisation<E extends NotificationWrapper> {
         }
     }
 
-    private void setConfidentialFields(SscsCaseData ccdResponse, SubscriptionWithType subscriptionWithType, Map<String, Object> personalisation) {
+    private void setConfidentialFields(SscsCaseData ccdResponse, SubscriptionWithType subscriptionWithType, Map<String, Object> personalisation,
+        State state) {
         if (subscriptionWithType.getSubscriptionType().equals(JOINT_PARTY) && null != ccdResponse.getConfidentialityRequestOutcomeJointParty()) {
             personalisation.put(OTHER_PARTY_NAME, ccdResponse.getAppeal().getAppellant().getName().getFullNameNoTitle());
             personalisation.put(CONFIDENTIALITY_OUTCOME, getRequestOutcome(ccdResponse.getConfidentialityRequestOutcomeJointParty()));
-
         } else if (subscriptionWithType.getSubscriptionType().equals(APPELLANT) && null != ccdResponse.getJointParty().getName() && null != ccdResponse.getConfidentialityRequestOutcomeAppellant()) {
             personalisation.put(OTHER_PARTY_NAME, ccdResponse.getJointParty().getName().getFullNameNoTitle());
             personalisation.put(CONFIDENTIALITY_OUTCOME, getRequestOutcome(ccdResponse.getConfidentialityRequestOutcomeAppellant()));
+        } else if (state == AWAIT_CONFIDENTIALITY_REQUIREMENTS
+            && ccdResponse.isBenefitType(UC)
+            && isNotEmpty(ccdResponse.getOtherParties())) {
+            ofNullable(ccdResponse.getOtherParties().getFirst().getValue().getName()).map(Name::getFullNameNoTitle).ifPresent(name -> personalisation.put(OTHER_PARTY_NAME, name));
         }
     }
 
@@ -867,10 +876,13 @@ public class Personalisation<E extends NotificationWrapper> {
             .map(DynamicListItem::getCode)
             .orElse(null);
 
-        if (nonNull(directionType)
-            && (DIRECTION_ISSUED.equals(notificationEventType)
-            || DIRECTION_ISSUED_WELSH.equals(notificationEventType))) {
-            return getSubscriptionTemplateNameWithDirection(notificationEventType, directionType, subscriptionType);
+        if (nonNull(directionType)) {
+            if (DIRECTION_ISSUED.equals(notificationEventType) || DIRECTION_ISSUED_WELSH.equals(notificationEventType)) {
+                return getSubscriptionTemplateNameWithDirection(notificationEventType, directionType, subscriptionType);
+            }
+            if (NOTIFY_APPELLANT_VALID_APPEAL.equals(notificationEventType) && DirectionType.APPEAL_TO_PROCEED.toString().equals(directionType)) {
+                return getSubscriptionTemplateNameWithDirection(notificationEventType, "appealToProceedNotifyValidAppeal", subscriptionType);
+            }
         }
 
         if (EVENTS_WITH_SUBSCRIPTION_TYPE_DOCMOSIS_TEMPLATES.contains(notificationEventType)) {
