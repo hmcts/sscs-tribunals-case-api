@@ -62,11 +62,6 @@ public class NotificationConfigTestIt extends AbstractNotificationConfigTest {
 
         Template template = getTemplate(eventType, subscriptionType, hearingType, hearingRoute, welsh, createdInGapsFrom);
 
-        System.out.println("expectedEmailTemplateId: " + expectedEmailTemplateId);
-        System.out.println("expectedSmsTemplateId: " + expectedSmsTemplateId);
-        System.out.println("expectedLetterTemplateId: " + expectedLetterTemplateId);
-        System.out.println("expectedDocmosisTemplateId: " + expectedDocmosisTemplateId);
-
         assertThat(template.getEmailTemplateId()).isEqualTo(expectedEmailTemplateId);
         assertThat(template.getSmsTemplateId()).isEqualTo(expectedSmsTemplateId);
         assertThat(template.getLetterTemplateId()).isEqualTo(expectedLetterTemplateId);
