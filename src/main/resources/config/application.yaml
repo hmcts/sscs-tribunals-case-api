@@ -913,6 +913,11 @@ notification:
             docmosisId: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome-v3.docx
         sORRefused:
             docmosisId: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome-v3.docx
+        otherPartyAddedToAppeal:
+            appellant:
+                docmosisId: TB-SCS-GNO-ENG-addition-of-other-party-to-appeal.docx
+            appointee:
+                docmosisId: TB-SCS-GNO-ENG-addition-of-other-party-to-appeal.docx
         addOtherPartyData:
             docmosisId: TB-SCS-GNO-ENG-other-party-added-to-appeal.docx
         paper:
@@ -1911,6 +1916,7 @@ pdf-service:
             permissionToAppealGranted: 'TB-SCS-GNO-ENG-00012.docx'
             libertyToApplyGranted: 'TB-SCS-GNO-ENG-00012.docx'
             libertyToApplyRefused: 'TB-SCS-GNO-ENG-00012.docx'
+            otherPartyAddedToAppeal: 'TB-SCS-GNO-ENG-00012.docx'
             adminSendToValidAppeal: 'TB-SCS-GNO-ENG-00012.docx'
             interlocValidAppeal: 'TB-SCS-GNO-ENG-00012.docx'
             validAppeal: 'TB-SCS-GNO-ENG-00012.docx'

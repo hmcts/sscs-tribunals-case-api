@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updateotherparty;
 
+import static java.time.LocalDate.now;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_OTHER_PARTY_DATA;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.issuehearingenquiryform.IssueHearingEnquiryFormAboutToSubmit.getHearingResponseExpectedByDays;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getUpdatedDirectionDueDate;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.validateHearingOptionsAndExcludeDates;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SYSTEM_USER;
@@ -21,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -28,6 +31,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsType;
@@ -50,10 +54,12 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
     private static final String ERR_ROLE_REQUIRED = "Role is required for the selected case";
 
     private IdamService idamService;
+    private final boolean cmOtherPartyConfidentialityEnabled;
 
     @Autowired
-    UpdateOtherPartyAboutToSubmitHandler(IdamService idamService) {
+    UpdateOtherPartyAboutToSubmitHandler(IdamService idamService, @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
         this.idamService = idamService;
+        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
 
     @Override
@@ -107,6 +113,12 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
         if (!sscsCaseData.isIbcCase() && roleAbsentForOtherParties(sscsCaseData.getOtherParties())) {
             response.addError(ERR_ROLE_REQUIRED);
         }
+
+        if (cmOtherPartyConfidentialityEnabled && sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT)) {
+            sscsCaseData.setDirectionDueDate(now().plusDays(getHearingResponseExpectedByDays()).toString());
+            sscsCaseData.setInterlocReviewState(InterlocReviewState.HEF_ISSUED);
+        }
+
         return response;
     }
 
