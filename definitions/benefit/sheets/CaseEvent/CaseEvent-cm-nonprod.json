@@ -167,6 +167,7 @@
     "PostConditionState": "validAppeal",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
+    "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/sendNotification",
     "Publish": "N"
   },
   {
