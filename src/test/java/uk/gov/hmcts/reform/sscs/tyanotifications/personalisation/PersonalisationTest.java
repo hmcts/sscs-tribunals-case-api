@@ -127,6 +127,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.REPRESENTATIVE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ACTION_POSTPONEMENT_REQUEST;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ACTION_POSTPONEMENT_REQUEST_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADD_OTHER_PARTY_DATA;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADJOURNED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADMIN_APPEAL_WITHDRAWN;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_DORMANT;
@@ -152,6 +153,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.JUDGE_DECISION_APPEAL_TO_PROCEED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.LIBERTY_TO_APPLY_GRANTED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.LIBERTY_TO_APPLY_REFUSED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.NOTIFY_APPELLANT_VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PERMISSION_TO_APPEAL_GRANTED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PERMISSION_TO_APPEAL_REFUSED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.POSTPONEMENT;
@@ -173,7 +175,14 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
@@ -188,7 +197,51 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AppellantInfo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AppellantInfoRequest;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DatedRequestOutcome;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Document;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Event;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Evidence;
+import uk.gov.hmcts.reform.sscs.ccd.domain.FormType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingStatus;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InfoRequests;
+import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFinalDecisionCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Venue;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
@@ -207,7 +260,7 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.MessageAuthenticationServiceImpl;
 
 @Slf4j
-public class PersonalisationTest {
+class PersonalisationTest {
 
     private static final String CASE_ID = "54321";
     private static final String ADDRESS1 = "HM Courts & Tribunals Service";
@@ -220,38 +273,7 @@ public class PersonalisationTest {
     private static final String PHONE_WELSH = "0300 303 5170";
     private static final String PHONE_IBC = "0300 131 2850";
     private static final String DATE = "2018-07-01T14:01:18.243";
-
-    @Mock
-    private NotificationConfig config;
-
-    @Mock
-    private HearingContactDateExtractor hearingContactDateExtractor;
-
-    @Mock
-    private MessageAuthenticationServiceImpl macService;
-
-    @Mock
-    private RegionalProcessingCenterService regionalProcessingCenterService;
-
-    @Mock
-    private NotificationDateConverterUtil notificationDateConverterUtil;
-
-    @Mock
-    private EvidenceProperties evidenceProperties;
-
-    @InjectMocks
-    public Personalisation<NotificationWrapper> personalisation;
-
-    @Spy
-    private PersonalisationConfiguration personalisationConfiguration;
-
-    protected Subscriptions subscriptions;
-
-    protected Name name;
-
-    private RegionalProcessingCenter rpc;
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
-
     private final String evidenceAddressLine1 = "line1";
     private final String evidenceAddressLine2 = "line2";
     private final String evidenceAddressLine3 = "line3";
@@ -268,10 +290,29 @@ public class PersonalisationTest {
     private final String evidenceAddressTelephoneWelsh = PHONE_WELSH;
     private final String evidenceAddressTelephoneIbc = PHONE_IBC;
     private final EvidenceProperties.EvidenceAddress evidenceAddress = new EvidenceProperties.EvidenceAddress();
+    protected Subscriptions subscriptions;
+    protected Name name;
+    @Mock
+    private NotificationConfig config;
+    @Mock
+    private HearingContactDateExtractor hearingContactDateExtractor;
+    @Mock
+    private MessageAuthenticationServiceImpl macService;
+    @Mock
+    private RegionalProcessingCenterService regionalProcessingCenterService;
+    @Mock
+    private NotificationDateConverterUtil notificationDateConverterUtil;
+    @Mock
+    private EvidenceProperties evidenceProperties;
+    @InjectMocks
+    private Personalisation<NotificationWrapper> personalisation;
+    @Spy
+    private PersonalisationConfiguration personalisationConfiguration;
+    private RegionalProcessingCenter rpc;
     private AutoCloseable autoCloseable;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         autoCloseable = openMocks(this);
         when(config.getTrackAppealLink()).thenReturn(Link.builder().linkUrl("http://tyalink.com/appeal_id").build());
         when(config.getMyaLink()).thenReturn(Link.builder().linkUrl("http://myalink.com/appeal_id").build());
@@ -340,31 +381,6 @@ public class PersonalisationTest {
         autoCloseable.close();
     }
 
-    private static Map<String, String> getWelshMap() {
-        Map<String, String> welshMap = new HashMap<>();
-        welshMap.put(PersonalisationKey.LANGUAGE_INTERPRETER.name(), "Dehonglydd iaith arwyddion: ");
-        welshMap.put(PersonalisationKey.SIGN_INTERPRETER.name(), "Dehonglydd iaith arwyddion: ");
-        welshMap.put(PersonalisationKey.HEARING_LOOP.name(), "Dolen glyw: ");
-        welshMap.put(PersonalisationKey.DISABLED_ACCESS.name(), "Mynediad i bobl anab: ");
-        welshMap.put(PersonalisationKey.OTHER_ARRANGEMENTS.name(), "Unrhyw drefniadau eraill: ");
-        welshMap.put(PersonalisationKey.REQUIRED.name(), "Gofynnol");
-        welshMap.put(PersonalisationKey.NOT_REQUIRED.name(), "Dim yn ofynnol");
-        return welshMap;
-    }
-
-    private static Map<String, String> getEnglishMap() {
-        Map<String, String> englishMap = new HashMap<>();
-        englishMap.put(PersonalisationKey.LANGUAGE_INTERPRETER.name(), "Language interpreter: ");
-        englishMap.put(PersonalisationKey.SIGN_INTERPRETER.name(), "Sign interpreter: ");
-        englishMap.put(PersonalisationKey.HEARING_LOOP.name(), "Hearing loop: ");
-        englishMap.put(PersonalisationKey.DISABLED_ACCESS.name(), "Disabled access: ");
-        englishMap.put(PersonalisationKey.OTHER_ARRANGEMENTS.name(), "Any other arrangements: ");
-        englishMap.put(PersonalisationKey.REQUIRED.name(), "Required");
-        englishMap.put(PersonalisationKey.NOT_REQUIRED.name(), "Not required");
-        return englishMap;
-    }
-
-
     @ParameterizedTest
     @CsvSource({"APPEAL_TO_PROCEED, directionIssued.appealToProceed, APPELLANT",
         "APPEAL_TO_PROCEED, directionIssued.appealToProceed, JOINT_PARTY",
@@ -375,7 +391,7 @@ public class PersonalisationTest {
         "REFUSE_REINSTATEMENT, directionIssued.refuseReinstatement, APPOINTEE",
         "REFUSE_HEARING_RECORDING_REQUEST, directionIssued.refuseHearingRecordingRequest, APPOINTEE"
     })
-    public void whenDirectionIssuedAndDirectionTypeShouldGenerateCorrectTemplate(DirectionType directionType,
+    void whenDirectionIssuedAndDirectionTypeShouldGenerateCorrectTemplate(DirectionType directionType,
                                                                                  String templateConfig,
                                                                                  SubscriptionType subscriptionType) {
 
@@ -408,7 +424,7 @@ public class PersonalisationTest {
         "JOINT_PARTY, refuseUrgentHearing, directionIssued.refuseUrgentHearing",
         "REPRESENTATIVE, refuseUrgentHearing, directionIssued.refuseUrgentHearing",
         "APPOINTEE, refuseUrgentHearing, directionIssued.refuseUrgentHearing"})
-    public void whenDirectionIssuedAndGrantOrRefuseUrgentHearingShouldGenerateCorrectTemplate(SubscriptionType subscriptionType, String directionTypeString, String templateConfig) {
+    void whenDirectionIssuedAndGrantOrRefuseUrgentHearingShouldGenerateCorrectTemplate(SubscriptionType subscriptionType, String directionTypeString, String templateConfig) {
 
         NotificationWrapper notificationWrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(SscsCaseData.builder()
@@ -439,7 +455,7 @@ public class PersonalisationTest {
         "JOINT_PARTY, refuseUrgentHearing, directionIssuedWelsh.refuseUrgentHearing",
         "REPRESENTATIVE, refuseUrgentHearing, directionIssuedWelsh.refuseUrgentHearing",
         "APPOINTEE, refuseUrgentHearing, directionIssuedWelsh.refuseUrgentHearing"})
-    public void whenDirectionIssuedWelshAndGrantOrRefuseUrgentHearingShouldGenerateCorrectTemplate(SubscriptionType subscriptionType, String directionTypeString, String templateConfig) {
+    void whenDirectionIssuedWelshAndGrantOrRefuseUrgentHearingShouldGenerateCorrectTemplate(SubscriptionType subscriptionType, String directionTypeString, String templateConfig) {
 
         NotificationWrapper notificationWrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(SscsCaseData.builder()
@@ -472,7 +488,7 @@ public class PersonalisationTest {
         "REFUSE_REINSTATEMENT, directionIssuedWelsh.refuseReinstatement, APPOINTEE",
         "REFUSE_HEARING_RECORDING_REQUEST, directionIssuedWelsh.refuseHearingRecordingRequest, APPOINTEE"
     })
-    public void whenDirectionIssuedWelshAndDirectionTypeShouldGenerateCorrectTemplate(DirectionType directionType,
+    void whenDirectionIssuedWelshAndDirectionTypeShouldGenerateCorrectTemplate(DirectionType directionType,
                                                                                       String templateConfig,
                                                                                       SubscriptionType subscriptionType) {
 
@@ -498,8 +514,89 @@ public class PersonalisationTest {
     }
 
     @ParameterizedTest
+    @CsvSource({
+        "APPELLANT, directionIssued.appealToProceedNotifyValidAppeal.appellant",
+        "APPOINTEE, directionIssued.appealToProceedNotifyValidAppeal.appointee"
+    })
+    void whenNotifyAppellantValidAppealWithAppealToProceedDirection_shouldGenerateDocmosisTemplateUnderValidAppeal(
+            SubscriptionType subscriptionType, String expectedDocmosisTemplate) {
+
+        final NotificationWrapper notificationWrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
+            .newSscsCaseData(SscsCaseData.builder()
+                .directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()))
+                .appeal(Appeal.builder()
+                    .hearingType(ONLINE.getValue())
+                    .build())
+                .build())
+            .notificationEventType(NOTIFY_APPELLANT_VALID_APPEAL)
+            .build());
+
+        personalisation.getTemplate(notificationWrapper, PIP, subscriptionType);
+
+        verify(config).getTemplate(
+            eq(NOTIFY_APPELLANT_VALID_APPEAL.getId()),
+            eq(NOTIFY_APPELLANT_VALID_APPEAL.getId()),
+            eq(NOTIFY_APPELLANT_VALID_APPEAL.getId()),
+            eq(expectedDocmosisTemplate),
+            any(Benefit.class), any(NotificationWrapper.class), eq(null)
+        );
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "PROVIDE_INFORMATION",
+        "GRANT_EXTENSION",
+        "REFUSE_EXTENSION"
+    })
+    void whenNotifyAppellantValidAppealWithNonAppealToProceedDirection_shouldFallBackToEventId(DirectionType directionType) {
+
+        final NotificationWrapper notificationWrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
+            .newSscsCaseData(SscsCaseData.builder()
+                .directionTypeDl(new DynamicList(directionType.toString()))
+                .appeal(Appeal.builder()
+                    .hearingType(ONLINE.getValue())
+                    .build())
+                .build())
+            .notificationEventType(NOTIFY_APPELLANT_VALID_APPEAL)
+            .build());
+
+        personalisation.getTemplate(notificationWrapper, PIP, SubscriptionType.APPELLANT);
+
+        verify(config).getTemplate(
+            eq(NOTIFY_APPELLANT_VALID_APPEAL.getId()),
+            eq(NOTIFY_APPELLANT_VALID_APPEAL.getId()),
+            eq(NOTIFY_APPELLANT_VALID_APPEAL.getId()),
+            eq(NOTIFY_APPELLANT_VALID_APPEAL.getId()),
+            any(Benefit.class), any(NotificationWrapper.class), eq(null)
+        );
+    }
+
+    @Test
+    void whenNotifyAppellantValidAppealWithNoDirectionTypeDl_shouldFallBackToEventId() {
+
+        final NotificationWrapper notificationWrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
+            .newSscsCaseData(SscsCaseData.builder()
+                .appeal(Appeal.builder()
+                    .hearingType(ONLINE.getValue())
+                    .build())
+                .build())
+            .notificationEventType(NOTIFY_APPELLANT_VALID_APPEAL)
+            .build());
+
+        personalisation.getTemplate(notificationWrapper, PIP, SubscriptionType.APPELLANT);
+
+        verify(config).getTemplate(
+            eq(NOTIFY_APPELLANT_VALID_APPEAL.getId()),
+            eq(NOTIFY_APPELLANT_VALID_APPEAL.getId()),
+            eq(NOTIFY_APPELLANT_VALID_APPEAL.getId()),
+            eq(NOTIFY_APPELLANT_VALID_APPEAL.getId()),
+            any(Benefit.class), any(NotificationWrapper.class), eq(null)
+        );
+    }
+
+    @ParameterizedTest
     @MethodSource("generateNotificationTypeAndSubscriptionsScenarios")
-    public void givenSubscriptionType_shouldGenerateEmailAndSmsAndLetterTemplateNamesPerSubscription(
+    void givenSubscriptionType_shouldGenerateEmailAndSmsAndLetterTemplateNamesPerSubscription(
         NotificationEventType notificationEventType, SubscriptionType subscriptionType, HearingType hearingType,
         boolean hasEmailTemplate, boolean hasSmsTemplate, boolean hasLetterTemplate, boolean hasDocmosisTemplate) {
         NotificationWrapper notificationWrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
@@ -522,146 +619,6 @@ public class PersonalisationTest {
         );
     }
 
-    private String getExpectedTemplateName(NotificationEventType notificationEventType,
-                                           SubscriptionType subscriptionType) {
-        return notificationEventType.getId() + (subscriptionType == null ? "" :
-            "." + lowerCase(subscriptionType.name()));
-    }
-
-    @SuppressWarnings({"Indentation", "unused"})
-    private static Object[] generateNotificationTypeAndSubscriptionsScenarios() {
-        return new Object[]{
-            new Object[]{ACTION_POSTPONEMENT_REQUEST, APPELLANT, REGULAR, false, false, false, true},
-            new Object[]{ACTION_POSTPONEMENT_REQUEST, APPOINTEE, REGULAR, false, false, false, true},
-            new Object[]{ACTION_POSTPONEMENT_REQUEST, JOINT_PARTY, REGULAR, false, false, false, true},
-            new Object[]{ACTION_POSTPONEMENT_REQUEST, REPRESENTATIVE, REGULAR, false, false, false, true},
-            new Object[]{ACTION_POSTPONEMENT_REQUEST_WELSH, APPELLANT, REGULAR, false, false, false, true},
-            new Object[]{ACTION_POSTPONEMENT_REQUEST_WELSH, APPOINTEE, REGULAR, false, false, false, true},
-            new Object[]{ACTION_POSTPONEMENT_REQUEST_WELSH, JOINT_PARTY, REGULAR, false, false, false, true},
-            new Object[]{ACTION_POSTPONEMENT_REQUEST_WELSH, REPRESENTATIVE, REGULAR, false, false, false, true},
-            new Object[]{ADJOURNED, APPELLANT, ONLINE, true, true, false, false},
-            new Object[]{ADJOURNED, APPELLANT, PAPER, true, true, false, false},
-            new Object[]{ADJOURNED, APPELLANT, REGULAR, true, true, false, false},
-            new Object[]{ADJOURNED, REPRESENTATIVE, ONLINE, true, true, false, false},
-            new Object[]{ADJOURNED, REPRESENTATIVE, PAPER, true, true, false, false},
-            new Object[]{ADJOURNED, REPRESENTATIVE, REGULAR, true, true, false, false},
-            new Object[]{ADMIN_APPEAL_WITHDRAWN, APPELLANT, ONLINE, true, true, false, true},
-            new Object[]{ADMIN_APPEAL_WITHDRAWN, APPELLANT, PAPER, true, true, false, true},
-            new Object[]{ADMIN_APPEAL_WITHDRAWN, APPELLANT, REGULAR, true, true, false, true},
-            new Object[]{ADMIN_APPEAL_WITHDRAWN, REPRESENTATIVE, ONLINE, true, true, false, true},
-            new Object[]{ADMIN_APPEAL_WITHDRAWN, REPRESENTATIVE, PAPER, true, true, false, true},
-            new Object[]{ADMIN_APPEAL_WITHDRAWN, REPRESENTATIVE, REGULAR, true, true, false, true},
-            new Object[]{APPEAL_DORMANT, APPELLANT, ORAL, true, true, false, false},
-            new Object[]{APPEAL_DORMANT, APPELLANT, PAPER, true, true, false, false},
-            new Object[]{APPEAL_DORMANT, REPRESENTATIVE, ORAL, true, true, false, false},
-            new Object[]{APPEAL_DORMANT, REPRESENTATIVE, PAPER, true, true, false, false},
-            new Object[]{APPEAL_LAPSED, APPELLANT, ONLINE, true, true, false, true},
-            new Object[]{APPEAL_LAPSED, APPELLANT, PAPER, true, true, false, true},
-            new Object[]{APPEAL_LAPSED, APPELLANT, REGULAR, true, true, false, true},
-            new Object[]{APPEAL_LAPSED, APPOINTEE, ONLINE, true, true, false, true},
-            new Object[]{APPEAL_LAPSED, APPOINTEE, PAPER, true, true, false, true},
-            new Object[]{APPEAL_LAPSED, APPOINTEE, REGULAR, true, true, false, true},
-            new Object[]{APPEAL_RECEIVED, APPELLANT, ONLINE, true, true, true, true},
-            new Object[]{APPEAL_RECEIVED, APPELLANT, PAPER, true, true, true, true},
-            new Object[]{APPEAL_RECEIVED, APPELLANT, REGULAR, true, true, true, true},
-            new Object[]{APPEAL_RECEIVED, APPOINTEE, ONLINE, true, true, true, true},
-            new Object[]{APPEAL_RECEIVED, APPOINTEE, PAPER, true, true, true, true},
-            new Object[]{APPEAL_RECEIVED, APPOINTEE, REGULAR, true, true, true, true},
-            new Object[]{APPEAL_RECEIVED, REPRESENTATIVE, ONLINE, true, true, true, true},
-            new Object[]{APPEAL_RECEIVED, REPRESENTATIVE, PAPER, true, true, true, true},
-            new Object[]{APPEAL_RECEIVED, REPRESENTATIVE, REGULAR, true, true, true, true},
-            new Object[]{APPEAL_WITHDRAWN, APPELLANT, ONLINE, true, true, false, true},
-            new Object[]{APPEAL_WITHDRAWN, APPELLANT, PAPER, true, true, false, true},
-            new Object[]{APPEAL_WITHDRAWN, APPELLANT, REGULAR, true, true, false, true},
-            new Object[]{APPEAL_WITHDRAWN, REPRESENTATIVE, ONLINE, true, true, false, true},
-            new Object[]{APPEAL_WITHDRAWN, REPRESENTATIVE, PAPER, true, true, false, true},
-            new Object[]{APPEAL_WITHDRAWN, REPRESENTATIVE, REGULAR, true, true, false, true},
-            new Object[]{DEATH_OF_APPELLANT, APPOINTEE, REGULAR, false, false, false, true},
-            new Object[]{DEATH_OF_APPELLANT, REPRESENTATIVE, REGULAR, false, false, false, true},
-            new Object[]{DECISION_ISSUED, APPELLANT, ONLINE, false, false, false, true},
-            new Object[]{DECISION_ISSUED, APPOINTEE, ONLINE, false, false, false, true},
-            new Object[]{DECISION_ISSUED, REPRESENTATIVE, ONLINE, false, false, false, true},
-            new Object[]{DECISION_ISSUED_WELSH, APPELLANT, ONLINE, false, false, false, true},
-            new Object[]{DECISION_ISSUED_WELSH, APPOINTEE, ONLINE, false, false, false, true},
-            new Object[]{DECISION_ISSUED_WELSH, REPRESENTATIVE, ONLINE, false, false, false, true},
-            new Object[]{DWP_RESPONSE_RECEIVED, APPELLANT, ONLINE, true, true, true, false},
-            new Object[]{DWP_RESPONSE_RECEIVED, APPELLANT, PAPER, true, true, true, false},
-            new Object[]{DWP_RESPONSE_RECEIVED, APPOINTEE, ONLINE, true, true, true, false},
-            new Object[]{DWP_RESPONSE_RECEIVED, APPOINTEE, PAPER, true, true, true, false},
-            new Object[]{DWP_RESPONSE_RECEIVED, REPRESENTATIVE, ONLINE, true, true, true, false},
-            new Object[]{DWP_RESPONSE_RECEIVED, REPRESENTATIVE, PAPER, true, true, true, false},
-            new Object[]{DWP_UPLOAD_RESPONSE, APPELLANT, ONLINE, true, true, false, true},
-            new Object[]{DWP_UPLOAD_RESPONSE, APPELLANT, PAPER, true, true, false, true},
-            new Object[]{DWP_UPLOAD_RESPONSE, APPOINTEE, ONLINE, true, true, false, true},
-            new Object[]{DWP_UPLOAD_RESPONSE, APPOINTEE, PAPER, true, true, false, true},
-            new Object[]{DWP_UPLOAD_RESPONSE, REPRESENTATIVE, ONLINE, true, true, false, true},
-            new Object[]{DWP_UPLOAD_RESPONSE, REPRESENTATIVE, PAPER, true, true, false, true},
-            new Object[]{EVIDENCE_RECEIVED, APPELLANT, ONLINE, true, true, true, false},
-            new Object[]{EVIDENCE_RECEIVED, APPELLANT, PAPER, true, true, true, false},
-            new Object[]{EVIDENCE_RECEIVED, APPELLANT, REGULAR, true, true, true, false},
-            new Object[]{EVIDENCE_RECEIVED, REPRESENTATIVE, ONLINE, true, true, true, false},
-            new Object[]{EVIDENCE_RECEIVED, REPRESENTATIVE, PAPER, true, true, true, false},
-            new Object[]{EVIDENCE_RECEIVED, REPRESENTATIVE, REGULAR, true, true, true, false},
-            new Object[]{HEARING_BOOKED, APPELLANT, ONLINE, true, true, false, true},
-            new Object[]{HEARING_BOOKED, APPELLANT, PAPER, true, true, false, true},
-            new Object[]{HEARING_BOOKED, APPELLANT, REGULAR, true, true, false, true},
-            new Object[]{HEARING_BOOKED, REPRESENTATIVE, ONLINE, true, true, false, true},
-            new Object[]{HEARING_BOOKED, REPRESENTATIVE, PAPER, true, true, false, true},
-            new Object[]{HEARING_BOOKED, REPRESENTATIVE, REGULAR, true, true, false, true},
-            new Object[]{ISSUE_ADJOURNMENT_NOTICE, APPELLANT, ONLINE, false, false, false, true},
-            new Object[]{ISSUE_ADJOURNMENT_NOTICE, APPOINTEE, ONLINE, false, false, false, true},
-            new Object[]{ISSUE_ADJOURNMENT_NOTICE, REPRESENTATIVE, ONLINE, false, false, false, true},
-            new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, APPELLANT, ONLINE, false, false, false, true},
-            new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, APPOINTEE, ONLINE, false, false, false, true},
-            new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, REPRESENTATIVE, ONLINE, false, false, false, true},
-            new Object[]{ISSUE_FINAL_DECISION, APPELLANT, ONLINE, false, false, false, true},
-            new Object[]{ISSUE_FINAL_DECISION, APPOINTEE, ONLINE, false, false, false, true},
-            new Object[]{ISSUE_FINAL_DECISION, REPRESENTATIVE, ONLINE, false, false, false, true},
-            new Object[]{ISSUE_FINAL_DECISION_WELSH, APPELLANT, ONLINE, false, false, false, true},
-            new Object[]{ISSUE_FINAL_DECISION_WELSH, APPOINTEE, ONLINE, false, false, false, true},
-            new Object[]{ISSUE_FINAL_DECISION_WELSH, REPRESENTATIVE, ONLINE, false, false, false, true},
-            new Object[]{POSTPONEMENT, APPELLANT, ONLINE, true, true, false, true},
-            new Object[]{POSTPONEMENT, APPELLANT, PAPER, true, true, false, true},
-            new Object[]{POSTPONEMENT, APPELLANT, REGULAR, true, true, false, true},
-            new Object[]{POSTPONEMENT, REPRESENTATIVE, ONLINE, true, true, false, true},
-            new Object[]{POSTPONEMENT, REPRESENTATIVE, PAPER, true, true, false, true},
-            new Object[]{POSTPONEMENT, REPRESENTATIVE, REGULAR, true, true, false, true},
-            new Object[]{PROVIDE_APPOINTEE_DETAILS, APPOINTEE, REGULAR, false, false, false, true},
-            new Object[]{PROVIDE_APPOINTEE_DETAILS, REPRESENTATIVE, REGULAR, false, false, false, true},
-            new Object[]{REQUEST_FOR_INFORMATION, APPELLANT, ONLINE, false, false, false, true},
-            new Object[]{REQUEST_FOR_INFORMATION, APPOINTEE, ONLINE, false, false, false, true},
-            new Object[]{REQUEST_FOR_INFORMATION, REPRESENTATIVE, ONLINE, false, false, false, true},
-            new Object[]{RESEND_APPEAL_CREATED, APPELLANT, ONLINE, true, true, false, false},
-            new Object[]{RESEND_APPEAL_CREATED, APPELLANT, PAPER, true, true, false, false},
-            new Object[]{RESEND_APPEAL_CREATED, APPELLANT, REGULAR, true, true, false, false},
-            new Object[]{RESEND_APPEAL_CREATED, REPRESENTATIVE, ONLINE, true, true, false, false},
-            new Object[]{RESEND_APPEAL_CREATED, REPRESENTATIVE, PAPER, true, true, false, false},
-            new Object[]{RESEND_APPEAL_CREATED, REPRESENTATIVE, REGULAR, true, true, false, false},
-            new Object[]{REVIEW_CONFIDENTIALITY_REQUEST, APPELLANT, REGULAR, false, false, false, true},
-            new Object[]{REVIEW_CONFIDENTIALITY_REQUEST, APPOINTEE, REGULAR, false, false, false, true},
-            new Object[]{REVIEW_CONFIDENTIALITY_REQUEST, JOINT_PARTY, REGULAR, false, false, false, true},
-            new Object[]{REVIEW_CONFIDENTIALITY_REQUEST, REPRESENTATIVE, REGULAR, false, false, false, true},
-            new Object[]{SYA_APPEAL_CREATED, APPELLANT, ONLINE, true, true, true, false},
-            new Object[]{SYA_APPEAL_CREATED, APPELLANT, PAPER, true, true, true, false},
-            new Object[]{SYA_APPEAL_CREATED, APPELLANT, REGULAR, true, true, true, false},
-            new Object[]{SYA_APPEAL_CREATED, APPOINTEE, ONLINE, true, true, true, false},
-            new Object[]{SYA_APPEAL_CREATED, APPOINTEE, PAPER, true, true, true, false},
-            new Object[]{SYA_APPEAL_CREATED, APPOINTEE, REGULAR, true, true, true, false},
-            new Object[]{SYA_APPEAL_CREATED, REPRESENTATIVE, ONLINE, true, true, true, false},
-            new Object[]{SYA_APPEAL_CREATED, REPRESENTATIVE, PAPER, true, true, true, false},
-            new Object[]{SYA_APPEAL_CREATED, REPRESENTATIVE, REGULAR, true, true, true, false},
-            new Object[]{VALID_APPEAL_CREATED, APPELLANT, ONLINE, true, true, true, true},
-            new Object[]{VALID_APPEAL_CREATED, APPELLANT, PAPER, true, true, true, true},
-            new Object[]{VALID_APPEAL_CREATED, APPELLANT, REGULAR, true, true, true, true},
-            new Object[]{VALID_APPEAL_CREATED, APPOINTEE, ONLINE, true, true, true, true},
-            new Object[]{VALID_APPEAL_CREATED, APPOINTEE, PAPER, true, true, true, true},
-            new Object[]{VALID_APPEAL_CREATED, APPOINTEE, REGULAR, true, true, true, true},
-            new Object[]{VALID_APPEAL_CREATED, REPRESENTATIVE, ONLINE, true, true, true, true},
-            new Object[]{VALID_APPEAL_CREATED, REPRESENTATIVE, PAPER, true, true, true, true},
-            new Object[]{VALID_APPEAL_CREATED, REPRESENTATIVE, REGULAR, true, true, true, true},
-        };
-    }
-
     @ParameterizedTest
     @CsvSource({
         "PIP,'judge, doctor and disability expert', Personal Independence Payment, Taliad Annibyniaeth Personol, 'barnwr, meddyg ac arbenigwr anableddau', PIP, PIP, sscs1",
@@ -674,7 +631,7 @@ public class PersonalisationTest {
         "taxCredit, judge and Financially Qualified Panel Member (if applicable), Tax Credit, Credyd Treth, Barnwr ac Aelod Panel sydd â chymhwyster i ddelio gyda materion Ariannol (os yw’n berthnasol), Tax Credit, Credyd Treth, sscs5",
         "infectedBloodCompensation,judge and if applicable a medical member and/or a financially qualified tribunal member, Infected Blood Compensation, Iawndal Gwaed Heintiedig, barnwr ac os yw’n berthnasol aelod meddygol a/neu aelod o’r tribiwnlys sy’n gymwys mewn materion ariannol, IBC, IGH, sscs8"
     })
-    public void customisePersonalisation(String benefitType,
+    void customisePersonalisation(String benefitType,
                                          String expectedPanelComposition,
                                          String expectedBenefitDesc,
                                          String welshExpectedBenefitDesc,
@@ -779,7 +736,7 @@ public class PersonalisationTest {
 
     @ParameterizedTest
     @CsvSource({", SSCS1", ", SSCS2", ", SSCS5", ", SSCS8", ","})
-    public void givenFormTypeWithNoBenefitType_customisePersonalisation(String benefitType, FormType formType) {
+    void givenFormTypeWithNoBenefitType_customisePersonalisation(String benefitType, FormType formType) {
         List<Event> events = new ArrayList<>();
         events.add(Event.builder().value(EventDetails.builder().date(DATE).type(EventType.APPEAL_RECEIVED.getCcdType()).build()).build());
 
@@ -864,7 +821,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void givenNoRpc_thenGivePhoneNumberBasedOnSc() {
+    void givenNoRpc_thenGivePhoneNumberBasedOnSc() {
         List<Event> events = new ArrayList<>();
         events.add(Event.builder().value(EventDetails.builder().date(DATE).type(EventType.APPEAL_RECEIVED.getCcdType()).build()).build());
 
@@ -886,7 +843,7 @@ public class PersonalisationTest {
 
     @ParameterizedTest
     @CsvSource({"readyToList,0300 790 6234", ",telephone"})
-    public void givenRpcAndReadyToList_thenGiveCorrectPhoneNumber(String createdInGapsFrom, String phone) {
+    void givenRpcAndReadyToList_thenGiveCorrectPhoneNumber(String createdInGapsFrom, String phone) {
         List<Event> events = new ArrayList<>();
         events.add(Event.builder().value(EventDetails.builder().date(DATE).type(EventType.APPEAL_RECEIVED.getCcdType()).build()).build());
 
@@ -916,7 +873,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void appealRefWillReturnCcdCaseIdWhenCaseReferenceIsNotSet() {
+    void appealRefWillReturnCcdCaseIdWhenCaseReferenceIsNotSet() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference(null)
             .regionalProcessingCenter(rpc)
@@ -934,7 +891,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void testCorrectionGrantedDwpState() {
+    void testCorrectionGrantedDwpState() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference(null)
             .dwpState(DwpState.CORRECTION_GRANTED)
@@ -951,7 +908,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void testCorrectionRefusedDwpState() {
+    void testCorrectionRefusedDwpState() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference(null)
             .dwpState(DwpState.CORRECTION_REFUSED)
@@ -968,7 +925,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void appealRefWillReturnCcdCaseIdWhenCreatedInGapsFromReadyToList() {
+    void appealRefWillReturnCcdCaseIdWhenCreatedInGapsFromReadyToList() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .regionalProcessingCenter(rpc)
@@ -987,7 +944,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void appealRefWillReturnCaseReferenceWhenCreatedInGapsFromValidAppeal() {
+    void appealRefWillReturnCaseReferenceWhenCreatedInGapsFromValidAppeal() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .regionalProcessingCenter(rpc)
@@ -1006,7 +963,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void givenEvidenceReceivedNotification_customisePersonalisation() {
+    void givenEvidenceReceivedNotification_customisePersonalisation() {
         List<Event> events = new ArrayList<>();
         events.add(Event.builder().value(EventDetails.builder().date(DATE).type(EventType.APPEAL_RECEIVED.getCcdType()).build()).build());
 
@@ -1050,7 +1007,7 @@ public class PersonalisationTest {
 
 
     @Test
-    public void givenEvidenceReceivedNotification_customisePersonalisation_welsh() {
+    void givenEvidenceReceivedNotification_customisePersonalisation_welsh() {
         List<Event> events = new ArrayList<>();
         events.add(Event.builder().value(EventDetails.builder().date(DATE).type(EventType.APPEAL_RECEIVED.getCcdType()).build()).build());
 
@@ -1094,7 +1051,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void setAppealReceivedEventData() {
+    void setAppealReceivedEventData() {
         List<Event> events = new ArrayList<>();
         events.add(Event.builder().value(EventDetails.builder().date(DATE).type(EventType.APPEAL_RECEIVED.getCcdType()).build()).build());
 
@@ -1112,7 +1069,7 @@ public class PersonalisationTest {
 
 
     @Test
-    public void setAppealReceivedEventData_Welsh() {
+    void setAppealReceivedEventData_Welsh() {
         List<Event> events = new ArrayList<>();
         events.add(Event.builder().value(EventDetails.builder().date(DATE).type(EventType.APPEAL_RECEIVED.getCcdType()).build()).build());
 
@@ -1129,7 +1086,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void setAppealReceivedChildSupportEventData_Welsh() {
+    void setAppealReceivedChildSupportEventData_Welsh() {
         List<Event> events = new ArrayList<>();
         events.add(Event.builder().value(EventDetails.builder().date(DATE).type(EventType.APPEAL_RECEIVED.getCcdType()).build()).build());
 
@@ -1146,7 +1103,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void givenDigitalCaseWithDateSentToDwp_thenUseCaseSentToDwpDateForAppealRespondDate() {
+    void givenDigitalCaseWithDateSentToDwp_thenUseCaseSentToDwpDateForAppealRespondDate() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).build())
@@ -1160,7 +1117,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void givenDigitalCaseWithDateSentToDwp_thenUseCaseSentToDwpDateForAppealRespondDate_Welsh() {
+    void givenDigitalCaseWithDateSentToDwp_thenUseCaseSentToDwpDateForAppealRespondDate_Welsh() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).build())
@@ -1176,7 +1133,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void setAppealReceivedChildSupportEventData() {
+    void setAppealReceivedChildSupportEventData() {
         List<Event> events = new ArrayList<>();
         events.add(Event.builder().value(EventDetails.builder().date(DATE).type(EventType.APPEAL_RECEIVED.getCcdType()).build()).build());
 
@@ -1194,7 +1151,7 @@ public class PersonalisationTest {
 
     @ParameterizedTest
     @MethodSource("appealResponseDate")
-    public void givenDigitalCaseWithNoDateSentToDwp_thenUseTodaysDateForAppealRespondDate(
+    void givenDigitalCaseWithNoDateSentToDwp_thenUseTodaysDateForAppealRespondDate(
         Appeal appeal, int responsePeriod) {
 
         SscsCaseData response = SscsCaseData.builder()
@@ -1212,20 +1169,8 @@ public class PersonalisationTest {
                 .format(DateTimeFormatter.ofPattern(RESPONSE_DATE_FORMAT)));
     }
 
-    private static Stream<Arguments> appealResponseDate() {
-        return Stream.of(
-            Arguments.of(Appeal.builder()
-                .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
-                .build(), MAX_DWP_RESPONSE_DAYS_CHILD_SUPPORT),
-            Arguments.of(null, MAX_DWP_RESPONSE_DAYS),
-            Arguments.of(Appeal.builder().build(), MAX_DWP_RESPONSE_DAYS),
-            Arguments.of(Appeal.builder().benefitType(BenefitType.builder().build()).build(), MAX_DWP_RESPONSE_DAYS),
-            Arguments.of(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.ESA.getShortName()).build()).build(), MAX_DWP_RESPONSE_DAYS)
-        );
-    }
-
     @Test
-    public void givenCaseWithCreatedDate_thenUseCreatedDate() {
+    void givenCaseWithCreatedDate_thenUseCreatedDate() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID)
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build())
@@ -1243,7 +1188,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void givenCaseWithCreatedDateSetToNull_thenUseTodaysDateForCreatedDate() {
+    void givenCaseWithCreatedDateSetToNull_thenUseTodaysDateForCreatedDate() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID)
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build())
@@ -1261,7 +1206,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void setJudgeDecisionAppealToProceedEventData() {
+    void setJudgeDecisionAppealToProceedEventData() {
         List<Event> events = new ArrayList<>();
         events.add(Event.builder().value(EventDetails.builder().date(DATE).type(JUDGE_DECISION_APPEAL_TO_PROCEED.getId()).build()).build());
 
@@ -1277,7 +1222,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void setTcwDecisionAppealToProceedEventData() {
+    void setTcwDecisionAppealToProceedEventData() {
         List<Event> events = new ArrayList<>();
         events.add(Event.builder().value(EventDetails.builder().date(DATE).type(TCW_DECISION_APPEAL_TO_PROCEED.getId()).build()).build());
 
@@ -1293,7 +1238,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void setEvidenceReceivedEventData() {
+    void setEvidenceReceivedEventData() {
         List<Document> documents = new ArrayList<>();
 
         Document doc = Document.builder().value(DocumentDetails.builder()
@@ -1317,7 +1262,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void setEvidenceReceivedEventDataWhenEvidenceIsEmpty() {
+    void setEvidenceReceivedEventDataWhenEvidenceIsEmpty() {
         Evidence evidence = Evidence.builder().documents(null).build();
 
         SscsCaseData response = SscsCaseData.builder()
@@ -1334,7 +1279,7 @@ public class PersonalisationTest {
 
     @ParameterizedTest
     @MethodSource("generateHearingNotificationTypeAndSubscriptionsScenarios")
-    public void givenHearingData_correctlySetTheHearingDetails(NotificationEventType hearingNotificationEventType,
+    void givenHearingData_correctlySetTheHearingDetails(NotificationEventType hearingNotificationEventType,
                                                                SubscriptionType subscriptionType) {
         LocalDate hearingDate = LocalDate.now().plusDays(7);
 
@@ -1365,7 +1310,7 @@ public class PersonalisationTest {
 
     @ParameterizedTest
     @MethodSource("generateHearingNotificationTypeAndSubscriptionsScenarios")
-    public void givenHearingData_correctlySetTheHearingDetails_welsh(NotificationEventType hearingNotificationEventType,
+    void givenHearingData_correctlySetTheHearingDetails_welsh(NotificationEventType hearingNotificationEventType,
                                                                      SubscriptionType subscriptionType) {
         LocalDate hearingDate = LocalDate.now().plusDays(7);
 
@@ -1396,19 +1341,8 @@ public class PersonalisationTest {
         assertEquals("in 7 days", result.get(DAYS_TO_HEARING_LITERAL));
     }
 
-    @SuppressWarnings({"Indentation", "unused"})
-    private static Object[] generateHearingNotificationTypeAndSubscriptionsScenarios() {
-        return new Object[]{
-            new Object[]{HEARING_BOOKED, APPELLANT},
-            new Object[]{HEARING_BOOKED, APPOINTEE},
-
-            new Object[]{HEARING_REMINDER, APPELLANT},
-            new Object[]{HEARING_REMINDER, APPOINTEE},
-        };
-    }
-
     @Test
-    public void givenOnlyOneDayUntilHearing_correctlySetTheDaysToHearingText() {
+    void givenOnlyOneDayUntilHearing_correctlySetTheDaysToHearingText() {
         LocalDate hearingDate = LocalDate.now().plusDays(1);
 
         Hearing hearing = createHearing(hearingDate);
@@ -1432,7 +1366,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void checkWelshDatesAreSet() {
+    void checkWelshDatesAreSet() {
         LocalDate hearingDate = LocalDate.now().plusDays(1);
 
         Hearing hearing = createHearing(hearingDate);
@@ -1458,7 +1392,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void checkWelshDataAreNotSet() {
+    void checkWelshDataAreNotSet() {
         LocalDate hearingDate = LocalDate.now().plusDays(1);
 
         Hearing hearing = createHearing(hearingDate);
@@ -1483,7 +1417,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void checkListAssistDataIsSet() {
+    void checkListAssistDataIsSet() {
         LocalDateTime hearingDate = LocalDateTime.now().plusDays(1);
 
         Hearing hearing = createListAssistHearing(hearingDate);
@@ -1524,7 +1458,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void shouldReturnOverrideFieldsDirectionHearingForFaceToFaceHearingBookedNotification() {
+    void shouldReturnOverrideFieldsDirectionHearingForFaceToFaceHearingBookedNotification() {
         LocalDateTime hearingDate = LocalDateTime.now().plusDays(1);
 
         Hearing hearing = createListAssistHearing(hearingDate);
@@ -1553,7 +1487,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void shouldReturnOverrideFieldsSubstantiveHearingForFaceToFaceHearingBookedNotification() {
+    void shouldReturnOverrideFieldsSubstantiveHearingForFaceToFaceHearingBookedNotification() {
         LocalDateTime hearingDate = LocalDateTime.now().plusDays(1);
 
         Hearing hearing = createListAssistHearing(hearingDate);
@@ -1582,7 +1516,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void shouldReturnDirectionHearingForFaceToFaceHearingBookedNotification() {
+    void shouldReturnDirectionHearingForFaceToFaceHearingBookedNotification() {
         LocalDateTime hearingDate = LocalDateTime.now().plusDays(1);
 
         Hearing hearing = createListAssistHearing(hearingDate);
@@ -1611,7 +1545,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void shouldReturnSubstantiveAsNullHearingForFaceToFaceHearingBookedNotification() {
+    void shouldReturnSubstantiveAsNullHearingForFaceToFaceHearingBookedNotification() {
         LocalDateTime hearingDate = LocalDateTime.now().plusDays(1);
 
         Hearing hearing = createListAssistHearing(hearingDate);
@@ -1639,7 +1573,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void shouldReturnSubstantiveHearingForFaceToFaceHearingBookedNotification() {
+    void shouldReturnSubstantiveHearingForFaceToFaceHearingBookedNotification() {
         LocalDateTime hearingDate = LocalDateTime.now().plusDays(1);
 
         Hearing hearing = createListAssistHearing(hearingDate);
@@ -1668,7 +1602,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void handleNullEventWhenPopulatingEventData() {
+    void handleNullEventWhenPopulatingEventData() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).build())
@@ -1680,7 +1614,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void handleEmptyEventsWhenPopulatingEventData() {
+    void handleEmptyEventsWhenPopulatingEventData() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).build())
@@ -1693,7 +1627,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void shouldPopulateRegionalProcessingCenterFromCcdCaseIfItsPresent() {
+    void shouldPopulateRegionalProcessingCenterFromCcdCaseIfItsPresent() {
         RegionalProcessingCenter rpc = RegionalProcessingCenter.builder()
             .name("LIVERPOOL").address1(ADDRESS1).address2(ADDRESS2).address3(ADDRESS3).address4(ADDRESS4).city(CITY).postcode(POSTCODE).build();
 
@@ -1722,7 +1656,7 @@ public class PersonalisationTest {
         "true, yes, ibcLine3, ibcPostcode, false",
         "true, no, ibcLine3, ibcPostcode, false"
     })
-    public void shouldPopulateSendEvidenceAddressToDigitalAddressWhenOnTheDigitalJourney(boolean isIbc, String isScottish, String expectedLine3, String expectedPostcode, boolean scottishPoBoxFeature) {
+    void shouldPopulateSendEvidenceAddressToDigitalAddressWhenOnTheDigitalJourney(boolean isIbc, String isScottish, String expectedLine3, String expectedPostcode, boolean scottishPoBoxFeature) {
 
         SscsCaseData response = SscsCaseData.builder()
             .createdInGapsFrom(EventType.READY_TO_LIST.getCcdType())
@@ -1745,7 +1679,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void shouldNotPopulateRegionalProcessingCenterIfRpcCannotBeFound() {
+    void shouldNotPopulateRegionalProcessingCenterIfRpcCannotBeFound() {
 
         SscsCaseData response = SscsCaseData.builder().regionalProcessingCenter(null).build();
 
@@ -1764,7 +1698,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void shouldPopulateHearingContactDateFromCcdCaseIfPresent() {
+    void shouldPopulateHearingContactDateFromCcdCaseIfPresent() {
 
         NotificationSscsCaseDataWrapper wrapper = NotificationSscsCaseDataWrapper.builder().newSscsCaseData(SscsCaseData.builder().build()).build();
 
@@ -1778,7 +1712,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void shouldNotPopulateHearingContactDateFromCcdCaseIfNotPresent() {
+    void shouldNotPopulateHearingContactDateFromCcdCaseIfNotPresent() {
 
         NotificationSscsCaseDataWrapper wrapper = NotificationSscsCaseDataWrapper.builder().newSscsCaseData(SscsCaseData.builder().build()).build();
 
@@ -1792,7 +1726,7 @@ public class PersonalisationTest {
 
 
     @Test
-    public void shouldPopulateAppointeeSubscriptionPersonalisation() {
+    void shouldPopulateAppointeeSubscriptionPersonalisation() {
         final String tyaNumber = "tya";
         Name appointeeName = Name.builder().title("MR").firstName("George").lastName("Appointee").build();
         when(macService.generateToken(tyaNumber, PIP.name())).thenReturn("ZYX");
@@ -1844,7 +1778,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void shouldPopulateRepSubscriptionPersonalisation() {
+    void shouldPopulateRepSubscriptionPersonalisation() {
         final String tyaNumber = "tya";
         final String repTyaNumber = "repTya";
         when(macService.generateToken(repTyaNumber, PIP.name())).thenReturn("ZYX");
@@ -1896,7 +1830,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void shouldPopulateJointPartySubscriptionPersonalisation() {
+    void shouldPopulateJointPartySubscriptionPersonalisation() {
         final String tyaNumber = "tya";
         final String jointPartyTyaNumber = "jointPartyTya";
         when(macService.generateToken(jointPartyTyaNumber, PIP.name())).thenReturn("ZYX");
@@ -1956,7 +1890,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void shouldPopulateOtherPartySubscriptionPersonalisation() {
+    void shouldPopulateOtherPartySubscriptionPersonalisation() {
         final String tyaNumber = "tya";
         final String otherPartyTyaNumber = "otherPartyTya";
         when(macService.generateToken(otherPartyTyaNumber, PIP.name())).thenReturn("ZYX");
@@ -2014,7 +1948,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void shouldHandleNoSubscription() {
+    void shouldHandleNoSubscription() {
         when(macService.generateToken(EMPTY, PIP.name())).thenReturn("ZYX");
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference(null)
@@ -2031,12 +1965,12 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void getLatestInfoRequestDetailWhenNoneProvided() {
+    void getLatestInfoRequestDetailWhenNoneProvided() {
         assertNull(Personalisation.getLatestInfoRequestDetail(createResponseWithInfoRequests(null)));
     }
 
     @Test
-    public void getLatestInfoRequestDetailWhenOneProvided() {
+    void getLatestInfoRequestDetailWhenOneProvided() {
         String expected = "Request for information";
 
         List<AppellantInfoRequest> requests = Collections.singletonList(
@@ -2059,7 +1993,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void getLatestInfoRequestDetailWhenMultipleProvided() {
+    void getLatestInfoRequestDetailWhenMultipleProvided() {
         String expected = "Final request for information";
 
         List<AppellantInfoRequest> requests = Arrays.asList(
@@ -2098,7 +2032,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void trackYourAppealWillReturnMyaLinkWhenCreatedInGapsFromReadyToList() {
+    void trackYourAppealWillReturnMyaLinkWhenCreatedInGapsFromReadyToList() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .regionalProcessingCenter(rpc)
@@ -2120,7 +2054,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void trackYourAppealWillReturnTyaLinkWhenCreatedInGapsFromIsNotReadyToList() {
+    void trackYourAppealWillReturnTyaLinkWhenCreatedInGapsFromIsNotReadyToList() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .regionalProcessingCenter(rpc)
@@ -2143,7 +2077,7 @@ public class PersonalisationTest {
 
     @ParameterizedTest
     @CsvSource({"GRANTED", "REFUSED"})
-    public void givenConfidentialRequestForAppellant_thenSetConfidentialFields(RequestOutcome requestOutcome) {
+    void givenConfidentialRequestForAppellant_thenSetConfidentialFields(RequestOutcome requestOutcome) {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID)
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build())
@@ -2164,7 +2098,7 @@ public class PersonalisationTest {
 
     @ParameterizedTest
     @CsvSource({"GRANTED", "REFUSED"})
-    public void givenConfidentialRequestForJointParty_thenSetConfidentialFields(RequestOutcome requestOutcome) {
+    void givenConfidentialRequestForJointParty_thenSetConfidentialFields(RequestOutcome requestOutcome) {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID)
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build())
@@ -2187,7 +2121,7 @@ public class PersonalisationTest {
 
     @ParameterizedTest
     @CsvSource({"yes, 0300 790 6234", "no, 0300 123 1142"})
-    public void setHelplineTelephoneNumber_relevantToTheCaseCountry(String isScottish, String helpLineTelephone) {
+    void setHelplineTelephoneNumber_relevantToTheCaseCountry(String isScottish, String helpLineTelephone) {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID)
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build())
@@ -2203,7 +2137,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void shouldPopulateCorrectlyWithEntityAndParty() {
+    void shouldPopulateCorrectlyWithEntityAndParty() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID)
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build())
@@ -2233,7 +2167,7 @@ public class PersonalisationTest {
 
 
     @Test
-    public void shouldProvideCorrectValuesForPtaGrantedValues() {
+    void shouldProvideCorrectValuesForPtaGrantedValues() {
         String date1 = LocalDate.now().toString();
         String date2 = LocalDate.now().minusDays(10).toString();
         SscsDocumentDetails document1 = SscsDocumentDetails.builder()
@@ -2276,7 +2210,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void shouldProvideCorrectValuesForPtaRefusedValues() {
+    void shouldProvideCorrectValuesForPtaRefusedValues() {
         String date = LocalDate.now().toString();
         SscsDocumentDetails document1 = SscsDocumentDetails.builder()
             .documentType(DocumentType.FINAL_DECISION_NOTICE.getValue())
@@ -2307,7 +2241,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void givenASyaAppealWithHearingArrangements_setHearingArrangementsForTemplate() {
+    void givenASyaAppealWithHearingArrangements_setHearingArrangementsForTemplate() {
         List<String> arrangementList = new ArrayList<>();
 
         arrangementList.add("signLanguageInterpreter");
@@ -2341,7 +2275,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void givenASyaAppealWithHearingArrangements_setHearingArrangementsForTemplate_Welsh() {
+    void givenASyaAppealWithHearingArrangements_setHearingArrangementsForTemplate_Welsh() {
 
         List<String> arrangementList = new ArrayList<>();
 
@@ -2387,7 +2321,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void testSetAsideGrantedDwpState() {
+    void testSetAsideGrantedDwpState() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference(null)
             .dwpState(DwpState.SET_ASIDE_GRANTED)
@@ -2404,7 +2338,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void shouldProvideCorrectValuesForBundleCreatedForUT() {
+    void shouldProvideCorrectValuesForBundleCreatedForUT() {
         String date = LocalDate.now().toString();
         SscsDocumentDetails document1 = SscsDocumentDetails.builder()
             .documentType(DocumentType.FINAL_DECISION_NOTICE.getValue())
@@ -2435,7 +2369,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void givenReviewAndSetAside_setCorrectPtaDecisionDate() {
+    void givenReviewAndSetAside_setCorrectPtaDecisionDate() {
         String date = LocalDate.now().toString();
         String date2 = LocalDate.now().minusDays(20).toString();
         SscsDocumentDetails document1 = SscsDocumentDetails.builder()
@@ -2480,7 +2414,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void givenReviewAndSetAside_setCorrectPtaDecisionDateAndNoReviewAndSetAsideDocument_shouldNotHaveDecisionDate() {
+    void givenReviewAndSetAside_setCorrectPtaDecisionDateAndNoReviewAndSetAsideDocument_shouldNotHaveDecisionDate() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID)
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build())
@@ -2507,7 +2441,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void whenDwpStateIsLtaGranted_setIsGrantedToTrue() {
+    void whenDwpStateIsLtaGranted_setIsGrantedToTrue() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .regionalProcessingCenter(rpc)
@@ -2526,7 +2460,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void whenDwpStateIsLtaRefused_setIsGrantedToFalse() {
+    void whenDwpStateIsLtaRefused_setIsGrantedToFalse() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .regionalProcessingCenter(rpc)
@@ -2545,7 +2479,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void whenDwpStateIsCorrectionIssued_setIsGrantedToTrue() {
+    void whenDwpStateIsCorrectionIssued_setIsGrantedToTrue() {
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
             .regionalProcessingCenter(rpc)
@@ -2564,7 +2498,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void whenPostHearingsIsTrueAndFinalDecisionIsSet_setFinalDecision() {
+    void whenPostHearingsIsTrueAndFinalDecisionIsSet_setFinalDecision() {
         ReflectionTestUtils.setField(personalisation, "isPostHearingsEnabled", true);
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
@@ -2586,7 +2520,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    public void whenPostHearingsIsTrueAndFinalDecisionIsNotSet_dontSetFinalDecision() {
+    void whenPostHearingsIsTrueAndFinalDecisionIsNotSet_dontSetFinalDecision() {
         ReflectionTestUtils.setField(personalisation, "isPostHearingsEnabled", true);
         SscsCaseData response = SscsCaseData.builder()
             .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
@@ -2604,6 +2538,108 @@ public class PersonalisationTest {
 
         assertTrue((boolean) result.get(IS_GRANTED));
         assertNull(result.get(FINAL_DECISION_DATE));
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("addOtherPartyDataScenarios")
+    void givenAddOtherPartyDataScenarios_thenSetsOtherPartyNameCorrectly(String scenario, String benefitCode, State state,
+        List<CcdValue<OtherParty>> otherParties, boolean shouldContainOtherPartyName, String expectedOtherPartyName) {
+
+        final SscsCaseData response = SscsCaseData
+            .builder()
+            .ccdCaseId(CASE_ID)
+            .appeal(Appeal
+                .builder()
+                .benefitType(BenefitType.builder().code(benefitCode).build())
+                .appellant(Appellant.builder().name(name).build())
+                .build())
+            .otherParties(otherParties)
+            .build();
+
+        final Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper
+                .builder()
+                .newSscsCaseData(response)
+                .notificationEventType(ADD_OTHER_PARTY_DATA)
+                .state(state)
+                .build(),
+            new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(),
+                response.getAppeal().getAppellant()));
+
+        if (shouldContainOtherPartyName) {
+            assertThat(result).containsEntry(OTHER_PARTY_NAME, expectedOtherPartyName);
+        } else {
+            assertThat(result).doesNotContainKey(OTHER_PARTY_NAME);
+        }
+    }
+
+    private static Map<String, String> getWelshMap() {
+        Map<String, String> welshMap = new HashMap<>();
+        welshMap.put(PersonalisationKey.LANGUAGE_INTERPRETER.name(), "Dehonglydd iaith arwyddion: ");
+        welshMap.put(PersonalisationKey.SIGN_INTERPRETER.name(), "Dehonglydd iaith arwyddion: ");
+        welshMap.put(PersonalisationKey.HEARING_LOOP.name(), "Dolen glyw: ");
+        welshMap.put(PersonalisationKey.DISABLED_ACCESS.name(), "Mynediad i bobl anab: ");
+        welshMap.put(PersonalisationKey.OTHER_ARRANGEMENTS.name(), "Unrhyw drefniadau eraill: ");
+        welshMap.put(PersonalisationKey.REQUIRED.name(), "Gofynnol");
+        welshMap.put(PersonalisationKey.NOT_REQUIRED.name(), "Dim yn ofynnol");
+        return welshMap;
+    }
+
+    private static Map<String, String> getEnglishMap() {
+        Map<String, String> englishMap = new HashMap<>();
+        englishMap.put(PersonalisationKey.LANGUAGE_INTERPRETER.name(), "Language interpreter: ");
+        englishMap.put(PersonalisationKey.SIGN_INTERPRETER.name(), "Sign interpreter: ");
+        englishMap.put(PersonalisationKey.HEARING_LOOP.name(), "Hearing loop: ");
+        englishMap.put(PersonalisationKey.DISABLED_ACCESS.name(), "Disabled access: ");
+        englishMap.put(PersonalisationKey.OTHER_ARRANGEMENTS.name(), "Any other arrangements: ");
+        englishMap.put(PersonalisationKey.REQUIRED.name(), "Required");
+        englishMap.put(PersonalisationKey.NOT_REQUIRED.name(), "Not required");
+        return englishMap;
+    }
+
+    @SuppressWarnings({"Indentation", "unused"})
+    private static Object[] generateNotificationTypeAndSubscriptionsScenarios() {
+        return new Object[]{new Object[]{ACTION_POSTPONEMENT_REQUEST, APPELLANT, REGULAR, false, false, false, true}, new Object[]{ACTION_POSTPONEMENT_REQUEST, APPOINTEE, REGULAR, false, false, false, true}, new Object[]{ACTION_POSTPONEMENT_REQUEST, JOINT_PARTY, REGULAR, false, false, false, true}, new Object[]{ACTION_POSTPONEMENT_REQUEST, REPRESENTATIVE, REGULAR, false, false, false, true}, new Object[]{ACTION_POSTPONEMENT_REQUEST_WELSH, APPELLANT, REGULAR, false, false, false, true}, new Object[]{ACTION_POSTPONEMENT_REQUEST_WELSH, APPOINTEE, REGULAR, false, false, false, true}, new Object[]{ACTION_POSTPONEMENT_REQUEST_WELSH, JOINT_PARTY, REGULAR, false, false, false, true}, new Object[]{ACTION_POSTPONEMENT_REQUEST_WELSH, REPRESENTATIVE, REGULAR, false, false, false, true}, new Object[]{ADJOURNED, APPELLANT, ONLINE, true, true, false, false}, new Object[]{ADJOURNED, APPELLANT, PAPER, true, true, false, false}, new Object[]{ADJOURNED, APPELLANT, REGULAR, true, true, false, false}, new Object[]{ADJOURNED, REPRESENTATIVE, ONLINE, true, true, false, false}, new Object[]{ADJOURNED, REPRESENTATIVE, PAPER, true, true, false, false}, new Object[]{ADJOURNED, REPRESENTATIVE, REGULAR, true, true, false, false}, new Object[]{ADMIN_APPEAL_WITHDRAWN, APPELLANT, ONLINE, true, true, false, true}, new Object[]{ADMIN_APPEAL_WITHDRAWN, APPELLANT, PAPER, true, true, false, true}, new Object[]{ADMIN_APPEAL_WITHDRAWN, APPELLANT, REGULAR, true, true, false, true}, new Object[]{ADMIN_APPEAL_WITHDRAWN, REPRESENTATIVE, ONLINE, true, true, false, true}, new Object[]{ADMIN_APPEAL_WITHDRAWN, REPRESENTATIVE, PAPER, true, true, false, true}, new Object[]{ADMIN_APPEAL_WITHDRAWN, REPRESENTATIVE, REGULAR, true, true, false, true}, new Object[]{APPEAL_DORMANT, APPELLANT, ORAL, true, true, false, false}, new Object[]{APPEAL_DORMANT, APPELLANT, PAPER, true, true, false, false}, new Object[]{APPEAL_DORMANT, REPRESENTATIVE, ORAL, true, true, false, false}, new Object[]{APPEAL_DORMANT, REPRESENTATIVE, PAPER, true, true, false, false}, new Object[]{APPEAL_LAPSED, APPELLANT, ONLINE, true, true, false, true}, new Object[]{APPEAL_LAPSED, APPELLANT, PAPER, true, true, false, true}, new Object[]{APPEAL_LAPSED, APPELLANT, REGULAR, true, true, false, true}, new Object[]{APPEAL_LAPSED, APPOINTEE, ONLINE, true, true, false, true}, new Object[]{APPEAL_LAPSED, APPOINTEE, PAPER, true, true, false, true}, new Object[]{APPEAL_LAPSED, APPOINTEE, REGULAR, true, true, false, true}, new Object[]{APPEAL_RECEIVED, APPELLANT, ONLINE, true, true, true, true}, new Object[]{APPEAL_RECEIVED, APPELLANT, PAPER, true, true, true, true}, new Object[]{APPEAL_RECEIVED, APPELLANT, REGULAR, true, true, true, true}, new Object[]{APPEAL_RECEIVED, APPOINTEE, ONLINE, true, true, true, true}, new Object[]{APPEAL_RECEIVED, APPOINTEE, PAPER, true, true, true, true}, new Object[]{APPEAL_RECEIVED, APPOINTEE, REGULAR, true, true, true, true}, new Object[]{APPEAL_RECEIVED, REPRESENTATIVE, ONLINE, true, true, true, true}, new Object[]{APPEAL_RECEIVED, REPRESENTATIVE, PAPER, true, true, true, true}, new Object[]{APPEAL_RECEIVED, REPRESENTATIVE, REGULAR, true, true, true, true}, new Object[]{APPEAL_WITHDRAWN, APPELLANT, ONLINE, true, true, false, true}, new Object[]{APPEAL_WITHDRAWN, APPELLANT, PAPER, true, true, false, true}, new Object[]{APPEAL_WITHDRAWN, APPELLANT, REGULAR, true, true, false, true}, new Object[]{APPEAL_WITHDRAWN, REPRESENTATIVE, ONLINE, true, true, false, true}, new Object[]{APPEAL_WITHDRAWN, REPRESENTATIVE, PAPER, true, true, false, true}, new Object[]{APPEAL_WITHDRAWN, REPRESENTATIVE, REGULAR, true, true, false, true}, new Object[]{DEATH_OF_APPELLANT, APPOINTEE, REGULAR, false, false, false, true}, new Object[]{DEATH_OF_APPELLANT, REPRESENTATIVE, REGULAR, false, false, false, true}, new Object[]{DECISION_ISSUED, APPELLANT, ONLINE, false, false, false, true}, new Object[]{DECISION_ISSUED, APPOINTEE, ONLINE, false, false, false, true}, new Object[]{DECISION_ISSUED, REPRESENTATIVE, ONLINE, false, false, false, true}, new Object[]{DECISION_ISSUED_WELSH, APPELLANT, ONLINE, false, false, false, true}, new Object[]{DECISION_ISSUED_WELSH, APPOINTEE, ONLINE, false, false, false, true}, new Object[]{DECISION_ISSUED_WELSH, REPRESENTATIVE, ONLINE, false, false, false, true}, new Object[]{DWP_RESPONSE_RECEIVED, APPELLANT, ONLINE, true, true, true, false}, new Object[]{DWP_RESPONSE_RECEIVED, APPELLANT, PAPER, true, true, true, false}, new Object[]{DWP_RESPONSE_RECEIVED, APPOINTEE, ONLINE, true, true, true, false}, new Object[]{DWP_RESPONSE_RECEIVED, APPOINTEE, PAPER, true, true, true, false}, new Object[]{DWP_RESPONSE_RECEIVED, REPRESENTATIVE, ONLINE, true, true, true, false}, new Object[]{DWP_RESPONSE_RECEIVED, REPRESENTATIVE, PAPER, true, true, true, false}, new Object[]{DWP_UPLOAD_RESPONSE, APPELLANT, ONLINE, true, true, false, true}, new Object[]{DWP_UPLOAD_RESPONSE, APPELLANT, PAPER, true, true, false, true}, new Object[]{DWP_UPLOAD_RESPONSE, APPOINTEE, ONLINE, true, true, false, true}, new Object[]{DWP_UPLOAD_RESPONSE, APPOINTEE, PAPER, true, true, false, true}, new Object[]{DWP_UPLOAD_RESPONSE, REPRESENTATIVE, ONLINE, true, true, false, true}, new Object[]{DWP_UPLOAD_RESPONSE, REPRESENTATIVE, PAPER, true, true, false, true}, new Object[]{EVIDENCE_RECEIVED, APPELLANT, ONLINE, true, true, true, false}, new Object[]{EVIDENCE_RECEIVED, APPELLANT, PAPER, true, true, true, false}, new Object[]{EVIDENCE_RECEIVED, APPELLANT, REGULAR, true, true, true, false}, new Object[]{EVIDENCE_RECEIVED, REPRESENTATIVE, ONLINE, true, true, true, false}, new Object[]{EVIDENCE_RECEIVED, REPRESENTATIVE, PAPER, true, true, true, false}, new Object[]{EVIDENCE_RECEIVED, REPRESENTATIVE, REGULAR, true, true, true, false}, new Object[]{HEARING_BOOKED, APPELLANT, ONLINE, true, true, false, true}, new Object[]{HEARING_BOOKED, APPELLANT, PAPER, true, true, false, true}, new Object[]{HEARING_BOOKED, APPELLANT, REGULAR, true, true, false, true}, new Object[]{HEARING_BOOKED, REPRESENTATIVE, ONLINE, true, true, false, true}, new Object[]{HEARING_BOOKED, REPRESENTATIVE, PAPER, true, true, false, true}, new Object[]{HEARING_BOOKED, REPRESENTATIVE, REGULAR, true, true, false, true}, new Object[]{ISSUE_ADJOURNMENT_NOTICE, APPELLANT, ONLINE, false, false, false, true}, new Object[]{ISSUE_ADJOURNMENT_NOTICE, APPOINTEE, ONLINE, false, false, false, true}, new Object[]{ISSUE_ADJOURNMENT_NOTICE, REPRESENTATIVE, ONLINE, false, false, false, true}, new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, APPELLANT, ONLINE, false, false, false, true}, new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, APPOINTEE, ONLINE, false, false, false, true}, new Object[]{ISSUE_ADJOURNMENT_NOTICE_WELSH, REPRESENTATIVE, ONLINE, false, false, false, true}, new Object[]{ISSUE_FINAL_DECISION, APPELLANT, ONLINE, false, false, false, true}, new Object[]{ISSUE_FINAL_DECISION, APPOINTEE, ONLINE, false, false, false, true}, new Object[]{ISSUE_FINAL_DECISION, REPRESENTATIVE, ONLINE, false, false, false, true}, new Object[]{ISSUE_FINAL_DECISION_WELSH, APPELLANT, ONLINE, false, false, false, true}, new Object[]{ISSUE_FINAL_DECISION_WELSH, APPOINTEE, ONLINE, false, false, false, true}, new Object[]{ISSUE_FINAL_DECISION_WELSH, REPRESENTATIVE, ONLINE, false, false, false, true}, new Object[]{POSTPONEMENT, APPELLANT, ONLINE, true, true, false, true}, new Object[]{POSTPONEMENT, APPELLANT, PAPER, true, true, false, true}, new Object[]{POSTPONEMENT, APPELLANT, REGULAR, true, true, false, true}, new Object[]{POSTPONEMENT, REPRESENTATIVE, ONLINE, true, true, false, true}, new Object[]{POSTPONEMENT, REPRESENTATIVE, PAPER, true, true, false, true}, new Object[]{POSTPONEMENT, REPRESENTATIVE, REGULAR, true, true, false, true}, new Object[]{PROVIDE_APPOINTEE_DETAILS, APPOINTEE, REGULAR, false, false, false, true}, new Object[]{PROVIDE_APPOINTEE_DETAILS, REPRESENTATIVE, REGULAR, false, false, false, true}, new Object[]{REQUEST_FOR_INFORMATION, APPELLANT, ONLINE, false, false, false, true}, new Object[]{REQUEST_FOR_INFORMATION, APPOINTEE, ONLINE, false, false, false, true}, new Object[]{REQUEST_FOR_INFORMATION, REPRESENTATIVE, ONLINE, false, false, false, true}, new Object[]{RESEND_APPEAL_CREATED, APPELLANT, ONLINE, true, true, false, false}, new Object[]{RESEND_APPEAL_CREATED, APPELLANT, PAPER, true, true, false, false}, new Object[]{RESEND_APPEAL_CREATED, APPELLANT, REGULAR, true, true, false, false}, new Object[]{RESEND_APPEAL_CREATED, REPRESENTATIVE, ONLINE, true, true, false, false}, new Object[]{RESEND_APPEAL_CREATED, REPRESENTATIVE, PAPER, true, true, false, false}, new Object[]{RESEND_APPEAL_CREATED, REPRESENTATIVE, REGULAR, true, true, false, false}, new Object[]{REVIEW_CONFIDENTIALITY_REQUEST, APPELLANT, REGULAR, false, false, false, true}, new Object[]{REVIEW_CONFIDENTIALITY_REQUEST, APPOINTEE, REGULAR, false, false, false, true}, new Object[]{REVIEW_CONFIDENTIALITY_REQUEST, JOINT_PARTY, REGULAR, false, false, false, true}, new Object[]{REVIEW_CONFIDENTIALITY_REQUEST, REPRESENTATIVE, REGULAR, false, false, false, true}, new Object[]{SYA_APPEAL_CREATED, APPELLANT, ONLINE, true, true, true, false}, new Object[]{SYA_APPEAL_CREATED, APPELLANT, PAPER, true, true, true, false}, new Object[]{SYA_APPEAL_CREATED, APPELLANT, REGULAR, true, true, true, false}, new Object[]{SYA_APPEAL_CREATED, APPOINTEE, ONLINE, true, true, true, false}, new Object[]{SYA_APPEAL_CREATED, APPOINTEE, PAPER, true, true, true, false}, new Object[]{SYA_APPEAL_CREATED, APPOINTEE, REGULAR, true, true, true, false}, new Object[]{SYA_APPEAL_CREATED, REPRESENTATIVE, ONLINE, true, true, true, false}, new Object[]{SYA_APPEAL_CREATED, REPRESENTATIVE, PAPER, true, true, true, false}, new Object[]{SYA_APPEAL_CREATED, REPRESENTATIVE, REGULAR, true, true, true, false}, new Object[]{VALID_APPEAL_CREATED, APPELLANT, ONLINE, true, true, true, true}, new Object[]{VALID_APPEAL_CREATED, APPELLANT, PAPER, true, true, true, true}, new Object[]{VALID_APPEAL_CREATED, APPELLANT, REGULAR, true, true, true, true}, new Object[]{VALID_APPEAL_CREATED, APPOINTEE, ONLINE, true, true, true, true}, new Object[]{VALID_APPEAL_CREATED, APPOINTEE, PAPER, true, true, true, true}, new Object[]{VALID_APPEAL_CREATED, APPOINTEE, REGULAR, true, true, true, true}, new Object[]{VALID_APPEAL_CREATED, REPRESENTATIVE, ONLINE, true, true, true, true}, new Object[]{VALID_APPEAL_CREATED, REPRESENTATIVE, PAPER, true, true, true, true}, new Object[]{VALID_APPEAL_CREATED, REPRESENTATIVE, REGULAR, true, true, true, true},};
+    }
+
+    private static Stream<Arguments> appealResponseDate() {
+        return Stream.of(Arguments.of(
+                Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build()).build(),
+                MAX_DWP_RESPONSE_DAYS_CHILD_SUPPORT), Arguments.of(null, MAX_DWP_RESPONSE_DAYS),
+            Arguments.of(Appeal.builder().build(), MAX_DWP_RESPONSE_DAYS),
+            Arguments.of(Appeal.builder().benefitType(BenefitType.builder().build()).build(), MAX_DWP_RESPONSE_DAYS),
+            Arguments.of(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.ESA.getShortName()).build()).build(),
+                MAX_DWP_RESPONSE_DAYS));
+    }
+
+    @SuppressWarnings({"Indentation", "unused"})
+    private static Object[] generateHearingNotificationTypeAndSubscriptionsScenarios() {
+        return new Object[]{new Object[]{HEARING_BOOKED, APPELLANT}, new Object[]{HEARING_BOOKED, APPOINTEE},
+
+            new Object[]{HEARING_REMINDER, APPELLANT}, new Object[]{HEARING_REMINDER, APPOINTEE},};
+    }
+
+    private static Stream<Arguments> addOtherPartyDataScenarios() {
+        return Stream.of(Arguments.of("UC benefit with single other party in AWAIT_CONFIDENTIALITY_REQUIREMENTS state",
+                Benefit.UC.getShortName(), State.AWAIT_CONFIDENTIALITY_REQUIREMENTS, List.of(
+                    new CcdValue<>(OtherParty.builder().name(Name.builder().firstName("John").lastName("Smith").build()).build())),
+                true, "John Smith"),
+            Arguments.of("UC benefit with multiple other parties in AWAIT_CONFIDENTIALITY_REQUIREMENTS state",
+                Benefit.UC.getShortName(), State.AWAIT_CONFIDENTIALITY_REQUIREMENTS, List.of(new CcdValue<>(
+                        OtherParty.builder().name(Name.builder().firstName("First").lastName("Party").build()).build()),
+                    new CcdValue<>(
+                        OtherParty.builder().name(Name.builder().firstName("Second").lastName("Party").build()).build())), true,
+                "First Party"),
+            Arguments.of("PIP benefit with other party in AWAIT_CONFIDENTIALITY_REQUIREMENTS state", Benefit.PIP.name(),
+                State.AWAIT_CONFIDENTIALITY_REQUIREMENTS, List.of(new CcdValue<>(
+                    OtherParty.builder().name(Name.builder().firstName("John").lastName("Smith").build()).build())), false, null),
+            Arguments.of("UC benefit with other party in WITH_DWP state", Benefit.UC.getShortName(), State.WITH_DWP, List.of(
+                    new CcdValue<>(OtherParty.builder().name(Name.builder().firstName("John").lastName("Smith").build()).build())),
+                false, null), Arguments.of("UC benefit with null other parties in AWAIT_CONFIDENTIALITY_REQUIREMENTS state",
+                Benefit.UC.getShortName(), State.AWAIT_CONFIDENTIALITY_REQUIREMENTS, null, false, null));
+    }
+
+    private String getExpectedTemplateName(NotificationEventType notificationEventType, SubscriptionType subscriptionType) {
+        return notificationEventType.getId() + (subscriptionType == null ? "" : "." + lowerCase(subscriptionType.name()));
     }
 
     private Hearing createHearing(LocalDate hearingDate) {

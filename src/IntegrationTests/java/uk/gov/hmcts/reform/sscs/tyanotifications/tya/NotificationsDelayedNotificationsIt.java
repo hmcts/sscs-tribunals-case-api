@@ -16,25 +16,28 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import junitparams.Parameters;
+import java.util.stream.Stream;
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 
-public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
+class NotificationsDelayedNotificationsIt extends NotificationsItBase {
 
-    @Before
+    @Override
+    @BeforeEach
     public void setup() throws Exception {
         super.setup();
 
         setupReminderController(getNotificationService());
     }
 
-    @Test
-    @Parameters(method = "generateAppointeeNotificationScenariosForDelayedNotifications")
-    public void shouldSendAppointeeNotificationsForADelayedNotificationEventForAnOralOrPaperHearingAndForEachSubscription(
+    @ParameterizedTest
+    @MethodSource("generateAppointeeNotificationScenariosForDelayedNotifications")
+    void shouldSendAppointeeNotificationsForADelayedNotificationEventForAnOralOrPaperHearingAndForEachSubscription(
         NotificationEventType notificationEventType, String hearingType, List<String> expectedEmailTemplateIds,
         List<String> expectedSmsTemplateIds, List<String> expectedLetterTemplateIds, String appointeeEmailSubs,
         String appointeeSmsSubs, int wantedNumberOfSendEmailInvocations, int wantedNumberOfSendSmsInvocations,
@@ -72,9 +75,9 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
         validateLetterNotifications(expectedLetterTemplateIds, wantedNumberOfSendLetterInvocations, expectedName);
     }
 
-    @Test
-    @Parameters(method = "generateRepsNotificationScenariosForDelayedNotifications")
-    public void shouldSendRepsNotificationsForADelayedNotificationEventForAnOralOrPaperHearingAndForEachSubscription(
+    @ParameterizedTest
+    @MethodSource("generateRepsNotificationScenariosForDelayedNotifications")
+    void shouldSendRepsNotificationsForADelayedNotificationEventForAnOralOrPaperHearingAndForEachSubscription(
         NotificationEventType notificationEventType, String hearingType, List<String> expectedEmailTemplateIds,
         List<String> expectedSmsTemplateIds, List<String> expectedLetterTemplateIds, String appellantEmailSubs, String appellantSmsSubs, String repsEmailSubs,
         String repsSmsSubs, int wantedNumberOfSendEmailInvocations, int wantedNumberOfSendSmsInvocations, int wantedNumberOfSendLetterInvocations) throws Exception {
@@ -98,16 +101,16 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/reminder"));
         assertHttpStatus(response, HttpStatus.OK);
 
-        String expectedName = "Harry Potter";
+        final String expectedName = "Harry Potter";
         validateEmailNotifications(expectedEmailTemplateIds, wantedNumberOfSendEmailInvocations, expectedName);
         validateSmsNotifications(expectedSmsTemplateIds, wantedNumberOfSendSmsInvocations);
         validateLetterNotifications(expectedLetterTemplateIds, wantedNumberOfSendLetterInvocations, expectedName);
     }
 
     @SuppressWarnings({"Indentation", "unused"})
-    private Object[] generateAppointeeNotificationScenariosForDelayedNotifications() {
-        return new Object[]{
-            new Object[]{
+    private static Stream<Arguments> generateAppointeeNotificationScenariosForDelayedNotifications() {
+        return Stream.of(
+            Arguments.of(
                 APPEAL_RECEIVED,
                 "paper",
                 Collections.singletonList("78cf9c9c-e2b8-44d7-bcf1-220311f114cb"),
@@ -115,12 +118,12 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
                 Collections.singletonList("TB-SCS-LET-ENG-Appeal-Lodged-Appellant-v2.docx"),
                 "yes",
                 "yes",
-                "1",
-                "1",
-                "0",
+                1,
+                1,
+                0,
                 "Appointee Appointee"
-            },
-            new Object[]{
+            ),
+            Arguments.of(
                 APPEAL_RECEIVED,
                 "oral",
                 Collections.singletonList("78cf9c9c-e2b8-44d7-bcf1-220311f114cb"),
@@ -128,12 +131,12 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
                 Collections.singletonList("TB-SCS-LET-ENG-Appeal-Lodged-Appellant-v2.docx"),
                 "yes",
                 "yes",
-                "1",
-                "1",
-                "0",
+                1,
+                1,
+                0,
                 "Appointee Appointee"
-            },
-            new Object[]{
+            ),
+            Arguments.of(
                 APPEAL_RECEIVED,
                 "paper",
                 Collections.emptyList(),
@@ -141,12 +144,12 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
                 Collections.singletonList("TB-SCS-LET-ENG-Appeal-Lodged-Appellant-v2.docx"),
                 "no",
                 "no",
-                "0",
-                "0",
-                "0",
+                0,
+                0,
+                0,
                 "Appointee Appointee"
-            },
-            new Object[]{
+            ),
+            Arguments.of(
                 VALID_APPEAL_CREATED,
                 "oral",
                 Collections.singletonList("362d9a85-e0e4-412b-b874-020c0464e2b4"),
@@ -154,12 +157,12 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
                 Collections.emptyList(),
                 "yes",
                 "yes",
-                "1",
-                "1",
-                "0",
+                1,
+                1,
+                0,
                 "Appointee Appointee"
-            },
-            new Object[]{
+            ),
+            Arguments.of(
                 VALID_APPEAL_CREATED,
                 "oral",
                 Collections.singletonList("362d9a85-e0e4-412b-b874-020c0464e2b4"),
@@ -167,12 +170,12 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
                 Collections.emptyList(),
                 "yes",
                 "yes",
-                "1",
-                "1",
-                "0",
+                1,
+                1,
+                0,
                 "Appointee Appointee"
-            },
-            new Object[]{
+            ),
+            Arguments.of(
                 VALID_APPEAL_CREATED,
                 "oral",
                 Collections.emptyList(),
@@ -180,12 +183,12 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
                 Collections.emptyList(),
                 "no",
                 "no",
-                "0",
-                "0",
-                "0",
+                0,
+                0,
+                0,
                 ""
-            },
-            new Object[]{
+            ),
+            Arguments.of(
                 DRAFT_TO_VALID_APPEAL_CREATED,
                 "oral",
                 Collections.singletonList("362d9a85-e0e4-412b-b874-020c0464e2b4"),
@@ -193,12 +196,12 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
                 Collections.emptyList(),
                 "yes",
                 "yes",
-                "1",
-                "1",
-                "0",
+                1,
+                1,
+                0,
                 "Appointee Appointee"
-            },
-            new Object[]{
+            ),
+            Arguments.of(
                 DRAFT_TO_VALID_APPEAL_CREATED,
                 "oral",
                 Collections.singletonList("362d9a85-e0e4-412b-b874-020c0464e2b4"),
@@ -206,12 +209,12 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
                 Collections.emptyList(),
                 "yes",
                 "yes",
-                "1",
-                "1",
-                "0",
+                1,
+                1,
+                0,
                 "Appointee Appointee"
-            },
-            new Object[]{
+            ),
+            Arguments.of(
                 DRAFT_TO_VALID_APPEAL_CREATED,
                 "oral",
                 Collections.emptyList(),
@@ -219,17 +222,17 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
                 Collections.emptyList(),
                 "no",
                 "no",
-                "0",
-                "0",
-                "0",
+                0,
+                0,
+                0,
                 ""
-            },
-        };
+            )
+        );
     }
 
-    private Object[] generateRepsNotificationScenariosForDelayedNotifications() {
-        return new Object[]{
-            new Object[]{
+    private static Stream<Arguments> generateRepsNotificationScenariosForDelayedNotifications() {
+        return Stream.of(
+            Arguments.of(
                 APPEAL_RECEIVED,
                 "oral",
                 Arrays.asList("d5fd9f65-1283-4533-a1be-10043dae7af6", "8003606e-3d80-4e17-b846-18698f8d681e"),
@@ -239,11 +242,11 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
                 "yes",
                 "yes",
                 "yes",
-                "2",
-                "2",
-                "0"
-            },
-            new Object[]{
+                2,
+                2,
+                0
+            ),
+            Arguments.of(
                 APPEAL_RECEIVED,
                 "paper",
                 Collections.singletonList("8003606e-3d80-4e17-b846-18698f8d681e"),
@@ -253,11 +256,11 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
                 "yes",
                 "yes",
                 "yes",
-                "1",
-                "2",
-                "0"
-            },
-            new Object[]{
+                1,
+                2,
+                0
+            ),
+            Arguments.of(
                 APPEAL_RECEIVED,
                 "paper",
                 Collections.emptyList(),
@@ -267,11 +270,11 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
                 "no",
                 "no",
                 "no",
-                "0",
-                "0",
-                "0"
-            },
-            new Object[]{
+                0,
+                0,
+                0
+            ),
+            Arguments.of(
                 VALID_APPEAL_CREATED,
                 "paper",
                 Arrays.asList("4917669f-d1b4-4748-851f-f10b90f27da3", "652753bf-59b4-46eb-9c24-bd762338a098"),
@@ -281,11 +284,11 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
                 "yes",
                 "yes",
                 "yes",
-                "2",
-                "2",
-                "0"
-            },
-            new Object[]{
+                2,
+                2,
+                0
+            ),
+            Arguments.of(
                 VALID_APPEAL_CREATED,
                 "oral",
                 Arrays.asList("4917669f-d1b4-4748-851f-f10b90f27da3", "652753bf-59b4-46eb-9c24-bd762338a098"),
@@ -295,11 +298,11 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
                 "yes",
                 "yes",
                 "yes",
-                "2",
-                "2",
-                "0"
-            },
-            new Object[]{
+                2,
+                2,
+                0
+            ),
+            Arguments.of(
                 VALID_APPEAL_CREATED,
                 "paper",
                 Collections.singletonList("652753bf-59b4-46eb-9c24-bd762338a098"),
@@ -309,11 +312,11 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
                 "yes",
                 "yes",
                 "yes",
-                "1",
-                "2",
-                "0"
-            },
-            new Object[]{
+                1,
+                2,
+                0
+            ),
+            Arguments.of(
                 VALID_APPEAL_CREATED,
                 "paper",
                 Collections.emptyList(),
@@ -323,11 +326,11 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
                 "no",
                 "no",
                 "no",
-                "0",
-                "0",
-                "0"
-            },
-            new Object[]{
+                0,
+                0,
+                0
+            ),
+            Arguments.of(
                 DRAFT_TO_VALID_APPEAL_CREATED,
                 "paper",
                 Arrays.asList("4917669f-d1b4-4748-851f-f10b90f27da3", "652753bf-59b4-46eb-9c24-bd762338a098"),
@@ -337,11 +340,11 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
                 "yes",
                 "yes",
                 "yes",
-                "2",
-                "2",
-                "0"
-            },
-            new Object[]{
+                2,
+                2,
+                0
+            ),
+            Arguments.of(
                 DRAFT_TO_VALID_APPEAL_CREATED,
                 "oral",
                 Arrays.asList("4917669f-d1b4-4748-851f-f10b90f27da3", "652753bf-59b4-46eb-9c24-bd762338a098"),
@@ -351,11 +354,11 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
                 "yes",
                 "yes",
                 "yes",
-                "2",
-                "2",
-                "0"
-            },
-            new Object[]{
+                2,
+                2,
+                0
+            ),
+            Arguments.of(
                 DRAFT_TO_VALID_APPEAL_CREATED,
                 "paper",
                 Collections.singletonList("652753bf-59b4-46eb-9c24-bd762338a098"),
@@ -365,11 +368,11 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
                 "yes",
                 "yes",
                 "yes",
-                "1",
-                "2",
-                "0"
-            },
-            new Object[]{
+                1,
+                2,
+                0
+            ),
+            Arguments.of(
                 DRAFT_TO_VALID_APPEAL_CREATED,
                 "paper",
                 Collections.emptyList(),
@@ -379,10 +382,10 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
                 "no",
                 "no",
                 "no",
-                "0",
-                "0",
-                "0"
-            },
-        };
+                0,
+                0,
+                0
+            )
+        );
     }
 }

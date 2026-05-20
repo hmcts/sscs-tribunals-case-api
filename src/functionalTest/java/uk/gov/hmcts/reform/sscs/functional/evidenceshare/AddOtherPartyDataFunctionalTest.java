@@ -80,7 +80,7 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
 
     private OtherParty buildOtherParty() {
         return OtherParty.builder().name(Name.builder().title("Miss").firstName("Bella").lastName("Kiki").build())
-            .address(Address.builder().postcode(POSTCODE).line1(ADDRESS_LINE_1).town(TOWN).build()).build();
+                         .address(Address.builder().postcode(POSTCODE).line1(ADDRESS_LINE_1).town(TOWN).build()).build();
     }
 
     private void addMinimalCaseData(SscsCaseData data) {
@@ -94,4 +94,5 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
             .setAddress(Address.builder().line1(LINE_1).town(TOWN).county(COUNTY).postcode(POSTCODE).build());
         data.setEvidencePresent("Yes");
     }
+
 }
