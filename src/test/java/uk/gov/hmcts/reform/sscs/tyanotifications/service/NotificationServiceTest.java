@@ -4,7 +4,6 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -47,6 +46,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.NOTIFY_APPELLANT_VALID_APPEAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.OTHER_PARTY_ADDED_TO_APPEAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.POSTPONEMENT;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PROCESS_AUDIO_VIDEO;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.REISSUE_DOCUMENT;
@@ -70,6 +70,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
@@ -202,7 +203,7 @@ public class NotificationServiceTest {
     @Mock
     private Appender<ILoggingEvent> mockAppender;
     @Captor
-    private ArgumentCaptor<?> captorLoggingEvent;
+    private ArgumentCaptor<ILoggingEvent> captorLoggingEvent;
 
     @Captor
     private ArgumentCaptor<CcdNotificationWrapper> ccdNotificationWrapperCaptor;
@@ -502,7 +503,8 @@ public class NotificationServiceTest {
             .map(SubscriptionWithType::getSubscriptionType)
             .toList();
         if (expectedSubscriptionTypes != null) {
-            assertTrue(List.of(expectedSubscriptionTypes).containsAll(actualSubscriptionTypes));
+            assertThat(actualSubscriptionTypes).isNotEmpty().allMatch(actualSubscriptionType ->
+                List.of(expectedSubscriptionTypes).contains(actualSubscriptionType));
         }
 
         then(notificationHandler).should(times(wantedNumberOfEmailNotificationsSent)).sendNotification(
@@ -559,8 +561,7 @@ public class NotificationServiceTest {
         ArgumentCaptor<SubscriptionWithType> subscriptionWithTypeCaptor = ArgumentCaptor.forClass(SubscriptionWithType.class);
         then(factory).should(times(expectedSubscriptionTypes.length))
                      .create(any(NotificationWrapper.class), subscriptionWithTypeCaptor.capture());
-        assertArrayEquals(expectedSubscriptionTypes,
-            subscriptionWithTypeCaptor.getAllValues().stream().map(SubscriptionWithType::getSubscriptionType).toArray());
+        assertThat(subscriptionWithTypeCaptor.getAllValues().stream().map(SubscriptionWithType::getSubscriptionType).toArray()).containsExactly(expectedSubscriptionTypes);
 
         then(notificationHandler).should(times(wantedNumberOfEmailNotificationsSent)).sendNotification(
             eq(ccdNotificationWrapper), eq(EMAIL_TEMPLATE_ID), eq("Email"),
@@ -824,7 +825,7 @@ public class NotificationServiceTest {
         verify(notificationHandler, never()).sendNotification(any(), any(), any(), any());
         ArgumentCaptor<ZonedDateTime> argument = ArgumentCaptor.forClass(ZonedDateTime.class);
         verify(notificationHandler).scheduleNotification(eq(ccdNotificationWrapper), argument.capture());
-        assertThat(argument.getValue()).isBefore(ZonedDateTime.now().plusMinutes(6));
+        assertThat(argument.getValue().isBefore(ZonedDateTime.now().plusMinutes(6))).isTrue();
         verifyNoMoreInteractions(reminderService);
 
         verifyNoErrorsLogged(mockAppender, captorLoggingEvent);
@@ -1066,7 +1067,7 @@ public class NotificationServiceTest {
         SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler,
             notificationValidService, pdfLetterService, pdfStoreService);
 
-        final NotificationService notificationService = new NotificationService(factory, reminderService,
+        notificationService = new NotificationService(factory, reminderService,
             notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService,
             false, false
         );
@@ -1080,16 +1081,12 @@ public class NotificationServiceTest {
     public void sendAppellantLetterOnAppealReceived() throws IOException {
         String fileUrl = "http://dm-store:4506/documents/1e1eb3d2-5b6c-430d-8dad-ebcea1ad7ecf";
         String docmosisId = "docmosis-id.doc";
-        ccdNotificationWrapper = buildWrapperWithDocuments(APPEAL_RECEIVED, fileUrl, APPELLANT_WITH_ADDRESS, null, "");
-        Notification notification = new Notification(Template.builder().docmosisTemplateId(docmosisId).build(),
-            Destination.builder().build(), new HashMap<>(), new Reference(), null);
-
-        byte[] sampleDirectionCoversheet = IOUtils.toByteArray(
-            getClass().getClassLoader().getResourceAsStream("pdf/direction-notice-coversheet-sample.pdf"));
+        ccdNotificationWrapper = buildWrapperWithDocuments(fileUrl);
+        Notification notification = new Notification(Template.builder().docmosisTemplateId(docmosisId).build(), Destination.builder().build(), new HashMap<>(), new Reference(), null);
 
         when((notificationValidService).isNotificationStillValidToSend(any(), any())).thenReturn(true);
         when((notificationValidService).isHearingTypeValidToSendNotification(any(), any())).thenReturn(true);
-        when(pdfLetterService.generateLetter(any(), any(), any())).thenReturn(sampleDirectionCoversheet);
+        when(pdfLetterService.generateLetter(any(), any(), any())).thenReturn(getCoversheet());
 
         when(factory.create(ccdNotificationWrapper, getSubscriptionWithType(ccdNotificationWrapper))).thenReturn(notification);
 
@@ -1104,7 +1101,7 @@ public class NotificationServiceTest {
     @Test
     public void shouldLogErrorWhenRequestForInformationWithEmptyInfoFromAppellant() {
         CcdNotificationWrapper wrapper = buildBaseWrapperWithCaseData(
-            getSscsCaseDataBuilderSettingInformationFromAppellant(APPELLANT_WITH_ADDRESS, null, null, null).build(),
+            getSscsCaseDataBuilderSettingInformationFromAppellant(null).build(),
             REQUEST_FOR_INFORMATION
         );
 
@@ -1117,7 +1114,7 @@ public class NotificationServiceTest {
     @Test
     public void shouldLogErrorWhenRequestForInformationWithNoInfoFromAppellant() {
         CcdNotificationWrapper wrapper = buildBaseWrapperWithCaseData(
-            getSscsCaseDataBuilderSettingInformationFromAppellant(APPELLANT_WITH_ADDRESS, null, null, "no").build(),
+            getSscsCaseDataBuilderSettingInformationFromAppellant("no").build(),
             REQUEST_FOR_INFORMATION
         );
 
@@ -1130,7 +1127,7 @@ public class NotificationServiceTest {
     @Test
     public void shouldNotLogErrorWhenRequestForInformationWithInfoFromAppellant() {
         CcdNotificationWrapper wrapper = buildBaseWrapperWithCaseData(
-            getSscsCaseDataBuilderSettingInformationFromAppellant(APPELLANT_WITH_ADDRESS, null, null, "yes").build(),
+            getSscsCaseDataBuilderSettingInformationFromAppellant("yes").build(),
             REQUEST_FOR_INFORMATION
         );
 
@@ -1157,7 +1154,7 @@ public class NotificationServiceTest {
     @Parameters(method = "allEventTypesExceptRequestForInformationAndProcessingHearingRequest")
     public void shouldNotLogErrorWhenNotRequestForInformation(NotificationEventType eventType) {
         CcdNotificationWrapper wrapper = buildBaseWrapperWithCaseData(
-            getSscsCaseDataBuilderSettingInformationFromAppellant(APPELLANT_WITH_ADDRESS, null, null, "yes").build(),
+            getSscsCaseDataBuilderSettingInformationFromAppellant("yes").build(),
             eventType
         );
 
@@ -1177,13 +1174,13 @@ public class NotificationServiceTest {
 
         getNotificationService().manageNotificationAndSubscription(wrapper, false);
 
-        verifyErrorLogMessageNotLogged(mockAppender, captorLoggingEvent, "Request For Information");
+        verifyErrorLogMessageNotLogged(mockAppender, captorLoggingEvent);
     }
 
     @Test
     public void shouldLogErrorWhenNotValidationNotification() {
         CcdNotificationWrapper wrapper = buildBaseWrapperWithCaseData(
-            getSscsCaseDataBuilderSettingInformationFromAppellant(APPELLANT_WITH_ADDRESS, null, null, "yes").build(),
+            getSscsCaseDataBuilderSettingInformationFromAppellant("yes").build(),
             ADJOURNED
         );
 
@@ -1244,7 +1241,7 @@ public class NotificationServiceTest {
         SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler,
             notificationValidService, pdfLetterService, pdfStoreService);
 
-        final NotificationService notificationService = new NotificationService(factory, reminderService,
+        notificationService = new NotificationService(factory, reminderService,
             notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService,
             true, false
         );
@@ -1358,12 +1355,12 @@ public class NotificationServiceTest {
     private void addHearings(CcdNotificationWrapper ccdNotificationWrapper) {
         String currentTime = LocalTime.now().toString();
         ccdNotificationWrapper.getOldSscsCaseData().setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
-            .hearingId("0")
-            .hearingDate(LocalDate.now().toString())
-            .time(currentTime)
-            .epimsId("324")
-            .hearingChannel(HearingChannel.PAPER)
-            .build()).build()));
+                                                                                                              .hearingId("0")
+                                                                                                              .hearingDate(LocalDate.now().toString())
+                                                                                                              .time(currentTime)
+                                                                                                              .epimsId("324")
+                                                                                                              .hearingChannel(HearingChannel.PAPER)
+                                                                                                              .build()).build()));
 
     }
 
@@ -1390,13 +1387,11 @@ public class NotificationServiceTest {
         given(notificationValidService.isNotificationStillValidToSend(anyList(), any()))
             .willReturn(true);
 
-        byte[] sampleDirectionCoversheet = IOUtils.toByteArray(
-            getClass().getClassLoader().getResourceAsStream("pdf/direction-notice-coversheet-sample.pdf"));
-        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(sampleDirectionCoversheet);
+        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(getCoversheet());
 
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
 
-        assertEquals(notificationEventType, ccdNotificationWrapperCaptor.getValue().getNotificationType());
+        assertThat(ccdNotificationWrapperCaptor.getValue().getNotificationType()).isEqualTo(notificationEventType);
 
         then(notificationHandler).should(times(1)).sendNotification(
             eq(ccdNotificationWrapper), any(), eq("Letter"),
@@ -1449,13 +1444,11 @@ public class NotificationServiceTest {
         given(notificationValidService.isNotificationStillValidToSend(anyList(), any()))
             .willReturn(true);
 
-        byte[] sampleDirectionCoversheet = IOUtils.toByteArray(
-            getClass().getClassLoader().getResourceAsStream("pdf/direction-notice-coversheet-sample.pdf"));
-        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(sampleDirectionCoversheet);
+        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(getCoversheet());
 
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
 
-        assertEquals(notificationEventType, ccdNotificationWrapperCaptor.getValue().getNotificationType());
+        assertThat(ccdNotificationWrapperCaptor.getValue().getNotificationType()).isEqualTo(notificationEventType);
 
         then(notificationHandler).should().sendNotification(
             eq(ccdNotificationWrapper), any(), eq("Letter"),
@@ -1483,13 +1476,11 @@ public class NotificationServiceTest {
         given(notificationValidService.isNotificationStillValidToSend(anyList(), any()))
             .willReturn(true);
 
-        byte[] sampleDirectionCoversheet = IOUtils.toByteArray(
-            getClass().getClassLoader().getResourceAsStream("pdf/direction-notice-coversheet-sample.pdf"));
-        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(sampleDirectionCoversheet);
+        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(getCoversheet());
 
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
 
-        assertEquals(ISSUE_FINAL_DECISION, ccdNotificationWrapperCaptor.getValue().getNotificationType());
+        assertThat(ccdNotificationWrapperCaptor.getValue().getNotificationType()).isEqualTo(ISSUE_FINAL_DECISION);
 
         then(notificationHandler).should(times(2)).sendNotification(
             eq(ccdNotificationWrapper), any(), eq("Letter"),
@@ -1514,13 +1505,11 @@ public class NotificationServiceTest {
         given(notificationValidService.isNotificationStillValidToSend(anyList(), any()))
             .willReturn(true);
 
-        byte[] sampleDirectionCoversheet = IOUtils.toByteArray(
-            getClass().getClassLoader().getResourceAsStream("pdf/direction-notice-coversheet-sample.pdf"));
-        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(sampleDirectionCoversheet);
+        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(getCoversheet());
 
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, true);
 
-        assertEquals(sentNotificationType, ccdNotificationWrapperCaptor.getValue().getNotificationType());
+        assertThat(ccdNotificationWrapperCaptor.getValue().getNotificationType()).isEqualTo(sentNotificationType);
 
         then(notificationHandler).should(atLeastOnce()).sendNotification(
             eq(ccdNotificationWrapper), any(), eq("Letter"),
@@ -1576,13 +1565,11 @@ public class NotificationServiceTest {
         given(notificationValidService.isNotificationStillValidToSend(anyList(), any()))
             .willReturn(true);
 
-        byte[] sampleDirectionCoversheet = IOUtils.toByteArray(
-            getClass().getClassLoader().getResourceAsStream("pdf/direction-notice-coversheet-sample.pdf"));
-        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(sampleDirectionCoversheet);
+        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(getCoversheet());
 
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
 
-        assertEquals(notificationEventType, ccdNotificationWrapperCaptor.getValue().getNotificationType());
+        assertThat(ccdNotificationWrapperCaptor.getValue().getNotificationType()).isEqualTo(notificationEventType);
 
         then(notificationHandler).should(atLeastOnce()).sendNotification(
             eq(ccdNotificationWrapper), any(), eq("Letter"),
@@ -1613,13 +1600,11 @@ public class NotificationServiceTest {
         given(notificationValidService.isNotificationStillValidToSend(anyList(), any()))
             .willReturn(true);
 
-        byte[] sampleDirectionCoversheet = IOUtils.toByteArray(
-            getClass().getClassLoader().getResourceAsStream("pdf/direction-notice-coversheet-sample.pdf"));
-        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(sampleDirectionCoversheet);
+        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(getCoversheet());
 
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
 
-        assertEquals(ISSUE_FINAL_DECISION, ccdNotificationWrapperCaptor.getValue().getNotificationType());
+        assertThat(ccdNotificationWrapperCaptor.getValue().getNotificationType()).isEqualTo(ISSUE_FINAL_DECISION);
 
         then(notificationHandler).should(times(2)).sendNotification(
             eq(ccdNotificationWrapper), any(), eq("Letter"),
@@ -1805,6 +1790,62 @@ public class NotificationServiceTest {
             any(NotificationHandler.SendNotification.class));
     }
 
+    @SuppressWarnings("unused")
+    private Object[] cmConfidentialityTestScenarios() {
+        final OtherParty existingParty = OtherParty.builder()
+                                                   .id("1")
+                                                   .name(Name.builder().firstName("OP").lastName("One").build())
+                                                   .address(Address.builder().line1("line 1").postcode("TS1 1ST").build())
+                                                   .sendNewOtherPartyNotification(YesNo.YES)
+                                                   .build();
+
+        final OtherParty newParty = OtherParty.builder()
+                                              .id("2")
+                                              .name(Name.builder().firstName("OP").lastName("Two").build())
+                                              .address(Address.builder().line1("line 2").postcode("TS2 2ST").build())
+                                              .sendNewOtherPartyNotification(YesNo.YES)
+                                              .build();
+
+        return new Object[]{
+            new Object[]{
+                "New other party added by ID with UPDATE_OTHER_PARTY_DATA event",
+                List.of(new CcdValue<>(existingParty)),
+                List.of(new CcdValue<>(existingParty), new CcdValue<>(newParty)),
+                null,
+                UPDATE_OTHER_PARTY_DATA,
+                OTHER_PARTY_ADDED_TO_APPEAL,
+                Benefit.CHILD_SUPPORT.getShortName()
+            },
+            new Object[]{
+                "Non UPDATE_OTHER_PARTY_DATA event with new other party",
+                List.of(new CcdValue<>(existingParty)),
+                List.of(new CcdValue<>(existingParty), new CcdValue<>(newParty)),
+                null,
+                ADMIN_APPEAL_WITHDRAWN,
+                ADMIN_APPEAL_WITHDRAWN,
+                Benefit.CHILD_SUPPORT.getShortName()
+            },
+            new Object[]{
+                "Null old data with multiple other parties",
+                null,
+                List.of(new CcdValue<>(existingParty), new CcdValue<>(newParty)),
+                null,
+                UPDATE_OTHER_PARTY_DATA,
+                OTHER_PARTY_ADDED_TO_APPEAL,
+                Benefit.CHILD_SUPPORT.getShortName()
+            },
+            new Object[]{
+                "Non-childSupport benefit type is not notified for other party added",
+                List.of(new CcdValue<>(existingParty)),
+                List.of(new CcdValue<>(existingParty), new CcdValue<>(newParty)),
+                null,
+                UPDATE_OTHER_PARTY_DATA,
+                UPDATE_OTHER_PARTY_DATA,
+                Benefit.UC.getShortName()
+            }
+        };
+    }
+
     @Test
     public void givenUpdateOtherPartyDataReceivedAndNewOtherPartyHasBeenAdded_thenSendToLetterToOtherParty() throws IOException {
 
@@ -1820,13 +1861,11 @@ public class NotificationServiceTest {
         given(notificationValidService.isNotificationStillValidToSend(anyList(), any()))
             .willReturn(true);
 
-        byte[] sampleDirectionCoversheet = IOUtils.toByteArray(
-            getClass().getClassLoader().getResourceAsStream("pdf/direction-notice-coversheet-sample.pdf"));
-        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(sampleDirectionCoversheet);
+        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(getCoversheet());
 
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
 
-        assertEquals(UPDATE_OTHER_PARTY_DATA, ccdNotificationWrapperCaptor.getValue().getNotificationType());
+        assertThat(ccdNotificationWrapperCaptor.getValue().getNotificationType()).isEqualTo(UPDATE_OTHER_PARTY_DATA);
 
         then(notificationHandler).should(times(2)).sendNotification(
             eq(ccdNotificationWrapper), any(), eq("Letter"),
@@ -1849,13 +1888,11 @@ public class NotificationServiceTest {
         given(notificationValidService.isNotificationStillValidToSend(anyList(), any()))
             .willReturn(true);
 
-        byte[] sampleDirectionCoversheet = IOUtils.toByteArray(
-            getClass().getClassLoader().getResourceAsStream("pdf/direction-notice-coversheet-sample.pdf"));
-        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(sampleDirectionCoversheet);
+        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(getCoversheet());
 
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
 
-        assertEquals(UPDATE_OTHER_PARTY_DATA, ccdNotificationWrapperCaptor.getValue().getNotificationType());
+        assertThat(ccdNotificationWrapperCaptor.getValue().getNotificationType()).isEqualTo(UPDATE_OTHER_PARTY_DATA);
 
         then(notificationHandler).should(times(6)).sendNotification(
             eq(ccdNotificationWrapper), any(), eq("Letter"),
@@ -1871,79 +1908,6 @@ public class NotificationServiceTest {
                 && !EVENTS_FOR_ACTION_FURTHER_EVIDENCE.contains(eventType)
                 && !EVENT_TYPES_FOR_BUNDLED_LETTER.contains(eventType))
         ).toArray();
-    }
-
-    @Test
-    public void hasJustSubscribedNoChange_returnsFalse() {
-        assertFalse(NotificationService.hasCaseJustSubscribed(subscription, subscription));
-    }
-
-    @Test
-    public void hasJustSubscribedUnsubscribedEmailAndSms_returnsFalse() {
-        Subscription newSubscription = subscription
-            .toBuilder()
-            .subscribeEmail(NO)
-            .subscribeSms(NO)
-            .wantSmsNotifications(NO)
-            .build();
-        assertFalse(NotificationService.hasCaseJustSubscribed(newSubscription, subscription));
-    }
-
-    @Test
-    public void hasJustSubscribedEmailAndMobile_returnsTrue() {
-        Subscription oldSubscription = subscription
-            .toBuilder()
-            .subscribeEmail(NO)
-            .subscribeSms(NO)
-            .wantSmsNotifications(NO)
-            .build();
-        assertTrue(NotificationService.hasCaseJustSubscribed(subscription, oldSubscription));
-    }
-
-    @Test
-    public void hasJustSubscribedEmail_returnsTrue() {
-        Subscription oldSubscription = subscription.toBuilder().subscribeEmail(NO).build();
-        assertTrue(NotificationService.hasCaseJustSubscribed(subscription, oldSubscription));
-    }
-
-    @Test
-    public void hasJustSubscribedSms_returnsTrue() {
-        Subscription oldSubscription = subscription.toBuilder().subscribeSms(NO).wantSmsNotifications(NO).build();
-        assertTrue(NotificationService.hasCaseJustSubscribed(subscription, oldSubscription));
-    }
-
-    @Test
-    public void givenActionPostponementRequestWithRefuseOnTheDay_willNotSendNotifications() {
-        ccdNotificationWrapper = buildBaseWrapper(ACTION_POSTPONEMENT_REQUEST, APPELLANT_WITH_ADDRESS,
-            Representative.builder().hasRepresentative("no").build(),
-            SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build());
-
-        ccdNotificationWrapper
-            .getNewSscsCaseData()
-            .getPostponementRequest()
-            .setActionPostponementRequestSelected("refuseOnTheDay");
-        notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
-
-        verifyNoInteractions(notificationValidService);
-        verifyNoInteractions(notificationHandler);
-    }
-
-    @Test
-    public void willNotSendHearingNotifications_whenGapsAndActionPostponementRequest() {
-        ccdNotificationWrapper = buildBaseWrapper(POSTPONEMENT, APPELLANT_WITH_ADDRESS, null, null);
-        ccdNotificationWrapper.getNewSscsCaseData().getSchedulingAndListingFields().setHearingRoute(HearingRoute.GAPS);
-
-        SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler,
-            notificationValidService, pdfLetterService, pdfStoreService);
-
-        final NotificationService notificationService = new NotificationService(factory, reminderService,
-            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService,
-            false, false
-        );
-
-        notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
-
-        then(notificationHandler).shouldHaveNoMoreInteractions();
     }
 
     @Test
@@ -1967,372 +1931,6 @@ public class NotificationServiceTest {
         then(notificationHandler).should(atLeastOnce()).sendNotification(
             eq(ccdNotificationWrapper), eq("emailTemplateId"), eq("Email"),
             any(NotificationHandler.SendNotification.class));
-    }
-
-    @Test
-    public void givenAddOtherPartyDataAndFeatureFlagDisabled_willProceedWithNotification() {
-        ccdNotificationWrapper = buildBaseWrapper(ADD_OTHER_PARTY_DATA, APPELLANT_WITH_ADDRESS, null, null);
-        ccdNotificationWrapper.getSscsCaseDataWrapper().setState(State.WITH_DWP);
-
-        final Notification notification = new Notification(
-            Template.builder().docmosisTemplateId(LETTER_TEMPLATE_ID).build(),
-            Destination.builder().build(),
-            new HashMap<>(), new Reference(), null);
-        given(factory.create(any(NotificationWrapper.class), any(SubscriptionWithType.class))).willReturn(notification);
-        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(new byte[]{1});
-
-        notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
-
-        then(notificationHandler).should(times(1)).sendNotification(
-            eq(ccdNotificationWrapper), any(), eq(LETTER),
-            any(NotificationHandler.SendNotification.class));
-    }
-
-    @Test
-    public void givenNonAddOtherPartyDataEventAndFeatureFlagEnabled_willNotBeBlockedByThisCondition() {
-        ccdNotificationWrapper = buildBaseWrapper(APPEAL_WITHDRAWN, APPELLANT_WITH_ADDRESS, null, null);
-        ccdNotificationWrapper.getNewSscsCaseData().getAppeal().getBenefitType().setCode(Benefit.UC.getShortName());
-
-        given(notificationValidService.isHearingTypeValidToSendNotification(any(), eq(APPEAL_WITHDRAWN))).willReturn(true);
-        given(notificationValidService.isNotificationStillValidToSend(any(), eq(APPEAL_WITHDRAWN))).willReturn(true);
-        final Notification notification = new Notification(
-            Template.builder().emailTemplateId(EMAIL_TEMPLATE_ID).build(),
-            Destination.builder().email("test@test.com").build(),
-            new HashMap<>(), new Reference(), null);
-        given(factory.create(any(NotificationWrapper.class), any(SubscriptionWithType.class))).willReturn(notification);
-
-        getNotificationServiceWithCmOtherPartyConfidentialityEnabled()
-            .manageNotificationAndSubscription(ccdNotificationWrapper, false);
-
-        then(notificationHandler).should(atLeastOnce()).sendNotification(
-            eq(ccdNotificationWrapper), any(), eq(EMAIL),
-            any(NotificationHandler.SendNotification.class));
-    }
-
-    @Test
-    public void givenAddOtherPartyDataWithNonUcBenefitAndFeatureFlagEnabled_willNotSendNotification() {
-        ccdNotificationWrapper = buildBaseWrapper(ADD_OTHER_PARTY_DATA, APPELLANT_WITH_ADDRESS, null, null);
-        ccdNotificationWrapper.getSscsCaseDataWrapper().setState(State.AWAIT_CONFIDENTIALITY_REQUIREMENTS);
-
-        getNotificationServiceWithCmOtherPartyConfidentialityEnabled()
-            .manageNotificationAndSubscription(ccdNotificationWrapper, false);
-
-        verifyNoInteractions(notificationValidService);
-        verifyNoInteractions(notificationHandler);
-    }
-
-    @Test
-    public void givenAddOtherPartyDataWithUcBenefitButWrongStateAndFeatureFlagEnabled_willNotSendNotification() {
-        ccdNotificationWrapper = buildBaseWrapper(ADD_OTHER_PARTY_DATA, APPELLANT_WITH_ADDRESS, null, null);
-        ccdNotificationWrapper.getNewSscsCaseData().getAppeal().getBenefitType().setCode(Benefit.UC.getShortName());
-        ccdNotificationWrapper.getSscsCaseDataWrapper().setState(State.WITH_DWP);
-
-        getNotificationServiceWithCmOtherPartyConfidentialityEnabled()
-            .manageNotificationAndSubscription(ccdNotificationWrapper, false);
-
-        verifyNoInteractions(notificationValidService);
-        verifyNoInteractions(notificationHandler);
-    }
-
-    @Test
-    public void givenAddOtherPartyDataWithUcBenefitAndAwaitingConfidentialityAndFeatureFlagEnabled_willProceedWithNotification() {
-        ccdNotificationWrapper = buildBaseWrapper(ADD_OTHER_PARTY_DATA, APPELLANT_WITH_ADDRESS, null, null);
-        ccdNotificationWrapper.getNewSscsCaseData().getAppeal().getBenefitType().setCode(Benefit.UC.getShortName());
-        ccdNotificationWrapper.getSscsCaseDataWrapper().setState(State.AWAIT_CONFIDENTIALITY_REQUIREMENTS);
-
-        final Notification notification = new Notification(
-            Template.builder().docmosisTemplateId(LETTER_TEMPLATE_ID).build(),
-            Destination.builder().build(),
-            new HashMap<>(), new Reference(), null);
-        given(factory.create(any(NotificationWrapper.class), any(SubscriptionWithType.class))).willReturn(notification);
-        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(new byte[]{1});
-
-        getNotificationServiceWithCmOtherPartyConfidentialityEnabled()
-            .manageNotificationAndSubscription(ccdNotificationWrapper, false);
-
-        then(notificationHandler).should(times(1)).sendNotification(
-            eq(ccdNotificationWrapper), any(), eq(LETTER),
-            any(NotificationHandler.SendNotification.class));
-    }
-
-    @Test
-    @Parameters({"CORRECTION_REQUEST", "LIBERTY_TO_APPLY_REQUEST", "STATEMENT_OF_REASONS_REQUEST", "SET_ASIDE_REQUEST"})
-    public void givenNotificationEventTypeAndSenderIsInValid_shouldManageNotificationAndSubscriptionAccordingly(
-        NotificationEventType eventType) {
-        DynamicList sender = new DynamicList(new DynamicListItem("dwp", "dwp"), new ArrayList<>());
-        SscsCaseData caseData = SscsCaseData.builder().ccdCaseId("1234").originalSender(sender).build();
-        CcdNotificationWrapper notificationWrapper = new CcdNotificationWrapper(
-            NotificationSscsCaseDataWrapper.builder().notificationEventType(eventType).newSscsCaseData(caseData).build());
-
-        notificationService.manageNotificationAndSubscription(notificationWrapper, false);
-        verifyExpectedLogMessage(mockAppender, captorLoggingEvent, notificationWrapper.getNewSscsCaseData().getCcdCaseId(),
-            "Incomplete Information with empty or no Information regarding sender for event", Level.INFO);
-    }
-
-    @DisplayName("When the original sender is null and Event type is VALID_SEND_TO_INTERLOC then return false.")
-    @Test
-    @Parameters({"CORRECTION_REQUEST", "LIBERTY_TO_APPLY_REQUEST", "STATEMENT_OF_REASONS_REQUEST", "SET_ASIDE_REQUEST"})
-    public void isNotificationStillValidToSendSetAsideRequest_senderIsNull_returnFalse(NotificationEventType eventType) {
-        SscsCaseData caseData = SscsCaseData.builder().ccdCaseId("1234").originalSender(null).build();
-        assertFalse(notificationService.isNotificationStillValidToSendSetAsideRequest(caseData, eventType));
-    }
-
-    @DisplayName("When the original sender is not null and sender is dwp then return false.")
-    @Test
-    @Parameters({"CORRECTION_REQUEST", "LIBERTY_TO_APPLY_REQUEST", "STATEMENT_OF_REASONS_REQUEST", "SET_ASIDE_REQUEST"})
-    public void isNotificationStillValidToSendSetAsideRequest_senderIsInValid_returnFalse(NotificationEventType eventType) {
-        DynamicList sender = new DynamicList(new DynamicListItem("dwp", "dwp"), new ArrayList<>());
-        SscsCaseData caseData = SscsCaseData.builder().ccdCaseId("1234").originalSender(sender).build();
-        assertFalse(notificationService.isNotificationStillValidToSendSetAsideRequest(caseData, eventType));
-    }
-
-    @DisplayName("When the original sender is not null, Event type is VALID_SEND_TO_INTERLOC and sender is other than dwp "
-        + "then return true.")
-    @Test
-    @Parameters({"CORRECTION_REQUEST", "LIBERTY_TO_APPLY_REQUEST", "STATEMENT_OF_REASONS_REQUEST", "SET_ASIDE_REQUEST"})
-    public void isNotificationStillValidToSendSetAsideRequest_senderIsValid_returnFalse(NotificationEventType eventType) {
-        DynamicList sender = new DynamicList(new DynamicListItem("appellant", "appellant"), new ArrayList<>());
-        SscsCaseData caseData = SscsCaseData.builder().ccdCaseId("1234").originalSender(sender).build();
-        assertTrue(notificationService.isNotificationStillValidToSendSetAsideRequest(caseData, eventType));
-    }
-
-    @DisplayName(
-        "When the original sender is not null, Event type is other than VALID_SEND_TO_INTERLOC and sender is other than dwp "
-            + " then return true.")
-    @Test
-    public void isNotificationStillValidToSendSetAsideRequest_InValidEventType_returnTrue() {
-        DynamicList sender = new DynamicList(new DynamicListItem("dwp1", "dwp1"), new ArrayList<>());
-        SscsCaseData caseData = SscsCaseData.builder().ccdCaseId("1234").originalSender(sender).build();
-        assertTrue(notificationService.isNotificationStillValidToSendSetAsideRequest(caseData, ADJOURNED));
-    }
-
-    @Test
-    public void givenDirectionIssuedForChildSupportWithAppealToProceed_whenCmFeatureEnabled_thenSendSecondNotificationToAppellant() {
-        final SscsCaseData caseData = getSscsCaseDataBuilder(APPELLANT_WITH_ADDRESS, Representative.builder().hasRepresentative("no").build(), null)
-            .appeal(Appeal.builder()
-                          .hearingType(AppealHearingType.ORAL.name())
-                          .hearingOptions(HearingOptions.builder().wantsToAttend(YES).build())
-                          .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
-                          .appellant(APPELLANT_WITH_ADDRESS)
-                          .rep(Representative.builder().hasRepresentative("no").build())
-                          .build())
-            .directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()))
-            .build();
-        final CcdNotificationWrapper wrapper = buildBaseWrapperWithCaseData(caseData, DIRECTION_ISSUED);
-
-        final Notification notification = new Notification(
-            Template.builder().emailTemplateId(EMAIL_TEMPLATE_ID).smsTemplateId(null).build(),
-            Destination.builder().email("test@testing.com").sms(null).build(),
-            new HashMap<>(), new Reference(), null);
-        given(factory.create(ccdNotificationWrapperCaptor.capture(), any())).willReturn(notification);
-
-        final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
-        final NotificationService serviceWithCmEnabled = new NotificationService(factory, reminderService,
-            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, true
-        );
-
-        serviceWithCmEnabled.manageNotificationAndSubscription(wrapper, false);
-
-        then(factory).should(times(2)).create(any(), any());
-        assertThat(ccdNotificationWrapperCaptor.getValue().getNotificationType()).isEqualTo(NOTIFY_APPELLANT_VALID_APPEAL);
-    }
-
-    @Test
-    @Parameters({
-        "false, CHILD_SUPPORT, APPEAL_TO_PROCEED",
-        "true, PIP, APPEAL_TO_PROCEED",
-        "true, PIP, PROVIDE_INFORMATION",
-        "true, CHILD_SUPPORT, PROVIDE_INFORMATION"
-    })
-    public void givenDirectionIssuedWithVariousScenarios_thenSendAppropriateNumberOfNotifications(
-        boolean cmFeatureEnabled, String benefitCode, String directionType) {
-
-        final SscsCaseData.SscsCaseDataBuilder caseDataBuilder = getSscsCaseDataBuilder(
-            APPELLANT_WITH_ADDRESS,
-            Representative.builder().hasRepresentative("no").build(),
-            null);
-
-        if (Benefit.CHILD_SUPPORT.name().equals(benefitCode)) {
-            caseDataBuilder.appeal(Appeal.builder()
-                                         .hearingType(AppealHearingType.ORAL.name())
-                                         .hearingOptions(HearingOptions.builder().wantsToAttend(YES).build())
-                                         .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
-                                         .appellant(APPELLANT_WITH_ADDRESS)
-                                         .rep(Representative.builder().hasRepresentative("no").build())
-                                         .build());
-        }
-
-        final SscsCaseData caseData = caseDataBuilder
-            .directionTypeDl(new DynamicList(DirectionType.valueOf(directionType).toString()))
-            .build();
-
-        final CcdNotificationWrapper wrapper = buildBaseWrapperWithCaseData(caseData, DIRECTION_ISSUED);
-
-        final Notification notification = new Notification(
-            Template.builder().emailTemplateId(EMAIL_TEMPLATE_ID).smsTemplateId(null).build(),
-            Destination.builder().email("test@testing.com").sms(null).build(),
-            new HashMap<>(), new Reference(), null);
-
-        given(factory.create(any(), any())).willReturn(notification);
-
-        final SendNotificationService sendNotificationService = new SendNotificationService(
-            notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
-
-        final NotificationService service = new NotificationService(
-            factory, reminderService, notificationValidService, notificationHandler,
-            outOfHoursCalculator, notificationConfig, sendNotificationService, false, cmFeatureEnabled
-        );
-
-        service.manageNotificationAndSubscription(wrapper, false);
-
-        then(factory).should(times(1)).create(any(), any());
-
-    }
-
-    @Test
-    @Parameters({
-        "ADMIN_SEND_TO_VALID_APPEAL, true",
-        "INTERLOC_VALID_APPEAL, true",
-        "VALID_APPEAL, true",
-        "ADMIN_SEND_TO_VALID_APPEAL, false",
-        "INTERLOC_VALID_APPEAL, false",
-        "VALID_APPEAL, false"
-    })
-    public void givenValidAppealEventNotification_whenCmEnabledOrDisabledAndNotChildSupport_shouldNotSendNotification(
-        final NotificationEventType eventType, boolean cmEnabled) {
-        final SscsCaseData caseData = getSscsCaseDataBuilder(APPELLANT_WITH_ADDRESS, null, null).build();
-        final CcdNotificationWrapper wrapper = buildBaseWrapperWithCaseData(caseData, eventType);
-
-        final SendNotificationService sendNotificationService = new SendNotificationService(
-            notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
-        final NotificationService service = new NotificationService(
-            factory, reminderService, notificationValidService, notificationHandler,
-            outOfHoursCalculator, notificationConfig, sendNotificationService, false, cmEnabled
-        );
-
-        service.manageNotificationAndSubscription(wrapper, false);
-
-        then(factory).should(never()).create(any(), any());
-    }
-
-    @Test
-    @Parameters({
-        "ADMIN_SEND_TO_VALID_APPEAL",
-        "INTERLOC_VALID_APPEAL",
-        "VALID_APPEAL"
-    })
-    public void givenValidAppealEventNotification_whenCmEnabledAndChildSupport_shouldProceedWithNotification(
-        final NotificationEventType eventType) {
-        final SscsCaseData caseData = getSscsCaseDataBuilder(APPELLANT_WITH_ADDRESS, null, null)
-            .appeal(Appeal.builder()
-                          .hearingType(AppealHearingType.ORAL.name())
-                          .hearingOptions(HearingOptions.builder().wantsToAttend(YES).build())
-                          .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
-                          .appellant(APPELLANT_WITH_ADDRESS)
-                          .rep(Representative.builder().hasRepresentative("no").build())
-                          .build())
-            .build();
-        final CcdNotificationWrapper wrapper = buildBaseWrapperWithCaseData(caseData, eventType);
-
-        final Notification notification = new Notification(
-            Template.builder().emailTemplateId(EMAIL_TEMPLATE_ID).smsTemplateId(null).build(),
-            Destination.builder().email("test@testing.com").sms(null).build(),
-            new HashMap<>(), new Reference(), null);
-        given(factory.create(any(), any())).willReturn(notification);
-        given(notificationValidService.isHearingTypeValidToSendNotification(any(), any())).willReturn(true);
-        given(notificationValidService.isNotificationStillValidToSend(anyList(), any())).willReturn(true);
-
-        final SendNotificationService sendNotificationService = new SendNotificationService(
-            notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
-        final NotificationService service = new NotificationService(
-            factory, reminderService, notificationValidService, notificationHandler,
-            outOfHoursCalculator, notificationConfig, sendNotificationService, false, true
-        );
-
-        service.manageNotificationAndSubscription(wrapper, false);
-
-        then(factory).should(atLeastOnce()).create(any(), any());
-    }
-
-    private static List<OtherPartyOption> getOtherPartyOptions(YesNo resendToOtherParty) {
-        return Collections.singletonList(OtherPartyOption
-            .builder()
-            .value(OtherPartyOptionDetails
-                .builder()
-                .otherPartyOptionId("3")
-                .otherPartyOptionName("OPAppointee OP3 - Appointee")
-                .resendToOtherParty(resendToOtherParty)
-                .build())
-            .build());
-    }
-
-    private static SscsCaseData.SscsCaseDataBuilder getSscsCaseDataBuilderSettingInformationFromAppellant(Appellant appellant,
-        Representative rep, SscsDocument sscsDocument, String informationFromAppellant) {
-        return SscsCaseData.builder()
-                           .appeal(
-                               Appeal
-                                   .builder()
-                                   .hearingType(AppealHearingType.ORAL.name())
-                                   .hearingOptions(HearingOptions.builder().wantsToAttend(YES).build())
-                                   .appellant(appellant)
-                                   .rep(rep)
-                                   .build())
-                           .dwpState(DwpState.RESPONSE_SUBMITTED_DWP)
-                           .subscriptions(Subscriptions.builder()
-                                                       .appellantSubscription(Subscription
-                                                           .builder()
-                                                           .tya(APPEAL_NUMBER)
-                                                           .email(EMAIL)
-                                                           .mobile(MOBILE_NUMBER_1)
-                                                           .subscribeEmail(YES)
-                                                           .subscribeSms(YES)
-                                                           .wantSmsNotifications(YES)
-                                                           .build()
-                                                       )
-                                                       .build())
-                           .caseReference(CASE_REFERENCE)
-                           .sscsInterlocDecisionDocument(SscsInterlocDecisionDocument
-                               .builder()
-                               .documentLink(DocumentLink
-                                   .builder()
-                                   .documentUrl("http://dm-store:4506/documents/1e1eb3d2-5b6c-430d-8dad-ebcea1ad7ecf")
-                                   .documentFilename("test.pdf")
-                                   .documentBinaryUrl("test/binary")
-                                   .build())
-                               .build())
-                           .sscsInterlocDirectionDocument(SscsInterlocDirectionDocument
-                               .builder()
-                               .documentLink(DocumentLink
-                                   .builder()
-                                   .documentUrl("http://dm-store:4506/documents/1e1eb3d2-5b6c-430d-8dad-ebcea1ad7ecf")
-                                   .documentFilename("test.pdf")
-                                   .documentBinaryUrl("test/binary")
-                                   .build())
-                               .build())
-                           .sscsStrikeOutDocument(SscsStrikeOutDocument
-                               .builder()
-                               .build()
-                               .builder()
-                               .documentLink(DocumentLink
-                                   .builder()
-                                   .documentUrl("http://dm-store:4506/documents/1e1eb3d2-5b6c-430d-8dad-ebcea1ad7ecf")
-                                   .documentFilename("test.pdf")
-                                   .documentBinaryUrl("test/binary")
-                                   .build())
-                               .build())
-                           .ccdCaseId(CASE_ID)
-                           .hearings(List.of(Hearing.builder().value(HearingDetails.builder().build()).build()))
-                           .sscsDocument(new ArrayList<>(singletonList(sscsDocument)))
-                           .informationFromAppellant(informationFromAppellant);
-    }
-
-    private static void verifyErrorLogMessageNotLogged(Appender<ILoggingEvent> mockAppender, ArgumentCaptor captorLoggingEvent,
-        String errorText) {
-        verify(mockAppender, atLeast(0)).doAppend(
-            (ILoggingEvent) captorLoggingEvent.capture()
-        );
-        List<ILoggingEvent> logEvents = (List<ILoggingEvent>) captorLoggingEvent.getAllValues();
-        assertEquals(0, logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage().contains(errorText)).count());
     }
 
     @SuppressWarnings({"Indentation", "UnusedPrivateMethod"})
@@ -3014,29 +2612,191 @@ public class NotificationServiceTest {
         return new CcdNotificationWrapper(notificationSscsCaseDataWrapper);
     }
 
-    private NotificationService getNotificationService() {
-        final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender,
-            notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
-        return new NotificationService(factory, reminderService,
-            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService,
-            false, false
-        );
+    @Test
+    @Parameters(method = "cmConfidentialityTestScenarios")
+    public void givenCmConfidentialityEnabledAndOtherPartyScenarios_thenHandleNotificationTypeAccordingly(
+        String scenarioName,
+        List<CcdValue<OtherParty>> oldParties,
+        List<CcdValue<OtherParty>> newParties,
+        SscsCaseData oldData,
+        NotificationEventType inputEventType,
+        NotificationEventType expectedEventType,
+        String benefitTypeCode
+    ) throws IOException {
+        final SendNotificationService sendNotificationService = new SendNotificationService(
+            notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
+        final NotificationService cmConfidentialityService = new NotificationService(
+            factory, reminderService, notificationValidService, notificationHandler,
+            outOfHoursCalculator, notificationConfig, sendNotificationService, false, true);
+
+        final SscsCaseData.SscsCaseDataBuilder baseBuilder = getSscsCaseDataBuilder(
+            APPELLANT_WITH_ADDRESS, null,
+            SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build());
+
+        final SscsCaseData actualOldData = oldData != null ? oldData :
+            (oldParties != null ? baseBuilder.otherParties(oldParties).build() : null);
+        final SscsCaseData newData = baseBuilder.otherParties(newParties).build();
+        newData.getAppeal().getBenefitType().setCode(benefitTypeCode);
+
+        ccdNotificationWrapper = buildBaseWrapperWithCaseData(newData, actualOldData, inputEventType);
+
+        final Notification notification = new Notification(
+            Template.builder().docmosisTemplateId(LETTER_TEMPLATE_ID).emailTemplateId(null).smsTemplateId(null).build(),
+            Destination.builder().email("test@testing.com").sms("07823456746").build(),
+            new HashMap<>(), new Reference(), null);
+
+        given(factory.create(ccdNotificationWrapperCaptor.capture(), any())).willReturn(notification);
+        given(notificationValidService.isHearingTypeValidToSendNotification(any(SscsCaseData.class), any())).willReturn(true);
+        given(notificationValidService.isNotificationStillValidToSend(anyList(), any())).willReturn(true);
+        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(getCoversheet());
+
+        cmConfidentialityService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
+
+        assertThat(ccdNotificationWrapperCaptor.getValue().getNotificationType()).isEqualTo(expectedEventType);
     }
 
-    private NotificationService getNotificationServiceWithCmOtherPartyConfidentialityEnabled() {
-        final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender,
-            notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
-        return new NotificationService(factory, reminderService,
-            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService,
-            false, true
-        );
+    @Test
+    public void givenCmConfidentialityEnabledAndOtherPartiesUnchangedById_thenDoNotTriggerOtherPartyAddedToAppeal() throws IOException {
+        final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
+        final NotificationService cmConfidentialityService = new NotificationService(factory, reminderService,
+            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, true);
+
+        ccdNotificationWrapper = buildBaseWrapperOtherParty(UPDATE_OTHER_PARTY_DATA, APPELLANT_WITH_ADDRESS, SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build());
+
+        final Notification notification = new Notification(Template.builder().docmosisTemplateId(LETTER_TEMPLATE_ID).emailTemplateId(null).smsTemplateId(null).build(), Destination.builder().email("test@testing.com").sms("07823456746").build(), new HashMap<>(), new Reference(), null);
+        given(factory.create(ccdNotificationWrapperCaptor.capture(), any())).willReturn(notification);
+        given(notificationValidService.isHearingTypeValidToSendNotification(any(SscsCaseData.class), any())).willReturn(true);
+        given(notificationValidService.isNotificationStillValidToSend(anyList(), any())).willReturn(true);
+        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(getCoversheet());
+
+        cmConfidentialityService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
+
+        assertThat(ccdNotificationWrapperCaptor.getValue().getNotificationType()).isEqualTo(UPDATE_OTHER_PARTY_DATA);
     }
 
-    private CcdNotificationWrapper buildWrapperWithDocuments(NotificationEventType eventType, String fileUrl, Appellant appellant,
-        Representative rep, String documentType) {
+    @Test
+    public void givenCmConfidentialityEnabledAndUpdateOtherPartyDataWithSingleOtherParty_thenDoNotTriggerOtherPartyAddedToAppeal() throws IOException {
+        final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
+        final NotificationService cmConfidentialityService = new NotificationService(factory, reminderService,
+            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, true);
+
+        final OtherParty singleOtherParty = OtherParty.builder()
+                                                      .id("1")
+                                                      .name(Name.builder().firstName("OP").lastName("One").build())
+                                                      .address(Address.builder().line1("line 1").postcode("TS1 1ST").build())
+                                                      .sendNewOtherPartyNotification(YesNo.YES)
+                                                      .build();
+        final SscsCaseData sscsCaseDataSingleOtherParty = getSscsCaseDataBuilder(APPELLANT_WITH_ADDRESS, null, SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build())
+            .otherParties(List.of(new CcdValue<>(singleOtherParty)))
+            .build();
+        final CcdNotificationWrapper wrapper = buildBaseWrapperWithCaseData(sscsCaseDataSingleOtherParty, UPDATE_OTHER_PARTY_DATA);
+
+        final Notification notification = new Notification(Template.builder().docmosisTemplateId(LETTER_TEMPLATE_ID).emailTemplateId(null).smsTemplateId(null).build(), Destination.builder().email("test@testing.com").sms("07823456746").build(), new HashMap<>(), new Reference(), null);
+        given(factory.create(any(), any())).willReturn(notification);
+        given(notificationValidService.isHearingTypeValidToSendNotification(any(SscsCaseData.class), any())).willReturn(true);
+        given(notificationValidService.isNotificationStillValidToSend(anyList(), any())).willReturn(true);
+        final byte[] sampleDirectionCoversheet = getCoversheet();
+        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(sampleDirectionCoversheet);
+
+        cmConfidentialityService.manageNotificationAndSubscription(wrapper, false);
+
+        assertThat(wrapper.getNotificationType()).isEqualTo(UPDATE_OTHER_PARTY_DATA);
+    }
+
+    @Test
+    public void givenCmConfidentialityDisabledAndUpdateOtherPartyDataWithMultipleOtherParties_thenDoNotTriggerOtherPartyAddedToAppeal() throws IOException {
+        ccdNotificationWrapper = buildBaseWrapperOtherParty(UPDATE_OTHER_PARTY_DATA, APPELLANT_WITH_ADDRESS, SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build());
+
+        final Notification notification = new Notification(Template.builder().docmosisTemplateId(LETTER_TEMPLATE_ID).emailTemplateId(null).smsTemplateId(null).build(), Destination.builder().email("test@testing.com").sms("07823456746").build(), new HashMap<>(), new Reference(), null);
+        given(factory.create(ccdNotificationWrapperCaptor.capture(), any())).willReturn(notification);
+        given(notificationValidService.isHearingTypeValidToSendNotification(any(SscsCaseData.class), any())).willReturn(true);
+        given(notificationValidService.isNotificationStillValidToSend(anyList(), any())).willReturn(true);
+
+        final byte[] sampleDirectionCoversheet = getCoversheet();
+        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(sampleDirectionCoversheet);
+
+        notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
+
+        assertThat(ccdNotificationWrapperCaptor.getValue().getNotificationType()).isEqualTo(UPDATE_OTHER_PARTY_DATA);
+    }
+
+    @Test
+    public void givenCmConfidentialityEnabledAndUpdateOtherPartyDataWithNoOtherParties_thenDoNotTriggerOtherPartyAddedToAppeal() {
+        final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
+        final NotificationService cmConfidentialityService = new NotificationService(factory, reminderService,
+            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, true);
+
+        final SscsCaseData sscsCaseDataNoOtherParties = getSscsCaseDataBuilder(APPELLANT_WITH_ADDRESS, null, SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build())
+            .otherParties(null)
+            .build();
+        final CcdNotificationWrapper wrapper = buildBaseWrapperWithCaseData(sscsCaseDataNoOtherParties, UPDATE_OTHER_PARTY_DATA);
+
+        given(notificationValidService.isHearingTypeValidToSendNotification(any(SscsCaseData.class), any())).willReturn(false);
+
+        cmConfidentialityService.manageNotificationAndSubscription(wrapper, false);
+
+        assertThat(wrapper.getNotificationType()).isEqualTo(UPDATE_OTHER_PARTY_DATA);
+    }
+
+    @Test
+    public void hasJustSubscribedNoChange_returnsFalse() {
+        assertThat(NotificationService.hasCaseJustSubscribed(subscription, subscription)).isFalse();
+    }
+
+    @Test
+    public void hasJustSubscribedUnsubscribedEmailAndSms_returnsFalse() {
+        Subscription newSubscription = subscription
+            .toBuilder()
+            .subscribeEmail(NO)
+            .subscribeSms(NO)
+            .wantSmsNotifications(NO)
+            .build();
+        assertThat(NotificationService.hasCaseJustSubscribed(newSubscription, subscription)).isFalse();
+    }
+
+    @Test
+    public void hasJustSubscribedEmailAndMobile_returnsTrue() {
+        Subscription oldSubscription = subscription
+            .toBuilder()
+            .subscribeEmail(NO)
+            .subscribeSms(NO)
+            .wantSmsNotifications(NO)
+            .build();
+        assertThat(NotificationService.hasCaseJustSubscribed(subscription, oldSubscription)).isTrue();
+    }
+
+    @Test
+    public void hasJustSubscribedEmail_returnsTrue() {
+        Subscription oldSubscription = subscription.toBuilder().subscribeEmail(NO).build();
+        assertThat(NotificationService.hasCaseJustSubscribed(subscription, oldSubscription)).isTrue();
+    }
+
+    @Test
+    public void hasJustSubscribedSms_returnsTrue() {
+        Subscription oldSubscription = subscription.toBuilder().subscribeSms(NO).wantSmsNotifications(NO).build();
+        assertThat(NotificationService.hasCaseJustSubscribed(subscription, oldSubscription)).isTrue();
+    }
+
+    @Test
+    public void givenActionPostponementRequestWithRefuseOnTheDay_willNotSendNotifications() {
+        ccdNotificationWrapper = buildBaseWrapper(ACTION_POSTPONEMENT_REQUEST, APPELLANT_WITH_ADDRESS,
+            Representative.builder().hasRepresentative("no").build(),
+            SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build());
+
+        ccdNotificationWrapper
+            .getNewSscsCaseData()
+            .getPostponementRequest()
+            .setActionPostponementRequestSelected("refuseOnTheDay");
+        notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
+
+        verifyNoInteractions(notificationValidService);
+        verifyNoInteractions(notificationHandler);
+    }
+
+    private CcdNotificationWrapper buildWrapperWithDocuments(String fileUrl) {
 
         SscsDocumentDetails sscsDocumentDetails = SscsDocumentDetails.builder()
-                                                                     .documentType(documentType)
+                                                                     .documentType("")
                                                                      .documentLink(
                                                                          DocumentLink.builder()
                                                                                      .documentUrl(fileUrl)
@@ -3048,7 +2808,7 @@ public class NotificationServiceTest {
 
         SscsDocument sscsDocument = SscsDocument.builder().value(sscsDocumentDetails).build();
 
-        return buildBaseWrapper(eventType, appellant, rep, sscsDocument);
+        return buildBaseWrapper(NotificationEventType.APPEAL_RECEIVED, NotificationServiceTest.APPELLANT_WITH_ADDRESS, null, sscsDocument);
     }
 
     private SubscriptionWithType getSubscriptionWithType(CcdNotificationWrapper ccdNotificationWrapper) {
@@ -3064,6 +2824,311 @@ public class NotificationServiceTest {
             ccdNotificationWrapper.getNewSscsCaseData().getAppeal().getRep());
     }
 
+    @Test
+    public void givenAddOtherPartyDataAndFeatureFlagDisabled_willProceedWithNotification() {
+        ccdNotificationWrapper = buildBaseWrapper(ADD_OTHER_PARTY_DATA, APPELLANT_WITH_ADDRESS, null, null);
+        ccdNotificationWrapper.getSscsCaseDataWrapper().setState(State.WITH_DWP);
+
+        final Notification notification = new Notification(
+            Template.builder().docmosisTemplateId(LETTER_TEMPLATE_ID).build(),
+            Destination.builder().build(),
+            new HashMap<>(), new Reference(), null);
+        given(factory.create(any(NotificationWrapper.class), any(SubscriptionWithType.class))).willReturn(notification);
+        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(new byte[]{1});
+
+        notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
+
+        then(notificationHandler).should(times(1)).sendNotification(
+            eq(ccdNotificationWrapper), any(), eq(LETTER),
+            any(NotificationHandler.SendNotification.class));
+    }
+
+    @Test
+    public void givenNonAddOtherPartyDataEventAndFeatureFlagEnabled_willNotBeBlockedByThisCondition() {
+        ccdNotificationWrapper = buildBaseWrapper(APPEAL_WITHDRAWN, APPELLANT_WITH_ADDRESS, null, null);
+        ccdNotificationWrapper.getNewSscsCaseData().getAppeal().getBenefitType().setCode(Benefit.UC.getShortName());
+
+        given(notificationValidService.isHearingTypeValidToSendNotification(any(), eq(APPEAL_WITHDRAWN))).willReturn(true);
+        given(notificationValidService.isNotificationStillValidToSend(any(), eq(APPEAL_WITHDRAWN))).willReturn(true);
+        final Notification notification = new Notification(
+            Template.builder().emailTemplateId(EMAIL_TEMPLATE_ID).build(),
+            Destination.builder().email("test@test.com").build(),
+            new HashMap<>(), new Reference(), null);
+        given(factory.create(any(NotificationWrapper.class), any(SubscriptionWithType.class))).willReturn(notification);
+
+        getNotificationServiceWithCmOtherPartyConfidentialityEnabled()
+            .manageNotificationAndSubscription(ccdNotificationWrapper, false);
+
+        then(notificationHandler).should(atLeastOnce()).sendNotification(
+            eq(ccdNotificationWrapper), any(), eq(EMAIL),
+            any(NotificationHandler.SendNotification.class));
+    }
+
+    @Test
+    public void givenAddOtherPartyDataWithNonUcBenefitAndFeatureFlagEnabled_willNotSendNotification() {
+        ccdNotificationWrapper = buildBaseWrapper(ADD_OTHER_PARTY_DATA, APPELLANT_WITH_ADDRESS, null, null);
+        ccdNotificationWrapper.getSscsCaseDataWrapper().setState(State.AWAIT_CONFIDENTIALITY_REQUIREMENTS);
+
+        getNotificationServiceWithCmOtherPartyConfidentialityEnabled()
+            .manageNotificationAndSubscription(ccdNotificationWrapper, false);
+
+        verifyNoInteractions(notificationValidService);
+        verifyNoInteractions(notificationHandler);
+    }
+
+    @Test
+    public void givenAddOtherPartyDataWithUcBenefitButWrongStateAndFeatureFlagEnabled_willNotSendNotification() {
+        ccdNotificationWrapper = buildBaseWrapper(ADD_OTHER_PARTY_DATA, APPELLANT_WITH_ADDRESS, null, null);
+        ccdNotificationWrapper.getNewSscsCaseData().getAppeal().getBenefitType().setCode(Benefit.UC.getShortName());
+        ccdNotificationWrapper.getSscsCaseDataWrapper().setState(State.WITH_DWP);
+
+        getNotificationServiceWithCmOtherPartyConfidentialityEnabled()
+            .manageNotificationAndSubscription(ccdNotificationWrapper, false);
+
+        verifyNoInteractions(notificationValidService);
+        verifyNoInteractions(notificationHandler);
+    }
+
+    @Test
+    public void givenAddOtherPartyDataWithUcBenefitAndAwaitingConfidentialityAndFeatureFlagEnabled_willProceedWithNotification() {
+        ccdNotificationWrapper = buildBaseWrapper(ADD_OTHER_PARTY_DATA, APPELLANT_WITH_ADDRESS, null, null);
+        ccdNotificationWrapper.getNewSscsCaseData().getAppeal().getBenefitType().setCode(Benefit.UC.getShortName());
+        ccdNotificationWrapper.getSscsCaseDataWrapper().setState(State.AWAIT_CONFIDENTIALITY_REQUIREMENTS);
+
+        final Notification notification = new Notification(
+            Template.builder().docmosisTemplateId(LETTER_TEMPLATE_ID).build(),
+            Destination.builder().build(),
+            new HashMap<>(), new Reference(), null);
+        given(factory.create(any(NotificationWrapper.class), any(SubscriptionWithType.class))).willReturn(notification);
+        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(new byte[]{1});
+
+        getNotificationServiceWithCmOtherPartyConfidentialityEnabled()
+            .manageNotificationAndSubscription(ccdNotificationWrapper, false);
+
+        then(notificationHandler).should(times(1)).sendNotification(
+            eq(ccdNotificationWrapper), any(), eq(LETTER),
+            any(NotificationHandler.SendNotification.class));
+    }
+
+    @Test
+    @Parameters({"CORRECTION_REQUEST", "LIBERTY_TO_APPLY_REQUEST", "STATEMENT_OF_REASONS_REQUEST", "SET_ASIDE_REQUEST"})
+    public void givenNotificationEventTypeAndSenderIsInValid_shouldManageNotificationAndSubscriptionAccordingly(
+        NotificationEventType eventType) {
+        DynamicList sender = new DynamicList(new DynamicListItem("dwp", "dwp"), new ArrayList<>());
+        SscsCaseData caseData = SscsCaseData.builder().ccdCaseId("1234").originalSender(sender).build();
+        CcdNotificationWrapper notificationWrapper = new CcdNotificationWrapper(
+            NotificationSscsCaseDataWrapper.builder().notificationEventType(eventType).newSscsCaseData(caseData).build());
+
+        notificationService.manageNotificationAndSubscription(notificationWrapper, false);
+        verifyExpectedLogMessage(mockAppender, captorLoggingEvent, notificationWrapper.getNewSscsCaseData().getCcdCaseId(),
+            "Incomplete Information with empty or no Information regarding sender for event", Level.INFO);
+    }
+
+    @DisplayName("When the original sender is null and Event type is VALID_SEND_TO_INTERLOC then return false.")
+    @Test
+    @Parameters({"CORRECTION_REQUEST", "LIBERTY_TO_APPLY_REQUEST", "STATEMENT_OF_REASONS_REQUEST", "SET_ASIDE_REQUEST"})
+    public void isNotificationStillValidToSendSetAsideRequest_senderIsNull_returnFalse(NotificationEventType eventType) {
+        SscsCaseData caseData = SscsCaseData.builder().ccdCaseId("1234").originalSender(null).build();
+        assertFalse(notificationService.isNotificationStillValidToSendSetAsideRequest(caseData, eventType));
+    }
+
+    @DisplayName("When the original sender is not null and sender is dwp then return false.")
+    @Test
+    @Parameters({"CORRECTION_REQUEST", "LIBERTY_TO_APPLY_REQUEST", "STATEMENT_OF_REASONS_REQUEST", "SET_ASIDE_REQUEST"})
+    public void isNotificationStillValidToSendSetAsideRequest_senderIsInValid_returnFalse(NotificationEventType eventType) {
+        DynamicList sender = new DynamicList(new DynamicListItem("dwp", "dwp"), new ArrayList<>());
+        SscsCaseData caseData = SscsCaseData.builder().ccdCaseId("1234").originalSender(sender).build();
+        assertFalse(notificationService.isNotificationStillValidToSendSetAsideRequest(caseData, eventType));
+    }
+
+    @DisplayName("When the original sender is not null, Event type is VALID_SEND_TO_INTERLOC and sender is other than dwp "
+        + "then return true.")
+    @Test
+    @Parameters({"CORRECTION_REQUEST", "LIBERTY_TO_APPLY_REQUEST", "STATEMENT_OF_REASONS_REQUEST", "SET_ASIDE_REQUEST"})
+    public void isNotificationStillValidToSendSetAsideRequest_senderIsValid_returnFalse(NotificationEventType eventType) {
+        DynamicList sender = new DynamicList(new DynamicListItem("appellant", "appellant"), new ArrayList<>());
+        SscsCaseData caseData = SscsCaseData.builder().ccdCaseId("1234").originalSender(sender).build();
+        assertTrue(notificationService.isNotificationStillValidToSendSetAsideRequest(caseData, eventType));
+    }
+
+    @DisplayName(
+        "When the original sender is not null, Event type is other than VALID_SEND_TO_INTERLOC and sender is other than dwp "
+            + " then return true.")
+    @Test
+    public void isNotificationStillValidToSendSetAsideRequest_InValidEventType_returnTrue() {
+        DynamicList sender = new DynamicList(new DynamicListItem("dwp1", "dwp1"), new ArrayList<>());
+        SscsCaseData caseData = SscsCaseData.builder().ccdCaseId("1234").originalSender(sender).build();
+        assertTrue(notificationService.isNotificationStillValidToSendSetAsideRequest(caseData, ADJOURNED));
+    }
+
+    @Test
+    public void givenDirectionIssuedForChildSupportWithAppealToProceed_whenCmFeatureEnabled_thenSendSecondNotificationToAppellant() {
+        final SscsCaseData caseData = getSscsCaseDataBuilder(APPELLANT_WITH_ADDRESS, Representative.builder().hasRepresentative("no").build(), null)
+            .appeal(Appeal.builder()
+                          .hearingType(AppealHearingType.ORAL.name())
+                          .hearingOptions(HearingOptions.builder().wantsToAttend(YES).build())
+                          .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
+                          .appellant(APPELLANT_WITH_ADDRESS)
+                          .rep(Representative.builder().hasRepresentative("no").build())
+                          .build())
+            .directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()))
+            .build();
+        final CcdNotificationWrapper wrapper = buildBaseWrapperWithCaseData(caseData, DIRECTION_ISSUED);
+
+        final Notification notification = new Notification(
+            Template.builder().emailTemplateId(EMAIL_TEMPLATE_ID).smsTemplateId(null).build(),
+            Destination.builder().email("test@testing.com").sms(null).build(),
+            new HashMap<>(), new Reference(), null);
+        given(factory.create(ccdNotificationWrapperCaptor.capture(), any())).willReturn(notification);
+
+        final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
+        final NotificationService serviceWithCmEnabled = new NotificationService(factory, reminderService,
+            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, true
+        );
+
+        serviceWithCmEnabled.manageNotificationAndSubscription(wrapper, false);
+
+        then(factory).should(times(2)).create(any(), any());
+        assertThat(ccdNotificationWrapperCaptor.getValue().getNotificationType()).isEqualTo(NOTIFY_APPELLANT_VALID_APPEAL);
+    }
+
+    @Test
+    @Parameters({
+        "false, CHILD_SUPPORT, APPEAL_TO_PROCEED",
+        "true, PIP, APPEAL_TO_PROCEED",
+        "true, PIP, PROVIDE_INFORMATION",
+        "true, CHILD_SUPPORT, PROVIDE_INFORMATION"
+    })
+    public void givenDirectionIssuedWithVariousScenarios_thenSendAppropriateNumberOfNotifications(
+        boolean cmFeatureEnabled, String benefitCode, String directionType) {
+
+        final SscsCaseData.SscsCaseDataBuilder caseDataBuilder = getSscsCaseDataBuilder(
+            APPELLANT_WITH_ADDRESS,
+            Representative.builder().hasRepresentative("no").build(),
+            null);
+
+        if (Benefit.CHILD_SUPPORT.name().equals(benefitCode)) {
+            caseDataBuilder.appeal(Appeal.builder()
+                                         .hearingType(AppealHearingType.ORAL.name())
+                                         .hearingOptions(HearingOptions.builder().wantsToAttend(YES).build())
+                                         .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
+                                         .appellant(APPELLANT_WITH_ADDRESS)
+                                         .rep(Representative.builder().hasRepresentative("no").build())
+                                         .build());
+        }
+
+        final SscsCaseData caseData = caseDataBuilder
+            .directionTypeDl(new DynamicList(DirectionType.valueOf(directionType).toString()))
+            .build();
+
+        final CcdNotificationWrapper wrapper = buildBaseWrapperWithCaseData(caseData, DIRECTION_ISSUED);
+
+        final Notification notification = new Notification(
+            Template.builder().emailTemplateId(EMAIL_TEMPLATE_ID).smsTemplateId(null).build(),
+            Destination.builder().email("test@testing.com").sms(null).build(),
+            new HashMap<>(), new Reference(), null);
+
+        given(factory.create(any(), any())).willReturn(notification);
+
+        final SendNotificationService sendNotificationService = new SendNotificationService(
+            notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
+
+        final NotificationService service = new NotificationService(
+            factory, reminderService, notificationValidService, notificationHandler,
+            outOfHoursCalculator, notificationConfig, sendNotificationService, false, cmFeatureEnabled
+        );
+
+        service.manageNotificationAndSubscription(wrapper, false);
+
+        then(factory).should(times(1)).create(any(), any());
+
+    }
+
+    @Test
+    @Parameters({
+        "ADMIN_SEND_TO_VALID_APPEAL, true",
+        "INTERLOC_VALID_APPEAL, true",
+        "VALID_APPEAL, true",
+        "ADMIN_SEND_TO_VALID_APPEAL, false",
+        "INTERLOC_VALID_APPEAL, false",
+        "VALID_APPEAL, false"
+    })
+    public void givenValidAppealEventNotification_whenCmEnabledOrDisabledAndNotChildSupport_shouldNotSendNotification(
+        final NotificationEventType eventType, boolean cmEnabled) {
+        final SscsCaseData caseData = getSscsCaseDataBuilder(APPELLANT_WITH_ADDRESS, null, null).build();
+        final CcdNotificationWrapper wrapper = buildBaseWrapperWithCaseData(caseData, eventType);
+
+        final SendNotificationService sendNotificationService = new SendNotificationService(
+            notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
+        final NotificationService service = new NotificationService(
+            factory, reminderService, notificationValidService, notificationHandler,
+            outOfHoursCalculator, notificationConfig, sendNotificationService, false, cmEnabled
+        );
+
+        service.manageNotificationAndSubscription(wrapper, false);
+
+        then(factory).should(never()).create(any(), any());
+    }
+
+    @Test
+    @Parameters({
+        "ADMIN_SEND_TO_VALID_APPEAL",
+        "INTERLOC_VALID_APPEAL",
+        "VALID_APPEAL"
+    })
+    public void givenValidAppealEventNotification_whenCmEnabledAndChildSupport_shouldProceedWithNotification(
+        final NotificationEventType eventType) {
+        final SscsCaseData caseData = getSscsCaseDataBuilder(APPELLANT_WITH_ADDRESS, null, null)
+            .appeal(Appeal.builder()
+                          .hearingType(AppealHearingType.ORAL.name())
+                          .hearingOptions(HearingOptions.builder().wantsToAttend(YES).build())
+                          .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
+                          .appellant(APPELLANT_WITH_ADDRESS)
+                          .rep(Representative.builder().hasRepresentative("no").build())
+                          .build())
+            .build();
+        final CcdNotificationWrapper wrapper = buildBaseWrapperWithCaseData(caseData, eventType);
+
+        final Notification notification = new Notification(
+            Template.builder().emailTemplateId(EMAIL_TEMPLATE_ID).smsTemplateId(null).build(),
+            Destination.builder().email("test@testing.com").sms(null).build(),
+            new HashMap<>(), new Reference(), null);
+        given(factory.create(any(), any())).willReturn(notification);
+        given(notificationValidService.isHearingTypeValidToSendNotification(any(), any())).willReturn(true);
+        given(notificationValidService.isNotificationStillValidToSend(anyList(), any())).willReturn(true);
+
+        final SendNotificationService sendNotificationService = new SendNotificationService(
+            notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
+        final NotificationService service = new NotificationService(
+            factory, reminderService, notificationValidService, notificationHandler,
+            outOfHoursCalculator, notificationConfig, sendNotificationService, false, true
+        );
+
+        service.manageNotificationAndSubscription(wrapper, false);
+
+        then(factory).should(atLeastOnce()).create(any(), any());
+    }
+
+    private static List<OtherPartyOption> getOtherPartyOptions(YesNo resendToOtherParty) {
+        return Collections.singletonList(OtherPartyOption
+            .builder()
+            .value(OtherPartyOptionDetails
+                .builder()
+                .otherPartyOptionId("3")
+                .otherPartyOptionName("OPAppointee OP3 - Appointee")
+                .resendToOtherParty(resendToOtherParty)
+                .build())
+            .build());
+    }
+
+    private static void verifyErrorLogMessageNotLogged(Appender<ILoggingEvent> mockAppender, ArgumentCaptor<ILoggingEvent> captorLoggingEvent) {
+        verify(mockAppender, atLeast(0)).doAppend(
+            captorLoggingEvent.capture()
+        );
+        List<ILoggingEvent> logEvents = captorLoggingEvent.getAllValues();
+        assertThat(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage().contains("Request For Information")).count()).isZero();
+    }
+
     private YesNo getYesNoFromString(String yesNoString) {
 
         if (YesNo.YES.getValue().equalsIgnoreCase(yesNoString)) {
@@ -3072,5 +3137,65 @@ public class NotificationServiceTest {
             return YesNo.NO;
         }
         return null;
+    }
+
+    private NotificationService getNotificationServiceWithCmOtherPartyConfidentialityEnabled() {
+        final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender,
+            notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
+        return new NotificationService(factory, reminderService,
+            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService,
+            false, true
+        );
+    }
+
+    private static SscsCaseData.SscsCaseDataBuilder getSscsCaseDataBuilderSettingInformationFromAppellant(String informationFromAppellant) {
+        return SscsCaseData.builder()
+                           .appeal(
+                               Appeal
+                                   .builder()
+                                   .hearingType(AppealHearingType.ORAL.name())
+                                   .hearingOptions(HearingOptions.builder().wantsToAttend(YES).build())
+                                   .appellant(NotificationServiceTest.APPELLANT_WITH_ADDRESS)
+                                   .rep(null)
+                                   .build())
+                           .dwpState(DwpState.RESPONSE_SUBMITTED_DWP)
+                           .subscriptions(Subscriptions.builder()
+                                                       .appellantSubscription(Subscription.builder()
+                                                                                          .tya(APPEAL_NUMBER)
+                                                                                          .email(EMAIL)
+                                                                                          .mobile(MOBILE_NUMBER_1)
+                                                                                          .subscribeEmail(YES)
+                                                                                          .subscribeSms(YES).wantSmsNotifications(YES)
+                                                                                          .build()
+                                                       )
+                                                       .build())
+                           .caseReference(CASE_REFERENCE)
+                           .sscsInterlocDecisionDocument(SscsInterlocDecisionDocument.builder().documentLink(DocumentLink.builder().documentUrl("http://dm-store:4506/documents/1e1eb3d2-5b6c-430d-8dad-ebcea1ad7ecf")
+                                                                                                                         .documentFilename("test.pdf")
+                                                                                                                         .documentBinaryUrl("test/binary").build()).build())
+                           .sscsInterlocDirectionDocument(SscsInterlocDirectionDocument.builder().documentLink(DocumentLink.builder().documentUrl("http://dm-store:4506/documents/1e1eb3d2-5b6c-430d-8dad-ebcea1ad7ecf")
+                                                                                                                           .documentFilename("test.pdf")
+                                                                                                                           .documentBinaryUrl("test/binary").build()).build())
+                           .sscsStrikeOutDocument(SscsStrikeOutDocument.builder().documentLink(DocumentLink.builder().documentUrl("http://dm-store:4506/documents/1e1eb3d2-5b6c-430d-8dad-ebcea1ad7ecf")
+                                                                                                           .documentFilename("test.pdf")
+                                                                                                           .documentBinaryUrl("test/binary").build()).build())
+                           .ccdCaseId(CASE_ID)
+                           .hearings(List.of(Hearing.builder().value(HearingDetails.builder().build()).build()))
+                           .sscsDocument(new ArrayList<>(singletonList(null)))
+                           .informationFromAppellant(informationFromAppellant);
+    }
+
+    private NotificationService getNotificationService() {
+        final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender,
+            notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
+        return new NotificationService(factory, reminderService,
+            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService,
+            false, false
+        );
+    }
+
+    private byte[] getCoversheet() throws IOException {
+        return IOUtils.toByteArray(
+            Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("pdf/direction-notice-coversheet-sample.pdf")));
     }
 }
