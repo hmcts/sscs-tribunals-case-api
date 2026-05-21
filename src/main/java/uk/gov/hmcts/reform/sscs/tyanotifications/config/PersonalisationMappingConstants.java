@@ -16,6 +16,7 @@ public final class PersonalisationMappingConstants {
     public static final String APPEAL_RESPOND_DATE = "appeal_respond_date";
     public static final String APPEAL_RESPOND_DATE_WELSH = "welsh_appeal_respond_date";
     public static final String APPELLANT_NAME = "appellant_name";
+    public static final String APPELLANT_CONFIDENTIALITY_REQUIRED = "appellant_confidentiality_required";
     public static final String APPOINTEE_DESCRIPTION = "appointee_description";
     public static final String APPOINTEE_DETAILS_LITERAL = "appointee_details";
     public static final String APPOINTEE_DETAILS_LITERAL_WELSH = "welsh_appointee_details";
@@ -97,6 +98,8 @@ public final class PersonalisationMappingConstants {
     public static final String OTHER_PARTY_DETAILS = "other_party_details";
     public static final String OTHER_PARTY_DETAILS_WELSH = "welsh_other_party_details";
     public static final String OTHER_PARTY_NAME = "other_party_name";
+    public static final String OTHER_PARTY_NAMES = "other_party_names";
+    public static final String OTHER_PARTY_SIZE = "other_party_size";
     public static final String PANEL_COMPOSITION = "panel_composition";
     public static final String PANEL_COMPOSITION_WELSH = "panel_composition_welsh";
     public static final String PARTY_TYPE = "partyType";
