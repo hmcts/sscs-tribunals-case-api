@@ -1944,7 +1944,7 @@ pdf-service:
             permissionToAppealGranted: 'TB-SCS-GNO-WEL-00479.docx'
             libertyToApplyGranted: 'TB-SCS-GNO-WEL-00479.docx'
             libertyToApplyRefused: 'TB-SCS-GNO-WEL-00479.docx'
-            addOtherPartyData: 'TB-SCS-GNO-ENG-00012.docx'
+            addOtherPartyData: 'TB-SCS-GNO-WEL-00479.docx'
 
 text:
     personalisation:
