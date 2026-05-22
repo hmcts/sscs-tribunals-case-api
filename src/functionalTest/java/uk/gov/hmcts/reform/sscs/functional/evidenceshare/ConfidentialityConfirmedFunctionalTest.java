@@ -9,9 +9,9 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED
 import java.time.LocalDate;
 import java.util.List;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
@@ -110,7 +110,8 @@ class ConfidentialityConfirmedFunctionalTest extends AbstractFunctionalTest {
     }
 
     @Nested
-    @DisabledIfEnvironmentVariable(named = "CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED", matches = "true")
+//    @DisabledIfEnvironmentVariable(named = "CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED", matches = "true")
+    @Disabled("Fails against prod CCD")
     class CmToggleOff {
         @Test
         @SneakyThrows
