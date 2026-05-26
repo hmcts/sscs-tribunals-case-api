@@ -713,6 +713,8 @@ notification:
             docmosisId: TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx
         validAppeal:
             docmosisId: TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx
+        confidentialityConfirmed:
+            docmosisId: TB-SCS-LET-ENG-Appeal-Lodged-Appellant-v2.docx
         directionIssued:
             appealToProceed:
                 appellant:

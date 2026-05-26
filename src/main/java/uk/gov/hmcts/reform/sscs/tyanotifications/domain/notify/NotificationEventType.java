@@ -27,6 +27,7 @@ public enum NotificationEventType {
     APPEAL_WITHDRAWN(EventType.WITHDRAWN, true, true, false, false, false, 0),
     BUNDLE_CREATED_FOR_UPPER_TRIBUNAL(EventType.BUNDLE_CREATED_FOR_UPPER_TRIBUNAL, false, false, false, false, false, 0),
     CASE_UPDATED(EventType.CASE_UPDATED, false, false, false, false, false, 0),
+    CONFIDENTIALITY_CONFIRMED(EventType.CONFIDENTIALITY_CONFIRMED, false, false, false, true, false, 0),
     CORRECTION_GRANTED(EventType.CORRECTION_GRANTED, true, true, true, false, false, 0),
     CORRECTION_REFUSED(EventType.CORRECTION_REFUSED, true, true, true, false, false, 0),
     CORRECTION_REQUEST(EventType.CORRECTION_REQUEST, false, false, false, true, false, 0),
@@ -36,7 +37,7 @@ public enum NotificationEventType {
     DIRECTION_ISSUED(EventType.DIRECTION_ISSUED, true, true, true, false, false, 0),
     DIRECTION_ISSUED_WELSH(EventType.DIRECTION_ISSUED_WELSH, true, true, true, false, false, 0),
     DRAFT_TO_NON_COMPLIANT(EventType.DRAFT_TO_NON_COMPLIANT, true, true, true, false, false, 0),
-    DRAFT_TO_VALID_APPEAL_CREATED(EventType.DRAFT_TO_VALID_APPEAL_CREATED, true, true, false, true, false, 240L),
+    DRAFT_TO_VALID_APPEAL_CREATED(EventType.DRAFT_TO_VALID_APPEAL_CREATED, true, true, false, true, false, 0),
     DWP_APPEAL_LAPSED(EventType.CONFIRM_LAPSED, true, true, false, false, false, 0),
     DWP_RESPONSE_RECEIVED(EventType.DWP_RESPOND, true, true, true, false, false, 0),
     DWP_UPLOAD_RESPONSE(EventType.DWP_UPLOAD_RESPONSE, true, true, true, false, false, 60L),
@@ -86,7 +87,7 @@ public enum NotificationEventType {
     UPDATE_OTHER_PARTY_DATA(EventType.UPDATE_OTHER_PARTY_DATA, true, true, true, true, false, 0),
     OTHER_PARTY_ADDED_TO_APPEAL(EventType.UPDATE_OTHER_PARTY_DATA, false, false, false, true, false, 0),
     VALID_APPEAL(EventType.VALID_APPEAL, false, false, false, true, false, 0),
-    VALID_APPEAL_CREATED(EventType.VALID_APPEAL_CREATED, true, true, false, true, false, 240L),
+    VALID_APPEAL_CREATED(EventType.VALID_APPEAL_CREATED, true, true, false, true, false, 0),
 
     @JsonEnumDefaultValue
     DO_NOT_SEND(null);
