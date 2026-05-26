@@ -201,6 +201,37 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     }
 
     @Test
+    void givenChildSupportConfidentialityAndNoSelectedParty_thenReturnsMustSelectPartyError() {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(null);
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        Assertions.assertThat(response.getErrors()).contains("Must select party");
+    }
+
+    @Test
+    void givenChildSupportConfidentialityAndSelectedPartyPresent_thenNoMustSelectPartyError() {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
+                new DynamicList(new DynamicListItem("appellant", "Appellant"), List.of()));
+
+        Assertions.assertThat(handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION).getErrors()).isEmpty();
+    }
+
+    @Test
+    void givenChildSupportConfidentialityAndFlagOff_thenNoMustSelectPartyError() {
+        handler = new HmctsResponseReviewedAboutToSubmitHandler(dwpDocumentService, panelCompService, addNoteService, false);
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(null);
+
+        Assertions.assertThat(handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION).getErrors()).isEmpty();
+    }
+
+    @Test
     public void givenAUcCaseWithSingleElementSelected_thenSetCaseCodeToUs() {
         List<String> elementList = new ArrayList<>();
         elementList.add("testElement");
