@@ -129,7 +129,6 @@ public class SubmitAppealTest {
                 "regionalProcessingCenter.epimsId",
                 "appeal.appellant.id",
                 "appeal.appellant.appointee.id",
-                "appeal.isOtherPartyAddedForChildMaintUCCase",
                 "appeal.rep.id",
                 "jointPartyId",
                 "correction",

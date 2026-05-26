@@ -223,8 +223,7 @@ public class BaseFunctionalTest {
                 "case_creation_details.case_data.regionalProcessingCenter.hearingRoute",
                 "case_creation_details.case_data.appeal.appellant.id",
                 "case_creation_details.case_data.appeal.rep.id",
-                "case_creation_details.case_data.appeal.appellant.appointee.id",
-                "case_creation_details.case_data.appeal.isOtherPartyAddedForChildMaintUCCase"
+                "case_creation_details.case_data.appeal.appellant.appointee.id"
             )
             .withFailMessage("Expected: %s%nActual: %s".formatted(expectedJson, actualJson)
             )

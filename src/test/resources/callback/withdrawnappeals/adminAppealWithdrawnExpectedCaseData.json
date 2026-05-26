@@ -82,8 +82,7 @@
     "signer": null,
     "hearingSubtype":null,
     "hearingType": "paper",
-    "receivedVia": "Paper",
-    "isOtherPartyAddedForChildMaintUCCase": null
+    "receivedVia": "Paper"
   },
   "hearings": [{
     "value": {

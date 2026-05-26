@@ -128,8 +128,7 @@
       "wantsHearingTypeFaceToFace": "No"
     },
     "hearingType": "oral",
-    "receivedVia": "Online",
-    "isOtherPartyAddedForChildMaintUCCase": null
+    "receivedVia": "Online"
   },
   "subscriptions": {
     "appellantSubscription": {
