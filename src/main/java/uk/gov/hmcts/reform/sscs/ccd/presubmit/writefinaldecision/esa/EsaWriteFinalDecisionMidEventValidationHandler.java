@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
@@ -70,6 +71,16 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
             }
             if (hasSvIssueCode(sscsCaseData) && !isFinalDecisionDateOfDecisionBlankOrAfterSvStartDate(sscsCaseData)) {
                 preSubmitCallbackResponse.addError("You cannot write decision notice until resolved. Please ask admin to amend issue code to WC or SG and then proceed.");
+            }
+            YesNo esaSevereCriteriaApplies = sscsCaseData.getExtendedSscsCaseData().getEsaWriteFinalDecisionSevereCriteriaApply();
+            if (nonNull(esaSevereCriteriaApplies)) {
+                String decision = sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAllowedOrRefused();
+                if ("allowed".equals(decision) && !YesNo.isYes(esaSevereCriteriaApplies)) {
+                    preSubmitCallbackResponse.addError("Appeal allowed, please select Yes to this question.");
+                }
+                if ("refused".equals(decision) && YesNo.isYes(esaSevereCriteriaApplies)) {
+                    preSubmitCallbackResponse.addError("Appeal refused, please select No to this question.");
+                }
             }
         }
 

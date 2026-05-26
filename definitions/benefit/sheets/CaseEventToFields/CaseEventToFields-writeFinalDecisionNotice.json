@@ -1288,6 +1288,7 @@
   },
   {
     "CaseEventID": "writeFinalDecision",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=severeCriteria",
     "CaseFieldID": "writeFinalDecisionSevereCriteriaApply",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
@@ -1301,6 +1302,7 @@
   },
   {
     "CaseEventID": "writeFinalDecision",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=esaSevereCriteria",
     "CaseFieldID": "esaWriteFinalDecisionSevereCriteriaApply",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
