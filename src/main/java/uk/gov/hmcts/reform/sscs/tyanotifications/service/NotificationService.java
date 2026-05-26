@@ -336,11 +336,12 @@ public class NotificationService {
 
     private boolean isEventAllowedToProceedWithValidData(NotificationWrapper notificationWrapper,
                                                          NotificationEventType notificationType) {
+        SscsCaseData newCaseData = notificationWrapper.getNewSscsCaseData();
         if (UPDATE_OTHER_PARTY_DATA.equals(notificationType)
             && cmOtherPartyConfidentialityEnabled
-            && notificationWrapper.getNewSscsCaseData().getAppeal() != null
-            && isCmOrUcCase(notificationWrapper.getNewSscsCaseData().getAppeal().getBenefitType())) {
-            log.info("Suppressing HEF notification for CM/UC case id {}.", notificationWrapper.getCaseId());
+            && (newCaseData.isBenefitType(CHILD_SUPPORT) || newCaseData.isBenefitType(UC))) {
+            String benefitType = newCaseData.isBenefitType(CHILD_SUPPORT) ? CHILD_SUPPORT.getShortName() : UC.getShortName();
+            log.info("Suppressing HEF notification for {} case id {}.", benefitType, notificationWrapper.getCaseId());
             return false;
         }
 
@@ -494,12 +495,6 @@ public class NotificationService {
         var newHearingChannel = Optional.ofNullable(newHearing.getHearingChannel());
 
         return oldHearingChannel.equals(newHearingChannel);
-    }
-
-    private boolean isCmOrUcCase(BenefitType benefitType) {
-        return benefitType != null
-            && (Benefit.CHILD_SUPPORT.getShortName().equals(benefitType.getCode())
-                || Benefit.UC.getShortName().equals(benefitType.getCode()));
     }
 
     private boolean isDigitalCase(final NotificationWrapper notificationWrapper) {
