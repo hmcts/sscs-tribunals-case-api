@@ -170,7 +170,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
     @ParameterizedTest
     @EnumSource(value = Benefit.class, names = {"UC", "CHILD_SUPPORT"})
-    void givenChildSupportConfidentialityAndNoSelectedParty_thenReturnsMustSelectPartyError(Benefit benefit) {
+    void givenConfidentialityAndNoSelectedParty_thenReturnsMustSelectPartyError(Benefit benefit) {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(benefit.getShortName()).build());
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
         sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(null);
