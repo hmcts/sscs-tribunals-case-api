@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -28,15 +29,18 @@ public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
     private final UpdateCcdCaseService updateCcdCaseService;
 
     private final IdamService idamService;
+    private final boolean cmConfidentialityEnabled;
 
     @Autowired
     public AppealReceivedHandler(CcdService ccdService,
                                  UpdateCcdCaseService updateCcdCaseService,
-                                 IdamService idamService) {
+                                 IdamService idamService,
+                                @Value("${feature.cm-other-party-confidentiality.enabled}") final boolean cmConfidentialityEnabled) {
         this.dispatchPriority = DispatchPriority.LATEST;
         this.ccdService = ccdService;
         this.updateCcdCaseService = updateCcdCaseService;
         this.idamService = idamService;
+        this.cmConfidentialityEnabled = cmConfidentialityEnabled;
     }
 
     @Override

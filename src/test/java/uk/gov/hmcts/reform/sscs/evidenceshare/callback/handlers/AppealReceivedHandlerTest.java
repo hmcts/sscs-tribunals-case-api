@@ -49,7 +49,7 @@ public class AppealReceivedHandlerTest {
 
     @Before
     public void setUp() {
-        handler = new AppealReceivedHandler(ccdService, updateCcdCaseService, idamService);
+        handler = new AppealReceivedHandler(ccdService, updateCcdCaseService, idamService, false);
     }
 
     @Test(expected = IllegalStateException.class)
