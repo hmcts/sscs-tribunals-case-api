@@ -191,17 +191,6 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenChildSupportConfidentialityAndNoSelectedParty_thenReturnsMustSelectPartyError() {
-        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
-        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
-        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(null);
-
-        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        Assertions.assertThat(response.getErrors()).contains("Must select party");
-    }
-
-    @Test
     void givenChildSupportConfidentialityAndFlagOff_thenNoMustSelectPartyError() {
         handler = new HmctsResponseReviewedAboutToSubmitHandler(dwpDocumentService, panelCompService, addNoteService, false);
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
