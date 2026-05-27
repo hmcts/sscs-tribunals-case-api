@@ -13,11 +13,13 @@
   "sendToInterlocPrePostHearingFieldLabel": "Pre or post hearing?",
   "sendToInterlocCaseReviewFieldLabel": "Select who should review this case",
   "sendToInterlocReasonReferredFieldLabel": "Reason referred to interloc",
+  "sendToInterLocSelectPartyFieldLabel": "Selected Party",
 
   "sendToInterlocHearingSelectValue": "Pre Hearing",
   "sendToInterlocCaseReviewSelectValue": "Review by TCW",
   "sendToInterlocReasonReferredValue": "Advice on how to proceed",
   "sendToInterlocConfidentialityReasonValue": "Confidentiality",
+  "sendToInterlocPartyConfidentialityValue": "Other party 1 - Testing Other party",
   "sendToInterlocReviewConfidentialityRequestValue": "UC JP ONLY - Review confidentiality request",
   "sendToInterlocReferralReasonOver300Pages": "Over 300 pages",
   "sendToInterlocReferralReasonComplexCase": "Complex Case",
