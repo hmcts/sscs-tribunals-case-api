@@ -10,6 +10,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.PIP;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT_SEND_TO_INTERLOC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_SEND_TO_INTERLOC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW;
@@ -20,11 +21,14 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -298,6 +302,98 @@ class ValidSendToInterlocAboutToSubmitHandlerTest {
 
         assertThatThrownBy(() -> handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION))
                 .isInstanceOf(IllegalStateException.class);
+    }
+
+    @ParameterizedTest
+    @MethodSource("missingSelectionScenarios")
+    void givenConfidentialityReferral_whenSelectionMissing_thenReturnsMustSelectPartyError(DynamicList selectedParty) {
+        handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService, true);
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(selectedParty);
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).hasSize(1).contains("Must select party");
+    }
+
+    @Test
+    void givenConfidentialityReferral_whenSelectionPresent_thenDoesNotReturnMustSelectPartyError() {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
+                new DynamicList(new DynamicListItem("appellant", "Appellant"), Collections.emptyList()));
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void givenConfidentialityReferralAndNonChildSupport_whenSelectionMissing_thenDoesNotReturnMustSelectPartyError() {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("PIP").build());
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(null);
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void givenConfidentialityReferralAndChildSupport_whenFlagOffAndSelectionMissing_thenDoesNotReturnMustSelectPartyError() {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(null);
+        var handlerWithFlagOff = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService, false);
+
+        var response = handlerWithFlagOff.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void canHandleReturnsTrueForNonCompliantSendToInterloc() {
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), NON_COMPLIANT_SEND_TO_INTERLOC, false);
+        assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isTrue();
+    }
+
+    @Test
+    void givenNonCompliantEvent_whenSubmitted_thenSetsReferralDateAndAddsNoteWithoutReviewerValidation() {
+        sscsCaseData.setTempNoteDetail("Non compliant note");
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), NON_COMPLIANT_SEND_TO_INTERLOC, false);
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getSelectWhoReviewsCase()).isNull();
+        assertThat(response.getData().getInterlocReferralDate()).isEqualTo(LocalDate.now());
+        assertThat(response.getData().getDirectionDueDate()).isNull();
+        verify(addNoteService).addNote(eq(USER_AUTHORISATION), eq(response.getData()), eq("Non compliant note"));
+    }
+
+    @Test
+    void givenNonCompliantEvent_whenSelectWhoReviewsCaseIsNull_thenStillSetsReferralDate() {
+        sscsCaseData = sscsCaseData.toBuilder().selectWhoReviewsCase(null).build();
+        sscsCaseData.setTempNoteDetail("Non compliant note");
+        caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), NON_COMPLIANT_SEND_TO_INTERLOC, false);
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getSelectWhoReviewsCase()).isNull();
+        assertThat(response.getData().getInterlocReferralDate()).isEqualTo(LocalDate.now());
+        assertThat(response.getData().getDirectionDueDate()).isNull();
+    }
+
+    private static Stream<Arguments> missingSelectionScenarios() {
+        return Stream.of(
+                Arguments.of((DynamicList) null),
+                Arguments.of(new DynamicList(null, Collections.emptyList())),
+                Arguments.of(new DynamicList(new DynamicListItem(null, "Appellant"), Collections.emptyList())),
+                Arguments.of(new DynamicList(new DynamicListItem("  ", "Appellant"), Collections.emptyList()))
+        );
     }
 
     private SscsCaseData setupDataForPostponementRequestInterlocSendToTcw(

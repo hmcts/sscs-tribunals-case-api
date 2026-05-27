@@ -205,11 +205,50 @@ export class SendToInterloc extends BaseStep {
       eventTestData.eventDescriptionInput
     );
     await this.eventNameAndDescriptionPage.confirmSubmission();
+    await this.homePage.navigateToTab('Summary');
+    await this.summaryTab.verifyPageSectionByKeyValue(
+      sendToInterlocData.sendToInterlocReasonReferredFieldLabel,
+      sendToInterlocData.sendToInterlocConfidentialityReasonValue
+    );
+  }
+
+  async submitConfidentialityReferralChildSupportAndVerifySummary(caseId: string, user) {
+    await this.loginUserWithCaseId(user, true, caseId);
+    await this.homePage.chooseEvent('Send to interloc');
+
+    const sendToInterlocPage = new SendToInterlocPage(this.page);
+    await sendToInterlocPage.verifyPageContent();
+    await sendToInterlocPage.selectHearingType(
+      sendToInterlocData.sendToInterlocHearingSelectValue
+    );
+    await sendToInterlocPage.selectCaseReview(
+      sendToInterlocData.sendToInterlocCaseReviewSelectValue
+    );
+    await sendToInterlocPage.selectReasonReferred(
+      sendToInterlocData.sendToInterlocConfidentialityReasonValue
+    );
+    await sendToInterlocPage.selectPartyConfidentiality(
+      sendToInterlocData.sendToInterlocPartyConfidentialityValue
+    );
+    await sendToInterlocPage.confirmSubmission();
+
+    await this.eventNameAndDescriptionPage.verifyPageContent(
+      'Send to interloc'
+    );
+    await this.eventNameAndDescriptionPage.inputData(
+      eventTestData.eventSummaryInput,
+      eventTestData.eventDescriptionInput
+    );
+    await this.eventNameAndDescriptionPage.confirmSubmission();
 
     await this.homePage.navigateToTab('Summary');
     await this.summaryTab.verifyPageSectionByKeyValue(
       sendToInterlocData.sendToInterlocReasonReferredFieldLabel,
       sendToInterlocData.sendToInterlocConfidentialityReasonValue
+    );
+    await this.summaryTab.verifyPageContentByKeyValue(
+      sendToInterlocData.sendToInterLocSelectPartyFieldLabel,
+      sendToInterlocData.sendToInterlocPartyConfidentialityValue
     );
   }
 
