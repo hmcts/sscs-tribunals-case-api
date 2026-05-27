@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 
@@ -53,7 +54,8 @@ public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
             || callback.getEvent() == EventType.DRAFT_TO_VALID_APPEAL_CREATED
             || callback.getEvent() == EventType.VALID_APPEAL
             || callback.getEvent() == EventType.INTERLOC_VALID_APPEAL)
-            && READY_TO_LIST.getId().equals(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom());
+            && ! (cmConfidentialityEnabled && callback.getCaseDetails().getCaseData().isBenefitType(CHILD_SUPPORT)
+            && READY_TO_LIST.getId().equals(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom()));
     }
 
     @Override
