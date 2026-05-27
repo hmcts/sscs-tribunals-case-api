@@ -451,15 +451,6 @@ public class NotificationService {
             return false;
         }
 
-        // if (cmOtherPartyConfidentialityEnabled && notificationWrapper.getNewSscsCaseData().isBenefitType(CHILD_SUPPORT) && (
-        //     VALID_APPEAL_CREATED.equals(notificationType)
-        //         || DRAFT_TO_VALID_APPEAL_CREATED.equals(notificationType)
-        //         || VALID_APPEAL.equals(notificationType)
-        //         || INTERLOC_VALID_APPEAL.equals(notificationType))) {
-        //     return false;
-        // }
-
-
         log.info("Notification valid to send for case id {} and event {} in state {}",
             notificationWrapper.getCaseId(),
             notificationType.getId(),

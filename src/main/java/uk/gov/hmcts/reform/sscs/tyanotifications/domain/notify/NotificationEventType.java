@@ -37,7 +37,7 @@ public enum NotificationEventType {
     DIRECTION_ISSUED(EventType.DIRECTION_ISSUED, true, true, true, false, false, 0),
     DIRECTION_ISSUED_WELSH(EventType.DIRECTION_ISSUED_WELSH, true, true, true, false, false, 0),
     DRAFT_TO_NON_COMPLIANT(EventType.DRAFT_TO_NON_COMPLIANT, true, true, true, false, false, 0),
-    DRAFT_TO_VALID_APPEAL_CREATED(EventType.DRAFT_TO_VALID_APPEAL_CREATED, true, true, false, true, false, 0),
+    DRAFT_TO_VALID_APPEAL_CREATED(EventType.DRAFT_TO_VALID_APPEAL_CREATED, true, true, false, true, false, 240L),
     DWP_APPEAL_LAPSED(EventType.CONFIRM_LAPSED, true, true, false, false, false, 0),
     DWP_RESPONSE_RECEIVED(EventType.DWP_RESPOND, true, true, true, false, false, 0),
     DWP_UPLOAD_RESPONSE(EventType.DWP_UPLOAD_RESPONSE, true, true, true, false, false, 60L),
@@ -87,7 +87,7 @@ public enum NotificationEventType {
     UPDATE_OTHER_PARTY_DATA(EventType.UPDATE_OTHER_PARTY_DATA, true, true, true, true, false, 0),
     OTHER_PARTY_ADDED_TO_APPEAL(EventType.UPDATE_OTHER_PARTY_DATA, false, false, false, true, false, 0),
     VALID_APPEAL(EventType.VALID_APPEAL, false, false, false, true, false, 0),
-    VALID_APPEAL_CREATED(EventType.VALID_APPEAL_CREATED, true, true, false, true, false, 0),
+    VALID_APPEAL_CREATED(EventType.VALID_APPEAL_CREATED, true, true, false, true, false, 240L),
 
     @JsonEnumDefaultValue
     DO_NOT_SEND(null);
