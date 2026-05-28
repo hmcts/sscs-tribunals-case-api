@@ -54,8 +54,8 @@ public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
             || callback.getEvent() == EventType.DRAFT_TO_VALID_APPEAL_CREATED
             || callback.getEvent() == EventType.VALID_APPEAL
             || callback.getEvent() == EventType.INTERLOC_VALID_APPEAL)
-            && ! (cmConfidentialityEnabled && callback.getCaseDetails().getCaseData().isBenefitType(CHILD_SUPPORT)
-            && READY_TO_LIST.getId().equals(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom()));
+            && READY_TO_LIST.getId().equals(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom())
+            && !(cmConfidentialityEnabled && callback.getCaseDetails().getCaseData().isBenefitType(CHILD_SUPPORT));
     }
 
     @Override
