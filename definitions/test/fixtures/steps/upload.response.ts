@@ -420,7 +420,6 @@ export class UploadResponse extends BaseStep {
       await this.uploadResponsePage.verifyPageContent();
       await this.uploadResponsePage.uploadChildSupportConfidentialDocs();
       await this.uploadResponsePage.continueSubmission();
-      await this.uploadResponsePage.addChildSupportOtherParty();
       await this.page
         .getByRole('button', { name: 'Submit', exact: true })
         .click();
