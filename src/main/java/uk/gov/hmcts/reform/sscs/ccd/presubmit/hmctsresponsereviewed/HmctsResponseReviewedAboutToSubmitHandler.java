@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.hmctsresponsereviewed;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.PHE_REQUEST;
@@ -13,6 +14,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -21,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpResponseDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
@@ -43,14 +46,17 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
     private final DwpDocumentService dwpDocumentService;
     private final PanelCompositionService panelCompositionService;
     private final AddNoteService addNoteService;
+    private final boolean cmOtherPartyConfidentialityEnabled;
 
     @Autowired
     public HmctsResponseReviewedAboutToSubmitHandler(DwpDocumentService dwpDocumentService,
                                                      PanelCompositionService panelCompositionService,
-                                                     AddNoteService addNoteService) {
+                                                     AddNoteService addNoteService,
+                                                     @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
         this.dwpDocumentService = dwpDocumentService;
         this.panelCompositionService = panelCompositionService;
         this.addNoteService = addNoteService;
+        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
 
     @Override
@@ -111,6 +117,19 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
             && sscsCaseData.getInterlocReferralReason() == PHE_REQUEST) {
             preSubmitCallbackResponse.addError("PHE request' is not a valid selection for child support cases");
         }
+
+        if (cmOtherPartyConfidentialityEnabled
+                && sscsCaseData.isBenefitType(CHILD_SUPPORT)
+                && sscsCaseData.getInterlocReferralReason() == InterlocReferralReason.CONFIDENTIALITY
+                && isSelectionMissing(sscsCaseData.getExtendedSscsCaseData().getSelectedConfidentialityParty())) {
+            preSubmitCallbackResponse.addError("Must select party");
+        }
+    }
+
+    private boolean isSelectionMissing(DynamicList dynamicList) {
+        return dynamicList == null
+                || dynamicList.getValue() == null
+                || isBlank(dynamicList.getValue().getCode());
     }
 
     protected void setDwpDocuments(SscsCaseData sscsCaseData) {
