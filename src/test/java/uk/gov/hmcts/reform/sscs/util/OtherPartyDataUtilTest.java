@@ -43,8 +43,8 @@ public class OtherPartyDataUtilTest {
     public static final String ID_3 = "3a9c1e2a-9536-4aa2-b63d-7cd874e582e3";
     public static final String ID_4 = "440d0d83-75e1-466a-bacc-90ce9e612074";
     private static final int UUID_SIZE = 36;
-    List<CcdValue<OtherParty>> before;
-    List<CcdValue<OtherParty>> after;
+    private List<CcdValue<OtherParty>> before;
+    private List<CcdValue<OtherParty>> after;
 
     @Test
     void givenUcbIsYesForOneOtherParty_thenSetCaseDataOtherPartyUcb() {
