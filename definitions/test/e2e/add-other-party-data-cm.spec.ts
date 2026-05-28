@@ -1,17 +1,17 @@
 import { test } from '../lib/steps.factory';
-import { createChildSupportCaseForCmConfidentiality } from '../api/client/sscs/factory/appeal.type.factory';
+import { createChildSupportCaseForCmConfidentiality, createUCCaseForConfidentiality} from '../api/client/sscs/factory/appeal.type.factory';
 import { credentials, featureFlags } from '../config/config';
 
-const users = [
+const benefitTypes = [
   {
-    label: 'superuser',
-    credentials: credentials.superUser
+    label: 'Child Support',
+    createCase: createChildSupportCaseForCmConfidentiality
   },
   {
-    label: 'fta user',
-    credentials: credentials.dwpResponseWriter
+    label: 'Universal Credit',
+    createCase: createUCCaseForConfidentiality
   }
-] as const;
+]
 
 test.describe('CM add other party data', () => {
   test.skip(
@@ -19,18 +19,19 @@ test.describe('CM add other party data', () => {
     'CM confidentiality flag is disabled'
   );
 
-  for (const user of users) {
+  for (const benefit of benefitTypes) {
     test(
-      `${user.label} adds other party data to a Child Support appeal in Await Other Party Data and moves it to Await Confidentiality Requirements`,
+      `Add other party data to a ${benefit.label} appeal in Await Other Party Data and moves it to Await Confidentiality Requirements`,
       { tag: ['@confidentiality'] },
       async ({ updateOtherPartyDataSteps }) => {
         test.slow();
         test.setTimeout(240000);
 
-        const caseId = await createChildSupportCaseForCmConfidentiality();
+        const caseId = await benefit.createCase();
         await updateOtherPartyDataSteps.addOtherPartyDataForAwaitOtherPartyData(
           caseId,
-          user.credentials
+          credentials.dwpResponseWriter,
+          benefit.label
         );
       }
     );
