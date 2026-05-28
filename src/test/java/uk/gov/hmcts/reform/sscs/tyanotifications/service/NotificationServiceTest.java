@@ -1835,13 +1835,40 @@ public class NotificationServiceTest {
                 Benefit.CHILD_SUPPORT.getShortName()
             },
             new Object[]{
+                    "New other party added by ID with UPDATE_OTHER_PARTY_DATA event",
+                    List.of(new CcdValue<>(existingParty)),
+                    List.of(new CcdValue<>(existingParty), new CcdValue<>(newParty)),
+                    null,
+                    UPDATE_OTHER_PARTY_DATA,
+                    OTHER_PARTY_ADDED_TO_APPEAL,
+                    Benefit.UC.getShortName()
+            },
+            new Object[]{
+                    "Non UPDATE_OTHER_PARTY_DATA event with new other party",
+                    List.of(new CcdValue<>(existingParty)),
+                    List.of(new CcdValue<>(existingParty), new CcdValue<>(newParty)),
+                    null,
+                    ADMIN_APPEAL_WITHDRAWN,
+                    ADMIN_APPEAL_WITHDRAWN,
+                    Benefit.UC.getShortName()
+            },
+            new Object[]{
+                    "Null old data with multiple other parties",
+                    null,
+                    List.of(new CcdValue<>(existingParty), new CcdValue<>(newParty)),
+                    null,
+                    UPDATE_OTHER_PARTY_DATA,
+                    OTHER_PARTY_ADDED_TO_APPEAL,
+                    Benefit.UC.getShortName()
+            },
+            new Object[]{
                 "Non-childSupport benefit type is not notified for other party added",
                 List.of(new CcdValue<>(existingParty)),
                 List.of(new CcdValue<>(existingParty), new CcdValue<>(newParty)),
                 null,
                 UPDATE_OTHER_PARTY_DATA,
                 UPDATE_OTHER_PARTY_DATA,
-                Benefit.UC.getShortName()
+                Benefit.PIP.getShortName()
             }
         };
     }

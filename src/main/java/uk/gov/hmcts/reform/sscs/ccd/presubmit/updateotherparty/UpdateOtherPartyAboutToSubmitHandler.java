@@ -114,7 +114,8 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
             response.addError(ERR_ROLE_REQUIRED);
         }
 
-        if (cmOtherPartyConfidentialityEnabled && sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT)) {
+        if (cmOtherPartyConfidentialityEnabled &&
+                (sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT) || sscsCaseData.isBenefitType(Benefit.UC))) {
             sscsCaseData.setDirectionDueDate(now().plusDays(getHearingResponseExpectedByDays()).toString());
             sscsCaseData.setInterlocReviewState(InterlocReviewState.HEF_ISSUED);
         }

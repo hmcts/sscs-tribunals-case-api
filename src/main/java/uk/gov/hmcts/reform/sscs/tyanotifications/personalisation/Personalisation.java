@@ -474,7 +474,7 @@ public class Personalisation<E extends NotificationWrapper> {
 
         setConfidentialFields(ccdResponse, subscriptionWithType, personalisation, responseWrapper.getState());
         if (cmOtherPartyConfidentialityEnabled
-            && ccdResponse.isBenefitType(CHILD_SUPPORT)
+            && (ccdResponse.isBenefitType(CHILD_SUPPORT) || ccdResponse.isBenefitType(UC))
             && OTHER_PARTY_ADDED_TO_APPEAL.equals(responseWrapper.getNotificationEventType())) {
             setOtherPartyConfidentialityFields(ccdResponse, ccdResponsePrevious, personalisation);
         }

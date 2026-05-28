@@ -139,7 +139,7 @@ public class NotificationService {
 
     private boolean shouldNotifyAppellantAboutAdditionalOtherParty(final NotificationWrapper notificationWrapper) {
         if (!cmOtherPartyConfidentialityEnabled
-            || !notificationWrapper.getNewSscsCaseData().isBenefitType(CHILD_SUPPORT)
+            || !(notificationWrapper.getNewSscsCaseData().isBenefitType(CHILD_SUPPORT) || notificationWrapper.getNewSscsCaseData().isBenefitType(UC))
             || !notificationWrapper.getNotificationType().equals(UPDATE_OTHER_PARTY_DATA)
             || emptyIfNull(notificationWrapper.getNewSscsCaseData().getOtherParties()).size() < MINIMUM_NUMBER_OTHER_PARTIES) {
             return false;
