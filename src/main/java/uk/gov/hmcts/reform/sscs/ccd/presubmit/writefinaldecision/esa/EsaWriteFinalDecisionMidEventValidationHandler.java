@@ -73,7 +73,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
                 preSubmitCallbackResponse.addError("You cannot write decision notice until resolved. Please ask admin to amend issue code to WC or SG and then proceed.");
             }
             YesNo esaSevereCriteriaApplies = sscsCaseData.getExtendedSscsCaseData().getEsaWriteFinalDecisionSevereCriteriaApply();
-            if (nonNull(esaSevereCriteriaApplies)) {
+            if (hasSvIssueCode(sscsCaseData) && nonNull(esaSevereCriteriaApplies)) {
                 String decision = sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAllowedOrRefused();
                 if ("allowed".equals(decision) && !YesNo.isYes(esaSevereCriteriaApplies)) {
                     preSubmitCallbackResponse.addError("Appeal allowed, please select Yes to this question.");
