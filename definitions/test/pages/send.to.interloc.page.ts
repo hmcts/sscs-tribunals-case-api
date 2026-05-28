@@ -71,6 +71,11 @@ export class SendToInterlocPage {
     ).toHaveText(reasonReferred);
   }
 
+  async selectSelectedParty(): Promise<void> {
+    await this.page.waitForLoadState('domcontentloaded');
+    await webAction.chooseOptionByIndex('#selectedConfidentialityParty', 3);
+  }
+
   async confirmSubmission(): Promise<void> {
     await webAction.clickButton('Submit');
   }
