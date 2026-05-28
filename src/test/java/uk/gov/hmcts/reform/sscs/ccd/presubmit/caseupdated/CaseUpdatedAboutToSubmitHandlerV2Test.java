@@ -37,20 +37,21 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -106,9 +107,6 @@ import uk.gov.hmcts.reform.sscs.service.VenueService;
 @ExtendWith(MockitoExtension.class)
 public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
-    @Captor
-    private ArgumentCaptor<Consumer<SscsCaseDetails>> caseDetailsCaptor;
-
     private static final String USER_AUTHORISATION = "Bearer token";
 
     private Callback<SscsCaseData> callback;
@@ -144,16 +142,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
     @BeforeEach
     void setUp() {
-        handler = new CaseUpdatedAboutToSubmitHandler(
-                regionalProcessingCenterService,
-                associatedCaseLinkHelper,
-                airLookupService,
-                new DwpAddressLookupService(),
-                idamService,
-                refDataService,
-                venueService,
-                hearingDurationsService,
-                panelCompositionService);
+        handler = createNewCaseHandler(false);
 
         sscsCaseData = SscsCaseData.builder()
                 .ccdCaseId("ccdId")
@@ -776,7 +765,6 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         String venueA = "VenueA";
         String venueB = "VenueB";
         String venueBEpimsId = "12345";
-        String venueAEpimsId = "12346";
         callback.getCaseDetails().getCaseData().setProcessingVenue(venueA);
         when(venueService.getEpimsIdForVenue(venueB)).thenReturn(venueBEpimsId);
         when(venueService.getVenueDetailsForActiveVenueByEpimsId(venueBEpimsId)).thenReturn(VenueDetails.builder().venName(venueB).legacyVenue(venueA).build());
@@ -1936,7 +1924,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         sscsCaseData.getAppeal().setHearingOptions(hearingOptions);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         String language = sscsCaseData.getAppeal().getHearingOptions().getLanguages();
 
@@ -2044,20 +2032,116 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         when(panelCompositionService.resetPanelCompositionIfStale(sscsCaseData, Optional.of(caseDetailsBefore)))
                 .thenReturn(panelMemberComposition);
         when(panelCompositionService.isBenefitIssueCodeValid(any(), any())).thenReturn(true);
-        handler = new CaseUpdatedAboutToSubmitHandler(
-                regionalProcessingCenterService,
-                associatedCaseLinkHelper,
-                airLookupService,
-                new DwpAddressLookupService(),
-                idamService,
-                refDataService,
-                venueService,
-                hearingDurationsService,
-                panelCompositionService);
+        handler = createNewCaseHandler(false);
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNotNull(response.getData().getPanelMemberComposition());
         assertEquals(panelMemberComposition, response.getData().getPanelMemberComposition());
+    }
+
+    @Nested
+    class CmOtherPartyConfidentialityDisabled {
+        @BeforeEach
+        void beforeEach() {
+            handler = createNewCaseHandler(false);
+        }
+
+        @Test
+        void givenUniversalCreditBenefitTypeWithoutOtherParties_thenCaseConfidentialNull() {
+            callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(Benefit.UC.getShortName());
+            callback.getCaseDetails()
+                .getCaseData()
+                .getAppeal()
+                .getBenefitType()
+                .setDescription(Benefit.UC.getDescription());
+            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
+                USER_AUTHORISATION);
+
+            Assertions.assertThat(response.getData().getIsConfidentialCase()).isNull();
+        }
+
+        @Test
+        void givenUniversalCreditBenefitTypeWithOtherParties_thenCaseConfidentialNull() {
+            callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(Benefit.UC.getShortName());
+            callback.getCaseDetails()
+                .getCaseData()
+                .getAppeal()
+                .getBenefitType()
+                .setDescription(Benefit.UC.getDescription());
+            List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
+            CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder()
+                .value(OtherParty.builder().confidentialityRequired(NO).build())
+                .build();
+            otherPartyList.add(ccdValue);
+            CcdValue<OtherParty> ccdValue1 = CcdValue.<OtherParty>builder()
+                .value(OtherParty.builder().confidentialityRequired(YES).build())
+                .build();
+            otherPartyList.add(ccdValue1);
+            callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
+            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
+                USER_AUTHORISATION);
+
+            Assertions.assertThat(response.getData().getIsConfidentialCase()).isNull();
+        }
+    }
+
+    @Nested
+    class CmOtherPartyConfidentialityEnabled {
+
+        static Stream<Benefit> benefits() {
+            return Stream.of(Benefit.CHILD_SUPPORT, Benefit.TAX_CREDIT, Benefit.GUARDIANS_ALLOWANCE,
+                Benefit.TAX_FREE_CHILDCARE, Benefit.HOME_RESPONSIBILITIES_PROTECTION, Benefit.CHILD_BENEFIT,
+                Benefit.THIRTY_HOURS_FREE_CHILDCARE, Benefit.GUARANTEED_MINIMUM_PENSION,
+                Benefit.NATIONAL_INSURANCE_CREDITS, Benefit.UC);
+        }
+
+        @BeforeEach
+        void beforeEach() {
+            handler = createNewCaseHandler(true);
+        }
+
+        @ParameterizedTest
+        @MethodSource("benefits")
+        void givenACaseAppellantConfidentialityYes_thenCaseConfidentialYes(Benefit benefit) {
+            callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(YES);
+            callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(benefit.getShortName());
+            callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefit.getDescription());
+            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
+                USER_AUTHORISATION);
+
+            Assertions.assertThat(response.getData().getIsConfidentialCase()).isEqualTo(YES);
+        }
+
+        @ParameterizedTest
+        @MethodSource("benefits")
+        void givenACaseAppellantConfidentialityNoOtherPartyYes_thenCaseConfidentialYes(Benefit benefit) {
+            callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(NO);
+            callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(benefit.getShortName());
+            callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefit.getDescription());
+            List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
+            CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder()
+                .value(OtherParty.builder().confidentialityRequired(YES).build())
+                .build();
+            otherPartyList.add(ccdValue);
+            callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
+            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
+                USER_AUTHORISATION);
+
+            Assertions.assertThat(response.getData().getIsConfidentialCase()).isEqualTo(YES);
+        }
+    }
+
+    private CaseUpdatedAboutToSubmitHandler createNewCaseHandler(boolean cmOtherPartyConfidentialityEnabled) {
+        return new CaseUpdatedAboutToSubmitHandler(
+            regionalProcessingCenterService,
+            associatedCaseLinkHelper,
+            airLookupService,
+            new DwpAddressLookupService(),
+            idamService,
+            refDataService,
+            venueService,
+            hearingDurationsService,
+            panelCompositionService, cmOtherPartyConfidentialityEnabled);
     }
 }

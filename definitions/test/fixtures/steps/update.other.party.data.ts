@@ -182,12 +182,10 @@ export class UpdateOtherPartyData extends BaseStep {
     of benefit type - Rohith - 07/02/2025
   */
 
-    async performUpdateOtherPartyData(caseId: string) {
-    // Creating case - CHILDSUPPORT
-    const ChildSupportCaseId = await createCaseBasedOnCaseType('CHILDSUPPORT');
+    async performUpdateOtherPartyData(caseId: string, benefitType: string) {
 
     // Starting event
-    await this.goToUpdateOtherPartyData(ChildSupportCaseId);
+    await this.goToUpdateOtherPartyData(caseId);
     await this.updateOtherPartyDataPage.verifyPageContent();
 
     // Filling fields and Submitting the event
@@ -200,78 +198,80 @@ export class UpdateOtherPartyData extends BaseStep {
     await expect(this.homePage.summaryTab).toBeVisible();
     await this.homePage.delay(3000);
 
-    // Adding other party subscription
-    await this.homePage.chooseEvent('Update subscription');
-    await this.updateOtherPartyDataPage.applyOtherPartiesSubscription();
-    await this.eventNameAndDescriptionPage.inputData(
-      eventTestData.eventSummaryInput,
-      eventTestData.eventDescriptionInput
-    );
-    await this.eventNameAndDescriptionPage.confirmSubmission();
-    await expect(this.homePage.summaryTab).toBeVisible();
-    await this.homePage.delay(3000);
-
-    // Verifying History tab + end state
-    await this.verifyHistoryTabDetails('Update subscription');
-    await this.historyTab.verifyPageContentByKeyValue(
-      'End state',
-      await this.getChildSupportEndState()
-    );
-    await this.historyTab.verifyPageContentByKeyValue(
-      'Event',
-      'Update subscription'
-    );
-
-    // Navigate to Other Party Details tab + validations
-    await this.verifyOtherPartyDetails('Other parties 1');
-    await this.otherPartyDetailsTab.verifyPageContentByKeyValue(
-      'First Name',
-      addUpdateOtherPartyData.updateOtherPartyDataFirstName
-    );
-    await this.otherPartyDetailsTab.verifyPageContentByKeyValue(
-      'Last Name',
-      addUpdateOtherPartyData.updateOtherPartyDataLastName
-    );
-    await this.otherPartyDetailsTab.verifyPageContentByKeyValue(
-      'Address Line 1',
-      addUpdateOtherPartyData.updateOtherPartyDataAddressLine
-    );
-    await this.otherPartyDetailsTab.verifyPageContentByKeyValue(
-      'Town',
-      addUpdateOtherPartyData.updateOtherPartyDataAddressTown
-    );
-    await this.otherPartyDetailsTab.verifyPageContentByKeyValue(
-      'Postcode',
-      addUpdateOtherPartyData.updateOtherPartyDataAddressPostCode
-    );
-    await this.otherPartyDetailsTab.verifyPageContentByRoleWithLocator(
-      'Confidentiality Required',
-      'No'
-    );
-    await this.otherPartyDetailsTab.verifyPageContentByRoleWithLocator(
-      'Unacceptable Customer Behaviour',
-      'No'
-    );
-    await this.otherPartyDetailsTab.verifyPageContentByKeyValue(
-      'Role',
-      addUpdateOtherPartyData.updateOtherPartyDataRole
-    );
-    await this.otherPartyDetailsTab.verifyPageContentByKeyValue(
-      'Track Your Appeal Number',
-      addUpdateSubscriptionData.updateSubscriptionTrackYAotherParty
-    );
-    await this.otherPartyDetailsTab.verifyPageContentByKeyValue(
-      'Email Address',
-      addUpdateSubscriptionData.updateSubscriptionEmailotherParty
-    );
-    await this.otherPartyDetailsTab.verifyPageContentByKeyValue(
-      'Mobile Number',
-      addUpdateSubscriptionData.updateSubscriptionMobileNumberotherParty
-    );
-    await this.otherPartyDetailsTab.verifyPageContentByRoleWithLocator(
-      'DV marker?',
-      'No'
+    if (benefitType === 'Child Support') {
+      // Adding other party subscription
+      await this.homePage.chooseEvent('Update subscription');
+      await this.updateOtherPartyDataPage.applyOtherPartiesSubscription();
+      await this.eventNameAndDescriptionPage.inputData(
+        eventTestData.eventSummaryInput,
+        eventTestData.eventDescriptionInput
       );
+      await this.eventNameAndDescriptionPage.confirmSubmission();
+      await expect(this.homePage.summaryTab).toBeVisible();
+      await this.homePage.delay(3000);
+
+      // Verifying History tab + end state
+      await this.verifyHistoryTabDetails('Update subscription');
+      await this.historyTab.verifyPageContentByKeyValue(
+        'End state',
+        await this.getChildSupportEndState()
+      );
+      await this.historyTab.verifyPageContentByKeyValue(
+        'Event',
+        'Update subscription'
+      );
+
+      // Navigate to Other Party Details tab + validations
+      await this.verifyOtherPartyDetails('Other parties 1');
+      await this.otherPartyDetailsTab.verifyPageContentByKeyValue(
+        'First Name',
+        addUpdateOtherPartyData.updateOtherPartyDataFirstName
+      );
+      await this.otherPartyDetailsTab.verifyPageContentByKeyValue(
+        'Last Name',
+        addUpdateOtherPartyData.updateOtherPartyDataLastName
+      );
+      await this.otherPartyDetailsTab.verifyPageContentByKeyValue(
+        'Address Line 1',
+        addUpdateOtherPartyData.updateOtherPartyDataAddressLine
+      );
+      await this.otherPartyDetailsTab.verifyPageContentByKeyValue(
+        'Town',
+        addUpdateOtherPartyData.updateOtherPartyDataAddressTown
+      );
+      await this.otherPartyDetailsTab.verifyPageContentByKeyValue(
+        'Postcode',
+        addUpdateOtherPartyData.updateOtherPartyDataAddressPostCode
+      );
+      await this.otherPartyDetailsTab.verifyPageContentByRoleWithLocator(
+        'Confidentiality Required',
+        'No'
+      );
+      await this.otherPartyDetailsTab.verifyPageContentByRoleWithLocator(
+        'Unacceptable Customer Behaviour',
+        'No'
+      );
+      await this.otherPartyDetailsTab.verifyPageContentByKeyValue(
+        'Role',
+        addUpdateOtherPartyData.updateOtherPartyDataRole
+      );
+      await this.otherPartyDetailsTab.verifyPageContentByKeyValue(
+        'Track Your Appeal Number',
+        addUpdateSubscriptionData.updateSubscriptionTrackYAotherParty
+      );
+      await this.otherPartyDetailsTab.verifyPageContentByKeyValue(
+        'Email Address',
+        addUpdateSubscriptionData.updateSubscriptionEmailotherParty
+      );
+      await this.otherPartyDetailsTab.verifyPageContentByKeyValue(
+        'Mobile Number',
+        addUpdateSubscriptionData.updateSubscriptionMobileNumberotherParty
+      );
+      await this.otherPartyDetailsTab.verifyPageContentByRoleWithLocator(
+        'DV marker?',
+        'No'
+        );
+    }
   }
 
   async performUpdateOtherPartyDataTaxCredit(caseId: string) {
@@ -390,14 +390,14 @@ export class UpdateOtherPartyData extends BaseStep {
     await this.homePage.delay(3000);
   }
 
-  async addOtherPartyDataForAwaitOtherPartyData(caseId: string, user) {
+  async addOtherPartyDataForAwaitOtherPartyData(caseId: string, user, benefitType: string) {
     await this.loginUserWithCaseId(user, true, caseId);
-    await this.waitForSummaryState('Await Other Party Data');
-
+    await (benefitType === 'Child Support'
+         ? this.waitForSummaryState('Await Other Party Data')
+         : this.waitForSummaryState('With FTA'));
     await this.homePage.chooseEvent('Add other party data');
     await this.updateOtherPartyDataPage.verifyPageContent('Add other party data');
     await this.updateOtherPartyDataPage.applyChildSupportFtaAddOtherPartyData();
-    await this.page.getByRole('button', { name: 'Submit', exact: true }).click();
 
     await this.waitForSummaryState('Await Confidentiality Requirements');
   }
@@ -427,7 +427,6 @@ export class UpdateOtherPartyData extends BaseStep {
       town: 'Test1',
       postcode: 'BN19SA'
     });
-    await this.submitEventWithOptionalSecondSubmit();
     await this.waitForSummaryState('Await Confidentiality Requirements');
     await this.verifyConfidentialityRows([
       {
