@@ -192,6 +192,9 @@ export class SendToInterloc extends BaseStep {
     await sendToInterlocPage.selectReasonReferred(
       sendToInterlocData.sendToInterlocConfidentialityReasonValue
     );
+    await sendToInterlocPage.selectPartyConfidentiality(
+      sendToInterlocData.sendToInterlocPartyConfidentialityValue_2
+    );
     await sendToInterlocPage.confirmSubmission();
 
     await this.eventNameAndDescriptionPage.verifyPageContent(
@@ -206,6 +209,10 @@ export class SendToInterloc extends BaseStep {
     await this.summaryTab.verifyPageSectionByKeyValue(
       sendToInterlocData.sendToInterlocReasonReferredFieldLabel,
       sendToInterlocData.sendToInterlocConfidentialityReasonValue
+    );
+     await this.summaryTab.verifyPageContentByKeyValue(
+      sendToInterlocData.sendToInterLocSelectPartyFieldLabel,
+      sendToInterlocData.sendToInterlocPartyConfidentialityValue_2
     );
   }
 
