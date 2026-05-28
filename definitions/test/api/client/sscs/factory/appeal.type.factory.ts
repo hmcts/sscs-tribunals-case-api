@@ -116,6 +116,13 @@ export async function createChildSupportCaseForCmConfidentiality() {
   return createCaseFromPayload(payload);
 }
 
+export async function createUCCaseForConfidentiality() {
+  const payload = clonePayload(ucPayload);
+  payload.appellant.nino = StringUtilsComponent.getRandomNINumber();
+
+  return createCaseFromPayload(payload);
+}
+
 export async function createChildSupportCaseForPreValidConfidentiality() {
   return createCaseFromPayload(
     childSupportPreValidConfidentialityPayload,
