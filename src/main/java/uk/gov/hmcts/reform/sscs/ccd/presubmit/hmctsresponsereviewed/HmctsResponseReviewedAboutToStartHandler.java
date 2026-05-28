@@ -66,7 +66,7 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
         setDefaultFieldValues(sscsCaseData);
         setDwpDocuments(sscsCaseData);
         setSelectWhoReviewsCase(sscsCaseData);
-        if (cmConfidentialityEnabled && isChildSupportAppeal(sscsCaseData)) {
+        if (cmConfidentialityEnabled && (isChildSupportAppeal(sscsCaseData) || sscsCaseData.isBenefitType(Benefit.UC))) {
             sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
                     getSelectedConfidentialityPartyDropdown(sscsCaseData));
         }
