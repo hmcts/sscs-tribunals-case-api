@@ -76,10 +76,10 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
             if (hasSvIssueCode(sscsCaseData) && nonNull(esaSevereCriteriaApplies)) {
                 String decision = sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAllowedOrRefused();
                 if ("allowed".equals(decision) && !YesNo.isYes(esaSevereCriteriaApplies)) {
-                    preSubmitCallbackResponse.addError("Appeal allowed, please select Yes to this question.");
+                    preSubmitCallbackResponse.addError(SV_ALLOWED_APPEAL_ERROR_MESSAGE);
                 }
                 if ("refused".equals(decision) && YesNo.isYes(esaSevereCriteriaApplies)) {
-                    preSubmitCallbackResponse.addError("Appeal refused, please select No to this question.");
+                    preSubmitCallbackResponse.addError(SV_REFUSED_APPEAL_ERROR_MESSAGE);
                 }
             }
         }

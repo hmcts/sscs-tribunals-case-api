@@ -81,10 +81,10 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
             if (hasSvIssueCode(sscsCaseData) && nonNull(ucSevereCriteriaApplies)) {
                 String decision = sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAllowedOrRefused();
                 if ("allowed".equals(decision) && !YesNo.isYes(ucSevereCriteriaApplies)) {
-                    preSubmitCallbackResponse.addError("Appeal allowed, please select Yes to this question.");
+                    preSubmitCallbackResponse.addError(SV_ALLOWED_APPEAL_ERROR_MESSAGE);
                 }
                 if ("refused".equals(decision) && YesNo.isYes(ucSevereCriteriaApplies)) {
-                    preSubmitCallbackResponse.addError("Appeal refused, please select No to this question.");
+                    preSubmitCallbackResponse.addError(SV_REFUSED_APPEAL_ERROR_MESSAGE);
                 }
             }
 
