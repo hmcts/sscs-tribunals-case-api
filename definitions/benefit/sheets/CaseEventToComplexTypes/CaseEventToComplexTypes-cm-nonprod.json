@@ -144,7 +144,7 @@
     "ListElementCode": "domesticViolenceMarker",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "16/03/2026",
-    "FieldShowCondition": "appeal.benefitType.code=\"childSupport\"",
+    "FieldShowCondition": "appeal.benefitType.code=\"childSupport\" OR appeal.benefitType.code=\"UC\"",
     "PageID": "1.0"
   },
   {
@@ -153,7 +153,7 @@
     "ListElementCode": "domesticViolenceMarker",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "16/03/2026",
-    "FieldShowCondition": "appeal.benefitType.code=\"childSupport\"",
+    "FieldShowCondition": "appeal.benefitType.code=\"childSupport\" OR appeal.benefitType.code=\"UC\"",
     "PageID": "1.0"
   },
   {
