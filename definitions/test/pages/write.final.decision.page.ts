@@ -315,14 +315,14 @@ export class WriteFinalDecisionPages {
   }
 
   async inputTypePageContentForDecisionPageData() {
-    await webActions.inputField('#writeFinalDecisionDateOfDecision-day', '11');
+    await webActions.inputField('#writeFinalDecisionDateOfDecision-day', '06');
     await webActions.inputField(
       '#writeFinalDecisionDateOfDecision-month',
-      '07'
+      '04'
     );
     await webActions.inputField(
       '#writeFinalDecisionDateOfDecision-year',
-      '2024'
+      '2026'
     );
     await this.page.locator('#writeFinalDecisionDateOfDecision-day').first().click()
     await webActions.verifyElementHidden('span.error-message')
@@ -1239,13 +1239,6 @@ export class WriteFinalDecisionPages {
     );
 
     await webActions.verifyTextVisibility(
-      writeFinalDecisionData.whenShouldFTAReAssessTheAwardLabel
-    );
-    await webActions.verifyTextVisibility(
-      writeFinalDecisionData.reassessWithin3MonthsLabel
-    );
-
-    await webActions.verifyTextVisibility(
       writeFinalDecisionData.reasonsForDecisionLabel
     );
     await webActions.verifyTextVisibility(
@@ -1950,13 +1943,6 @@ export class WriteFinalDecisionPages {
       { label: writeFinalDecisionData.reasonsForDecisionLabel, value: writeFinalDecisionData.reasonsForDecisionInput },
       { label: writeFinalDecisionData.checkYourAnswersAnythingElse, value: writeFinalDecisionData.anythingElseInput }
     ]
-
-    if (isAppealAllowed) {
-      expectedRows.push({
-        label: writeFinalDecisionData.whenShouldFTAReAssessTheAwardLabel,
-        value: writeFinalDecisionData.reassessWithin3MonthsLabel
-      });
-    }
 
     if (isEsaCase) {
       expectedRows.push(

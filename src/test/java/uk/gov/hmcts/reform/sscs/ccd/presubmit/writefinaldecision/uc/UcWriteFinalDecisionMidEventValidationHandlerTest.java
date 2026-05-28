@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import jakarta.validation.Validator;
@@ -19,10 +20,7 @@ import junitparams.converters.Nullable;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ElementDisputed;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ElementDisputedDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionMidEventValidationHandlerBase;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionMidEventValidationHandlerTestBase;
@@ -208,6 +206,63 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
     }
 
     @Test
+    public void givenUcCaseWithWcaAppealFlowAndSevereConditionsTrue_thenDoNotShowDwpReassessAwardPage() {
+
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        sscsCaseData.setWcaAppeal(YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereCriteriaApply(YES);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getPageId()).thenReturn("workCapabilityAssessment");
+
+        UcWriteFinalDecisionMidEventValidationHandler severeConditionsHandler = new UcWriteFinalDecisionMidEventValidationHandler(
+                validator, decisionNoticeService, true, true);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = severeConditionsHandler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getShowDwpReassessAwardPage()).isEqualTo(NO);
+    }
+
+    @Test
+    public void givenUcCaseWithWcaAppealFlowAndSvIssueCode_thenDoNotShowDwpReassessAwardPage() {
+
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        sscsCaseData.setWcaAppeal(YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.setElementsDisputedLimitedWork(List.of(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("SV").build()).build()));
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getPageId()).thenReturn("workCapabilityAssessment");
+
+        UcWriteFinalDecisionMidEventValidationHandler severeConditionsHandler = new UcWriteFinalDecisionMidEventValidationHandler(
+                validator, decisionNoticeService, true, true);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = severeConditionsHandler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getShowDwpReassessAwardPage()).isEqualTo(NO);
+    }
+
+    @Test
+    public void givenUcCaseWithWcaAppealFlowAndSevereConditionsFalse_thenSetShowDwpReassessAwardPage() {
+
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        sscsCaseData.setWcaAppeal(YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereCriteriaApply(NO);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getPageId()).thenReturn("workCapabilityAssessment");
+
+        UcWriteFinalDecisionMidEventValidationHandler severeConditionsHandler = new UcWriteFinalDecisionMidEventValidationHandler(
+                validator, decisionNoticeService, true, true);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = severeConditionsHandler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getShowDwpReassessAwardPage()).isEqualTo(YES);
+    }
+
+    @Test
     @Parameters({"STANDARD_RATE, STANDARD_RATE",})
     @Override
     public void shouldExhibitBenefitSpecificBehaviourWhenAnAnAwardIsGivenAndNoActivitiesSelected(AwardType dailyLiving, AwardType mobility) {
@@ -302,6 +357,15 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
     }
 
     @Test
+    @Parameters({"2026-04-05, NO", "2026-04-06, YES"})
+    public void givenSevereConditionsEnabled_shouldSetWriteFinalDecisionDateOfDecisionIsAfterSvDate(String dateOfDecision, YesNo isDateOfDecisionAfterSvDate) {
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision(dateOfDecision);
+        UcWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, true);
+        handlerWithSevereConditions.setDefaultFields(sscsCaseData);
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecisionIsAfterSvDate()).isEqualTo(isDateOfDecisionAfterSvDate);
+    }
+
+    @Test
     @Parameters({"SV", "DD"})
     public void givenSevereConditionsNotEnabled_thenShouldNotSetHasSvIssueCode(String issueCode) {
         UcWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, false);
@@ -310,5 +374,75 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
         handlerWithSevereConditions.setDefaultFields(sscsCaseData);
 
         assertThat(sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionHasSVIssueCode()).isNull();
+    }
+
+    @Test
+    public void givenSvIssueCode_WhenNoWriteFinalDecisionSevereYesNo_thenDisplayError() {
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        sscsCaseData.setElementsDisputedLimitedWork(List.of(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("SV").build()).build()));
+        sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(NO);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
+
+        UcWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, true);
+        handlerWithSevereConditions.setDefaultFields(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handlerWithSevereConditions.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+        assertEquals("This is a severe conditions criteria only appeal. Please select yes to this question.", response.getErrors().iterator().next());
+    }
+
+    @Test
+    @Parameters({
+        "SV, YES",
+        "CE, NO",
+        "CE, YES"
+    })
+    public void givenConditionsNotMet_shouldNotDisplaySevereConditionsError(String issueCode, String isCaseSevereCondition) {
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(YesNo.valueOf(isCaseSevereCondition));
+        sscsCaseData.setElementsDisputedLimitedWork(List.of(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode(issueCode).build()).build()));
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
+        UcWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, true);
+        handlerWithSevereConditions.setDefaultFields(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handlerWithSevereConditions.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    public void givenSevereConditionsCaseBeforeSvStartDate_thenShouldThrowError() {
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2026-04-05");
+        sscsCaseData.setElementsDisputedLimitedWork(List.of(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("SV").build()).build()));
+        UcWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, true);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handlerWithSevereConditions.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).hasSize(1);
+        assertThat(response.getErrors().iterator().next()).isEqualTo("You cannot write decision notice until resolved. Please ask admin to amend issue code to WC or SG and then proceed.");
+    }
+
+    @Test
+    public void givenSevereConditionsCaseAfterSvStartDate_thenShouldNotThrowError() {
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2026-04-06");
+        sscsCaseData.setElementsDisputedLimitedWork(List.of(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("SV").build()).build()));
+        UcWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, true);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handlerWithSevereConditions.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    public void givenNonSevereConditionsCase_thenShouldNotThrowError() {
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2026-04-05");
+        sscsCaseData.setElementsDisputedLimitedWork(List.of(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("WC").build()).build()));
+        UcWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, true);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handlerWithSevereConditions.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
     }
 }

@@ -13,18 +13,20 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionComponentId;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class WriteFinalDecisionTemplateContent {
 
-    public static final String FACETOFACE = "faceToFace";
-    public static final String TRIAGE = "triage";
+    private static final String FACETOFACE = "faceToFace";
+    private static final String TRIAGE = "triage";
     protected static DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
+    @Getter
     @JsonProperty("template_content")
-    private List<TemplateComponent<?>> components;
+    private final List<TemplateComponent<?>> components;
 
     private boolean isBenefitTypeAlreadyMentioned;
     private boolean isRegulationsAlreadyMentioned;
@@ -74,16 +76,12 @@ public abstract class WriteFinalDecisionTemplateContent {
         this.components = new ArrayList<>();
     }
 
-    public List<TemplateComponent<?>> getComponents() {
-        return components;
-    }
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (TemplateComponent<?> component : components) {
             if (!component.toString().isBlank()) {
-                sb.append(component.toString());
+                sb.append(component);
                 sb.append("\n\n");
             }
 
@@ -93,11 +91,6 @@ public abstract class WriteFinalDecisionTemplateContent {
 
     public String getAllowedOrRefusedSentence(boolean allowed) {
         return "The appeal is " + (allowed ? "allowed" : "refused") + ".";
-    }
-
-    public String getConfirmedOrSetAsideSentence(boolean setAside, String decisionDate) {
-        return "The decision made by the Secretary of State on " + DATEFORMATTER.format(LocalDate.parse(decisionDate)) + " is "
-            + (!setAside ? "confirmed." : "set aside.");
     }
 
     public String getConfirmedOrSetAsideSentence(boolean setAside, String decisionDate, boolean isHmrc, boolean isIbca) {
@@ -156,7 +149,8 @@ public abstract class WriteFinalDecisionTemplateContent {
                     writeFinalDecisionTemplateBody.isAppointeeAttended(),
                     writeFinalDecisionTemplateBody.isAppointeeOnCase(),
                     writeFinalDecisionTemplateBody.isPresentingOfficerAttended(),
-                    writeFinalDecisionTemplateBody.getOtherPartyNamesAttendedHearing());
+                    writeFinalDecisionTemplateBody.getOtherPartyNamesAttendedHearing(),
+                    writeFinalDecisionTemplateBody.getOtherPartyNamesDidNotAttendHearing());
         }
     }
 
@@ -173,60 +167,121 @@ public abstract class WriteFinalDecisionTemplateContent {
         }
     }
 
-    public void addDescriptorTableIfPopulated(DescriptorTable desciptorTable) {
-        if (desciptorTable.getContent() != null && !desciptorTable.getContent().isEmpty()) {
-            this.components.add(desciptorTable);
+    public void addDescriptorTableIfPopulated(DescriptorTable descriptorTable) {
+        if (descriptorTable.getContent() != null && !descriptorTable.getContent().isEmpty()) {
+            this.components.add(descriptorTable);
         }
     }
 
-    protected String getAppellantAndOtherPartyAttended(boolean appellantAttended, boolean appointeeAttended,
-                                                       String hearingType, String appellantName,
-                                                       String appointeeName, boolean presentingOfficerAttended,
-                                                       String bundlePage, String otherPartyNamesAttended) {
-        String faceToFaceHearing = getOtherPartyNamesAttendedString(otherPartyNamesAttended)
-                + " attended the hearing today and the Tribunal considered the appeal bundle to page "
-                + bundlePage
-                + ". " + getPresentingOfficerAttendance(presentingOfficerAttended);
-        String nonFaceToFaceHearing = getOtherPartyNamesAttendedString(otherPartyNamesAttended)
-                + " attended and the Tribunal considered the appeal bundle to page " + bundlePage + ". "
-                + getPresentingOfficerAttendance(presentingOfficerAttended);
+    private String getAppellantAndOtherPartySentences(boolean isAppointeeOnCase,
+                                                      boolean appointeeAttended,
+                                                      boolean appellantAttended,
+                                                      String appellantName,
+                                                      String appointeeName,
+                                                      boolean presentingOfficerAttended,
+                                                      String bundlePage,
+                                                      List<String> otherPartyNamesAttended,
+                                                      List<String> otherPartyNamesDidNotAttend) {
 
-        if (equalsIgnoreCase(FACETOFACE, hearingType)) {
-            if (appellantAttended) {
-                return getAttended(appellantName, false) + faceToFaceHearing;
-            } else if (appointeeAttended) {
-                return getAttended(appointeeName, true) + faceToFaceHearing;
-            } else {
-                return appellantName + faceToFaceHearing;
-            }
-        } else {
-            if (appellantAttended) {
-                return getAttended(appellantName, false) + nonFaceToFaceHearing;
-            } else if (appointeeAttended) {
-                return getAttended(appointeeName, true) + nonFaceToFaceHearing;
-            } else {
-                return appellantName + nonFaceToFaceHearing;
-            }
+        List<String> sentences = new ArrayList<>();
+
+        var attendedText = getRespondentsAttended(isAppointeeOnCase, appellantAttended, appellantName, appointeeAttended,
+            appointeeName, presentingOfficerAttended, otherPartyNamesAttended);
+
+        var notAttendedText = getRespondentsNotAttend(isAppointeeOnCase, appellantAttended, appellantName, appointeeAttended,
+            appointeeName, presentingOfficerAttended,
+            otherPartyNamesDidNotAttend);
+
+        if (StringUtils.isNotEmpty(attendedText)) {
+            sentences.add("The following people attended: %s".formatted(attendedText));
         }
+
+        if (StringUtils.isNotEmpty(notAttendedText)) {
+            sentences.add("%s did not attend".formatted(notAttendedText));
+        }
+
+        if (StringUtils.isNotEmpty(bundlePage)) {
+            sentences.add(String.format("The Tribunal considered the appeal bundle to page %s", bundlePage));
+        }
+
+        return sentences.isEmpty() ? "" : String.join(". ", sentences) + ".";
     }
 
-    protected String getAttended(String attendedName, boolean appointeeAttended) {
-        if (appointeeAttended) {
-            return attendedName + " the appointee";
-        } else {
-            return attendedName + " the appellant";
+    private String getRespondentsAttended(boolean isAppointeeOnCase,
+                                          boolean appellantAttended,
+                                          String appellantName,
+                                          boolean appointeeAttended,
+                                          String appointeeName,
+                                          boolean presentingOfficerAttended,
+                                          List<String> otherPartyNamesAttended) {
+
+        List<String> respondents = new ArrayList<>();
+
+        if (isAppointeeOnCase & appointeeAttended) {
+            respondents.add(String.format("%s the appointee", appointeeName));
         }
+
+        if (!isAppointeeOnCase && appellantAttended) {
+            respondents.add(String.format("%s the appellant", appellantName));
+        }
+
+        if (otherPartyNamesAttended != null && !otherPartyNamesAttended.isEmpty()) {
+            respondents.addAll(otherPartyNamesAttended);
+        }
+
+        if (presentingOfficerAttended) {
+            respondents.add(presentingOfficerText(!respondents.isEmpty()));
+        }
+
+        return joinRespondentsNameAsStr(respondents);
     }
 
-    private static String getPresentingOfficerAttendance(boolean presentingOfficerAttended) {
-        return presentingOfficerAttended ? "First Tier Agency representative attended on behalf of the Respondent." : "First Tier Agency representative did not attend.";
+    private String getRespondentsNotAttend(boolean isAppointeeOnCase,
+                                           boolean appellantAttended,
+                                           String appellantName,
+                                           boolean appointeeAttended,
+                                           String appointeeName,
+                                           boolean presentingOfficerAttended,
+                                           List<String> otherPartyNamesDidNotAttend) {
+
+        List<String> respondents = new ArrayList<>();
+
+        if (isAppointeeOnCase && !appointeeAttended) {
+            respondents.add(String.format("%s the appointee", appointeeName));
+        }
+
+        if (!isAppointeeOnCase && !appellantAttended) {
+            respondents.add(String.format("%s the appellant", appellantName));
+        }
+
+        if (otherPartyNamesDidNotAttend != null && !otherPartyNamesDidNotAttend.isEmpty()) {
+            respondents.addAll(otherPartyNamesDidNotAttend);
+        }
+
+        if (!presentingOfficerAttended) {
+            respondents.add(presentingOfficerText(!respondents.isEmpty()));
+        }
+
+        return joinRespondentsNameAsStr(respondents);
     }
 
-    protected String getOtherPartyNamesAttendedString(String otherPartyNamesAttended) {
-        if (StringUtils.isNotEmpty(otherPartyNamesAttended)) {
-            return ", " + otherPartyNamesAttended;
+    private String joinRespondentsNameAsStr(List<String> respondents) {
+        if (respondents.isEmpty()) {
+            return "";
         }
-        return "";
+
+        if (respondents.size() == 1) {
+            return respondents.getFirst();
+        }
+
+        var lastRespondent = respondents.getLast();
+
+        return String.join(", ", respondents.subList(0, respondents.size() - 1)) + " and " + lastRespondent;
+    }
+
+    private String presentingOfficerText(boolean anyOneElseBesideOfficer) {
+        return anyOneElseBesideOfficer ? "a representative from the First Tier Agency"
+            : "A representative from the First Tier Agency";
     }
 
     protected String getConsideredParagraph(String bundlePage, String appointeName) {
@@ -237,223 +292,181 @@ public abstract class WriteFinalDecisionTemplateContent {
         return "The tribunal considered the appeal bundle to page " + bundlePage + ".";
     }
 
-    public List<String> getFaceToFaceTelephoneVideoHearingTypeSentences(String hearingType, String appellantName,
-                                                                        String appointeeName, String bundlePage,
-                                                                        boolean appellantAttended, boolean appointeeAttended,
-                                                                        boolean isAppointeeOnCase, boolean presentingOfficerAttended,
-                                                                        String otherPartyNamesAttended) {
+    private List<String> getFaceToFaceTelephoneVideoHearingTypeSentences(String hearingType,
+                                                                         String appellantName,
+                                                                         String appointeeName,
+                                                                         String bundlePage,
+                                                                         boolean appellantAttended,
+                                                                         boolean appointeeAttended,
+                                                                         boolean isAppointeeOnCase,
+                                                                         boolean presentingOfficerAttended,
+                                                                         List<String> otherPartyNamesAttended,
+                                                                         List<String> otherPartyNamesDidNotAttend) {
 
         if (isAppointeeOnCase && appointeeAttended) {
             return getSentenceAppointeeOnCaseAppointeeAttended(hearingType, appellantAttended, appellantName, appointeeName,
-            presentingOfficerAttended, bundlePage, otherPartyNamesAttended);
+                presentingOfficerAttended, bundlePage, otherPartyNamesAttended, otherPartyNamesDidNotAttend);
         }
 
         if (isAppointeeOnCase) {
-            return getSentenceAppointeeOnCaseAppointeeNotAttended(hearingType, appellantAttended, appellantName, appointeeName,
-            presentingOfficerAttended, bundlePage);
+            return getSentenceAppointeeOnCaseAppointeeNotAttended(hearingType, appellantAttended, appellantName, appointeeName, presentingOfficerAttended,
+                bundlePage, otherPartyNamesAttended, otherPartyNamesDidNotAttend);
         }
 
         if (appellantAttended) {
             return getSentenceAppointeeNotOnCaseAppellantAttended(hearingType,
-                    appellantName, appointeeName, presentingOfficerAttended, bundlePage, otherPartyNamesAttended);
+                appellantName, appointeeName, presentingOfficerAttended, bundlePage,
+                otherPartyNamesAttended, otherPartyNamesDidNotAttend);
         }
 
         return getSentenceAppointeeNotOnCaseAppellantNotAttended(hearingType, appointeeAttended, appellantName,
-                    appointeeName, presentingOfficerAttended, bundlePage);
+            appointeeName, presentingOfficerAttended, bundlePage, otherPartyNamesAttended, otherPartyNamesDidNotAttend);
     }
 
-    protected List<String> getSentenceAppointeeOnCaseAppointeeAttended(String hearingType, boolean appellantAttended,
-                                                                       String appellantName, String appointeeName,
-                                                                       boolean presentingOfficerAttended,
-                                                                       String bundlePage,
-                                                                       String otherPartyNamesAttended) {
+    private List<String> getSentenceAppointeeOnCaseAppointeeAttended(String hearingType,
+                                                                     boolean appellantAttended,
+                                                                     String appellantName,
+                                                                     String appointeeName,
+                                                                     boolean presentingOfficerAttended,
+                                                                     String bundlePage,
+                                                                     List<String> otherPartyNamesAttended,
+                                                                     List<String> otherPartyNamesDidNotAttend) {
         if (equalsIgnoreCase(FACETOFACE, hearingType)) {
             return singletonList(
-                    getFaceToFaceTypeSentences(
-                            true,
-                            true,
-                            appellantAttended,
-                            appellantName,
-                            appointeeName)
-                            + getAppellantAndOtherPartyAttended(
-                            false,
-                            true,
-                            hearingType,
-                            appellantName,
-                            appointeeName,
-                            presentingOfficerAttended,
-                            bundlePage, otherPartyNamesAttended));
+                getFaceToFaceTypeSentences()
+                    + getAppellantAndOtherPartySentences(
+                        true,
+                    true,
+                    appellantAttended,
+                    appellantName,
+                    appointeeName,
+                    presentingOfficerAttended,
+                    bundlePage, otherPartyNamesAttended, otherPartyNamesDidNotAttend));
         } else if (equalsIgnoreCase(TRIAGE, hearingType)) {
             return singletonList(getTriageConsideredParagraph(bundlePage));
         } else {
             return singletonList(
-                    getNonFaceToFaceTypeSentences(
-                            true,
-                            true,
-                            appellantAttended,
-                            hearingType,
-                            appellantName,
-                            appointeeName)
-                            + getAppellantAndOtherPartyAttended(
-                            false,
-                            true,
-                            hearingType,
-                            appellantName,
-                            appointeeName,
-                            presentingOfficerAttended,
-                            bundlePage,
-                            otherPartyNamesAttended));
+                getNonFaceToFaceTypeSentences(hearingType)
+                    + getAppellantAndOtherPartySentences(
+                        true,
+                    true,
+                    appellantAttended,
+                    appellantName,
+                    appointeeName,
+                    presentingOfficerAttended,
+                    bundlePage,
+                    otherPartyNamesAttended,
+                    otherPartyNamesDidNotAttend));
         }
     }
 
-    protected List<String> getSentenceAppointeeOnCaseAppointeeNotAttended(String hearingType, boolean appellantAttended,
-                                                                          String appellantName, String appointeeName,
-                                                                          boolean presentingOfficerAttended,
-                                                                          String bundlePage) {
+    private List<String> getSentenceAppointeeOnCaseAppointeeNotAttended(String hearingType,
+                                                                        boolean appellantAttended,
+                                                                        String appellantName,
+                                                                        String appointeeName,
+                                                                        boolean presentingOfficerAttended,
+                                                                        String bundlePage,
+                                                                        List<String> otherPartyNamesAttended,
+                                                                        List<String> otherPartyNamesDidNotAttend) {
         if (equalsIgnoreCase(FACETOFACE, hearingType)) {
             return asList(
-                    getFaceToFaceTypeSentences(
-                            true,
-                            false,
-                            appellantAttended,
-                            appellantName,
-                            appointeeName)
-                            + getPresentingOfficerAttendance(presentingOfficerAttended),
-                    getConsideredParagraph(bundlePage, appointeeName));
+                getFaceToFaceTypeSentences()
+                    + getAppellantAndOtherPartySentences(
+                        true,
+                    false,
+                    appellantAttended,
+                    appellantName,
+                    appointeeName,
+                    presentingOfficerAttended,
+                    null, otherPartyNamesAttended, otherPartyNamesDidNotAttend),
+                getConsideredParagraph(bundlePage, appointeeName));
         } else if (equalsIgnoreCase(TRIAGE, hearingType)) {
             return singletonList(getTriageConsideredParagraph(bundlePage));
         } else {
             return asList(
-                    getNonFaceToFaceTypeSentences(
-                            true,
-                            false,
-                            appellantAttended,
-                            hearingType,
-                            appellantName,
-                            appointeeName)
-                            + getPresentingOfficerAttendance(presentingOfficerAttended),
-                    getConsideredParagraph(bundlePage, appointeeName));
+                getNonFaceToFaceTypeSentences(hearingType)
+                    + getAppellantAndOtherPartySentences(
+                        true,
+                    false,
+                    appellantAttended,
+                    appellantName,
+                    appointeeName,
+                    presentingOfficerAttended,
+                    null, otherPartyNamesAttended, otherPartyNamesDidNotAttend),
+                getConsideredParagraph(bundlePage, appointeeName));
         }
     }
 
-    protected List<String> getSentenceAppointeeNotOnCaseAppellantAttended(String hearingType,
-                                                                          String appellantName, String appointeeName,
-                                                                          boolean presentingOfficerAttended,
-                                                                          String bundlePage,
-                                                                          String otherPartyNamesAttended) {
+    private List<String> getSentenceAppointeeNotOnCaseAppellantAttended(String hearingType,
+                                                                        String appellantName,
+                                                                        String appointeeName,
+                                                                        boolean presentingOfficerAttended,
+                                                                        String bundlePage,
+                                                                        List<String> otherPartyNamesAttended,
+                                                                        List<String> otherPartyNamesDidNotAttend) {
         if (equalsIgnoreCase(FACETOFACE, hearingType)) {
             return singletonList(
-                    getFaceToFaceTypeSentences(
-                            false,
-                            false,
-                            true,
-                            appellantName,
-                            appointeeName)
-                            + getAppellantAndOtherPartyAttended(
-                            true,
-                            false,
-                            hearingType,
-                            appellantName,
-                            appointeeName,
-                            presentingOfficerAttended,
-                            bundlePage, otherPartyNamesAttended));
+                getFaceToFaceTypeSentences()
+                    + getAppellantAndOtherPartySentences(
+                        false,
+                    false,
+                    true,
+                    appellantName,
+                    appointeeName,
+                    presentingOfficerAttended,
+                    bundlePage,
+                    otherPartyNamesAttended,
+                    otherPartyNamesDidNotAttend));
         } else if (equalsIgnoreCase(TRIAGE, hearingType)) {
             return singletonList(getTriageConsideredParagraph(bundlePage));
         } else {
             return singletonList(
-                    getNonFaceToFaceTypeSentences(
-                            false,
-                            false,
-                            true,
-                            hearingType,
-                            appellantName,
-                            appointeeName)
-                    + getAppellantAndOtherPartyAttended(
-                            true,
-                            false,
-                            hearingType,
-                            appellantName,
-                            appointeeName,
-                            presentingOfficerAttended,
-                            bundlePage,
-                            otherPartyNamesAttended));
+                getNonFaceToFaceTypeSentences(hearingType)
+                    + getAppellantAndOtherPartySentences(
+                        false,
+                    false,
+                    true,
+                    appellantName,
+                    appointeeName,
+                    presentingOfficerAttended,
+                    bundlePage,
+                    otherPartyNamesAttended,
+                    otherPartyNamesDidNotAttend));
         }
     }
 
-    protected List<String> getSentenceAppointeeNotOnCaseAppellantNotAttended(String hearingType, boolean appointeeAttended,
-                                                                          String appellantName, String appointeeName,
-                                                                          boolean presentingOfficerAttended,
-                                                                          String bundlePage) {
+    private List<String> getSentenceAppointeeNotOnCaseAppellantNotAttended(String hearingType,
+                                                                           boolean appointeeAttended,
+                                                                           String appellantName, String appointeeName,
+                                                                           boolean presentingOfficerAttended,
+                                                                           String bundlePage,
+                                                                           List<String> otherPartyNamesAttended,
+                                                                           List<String> otherPartyNamesDidNotAttend) {
         if (equalsIgnoreCase(FACETOFACE, hearingType)) {
             return asList(
-                    getFaceToFaceTypeSentences(
-                            false,
-                            appointeeAttended,
-                            false,
-                            appellantName,
-                            appointeeName)
-                            + getPresentingOfficerAttendance(presentingOfficerAttended),
-                    getConsideredParagraph(bundlePage, appellantName));
+                getFaceToFaceTypeSentences()
+                    + getAppellantAndOtherPartySentences(false, appointeeAttended, false, appellantName, appointeeName,
+                    presentingOfficerAttended, null, otherPartyNamesAttended,
+                    otherPartyNamesDidNotAttend),
+                getConsideredParagraph(bundlePage, appellantName));
         } else if (equalsIgnoreCase(TRIAGE, hearingType)) {
             return singletonList(getTriageConsideredParagraph(bundlePage));
         } else {
             return asList(
-                    getNonFaceToFaceTypeSentences(
-                            false,
-                            appointeeAttended,
-                            false,
-                            hearingType,
-                            appellantName,
-                            appointeeName)
-                            + getPresentingOfficerAttendance(presentingOfficerAttended),
-                    getConsideredParagraph(bundlePage, appellantName));
+                getNonFaceToFaceTypeSentences(hearingType)
+                    + getAppellantAndOtherPartySentences(false, appointeeAttended, false, appellantName, appointeeName,
+                    presentingOfficerAttended, null, otherPartyNamesAttended,
+                    otherPartyNamesDidNotAttend),
+                getConsideredParagraph(bundlePage, appellantName));
         }
     }
 
-    protected String getFaceToFaceTypeSentences(boolean isAppointeeOnCase, boolean appointeeAttended,
-                                                boolean appellantAttended, String appellantName,
-                                                String appointeeName) {
-        String oralFaceToFace = "This has been an oral (face to face) hearing. ";
-        String notAttended = "requested an oral hearing but did not attend today. ";
-
-        if (isAppointeeOnCase) {
-            if (appointeeAttended) {
-                return oralFaceToFace;
-            } else {
-                return appointeeName
-                        + " the appointee "
-                        + notAttended;
-            }
-        } else {
-            if (appellantAttended) {
-                return oralFaceToFace;
-            } else {
-                return appellantName
-                        + " the appellant "
-                        + notAttended;
-            }
-        }
+    private String getFaceToFaceTypeSentences() {
+        return "This has been an oral (face to face) hearing. ";
     }
 
-    protected String getNonFaceToFaceTypeSentences(boolean isAppointeeOnCase, boolean appointeeAttended,
-                                                   boolean appellantAttended, String hearingType,
-                                                   String appellantName, String appointeeName) {
-        String remoteHearing = "This has been a remote hearing in the form of a " + hearingType + " hearing. ";
-        String notAttended = "did not attend the hearing today. ";
-
-        if (isAppointeeOnCase) {
-            if (appointeeAttended) {
-                return remoteHearing;
-            } else {
-                return remoteHearing + appointeeName + " the appointee " + notAttended;
-            }
-        } else {
-            if (appellantAttended) {
-                return remoteHearing;
-            } else {
-                return remoteHearing + appellantName + " the appellant " + notAttended;
-            }
-        }
+    private String getNonFaceToFaceTypeSentences(String hearingType)  {
+        return "This has been a remote hearing in the form of a " + hearingType + " hearing. ";
     }
 
     public void addHearingType(WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody) {

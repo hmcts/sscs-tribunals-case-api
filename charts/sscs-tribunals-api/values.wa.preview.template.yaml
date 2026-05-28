@@ -5,6 +5,7 @@ tags:
 java:
   devmemoryRequests: 1Gi
   devmemoryLimits: 2Gi
+  devcpuRequests: 50m
   image: ${IMAGE_NAME}
   readinessDelay: 45
   environment:
@@ -118,6 +119,7 @@ aac-manage-case-assignment:
     releaseNameOverride: ${SERVICE_NAME}-aac-manage-case-assignment
     image: hmctsprod.azurecr.io/aac/manage-case-assignment:latest
     ingressHost: aac-${SERVICE_FQDN}
+    devcpuRequests: 50m
     environment:
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
@@ -149,6 +151,8 @@ em-ccdorc:
     image: hmctsprod.azurecr.io/em/ccdorc:latest
     releaseNameOverride: ${SERVICE_NAME}-em-ccdorc
     ingressHost: em-ccdorc-${SERVICE_FQDN}
+    devcpuRequests: 50m
+    devcpuLimits: 250m
     environment:
       IDAM_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
       OPEN_ID_API_BASE_URI: https://idam-web-public.aat.platform.hmcts.net/o
@@ -170,6 +174,8 @@ em-ccdorc:
 em-stitching:
   enabled: ${PREVIEW_BRANCH_WITH_LOCAL_CCD}
   java:
+    devcpuRequests: 50m
+    devcpuLimits: 250m
     image: hmctsprod.azurecr.io/em/stitching:latest
     releaseNameOverride: ${SERVICE_NAME}-em-stitching
     ingressHost: em-stitching-${SERVICE_FQDN}
@@ -207,6 +213,8 @@ ccd-case-document-am-api:
   java:
     image: hmctsprod.azurecr.io/ccd/case-document-am-api:latest
     releaseNameOverride: ${SERVICE_NAME}-ccd-case-document-am-api
+    devcpuRequests: 50m
+    devcpuLimits: 250m
     environment:
       CCD_DATA_STORE_API_BASE_URL: http://${SERVICE_NAME}-ccd-data-store-api
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
@@ -220,8 +228,8 @@ xui-webapp:
   nodejs:
     devmemoryRequests: "512Mi"
     devmemoryLimits: "1Gi"
-    devcpuRequests: "200m"
-    devcpuLimits: "1000m"
+    devcpuRequests: 50m
+    devcpuLimits: 250m
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
     image: hmctsprod.azurecr.io/xui/webapp:latest
@@ -327,7 +335,7 @@ ccd:
         CCD_DATA_STORE_URL: http://${SERVICE_NAME}-ccd-data-store-api
         RAS_ENV: pr
       devmemoryRequests: 1024Mi
-      devcpuRequests: 250m
+      devcpuRequests: 50m
       devmemoryLimits: 2048Mi
       devcpuLimits: 1500m
       keyVaults:
@@ -354,8 +362,8 @@ ccd:
     replicas: 1
 
   logstash:
-    image: hmctsprod.azurecr.io/imported/logstash/logstash
-    imageTag: "7.16.1"
+    image: hmctsprod.azurecr.io/imported/elastic/logstash
+    imageTag: "9.2.4"
     imagePullPolicy: "IfNotPresent"
     logstashJavaOpts: -Xmx1g -Xms512M
     persistence:
@@ -366,7 +374,7 @@ ccd:
     extraInitContainers: |
       - name: download-postgres-jdbc
         image: hmctsprod.azurecr.io/curl:7.70.0
-        command: ['curl', '-L', 'https://jdbc.postgresql.org/download/postgresql-42.3.3.jar', '-o', '/logstash-lib/postgresql.jar']
+        command: ['curl', '-L', 'https://jdbc.postgresql.org/download/postgresql-42.7.9.jar', '-o', '/logstash-lib/postgresql.jar']
         volumeMounts:
         - name: logstash-lib
           mountPath: /logstash-lib
@@ -384,10 +392,11 @@ ccd:
         readOnly: true
     logstashConfig:
       logstash.yml: |
-        http.host: 0.0.0.0
+        api.http.host: 0.0.0.0
         xpack.monitoring.enabled: false
         queue.type: persisted
         dead_letter_queue.enable: true
+        pipeline.ecs_compatibility: disabled
       pipelines.yml: |
         - pipeline.id: main
           path.config: "/usr/share/logstash/pipeline/{01_input,02_filter,03_output}.conf"
@@ -557,10 +566,11 @@ ccd:
 
   ccd-definition-store-api:
     java:
+      image: hmctsprod.azurecr.io/ccd/definition-store-api:latest
       disableKeyVaults: true
       devmemoryRequests: '1024Mi'
       devmemoryLimits: '2048Mi'
-      devcpuRequests: '500m'
+      devcpuRequests: '50m'
       autoscaling:
         enabled: false
         minReplicas: 1
@@ -588,7 +598,7 @@ ccd:
       imagePullPolicy: Always
       devmemoryRequests: '1524Mi'
       devmemoryLimits: '2048Mi'
-      devcpuRequests: '500m'
+      devcpuRequests: '50m'
       environment:
         DATA_STORE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
         DATA_STORE_DB_USERNAME: hmcts
@@ -758,7 +768,7 @@ camunda-bpm:
     disableKeyVaults: true
     ingressHost: camunda-${SERVICE_FQDN}
     releaseNameOverride: ${SERVICE_NAME}-camunda
-    devcpuRequests: 500m
+    devcpuRequests: 50m
     devmemoryRequests: 512Mi
     devcpuLimits: 1
     devmemoryLimits: 1Gi
@@ -784,6 +794,7 @@ wa-task-management-api:
     releaseNameOverride: ${SERVICE_NAME}-wa-task-management-api
     ingressHost: wa-task-management-api-${SERVICE_FQDN}
     readinessDelay: 90
+    devcpuRequests: 50m
     secrets:
       POSTGRES_PASSWORD:
         secretRef: postgres
@@ -812,6 +823,7 @@ wa-task-monitor:
     ingressHost: wa-task-monitor-${SERVICE_FQDN}
     releaseNameOverride: ${SERVICE_NAME}-wa-task-monitor
     readinessDelay: 90
+    devcpuRequests: 50m
     environment:
       CAMUNDA_URL: https://camunda-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net/engine-rest
       WA_TASK_MANAGEMENT_API_URL: http://{{ .Release.Name }}-wa-task-management-api
@@ -862,6 +874,7 @@ wa-workflow-api:
     ingressHost: wa-workflow-api-${SERVICE_FQDN}
     releaseNameOverride: ${SERVICE_NAME}-wa-workflow-api
     readinessDelay: 90
+    devcpuRequests: 50m
     secrets:
       POSTGRES_PASSWORD:
         secretRef: postgres

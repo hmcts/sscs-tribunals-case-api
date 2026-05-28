@@ -28,6 +28,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -98,6 +99,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private static final String LAST_NAME = "Last Name";
 
+    private final boolean cmOtherPartyConfidentialityEnabled;
 
     @SuppressWarnings("squid:S107")
     CaseUpdatedAboutToSubmitHandler(RegionalProcessingCenterService regionalProcessingCenterService,
@@ -108,7 +110,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                                     RefDataService refDataService,
                                     VenueService venueService,
                                     HearingDurationsService hearingDurationsService,
-                                    PanelCompositionService panelCompositionService) {
+                                    PanelCompositionService panelCompositionService,
+                                    @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.associatedCaseLinkHelper = associatedCaseLinkHelper;
         this.airLookupService = airLookupService;
@@ -118,6 +121,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         this.hearingDurationsService = hearingDurationsService;
         this.panelCompositionService = panelCompositionService;
         this.venueService = venueService;
+        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
 
     @Override
@@ -181,7 +185,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             }
         }
 
-        sscsCaseData.setIsConfidentialCase(isConfidential(sscsCaseData));
+        sscsCaseData.setIsConfidentialCase(isConfidential(sscsCaseData, cmOtherPartyConfidentialityEnabled));
         updateCaseName(callback, sscsCaseData);
         updateCaseCategoriesIfBenefitTypeUpdated(callback, sscsCaseData, preSubmitCallbackResponse);
         updateLanguage(sscsCaseData);

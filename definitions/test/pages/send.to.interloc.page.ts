@@ -45,6 +45,10 @@ export class SendToInterlocPage {
     await dropdown.blur();
   }
 
+  async selectPartyConfidentiality(partyConfidentiality: string): Promise<void> {
+    await webAction.chooseOptionByLabel('#selectedConfidentialityParty', partyConfidentiality);
+  }
+
   async verifyReasonReferredOptions(options: string[]): Promise<void> {
     await webAction.clickElementById('#interlocReferralReason');
 
@@ -65,6 +69,11 @@ export class SendToInterlocPage {
     await expect(
       this.page.locator('#interlocReferralReason option:checked')
     ).toHaveText(reasonReferred);
+  }
+
+  async selectSelectedParty(): Promise<void> {
+    await this.page.waitForLoadState('domcontentloaded');
+    await webAction.chooseOptionByIndex('#selectedConfidentialityParty', 3);
   }
 
   async confirmSubmission(): Promise<void> {
