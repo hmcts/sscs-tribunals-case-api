@@ -33,6 +33,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -40,6 +41,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
@@ -95,7 +97,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
                 new CaseDetails<>(1234L, "SSCS", RESPONSE_RECEIVED, sscsCaseDataBefore, now(), "Benefit");
         callback = new Callback<>(caseDetails, Optional.of(caseDetailsBefore), HMCTS_RESPONSE_REVIEWED, false);
 
-        handler = new HmctsResponseReviewedAboutToSubmitHandler(dwpDocumentService, panelCompService, addNoteService);
+        handler = new HmctsResponseReviewedAboutToSubmitHandler(dwpDocumentService, panelCompService, addNoteService, true);
     }
 
     @Test
@@ -164,6 +166,38 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
         for (String error : response.getErrors()) {
             assertEquals("Issue code cannot be set to the default value of DD", error);
         }
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = Benefit.class, names = {"UC", "CHILD_SUPPORT"})
+    void givenConfidentialityAndNoSelectedParty_thenReturnsMustSelectPartyError(Benefit benefit) {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(benefit.getShortName()).build());
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(null);
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        Assertions.assertThat(response.getErrors()).contains("Must select party");
+    }
+
+    @Test
+    void givenChildSupportConfidentialityAndSelectedPartyPresent_thenNoMustSelectPartyError() {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
+                new DynamicList(new DynamicListItem("appellant", "Appellant"), List.of()));
+
+        Assertions.assertThat(handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION).getErrors()).isEmpty();
+    }
+
+    @Test
+    void givenChildSupportConfidentialityAndFlagOff_thenNoMustSelectPartyError() {
+        handler = new HmctsResponseReviewedAboutToSubmitHandler(dwpDocumentService, panelCompService, addNoteService, false);
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(null);
+
+        Assertions.assertThat(handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION).getErrors()).isEmpty();
     }
 
     @Test

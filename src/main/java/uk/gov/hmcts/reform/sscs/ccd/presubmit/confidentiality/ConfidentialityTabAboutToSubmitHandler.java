@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.confidentiality;
 
-import static java.time.LocalDateTime.now;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ACTION_HEARING_RECORDING_REQUEST;
@@ -11,6 +10,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INCOMPLETE_APPLICATI
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_OTHER_PARTY_DATA;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDateTime;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.updateOtherPartiesConfidentialityChangedDate;
 
 import java.util.List;
@@ -92,7 +92,8 @@ public class ConfidentialityTabAboutToSubmitHandler implements PreSubmitCallback
         final YesNo confidentialityRequired = currentCaseData.getAppellantConfidentialityRequired().orElse(null);
         if (nonNull(confidentialityRequired) && (confidentialityRequiredBefore == null || !Objects.equals(
             confidentialityRequiredBefore, confidentialityRequired))) {
-            currentCaseData.getAppellant().ifPresent(appellant -> appellant.setConfidentialityRequiredChangedDate(now()));
+            currentCaseData.getAppellant().ifPresent(appellant -> appellant.setConfidentialityRequiredChangedDate(
+                getLocalDateTime()));
         }
     }
 }
