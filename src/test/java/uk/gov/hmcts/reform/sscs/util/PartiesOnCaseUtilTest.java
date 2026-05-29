@@ -85,6 +85,80 @@ class PartiesOnCaseUtilTest {
     }
 
     @Test
+    void shouldRetainExistingSelectedConfidentialityPartyWhenStillValid() {
+        OtherParty otherParty = OtherParty.builder()
+            .id("1")
+            .name(Name.builder().firstName("Bo").lastName("Surname").build())
+            .build();
+        sscsCaseData.setOtherParties(List.of(new CcdValue<>(otherParty)));
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
+            new DynamicList(
+                new DynamicListItem(PartyItemList.OTHER_PARTY.getCode() + "1", "Other party 1 - Bo Surname"),
+                new ArrayList<>()
+            )
+        );
+
+        DynamicList response = PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown(sscsCaseData);
+
+        assertThat(response.getValue().getCode()).isEqualTo(PartyItemList.OTHER_PARTY.getCode() + "1");
+        assertThat(response.getListItems()).extracting(DynamicListItem::getCode)
+            .contains(PartyItemList.APPELLANT.getCode(), PartyItemList.OTHER_PARTY.getCode() + "1");
+    }
+
+    @Test
+    void shouldResetSelectedConfidentialityPartyWhenExistingSelectionNotInCurrentOptions() {
+        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
+            new DynamicList(new DynamicListItem("invalidCode", "Invalid"), new ArrayList<>())
+        );
+
+        DynamicList response = PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown(sscsCaseData);
+
+        assertThat(response.getValue().getCode()).isEmpty();
+        assertThat(response.getValue().getLabel()).isEmpty();
+        assertThat(response.getListItems()).extracting(DynamicListItem::getCode)
+            .contains(PartyItemList.APPELLANT.getCode());
+    }
+
+    @Test
+    void shouldReturnBlankSelectedConfidentialityPartyWhenNoExistingSelection() {
+        DynamicList response = PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown(sscsCaseData);
+
+        assertThat(response.getValue().getCode()).isEmpty();
+        assertThat(response.getValue().getLabel()).isEmpty();
+        assertThat(response.getListItems()).extracting(DynamicListItem::getCode)
+            .containsExactly(PartyItemList.APPELLANT.getCode());
+    }
+
+    @Test
+    void shouldReturnOnlyAppellantWhenNoOtherPartiesInSelectedConfidentialityPartyDropdown() {
+        DynamicList response = PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown(sscsCaseData);
+
+        assertThat(response.getListItems()).extracting(DynamicListItem::getCode)
+            .containsExactly(PartyItemList.APPELLANT.getCode());
+    }
+
+    @Test
+    void shouldExcludeRepresentativeOptionsFromSelectedConfidentialityPartyDropdown() {
+        sscsCaseData.getAppeal().setRep(Representative.builder().id("main-rep").hasRepresentative(YES.getValue()).build());
+        OtherParty otherParty = OtherParty.builder()
+            .id("1")
+            .name(Name.builder().firstName("Bo").lastName("Surname").build())
+            .rep(Representative.builder()
+                .id("2")
+                .hasRepresentative(YES.getValue())
+                .name(Name.builder().firstName("Harry").lastName("Rep").build())
+                .build())
+            .build();
+        sscsCaseData.setOtherParties(List.of(new CcdValue<>(otherParty)));
+
+        DynamicList response = PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown(sscsCaseData);
+
+        assertThat(response.getListItems()).extracting(DynamicListItem::getCode)
+            .contains(PartyItemList.APPELLANT.getCode(), PartyItemList.OTHER_PARTY.getCode() + "1")
+            .doesNotContain(PartyItemList.REPRESENTATIVE.getCode(), PartyItemList.OTHER_PARTY_REPRESENTATIVE.getCode() + "2");
+    }
+
+    @Test
     void willGetOtherPartyAndRepOnChildSupportAppeal() {
 
         OtherParty otherParty = OtherParty.builder()
@@ -176,6 +250,7 @@ class PartiesOnCaseUtilTest {
         addOtherPartiesToListOptions(caseData, listOptions, includeRepresentatives);
 
         assertThat(listOptions).hasSize(expectedSize);
+        assertThat(listOptions).isNotEmpty();
         assertThat(listOptions.getFirst().getCode()).isEqualTo(PartyItemList.OTHER_PARTY.getCode() + "1");
         assertThat(
             listOptions.stream().anyMatch(item -> item.getCode().startsWith(PartyItemList.OTHER_PARTY_REPRESENTATIVE.getCode())))
@@ -191,13 +266,12 @@ class PartiesOnCaseUtilTest {
 
     @Test
     void shouldPreserveExistingSelectedConfidentialityPartyWhenValueStillExists() {
-        final DynamicListItem existingValue = new DynamicListItem("representative", "Representative");
-        sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative("yes").build());
+        final DynamicListItem existingValue = new DynamicListItem("appellant", "Appellant");
         sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(new DynamicList(existingValue, new ArrayList<>()));
 
         DynamicList dropdown = PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown(sscsCaseData);
 
-        assertThat(dropdown.getValue().getCode()).isEqualTo("representative");
+        assertThat(dropdown.getValue().getCode()).isEqualTo("appellant");
     }
 
     @Test

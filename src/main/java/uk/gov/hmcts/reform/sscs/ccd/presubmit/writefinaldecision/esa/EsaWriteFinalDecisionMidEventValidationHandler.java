@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Issue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionMidEventValidationHandlerBase;
@@ -18,10 +19,15 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 @Component
 public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDecisionMidEventValidationHandlerBase {
 
+    private final boolean isSevereConditionsEnabled;
+    private static final String SEVERE_CONDITIONS_ISSUE_CODE = "SV";
+
     public EsaWriteFinalDecisionMidEventValidationHandler(Validator validator,
                                                           DecisionNoticeService decisionNoticeService,
-                                                          @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled) {
+                                                          @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled,
+                                                          @Value("${feature.severeConditions.enabled}") boolean isSevereConditionsEnabled) {
         super(validator, decisionNoticeService, isPostHearingsEnabled);
+        this.isSevereConditionsEnabled = isSevereConditionsEnabled;
     }
 
     @Override
@@ -33,6 +39,9 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
     protected void setDefaultFields(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply() == null) {
             sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
+        }
+        if (isSevereConditionsEnabled) {
+            sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecisionIsAfterSvDate(isFinalDecisionDateOfDecisionBlankOrAfterSvStartDate(sscsCaseData) ? YES : NO);
         }
     }
 
@@ -55,6 +64,15 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
 
     @Override
     protected void validateAwardTypes(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        if (isSevereConditionsEnabled) {
+            if (Issue.SV.name().equals(sscsCaseData.getIssueCode()) && NO.equals(sscsCaseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo())) {
+                preSubmitCallbackResponse.addError("This is a severe conditions criteria only appeal. Please select yes to this question.");
+            }
+            if (hasSvIssueCode(sscsCaseData) && !isFinalDecisionDateOfDecisionBlankOrAfterSvStartDate(sscsCaseData)) {
+                preSubmitCallbackResponse.addError("You cannot write decision notice until resolved. Please ask admin to amend issue code to WC or SG and then proceed.");
+            }
+        }
+
         if (isYes(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply())) {
             if (sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesQuestion() == null
                 || sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesQuestion().isEmpty()) {
@@ -86,6 +104,12 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
 
     @Override
     protected void setDwpReassessAwardPage(SscsCaseData sscsCaseData, String pageId) {
+        if (isSevereConditionsEnabled
+                && (YesNo.isYes(sscsCaseData.getExtendedSscsCaseData().getEsaWriteFinalDecisionSevereCriteriaApply())
+                || SEVERE_CONDITIONS_ISSUE_CODE.equals(sscsCaseData.getIssueCode()))) {
+            sscsCaseData.setShowDwpReassessAwardPage(YesNo.NO);
+            return;
+        }
         if (pageId != null && pageId.equals("workCapabilityAssessment")) {
             if (isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())
                 && sscsCaseData.isWcaAppeal()

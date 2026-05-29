@@ -3,15 +3,10 @@ package uk.gov.hmcts.reform.sscs.util;
 import static java.time.LocalDateTime.now;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-import static java.util.Objects.nonNull;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.*;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyUcb;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.sendNewOtherPartyNotification;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.updateOtherPartiesConfidentialityChangedDate;
@@ -19,24 +14,28 @@ import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.updateOtherPartie
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.assertj.core.api.Assertions;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
-@RunWith(JUnitParamsRunner.class)
 public class OtherPartyDataUtilTest {
 
     public static final String ID_1 = "17a74540-c1b6-49e2-a81b-a9dbd2259251";
@@ -44,120 +43,118 @@ public class OtherPartyDataUtilTest {
     public static final String ID_3 = "3a9c1e2a-9536-4aa2-b63d-7cd874e582e3";
     public static final String ID_4 = "440d0d83-75e1-466a-bacc-90ce9e612074";
     private static final int UUID_SIZE = 36;
-    List<CcdValue<OtherParty>> before;
-    List<CcdValue<OtherParty>> after;
+    private List<CcdValue<OtherParty>> before;
+    private List<CcdValue<OtherParty>> after;
 
     @Test
-    public void givenUcbIsYesForOneOtherParty_thenSetCaseDataOtherPartyUcb() {
+    void givenUcbIsYesForOneOtherParty_thenSetCaseDataOtherPartyUcb() {
         List<CcdValue<OtherParty>> otherParties = Arrays.asList(buildOtherParty(ID_1, true), buildOtherParty(ID_2, false));
 
-        assertEquals(YesNo.YES.getValue(), getOtherPartyUcb(otherParties));
+        assertThat(getOtherPartyUcb(otherParties)).isEqualTo(YesNo.YES.getValue());
     }
 
     @Test
-    public void givenUcbIsNoForAllOtherParty_thenSetCaseDataOtherPartyUcb() {
+    void givenUcbIsNoForAllOtherParty_thenSetCaseDataOtherPartyUcb() {
         List<CcdValue<OtherParty>> otherParties = Arrays.asList(buildOtherParty(ID_1, false), buildOtherParty(ID_2, false));
 
-        assertEquals(YesNo.NO.getValue(), getOtherPartyUcb(otherParties));
+        assertThat(getOtherPartyUcb(otherParties)).isEqualTo(YesNo.NO.getValue());
     }
 
-    @Test
-    @Parameters({"UPDATE_OTHER_PARTY_DATA", "DWP_UPLOAD_RESPONSE"})
-    public void givenNewOtherPartyAdded_thenAssignAnIdAndNotificationFlag(EventType eventType) {
-        List<CcdValue<OtherParty>> otherParties = Arrays.asList(buildOtherPartyWithAppointeeAndRep(null, null, null));
+    @ParameterizedTest
+    @ValueSource(strings = {"UPDATE_OTHER_PARTY_DATA", "DWP_UPLOAD_RESPONSE"})
+    void givenNewOtherPartyAdded_thenAssignAnIdAndNotificationFlag(EventType eventType) {
+        List<CcdValue<OtherParty>> otherParties = singletonList(buildOtherPartyWithAppointeeAndRep(null, null, null));
 
         otherParties.forEach(otherPartyCcdValue -> otherPartyCcdValue.getValue()
             .setSendNewOtherPartyNotification(sendNewOtherPartyNotification(otherPartyCcdValue)));
 
-        Assertions.assertThat(otherParties).hasSize(1).extracting(CcdValue::getValue).anySatisfy((OtherParty otherParty) -> {
-            Assertions.assertThat(otherParty.getId()).hasSize(UUID_SIZE);
-            Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
-            Assertions.assertThat(otherParty.getAppointee().getId()).hasSize(UUID_SIZE);
-            Assertions.assertThat(otherParty.getRep().getId()).hasSize(UUID_SIZE);
+        assertThat(otherParties).hasSize(1).extracting(CcdValue::getValue).anySatisfy((OtherParty otherParty) -> {
+            assertThat(otherParty.getId()).hasSize(UUID_SIZE);
+            assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+            assertThat(otherParty.getAppointee().getId()).hasSize(UUID_SIZE);
+            assertThat(otherParty.getRep().getId()).hasSize(UUID_SIZE);
         });
     }
 
     @Test
-    public void givenExistingOtherPartiesInUpdateOtherParty_thenNewOtherPartyAssignedNewIdAndSetNotificationFlagForOnlyNewOnes() {
+    void givenExistingOtherPartiesInUpdateOtherParty_thenNewOtherPartyAssignedNewIdAndSetNotificationFlagForOnlyNewOnes() {
         List<CcdValue<OtherParty>> otherParties = Arrays.asList(buildOtherPartyWithNotificationFlag(ID_2, true),
             buildOtherParty(ID_1), buildOtherPartyWithAppointeeAndRep(null, null, null));
 
         otherParties.forEach(otherPartyCcdValue -> otherPartyCcdValue.getValue()
             .setSendNewOtherPartyNotification(sendNewOtherPartyNotification(otherPartyCcdValue)));
 
-        Assertions.assertThat(otherParties).hasSize(3).extracting(CcdValue::getValue).anySatisfy((OtherParty otherParty) -> {
-            Assertions.assertThat(otherParty.getId()).isEqualTo(ID_1);
-            Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
-            ;
+        assertThat(otherParties).hasSize(3).extracting(CcdValue::getValue).anySatisfy((OtherParty otherParty) -> {
+            assertThat(otherParty.getId()).isEqualTo(ID_1);
+            assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+
         }).anySatisfy((OtherParty otherParty) -> {
-            Assertions.assertThat(otherParty.getId()).isEqualTo(ID_2);
-            Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(NO);
+            assertThat(otherParty.getId()).isEqualTo(ID_2);
+            assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(NO);
         }).anySatisfy((OtherParty otherParty) -> {
-            Assertions.assertThat(otherParty.getId()).isNotEqualTo(ID_1).isNotEqualTo(ID_2).hasSize(UUID_SIZE);
-            Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
-            Assertions.assertThat(otherParty.getAppointee().getId()).hasSize(UUID_SIZE);
-            Assertions.assertThat(otherParty.getRep().getId()).hasSize(UUID_SIZE);
+            assertThat(otherParty.getId()).isNotEqualTo(ID_1).isNotEqualTo(ID_2).hasSize(UUID_SIZE);
+            assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+            assertThat(otherParty.getAppointee().getId()).hasSize(UUID_SIZE);
+            assertThat(otherParty.getRep().getId()).hasSize(UUID_SIZE);
         });
     }
 
     @Test
-    public void givenExistingOtherPartiesWithAppointeeAndRep_thenNewOtherPartyAssignedNewId() {
+    void givenExistingOtherPartiesWithAppointeeAndRep_thenNewOtherPartyAssignedNewId() {
         List<CcdValue<OtherParty>> otherParties = Arrays.asList(buildOtherParty(ID_2),
             buildOtherPartyWithAppointeeAndRep(ID_1, ID_3, ID_4), buildOtherPartyWithAppointeeAndRep(null, null, null));
 
         otherParties.forEach(otherPartyCcdValue -> otherPartyCcdValue.getValue()
             .setSendNewOtherPartyNotification(sendNewOtherPartyNotification(otherPartyCcdValue)));
 
-        Assertions.assertThat(otherParties).hasSize(3).extracting(CcdValue::getValue).anySatisfy((OtherParty otherParty) -> {
-            Assertions.assertThat(otherParty.getId()).isEqualTo(ID_1);
-            Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
-            ;
-            Assertions.assertThat(otherParty.getAppointee().getId()).isEqualTo(ID_3);
-            Assertions.assertThat(otherParty.getRep().getId()).isEqualTo(ID_4);
+        assertThat(otherParties).hasSize(3).extracting(CcdValue::getValue).anySatisfy((OtherParty otherParty) -> {
+            assertThat(otherParty.getId()).isEqualTo(ID_1);
+            assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+            assertThat(otherParty.getAppointee().getId()).isEqualTo(ID_3);
+            assertThat(otherParty.getRep().getId()).isEqualTo(ID_4);
         }).anySatisfy((OtherParty otherParty) -> {
-            Assertions.assertThat(otherParty.getId()).isEqualTo(ID_2);
-            Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+            assertThat(otherParty.getId()).isEqualTo(ID_2);
+            assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
         }).anySatisfy((OtherParty otherParty) -> {
-            Assertions.assertThat(otherParty.getId()).isNotEqualTo(ID_1).isNotEqualTo(ID_2).hasSize(UUID_SIZE);
-            Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
-            Assertions.assertThat(otherParty.getAppointee().getId()).hasSize(UUID_SIZE);
-            Assertions.assertThat(otherParty.getRep().getId()).hasSize(UUID_SIZE);
+            assertThat(otherParty.getId()).isNotEqualTo(ID_1).isNotEqualTo(ID_2).hasSize(UUID_SIZE);
+            assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+            assertThat(otherParty.getAppointee().getId()).hasSize(UUID_SIZE);
+            assertThat(otherParty.getRep().getId()).hasSize(UUID_SIZE);
         });
     }
 
     @Test
-    public void givenExistingOtherParties_thenNewOtherPartyAppointeeAndRepAssignedNewId() {
+    void givenExistingOtherParties_thenNewOtherPartyAppointeeAndRepAssignedNewId() {
         List<CcdValue<OtherParty>> otherParties = Arrays.asList(buildOtherPartyWithAppointeeAndRep(ID_2, null, null),
             buildOtherPartyWithAppointeeAndRep(ID_1, ID_3, ID_4), buildOtherParty(null));
 
         otherParties.forEach(otherPartyCcdValue -> otherPartyCcdValue.getValue()
             .setSendNewOtherPartyNotification(sendNewOtherPartyNotification(otherPartyCcdValue)));
 
-        Assertions.assertThat(otherParties).hasSize(3).extracting(CcdValue::getValue).anySatisfy((OtherParty otherParty) -> {
-            Assertions.assertThat(otherParty.getId()).isEqualTo(ID_1);
-            Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
-            ;
-            Assertions.assertThat(otherParty.getAppointee().getId()).isEqualTo(ID_3);
-            Assertions.assertThat(otherParty.getRep().getId()).isEqualTo(ID_4);
+        assertThat(otherParties).hasSize(3).extracting(CcdValue::getValue).anySatisfy((OtherParty otherParty) -> {
+            assertThat(otherParty.getId()).isEqualTo(ID_1);
+            assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+            assertThat(otherParty.getAppointee().getId()).isEqualTo(ID_3);
+            assertThat(otherParty.getRep().getId()).isEqualTo(ID_4);
         }).anySatisfy((OtherParty otherParty) -> {
-            Assertions.assertThat(otherParty.getId()).isEqualTo(ID_2);
-            Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
-            Assertions.assertThat(otherParty.getAppointee().getId()).hasSize(UUID_SIZE);
-            Assertions.assertThat(otherParty.getRep().getId()).hasSize(UUID_SIZE);
+            assertThat(otherParty.getId()).isEqualTo(ID_2);
+            assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+            assertThat(otherParty.getAppointee().getId()).hasSize(UUID_SIZE);
+            assertThat(otherParty.getRep().getId()).hasSize(UUID_SIZE);
         }).anySatisfy((OtherParty otherParty) -> {
-            Assertions.assertThat(otherParty.getId()).isNotEqualTo(ID_1).isNotEqualTo(ID_2).hasSize(UUID_SIZE);
-            Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+            assertThat(otherParty.getId()).isNotEqualTo(ID_1).isNotEqualTo(ID_2).hasSize(UUID_SIZE);
+            assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
         });
     }
 
-    @Test
-    @Parameters(method = "buildOtherPartyBeforeAndAfterCollections")
-    public void givenNewOtherPartyAdded_thenReturnTrue(List<CcdValue<OtherParty>> before, List<CcdValue<OtherParty>> after,
+    @ParameterizedTest
+    @MethodSource("buildOtherPartyBeforeAndAfterCollections")
+    void givenNewOtherPartyAdded_thenReturnTrue(List<CcdValue<OtherParty>> before, List<CcdValue<OtherParty>> after,
         boolean hasNewOtherParty) {
-        assertEquals(hasNewOtherParty, OtherPartyDataUtil.hasNewOtherPartyAdded(before, after));
+        assertThat(hasNewOtherPartyAdded(before, after)).isEqualTo(hasNewOtherParty);
     }
 
-    public Object[] buildOtherPartyBeforeAndAfterCollections() {
+    static Object[] buildOtherPartyBeforeAndAfterCollections() {
         return new Object[]{new Object[]{null, null, false}, new Object[]{null, List.of(), false}, new Object[]{null, List.of(
             buildOtherParty(ID_1)), true}, new Object[]{List.of(), List.of(buildOtherParty(ID_1)), true}, new Object[]{List.of(
             buildOtherParty(ID_1), buildOtherParty(ID_2)), List.of(buildOtherParty(ID_1),
@@ -167,93 +164,90 @@ public class OtherPartyDataUtilTest {
     }
 
     @Test
-    public void testComparingListsOfOtherParties() {
+    void testComparingListsOfOtherParties() {
         before = singletonList(CcdValue.<OtherParty>builder().value(OtherParty.builder().id("other_party_1").build()).build());
         after = singletonList(CcdValue.<OtherParty>builder().value(OtherParty.builder().id("other_party_1").build()).build());
 
-        assertFalse(OtherPartyDataUtil.haveOtherPartiesChanged(before, after));
+        assertThat(haveOtherPartiesChanged(before, after)).isFalse();
     }
 
     @Test
-    public void testComparingListsOfOtherPartiesRemoved() {
+    void testComparingListsOfOtherPartiesRemoved() {
         before = singletonList(CcdValue.<OtherParty>builder().value(OtherParty.builder().id("other_party_1").build()).build());
         after = emptyList();
 
-        assertTrue(OtherPartyDataUtil.haveOtherPartiesChanged(before, after));
+        assertThat(haveOtherPartiesChanged(before, after)).isTrue();
     }
 
     @Test
-    public void testComparingListsOfOtherPartiesDifferentIds() {
+    void testComparingListsOfOtherPartiesDifferentIds() {
         before = singletonList(CcdValue.<OtherParty>builder().value(OtherParty.builder().id("other_party_1").build()).build());
         after = singletonList(CcdValue.<OtherParty>builder().value(OtherParty.builder().id("other_party_2").build()).build());
 
-        assertTrue(OtherPartyDataUtil.haveOtherPartiesChanged(before, after));
+        assertThat(haveOtherPartiesChanged(before, after)).isTrue();
     }
 
     @Test
-    public void testComparingListsOfOtherPartiesOrder() {
+    void testComparingListsOfOtherPartiesOrder() {
         before = Arrays.asList(CcdValue.<OtherParty>builder().value(OtherParty.builder().id("other_party_1").build()).build(),
             CcdValue.<OtherParty>builder().value(OtherParty.builder().id("other_party_2").build()).build());
         after = Arrays.asList(CcdValue.<OtherParty>builder().value(OtherParty.builder().id("other_party_2").build()).build(),
             CcdValue.<OtherParty>builder().value(OtherParty.builder().id("other_party_1").build()).build());
 
-        assertFalse(OtherPartyDataUtil.haveOtherPartiesChanged(before, after));
+        assertThat(haveOtherPartiesChanged(before, after)).isFalse();
     }
 
     @Test
-    public void testComparingListsOfOtherPartiesNullId() {
-        before = Arrays.asList(CcdValue.<OtherParty>builder().value(OtherParty.builder().id("other_party_1").build()).build());
-        after = Arrays.asList(CcdValue.<OtherParty>builder().value(OtherParty.builder().build()).build());
+    void testComparingListsOfOtherPartiesNullId() {
+        before = singletonList(CcdValue.<OtherParty>builder().value(OtherParty.builder().id("other_party_1").build()).build());
+        after = singletonList(CcdValue.<OtherParty>builder().value(OtherParty.builder().build()).build());
 
-        assertTrue(OtherPartyDataUtil.haveOtherPartiesChanged(before, after));
+        assertThat(haveOtherPartiesChanged(before, after)).isTrue();
     }
 
     @Test
-    public void testComparingListsOfOtherPartiesNullList() {
+    void testComparingListsOfOtherPartiesNullList() {
         before = null;
         after = null;
 
-        assertFalse(OtherPartyDataUtil.haveOtherPartiesChanged(before, after));
+        assertThat(haveOtherPartiesChanged(before, after)).isFalse();
     }
 
     @Test
-    public void testComparingListsOfOtherPartiesNullBfore() {
+    void testComparingListsOfOtherPartiesNullBfore() {
         before = null;
         after = singletonList(CcdValue.<OtherParty>builder().value(OtherParty.builder().id("other_party_1").build()).build());
-        ;
 
-        assertTrue(OtherPartyDataUtil.haveOtherPartiesChanged(before, after));
+        assertThat(haveOtherPartiesChanged(before, after)).isTrue();
     }
 
     @Test
-    public void testComparingListsOfOtherPartiesNullAfter() {
+    void testComparingListsOfOtherPartiesNullAfter() {
         before = singletonList(CcdValue.<OtherParty>builder().value(OtherParty.builder().id("other_party_1").build()).build());
-        ;
         after = null;
 
-        assertTrue(OtherPartyDataUtil.haveOtherPartiesChanged(before, after));
+        assertThat(haveOtherPartiesChanged(before, after)).isTrue();
     }
 
     @Test
-    public void getOtherPartyNameFromId_withNullReturnsNull() {
+    void getOtherPartyNameFromId_withNullReturnsNull() {
         SscsCaseData sscsCaseData = SscsCaseData.builder().build();
-        String otherPartyName = OtherPartyDataUtil.getOtherPartyName(sscsCaseData, (String) null);
+        String otherPartyName = getOtherPartyName(sscsCaseData, (String) null);
         assertThat(otherPartyName).isNull();
     }
 
-    @Test
-    @Parameters({"1, OtherParty 1", "3, Appointee 3", "4, Rep 4"})
-
-    public void getOtherPartyNameFromId_forOtherPartyRepReturnsRepName(String otherPartyId, String expectedName) {
+    @ParameterizedTest
+    @CsvSource({"1, OtherParty 1", "3, Appointee 3", "4, Rep 4"})
+    void getOtherPartyNameFromId_forOtherPartyRepReturnsRepName(String otherPartyId, String expectedName) {
         List<CcdValue<OtherParty>> otherParties = List.of(buildOtherParty("1"),
             buildOtherPartyWithAppointeeAndRep("2", "3", "4"));
         SscsCaseData sscsCaseData = SscsCaseData.builder().otherParties(otherParties).build();
-        String otherPartyName = OtherPartyDataUtil.getOtherPartyName(sscsCaseData, otherPartyId);
+        String otherPartyName = getOtherPartyName(sscsCaseData, otherPartyId);
         assertThat(otherPartyName).isEqualTo(expectedName);
     }
 
     @Test
-    public void updateOtherPartiesConfidentialityChangedDate_whenNoPreviousParties_updatesDateForAllCurrentParties() {
+    void updateOtherPartiesConfidentialityChangedDate_whenNoPreviousParties_updatesDateForAllCurrentParties() {
         final LocalDateTime originalDate = now().minusHours(1);
         final List<CcdValue<OtherParty>> current = List.of(buildOtherPartyWithConfidentiality(ID_1, YES, originalDate));
 
@@ -263,7 +257,7 @@ public class OtherPartyDataUtilTest {
     }
 
     @Test
-    public void updateOtherPartiesConfidentialityChangedDate_whenNoMatchingPreviousPartyById_updatesDate() {
+    void updateOtherPartiesConfidentialityChangedDate_whenNoMatchingPreviousPartyById_updatesDate() {
         final LocalDateTime originalDate = now().minusHours(1);
         final List<CcdValue<OtherParty>> previous = List.of(buildOtherPartyWithConfidentiality(ID_2, YES, originalDate));
         final List<CcdValue<OtherParty>> current = List.of(buildOtherPartyWithConfidentiality(ID_1, YES, originalDate));
@@ -274,7 +268,7 @@ public class OtherPartyDataUtilTest {
     }
 
     @Test
-    public void updateConfidentialityChangedDate_whenConfidentialityUnchanged_doesNotUpdateOtherPartiesDate() {
+    void updateConfidentialityChangedDate_whenConfidentialityUnchanged_doesNotUpdateOtherPartiesDate() {
         final LocalDateTime originalDate = now().minusHours(1);
         final List<CcdValue<OtherParty>> previous = List.of(buildOtherPartyWithConfidentiality(ID_1, YES, originalDate));
         final List<CcdValue<OtherParty>> current = List.of(buildOtherPartyWithConfidentiality(ID_1, YES, originalDate));
@@ -285,7 +279,7 @@ public class OtherPartyDataUtilTest {
     }
 
     @Test
-    public void updateConfidentialityChangedDate_whenOtherPartiesConfidentialityChanged_updatesDate() {
+    void updateConfidentialityChangedDate_whenOtherPartiesConfidentialityChanged_updatesDate() {
         final LocalDateTime originalDate = now().minusHours(1);
         final List<CcdValue<OtherParty>> previous = List.of(buildOtherPartyWithConfidentiality(ID_1, NO, originalDate));
         final List<CcdValue<OtherParty>> current = List.of(buildOtherPartyWithConfidentiality(ID_1, YES, originalDate));
@@ -295,11 +289,120 @@ public class OtherPartyDataUtilTest {
         assertThat(current.getFirst().getValue().getConfidentialityRequiredChangedDate()).isAfter(originalDate);
     }
 
-    private CcdValue<OtherParty> buildOtherParty(String id) {
+    @ParameterizedTest
+    @MethodSource("benefitsWithSsCsType2And5")
+    void givenACaseAppellantConfidentialityIsRequired_thenCaseConfidentialYes(Benefit benefit) {
+        var caseData = buildSscsCaseData(benefit, YES);
+
+        assertThat(isConfidential(caseData,false)).isEqualTo(YES);
+    }
+
+    @ParameterizedTest
+    @MethodSource("benefitsWithSsCsType2And5")
+    void givenACaseWithOtherPartyButConfidentialityIsNotRequired_thenCaseConfidentialNull(Benefit benefit) {
+        var caseData = buildSscsCaseData(benefit);
+        caseData.setOtherParties(List.of(buildOtherParty("otherparty-1", true, null)));
+
+        assertThat(isConfidential(caseData,false)).isNull();
+    }
+
+    @ParameterizedTest
+    @MethodSource("benefitsWithSsCsType2And5")
+    void givenACaseWithOtherPartyConfidentialityYesAndCmFlagEnabled_thenCaseConfidentialYes(Benefit benefit) {
+        var caseData = buildSscsCaseData(benefit);
+        caseData.setOtherParties(List.of(buildOtherParty("otherparty-1", true, YES)));
+
+        assertThat(isConfidential(caseData,false)).isEqualTo(YES);
+    }
+
+    @ParameterizedTest
+    @ValueSource (booleans = {true, false})
+    void givenACaseWithoutBenefitType_thenCaseConfidentialNull(boolean cmOtherPartyConfidentialityEnabled) {
+        var caseData = buildSscsCaseData(null);
+        caseData.setOtherParties(List.of(buildOtherParty("otherparty-1", true, YES)));
+
+        assertThat(isConfidential(caseData,cmOtherPartyConfidentialityEnabled)).isNull();
+    }
+
+    @Test
+    void givenUniversalCreditCaseOtherPartyConfidentialityYesAndCmFlagEnabled_thenCaseConfidentialYes() {
+        var caseData = buildSscsCaseData(Benefit.UC);
+        caseData.setOtherParties(List.of(buildOtherParty("otherparty-1", true, YES)));
+
+        assertThat(isConfidential(caseData,true)).isEqualTo(YES);
+    }
+
+    @Test
+    void givenUniversalCreditCaseWithoutOtherPartiesAndCmFlagEnabled_thenCaseConfidentialIsNull() {
+        var caseData = buildSscsCaseData(Benefit.UC);
+
+        assertThat(isConfidential(caseData,true)).isNull();
+    }
+
+    @Test
+    void givenUniversalCreditCaseWithOtherPartiesButConfidentialityIsNotRequiredAndCmFlagEnabled_thenCaseConfidentialIsNull() {
+        var caseData = buildSscsCaseData(Benefit.UC);
+        caseData.setOtherParties(List.of(buildOtherParty("otherparty-1", true, NO)));
+
+        assertThat(isConfidential(caseData,true)).isNull();
+    }
+
+    @Test
+    void givenUniversalCreditCaseWithOtherPartiesConfidentialityRequiredButCmFlagDisabled_thenCaseConfidentialIsNull() {
+        var caseData = buildSscsCaseData(Benefit.UC);
+        caseData.setOtherParties(List.of(buildOtherParty("otherparty-1", true, YES)));
+
+        assertThat(isConfidential(caseData,false)).isNull();
+    }
+
+    @Test
+    void givenUniversalCreditCaseWithOtherPartiesButConfidentialityIsNotRequiredAndCmFlagDisabled_thenCaseConfidentialIsNul() {
+        var caseData = buildSscsCaseData(Benefit.UC);
+        caseData.setOtherParties(List.of(buildOtherParty("otherparty-1", true, NO), buildOtherParty("otherparty-2", true, null)));
+
+        assertThat(isConfidential(caseData,false)).isNull();
+    }
+
+    @ParameterizedTest
+    @MethodSource("benefitsWithSsCsType2And5")
+    void givenBenefitWithSsCsType2And5_thenReturnTrue(Benefit benefit) {
+        assertThat(isValidBenefitTypeForConfidentiality(buildBenefitType(benefit))).isTrue();
+    }
+
+    @Test
+    void givenBenefitTypesUniversalCredit_thenReturnFalse() {
+        assertThat(isValidBenefitTypeForConfidentiality(buildBenefitType(Benefit.UC))).isFalse();
+    }
+
+    @Test
+    void givenBenefitTypesUniversalCreditAndCmFlagEnabled_thenReturnTrue() {
+        assertThat(isValidBenefitTypeForConfidentiality(buildBenefitType(Benefit.UC), true)).isTrue();
+    }
+
+    @Test
+    void givenBenefitTypesUniversalCreditAndCmFlagDisabled_thenReturnFalse() {
+        assertThat(isValidBenefitTypeForConfidentiality(buildBenefitType(Benefit.UC), false)).isFalse();
+    }
+
+    static Stream<Benefit> benefitsWithSsCsType2And5() {
+        return Stream.of(Benefit.CHILD_SUPPORT, Benefit.TAX_CREDIT, Benefit.GUARDIANS_ALLOWANCE,
+            Benefit.TAX_FREE_CHILDCARE, Benefit.HOME_RESPONSIBILITIES_PROTECTION, Benefit.CHILD_BENEFIT,
+            Benefit.THIRTY_HOURS_FREE_CHILDCARE, Benefit.GUARANTEED_MINIMUM_PENSION,
+            Benefit.NATIONAL_INSURANCE_CREDITS);
+    }
+
+    private static CcdValue<OtherParty> buildOtherParty(String id) {
         return buildOtherParty(id, true);
     }
 
-    private CcdValue<OtherParty> buildOtherParty(String id, boolean ucb) {
+    private static CcdValue<OtherParty> buildOtherParty(String id, boolean ucb, YesNo confidentialityRequired) {
+        return CcdValue.<OtherParty>builder().value(
+            OtherParty.builder().id(id).name(name("OtherParty", id)).unacceptableCustomerBehaviour(ucb ? YesNo.YES : YesNo.NO)
+                .confidentialityRequired(confidentialityRequired)
+                .build()).build();
+    }
+
+    private static CcdValue<OtherParty> buildOtherParty(String id, boolean ucb) {
         return CcdValue.<OtherParty>builder().value(
             OtherParty.builder().id(id).name(name("OtherParty", id)).unacceptableCustomerBehaviour(ucb ? YesNo.YES : YesNo.NO)
                 .build()).build();
@@ -318,7 +421,7 @@ public class OtherPartyDataUtilTest {
                 .build()).build();
     }
 
-    private Name name(String name, String id) {
+    private static Name name(String name, String id) {
         return Name.builder().firstName(name).lastName(id).build();
     }
 
@@ -329,21 +432,39 @@ public class OtherPartyDataUtilTest {
                 .build()).build();
     }
 
-    @SuppressWarnings("unchecked")
-    private Callback<SscsCaseData> buildCallback(final SscsCaseData currentCaseData, final SscsCaseData previousCaseData) {
-        final Callback<SscsCaseData> callback = mock(Callback.class);
-        final CaseDetails<SscsCaseData> caseDetails = mock(CaseDetails.class);
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(currentCaseData);
-
-        if (nonNull(previousCaseData)) {
-            final CaseDetails<SscsCaseData> caseDetailsBefore = mock(CaseDetails.class);
-            when(caseDetailsBefore.getCaseData()).thenReturn(previousCaseData);
-            when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
-        } else {
-            when(callback.getCaseDetailsBefore()).thenReturn(Optional.empty());
-        }
-        return callback;
+    private SscsCaseData buildSscsCaseData(Benefit benefit) {
+        return buildSscsCaseData(benefit, null);
     }
 
+    private SscsCaseData buildSscsCaseData(Benefit benefit, YesNo confidentialityRequired) {
+        var benefitType = benefit != null
+            ? buildBenefitType(benefit)
+            : null;
+        return SscsCaseData.builder()
+            .ccdCaseId("ccdId")
+            .appeal(Appeal.builder()
+                .benefitType(benefitType)
+                .appellant(Appellant.builder()
+                    .name(Name.builder().firstName("First").lastName("Last").build())
+                    .address(Address.builder().line1("Line1").line2("Line2").postcode("CM120NS").build())
+                    .identity(Identity.builder().nino("AB223344B").dob("1995-12-20").build())
+                    .isAppointee("Yes")
+                    .confidentialityRequired(confidentialityRequired)
+                    .appointee(Appointee.builder()
+                        .address(Address.builder().line1("123 the Street").postcode("CM120NS").build())
+                        .build()).build())
+                .rep(Representative.builder()
+                    .address(Address.builder().line1("123 the Street").postcode("CM120NS").build()).build())
+                .build())
+            .jointParty(JointParty.builder().jointPartyAddressSameAsAppellant(NO)
+                .address(Address.builder().line1("123 the street").postcode("CM120NS").build()).build())
+            .benefitCode("002")
+            .issueCode("DD")
+            .isFqpmRequired(NO)
+            .build();
+    }
+
+    private static BenefitType buildBenefitType(Benefit benefit) {
+        return BenefitType.builder().code(benefit.getShortName()).description(benefit.getDescription()).build();
+    }
 }

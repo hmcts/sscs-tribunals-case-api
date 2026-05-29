@@ -5,14 +5,21 @@ import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getBenefitByCodeOrThrowException;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getLongBenefitNameDescriptionWithOptionalAcronym;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelComposition.JUDGE_DOCTOR_AND_DISABILITY_EXPERT_IF_APPLICABLE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.AWAIT_CONFIDENTIALITY_REQUIREMENTS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.YES;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsDetailsMapping.getHearingType;
@@ -61,6 +68,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMa
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPEAL_REF;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPEAL_RESPOND_DATE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPEAL_RESPOND_DATE_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPELLANT_CONFIDENTIALITY_REQUIRED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPELLANT_NAME;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPOINTEE_DESCRIPTION;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPOINTEE_NAME;
@@ -120,6 +128,8 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMa
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ONLINE_HEARING_REGISTER_LINK_LITERAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ONLINE_HEARING_SIGN_IN_LINK_LITERAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.OTHER_PARTY_NAME;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.OTHER_PARTY_NAMES;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.OTHER_PARTY_SIZE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.PANEL_COMPOSITION;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.PANEL_COMPOSITION_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.PARTY_TYPE;
@@ -152,6 +162,8 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DIRECTION_ISSUED_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.EVIDENCE_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.JUDGE_DECISION_APPEAL_TO_PROCEED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.NOTIFY_APPELLANT_VALID_APPEAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.OTHER_PARTY_ADDED_TO_APPEAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PERMISSION_TO_APPEAL_REFUSED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.REVIEW_AND_SET_ASIDE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SUBSCRIPTION_CREATED;
@@ -177,9 +189,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -187,7 +201,9 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AppellantInfoRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DatedRequestOutcome;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
@@ -200,12 +216,14 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelComposition;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.exception.BenefitMappingException;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
@@ -233,6 +251,8 @@ public class Personalisation<E extends NotificationWrapper> {
     public static final String TEMPLATE_NAME_TEMPLATE_WITH_DIRECTION_TYPE = "%s.%s.%s";
     public static final String TEMPLATE_NAME_TEMPLATE = "%s.%s";
 
+    private static final Map<NotificationEventType, String> OVERRIDE_ID = Map.of(OTHER_PARTY_ADDED_TO_APPEAL, "otherPartyAddedToAppeal");
+
     @Autowired
     protected NotificationConfig config;
     private boolean sendSmsSubscriptionConfirmation;
@@ -256,6 +276,9 @@ public class Personalisation<E extends NotificationWrapper> {
 
     @Value("${feature.postHearings.enabled}")
     private boolean isPostHearingsEnabled;
+
+    @Value("${feature.cm-other-party-confidentiality.enabled}")
+    private boolean cmOtherPartyConfidentialityEnabled;
 
     private static String tya(Subscription subscription) {
         if (subscription != null) {
@@ -324,6 +347,8 @@ public class Personalisation<E extends NotificationWrapper> {
     protected Map<String, Object> create(final NotificationSscsCaseDataWrapper responseWrapper, final SubscriptionWithType subscriptionWithType) {
 
         SscsCaseData ccdResponse = responseWrapper.getNewSscsCaseData();
+        SscsCaseData ccdResponsePrevious = responseWrapper.getOldSscsCaseData();
+
         Map<String, Object> personalisation = new HashMap<>();
         Benefit benefit = null;
 
@@ -447,7 +472,12 @@ public class Personalisation<E extends NotificationWrapper> {
             personalisation.put(PersonalisationMappingConstants.JOINT_PARTY, "Yes");
         }
 
-        setConfidentialFields(ccdResponse, subscriptionWithType, personalisation);
+        setConfidentialFields(ccdResponse, subscriptionWithType, personalisation, responseWrapper.getState());
+        if (cmOtherPartyConfidentialityEnabled
+            && ccdResponse.isBenefitType(CHILD_SUPPORT)
+            && OTHER_PARTY_ADDED_TO_APPEAL.equals(responseWrapper.getNotificationEventType())) {
+            setOtherPartyConfidentialityFields(ccdResponse, ccdResponsePrevious, personalisation);
+        }
 
         setHelplineTelephone(ccdResponse, personalisation);
         if (subscriptionWithType.getSubscriptionType() == OTHER_PARTY) {
@@ -576,14 +606,59 @@ public class Personalisation<E extends NotificationWrapper> {
         }
     }
 
-    private void setConfidentialFields(SscsCaseData ccdResponse, SubscriptionWithType subscriptionWithType, Map<String, Object> personalisation) {
+    private void setConfidentialFields(SscsCaseData ccdResponse, SubscriptionWithType subscriptionWithType, Map<String, Object> personalisation,
+        State state) {
         if (subscriptionWithType.getSubscriptionType().equals(JOINT_PARTY) && null != ccdResponse.getConfidentialityRequestOutcomeJointParty()) {
             personalisation.put(OTHER_PARTY_NAME, ccdResponse.getAppeal().getAppellant().getName().getFullNameNoTitle());
             personalisation.put(CONFIDENTIALITY_OUTCOME, getRequestOutcome(ccdResponse.getConfidentialityRequestOutcomeJointParty()));
-
         } else if (subscriptionWithType.getSubscriptionType().equals(APPELLANT) && null != ccdResponse.getJointParty().getName() && null != ccdResponse.getConfidentialityRequestOutcomeAppellant()) {
             personalisation.put(OTHER_PARTY_NAME, ccdResponse.getJointParty().getName().getFullNameNoTitle());
             personalisation.put(CONFIDENTIALITY_OUTCOME, getRequestOutcome(ccdResponse.getConfidentialityRequestOutcomeAppellant()));
+        } else if (state == AWAIT_CONFIDENTIALITY_REQUIREMENTS
+            && ccdResponse.isBenefitType(UC)
+            && isNotEmpty(ccdResponse.getOtherParties())) {
+            ofNullable(ccdResponse.getOtherParties().getFirst().getValue().getName()).map(Name::getFullNameNoTitle).ifPresent(name -> personalisation.put(OTHER_PARTY_NAME, name));
+        }
+    }
+
+    private void setOtherPartyConfidentialityFields(SscsCaseData ccdResponse, SscsCaseData ccdResponsePrevious,
+        Map<String, Object> personalisation) {
+
+        personalisation.put(APPELLANT_CONFIDENTIALITY_REQUIRED,
+            YesNo.YES == ccdResponse.getAppellantConfidentialityRequired().orElse(null));
+
+        final List<CcdValue<OtherParty>> otherParties = getNewlyAddedParties(ccdResponse, ccdResponsePrevious);
+        personalisation.put(OTHER_PARTY_SIZE, otherParties.size());
+        personalisation.put(OTHER_PARTY_NAMES, otherParties
+            .stream()
+            .map(party -> party.getValue().getName().getFullNameNoTitle())
+            .collect(collectingAndThen(toList(), Personalisation::formatCommaSeparatedList)));
+    }
+
+    private static List<CcdValue<OtherParty>> getNewlyAddedParties(SscsCaseData ccdResponse, SscsCaseData ccdResponsePrevious) {
+        if (CollectionUtils.isEmpty(ccdResponse.getOtherParties())) {
+            return List.of();
+        }
+        final Set<String> previousOtherPartyIds;
+        if (ccdResponsePrevious != null && isNotEmpty(ccdResponsePrevious.getOtherParties())) {
+            previousOtherPartyIds = ccdResponsePrevious.getOtherParties().stream()
+                .map(party -> party.getValue().getId())
+                .collect(toSet());
+        } else {
+            previousOtherPartyIds = Set.of();
+        }
+        return ccdResponse.getOtherParties().stream()
+            .filter(party -> !previousOtherPartyIds.contains(party.getValue().getId()))
+            .toList();
+    }
+
+    private static String formatCommaSeparatedList(List<String> list) {
+        if (CollectionUtils.isEmpty(list)) {
+            return "";
+        } else if (list.size() == 1) {
+            return list.getFirst();
+        } else {
+            return String.join(", ", list.subList(0, list.size() - 1)) + " and " + list.getLast();
         }
     }
 
@@ -867,13 +942,19 @@ public class Personalisation<E extends NotificationWrapper> {
             .map(DynamicListItem::getCode)
             .orElse(null);
 
-        if (nonNull(directionType)
-            && (DIRECTION_ISSUED.equals(notificationEventType)
-            || DIRECTION_ISSUED_WELSH.equals(notificationEventType))) {
-            return getSubscriptionTemplateNameWithDirection(notificationEventType, directionType, subscriptionType);
+        if (nonNull(directionType)) {
+            if (DIRECTION_ISSUED.equals(notificationEventType) || DIRECTION_ISSUED_WELSH.equals(notificationEventType)) {
+                return getSubscriptionTemplateNameWithDirection(notificationEventType, directionType, subscriptionType);
+            }
+            if (NOTIFY_APPELLANT_VALID_APPEAL.equals(notificationEventType) && DirectionType.APPEAL_TO_PROCEED.toString().equals(directionType)) {
+                return getSubscriptionTemplateNameWithDirection(notificationEventType, "appealToProceedNotifyValidAppeal", subscriptionType);
+            }
         }
 
         if (EVENTS_WITH_SUBSCRIPTION_TYPE_DOCMOSIS_TEMPLATES.contains(notificationEventType)) {
+            if (OVERRIDE_ID.containsKey(notificationEventType)) {
+                return getSubscriptionTemplateName(OVERRIDE_ID.get(notificationEventType), subscriptionType);
+            }
             return getSubscriptionTemplateName(notificationEventType, subscriptionType);
         }
 
@@ -935,6 +1016,13 @@ public class Personalisation<E extends NotificationWrapper> {
                                                       SubscriptionType subscriptionType) {
         return String.format(TEMPLATE_NAME_TEMPLATE,
             notificationEventType.getId(),
+            subscriptionType.name().toLowerCase());
+    }
+
+    private static String getSubscriptionTemplateName(String id,
+        SubscriptionType subscriptionType) {
+        return String.format(TEMPLATE_NAME_TEMPLATE,
+            id,
             subscriptionType.name().toLowerCase());
     }
 
