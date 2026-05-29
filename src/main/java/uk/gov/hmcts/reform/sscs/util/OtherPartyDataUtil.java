@@ -138,15 +138,6 @@ public class OtherPartyDataUtil {
             && Benefit.UC.getShortName().equals(benefitCode));
     }
 
-    public static boolean isBenefitTypeChildSupportOrUc(SscsCaseData sscsCaseData) {
-        String benefitType = !nonNull(sscsCaseData.getAppeal()) ? null :
-                !nonNull(sscsCaseData.getAppeal().getBenefitType()) ? null :
-                        sscsCaseData.getAppeal().getBenefitType().getCode();
-
-        return nonNull(benefitType) && (Benefit.CHILD_SUPPORT.getShortName().equals(benefitType) || Benefit.UC.getShortName().equals(benefitType));
-    }
-
-
     public static boolean isOtherPartyPresent(SscsCaseData sscsCaseData) {
         return sscsCaseData.getOtherParties() != null && !sscsCaseData.getOtherParties().isEmpty();
     }

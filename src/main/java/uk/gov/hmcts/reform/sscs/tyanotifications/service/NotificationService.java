@@ -16,7 +16,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.getSubscription;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.isOkToSendNotification;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationValidService.isMandatoryLetterEventType;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isBenefitTypeChildSupportOrUc;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isBenefitTypeChildSupportOrUc;
 
 import java.time.ZonedDateTime;
 import java.util.Arrays;

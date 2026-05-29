@@ -173,7 +173,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getN
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.hasAppointee;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.hasJointParty;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.hasRepresentative;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isBenefitTypeChildSupportOrUc;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isBenefitTypeChildSupportOrUc;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;

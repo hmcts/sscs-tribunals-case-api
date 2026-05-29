@@ -12,12 +12,12 @@ import static uk.gov.hmcts.reform.sscs.idam.UserRole.SYSTEM_USER;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.clearOtherPartiesIfEmpty;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartiesWithClearedRoles;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyUcb;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isBenefitTypeChildSupportOrUc;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isConfidential;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.otherPartyWantsToAttendHearing;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.roleAbsentForOtherParties;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.roleExistsForOtherParties;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.sendNewOtherPartyNotification;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isBenefitTypeChildSupportOrUc;
 
 import java.util.ArrayList;
 import java.util.List;
