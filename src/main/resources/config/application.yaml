@@ -713,11 +713,6 @@ notification:
             docmosisId: TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx
         validAppeal:
             docmosisId: TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx
-        confidentialityConfirmed:
-            appellant:
-                docmosisId: TB-SCS-LET-ENG-Appeal-Lodged-Appellant-v2.docx
-            appointee:
-                docmosisId: TB-SCS-LET-ENG-Appeal-Lodged-Appellant-v2.docx
         directionIssued:
             appealToProceed:
                 appellant:
@@ -1916,7 +1911,6 @@ pdf-service:
             validAppeal: 'TB-SCS-GNO-ENG-00012.docx'
             appealToProceedNotifyValidAppeal: 'TB-SCS-GNO-ENG-00012.docx'
             addOtherPartyData: 'TB-SCS-GNO-ENG-00012.docx'
-            confidentialityConfirmed: 'TB-SCS-GNO-ENG-00012.docx'
         welsh:
             adminCorrectionHeader: 'TB-SCS-GNO-WEL-00479.docx'
             appealReceived: 'TB-SCS-GNO-WEL-00479.docx'
