@@ -384,6 +384,13 @@ public class OtherPartyDataUtilTest {
         assertThat(isValidBenefitTypeForConfidentiality(buildBenefitType(Benefit.UC), false)).isFalse();
     }
 
+    @ParameterizedTest
+    @CsvSource({"UC, True", "childSupport, True", "PIP, False", "ESA, False"})
+    void givenBenefitType_isBenefitTypeChildSupportOrUcReturnsCorrectValue(String benefitCode, Boolean expectedValue) {
+        SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefitCode).build()).build()).build();
+        assertThat(isBenefitTypeChildSupportOrUc(sscsCaseData)).isEqualTo(expectedValue);
+    }
+
     static Stream<Benefit> benefitsWithSsCsType2And5() {
         return Stream.of(Benefit.CHILD_SUPPORT, Benefit.TAX_CREDIT, Benefit.GUARDIANS_ALLOWANCE,
             Benefit.TAX_FREE_CHILDCARE, Benefit.HOME_RESPONSIBILITIES_PROTECTION, Benefit.CHILD_BENEFIT,
