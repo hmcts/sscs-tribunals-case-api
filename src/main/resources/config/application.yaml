@@ -1957,7 +1957,6 @@ pdf-service:
             permissionToAppealGranted: 'TB-SCS-GNO-WEL-00479.docx'
             libertyToApplyGranted: 'TB-SCS-GNO-WEL-00479.docx'
             libertyToApplyRefused: 'TB-SCS-GNO-WEL-00479.docx'
-            otherPartyAddedToAppeal: 'TB-SCS-GNO-WEL-00479.docx'
             adminSendToValidAppeal: 'TB-SCS-GNO-WEL-00479.docx'
             interlocValidAppeal: 'TB-SCS-GNO-WEL-00479.docx'
             validAppeal: 'TB-SCS-GNO-WEL-00479.docx'
