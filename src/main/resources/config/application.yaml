@@ -1916,6 +1916,7 @@ pdf-service:
             validAppeal: 'TB-SCS-GNO-ENG-00012.docx'
             appealToProceedNotifyValidAppeal: 'TB-SCS-GNO-ENG-00012.docx'
             addOtherPartyData: 'TB-SCS-GNO-ENG-00012.docx'
+            confidentialityConfirmed: 'TB-SCS-GNO-ENG-00012.docx'
         welsh:
             adminCorrectionHeader: 'TB-SCS-GNO-WEL-00479.docx'
             appealReceived: 'TB-SCS-GNO-WEL-00479.docx'

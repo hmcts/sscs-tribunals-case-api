@@ -36,7 +36,7 @@ public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
     public AppealReceivedHandler(CcdService ccdService,
                                  UpdateCcdCaseService updateCcdCaseService,
                                  IdamService idamService,
-                                @Value("${feature.cm-other-party-confidentiality.enabled}") final boolean cmConfidentialityEnabled) {
+                                 @Value("${feature.cm-other-party-confidentiality.enabled}") final boolean cmConfidentialityEnabled) {
         this.dispatchPriority = DispatchPriority.LATEST;
         this.ccdService = ccdService;
         this.updateCcdCaseService = updateCcdCaseService;
