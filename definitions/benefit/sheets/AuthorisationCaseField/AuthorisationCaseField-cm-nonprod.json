@@ -1,4 +1,5 @@
 [
+  {"LiveFrom": "15/01/2026", "CaseTypeID": "Benefit", "CaseFieldID": "awareOfAnyAdditionalOtherParties", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
   {"LiveFrom": "15/01/2026", "CaseTypeID": "Benefit", "CaseFieldID": "awareOfAnyAdditionalOtherParties", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
   {"LiveFrom": "15/01/2026", "CaseTypeID": "Benefit", "CaseFieldID": "awareOfAnyAdditionalOtherParties", "AccessProfile": "caseworker-sscs-dwpresponsewriter", "CRUD": "CRUD"},
   {"LiveFrom": "15/01/2026", "CaseTypeID": "Benefit", "CaseFieldID": "addOtherPartyDetailsLabel", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},

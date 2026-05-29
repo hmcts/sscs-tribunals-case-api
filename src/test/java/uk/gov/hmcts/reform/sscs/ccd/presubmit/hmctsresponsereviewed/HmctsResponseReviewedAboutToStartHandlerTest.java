@@ -40,7 +40,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.HearingsService;
 
-class HmctsResponseReviewedAboutToStartTest {
+class HmctsResponseReviewedAboutToStartHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
     private HmctsResponseReviewedAboutToStartHandler handler;
@@ -309,10 +309,11 @@ class HmctsResponseReviewedAboutToStartTest {
         assertThat(response.getData().getSelectWhoReviewsCase()).isEqualTo(expected);
     }
 
-    @Test
-    void givenFlagEnabledAndChildSupport_thenSelectedConfidentialityPartyHasNoDefaultSelection() {
+    @ParameterizedTest
+    @EnumSource(value = Benefit.class, names = {"UC", "CHILD_SUPPORT"})
+    void givenFlagEnabledAndChildSupport_thenSelectedConfidentialityPartyHasNoDefaultSelection(Benefit benefit) {
         handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService, true);
-        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(benefit.getShortName()).build());
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
