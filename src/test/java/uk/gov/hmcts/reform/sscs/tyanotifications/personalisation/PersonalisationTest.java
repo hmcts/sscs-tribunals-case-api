@@ -2680,7 +2680,7 @@ class PersonalisationTest {
 
     @ParameterizedTest(name = "{0} - {1} other parties -> OTHER_PARTY_SIZE = {2}")
     @MethodSource("childSupportOrUcOtherPartySizeScenarios")
-    void givenChildSupportBenefitAndFeatureEnabled_thenSetsOtherPartySize(String benefitType,
+    void givenChildSupportOrUcBenefitAndFeatureEnabled_thenSetsOtherPartySize(String benefitType,
                                                                           final List<CcdValue<OtherParty>> otherParties,
                                                                           final int expectedSize) {
         setField(personalisation, "cmOtherPartyConfidentialityEnabled", true);
@@ -2722,8 +2722,8 @@ class PersonalisationTest {
     }
 
     @ParameterizedTest(name = "{0} - {1}")
-    @MethodSource("childSupportWithPreviousOtherPartiesScenarios")
-    void givenChildSupportBenefitAndPreviousOtherParties_thenFiltersNewPartiesCorrectly(
+    @MethodSource("childSupportOrUcWithPreviousOtherPartiesScenarios")
+    void givenChildSupportOrUcBenefitAndPreviousOtherParties_thenFiltersNewPartiesCorrectly(
         final String scenario,
         final String benefitCode,
         final List<CcdValue<OtherParty>> previousOtherParties,
@@ -2759,7 +2759,7 @@ class PersonalisationTest {
             .containsEntry(OTHER_PARTY_NAMES, expectedNames);
     }
 
-    private static Stream<Arguments> childSupportWithPreviousOtherPartiesScenarios() {
+    private static Stream<Arguments> childSupportOrUcWithPreviousOtherPartiesScenarios() {
         return Stream.of(
             // childSupport scenarios
             Arguments.of(
@@ -2770,7 +2770,7 @@ class PersonalisationTest {
                 2, "Alice Jones and Bob Smith"),
             Arguments.of(
                 "empty previous returns all current parties",
-                "childSupport",
+                "UC",
                 List.of(),
                 buildOtherParties("Alice Jones", "Bob Smith", "Carol White"),
                 3, "Alice Jones, Bob Smith and Carol White"),
@@ -2782,7 +2782,7 @@ class PersonalisationTest {
                 1, "Bob Smith"),
             Arguments.of(
                 "two existing parties filtered out by ID, one new party kept",
-                "childSupport",
+                "UC",
                 buildOtherParties("Alice Jones", "Bob Smith"),
                 buildOtherParties("Alice Jones", "Bob Smith", "Carol White"),
                 1, "Carol White"),
@@ -2794,57 +2794,13 @@ class PersonalisationTest {
                 2, "Alice Jones and Bob Smith"),
             Arguments.of(
                 "all current parties existed in previous, result is empty",
-                "childSupport",
-                buildOtherParties("Alice Jones", "Bob Smith"),
-                buildOtherParties("Alice Jones", "Bob Smith"),
-                0, ""),
-            Arguments.of(
-                "empty new parties with non-empty previous returns empty result",
-                "childSupport",
-                buildOtherParties("Alice Jones"),
-                List.of(),
-                0, ""),
-
-            // UC scenarios
-            Arguments.of(
-                "empty previous returns all current parties",
-                "UC",
-                List.of(),
-                buildOtherParties("Alice Jones", "Bob Smith"),
-                2, "Alice Jones and Bob Smith"),
-            Arguments.of(
-                "empty previous returns all current parties",
-                "UC",
-                List.of(),
-                buildOtherParties("Alice Jones", "Bob Smith", "Carol White"),
-                3, "Alice Jones, Bob Smith and Carol White"),
-            Arguments.of(
-                "one existing party filtered out by ID, one new party kept",
-                "UC",
-                buildOtherParties("Alice Jones"),
-                buildOtherParties("Alice Jones", "Bob Smith"),
-                1, "Bob Smith"),
-            Arguments.of(
-                "two existing parties filtered out by ID, one new party kept",
-                "UC",
-                buildOtherParties("Alice Jones", "Bob Smith"),
-                buildOtherParties("Alice Jones", "Bob Smith", "Carol White"),
-                1, "Carol White"),
-            Arguments.of(
-                "all current parties are new, none in previous",
-                "UC",
-                buildOtherParties("Carol White"),
-                buildOtherParties("Alice Jones", "Bob Smith"),
-                2, "Alice Jones and Bob Smith"),
-            Arguments.of(
-                "all current parties existed in previous, result is empty",
                 "UC",
                 buildOtherParties("Alice Jones", "Bob Smith"),
                 buildOtherParties("Alice Jones", "Bob Smith"),
                 0, ""),
             Arguments.of(
                 "empty new parties with non-empty previous returns empty result",
-                "UC",
+                "childSupport",
                 buildOtherParties("Alice Jones"),
                 List.of(),
                 0, "")
