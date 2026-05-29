@@ -262,6 +262,50 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
         assertThat(response.getData().getShowDwpReassessAwardPage()).isEqualTo(YES);
     }
 
+
+    @Test
+    @Parameters({"allowed, NO, You have previously selected appeal Allowed. Your selection not to apply the Severe Conditions criteria does not match. Please review your selections.",
+                    "refused, YES, You have previously selected appeal Refused. Your selection to apply the Severe Conditions criteria does not match. Please review your previous selections."})
+    public void givenUcCaseWithAppealGrantedAndSevereConditionsDoesNotApply_thenReturnError(String allowedOrRefused, YesNo severeConditionsApply, String errorMsg) {
+
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        sscsCaseData.setElementsDisputedLimitedWork(List.of(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("SV").build()).build()));
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused(allowedOrRefused);
+        sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereCriteriaApply(severeConditionsApply);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getPageId()).thenReturn("severeCriteria");
+
+        UcWriteFinalDecisionMidEventValidationHandler severeConditionsHandler = new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, true);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = severeConditionsHandler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isNotEmpty();
+        assertThat(response.getErrors()).contains(errorMsg);
+    }
+
+    @Test
+    @Parameters({"allowed, YES", "refused, NO"})
+    public void givenUcCaseWithValidSevereConditionsAndAllowedOrRefusedState_thenDontReturnError(String allowedOrRefused, YesNo severeConditionsApply) {
+
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        sscsCaseData.setElementsDisputedLimitedWork(List.of(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("SV").build()).build()));
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused(allowedOrRefused);
+        sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereCriteriaApply(severeConditionsApply);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getPageId()).thenReturn("severeCriteria");
+
+        UcWriteFinalDecisionMidEventValidationHandler severeConditionsHandler = new UcWriteFinalDecisionMidEventValidationHandler(
+                validator, decisionNoticeService, true, true);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = severeConditionsHandler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+
+    }
+
+
     @Test
     @Parameters({"STANDARD_RATE, STANDARD_RATE",})
     @Override
