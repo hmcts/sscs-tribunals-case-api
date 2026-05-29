@@ -2761,7 +2761,6 @@ class PersonalisationTest {
 
     private static Stream<Arguments> childSupportOrUcWithPreviousOtherPartiesScenarios() {
         return Stream.of(
-            // childSupport scenarios
             Arguments.of(
                 "empty previous returns all current parties",
                 "childSupport",
