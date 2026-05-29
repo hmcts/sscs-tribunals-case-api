@@ -151,6 +151,26 @@ class AppealReceivedHandlerTest {
         verifyNoInteractions(ccdService, updateCcdCaseService);
     }
 
+    @Test
+    void givenChildSupportCaseAndConfidentialityConfirmedEventAndFlagEnabled_canHandleReturnsTrue() {
+        final AppealReceivedHandler handlerWithFlagOn = new AppealReceivedHandler(ccdService, updateCcdCaseService, idamService,
+            true);
+        assertThat(handlerWithFlagOn.canHandle(SUBMITTED,
+            HandlerHelper.buildTestCallbackForGivenData(childSupportCaseData(), INTERLOCUTORY_REVIEW_STATE,
+                EventType.CONFIDENTIALITY_CONFIRMED))).isTrue();
+    }
+
+    @Test
+    void givenChildSupportCaseAndConfidentialityConfirmedEventAndFlagEnabled_handleTriggersAppealReceived() {
+        final AppealReceivedHandler handlerWithFlagOn = new AppealReceivedHandler(ccdService, updateCcdCaseService, idamService,
+            true);
+        handlerWithFlagOn.handle(SUBMITTED,
+            HandlerHelper.buildTestCallbackForGivenData(childSupportCaseData(), INTERLOCUTORY_REVIEW_STATE,
+                EventType.CONFIDENTIALITY_CONFIRMED));
+        verify(updateCcdCaseService).triggerCaseEventV2(eq(1L), eq(EventType.APPEAL_RECEIVED.getCcdType()),
+            eq("Appeal received"), eq("Appeal received event has been triggered from Tribunals API for digital case"), any());
+    }
+
     private static SscsCaseData childSupportCaseData() {
         return SscsCaseData
             .builder()

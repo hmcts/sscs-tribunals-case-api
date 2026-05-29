@@ -34,9 +34,9 @@ public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
 
     @Autowired
     public AppealReceivedHandler(CcdService ccdService,
-                                 UpdateCcdCaseService updateCcdCaseService,
-                                 IdamService idamService,
-                                 @Value("${feature.cm-other-party-confidentiality.enabled}") final boolean cmConfidentialityEnabled) {
+        UpdateCcdCaseService updateCcdCaseService,
+        IdamService idamService,
+        @Value("${feature.cm-other-party-confidentiality.enabled}") final boolean cmConfidentialityEnabled) {
         this.dispatchPriority = DispatchPriority.LATEST;
         this.ccdService = ccdService;
         this.updateCcdCaseService = updateCcdCaseService;
@@ -49,13 +49,22 @@ public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
 
-        return callbackType.equals(CallbackType.SUBMITTED)
+        var submittedAndReadToList = callbackType.equals(CallbackType.SUBMITTED) && READY_TO_LIST
+            .getId()
+            .equals(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom());
+
+        if (cmConfidentialityEnabled && submittedAndReadToList && callback
+            .getCaseDetails()
+            .getCaseData()
+            .isBenefitType(CHILD_SUPPORT)) {
+            return callback.getEvent() == EventType.CONFIDENTIALITY_CONFIRMED;
+        }
+
+        return submittedAndReadToList
             && (callback.getEvent() == EventType.VALID_APPEAL_CREATED
             || callback.getEvent() == EventType.DRAFT_TO_VALID_APPEAL_CREATED
             || callback.getEvent() == EventType.VALID_APPEAL
-            || callback.getEvent() == EventType.INTERLOC_VALID_APPEAL)
-            && READY_TO_LIST.getId().equals(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom())
-            && !(cmConfidentialityEnabled && callback.getCaseDetails().getCaseData().isBenefitType(CHILD_SUPPORT));
+            || callback.getEvent() == EventType.INTERLOC_VALID_APPEAL);
     }
 
     @Override
@@ -75,11 +84,11 @@ public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
 
         log.info("About to update case v2 with appealReceived event for id {}", callback.getCaseDetails().getId());
         updateCcdCaseService.triggerCaseEventV2(
-                callback.getCaseDetails().getId(),
-                APPEAL_RECEIVED.getCcdType(),
-                "Appeal received",
-                "Appeal received event has been triggered from Tribunals API for digital case",
-                idamService.getIdamTokens()
+            callback.getCaseDetails().getId(),
+            APPEAL_RECEIVED.getCcdType(),
+            "Appeal received",
+            "Appeal received event has been triggered from Tribunals API for digital case",
+            idamService.getIdamTokens()
         );
     }
 
