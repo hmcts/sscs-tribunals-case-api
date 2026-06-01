@@ -1814,7 +1814,8 @@ public class NotificationServiceTest {
                 null,
                 UPDATE_OTHER_PARTY_DATA,
                 OTHER_PARTY_ADDED_TO_APPEAL,
-                Benefit.CHILD_SUPPORT.getShortName()
+                Benefit.CHILD_SUPPORT.getShortName(),
+                true
             },
             new Object[]{
                 "Non UPDATE_OTHER_PARTY_DATA event with new other party",
@@ -1823,7 +1824,8 @@ public class NotificationServiceTest {
                 null,
                 ADMIN_APPEAL_WITHDRAWN,
                 ADMIN_APPEAL_WITHDRAWN,
-                Benefit.CHILD_SUPPORT.getShortName()
+                Benefit.CHILD_SUPPORT.getShortName(),
+                false
             },
             new Object[]{
                 "Null old data with multiple other parties",
@@ -1832,7 +1834,8 @@ public class NotificationServiceTest {
                 null,
                 UPDATE_OTHER_PARTY_DATA,
                 OTHER_PARTY_ADDED_TO_APPEAL,
-                Benefit.CHILD_SUPPORT.getShortName()
+                Benefit.CHILD_SUPPORT.getShortName(),
+                true
             },
             new Object[]{
                 "Non-childSupport benefit type is not notified for other party added",
@@ -1841,7 +1844,8 @@ public class NotificationServiceTest {
                 null,
                 UPDATE_OTHER_PARTY_DATA,
                 UPDATE_OTHER_PARTY_DATA,
-                Benefit.UC.getShortName()
+                Benefit.UC.getShortName(),
+                true
             }
         };
     }
@@ -2621,7 +2625,8 @@ public class NotificationServiceTest {
         SscsCaseData oldData,
         NotificationEventType inputEventType,
         NotificationEventType expectedEventType,
-        String benefitTypeCode
+        String benefitTypeCode,
+        boolean expectSuppressed
     ) throws IOException {
         final SendNotificationService sendNotificationService = new SendNotificationService(
             notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
@@ -2652,7 +2657,11 @@ public class NotificationServiceTest {
 
         cmConfidentialityService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
 
-        assertThat(ccdNotificationWrapperCaptor.getValue().getNotificationType()).isEqualTo(expectedEventType);
+        if (expectSuppressed) {
+            verify(factory, never()).create(any(), any());
+        } else {
+            assertThat(ccdNotificationWrapperCaptor.getValue().getNotificationType()).isEqualTo(expectedEventType);
+        }
     }
 
     @Test
@@ -3183,6 +3192,85 @@ public class NotificationServiceTest {
                            .hearings(List.of(Hearing.builder().value(HearingDetails.builder().build()).build()))
                            .sscsDocument(new ArrayList<>(singletonList(null)))
                            .informationFromAppellant(informationFromAppellant);
+    }
+
+    @Test
+    @Parameters({"childSupport", "UC"})
+    public void givenUpdateOtherPartyDataEventAndCmFlagOnAndCmOrUcCase_thenSuppressNotification(String benefitCode) {
+        CcdNotificationWrapper wrapper = buildNotificationWrapperGivenNotificationTypeAndSubscriptions(
+            UPDATE_OTHER_PARTY_DATA, null, null, null,
+            List.of(CcdValue.<OtherParty>builder().value(OtherParty.builder()
+                .sendNewOtherPartyNotification(YesNo.YES)
+                .id("1")
+                .otherPartySubscription(Subscription.builder().email("other@party.com").subscribeEmail("Yes").build())
+                .build()).build())
+        );
+        wrapper.getNewSscsCaseData().setCcdCaseId("123456789");
+        wrapper.getNewSscsCaseData().setAppeal(Appeal.builder()
+            .hearingType(AppealHearingType.ORAL.name())
+            .benefitType(BenefitType.builder().code(benefitCode).build())
+            .appellant(Appellant.builder().build())
+            .build());
+
+        getNotificationServiceWithCmOtherPartyConfidentialityEnabled().manageNotificationAndSubscription(wrapper, false);
+
+        verifyExpectedLogMessage(mockAppender, captorLoggingEvent, "123456789", "Suppressing HEF notification", Level.INFO);
+    }
+
+    @Test
+    public void givenUpdateOtherPartyDataEventAndCmFlagOffAndChildSupportCase_thenDoNotSuppressNotification() {
+        CcdNotificationWrapper wrapper = buildNotificationWrapperGivenNotificationTypeAndSubscriptions(
+            UPDATE_OTHER_PARTY_DATA, null, null, null,
+            List.of(CcdValue.<OtherParty>builder().value(OtherParty.builder()
+                .sendNewOtherPartyNotification(YesNo.YES)
+                .id("1")
+                .otherPartySubscription(Subscription.builder().email("other@party.com").subscribeEmail("Yes").build())
+                .build()).build())
+        );
+        wrapper.getNewSscsCaseData().setAppeal(Appeal.builder()
+            .hearingType(AppealHearingType.ORAL.name())
+            .benefitType(BenefitType.builder().code("childSupport").build())
+            .appellant(Appellant.builder().build())
+            .build());
+        given(factory.create(any(NotificationWrapper.class), any(SubscriptionWithType.class)))
+            .willReturn(new Notification(
+                Template.builder().emailTemplateId(EMAIL_TEMPLATE_ID).smsTemplateId(List.of(SMS_TEMPLATE_ID)).build(),
+                Destination.builder().email(EMAIL).sms(SMS_MOBILE).build(),
+                new HashMap<>(), new Reference(), null));
+
+        getNotificationService().manageNotificationAndSubscription(wrapper, false);
+
+        verify(mockAppender, atLeast(0)).doAppend((ILoggingEvent) captorLoggingEvent.capture());
+        assertThat(captorLoggingEvent.getAllValues().stream()
+            .filter(logEvent -> logEvent.getFormattedMessage().contains("Suppressing HEF notification")).count()).isZero();
+    }
+
+    @Test
+    public void givenUpdateOtherPartyDataEventAndCmFlagOnAndNonChildSupportCase_thenDoNotSuppressNotification() {
+        CcdNotificationWrapper wrapper = buildNotificationWrapperGivenNotificationTypeAndSubscriptions(
+            UPDATE_OTHER_PARTY_DATA, null, null, null,
+            List.of(CcdValue.<OtherParty>builder().value(OtherParty.builder()
+                .sendNewOtherPartyNotification(YesNo.YES)
+                .id("1")
+                .otherPartySubscription(Subscription.builder().email("other@party.com").subscribeEmail("Yes").build())
+                .build()).build())
+        );
+        wrapper.getNewSscsCaseData().setAppeal(Appeal.builder()
+            .hearingType(AppealHearingType.ORAL.name())
+            .benefitType(BenefitType.builder().code("PIP").build())
+            .appellant(Appellant.builder().build())
+            .build());
+        given(factory.create(any(NotificationWrapper.class), any(SubscriptionWithType.class)))
+            .willReturn(new Notification(
+                Template.builder().emailTemplateId(EMAIL_TEMPLATE_ID).smsTemplateId(List.of(SMS_TEMPLATE_ID)).build(),
+                Destination.builder().email(EMAIL).sms(SMS_MOBILE).build(),
+                new HashMap<>(), new Reference(), null));
+
+        getNotificationServiceWithCmOtherPartyConfidentialityEnabled().manageNotificationAndSubscription(wrapper, false);
+
+        verify(mockAppender, atLeast(0)).doAppend((ILoggingEvent) captorLoggingEvent.capture());
+        assertThat(captorLoggingEvent.getAllValues().stream()
+            .filter(logEvent -> logEvent.getFormattedMessage().contains("Suppressing HEF notification")).count()).isZero();
     }
 
     private NotificationService getNotificationService() {
