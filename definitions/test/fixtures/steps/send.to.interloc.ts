@@ -210,6 +210,10 @@ export class SendToInterloc extends BaseStep {
       sendToInterlocData.sendToInterlocReasonReferredFieldLabel,
       sendToInterlocData.sendToInterlocConfidentialityReasonValue
     );
+     await this.summaryTab.verifyPageContentByKeyValue(
+      sendToInterlocData.sendToInterLocSelectPartyFieldLabel,
+      sendToInterlocData.sendToInterlocPartyConfidentialityValue_2
+    );
   }
 
   async submitConfidentialityReferralChildSupportAndVerifySummary(caseId: string, user) {
