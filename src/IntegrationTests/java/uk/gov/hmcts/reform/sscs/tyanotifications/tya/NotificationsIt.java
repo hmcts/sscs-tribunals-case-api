@@ -5223,7 +5223,7 @@ class NotificationsIt extends NotificationsItBase {
     }
 
     @Test
-    public void givenUpdateOtherPartyDataEvent_whenMoreThanOneOtherParty_thenLetterNotificationSent() throws Exception {
+    public void givenUpdateOtherPartyDataEventAndCmFlagOnAndChildSupportCase_whenMoreThanOneOtherParty_thenNotificationSuppressed() throws Exception {
         String updatedJson = updateEmbeddedJson(json, "updateOtherPartyData", "event_id");
         updatedJson = updateEmbeddedJson(updatedJson, "childSupport", "case_details", "case_data", "appeal", "benefitType",
             "code");
@@ -5234,7 +5234,7 @@ class NotificationsIt extends NotificationsItBase {
 
         getResponse(getRequestWithAuthHeader(updatedJson));
 
-        verify(notificationClient, atLeastOnce()).sendPrecompiledLetterWithInputStream(any(), any());
+        verify(notificationClient, never()).sendPrecompiledLetterWithInputStream(any(), any());
     }
 
     @Test
