@@ -20,6 +20,7 @@
   "sendToInterlocReasonReferredValue": "Advice on how to proceed",
   "sendToInterlocConfidentialityReasonValue": "Confidentiality",
   "sendToInterlocPartyConfidentialityValue": "Other party 1 - Testing Other party",
+  "sendToInterlocPartyConfidentialityValue_2": "Appellant (or Appointee)",
   "sendToInterlocReviewConfidentialityRequestValue": "UC JP ONLY - Review confidentiality request",
   "sendToInterlocReferralReasonOver300Pages": "Over 300 pages",
   "sendToInterlocReferralReasonComplexCase": "Complex Case",
