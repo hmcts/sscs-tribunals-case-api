@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.confidentialityconfirmed;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -37,7 +38,8 @@ class ConfidentialityConfirmedMidEventHandler implements PreSubmitCallbackHandle
             return false;
         }
 
-        return callback.getCaseDetails().getCaseData().isBenefitType(CHILD_SUPPORT);
+        final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        return caseData.isBenefitType(CHILD_SUPPORT) || caseData.isBenefitType(UC);
     }
 
     @Override
@@ -46,7 +48,7 @@ class ConfidentialityConfirmedMidEventHandler implements PreSubmitCallbackHandle
             throw new IllegalStateException("Cannot handle callback");
         }
 
-        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
         var preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
         boolean otherPartyConfidentialityMissing = Optional.ofNullable(caseData.getOtherParties())
