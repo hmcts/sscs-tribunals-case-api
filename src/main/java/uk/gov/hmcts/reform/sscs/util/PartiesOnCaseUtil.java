@@ -91,10 +91,6 @@ public class PartiesOnCaseUtil {
                 .isPresent();
     }
 
-    public static boolean isBenefitTypeChildSupportOrUc(SscsCaseData sscsCaseData) {
-        return sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT) || sscsCaseData.isBenefitType(Benefit.UC);
-    }
-
     public static DynamicList getSelectedConfidentialityPartyDropdown(SscsCaseData sscsCaseData) {
         List<DynamicListItem> listOptions = getPartiesOnCaseForConfidentiality(sscsCaseData);
 

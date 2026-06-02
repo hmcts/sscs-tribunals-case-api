@@ -3,13 +3,11 @@ package uk.gov.hmcts.reform.sscs.util;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.PIP;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.addOtherPartiesToListOptions;
-import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.isBenefitTypeChildSupportOrUc;
 import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.isChildSupportAppeal;
 
 import java.util.ArrayList;
@@ -311,30 +309,10 @@ class PartiesOnCaseUtilTest {
         assertFalse(isChildSupportAppeal(sscsCaseData));
     }
 
-    @ParameterizedTest
-    @MethodSource("childSupportOrUcBenefitTypes")
-    void givenChildSupportOrUcBenefit_isBenefitTypeChildSupportOrUcReturnsTrue(String benefitShortName) {
-        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(benefitShortName).build());
-        assertTrue(isBenefitTypeChildSupportOrUc(sscsCaseData));
-    }
-
-    @Test
-    void givenOtherBenefit_isBenefitTypeChildSupportOrUcReturnsFalse() {
-        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(PIP.getShortName()).build());
-        assertFalse(isBenefitTypeChildSupportOrUc(sscsCaseData));
-    }
-
     private static Stream<Arguments> nonChildSupportBenefitTypes() {
         return Stream.of(
             Arguments.of(UC.getShortName()),
             Arguments.of(PIP.getShortName())
-        );
-    }
-
-    private static Stream<Arguments> childSupportOrUcBenefitTypes() {
-        return Stream.of(
-            Arguments.of(CHILD_SUPPORT.getShortName()),
-            Arguments.of(UC.getShortName())
         );
     }
 
