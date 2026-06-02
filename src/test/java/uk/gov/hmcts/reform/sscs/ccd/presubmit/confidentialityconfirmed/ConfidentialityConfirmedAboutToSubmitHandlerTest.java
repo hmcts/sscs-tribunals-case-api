@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CONFIDENTIALITY_CONFIRMED;
 
 import ch.qos.logback.classic.Level;
@@ -34,6 +35,7 @@ import uk.gov.hmcts.reform.sscs.util.LogCaptureExtension;
 class ConfidentialityConfirmedAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
+    private static final int DWP_DUE_DATE = 28;
     private static final int CHILD_SUPPORT_DWP_DUE_DATE = 42;
     @RegisterExtension
     private final LogCaptureExtension logCapture =
@@ -46,7 +48,7 @@ class ConfidentialityConfirmedAboutToSubmitHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new ConfidentialityConfirmedAboutToSubmitHandler(CHILD_SUPPORT_DWP_DUE_DATE, true);
+        handler = new ConfidentialityConfirmedAboutToSubmitHandler(DWP_DUE_DATE, CHILD_SUPPORT_DWP_DUE_DATE, true);
     }
 
     @ParameterizedTest
@@ -56,8 +58,8 @@ class ConfidentialityConfirmedAboutToSubmitHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = Benefit.class, mode = EnumSource.Mode.EXCLUDE, names = {"CHILD_SUPPORT"})
-    void givenNonChildSupportBenefit_thenReturnFalse(Benefit benefit) {
+    @EnumSource(value = Benefit.class, mode = EnumSource.Mode.EXCLUDE, names = {"CHILD_SUPPORT", "UC"})
+    void givenNonSupportedBenefit_thenReturnFalse(Benefit benefit) {
         when(callback.getEvent()).thenReturn(CONFIDENTIALITY_CONFIRMED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseDataWithBenefit(benefit.getShortName()));
@@ -73,9 +75,10 @@ class ConfidentialityConfirmedAboutToSubmitHandlerTest {
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
 
-    @Test
-    void givenConfidentialityConfirmedEventAndChildSupportBenefit_thenReturnTrue() {
-        var sscsCaseData = caseDataWithBenefit(CHILD_SUPPORT.getShortName());
+    @ParameterizedTest
+    @EnumSource(value = Benefit.class, names = {"CHILD_SUPPORT", "UC"})
+    void givenConfidentialityConfirmedEventAndSupportedBenefit_thenReturnTrue(Benefit benefit) {
+        var sscsCaseData = caseDataWithBenefit(benefit.getShortName());
 
         when(callback.getEvent()).thenReturn(CONFIDENTIALITY_CONFIRMED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -85,7 +88,7 @@ class ConfidentialityConfirmedAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenConfidentialityConfirmedEvent_thenResetTheDwpDueDate() {
+    void givenConfidentialityConfirmedEventForChildSupport_thenResetTheDwpDueDate() {
         var sscsCaseData = caseDataWithBenefit(CHILD_SUPPORT.getShortName());
         sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE);
 
@@ -105,6 +108,26 @@ class ConfidentialityConfirmedAboutToSubmitHandlerTest {
     }
 
     @Test
+    void givenConfidentialityConfirmedEventForUniversalCredit_thenResetTheDwpDueDate() {
+        var sscsCaseData = caseDataWithBenefit(UC.getShortName());
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE);
+
+        when(callback.getEvent()).thenReturn(CONFIDENTIALITY_CONFIRMED);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        final String dwpDueDate = LocalDate.now().plusDays(DWP_DUE_DATE).toString();
+        assertThat(response.getData().getDwpDueDate()).isEqualTo(LocalDate.now().plusDays(DWP_DUE_DATE).toString());
+        assertThat(response.getData().getDwpState()).isEqualTo(DwpState.UNREGISTERED);
+
+        logCapture.assertLogContains(
+            "Setting dwp state to UNREGISTERED and dwp due date to %s for case id 0".formatted(dwpDueDate),
+            Level.INFO);
+    }
+
+    @Test
     void throwsExceptionIfItCannotHandleTheAppeal() {
         when(callback.getEvent()).thenReturn(EventType.ADD_OTHER_PARTY_DATA);
 
@@ -114,7 +137,7 @@ class ConfidentialityConfirmedAboutToSubmitHandlerTest {
 
     @Test
     void givenCmOtherPartyConfidentialityFlagIsDisabled_thenReturnFalse() {
-        assertThat(new ConfidentialityConfirmedAboutToSubmitHandler(CHILD_SUPPORT_DWP_DUE_DATE, false).canHandle(ABOUT_TO_SUBMIT,
+        assertThat(new ConfidentialityConfirmedAboutToSubmitHandler(DWP_DUE_DATE, CHILD_SUPPORT_DWP_DUE_DATE, false).canHandle(ABOUT_TO_SUBMIT,
             callback)).isFalse();
     }
 

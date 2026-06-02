@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CONFIDENTIALITY_CONFIRMED;
 
 import java.util.Collections;
@@ -55,8 +54,8 @@ class ConfidentialityConfirmedMidEventHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = Benefit.class, mode = EnumSource.Mode.EXCLUDE, names = {"CHILD_SUPPORT"})
-    void givenNonChildSupportBenefit_thenReturnFalse(Benefit benefit) {
+    @EnumSource(value = Benefit.class, mode = EnumSource.Mode.EXCLUDE, names = {"CHILD_SUPPORT", "UC"})
+    void givenNonSupportedBenefit_thenReturnFalse(Benefit benefit) {
         when(callback.getEvent()).thenReturn(CONFIDENTIALITY_CONFIRMED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseDataWithBenefit(benefit.getShortName()));
@@ -72,9 +71,10 @@ class ConfidentialityConfirmedMidEventHandlerTest {
         assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
     }
 
-    @Test
-    void givenConfidentialityConfirmedEventAndChildSupportBenefit_thenReturnTrue() {
-        var sscsCaseData = caseDataWithBenefit(CHILD_SUPPORT.getShortName());
+    @ParameterizedTest
+    @EnumSource(value = Benefit.class, names = {"CHILD_SUPPORT", "UC"})
+    void givenConfidentialityConfirmedEventAndSupportedBenefit_thenReturnTrue(Benefit benefit) {
+        var sscsCaseData = caseDataWithBenefit(benefit.getShortName());
 
         when(callback.getEvent()).thenReturn(CONFIDENTIALITY_CONFIRMED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -83,9 +83,10 @@ class ConfidentialityConfirmedMidEventHandlerTest {
         assertThat(handler.canHandle(MID_EVENT, callback)).isTrue();
     }
 
-    @Test
-    void givenConfidentialityConfirmedEventWithSingleOtherPartyAndConfidentialitySet_thenRunSuccessfully() {
-        var sscsCaseData = caseDataWithBenefit(CHILD_SUPPORT.getShortName());
+    @ParameterizedTest
+    @EnumSource(value = Benefit.class, names = {"CHILD_SUPPORT", "UC"})
+    void givenConfidentialityConfirmedEventWithSingleOtherPartyAndConfidentialitySet_thenRunSuccessfully(Benefit benefit) {
+        var sscsCaseData = caseDataWithBenefit(benefit.getShortName());
         sscsCaseData.setOtherParties(Collections.singletonList(buildOtherParty("1", YesNo.YES)));
 
         when(callback.getEvent()).thenReturn(CONFIDENTIALITY_CONFIRMED);
@@ -97,9 +98,10 @@ class ConfidentialityConfirmedMidEventHandlerTest {
         assertThat(response.getErrors()).isEmpty();
     }
 
-    @Test
-    void givenConfidentialityConfirmedEventWithNoOtherPartyAndConfidentialitySet_thenRunSuccessfully() {
-        var sscsCaseData = caseDataWithBenefit(CHILD_SUPPORT.getShortName());
+    @ParameterizedTest
+    @EnumSource(value = Benefit.class, names = {"CHILD_SUPPORT", "UC"})
+    void givenConfidentialityConfirmedEventWithNoOtherPartyAndConfidentialitySet_thenRunSuccessfully(Benefit benefit) {
+        var sscsCaseData = caseDataWithBenefit(benefit.getShortName());
         sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequired(YesNo.YES).build());
 
         when(callback.getEvent()).thenReturn(CONFIDENTIALITY_CONFIRMED);
@@ -111,9 +113,10 @@ class ConfidentialityConfirmedMidEventHandlerTest {
         assertThat(response.getErrors()).isEmpty();
     }
 
-    @Test
-    void givenConfidentialityConfirmedEventWithNullOtherPartyAndConfidentialitySet_thenRunSuccessfully() {
-        var sscsCaseData = caseDataWithBenefit(CHILD_SUPPORT.getShortName());
+    @ParameterizedTest
+    @EnumSource(value = Benefit.class, names = {"CHILD_SUPPORT", "UC"})
+    void givenConfidentialityConfirmedEventWithNullOtherPartyAndConfidentialitySet_thenRunSuccessfully(Benefit benefit) {
+        var sscsCaseData = caseDataWithBenefit(benefit.getShortName());
         CcdValue<OtherParty> nullParty = null;
         sscsCaseData.setOtherParties(Collections.singletonList(nullParty));
 
@@ -126,9 +129,10 @@ class ConfidentialityConfirmedMidEventHandlerTest {
         assertThat(response.getErrors()).isEmpty();
     }
 
-    @Test
-    void givenConfidentialityConfirmedEventWithConfidentialityMissing_thenReturnError() {
-        var sscsCaseData = caseDataWithBenefit(CHILD_SUPPORT.getShortName());
+    @ParameterizedTest
+    @EnumSource(value = Benefit.class, names = {"CHILD_SUPPORT", "UC"})
+    void givenConfidentialityConfirmedEventWithConfidentialityMissing_thenReturnError(Benefit benefit) {
+        var sscsCaseData = caseDataWithBenefit(benefit.getShortName());
 
         CcdValue<OtherParty> otherPartyWithConfidentiality = buildOtherParty("1", YesNo.NO);
         CcdValue<OtherParty> otherPartyWithoutConfidentiality = buildOtherParty("2", null);
@@ -143,9 +147,10 @@ class ConfidentialityConfirmedMidEventHandlerTest {
         assertThat(response.getErrors()).contains("Confidentiality for all parties must be determined to either Yes or No.");
     }
 
-    @Test
-    void givenConfidentialityConfirmedEventWithAppellantConfidentialityMissing_thenReturnError() {
-        var sscsCaseData = caseDataWithBenefit(CHILD_SUPPORT.getShortName());
+    @ParameterizedTest
+    @EnumSource(value = Benefit.class, names = {"CHILD_SUPPORT", "UC"})
+    void givenConfidentialityConfirmedEventWithAppellantConfidentialityMissing_thenReturnError(Benefit benefit) {
+        var sscsCaseData = caseDataWithBenefit(benefit.getShortName());
         sscsCaseData.getAppeal().setAppellant(Appellant.builder().build());
 
         when(callback.getEvent()).thenReturn(CONFIDENTIALITY_CONFIRMED);
