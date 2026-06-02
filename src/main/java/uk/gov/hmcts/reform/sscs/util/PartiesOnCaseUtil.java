@@ -87,8 +87,12 @@ public class PartiesOnCaseUtil {
 
     public static boolean isChildSupportAppeal(SscsCaseData sscsCaseData) {
         return sscsCaseData.getBenefitType()
-                .filter(benefitType -> benefitType == Benefit.CHILD_SUPPORT || benefitType == Benefit.UC)
+                .filter(benefitType -> benefitType == Benefit.CHILD_SUPPORT)
                 .isPresent();
+    }
+
+    public static boolean isBenefitTypeChildSupportOrUc(SscsCaseData sscsCaseData) {
+        return sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT) || sscsCaseData.isBenefitType(Benefit.UC);
     }
 
     public static DynamicList getSelectedConfidentialityPartyDropdown(SscsCaseData sscsCaseData) {
