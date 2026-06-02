@@ -336,15 +336,6 @@ public class NotificationService {
 
     private boolean isEventAllowedToProceedWithValidData(NotificationWrapper notificationWrapper,
                                                          NotificationEventType notificationType) {
-        SscsCaseData newCaseData = notificationWrapper.getNewSscsCaseData();
-        if (UPDATE_OTHER_PARTY_DATA.equals(notificationType)
-            && cmOtherPartyConfidentialityEnabled
-            && (newCaseData.isBenefitType(CHILD_SUPPORT) || newCaseData.isBenefitType(UC))) {
-            String benefitType = newCaseData.isBenefitType(CHILD_SUPPORT) ? CHILD_SUPPORT.getShortName() : UC.getShortName();
-            log.info("Suppressing HEF notification for {} case id {}.", benefitType, notificationWrapper.getCaseId());
-            return false;
-        }
-
         if (REQUEST_FOR_INFORMATION.equals(notificationType)
             && !isYes(notificationWrapper.getNewSscsCaseData().getInformationFromAppellant())) {
             log.info("Request for Information with empty or no Information From Appellant for ccdCaseId {}.",
