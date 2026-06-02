@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
@@ -25,23 +24,18 @@ public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
 
     private final DispatchPriority dispatchPriority;
 
-    private final CcdService ccdService;
-
     private final UpdateCcdCaseService updateCcdCaseService;
 
     private final IdamService idamService;
-    private final boolean cmConfidentialityEnabled;
+    private final boolean cmOtherPartyConfidentialityEnabled;
 
     @Autowired
-    public AppealReceivedHandler(CcdService ccdService,
-        UpdateCcdCaseService updateCcdCaseService,
-        IdamService idamService,
-        @Value("${feature.cm-other-party-confidentiality.enabled}") final boolean cmConfidentialityEnabled) {
+    public AppealReceivedHandler(UpdateCcdCaseService updateCcdCaseService,
+                                 IdamService idamService, @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
+        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
         this.dispatchPriority = DispatchPriority.LATEST;
-        this.ccdService = ccdService;
         this.updateCcdCaseService = updateCcdCaseService;
         this.idamService = idamService;
-        this.cmConfidentialityEnabled = cmConfidentialityEnabled;
     }
 
     @Override
@@ -53,7 +47,7 @@ public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
             .getId()
             .equals(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom());
 
-        if (cmConfidentialityEnabled && submittedAndReadToList && callback
+        if (cmOtherPartyConfidentialityEnabled && submittedAndReadToList && callback
             .getCaseDetails()
             .getCaseData()
             .isBenefitType(CHILD_SUPPORT)) {

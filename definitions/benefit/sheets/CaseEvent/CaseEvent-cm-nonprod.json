@@ -516,7 +516,7 @@
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "SecurityClassification": "Public",
-    "EventEnablingCondition": "appeal.benefitType.code=\"childSupport\"",
+    "EventEnablingCondition": "appeal.benefitType.code=\"childSupport\" OR appeal.benefitType.code=\"UC\"",
     "Publish": "N",
     "ShowSummary": "N"
   }
