@@ -1408,15 +1408,16 @@ class DirectionIssuedAboutToSubmitHandlerTest {
                 .roles(List.of("other")).build()}};
         }
 
-        @Test
-        void givenConfidentialityGranted_thenIsConfidentialCaseFlagIsSet() {
+        @ParameterizedTest
+        @ValueSource(strings = {"childSupport", "UC"})
+        void givenConfidentialityGranted_thenIsConfidentialCaseFlagIsSet(final String benefitTypeCode) {
             when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
             handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, idamService, 35, 42, false,
                 cmOtherPartyConfidentialityFeatureFlag);
 
             callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList("confidentialityGrantedSendToAdmin"));
             callback.getCaseDetails().getCaseData().getAppeal()
-                .setBenefitType(BenefitType.builder().code(CHILD_SUPPORT.getShortName()).build());
+                .setBenefitType(BenefitType.builder().code(benefitTypeCode).build());
             var selectedConfidentialityParty = new DynamicList(new DynamicListItem("appellant", "Appellant (or Appointee)"), null);
             callback.getCaseDetails().getCaseData()
                 .setExtendedSscsCaseData(ExtendedSscsCaseData.builder().selectedConfidentialityParty(selectedConfidentialityParty).build());
