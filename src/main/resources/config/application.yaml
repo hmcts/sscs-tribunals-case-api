@@ -1387,8 +1387,6 @@ notification:
             docmosisId: TB-SCS-LET-WEL-Set-Aside-Grant-Refused-v2.docx
         setAsideRefused:
             docmosisId: TB-SCS-LET-WEL-Set-Aside-Grant-Refused-v2.docx
-        adminSendToValidAppeal:
-            docmosisId: TB-SCS-GNO-WEL-Acknowledgment-of-Appeal.docx
         interlocValidAppeal:
             docmosisId: TB-SCS-GNO-WEL-Acknowledgment-of-Appeal.docx
         validAppeal:
@@ -1957,7 +1955,6 @@ pdf-service:
             permissionToAppealGranted: 'TB-SCS-GNO-WEL-00479.docx'
             libertyToApplyGranted: 'TB-SCS-GNO-WEL-00479.docx'
             libertyToApplyRefused: 'TB-SCS-GNO-WEL-00479.docx'
-            adminSendToValidAppeal: 'TB-SCS-GNO-WEL-00479.docx'
             interlocValidAppeal: 'TB-SCS-GNO-WEL-00479.docx'
             validAppeal: 'TB-SCS-GNO-WEL-00479.docx'
             appealToProceedNotifyValidAppeal: 'TB-SCS-GNO-WEL-00479.docx'
