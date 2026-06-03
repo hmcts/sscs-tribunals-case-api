@@ -56,7 +56,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Correction;
@@ -119,30 +118,6 @@ class SscsUtilTest {
                 .isCorrectionFinalDecisionInProgress(YesNo.NO).build()).build();
         caseData = new SscsCaseData();
         caseData.setPostHearing(postHearing);
-    }
-
-    @Test
-    void givenChildSupportBenefit_isBenefitTypeChildSupportOrUcReturnsTrue() {
-        SscsCaseData sscsCaseData = SscsCaseData.builder()
-            .appeal(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build()).build())
-            .build();
-        assertTrue(isBenefitTypeChildSupportOrUc(sscsCaseData));
-    }
-
-    @Test
-    void givenUcBenefit_isBenefitTypeChildSupportOrUcReturnsTrue() {
-        SscsCaseData sscsCaseData = SscsCaseData.builder()
-            .appeal(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build())
-            .build();
-        assertTrue(isBenefitTypeChildSupportOrUc(sscsCaseData));
-    }
-
-    @Test
-    void givenOtherBenefit_isBenefitTypeChildSupportOrUcReturnsFalse() {
-        SscsCaseData sscsCaseData = SscsCaseData.builder()
-            .appeal(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.PIP.getShortName()).build()).build())
-            .build();
-        assertFalse(isBenefitTypeChildSupportOrUc(sscsCaseData));
     }
 
     @Test
@@ -974,5 +949,12 @@ class SscsUtilTest {
         caseData.setAdjournment(adjournment);
         String hearingType = "oral";
         assertFalse(SscsUtil.hasChannelChangedForAdjournment(caseData, hearingType));
+    }
+
+    @ParameterizedTest
+    @CsvSource({"UC, True", "childSupport, True", "PIP, False", "ESA, False"})
+    void givenBenefitType_isBenefitTypeChildSupportOrUcReturnsCorrectValue(String benefitCode, Boolean expectedValue) {
+        SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefitCode).build()).build()).build();
+        assertThat(isBenefitTypeChildSupportOrUc(sscsCaseData)).isEqualTo(expectedValue);
     }
 }

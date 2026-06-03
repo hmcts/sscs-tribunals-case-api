@@ -629,11 +629,15 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
         assertThat(response.getData().getIsConfidentialCase()).isNull();
     }
 
-    @Test
-    void givenCmConfidentialityEnabledAndChildSupportBenefit_thenDirectionDueDateAndInterlocSet() {
+    @ParameterizedTest
+    @CsvSource({
+        "childSupport",
+        "UC"
+    })
+    void givenCmConfidentialityEnabledAndChildSupportOrUcBenefit_thenDirectionDueDateAndInterlocSet(String benefitType) {
         final UpdateOtherPartyAboutToSubmitHandler handlerWithFlag = new UpdateOtherPartyAboutToSubmitHandler(idamService, true);
         final SscsCaseData caseData = SscsCaseData.builder()
-            .appeal(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build()).build())
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefitType).build()).build())
             .otherParties(singletonList(buildSscs5OtherParty(ID_1, "PayingParent")))
             .build();
         when(caseDetails.getCaseData()).thenReturn(caseData);

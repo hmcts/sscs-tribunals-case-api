@@ -778,6 +778,5 @@ public class SscsUtil {
             return sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode();
         }
     }
-
 }
 
