@@ -122,30 +122,6 @@ class SscsUtilTest {
     }
 
     @Test
-    void givenChildSupportBenefit_isBenefitTypeChildSupportOrUcReturnsTrue() {
-        SscsCaseData sscsCaseData = SscsCaseData.builder()
-            .appeal(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build()).build())
-            .build();
-        assertTrue(isBenefitTypeChildSupportOrUc(sscsCaseData));
-    }
-
-    @Test
-    void givenUcBenefit_isBenefitTypeChildSupportOrUcReturnsTrue() {
-        SscsCaseData sscsCaseData = SscsCaseData.builder()
-            .appeal(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build())
-            .build();
-        assertTrue(isBenefitTypeChildSupportOrUc(sscsCaseData));
-    }
-
-    @Test
-    void givenOtherBenefit_isBenefitTypeChildSupportOrUcReturnsFalse() {
-        SscsCaseData sscsCaseData = SscsCaseData.builder()
-            .appeal(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.PIP.getShortName()).build()).build())
-            .build();
-        assertFalse(isBenefitTypeChildSupportOrUc(sscsCaseData));
-    }
-
-    @Test
     void givenPostHearingsEnabledFalse_returnDecisionNotice() {
         DocumentType documentType = getPostHearingReviewDocumentType(postHearing, false);
         assertThat(documentType).isEqualTo(DocumentType.DECISION_NOTICE);

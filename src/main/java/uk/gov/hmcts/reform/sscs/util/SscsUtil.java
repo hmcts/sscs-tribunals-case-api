@@ -778,10 +778,5 @@ public class SscsUtil {
             return sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode();
         }
     }
-
-    public static boolean isBenefitTypeChildSupportOrUc(SscsCaseData sscsCaseData) {
-        return sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT) || sscsCaseData.isBenefitType(Benefit.UC);
-    }
-
 }
 
