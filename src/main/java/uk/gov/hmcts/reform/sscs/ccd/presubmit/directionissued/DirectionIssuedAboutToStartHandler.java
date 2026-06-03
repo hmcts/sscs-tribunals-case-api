@@ -10,6 +10,7 @@ import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.JUDGE;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.TCW;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isBenefitTypeChildSupportOrUc;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,7 +84,7 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
 
         if (cmDirectionTypesConfidentiality
             && isAuthorisedToGrantConfidentiality(userAuthorisation)
-            && sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT)
+            && isBenefitTypeChildSupportOrUc(sscsCaseData)
             && InterlocReferralReason.CONFIDENTIALITY.equals(sscsCaseData.getInterlocReferralReason())) {
             listOptions.add(new DynamicListItem(CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString(), CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.getLabel()));
             listOptions.add(new DynamicListItem(CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN.toString(), CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN.getLabel()));

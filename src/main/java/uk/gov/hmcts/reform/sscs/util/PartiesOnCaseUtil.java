@@ -87,7 +87,7 @@ public class PartiesOnCaseUtil {
 
     public static boolean isChildSupportAppeal(SscsCaseData sscsCaseData) {
         return sscsCaseData.getBenefitType()
-                .filter(f -> f == Benefit.CHILD_SUPPORT)
+                .filter(benefitType -> benefitType == Benefit.CHILD_SUPPORT)
                 .isPresent();
     }
 
