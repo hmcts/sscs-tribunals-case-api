@@ -714,8 +714,8 @@ public class NotificationConfigTestIt extends AbstractNotificationConfigTest {
 
             new Object[]{ADMIN_SEND_TO_VALID_APPEAL, false, null, ORAL, GAPS, null, null, List.of(), null, "TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx"},
             new Object[]{ADMIN_SEND_TO_VALID_APPEAL, false, null, PAPER, GAPS, null, null, List.of(), null, "TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx"},
-            new Object[]{ADMIN_SEND_TO_VALID_APPEAL, true, null, ORAL, GAPS, null, null, List.of(), null, "TB-SCS-GNO-WEL-Acknowledgment-of-Appeal.docx"},
-            new Object[]{ADMIN_SEND_TO_VALID_APPEAL, true, null, PAPER, GAPS, null, null, List.of(), null, "TB-SCS-GNO-WEL-Acknowledgment-of-Appeal.docx"},
+            new Object[]{ADMIN_SEND_TO_VALID_APPEAL, true, null, ORAL, GAPS, null, null, List.of(), null, null},
+            new Object[]{ADMIN_SEND_TO_VALID_APPEAL, true, null, PAPER, GAPS, null, null, List.of(), null, null},
 
             new Object[]{INTERLOC_VALID_APPEAL, false, null, ORAL, GAPS, null, null, List.of(), null, "TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx"},
             new Object[]{INTERLOC_VALID_APPEAL, false, null, PAPER, GAPS, null, null, List.of(), null, "TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx"},
