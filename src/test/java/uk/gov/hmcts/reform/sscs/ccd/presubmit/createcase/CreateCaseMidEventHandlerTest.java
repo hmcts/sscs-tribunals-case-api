@@ -266,7 +266,7 @@ public class CreateCaseMidEventHandlerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"A12112", "A11A12", "A12b12", "A12012"})
+    @ValueSource(strings = {"A12112", "A11A12", "A12b12", "A12012", "ABCDEF", "123456"})
     void shouldNotReturnErrorsOnMidEventForIbcaCase(String ibcaReference) {
         SscsCaseData caseData = SscsCaseData.builder()
                 .appeal(Appeal.builder()
