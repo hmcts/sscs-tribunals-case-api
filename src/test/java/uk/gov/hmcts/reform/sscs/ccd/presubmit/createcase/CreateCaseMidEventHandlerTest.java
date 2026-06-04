@@ -229,8 +229,9 @@ public class CreateCaseMidEventHandlerTest {
         assertThat(response.getWarnings()).contains(IBCA_REFERENCE_EMPTY_ERROR);
     }
 
-    @Test
-    void shouldReturnWarningsOnMidEventForInvalidIbcaReference() {
+    @ParameterizedTest
+    @ValueSource(strings = {"A1211", "A11A12AA", "A12b-2", "A 2012", "ABC/EF", "12345!"})
+    void shouldReturnWarningsOnMidEventForInvalidIbcaReference(String ibcaReference) {
         SscsCaseData caseData = SscsCaseData.builder()
                 .appeal(Appeal.builder()
                         .appellant(Appellant.builder()
@@ -246,7 +247,7 @@ public class CreateCaseMidEventHandlerTest {
                                         .inMainlandUk(NO)
                                         .build()
                                 )
-                                .identity(Identity.builder().ibcaReference("IBCA1234").build())
+                                .identity(Identity.builder().ibcaReference(ibcaReference).build())
                                 .build()
                         )
                         .rep(Representative.builder().build())
