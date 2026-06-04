@@ -2,9 +2,13 @@ package uk.gov.hmcts.reform.sscs.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.PIP;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.addOtherPartiesToListOptions;
+import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.isChildSupportAppeal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -296,6 +300,20 @@ class PartiesOnCaseUtilTest {
 
         assertThat(dropdown.getValue().getCode()).isEmpty();
         assertThat(dropdown.getListItems()).isNotEmpty();
+    }
+
+    @ParameterizedTest
+    @MethodSource("nonChildSupportBenefitTypes")
+    void givenNonChildSupportBenefit_isChildSupportAppealReturnsFalse(String benefitShortName) {
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(benefitShortName).build());
+        assertFalse(isChildSupportAppeal(sscsCaseData));
+    }
+
+    private static Stream<Arguments> nonChildSupportBenefitTypes() {
+        return Stream.of(
+            Arguments.of(UC.getShortName()),
+            Arguments.of(PIP.getShortName())
+        );
     }
 
     private void setupOtherParties() {
