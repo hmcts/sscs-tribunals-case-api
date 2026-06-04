@@ -549,8 +549,8 @@ class PersonalisationTest {
 
     @ParameterizedTest
     @CsvSource({
-        "APPELLANT, directionIssuedWelsh.appealToProceedNotifyValidAppealWelsh.appellant",
-        "APPOINTEE, directionIssuedWelsh.appealToProceedNotifyValidAppealWelsh.appointee"
+        "APPELLANT, directionIssuedWelsh.appealToProceedNotifyValidAppeal.appellant",
+        "APPOINTEE, directionIssuedWelsh.appealToProceedNotifyValidAppeal.appointee"
     })
     void whenNotifyAppellantValidAppealInWelshWithAppealToProceedDirection_shouldGenerateDocmosisTemplateUnderValidAppeal(
         SubscriptionType subscriptionType, String expectedDocmosisTemplate) {

@@ -948,11 +948,8 @@ public class Personalisation<E extends NotificationWrapper> {
                 return getSubscriptionTemplateNameWithDirection(notificationEventType, directionType, subscriptionType);
             }
             if (DirectionType.APPEAL_TO_PROCEED.toString().equals(directionType)) {
-                if (NOTIFY_APPELLANT_VALID_APPEAL.equals(notificationEventType)) {
+                if (NOTIFY_APPELLANT_VALID_APPEAL.equals(notificationEventType) || NOTIFY_APPELLANT_VALID_APPEAL_WELSH.equals(notificationEventType)) {
                     return getSubscriptionTemplateNameWithDirection(notificationEventType, "appealToProceedNotifyValidAppeal", subscriptionType);
-                }
-                if (NOTIFY_APPELLANT_VALID_APPEAL_WELSH.equals(notificationEventType)) {
-                    return getSubscriptionTemplateNameWithDirection(notificationEventType, "appealToProceedNotifyValidAppealWelsh", subscriptionType);
                 }
             }
         }
