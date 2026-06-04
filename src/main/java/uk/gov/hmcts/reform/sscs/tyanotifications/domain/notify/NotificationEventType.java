@@ -27,6 +27,7 @@ public enum NotificationEventType {
     APPEAL_WITHDRAWN(EventType.WITHDRAWN, true, true, false, false, false, 0),
     BUNDLE_CREATED_FOR_UPPER_TRIBUNAL(EventType.BUNDLE_CREATED_FOR_UPPER_TRIBUNAL, false, false, false, false, false, 0),
     CASE_UPDATED(EventType.CASE_UPDATED, false, false, false, false, false, 0),
+    CONFIDENTIALITY_CONFIRMED(EventType.CONFIDENTIALITY_CONFIRMED, false, false, false, true, false, 0),
     CORRECTION_GRANTED(EventType.CORRECTION_GRANTED, true, true, true, false, false, 0),
     CORRECTION_REFUSED(EventType.CORRECTION_REFUSED, true, true, true, false, false, 0),
     CORRECTION_REQUEST(EventType.CORRECTION_REQUEST, false, false, false, true, false, 0),
