@@ -27,17 +27,17 @@ import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
 @Slf4j
 public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    public static final String IBCA_REFERENCE_EMPTY_ERROR =
-            "An IBCA reference is required to update this case. The IBCA Reference format is 1 letter, 2 digits, 1 letter, 2 digits e.g. E24A45.";
+    static final String IBCA_REFERENCE_EMPTY_ERROR =
+            "An IBCA reference is required to update this case. The IBCA Reference format is exactly 6 characters (numbers and letters only) e.g. E24A45.";
 
-    public static final String IBCA_REFERENCE_VALIDATION_ERROR =
-            "The IBCA reference must be 6 characters and match the format. The IBCA Reference format is 1 letter, 2 digits, 1 letter or digit, 2 digits e.g. E24A45";
+    static final String IBCA_REFERENCE_VALIDATION_ERROR =
+            "The IBCA reference must be exactly 6 characters (numbers and letters only) e.g. E24A45.";
 
     private static final String HEARING_ROUTE_ERROR_MESSAGE = "Hearing route must be List Assist";
 
     private final PostcodeValidator postcodeValidator = new PostcodeValidator();
 
-    private static final Pattern IBCA_REFERENCE_REGEX = Pattern.compile("^[A-Za-z]\\d{2}[A-Za-z0-9]\\d{2}$");
+    private static final Pattern IBCA_REFERENCE_REGEX = Pattern.compile("^[A-Za-z0-9]{6}$");
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
