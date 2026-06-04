@@ -14,6 +14,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.PIP;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.APPEAL_TO_PROCEED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN;
@@ -207,6 +208,29 @@ class DirectionIssuedAboutToStartHandlerTest {
         when(idamService.getUserDetails(anyString())).thenReturn(userDetails);
         when(userDetails.hasRole(SUPER_USER)).thenReturn(true);
         callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(CHILD_SUPPORT.getShortName()).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getDirectionTypeDl().getListItems()).containsExactlyElementsOf(listOptions);
+    }
+
+    @Test
+    void givenUcAppealWithConfidentialityReferralAndFeatureFlagEnabled_populateDirectionTypeDropdown() {
+        handler = new DirectionIssuedAboutToStartHandler(false, true, idamService);
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
+
+        List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
+        listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
+        listOptions.add(new DynamicListItem(ISSUE_AND_SEND_TO_ADMIN.toString(), ISSUE_AND_SEND_TO_ADMIN.getLabel()));
+        listOptions.add(new DynamicListItem(CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString(),
+            CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.getLabel()));
+        listOptions.add(new DynamicListItem(CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN.toString(),
+            CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN.getLabel()));
+
+        when(idamService.getUserDetails(anyString())).thenReturn(userDetails);
+        when(userDetails.hasRole(SUPER_USER)).thenReturn(true);
+        callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(UC.getShortName()).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
@@ -518,18 +542,14 @@ class DirectionIssuedAboutToStartHandlerTest {
         assertNull(response.getData().getHmcHearingType());
     }
 
-    @ParameterizedTest
-    @CsvSource({
-        "SUPER_USER",
-        "TCW",
-        "JUDGE"
-    })
-    void givenConfidentialityFlagAndAuthorisedRole_populateConfidentialityDirections(UserRole roleName) {
+    @ParameterizedTest(name = "{0} - {1}")
+    @MethodSource("provideRoleAndBenefitTestCases")
+    void givenConfidentialityFlagAndAuthorisedRole_populateConfidentialityDirections(UserRole roleName, String benefitShortName) {
         handler = new DirectionIssuedAboutToStartHandler(false, true, idamService);
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
         when(idamService.getUserDetails(anyString())).thenReturn(userDetails);
         lenient().when(userDetails.hasRole(roleName)).thenReturn(true);
-        callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(CHILD_SUPPORT.getShortName()).build());
+        callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(benefitShortName).build());
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
@@ -537,6 +557,17 @@ class DirectionIssuedAboutToStartHandlerTest {
                 .anyMatch(item -> item.getCode().equals(CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString()));
         assertThat(response.getData().getDirectionTypeDl().getListItems())
                 .anyMatch(item -> item.getCode().equals(CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN.toString()));
+    }
+
+    private static Stream<Arguments> provideRoleAndBenefitTestCases() {
+        return Stream.of(
+            Arguments.of(UserRole.SUPER_USER, CHILD_SUPPORT.getShortName()),
+            Arguments.of(UserRole.TCW, CHILD_SUPPORT.getShortName()),
+            Arguments.of(UserRole.JUDGE, CHILD_SUPPORT.getShortName()),
+            Arguments.of(UserRole.SUPER_USER, UC.getShortName()),
+            Arguments.of(UserRole.TCW, UC.getShortName()),
+            Arguments.of(UserRole.JUDGE, UC.getShortName())
+        );
     }
 
     @ParameterizedTest(name = "{0}")

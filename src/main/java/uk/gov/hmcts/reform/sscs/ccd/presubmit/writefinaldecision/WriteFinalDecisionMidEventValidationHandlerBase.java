@@ -32,6 +32,8 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
     public static final String CANT_UPLOAD_ERROR_MESSAGE = "Unable to generate the corrected decision notice due to the original being uploaded";
     private static final List<String> DEATH_OF_APPELLANT_WARNING_PAGES = Arrays.asList("typeOfAppeal", "previewDecisionNotice");
     private static final LocalDate SV_APPLIES_CUTOFF_DATE = LocalDate.of(2026, 04, 05);
+    protected static final String SV_ALLOWED_APPEAL_ERROR_MESSAGE = "You have previously selected appeal Allowed. Your selection not to apply the Severe Conditions criteria does not match. Please review your selections.";
+    protected static final String SV_REFUSED_APPEAL_ERROR_MESSAGE = "You have previously selected appeal Refused. Your selection to apply the Severe Conditions criteria does not match. Please review your previous selections.";
     private final Validator validator;
 
     protected final DecisionNoticeService decisionNoticeService;

@@ -5222,10 +5222,11 @@ class NotificationsIt extends NotificationsItBase {
         json = updateEmbeddedJson(json, "paper", "case_details", "case_data", "appeal", "hearingType");
     }
 
-    @Test
-    public void givenUpdateOtherPartyDataEventAndCmFlagOnAndChildSupportCase_whenMoreThanOneOtherParty_thenNotificationSuppressed() throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = {"childSupport", "UC"})
+    public void givenUpdateOtherPartyDataEvent_whenMoreThanOneOtherParty_thenLetterNotificationSent(String benefitType) throws Exception {
         String updatedJson = updateEmbeddedJson(json, "updateOtherPartyData", "event_id");
-        updatedJson = updateEmbeddedJson(updatedJson, "childSupport", "case_details", "case_data", "appeal", "benefitType",
+        updatedJson = updateEmbeddedJson(updatedJson, benefitType, "case_details", "case_data", "appeal", "benefitType",
             "code");
         updatedJson = updateEmbeddedJson(updatedJson,
             List.of(CcdValue.<OtherParty>builder().value(OtherParty.builder().build()).build(),
@@ -5234,7 +5235,7 @@ class NotificationsIt extends NotificationsItBase {
 
         getResponse(getRequestWithAuthHeader(updatedJson));
 
-        verify(notificationClient, never()).sendPrecompiledLetterWithInputStream(any(), any());
+        verify(notificationClient, atLeastOnce()).sendPrecompiledLetterWithInputStream(any(), any());
     }
 
     @Test

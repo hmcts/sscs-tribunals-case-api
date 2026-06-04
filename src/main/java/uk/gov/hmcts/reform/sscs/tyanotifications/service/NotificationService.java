@@ -16,6 +16,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.getSubscription;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.isOkToSendNotification;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationValidService.isMandatoryLetterEventType;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isBenefitTypeChildSupportOrUc;
 
 import java.time.ZonedDateTime;
 import java.util.Arrays;
@@ -139,7 +140,7 @@ public class NotificationService {
 
     private boolean shouldNotifyAppellantAboutAdditionalOtherParty(final NotificationWrapper notificationWrapper) {
         if (!cmOtherPartyConfidentialityEnabled
-            || !notificationWrapper.getNewSscsCaseData().isBenefitType(CHILD_SUPPORT)
+            || !isBenefitTypeChildSupportOrUc(notificationWrapper.getNewSscsCaseData())
             || !notificationWrapper.getNotificationType().equals(UPDATE_OTHER_PARTY_DATA)
             || emptyIfNull(notificationWrapper.getNewSscsCaseData().getOtherParties()).size() < MINIMUM_NUMBER_OTHER_PARTIES) {
             return false;
@@ -336,15 +337,6 @@ public class NotificationService {
 
     private boolean isEventAllowedToProceedWithValidData(NotificationWrapper notificationWrapper,
                                                          NotificationEventType notificationType) {
-        SscsCaseData newCaseData = notificationWrapper.getNewSscsCaseData();
-        if (UPDATE_OTHER_PARTY_DATA.equals(notificationType)
-            && cmOtherPartyConfidentialityEnabled
-            && (newCaseData.isBenefitType(CHILD_SUPPORT) || newCaseData.isBenefitType(UC))) {
-            String benefitType = newCaseData.isBenefitType(CHILD_SUPPORT) ? CHILD_SUPPORT.getShortName() : UC.getShortName();
-            log.info("Suppressing HEF notification for {} case id {}.", benefitType, notificationWrapper.getCaseId());
-            return false;
-        }
-
         if (REQUEST_FOR_INFORMATION.equals(notificationType)
             && !isYes(notificationWrapper.getNewSscsCaseData().getInformationFromAppellant())) {
             log.info("Request for Information with empty or no Information From Appellant for ccdCaseId {}.",

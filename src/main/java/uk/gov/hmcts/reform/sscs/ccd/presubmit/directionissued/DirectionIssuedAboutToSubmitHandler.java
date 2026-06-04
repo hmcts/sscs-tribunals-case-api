@@ -22,6 +22,7 @@ import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.TCW;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.APPELLANT;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isConfidential;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -269,6 +270,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             && isConfidentialityDirection(caseData.getDirectionTypeDl().getValue().getCode())
             && isBenefitTypeWithConfidentialityTab(caseData)) {
             applyConfidentialityDecisionFromDirection(caseData);
+            caseData.setIsConfidentialCase(isConfidential(caseData, cmOtherPartyConfidentialityEnabled));
             caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION);
         } else {
             caseData.setInterlocReviewState(null);
