@@ -163,6 +163,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.EVIDENCE_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.JUDGE_DECISION_APPEAL_TO_PROCEED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.NOTIFY_APPELLANT_VALID_APPEAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.NOTIFY_APPELLANT_VALID_APPEAL_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.OTHER_PARTY_ADDED_TO_APPEAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PERMISSION_TO_APPEAL_REFUSED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.REVIEW_AND_SET_ASIDE;
@@ -946,8 +947,13 @@ public class Personalisation<E extends NotificationWrapper> {
             if (DIRECTION_ISSUED.equals(notificationEventType) || DIRECTION_ISSUED_WELSH.equals(notificationEventType)) {
                 return getSubscriptionTemplateNameWithDirection(notificationEventType, directionType, subscriptionType);
             }
-            if (NOTIFY_APPELLANT_VALID_APPEAL.equals(notificationEventType) && DirectionType.APPEAL_TO_PROCEED.toString().equals(directionType)) {
-                return getSubscriptionTemplateNameWithDirection(notificationEventType, "appealToProceedNotifyValidAppeal", subscriptionType);
+            if (DirectionType.APPEAL_TO_PROCEED.toString().equals(directionType)) {
+                if (NOTIFY_APPELLANT_VALID_APPEAL.equals(notificationEventType)) {
+                    return getSubscriptionTemplateNameWithDirection(notificationEventType, "appealToProceedNotifyValidAppeal", subscriptionType);
+                }
+                if (NOTIFY_APPELLANT_VALID_APPEAL_WELSH.equals(notificationEventType)) {
+                    return getSubscriptionTemplateNameWithDirection(notificationEventType, "appealToProceedNotifyValidAppealWelsh", subscriptionType);
+                }
             }
         }
 

@@ -134,6 +134,13 @@ public class NotificationService {
             log.info("Trigger second notification event for {} with {}", DIRECTION_ISSUED.getId(), DirectionType.APPEAL_TO_PROCEED.getLabel());
             notificationWrapper.getSscsCaseDataWrapper().setNotificationEventType(NOTIFY_APPELLANT_VALID_APPEAL);
             sendNotificationPerSubscription(notificationWrapper);
+        } else if (cmOtherPartyConfidentialityEnabled
+            && notificationWrapper.getNotificationType().equals(DIRECTION_ISSUED_WELSH)
+            && notificationWrapper.getSscsCaseDataWrapper().getNewSscsCaseData().isBenefitType(CHILD_SUPPORT)
+            && isAppealToProceed(notificationWrapper)) {
+            log.info("Trigger second notification event for {} with {}", DIRECTION_ISSUED_WELSH.getId(), DirectionType.APPEAL_TO_PROCEED.getLabel());
+            notificationWrapper.getSscsCaseDataWrapper().setNotificationEventType(NOTIFY_APPELLANT_VALID_APPEAL_WELSH);
+            sendNotificationPerSubscription(notificationWrapper);
         }
     }
 

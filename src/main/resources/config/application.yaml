@@ -1403,7 +1403,7 @@ notification:
                     docmosisId: TB-SCS-GNO-WEL-00590-v3.docx
                 other_party:
                     docmosisId: TB-SCS-GNO-WEL-00590-v3.docx
-            appealToProceedNotifyValidAppeal:
+            appealToProceedNotifyValidAppealWelsh:
                 appellant:
                     docmosisId: TB-SCS-GNO-WEL-Acknowledgment-of-Appeal.docx
                 appointee:
@@ -1957,7 +1957,7 @@ pdf-service:
             libertyToApplyRefused: 'TB-SCS-GNO-WEL-00479.docx'
             interlocValidAppeal: 'TB-SCS-GNO-WEL-00479.docx'
             validAppeal: 'TB-SCS-GNO-WEL-00479.docx'
-            appealToProceedNotifyValidAppeal: 'TB-SCS-GNO-WEL-00479.docx'
+            appealToProceedNotifyValidAppealWelsh: 'TB-SCS-GNO-WEL-00479.docx'
             addOtherPartyData: 'TB-SCS-GNO-WEL-00479.docx'
 
 text:
