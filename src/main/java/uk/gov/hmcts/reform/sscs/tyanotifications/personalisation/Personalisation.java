@@ -14,7 +14,6 @@ import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getBenefitByCodeOrThrowException;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getLongBenefitNameDescriptionWithOptionalAcronym;
@@ -175,6 +174,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getN
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.hasAppointee;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.hasJointParty;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.hasRepresentative;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isBenefitTypeChildSupportOrUc;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -475,7 +475,7 @@ public class Personalisation<E extends NotificationWrapper> {
 
         setConfidentialFields(ccdResponse, subscriptionWithType, personalisation, responseWrapper.getState());
         if (cmOtherPartyConfidentialityEnabled
-            && ccdResponse.isBenefitType(CHILD_SUPPORT)
+            && (isBenefitTypeChildSupportOrUc(ccdResponse))
             && OTHER_PARTY_ADDED_TO_APPEAL.equals(responseWrapper.getNotificationEventType())) {
             setOtherPartyConfidentialityFields(ccdResponse, ccdResponsePrevious, personalisation);
         }

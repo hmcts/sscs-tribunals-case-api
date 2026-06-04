@@ -17,6 +17,7 @@ import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.otherPartyWantsTo
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.roleAbsentForOtherParties;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.roleExistsForOtherParties;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.sendNewOtherPartyNotification;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isBenefitTypeChildSupportOrUc;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,7 +81,7 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
 
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         sscsCaseData.setOtherPartyUcb(getOtherPartyUcb(sscsCaseData.getOtherParties()));
-        sscsCaseData.setIsConfidentialCase(isConfidential(sscsCaseData));
+        sscsCaseData.setIsConfidentialCase(isConfidential(sscsCaseData, cmOtherPartyConfidentialityEnabled));
         sscsCaseData.getOtherParties().forEach(otherPartyCcdValue -> otherPartyCcdValue.getValue()
                 .setSendNewOtherPartyNotification(sendNewOtherPartyNotification(otherPartyCcdValue)));
         sscsCaseData.setOtherParties(clearOtherPartiesIfEmpty(sscsCaseData));
@@ -114,7 +115,8 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
             response.addError(ERR_ROLE_REQUIRED);
         }
 
-        if (cmOtherPartyConfidentialityEnabled && sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT)) {
+        if (cmOtherPartyConfidentialityEnabled
+                && (isBenefitTypeChildSupportOrUc(sscsCaseData))) {
             sscsCaseData.setDirectionDueDate(now().plusDays(getHearingResponseExpectedByDays()).toString());
             sscsCaseData.setInterlocReviewState(InterlocReviewState.HEF_ISSUED);
         }
