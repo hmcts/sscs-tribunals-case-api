@@ -33,6 +33,7 @@ import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getPostHearingReviewDocumen
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getSscsType;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getWriteFinalDecisionDocumentType;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleIbcaCase;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isBenefitTypeChildSupportOrUc;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.updateHearingChannel;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.updateHearingInterpreter;
 
@@ -948,5 +949,12 @@ class SscsUtilTest {
         caseData.setAdjournment(adjournment);
         String hearingType = "oral";
         assertFalse(SscsUtil.hasChannelChangedForAdjournment(caseData, hearingType));
+    }
+
+    @ParameterizedTest
+    @CsvSource({"UC, True", "childSupport, True", "PIP, False", "ESA, False"})
+    void givenBenefitType_isBenefitTypeChildSupportOrUcReturnsCorrectValue(String benefitCode, Boolean expectedValue) {
+        SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefitCode).build()).build()).build();
+        assertThat(isBenefitTypeChildSupportOrUc(sscsCaseData)).isEqualTo(expectedValue);
     }
 }

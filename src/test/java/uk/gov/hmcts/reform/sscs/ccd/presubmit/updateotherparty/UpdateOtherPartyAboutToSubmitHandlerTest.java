@@ -600,10 +600,44 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
 
 
     @Test
-    void givenCmConfidentialityEnabledAndChildSupportBenefit_thenDirectionDueDateAndInterlocSet() {
+    void givenUcCaseWithConfidentialOtherPartyAndCmFlagOn_thenIsConfidentialCaseSetToYes() {
         final UpdateOtherPartyAboutToSubmitHandler handlerWithFlag = new UpdateOtherPartyAboutToSubmitHandler(idamService, true);
         final SscsCaseData caseData = SscsCaseData.builder()
-            .appeal(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build()).build())
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build())
+            .otherParties(singletonList(buildOtherParty("Yes", YES)))
+            .build();
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response =
+            handlerWithFlag.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getIsConfidentialCase()).isEqualTo(YES);
+    }
+
+    @Test
+    void givenUcCaseWithAllNonConfidentialPartiesAndCmFlagOn_thenIsConfidentialCaseNotSet() {
+        final UpdateOtherPartyAboutToSubmitHandler handlerWithFlag = new UpdateOtherPartyAboutToSubmitHandler(idamService, true);
+        final SscsCaseData caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build())
+            .otherParties(singletonList(buildOtherParty("Yes", NO)))
+            .build();
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response =
+            handlerWithFlag.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getIsConfidentialCase()).isNull();
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "childSupport",
+        "UC"
+    })
+    void givenCmConfidentialityEnabledAndChildSupportOrUcBenefit_thenDirectionDueDateAndInterlocSet(String benefitType) {
+        final UpdateOtherPartyAboutToSubmitHandler handlerWithFlag = new UpdateOtherPartyAboutToSubmitHandler(idamService, true);
+        final SscsCaseData caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefitType).build()).build())
             .otherParties(singletonList(buildSscs5OtherParty(ID_1, "PayingParent")))
             .build();
         when(caseDetails.getCaseData()).thenReturn(caseData);

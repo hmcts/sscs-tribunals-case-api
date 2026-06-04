@@ -1,18 +1,29 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.config;
 
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference.ENGLISH;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference.WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.UPDATE_OTHER_PARTY_DATA;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.VALID_APPEAL_CREATED;
 
 import jakarta.validation.constraints.NotNull;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
+import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Link;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Template;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
@@ -143,6 +154,14 @@ public class NotificationConfig {
                 .getNewSscsCaseData()
                 .isBenefitType(CHILD_SUPPORT))
                 || (!cmOtherPartyConfidentialityEnabled && VALID_APPEAL_CREATED.equals(notificationWrapper.getNotificationType()))) {
+                docmosisTemplateId = null;
+            }
+            if (cmOtherPartyConfidentialityEnabled
+                && (notificationWrapper.getNewSscsCaseData().isBenefitType(UC)
+                || notificationWrapper.getNewSscsCaseData().isBenefitType(CHILD_SUPPORT))
+                && (UPDATE_OTHER_PARTY_DATA
+                == notificationWrapper.getNotificationType())
+                && "updateOtherPartyData.other_party".equals(docmosisTemplateName)) {
                 docmosisTemplateId = null;
             }
         }
