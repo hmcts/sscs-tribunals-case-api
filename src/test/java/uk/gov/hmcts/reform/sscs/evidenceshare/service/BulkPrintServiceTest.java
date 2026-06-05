@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -50,6 +51,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
@@ -354,6 +356,24 @@ class BulkPrintServiceTest {
             assertThat(merged.getNumberOfPages()).isEqualTo(3);
         }
     }
+
+    @Test
+    void sendIssueGenericLetterToBulkPrint_returnsIdAndStoresNotificationLetter() throws IOException {
+        when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), captor.capture())).thenReturn(new SendLetterResponse(LETTER_ID));
+        Optional<UUID> id = bulkPrintService.sendIssueGenericLetterToBulkPrint(234, SSCS_CASE_DATA, PDF_LIST, EventType.ISSUE_GENERIC_LETTER, "appellant");
+        assertThat(id).isEqualTo(Optional.of(LETTER_ID));
+        verify(ccdNotificationService, times(1)).storeNotificationLetterIntoCcd(any(), any(), any(), any());
+    }
+
+    @Test
+    void sendIssueGenericLetterToBulkPrint() {
+        BulkPrintService notEnabledBulkPrint = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper, false, 1,
+                ccdNotificationService);
+        Optional<UUID> id = notEnabledBulkPrint.sendIssueGenericLetterToBulkPrint(234, SSCS_CASE_DATA, PDF_LIST, EventType.ISSUE_GENERIC_LETTER, "appellant");
+        assertThat(id).isEqualTo(Optional.empty());
+        verifyNoInteractions(ccdNotificationService);
+    }
+
 
     @ParameterizedTest
     @NullAndEmptySource
