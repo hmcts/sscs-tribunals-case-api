@@ -338,11 +338,21 @@ class BulkPrintServiceTest {
     }
 
     @Test
-    void testmergePdfs(){
+    void mergePdfsIntoLetter_ReturnsDocument() {
         final byte[] result = bulkPrintService.mergePdfsIntoLetter(PDF_LIST);
-
         assertThat(result).isNotNull();
         assertThat(result.length).isEqualTo("myData".getBytes().length);
+    }
+
+    @Test
+    void mergePdfsIntoLetter_returnsDocumentOfCorrectSize() throws IOException {
+        final byte[] firstDocument = createPdf(2);
+        final byte[] secondDocument = createPdf(1);
+        final byte[] result = bulkPrintService.mergePdfsIntoLetter(List.of(new Pdf(firstDocument, "file.pdf"), new Pdf(secondDocument, "file2.pdf")));
+        assertThat(result).isNotNull();
+        try (PDDocument merged = Loader.loadPDF(result)) {
+            assertThat(merged.getNumberOfPages()).isEqualTo(3);
+        }
     }
 
     @ParameterizedTest
