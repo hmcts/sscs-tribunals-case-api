@@ -337,6 +337,14 @@ class BulkPrintServiceTest {
         assertThat(captor.getValue().getAdditionalData()).containsEntry("isIbca", isIbca);
     }
 
+    @Test
+    void testmergePdfs(){
+        final byte[] result = bulkPrintService.mergePdfsIntoLetter(PDF_LIST);
+
+        assertThat(result).isNotNull();
+        assertThat(result.length).isEqualTo("myData".getBytes().length);
+    }
+
     @ParameterizedTest
     @NullAndEmptySource
     void buildBundledLetter_nullList_throwsBulkPrintException(List<byte[]> documents) {

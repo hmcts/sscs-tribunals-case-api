@@ -112,17 +112,16 @@ public class BulkPrintService implements PrintService {
         Optional<UUID> id = sendToBulkPrint(pdfs, caseData, recipient);
 
         if (id.isPresent()) {
-            ccdNotificationService.storeNotificationLetterIntoCcd(eventType, mergePdfs(pdfs), caseId, recipient);
-            log.info("Letter was sent for event {} and case {}, send-letter-service id {}", eventType.getCcdType(), caseId, id.get());
+            ccdNotificationService.storeNotificationLetterIntoCcd(eventType, mergePdfsIntoLetter(pdfs), caseId, recipient);
+            log.info("Issue Generic Letter was sent for event {} and case {}, send-letter-service id {}", eventType.getCcdType(), caseId, id.get());
         } else {
-            log.error("Failed to send to bulk print for case {}. No print id returned", caseId);
+            log.error("Failed to send to bulk print for Issue Generic Letter for case {}. No print id returned", caseId);
         }
 
         return id;
     }
 
-    public byte[] mergePdfs(List<Pdf> pdfs) {
-        log.info("merging issue generic letter pdfs");
+    public byte[] mergePdfsIntoLetter(List<Pdf> pdfs) {
         List<byte[]> pdfDocuments = new ArrayList<>();
         for (Pdf pdf : pdfs) {
             pdfDocuments.add(pdf.getContent());
