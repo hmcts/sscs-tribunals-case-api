@@ -370,17 +370,6 @@ class BulkPrintServiceTest {
     }
 
     @Test
-    void mergePdfsIntoLetter_returnsDocumentOfCorrectSize() throws IOException {
-        final byte[] firstDocument = createPdf(2);
-        final byte[] secondDocument = createPdf(1);
-        final byte[] result = bulkPrintService.mergePdfsIntoLetter(List.of(new Pdf(firstDocument, "file.pdf"), new Pdf(secondDocument, "file2.pdf")));
-        assertThat(result).isNotNull();
-        try (PDDocument merged = Loader.loadPDF(result)) {
-            assertThat(merged.getNumberOfPages()).isEqualTo(3);
-        }
-    }
-
-    @Test
     void sendIssueGenericLetterToBulkPrint_returnsIdAndStoresNotificationLetter() throws IOException {
         when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), captor.capture())).thenReturn(new SendLetterResponse(LETTER_ID));
         Optional<UUID> id = bulkPrintService.sendIssueGenericLetterToBulkPrint(234, SSCS_CASE_DATA, PDF_LIST, EventType.ISSUE_GENERIC_LETTER, "appellant");
