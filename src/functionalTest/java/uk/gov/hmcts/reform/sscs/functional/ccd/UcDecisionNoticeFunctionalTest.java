@@ -362,7 +362,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("6. The appellant meets the severe conditions criteria because they will constantly meet a Schedule 7 descriptor, and they have a lifelong condition with no realistic prospect of recovery of function."));
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else"));
-            assertThat(pdfTextWithoutNewLines, containsString("9. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative did not attend."));
+            assertThat(pdfTextWithoutNewLines, containsString("9. This has been a remote hearing in the form of a telephone hearing. The following people attended: Joe Bloggs the appellant. A representative from the First Tier Agency did not attend. The Tribunal considered the appeal bundle to page B7."));
             assertThat(pdfTextWithoutNewLines, containsString("10. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal makes no recommendation as to when the Department should reassess Joe Bloggs."));
             assertThat(pdfTextWithoutNewLines, not(containsString("11.")));
         }
