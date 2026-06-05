@@ -345,7 +345,7 @@ class BulkPrintServiceTest {
         final byte[] secondDocument = createPdf(2);
         final byte[] thirdDocument = createPdf(1);
         final byte[] result = bulkPrintService.buildBundledLetterFromPdfs(List.of(new Pdf(firstDocument, "file.pdf"),
-                new Pdf(secondDocument, "file2.pdf"), new Pdf(thirdDocument, "file3.pdf")));
+            new Pdf(secondDocument, "file2.pdf"), new Pdf(thirdDocument, "file3.pdf")));
         assertThat(result).isNotNull();
         try (PDDocument merged = Loader.loadPDF(result)) {
             assertThat(merged.getNumberOfPages()).isEqualTo(5);
@@ -367,6 +367,17 @@ class BulkPrintServiceTest {
         Optional<UUID> id = notEnabledBulkPrint.sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(234, SSCS_CASE_DATA, PDF_LIST, EventType.ISSUE_GENERIC_LETTER, "appellant");
         assertThat(id).isEqualTo(Optional.empty());
         verifyNoInteractions(ccdNotificationService);
+    }
+
+    @Test
+    void mergePdfsIntoLetter_returnsDocumentOfCorrectSize() throws IOException {
+        final byte[] firstDocument = createPdf(2);
+        final byte[] secondDocument = createPdf(1);
+        final byte[] result = bulkPrintService.mergePdfsIntoLetter(List.of(new Pdf(firstDocument, "file.pdf"), new Pdf(secondDocument, "file2.pdf")));
+        assertThat(result).isNotNull();
+        try (PDDocument merged = Loader.loadPDF(result)) {
+            assertThat(merged.getNumberOfPages()).isEqualTo(3);
+        }
     }
 
     @ParameterizedTest
