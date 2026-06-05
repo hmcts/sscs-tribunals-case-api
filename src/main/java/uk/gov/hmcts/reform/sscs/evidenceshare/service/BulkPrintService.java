@@ -178,11 +178,12 @@ public class BulkPrintService implements PrintService {
     }
 
     public byte[] buildBundledLetter(List<byte[]> documents) {
-        log.info("Building bundled letter with {} documents", documents.size());
         if (isEmpty(documents)) {
             log.error("Failed to merge documents: document list is empty");
             throw new BulkPrintException("Failed to merge documents: document list is empty");
         }
+
+        log.info("Building bundled letter with {} documents", documents.size());
 
         if (documents.size() == 1) {
             return documents.getFirst();
