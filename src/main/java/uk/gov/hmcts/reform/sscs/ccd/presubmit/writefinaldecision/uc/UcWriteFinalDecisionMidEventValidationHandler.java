@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import jakarta.validation.Validator;
@@ -76,6 +77,17 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
             if (hasSvIssueCode(sscsCaseData) && !isFinalDecisionDateOfDecisionBlankOrAfterSvStartDate(sscsCaseData)) {
                 preSubmitCallbackResponse.addError("You cannot write decision notice until resolved. Please ask admin to amend issue code to WC or SG and then proceed.");
             }
+            YesNo ucSevereCriteriaApplies = sscsCaseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply();
+            if (hasSvIssueCode(sscsCaseData) && nonNull(ucSevereCriteriaApplies)) {
+                String decision = sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAllowedOrRefused();
+                if ("allowed".equals(decision) && !YesNo.isYes(ucSevereCriteriaApplies)) {
+                    preSubmitCallbackResponse.addError(SV_ALLOWED_APPEAL_ERROR_MESSAGE);
+                }
+                if ("refused".equals(decision) && YesNo.isYes(ucSevereCriteriaApplies)) {
+                    preSubmitCallbackResponse.addError(SV_REFUSED_APPEAL_ERROR_MESSAGE);
+                }
+            }
+
         }
 
         if ("Yes".equalsIgnoreCase(sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionSchedule7ActivitiesApply())) {
