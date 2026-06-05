@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
-import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -77,12 +76,12 @@ class IssueGenericLetterHandlerTest {
     @Captor
     ArgumentCaptor<String> argumentCaptor;
 
-    private final Map<LanguagePreference, Map<String, Map<String, String>>> template = new HashMap<>();
+    private Map<LanguagePreference, Map<String, Map<String, String>>> template = new HashMap<>();
 
     private byte[] letter = new byte[1];
 
     @BeforeEach
-    void setup() {
+    public void setup() {
         Map<String, String> nameMap = new HashMap<>();
         nameMap.put("name", "TB-SCS-LET-ENG-Issue-Generic-Letter.docx");
         nameMap.put("cover", "TB-SCS-LET-ENG-Cover-Sheet.docx");
@@ -168,7 +167,7 @@ class IssueGenericLetterHandlerTest {
 
         handler.handle(SUBMITTED, callback);
 
-        verify(bulkPrintService, times(5)).sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(eq(callback.getCaseDetails().getId()),
+        verify(bulkPrintService, times(5)).sendIssueGenericLetterToBulkPrint(eq(callback.getCaseDetails().getId()),
             eq(caseData), any(), eq(ISSUE_GENERIC_LETTER),
             argumentCaptor.capture());
         Assertions.assertEquals(argumentCaptor.getAllValues(), List.of("User Test", "Wendy Giles", "Joint Party", "Other Party", "OPRepFirstName OPRepLastName"));
@@ -204,7 +203,7 @@ class IssueGenericLetterHandlerTest {
 
         handler.handle(SUBMITTED, callback);
 
-        verify(bulkPrintService, times(5)).sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(eq(callback.getCaseDetails().getId()),
+        verify(bulkPrintService, times(5)).sendIssueGenericLetterToBulkPrint(eq(callback.getCaseDetails().getId()),
             eq(caseData), any(), eq(ISSUE_GENERIC_LETTER),
             argumentCaptor.capture());
         Assertions.assertEquals(argumentCaptor.getAllValues(), List.of("User Test", "Wendy Giles", "Joint Party", "Other Party", "OPRepFirstName OPRepLastName"));
@@ -254,7 +253,7 @@ class IssueGenericLetterHandlerTest {
         handler.handle(SUBMITTED, callback);
 
         verify(ccdNotificationService, times(0)).storeNotificationLetterIntoCcd(any(), any(), any(), any());
-        verify(bulkPrintService, times(2)).sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(eq(callback.getCaseDetails().getId()),
+        verify(bulkPrintService, times(2)).sendIssueGenericLetterToBulkPrint(eq(callback.getCaseDetails().getId()),
             eq(caseData), any(), eq(ISSUE_GENERIC_LETTER),
             argumentCaptor.capture());
         Assertions.assertEquals(argumentCaptor.getAllValues(), List.of("User Test", "Wendy Giles"));
@@ -268,8 +267,7 @@ class IssueGenericLetterHandlerTest {
         caseData.setSendToOtherParties(YesNo.NO);
         caseData.setSendToRepresentative(YesNo.NO);
 
-        byte[] pdfBytes = IOUtils.toByteArray(
-            requireNonNull(getClass().getClassLoader().getResourceAsStream("myPdf.pdf")));
+        byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("myPdf.pdf"));
         when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(pdfBytes);
         when(coverLetterService.generateCoverSheet(anyString(), anyString(), any())).thenReturn(pdfBytes);
 
@@ -277,7 +275,7 @@ class IssueGenericLetterHandlerTest {
 
         handler.handle(SUBMITTED, callback);
 
-        verify(bulkPrintService, times(1)).sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(eq(callback.getCaseDetails().getId()),
+        verify(bulkPrintService, times(1)).sendIssueGenericLetterToBulkPrint(eq(callback.getCaseDetails().getId()),
             eq(caseData), any(), eq(ISSUE_GENERIC_LETTER),
             argumentCaptor.capture());
         Assertions.assertEquals(argumentCaptor.getAllValues(), List.of("User Test"));
