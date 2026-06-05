@@ -124,21 +124,12 @@ public class BulkPrintService implements PrintService {
     }
 
     public byte[] mergePdfs(List<Pdf> pdfs) {
-        PDFMergerUtility merger = new PDFMergerUtility();
-
-        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-
+        log.info("merging issue generic letter pdfs");
+        List<byte[]> pdfDocuments = new ArrayList<>();
             for (Pdf pdf : pdfs) {
-                merger.addSource(new ByteArrayInputStream(pdf.getContent()).toString());
+                pdfDocuments.add(pdf.getContent());
             }
-
-            merger.setDestinationStream(outputStream);
-            merger.mergeDocuments(IOUtils.createMemoryOnlyStreamCache());
-
-            return outputStream.toByteArray();
-        } catch (IOException e) {
-            throw new IllegalStateException("Failed to merge PDFs", e);
-        }
+        return buildBundledLetter(pdfDocuments);
     }
 
     public byte[] buildBundledLetter(byte[] coverSheet, byte[] letter) {
@@ -166,6 +157,7 @@ public class BulkPrintService implements PrintService {
     }
 
     public byte[] buildBundledLetter(List<byte[]> documents) {
+        log.info("Building bundled letter with {} documents", documents.size());
         if (isEmpty(documents)) {
             log.error("Failed to merge documents: document list is empty");
             throw new BulkPrintException("Failed to merge documents: document list is empty");
