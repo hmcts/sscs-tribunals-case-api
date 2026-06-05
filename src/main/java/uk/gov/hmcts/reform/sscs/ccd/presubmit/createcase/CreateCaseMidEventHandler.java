@@ -27,11 +27,9 @@ import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
 @Slf4j
 public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    static final String IBCA_REFERENCE_EMPTY_ERROR =
-            "An IBCA reference is required to update this case. The IBCA Reference format is exactly 6 characters (numbers and letters only) e.g. E24A45.";
+    static final String IBCA_REFERENCE_EMPTY_ERROR = "An IBCA reference is required to update this case";
 
-    static final String IBCA_REFERENCE_VALIDATION_ERROR =
-            "The IBCA reference must be exactly 6 characters (numbers and letters only) e.g. E24A45.";
+    static final String IBCA_REFERENCE_VALIDATION_ERROR = "An IBCA reference must be 6 characters";
 
     private static final String HEARING_ROUTE_ERROR_MESSAGE = "Hearing route must be List Assist";
 
