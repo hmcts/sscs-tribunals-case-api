@@ -1182,6 +1182,11 @@ notification:
             docmosisId: TB-SCS-LET-WEL-Action-Further-Evidence-v2.docx
         addOtherPartyData:
             docmosisId: TB-SCS-GNO-WEL-other-party-added-to-appeal.docx
+        otherPartyAddedToAppeal:
+          appellant:
+            docmosisId: TB-SCS-GNO-WEL-addition-of-other-party-to-appeal.docx
+          appointee:
+            docmosisId: TB-SCS-GNO-WEL-addition-of-other-party-to-appeal.docx
         reviewAndSetAside:
             docmosisId: TB-SCS-LET-WEL-Permission-to-Appeal-Review-v2.docx
         permissionToAppealRefused:
@@ -1945,6 +1950,7 @@ pdf-service:
             libertyToApplyGranted: 'TB-SCS-GNO-WEL-00479.docx'
             libertyToApplyRefused: 'TB-SCS-GNO-WEL-00479.docx'
             addOtherPartyData: 'TB-SCS-GNO-WEL-00479.docx'
+            otherPartyAddedToAppeal: 'TB-SCS-GNO-WEL-00479.docx'
 
 text:
     personalisation:
