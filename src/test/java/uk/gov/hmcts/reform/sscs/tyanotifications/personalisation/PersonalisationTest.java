@@ -17,6 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.PIP;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getLongBenefitNameDescriptionWithOptionalAcronym;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
@@ -157,6 +158,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.LIBERTY_TO_APPLY_GRANTED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.LIBERTY_TO_APPLY_REFUSED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.NOTIFY_APPELLANT_VALID_APPEAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.NOTIFY_APPELLANT_VALID_APPEAL_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.OTHER_PARTY_ADDED_TO_APPEAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PERMISSION_TO_APPEAL_GRANTED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PERMISSION_TO_APPEAL_REFUSED;
@@ -540,6 +542,35 @@ class PersonalisationTest {
             eq(NOTIFY_APPELLANT_VALID_APPEAL.getId()),
             eq(NOTIFY_APPELLANT_VALID_APPEAL.getId()),
             eq(NOTIFY_APPELLANT_VALID_APPEAL.getId()),
+            eq(expectedDocmosisTemplate),
+            any(Benefit.class), any(NotificationWrapper.class), eq(null)
+        );
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "APPELLANT, directionIssuedWelsh.appealToProceedNotifyValidAppeal.appellant",
+        "APPOINTEE, directionIssuedWelsh.appealToProceedNotifyValidAppeal.appointee"
+    })
+    void whenNotifyAppellantValidAppealInWelshWithAppealToProceedDirection_shouldGenerateDocmosisTemplateUnderValidAppeal(
+        SubscriptionType subscriptionType, String expectedDocmosisTemplate) {
+
+        final NotificationWrapper notificationWrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
+                                                                                                                  .newSscsCaseData(SscsCaseData.builder()
+                                                                                                                                               .directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()))
+                                                                                                                                               .appeal(Appeal.builder()
+                                                                                                                                                             .hearingType(ONLINE.getValue())
+                                                                                                                                                             .build())
+                                                                                                                                               .build())
+                                                                                                                  .notificationEventType(NOTIFY_APPELLANT_VALID_APPEAL_WELSH)
+                                                                                                                  .build());
+
+        personalisation.getTemplate(notificationWrapper, CHILD_SUPPORT, subscriptionType);
+
+        verify(config).getTemplate(
+            eq(NOTIFY_APPELLANT_VALID_APPEAL_WELSH.getId()),
+            eq(NOTIFY_APPELLANT_VALID_APPEAL_WELSH.getId()),
+            eq(NOTIFY_APPELLANT_VALID_APPEAL_WELSH.getId()),
             eq(expectedDocmosisTemplate),
             any(Benefit.class), any(NotificationWrapper.class), eq(null)
         );

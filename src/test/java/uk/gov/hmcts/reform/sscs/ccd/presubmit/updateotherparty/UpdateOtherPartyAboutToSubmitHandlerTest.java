@@ -598,14 +598,13 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
         assertThat(response.getErrors()).containsExactly("Unavailability start date must be before end date");
     }
 
-
     @Test
     void givenUcCaseWithConfidentialOtherPartyAndCmFlagOn_thenIsConfidentialCaseSetToYes() {
         final UpdateOtherPartyAboutToSubmitHandler handlerWithFlag = new UpdateOtherPartyAboutToSubmitHandler(idamService, true);
         final SscsCaseData caseData = SscsCaseData.builder()
-            .appeal(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build())
-            .otherParties(singletonList(buildOtherParty("Yes", YES)))
-            .build();
+                                                  .appeal(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build())
+                                                  .otherParties(singletonList(buildOtherParty("Yes", YES)))
+                                                  .build();
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
         final PreSubmitCallbackResponse<SscsCaseData> response =
@@ -618,9 +617,9 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
     void givenUcCaseWithAllNonConfidentialPartiesAndCmFlagOn_thenIsConfidentialCaseNotSet() {
         final UpdateOtherPartyAboutToSubmitHandler handlerWithFlag = new UpdateOtherPartyAboutToSubmitHandler(idamService, true);
         final SscsCaseData caseData = SscsCaseData.builder()
-            .appeal(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build())
-            .otherParties(singletonList(buildOtherParty("Yes", NO)))
-            .build();
+                                                  .appeal(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build())
+                                                  .otherParties(singletonList(buildOtherParty("Yes", NO)))
+                                                  .build();
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
         final PreSubmitCallbackResponse<SscsCaseData> response =
