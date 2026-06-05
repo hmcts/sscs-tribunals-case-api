@@ -93,7 +93,7 @@ class IssueGenericLetterHandlerTest {
         docmosisTemplateConfig.setTemplate(template);
 
         handler = new IssueGenericLetterHandler(bulkPrintService, genericLetterPlaceholderService, coverLetterService,
-            docmosisTemplateConfig, true);
+            docmosisTemplateConfig);
     }
 
     @Test
@@ -112,19 +112,6 @@ class IssueGenericLetterHandlerTest {
         Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder().build(),
             READY_TO_LIST,
             DECISION_ISSUED);
-
-        boolean result = handler.canHandle(SUBMITTED, callback);
-
-        Assertions.assertFalse(result);
-    }
-
-    @Test
-    void shouldReturnFalse_givenFeatureFlagIsFalse() {
-        Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder().build(),
-            READY_TO_LIST,
-            ISSUE_GENERIC_LETTER);
-        handler = new IssueGenericLetterHandler(bulkPrintService, genericLetterPlaceholderService, coverLetterService,
-            null, false);
 
         boolean result = handler.canHandle(SUBMITTED, callback);
 
@@ -180,7 +167,7 @@ class IssueGenericLetterHandlerTest {
 
         handler.handle(SUBMITTED, callback);
 
-        verify(bulkPrintService, times(5)).sendToBulkPrint(eq(callback.getCaseDetails().getId()),
+        verify(bulkPrintService, times(5)).sendIssueGenericLetterToBulkPrint(eq(callback.getCaseDetails().getId()),
             eq(caseData), any(), eq(ISSUE_GENERIC_LETTER),
             argumentCaptor.capture());
         Assertions.assertEquals(argumentCaptor.getAllValues(), List.of("User Test", "Wendy Giles", "Joint Party", "Other Party", "OPRepFirstName OPRepLastName"));
@@ -216,7 +203,7 @@ class IssueGenericLetterHandlerTest {
 
         handler.handle(SUBMITTED, callback);
 
-        verify(bulkPrintService, times(5)).sendToBulkPrint(eq(callback.getCaseDetails().getId()),
+        verify(bulkPrintService, times(5)).sendIssueGenericLetterToBulkPrint(eq(callback.getCaseDetails().getId()),
             eq(caseData), any(), eq(ISSUE_GENERIC_LETTER),
             argumentCaptor.capture());
         Assertions.assertEquals(argumentCaptor.getAllValues(), List.of("User Test", "Wendy Giles", "Joint Party", "Other Party", "OPRepFirstName OPRepLastName"));
@@ -266,7 +253,7 @@ class IssueGenericLetterHandlerTest {
         handler.handle(SUBMITTED, callback);
 
         verify(ccdNotificationService, times(0)).storeNotificationLetterIntoCcd(any(), any(), any(), any());
-        verify(bulkPrintService, times(2)).sendToBulkPrint(eq(callback.getCaseDetails().getId()),
+        verify(bulkPrintService, times(2)).sendIssueGenericLetterToBulkPrint(eq(callback.getCaseDetails().getId()),
             eq(caseData), any(), eq(ISSUE_GENERIC_LETTER),
             argumentCaptor.capture());
         Assertions.assertEquals(argumentCaptor.getAllValues(), List.of("User Test", "Wendy Giles"));
@@ -288,7 +275,7 @@ class IssueGenericLetterHandlerTest {
 
         handler.handle(SUBMITTED, callback);
 
-        verify(bulkPrintService, times(1)).sendToBulkPrint(eq(callback.getCaseDetails().getId()),
+        verify(bulkPrintService, times(1)).sendIssueGenericLetterToBulkPrint(eq(callback.getCaseDetails().getId()),
             eq(caseData), any(), eq(ISSUE_GENERIC_LETTER),
             argumentCaptor.capture());
         Assertions.assertEquals(argumentCaptor.getAllValues(), List.of("User Test"));

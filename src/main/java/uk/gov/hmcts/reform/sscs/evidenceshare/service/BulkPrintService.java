@@ -5,6 +5,7 @@ import static java.util.Base64.getEncoder;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.io.IOUtils;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -106,6 +108,37 @@ public class BulkPrintService implements PrintService {
         }
 
         return id;
+    }
+
+    public Optional<UUID> sendIssueGenericLetterToBulkPrint(long caseId, SscsCaseData caseData, List<Pdf> pdfs, EventType eventType, String recipient) {
+        Optional<UUID> id = sendToBulkPrint(pdfs, caseData, recipient);
+
+        if (id.isPresent()) {
+            ccdNotificationService.storeNotificationLetterIntoCcd(eventType, mergePdfs(pdfs), caseId, recipient);
+            log.info("Letter was sent for event {} and case {}, send-letter-service id {}", eventType.getCcdType(), caseId, id.get());
+        } else {
+            log.error("Failed to send to bulk print for case {}. No print id returned", caseId);
+        }
+
+        return id;
+    }
+
+    public byte[] mergePdfs(List<Pdf> pdfs) {
+        PDFMergerUtility merger = new PDFMergerUtility();
+
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+            for (Pdf pdf : pdfs) {
+                merger.addSource(new ByteArrayInputStream(pdf.getContent()).toString());
+            }
+
+            merger.setDestinationStream(outputStream);
+            merger.mergeDocuments(IOUtils.createMemoryOnlyStreamCache());
+
+            return outputStream.toByteArray();
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to merge PDFs", e);
+        }
     }
 
     public byte[] buildBundledLetter(byte[] coverSheet, byte[] letter) {
