@@ -387,10 +387,10 @@ public class NotificationConfigTestIt extends AbstractNotificationConfigTest {
             new Object[]{VALID_APPEAL_CREATED, false, APPOINTEE, PAPER, GAPS, null, "362d9a85-e0e4-412b-b874-020c0464e2b4", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx"},
             new Object[]{VALID_APPEAL_CREATED, false, REPRESENTATIVE, ORAL, GAPS, null, "652753bf-59b4-46eb-9c24-bd762338a098", List.of("a6c09fad-6265-4c7c-8b95-36245ffa5352"), null, null},
             new Object[]{VALID_APPEAL_CREATED, false, REPRESENTATIVE, PAPER, GAPS, null, "652753bf-59b4-46eb-9c24-bd762338a098", List.of("a6c09fad-6265-4c7c-8b95-36245ffa5352"), null, null},
-            new Object[]{VALID_APPEAL_CREATED, true, APPELLANT, ORAL, GAPS, null, "8910e2d2-4332-4ef6-a4b5-025ffad4f17d", List.of("6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82","f41222ef-c05c-4682-9634-6b034a166368"), null, null},
-            new Object[]{VALID_APPEAL_CREATED, true, APPELLANT, PAPER, GAPS, null, "8910e2d2-4332-4ef6-a4b5-025ffad4f17d", List.of("6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82","f41222ef-c05c-4682-9634-6b034a166368"), null, null},
-            new Object[]{VALID_APPEAL_CREATED, true, APPOINTEE, ORAL, GAPS, null, "e0355abd-42a6-4f94-836b-ec7ee22631cc", List.of("6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82","f41222ef-c05c-4682-9634-6b034a166368"), null, null},
-            new Object[]{VALID_APPEAL_CREATED, true, APPOINTEE, PAPER, GAPS, null, "e0355abd-42a6-4f94-836b-ec7ee22631cc", List.of("6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82","f41222ef-c05c-4682-9634-6b034a166368"), null, null},
+            new Object[]{VALID_APPEAL_CREATED, true, APPELLANT, ORAL, GAPS, null, "8910e2d2-4332-4ef6-a4b5-025ffad4f17d", List.of("6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82","f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-GNO-WEL-Acknowledgment-of-Appeal.docx"},
+            new Object[]{VALID_APPEAL_CREATED, true, APPELLANT, PAPER, GAPS, null, "8910e2d2-4332-4ef6-a4b5-025ffad4f17d", List.of("6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82","f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-GNO-WEL-Acknowledgment-of-Appeal.docx"},
+            new Object[]{VALID_APPEAL_CREATED, true, APPOINTEE, ORAL, GAPS, null, "e0355abd-42a6-4f94-836b-ec7ee22631cc", List.of("6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82","f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-GNO-WEL-Acknowledgment-of-Appeal.docx"},
+            new Object[]{VALID_APPEAL_CREATED, true, APPOINTEE, PAPER, GAPS, null, "e0355abd-42a6-4f94-836b-ec7ee22631cc", List.of("6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82","f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-GNO-WEL-Acknowledgment-of-Appeal.docx"},
 
             // -------------------- List Assist --------------------------
             new Object[]{ADJOURNED, false, APPELLANT, ORAL, LIST_ASSIST, null, "77ea995b-9744-4167-9250-e627c85e5eda", List.of("7455de19-aa3b-48f0-b765-ab2757ba6a88"), null, null},
@@ -707,10 +707,10 @@ public class NotificationConfigTestIt extends AbstractNotificationConfigTest {
             new Object[]{VALID_APPEAL_CREATED, false, APPOINTEE, PAPER, LIST_ASSIST, null, "362d9a85-e0e4-412b-b874-020c0464e2b4", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx"},
             new Object[]{VALID_APPEAL_CREATED, false, REPRESENTATIVE, ORAL, LIST_ASSIST, null, "652753bf-59b4-46eb-9c24-bd762338a098", List.of("a6c09fad-6265-4c7c-8b95-36245ffa5352"), null, null},
             new Object[]{VALID_APPEAL_CREATED, false, REPRESENTATIVE, PAPER, LIST_ASSIST, null, "652753bf-59b4-46eb-9c24-bd762338a098", List.of("a6c09fad-6265-4c7c-8b95-36245ffa5352"), null, null},
-            new Object[]{VALID_APPEAL_CREATED, true, APPELLANT, ORAL, LIST_ASSIST, null, "8910e2d2-4332-4ef6-a4b5-025ffad4f17d", List.of("6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82","f41222ef-c05c-4682-9634-6b034a166368"), null, null},
-            new Object[]{VALID_APPEAL_CREATED, true, APPELLANT, PAPER, LIST_ASSIST, null, "8910e2d2-4332-4ef6-a4b5-025ffad4f17d", List.of("6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82","f41222ef-c05c-4682-9634-6b034a166368"), null, null},
-            new Object[]{VALID_APPEAL_CREATED, true, APPOINTEE, ORAL, LIST_ASSIST, null, "e0355abd-42a6-4f94-836b-ec7ee22631cc", List.of("6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82","f41222ef-c05c-4682-9634-6b034a166368"), null, null},
-            new Object[]{VALID_APPEAL_CREATED, true, APPOINTEE, PAPER, LIST_ASSIST, null, "e0355abd-42a6-4f94-836b-ec7ee22631cc", List.of("6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82","f41222ef-c05c-4682-9634-6b034a166368"), null, null},
+            new Object[]{VALID_APPEAL_CREATED, true, APPELLANT, ORAL, LIST_ASSIST, null, "8910e2d2-4332-4ef6-a4b5-025ffad4f17d", List.of("6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82","f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-GNO-WEL-Acknowledgment-of-Appeal.docx"},
+            new Object[]{VALID_APPEAL_CREATED, true, APPELLANT, PAPER, LIST_ASSIST, null, "8910e2d2-4332-4ef6-a4b5-025ffad4f17d", List.of("6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82","f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-GNO-WEL-Acknowledgment-of-Appeal.docx"},
+            new Object[]{VALID_APPEAL_CREATED, true, APPOINTEE, ORAL, LIST_ASSIST, null, "e0355abd-42a6-4f94-836b-ec7ee22631cc", List.of("6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82","f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-GNO-WEL-Acknowledgment-of-Appeal.docx"},
+            new Object[]{VALID_APPEAL_CREATED, true, APPOINTEE, PAPER, LIST_ASSIST, null, "e0355abd-42a6-4f94-836b-ec7ee22631cc", List.of("6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82","f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-GNO-WEL-Acknowledgment-of-Appeal.docx"},
 
             new Object[]{ADMIN_SEND_TO_VALID_APPEAL, false, null, ORAL, GAPS, null, null, List.of(), null, "TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx"},
             new Object[]{ADMIN_SEND_TO_VALID_APPEAL, false, null, PAPER, GAPS, null, null, List.of(), null, "TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx"},
@@ -719,13 +719,13 @@ public class NotificationConfigTestIt extends AbstractNotificationConfigTest {
 
             new Object[]{INTERLOC_VALID_APPEAL, false, null, ORAL, GAPS, null, null, List.of(), null, "TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx"},
             new Object[]{INTERLOC_VALID_APPEAL, false, null, PAPER, GAPS, null, null, List.of(), null, "TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx"},
-            new Object[]{INTERLOC_VALID_APPEAL, true, null, ORAL, GAPS, null, null, List.of(), null, null},
-            new Object[]{INTERLOC_VALID_APPEAL, true, null, PAPER, GAPS, null, null, List.of(), null, null},
+            new Object[]{INTERLOC_VALID_APPEAL, true, null, ORAL, GAPS, null, null, List.of(), null, "TB-SCS-GNO-WEL-Acknowledgment-of-Appeal.docx"},
+            new Object[]{INTERLOC_VALID_APPEAL, true, null, PAPER, GAPS, null, null, List.of(), null, "TB-SCS-GNO-WEL-Acknowledgment-of-Appeal.docx"},
 
             new Object[]{VALID_APPEAL, false, null, ORAL, GAPS, null, null, List.of(), null, "TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx"},
             new Object[]{VALID_APPEAL, false, null, PAPER, GAPS, null, null, List.of(), null, "TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx"},
-            new Object[]{VALID_APPEAL, true, null, ORAL, GAPS, null, null, List.of(), null, null},
-            new Object[]{VALID_APPEAL, true, null, PAPER, GAPS, null, null, List.of(), null, null},
+            new Object[]{VALID_APPEAL, true, null, ORAL, GAPS, null, null, List.of(), null, "TB-SCS-GNO-WEL-Acknowledgment-of-Appeal.docx"},
+            new Object[]{VALID_APPEAL, true, null, PAPER, GAPS, null, null, List.of(), null, "TB-SCS-GNO-WEL-Acknowledgment-of-Appeal.docx"},
 
         };
     }
