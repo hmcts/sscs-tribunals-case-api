@@ -5,7 +5,6 @@ import static java.util.Base64.getEncoder;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,7 +15,6 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.Loader;
-import org.apache.pdfbox.io.IOUtils;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -149,9 +147,9 @@ public class BulkPrintService implements PrintService {
     public byte[] mergePdfs(List<Pdf> pdfs) {
         log.info("merging issue generic letter pdfs");
         List<byte[]> pdfDocuments = new ArrayList<>();
-            for (Pdf pdf : pdfs) {
-                pdfDocuments.add(pdf.getContent());
-            }
+        for (Pdf pdf : pdfs) {
+            pdfDocuments.add(pdf.getContent());
+        }
         return buildBundledLetter(pdfDocuments);
     }
 
