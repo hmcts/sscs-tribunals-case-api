@@ -38,6 +38,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_WITHDRAWN;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DIRECTION_ISSUED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DIRECTION_ISSUED_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DRAFT_TO_VALID_APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DWP_RESPONSE_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DWP_UPLOAD_RESPONSE;
@@ -46,6 +47,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.NOTIFY_APPELLANT_VALID_APPEAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.NOTIFY_APPELLANT_VALID_APPEAL_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.OTHER_PARTY_ADDED_TO_APPEAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.POSTPONEMENT;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PROCESS_AUDIO_VIDEO;
@@ -3069,6 +3071,88 @@ public class NotificationServiceTest {
 
         then(factory).should(times(1)).create(any(), any());
 
+    }
+
+    @Test
+    public void givenDirectionIssuedWelshForChildSupportWithAppealToProceed_whenCmFeatureEnabled_thenSendSecondWelshNotificationToAppellant() {
+        final SscsCaseData caseData = getSscsCaseDataBuilder(APPELLANT_WITH_ADDRESS, Representative.builder().hasRepresentative("no").build(), null)
+            .appeal(Appeal.builder()
+                          .hearingType(AppealHearingType.ORAL.name())
+                          .hearingOptions(HearingOptions.builder().wantsToAttend(YES).build())
+                          .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
+                          .appellant(APPELLANT_WITH_ADDRESS)
+                          .rep(Representative.builder().hasRepresentative("no").build())
+                          .build())
+            .directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()))
+            .build();
+        final CcdNotificationWrapper wrapper = buildBaseWrapperWithCaseData(caseData, DIRECTION_ISSUED_WELSH);
+
+        final Notification notification = new Notification(
+            Template.builder().emailTemplateId(EMAIL_TEMPLATE_ID).smsTemplateId(null).build(),
+            Destination.builder().email("test@testing.com").sms(null).build(),
+            new HashMap<>(), new Reference(), null);
+        given(factory.create(ccdNotificationWrapperCaptor.capture(), any())).willReturn(notification);
+
+        final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
+        final NotificationService serviceWithCmEnabled = new NotificationService(factory, reminderService,
+            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, true
+        );
+
+        serviceWithCmEnabled.manageNotificationAndSubscription(wrapper, false);
+
+        then(factory).should(times(2)).create(any(), any());
+        assertThat(ccdNotificationWrapperCaptor.getValue().getNotificationType()).isEqualTo(NOTIFY_APPELLANT_VALID_APPEAL_WELSH);
+    }
+
+    @Test
+    @Parameters({
+        "false, CHILD_SUPPORT, APPEAL_TO_PROCEED",
+        "true, PIP, APPEAL_TO_PROCEED",
+        "true, PIP, PROVIDE_INFORMATION",
+        "true, CHILD_SUPPORT, PROVIDE_INFORMATION"
+    })
+    public void givenDirectionIssuedWelshWithVariousScenarios_thenSendOnlyOneNotification(
+        boolean cmFeatureEnabled, String benefitCode, String directionType) {
+
+        final SscsCaseData.SscsCaseDataBuilder caseDataBuilder = getSscsCaseDataBuilder(
+            APPELLANT_WITH_ADDRESS,
+            Representative.builder().hasRepresentative("no").build(),
+            null);
+
+        if (Benefit.CHILD_SUPPORT.name().equals(benefitCode)) {
+            caseDataBuilder.appeal(Appeal.builder()
+                                         .hearingType(AppealHearingType.ORAL.name())
+                                         .hearingOptions(HearingOptions.builder().wantsToAttend(YES).build())
+                                         .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
+                                         .appellant(APPELLANT_WITH_ADDRESS)
+                                         .rep(Representative.builder().hasRepresentative("no").build())
+                                         .build());
+        }
+
+        final SscsCaseData caseData = caseDataBuilder
+            .directionTypeDl(new DynamicList(DirectionType.valueOf(directionType).toString()))
+            .build();
+
+        final CcdNotificationWrapper wrapper = buildBaseWrapperWithCaseData(caseData, DIRECTION_ISSUED_WELSH);
+
+        final Notification notification = new Notification(
+            Template.builder().emailTemplateId(EMAIL_TEMPLATE_ID).smsTemplateId(null).build(),
+            Destination.builder().email("test@testing.com").sms(null).build(),
+            new HashMap<>(), new Reference(), null);
+
+        given(factory.create(any(), any())).willReturn(notification);
+
+        final SendNotificationService sendNotificationService = new SendNotificationService(
+            notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
+
+        final NotificationService service = new NotificationService(
+            factory, reminderService, notificationValidService, notificationHandler,
+            outOfHoursCalculator, notificationConfig, sendNotificationService, false, cmFeatureEnabled
+        );
+
+        service.manageNotificationAndSubscription(wrapper, false);
+
+        then(factory).should(times(1)).create(any(), any());
     }
 
     @Test

@@ -1182,6 +1182,11 @@ notification:
             docmosisId: TB-SCS-LET-WEL-Action-Further-Evidence-v2.docx
         addOtherPartyData:
             docmosisId: TB-SCS-GNO-WEL-other-party-added-to-appeal.docx
+        otherPartyAddedToAppeal:
+          appellant:
+            docmosisId: TB-SCS-GNO-WEL-addition-of-other-party-to-appeal.docx
+          appointee:
+            docmosisId: TB-SCS-GNO-WEL-addition-of-other-party-to-appeal.docx
         reviewAndSetAside:
             docmosisId: TB-SCS-LET-WEL-Permission-to-Appeal-Review-v2.docx
         permissionToAppealRefused:
@@ -1358,12 +1363,14 @@ notification:
             appellant:
                 emailId: 8910e2d2-4332-4ef6-a4b5-025ffad4f17d
                 smsId: 6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82
+                docmosisId: TB-SCS-GNO-WEL-Acknowledgment-of-Appeal.docx
             representative:
                 emailId: 364bccc5-ffa6-495d-8035-e642d15114bf
                 smsId: f8391d2b-4d80-480e-87a9-816710f5650b
             appointee:
                 emailId: e0355abd-42a6-4f94-836b-ec7ee22631cc
                 smsId: 6a39acc9-7a3f-4ed7-a0b1-d30f6594fe82
+                docmosisId: TB-SCS-GNO-WEL-Acknowledgment-of-Appeal.docx
         resendAppealCreated:
             appellant:
                 emailId: 8910e2d2-4332-4ef6-a4b5-025ffad4f17d
@@ -1385,6 +1392,10 @@ notification:
             docmosisId: TB-SCS-LET-WEL-Set-Aside-Grant-Refused-v2.docx
         setAsideRefused:
             docmosisId: TB-SCS-LET-WEL-Set-Aside-Grant-Refused-v2.docx
+        interlocValidAppeal:
+            docmosisId: TB-SCS-GNO-WEL-Acknowledgment-of-Appeal.docx
+        validAppeal:
+            docmosisId: TB-SCS-GNO-WEL-Acknowledgment-of-Appeal.docx
         directionIssuedWelsh:
             appealToProceed:
                 appellant:
@@ -1397,6 +1408,11 @@ notification:
                     docmosisId: TB-SCS-GNO-WEL-00590-v3.docx
                 other_party:
                     docmosisId: TB-SCS-GNO-WEL-00590-v3.docx
+            appealToProceedNotifyValidAppeal:
+                appellant:
+                    docmosisId: TB-SCS-GNO-WEL-Acknowledgment-of-Appeal.docx
+                appointee:
+                    docmosisId: TB-SCS-GNO-WEL-Acknowledgment-of-Appeal.docx
             provideInformation:
                 appellant:
                     docmosisId: TB-SCS-GNO-WEL-00468-v2.docx
@@ -1944,7 +1960,11 @@ pdf-service:
             permissionToAppealGranted: 'TB-SCS-GNO-WEL-00479.docx'
             libertyToApplyGranted: 'TB-SCS-GNO-WEL-00479.docx'
             libertyToApplyRefused: 'TB-SCS-GNO-WEL-00479.docx'
+            interlocValidAppeal: 'TB-SCS-GNO-WEL-00479.docx'
+            validAppeal: 'TB-SCS-GNO-WEL-00479.docx'
+            appealToProceedNotifyValidAppeal: 'TB-SCS-GNO-WEL-00479.docx'
             addOtherPartyData: 'TB-SCS-GNO-WEL-00479.docx'
+            otherPartyAddedToAppeal: 'TB-SCS-GNO-WEL-00479.docx'
 
 text:
     personalisation:
