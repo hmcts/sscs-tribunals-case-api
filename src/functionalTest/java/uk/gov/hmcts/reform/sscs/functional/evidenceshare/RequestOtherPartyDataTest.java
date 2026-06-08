@@ -33,7 +33,7 @@ class RequestOtherPartyDataTest extends AbstractFunctionalTest {
     }
 
     @Nested
-    @DisabledIfEnvironmentVariable(named = CM_CONF_ENABLED, matches = "true")
+    @EnabledIfEnvironmentVariable(named = CM_CONF_ENABLED, matches = "false")
     class CmToggleOff {
 
         @Test
