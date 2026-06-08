@@ -132,6 +132,8 @@ public class BulkPrintService implements PrintService {
     }
 
     public Optional<UUID> sendIssueGenericLetterToBulkPrint(long caseId, SscsCaseData caseData, List<Pdf> pdfs, EventType eventType, String recipient) {
+        log.info("Sending {} document(s) to bulk print for Issue Generic Letter for case {}: {}",
+            pdfs.size(), caseId, pdfs.stream().map(Pdf::getName).toList());
         Optional<UUID> id = sendToBulkPrint(pdfs, caseData, recipient);
 
         if (id.isPresent()) {
@@ -181,8 +183,6 @@ public class BulkPrintService implements PrintService {
             log.error("Failed to merge documents: document list is empty");
             throw new BulkPrintException("Failed to merge documents: document list is empty");
         }
-
-        log.info("Building bundled letter with {} documents", documents.size());
 
         if (documents.size() == 1) {
             return documents.getFirst();
