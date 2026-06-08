@@ -110,7 +110,7 @@ class ConfidentialityConfirmedFunctionalTest extends AbstractFunctionalTest {
     }
 
     @Nested
-    @DisabledIfEnvironmentVariable(named = "CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED", matches = "true")
+    @EnabledIfEnvironmentVariable(named = "CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED", matches = "false")
     class CmToggleOff {
         @Test
         @SneakyThrows
