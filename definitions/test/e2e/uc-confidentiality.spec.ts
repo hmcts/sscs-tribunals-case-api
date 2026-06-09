@@ -1,5 +1,6 @@
 import { test } from '../lib/steps.factory';
 import createCaseBasedOnCaseType from '../api/client/sscs/factory/appeal.type.factory';
+import { credentials } from '../config/config';
 
 let caseId: string;
 
@@ -7,33 +8,35 @@ test.describe(
   'Universal Credit confidentiality',
   { tag: '@nightly-pipeline' },
   async () => {
+    test.beforeEach(async ({ ucConfidentialitySteps }) => {
+      caseId = await createCaseBasedOnCaseType('UC');
+      await ucConfidentialitySteps.addOtherPartyToUcCase(caseId);
+      await ucConfidentialitySteps.issueHef(caseId);
+    });
+
     test('UC - add other party - confirm confidentiality', async ({
       ucConfidentialitySteps
     }) => {
-      //login as DWP and go to case
-      //confirm confidentiality tab is not visible
-      // add other party
-      //confirm other party is added successfully
-      caseId = await createCaseBasedOnCaseType('UC');
-      await ucConfidentialitySteps.addOtherPartyToUcCase(caseId);
-
-      //login as caseworker and go to case
-      //issue hef
-      //confirm hef issued successfully
-      await ucConfidentialitySteps.issueHef(caseId);
-
-      //set confidentiality for appellant
       await ucConfidentialitySteps.setConfidentialityForAppellant(true);
-
-      //set confidentiality for other party
       await ucConfidentialitySteps.setConfidentialityForOtherParty(true);
+      await ucConfidentialitySteps.confirmConfidentialityGrantedSetSuccessfully();
+      await ucConfidentialitySteps.submitConfidentialityConfirmedEvent(caseId);
+    });
 
-      //confirm confidentiality set successfully
-      //verify confidentiality flag is set and visible
-      await ucConfidentialitySteps.confirmConfidentialitySetSuccessfully();
-
-      //run Confidentiality confirmed event and confirm end state is With FTA
-      await ucConfidentialitySteps.submitConfidentialityConfirmedEvent();
+    test('UC - appellant confidentiality refused via interloc', async ({
+      ucConfidentialitySteps,
+      sendToInterlocSteps
+    }) => {
+      await ucConfidentialitySteps.setConfidentialityForOtherParty(false);
+      await sendToInterlocSteps.submitConfidentialityReferralAndVerifySummary(
+        caseId,
+        credentials.amCaseWorker
+      );
+      await ucConfidentialitySteps.refuseAppellantConfidentialityViaIssueDirectionNotice(
+        caseId
+      );
+      await ucConfidentialitySteps.confirmConfidentialityRefusedSetSuccessfully();
+      await ucConfidentialitySteps.submitConfidentialityConfirmedEvent(caseId);
     });
   }
 );

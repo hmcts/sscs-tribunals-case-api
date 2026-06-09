@@ -14,7 +14,7 @@ export class Confidentiality {
     webActions = new WebAction(this.page);
   }
 
-   async verifyConfidentialityRows(
+  async verifyConfidentialityRows(
     rows: Array<{
       party: string;
       name: string;
@@ -73,8 +73,13 @@ export class Confidentiality {
     }).format(new Date());
   }
 
-  async verifyConfidentialityFlagVisible() {
-    await webActions.verifyElementVisibility('#isConfidentialCaseLabel img');
-  }
+  async verifyConfidentialityFlagVisibility(visible: boolean) {
+    const locator = '#isConfidentialCaseLabel img';
 
+    if (visible) {
+      await webActions.verifyElementVisibility(locator);
+    } else {
+      await webActions.verifyElementHidden(locator);
+    }
+  }
 }

@@ -75,6 +75,7 @@ import { AddOtherPartyDataPage } from '../../pages/add.other.party.data.page';
 import { Confidentiality } from '../../pages/tabs/confidentiality';
 import { IssueHearingEnquiryFormPage } from '../../pages/issue.hearing.enquiry.form.page';
 import { ConfidentialityConfirmed } from '../../pages/confidentiality.confirmed';
+import { SendToInterlocPage } from '../../pages/send.to.interloc.page';
 
 export abstract class BaseStep {
   readonly page: Page;
@@ -154,6 +155,8 @@ export abstract class BaseStep {
   protected addOtherPartyDataPage: AddOtherPartyDataPage;
   protected issueHefPage: IssueHearingEnquiryFormPage;
   protected confidentialityConfirmedPage: ConfidentialityConfirmed;
+  protected sendToInterlocPage: SendToInterlocPage
+
   protected constructor(page: Page) {
     this.page = page;
     this.loginPage = new LoginPage(this.page);
@@ -250,6 +253,7 @@ export abstract class BaseStep {
     this.addOtherPartyDataPage = new AddOtherPartyDataPage(this.page);
     this.confidentialityTab = new Confidentiality(this.page);
     this.issueHefPage = new IssueHearingEnquiryFormPage(this.page);
+    this.sendToInterlocPage = new SendToInterlocPage(this.page)
   }
 
   async loginUserWithCaseIdViaCaseList(
