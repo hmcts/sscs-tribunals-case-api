@@ -108,7 +108,7 @@ public class BulkPrintService implements PrintService {
         return id;
     }
 
-    public Optional<UUID> sendIssueGenericLetterToBulkPrint(long caseId, SscsCaseData caseData, List<Pdf> pdfs, EventType eventType, String recipient) {
+    public Optional<UUID> sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(long caseId, SscsCaseData caseData, List<Pdf> pdfs, EventType eventType, String recipient) {
         log.info("Sending {} document(s) to bulk print for Issue Generic Letter for case {}: {}",
             pdfs.size(), caseId, pdfs.stream().map(Pdf::getName).toList());
         Optional<UUID> id = sendToBulkPrint(pdfs, caseData, recipient);

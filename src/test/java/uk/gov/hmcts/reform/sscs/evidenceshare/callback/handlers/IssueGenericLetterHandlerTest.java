@@ -167,7 +167,7 @@ class IssueGenericLetterHandlerTest {
 
         handler.handle(SUBMITTED, callback);
 
-        verify(bulkPrintService, times(5)).sendIssueGenericLetterToBulkPrint(eq(callback.getCaseDetails().getId()),
+        verify(bulkPrintService, times(5)).sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(eq(callback.getCaseDetails().getId()),
             eq(caseData), any(), eq(ISSUE_GENERIC_LETTER),
             argumentCaptor.capture());
         Assertions.assertEquals(argumentCaptor.getAllValues(), List.of("User Test", "Wendy Giles", "Joint Party", "Other Party", "OPRepFirstName OPRepLastName"));
@@ -203,7 +203,7 @@ class IssueGenericLetterHandlerTest {
 
         handler.handle(SUBMITTED, callback);
 
-        verify(bulkPrintService, times(5)).sendIssueGenericLetterToBulkPrint(eq(callback.getCaseDetails().getId()),
+        verify(bulkPrintService, times(5)).sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(eq(callback.getCaseDetails().getId()),
             eq(caseData), any(), eq(ISSUE_GENERIC_LETTER),
             argumentCaptor.capture());
         Assertions.assertEquals(argumentCaptor.getAllValues(), List.of("User Test", "Wendy Giles", "Joint Party", "Other Party", "OPRepFirstName OPRepLastName"));
@@ -253,7 +253,7 @@ class IssueGenericLetterHandlerTest {
         handler.handle(SUBMITTED, callback);
 
         verify(ccdNotificationService, times(0)).storeNotificationLetterIntoCcd(any(), any(), any(), any());
-        verify(bulkPrintService, times(2)).sendIssueGenericLetterToBulkPrint(eq(callback.getCaseDetails().getId()),
+        verify(bulkPrintService, times(2)).sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(eq(callback.getCaseDetails().getId()),
             eq(caseData), any(), eq(ISSUE_GENERIC_LETTER),
             argumentCaptor.capture());
         Assertions.assertEquals(argumentCaptor.getAllValues(), List.of("User Test", "Wendy Giles"));
@@ -275,7 +275,7 @@ class IssueGenericLetterHandlerTest {
 
         handler.handle(SUBMITTED, callback);
 
-        verify(bulkPrintService, times(1)).sendIssueGenericLetterToBulkPrint(eq(callback.getCaseDetails().getId()),
+        verify(bulkPrintService, times(1)).sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(eq(callback.getCaseDetails().getId()),
             eq(caseData), any(), eq(ISSUE_GENERIC_LETTER),
             argumentCaptor.capture());
         Assertions.assertEquals(argumentCaptor.getAllValues(), List.of("User Test"));
