@@ -340,11 +340,11 @@ class BulkPrintServiceTest {
     }
 
     @Test
-    void mergePdfsIntoLetter_returnsCorrectNumberOfPages() throws IOException {
+    void buildBundledLetterFromPdfs_returnsCorrectNumberOfPages() throws IOException {
         final byte[] firstDocument = createPdf(2);
         final byte[] secondDocument = createPdf(2);
         final byte[] thirdDocument = createPdf(1);
-        final byte[] result = bulkPrintService.mergePdfsIntoLetter(List.of(new Pdf(firstDocument, "file.pdf"),
+        final byte[] result = bulkPrintService.buildBundledLetterFromPdfs(List.of(new Pdf(firstDocument, "file.pdf"),
                 new Pdf(secondDocument, "file2.pdf"), new Pdf(thirdDocument, "file3.pdf")));
         assertThat(result).isNotNull();
         try (PDDocument merged = Loader.loadPDF(result)) {
