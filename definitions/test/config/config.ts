@@ -5,38 +5,45 @@ const yaml = require('js-yaml');
 const isEnabled = (value?: string) =>
   ['true', '1', 'yes', 'on'].includes((value || '').trim().toLowerCase());
 
-const isPreviewTarget = () => {
-  const targetUrl =
+const getTargetUrl = () =>
     process.env.TEST_E2E_URL_WEB || process.env.TEST_E2E_API_URI || '';
 
-  return (
-    environment.name === 'pr' ||
-    targetUrl.includes('.preview.platform.hmcts.net')
-  );
+const isPreviewTarget = () => {
+    return (
+        environment.name === 'pr' || getTargetUrl().includes('.preview.platform.hmcts.net')
+    );
 };
 
+const isAatTarget = () =>
+    environment.name === 'aat' || getTargetUrl().includes('.aat.platform.hmcts.net');
+
 const getCmOtherPartyConfidentialityFlag = () => {
-  const chartConfigPath = path.resolve(
-    __dirname,
-    isPreviewTarget()
-      ? '../../../charts/sscs-tribunals-api/values.preview.template.yaml'
-      : '../../../charts/sscs-tribunals-api/values.yaml'
-  );
 
-  try {
-    const chartConfig = yaml.load(fs.readFileSync(chartConfigPath, 'utf8')) as {
-      java?: { environment?: { CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED?: boolean } };
-    };
-
-    const value =
-      chartConfig?.java?.environment?.CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED;
-
-    if (typeof value === 'boolean') {
-      return value;
+    if (isAatTarget()) {
+        return true;
     }
-  } catch (error) {
-    // Fall back to env if chart config cannot be read in the local test workspace.
-  }
+
+    const chartConfigPath = path.resolve(
+      __dirname,
+      isPreviewTarget()
+        ? '../../../charts/sscs-tribunals-api/values.preview.template.yaml'
+        : '../../../charts/sscs-tribunals-api/values.yaml'
+    );
+
+    try {
+    const chartConfig = yaml.load(fs.readFileSync(chartConfigPath, 'utf8')) as {
+        java?: { environment?: { CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED?: boolean } };
+      };
+
+      const value =
+        chartConfig?.java?.environment?.CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED;
+
+      if (typeof value === 'boolean') {
+        return value;
+      }
+    } catch (error) {
+      // Fall back to env if chart config cannot be read in the local test workspace.
+    }
 
   return isEnabled(process.env.CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED);
 };
