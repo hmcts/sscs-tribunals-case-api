@@ -19,9 +19,9 @@ const isAatTarget = () =>
 
 const getCmOtherPartyConfidentialityFlag = () => {
 
-    if (isAatTarget()) {
-        return true;
-    }
+  if (isAatTarget()) {
+    return true;
+  }
 
   const chartConfigPath = path.resolve(
     __dirname,
