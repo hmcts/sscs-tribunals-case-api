@@ -10,12 +10,12 @@ const getTargetUrl = () =>
 
 const isPreviewTarget = () => {
   return (
-        environment.name === 'pr' || getTargetUrl().includes('.preview.platform.hmcts.net')
+        environment.name === 'pr' || getTargetUrl().includes('preview')
   );
 };
 
 const isAatTarget = () =>
-    environment.name === 'aat' || getTargetUrl().includes('.aat.platform.hmcts.net');
+    environment.name === 'aat' || getTargetUrl().includes('aat');
 
 const getCmOtherPartyConfidentialityFlag = () => {
 
