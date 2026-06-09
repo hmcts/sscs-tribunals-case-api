@@ -131,29 +131,6 @@ public class BulkPrintService implements PrintService {
         return buildBundledLetter(pdfDocuments);
     }
 
-    public Optional<UUID> sendIssueGenericLetterToBulkPrint(long caseId, SscsCaseData caseData, List<Pdf> pdfs, EventType eventType, String recipient) {
-        log.info("Sending {} document(s) to bulk print for Issue Generic Letter for case {}: {}",
-            pdfs.size(), caseId, pdfs.stream().map(Pdf::getName).toList());
-        Optional<UUID> id = sendToBulkPrint(pdfs, caseData, recipient);
-
-        if (id.isPresent()) {
-            ccdNotificationService.storeNotificationLetterIntoCcd(eventType, mergePdfsIntoLetter(pdfs), caseId, recipient);
-            log.info("Issue Generic Letter was sent for event {} and case {}, send-letter-service id {}", eventType.getCcdType(), caseId, id.get());
-        } else {
-            log.error("Failed to send to bulk print for Issue Generic Letter for case {}. No print id returned", caseId);
-        }
-
-        return id;
-    }
-
-    public byte[] mergePdfsIntoLetter(List<Pdf> pdfs) {
-        List<byte[]> pdfDocuments = new ArrayList<>();
-        for (Pdf pdf : pdfs) {
-            pdfDocuments.add(pdf.getContent());
-        }
-        return buildBundledLetter(pdfDocuments);
-    }
-
     public byte[] buildBundledLetter(byte[] coverSheet, byte[] letter) {
         if (coverSheet != null) {
             PDDocument bundledLetter;
