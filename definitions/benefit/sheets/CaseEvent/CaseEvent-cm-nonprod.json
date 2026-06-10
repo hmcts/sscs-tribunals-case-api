@@ -197,6 +197,19 @@
     "Publish": "N"
   },
   {
+    "LiveFrom": "09/06/2026",
+    "CaseTypeID": "Benefit",
+    "ID": "adminSendToAwaitConfidentialityRequirements",
+    "Name": "Admin - Await Conf Requirement",
+    "Description": "Admin - Awaiting Confidentiality Requirements",
+    "DisplayOrder": 139,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "awaitConfidentialityRequirements",
+    "ShowEventNotes": "N",
+    "SecurityClassification": "Public",
+    "Publish": "N"
+  },
+  {
     "LiveFrom": "01/01/2018",
     "CaseTypeID": "Benefit",
     "ID": "adminAppealWithdrawn",
