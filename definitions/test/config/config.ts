@@ -5,17 +5,24 @@ const yaml = require('js-yaml');
 const isEnabled = (value?: string) =>
   ['true', '1', 'yes', 'on'].includes((value || '').trim().toLowerCase());
 
-const isPreviewTarget = () => {
-  const targetUrl =
+const getTargetUrl = () =>
     process.env.TEST_E2E_URL_WEB || process.env.TEST_E2E_API_URI || '';
 
+const isPreviewTarget = () => {
   return (
-    environment.name === 'pr' ||
-    targetUrl.includes('.preview.platform.hmcts.net')
+        environment.name === 'pr' || getTargetUrl().includes('preview')
   );
 };
 
+const isAatTarget = () =>
+    environment.name === 'aat' || getTargetUrl().includes('aat');
+
 const getCmOtherPartyConfidentialityFlag = () => {
+
+  if (isAatTarget()) {
+    return true;
+  }
+
   const chartConfigPath = path.resolve(
     __dirname,
     isPreviewTarget()

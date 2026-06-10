@@ -90,11 +90,22 @@ export class History {
   }
 
   async getDateOfEvent(): Promise<string> {
-    return await this.page.locator('.EventLog-DetailsPanel .tooltip').textContent();
+    return await this.page
+      .locator('.EventLog-DetailsPanel .tooltip')
+      .textContent();
   }
 
   async getAuthorOfEvent(): Promise<string> {
-    const authorSelector: Locator = this.page.locator("//table[@class='EventLogDetails']//span[text()='Author']/../following-sibling::td/span");  
+    const authorSelector: Locator = this.page.locator(
+      "//table[@class='EventLogDetails']//span[text()='Author']/../following-sibling::td/span"
+    );
     return await authorSelector.textContent();
+  }
+
+  async verifyInterlocReviewState(state: string) {
+    await webActions.verifyPageLabel(
+      '#case-viewer-field-read--interlocReviewState .ng-star-inserted span',
+      state
+    );
   }
 }
