@@ -1017,5 +1017,6 @@
   {"LiveFrom": "09/06/2026", "CaseTypeID": "Benefit", "CaseEventID": "adminSendToAwaitConfidentialityRequirements", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
   {"LiveFrom": "09/06/2026", "CaseTypeID": "Benefit", "CaseEventID": "adminSendToAwaitConfidentialityRequirements", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRU"},
   {"LiveFrom": "09/06/2026", "CaseTypeID": "Benefit", "CaseEventID": "adminSendToAwaitConfidentialityRequirements", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
-  {"LiveFrom": "09/06/2026", "CaseTypeID": "Benefit", "CaseEventID": "adminSendToAwaitConfidentialityRequirements", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"}
+  {"LiveFrom": "09/06/2026", "CaseTypeID": "Benefit", "CaseEventID": "adminSendToAwaitConfidentialityRequirements", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"},
+  {"LiveFrom": "10/06/2026", "CaseTypeID": "Benefit", "CaseEventID": "addOtherPartyData", "AccessProfile": "caseworker-sscs", "CRUD": "R"}
 ]
