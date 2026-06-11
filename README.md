@@ -272,4 +272,3 @@ chmod +x bin/create-idam-users.sh
 ```bash
 bin/create-idam-users.sh
 ```
-
