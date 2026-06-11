@@ -16,6 +16,7 @@
   "prepostHearingLabel": "Pre or post hearing?",
   "directionTypeLabel": "Direction type",
   "appealToProceedDirectionType": "Appeal to Proceed",
+  "confidentialityRefused": "Confidentiality Refused – Send to Admin",
   "provideInformationDirectionType": "Provide information",
   "allowTimeExtensionDirectionType": "Allow time extension",
   "refuseTimeExtensionDirectionType": "Refuse time extension",
