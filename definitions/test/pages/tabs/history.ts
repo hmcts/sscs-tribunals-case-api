@@ -60,7 +60,7 @@ export class History {
   async verifyHistoryPageEventLink(fieldLabel: string) {
     let linkElement = this.page.locator(
       `//a[normalize-space()="${fieldLabel}"]`
-    );
+    ).first();
     const max = 5;
     for (let i = 0; i <= max; i++) {
       try {
