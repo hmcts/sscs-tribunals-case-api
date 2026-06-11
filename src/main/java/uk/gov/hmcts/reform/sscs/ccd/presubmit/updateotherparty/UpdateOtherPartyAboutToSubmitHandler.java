@@ -5,6 +5,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_OTHER_PARTY_DATA;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.issuehearingenquiryform.IssueHearingEnquiryFormAboutToSubmit.getHearingResponseExpectedByDays;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getUpdatedDirectionDueDate;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.validateHearingOptionsAndExcludeDates;
@@ -132,9 +133,8 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
     }
 
     private static boolean appellantConfidentialityNotRequiredOrUnknown(SscsCaseData sscsCaseData) {
-        return isNull(sscsCaseData.getAppeal().getAppellant()) || isNull(
-            sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired())
-            || sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired() == YesNo.NO;
+        return isNull(sscsCaseData.getAppeal().getAppellant()) || isNoOrNull(
+            sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired());
     }
 
     private List<String> verifyHearingUnavailableDates(final List<CcdValue<OtherParty>> otherParties) {
