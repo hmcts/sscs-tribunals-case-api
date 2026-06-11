@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
@@ -40,6 +41,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.util.predicates.AdditionalOtherPartyAddedPredicate;
 
 
 @Component
@@ -56,11 +58,13 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
 
     private IdamService idamService;
     private final boolean cmOtherPartyConfidentialityEnabled;
+    private final AdditionalOtherPartyAddedPredicate additionalOtherPartyAddedPredicate;
 
     @Autowired
     UpdateOtherPartyAboutToSubmitHandler(IdamService idamService, @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
         this.idamService = idamService;
         this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
+        this.additionalOtherPartyAddedPredicate = new AdditionalOtherPartyAddedPredicate();
     }
 
     @Override
@@ -116,12 +120,21 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
         }
 
         if (cmOtherPartyConfidentialityEnabled
-                && (isBenefitTypeChildSupportOrUc(sscsCaseData))) {
+            && isBenefitTypeChildSupportOrUc(sscsCaseData)
+            && appellantConfidentialityNotRequiredOrUnknown(sscsCaseData)
+            && additionalOtherPartyAddedPredicate.test(sscsCaseData, callback.getCaseDetailsBefore().map(CaseDetails::getCaseData).orElse(null))
+        ) {
             sscsCaseData.setDirectionDueDate(now().plusDays(getHearingResponseExpectedByDays()).toString());
             sscsCaseData.setInterlocReviewState(InterlocReviewState.HEF_ISSUED);
         }
 
         return response;
+    }
+
+    private static boolean appellantConfidentialityNotRequiredOrUnknown(SscsCaseData sscsCaseData) {
+        return isNull(sscsCaseData.getAppeal().getAppellant()) || isNull(
+            sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired())
+            || sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired() == YesNo.NO;
     }
 
     private List<String> verifyHearingUnavailableDates(final List<CcdValue<OtherParty>> otherParties) {
