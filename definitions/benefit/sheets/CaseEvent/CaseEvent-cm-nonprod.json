@@ -519,5 +519,19 @@
     "EventEnablingCondition": "appeal.benefitType.code=\"childSupport\" OR appeal.benefitType.code=\"UC\"",
     "Publish": "N",
     "ShowSummary": "N"
+  },
+  {
+    "LiveFrom": "09/06/2026",
+    "CaseTypeID": "Benefit",
+    "ID": "adminSendToAwaitConfidentialityRequirements",
+    "Name": "Awaiting Confidentiality Req's",
+    "Description": "Admin - Send To Awaiting Confidentiality Requirements",
+    "DisplayOrder": 505,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "awaitConfidentialityRequirements",
+    "EventEnablingCondition": "appeal.benefitType.code=\"childSupport\"",
+    "ShowEventNotes": "Y",
+    "SecurityClassification": "Public",
+    "Publish": "N"
   }
 ]
