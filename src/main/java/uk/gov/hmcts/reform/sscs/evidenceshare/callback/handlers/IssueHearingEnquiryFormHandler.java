@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_HEARING_ENQUIR
 import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.OTHER_PARTY_LETTER;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.ADDRESS_NAME;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_NAME;
+import static uk.gov.hmcts.reform.sscs.helper.PdfHelper.buildBundledLetter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -136,7 +137,7 @@ public class IssueHearingEnquiryFormHandler implements CallbackHandler<SscsCaseD
 
         var coverSheet = coverLetterService.generateCoverSheet(getCoverSheetTemplateName(caseData), "coversheet", placeholders);
 
-        final byte[] bundledLetter = bulkPrintService.buildBundledLetter(List.of(coverLetter, hefForm, coverSheet));
+        final byte[] bundledLetter = buildBundledLetter(List.of(coverLetter, hefForm, coverSheet));
 
         final Pdf pdf = new Pdf(bundledLetter, letterName);
         final List<Pdf> letter = new ArrayList<>();

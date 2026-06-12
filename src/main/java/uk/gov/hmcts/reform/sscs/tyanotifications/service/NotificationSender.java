@@ -2,7 +2,9 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.sscs.helper.PdfHelper.buildBundledLetterFromPdfs;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_GENERIC_LETTER;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -24,6 +26,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Correspondence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorrespondenceDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorrespondenceType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReasonableAdjustmentStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
@@ -199,15 +202,60 @@ public class NotificationSender {
         return sendLetterResponse;
     }
 
-    public void sendBundledLetter(NotificationWrapper wrapper, byte[] content, String recipient)
-            throws NotificationClientException {
+    public void sendBundledLetter(EventType eventType, SscsCaseData caseData, Long caseId, List<Pdf> pdfs, String recipient)
+        throws NotificationClientException {
+        byte[] content = buildBundledLetterFromPdfs(pdfs);
         if (content != null) {
             boolean pageLimitExceeded = false;
 
             try (PDDocument pdfDoc = Loader.loadPDF(content)) {
                 pageLimitExceeded = pdfDoc.getNumberOfPages() > 10;
                 log.info(pageLimitExceeded ? "{} letter exceeds Gov.Notify 10-page limit for precompiled letters [{}]"
-                                : "Sending {} precompiled letter of [{}] pages",
+                        : "Sending {} precompiled letter of [{}] pages",
+                    eventType, pdfDoc.getNumberOfPages());
+            } catch (IOException e) {
+                log.info("Failed to calculate the number of pages contained in the letter {}", e.getMessage());
+            }
+
+            String govNotifyId = null;
+            NotificationClient client = null;
+
+            if (pageLimitExceeded) {
+                bulkPrintService
+                    .sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(caseId, caseData, pdfs, eventType, recipient);
+                log.info("Sending {} Letter for case id : {} via BulkPrint because it exceeds 10 pages",
+                    eventType, caseId);
+            } else {
+                client = getLetterNotificationClient(caseData.getAppeal().getAppellant().getAddress().getPostcode());
+                ByteArrayInputStream inputStream = new ByteArrayInputStream(content);
+                final LetterResponse notifyResponse = sendBundledLetter(caseId.toString(), client, inputStream);
+                govNotifyId = nonNull(notifyResponse) ? notifyResponse.getNotificationId().toString() : null;
+
+                log.info("Letter Notification send for case id : {}, Gov notify id: {} ",
+                    caseId, govNotifyId);
+            }
+
+            if (saveCorrespondence) {
+                // TODO derive event type from event
+                final var correspondence = getLetterCorrespondence(ISSUE_GENERIC_LETTER, recipient, null);
+                if (isNull(govNotifyId)) {
+                    saveCorrespondenceAsyncService.saveLetter(content, correspondence, caseId.toString());
+                } else {
+                    saveCorrespondenceAsyncService.saveLetter(client, govNotifyId, correspondence, caseId.toString());
+                }
+            }
+        }
+    }
+
+    public void sendBundledLetter(NotificationWrapper wrapper, byte[] content, String recipient)
+        throws NotificationClientException {
+        if (content != null) {
+            boolean pageLimitExceeded = false;
+
+            try (PDDocument pdfDoc = Loader.loadPDF(content)) {
+                pageLimitExceeded = pdfDoc.getNumberOfPages() > 10;
+                log.info(pageLimitExceeded ? "{} letter exceeds Gov.Notify 10-page limit for precompiled letters [{}]"
+                        : "Sending {} precompiled letter of [{}] pages",
                         wrapper.getNotificationType(), pdfDoc.getNumberOfPages());
             } catch (IOException e) {
                 log.info("Failed to calculate the number of pages contained in the letter {}", e.getMessage());
@@ -219,7 +267,7 @@ public class NotificationSender {
 
             if (wrapper.getNotificationType().equals(ISSUE_FINAL_DECISION) && pageLimitExceeded) {
                 bulkPrintService
-                        .sendToBulkPrint(List.of(new Pdf(content, ISSUE_FINAL_DECISION.name())), caseData, recipient);
+                    .sendToBulkPrint(List.of(new Pdf(content, ISSUE_FINAL_DECISION.name())), caseData, recipient);
                 log.info("Sending {} Letter for case id : {} via BulkPrint because it exceeds 10 pages",
                         wrapper.getNotificationType(), wrapper.getCaseId());
             } else {

@@ -1,16 +1,26 @@
 package uk.gov.hmcts.reform.sscs.helper;
 
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.util.Matrix;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
+import uk.gov.hmcts.reform.sscs.evidenceshare.exception.BulkPrintException;
+import uk.gov.hmcts.reform.sscs.evidenceshare.exception.PdfException;
 
 @Slf4j
 @Service
@@ -159,6 +169,61 @@ public class PdfHelper {
             // In raw PDF this equates to: "\nQ\nQ\n" - we saved it twice so we have to restore twice
             contentStream.restoreGraphicsState();
             contentStream.restoreGraphicsState();
+        }
+    }
+
+    public static int getPhysicalPageCount(List<Pdf> pdfs) {
+        int totalSheets = 0;
+        if (pdfs == null) {
+            return totalSheets;
+        }
+        for (Pdf pdf : pdfs) {
+            try (PDDocument document = Loader.loadPDF(pdf.getContent())) {
+                totalSheets += (document.getNumberOfPages() + 1) / 2;
+            } catch (IOException e) {
+                throw new PdfException(
+                    "Failed to read page count for pdf %s with exception %s".formatted(pdf.getName(), e.getMessage()), e);
+            }
+        }
+        return totalSheets;
+    }
+
+    public static byte[] buildBundledLetterFromPdfs(List<Pdf> pdfs) {
+        List<byte[]> pdfDocuments = new ArrayList<>();
+        for (Pdf pdf : pdfs) {
+            pdfDocuments.add(pdf.getContent());
+        }
+        return buildBundledLetter(pdfDocuments);
+    }
+
+    public static byte[] buildBundledLetter(List<byte[]> documents) {
+        if (isEmpty(documents)) {
+            log.error("Failed to merge documents: document list is empty");
+            throw new BulkPrintException("Failed to merge documents: document list is empty");
+        }
+
+        if (documents.size() == 1) {
+            return documents.getFirst();
+        }
+
+        try (PDDocument bundledLetter = Loader.loadPDF(documents.getFirst())) {
+            final PDFMergerUtility merger = new PDFMergerUtility();
+            for (int i = 1; i < documents.size(); i++) {
+                if (documents.get(i) != null) {
+                    if (bundledLetter.getNumberOfPages() % 2 != 0) {
+                        bundledLetter.addPage(new PDPage(PDRectangle.A4));
+                    }
+                    try (PDDocument loadDoc = Loader.loadPDF(documents.get(i))) {
+                        merger.appendDocument(bundledLetter, loadDoc);
+                    }
+                }
+            }
+            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bundledLetter.save(baos);
+            return baos.toByteArray();
+        } catch (IOException e) {
+            log.error("Failed to merge documents with exception {}", e.getMessage());
+            throw new BulkPrintException("Failed to merge documents with exception " + e.getMessage(), e);
         }
     }
 }

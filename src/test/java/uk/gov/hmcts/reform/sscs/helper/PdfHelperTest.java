@@ -1,323 +1,333 @@
 package uk.gov.hmcts.reform.sscs.helper;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static java.math.RoundingMode.HALF_EVEN;
+import static java.util.Objects.requireNonNull;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.within;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.NullSource;
+import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
+import uk.gov.hmcts.reform.sscs.evidenceshare.exception.PdfException;
 
-public class PdfHelperTest {
+class PdfHelperTest {
 
-    PdfHelper pdfHelper = new PdfHelper();
+    private final PdfHelper pdfHelper = new PdfHelper();
 
     @Test
-    public void returnFalseWhenPdfHasPageGreaterThanAllowedSizePortrait() throws IOException {
+    void returnFalseWhenPdfHasPageGreaterThanAllowedSizePortrait() throws IOException {
 
         PDRectangle pageSize = PDRectangle.A4;
         try (PDDocument document = new PDDocument()) {
             document.addPage(new PDPage(new PDRectangle(pageSize.getWidth() + 100, pageSize.getHeight() + 100)));
 
             boolean result = pdfHelper.isDocumentWithinSizeTolerance(document, pageSize);
-            assertFalse(result);
+            assertThat(result).isFalse();
         }
     }
 
     @Test
-    public void returnFalseWhenPdfHasPageGreaterThanAllowedSizeLandscape() throws IOException {
+    void returnFalseWhenPdfHasPageGreaterThanAllowedSizeLandscape() throws IOException {
         PDRectangle pageSize = PDRectangle.A4;
         try (PDDocument document = new PDDocument()) {
             document.addPage(new PDPage(new PDRectangle(pageSize.getHeight() + 100, pageSize.getWidth() + 100)));
 
             boolean result = pdfHelper.isDocumentWithinSizeTolerance(document, pageSize);
-            assertFalse(result);
+            assertThat(result).isFalse();
         }
     }
 
     @Test
-    public void returnFalseWhenPdfHasPageLowerThanAllowedSizePortrait() throws IOException {
+    void returnFalseWhenPdfHasPageLowerThanAllowedSizePortrait() throws IOException {
 
         PDRectangle pageSize = PDRectangle.A4;
         try (PDDocument document = new PDDocument()) {
             document.addPage(new PDPage(new PDRectangle(pageSize.getWidth() - 100, pageSize.getHeight() - 100)));
 
             boolean result = pdfHelper.isDocumentWithinSizeTolerance(document, pageSize);
-            assertFalse(result);
+            assertThat(result).isFalse();
         }
     }
 
     @Test
-    public void returnFalseWhenPdfHasPageLowerThanAllowedSizeLandscape() throws IOException {
+    void returnFalseWhenPdfHasPageLowerThanAllowedSizeLandscape() throws IOException {
         PDRectangle pageSize = PDRectangle.A4;
         try (PDDocument document = new PDDocument()) {
             document.addPage(new PDPage(new PDRectangle(pageSize.getHeight() - 100, pageSize.getWidth() - 100)));
 
             boolean result = pdfHelper.isDocumentWithinSizeTolerance(document, pageSize);
-            assertFalse(result);
+            assertThat(result).isFalse();
         }
     }
 
     @Test
-    public void returnTrueWhenPdfHasNoPagesGreaterThanAllowedSizePortrait() throws IOException {
+    void returnTrueWhenPdfHasNoPagesGreaterThanAllowedSizePortrait() throws IOException {
         PDRectangle pageSize = PDRectangle.A4;
         try (PDDocument document = new PDDocument()) {
             document.addPage(new PDPage(new PDRectangle(pageSize.getWidth() + 5, pageSize.getHeight())));
 
             boolean result = pdfHelper.isDocumentWithinSizeTolerance(document, pageSize);
-            assertTrue(result);
+            assertThat(result).isTrue();
         }
     }
 
     @Test
-    public void returnTrueWhenPdfHasNoPagesGreaterThanAllowedSizeLandscape() throws IOException {
+    void returnTrueWhenPdfHasNoPagesGreaterThanAllowedSizeLandscape() throws IOException {
         PDRectangle pageSize = PDRectangle.A4;
         try (PDDocument document = new PDDocument()) {
             document.addPage(new PDPage(new PDRectangle(pageSize.getHeight() + 5, pageSize.getWidth())));
 
             boolean result = pdfHelper.isDocumentWithinSizeTolerance(document, pageSize);
-            assertTrue(result);
+            assertThat(result).isTrue();
         }
     }
 
     @Test
-    public void returnTrueWhenPdfHasNoPagesLowerThanAllowedSizePortrait() throws IOException {
+    void returnTrueWhenPdfHasNoPagesLowerThanAllowedSizePortrait() throws IOException {
         PDRectangle pageSize = PDRectangle.A4;
         try (PDDocument document = new PDDocument()) {
             document.addPage(new PDPage(new PDRectangle(pageSize.getWidth() - 5, pageSize.getHeight())));
 
             boolean result = pdfHelper.isDocumentWithinSizeTolerance(document, pageSize);
-            assertTrue(result);
+            assertThat(result).isTrue();
         }
     }
 
     @Test
-    public void returnTrueWhenPdfHasNoPagesLowerThanAllowedSizeLandscape() throws IOException {
+    void returnTrueWhenPdfHasNoPagesLowerThanAllowedSizeLandscape() throws IOException {
         PDRectangle pageSize = PDRectangle.A4;
         try (PDDocument document = new PDDocument()) {
             document.addPage(new PDPage(new PDRectangle(pageSize.getHeight() - 5, pageSize.getWidth())));
 
             boolean result = pdfHelper.isDocumentWithinSizeTolerance(document, pageSize);
-            assertTrue(result);
+            assertThat(result).isTrue();
         }
     }
 
     @Test
-    public void returnCorrectMaxScalingFactorForOversizedPortraitWidth() throws IOException {
+    void returnCorrectMaxScalingFactorForOversizedPortraitWidth() throws IOException {
         PDRectangle pageSize = PDRectangle.A4;
         try (PDDocument document = new PDDocument()) {
             document.addPage(new PDPage(new PDRectangle(pageSize.getWidth() + 100, pageSize.getHeight() + 50)));
 
             BigDecimal result = pdfHelper.scalingFactor(document.getPage(0), pageSize);
-            assertEquals(new BigDecimal("0.8562").setScale(4, RoundingMode.HALF_EVEN), result);
+            assertThat(result).isEqualTo(new BigDecimal("0.8562").setScale(4, HALF_EVEN));
         }
     }
 
     @Test
-    public void returnCorrectMaxScalingFactorForUndersizedPortraitWidth() throws IOException {
+    void returnCorrectMaxScalingFactorForUndersizedPortraitWidth() throws IOException {
         PDRectangle pageSize = PDRectangle.A4;
         try (PDDocument document = new PDDocument()) {
             document.addPage(new PDPage(new PDRectangle(pageSize.getWidth() - 100, pageSize.getHeight())));
 
             BigDecimal result = pdfHelper.scalingFactor(document.getPage(0), pageSize);
-            assertEquals(BigDecimal.ONE.setScale(2), result.setScale(2));
+            assertThat(result.setScale(2, HALF_EVEN)).isEqualTo(BigDecimal.ONE.setScale(2, HALF_EVEN));
         }
     }
 
     @Test
-    public void returnCorrectMaxScalingFactorForUndersizedPortraitHeight() throws IOException {
+    void returnCorrectMaxScalingFactorForUndersizedPortraitHeight() throws IOException {
         PDRectangle pageSize = PDRectangle.A4;
         try (PDDocument document = new PDDocument()) {
             document.addPage(new PDPage(new PDRectangle(pageSize.getWidth(), pageSize.getHeight() - 100)));
 
             BigDecimal result = pdfHelper.scalingFactor(document.getPage(0), pageSize);
-            assertEquals(BigDecimal.ONE.setScale(2), result.setScale(2));
+            assertThat(result.setScale(2, HALF_EVEN)).isEqualTo(BigDecimal.ONE.setScale(2, HALF_EVEN));
         }
     }
 
     @Test
-    public void returnCorrectMaxScalingFactorForOversizedPortraitWidthExtraLarge() throws IOException {
+    void returnCorrectMaxScalingFactorForOversizedPortraitWidthExtraLarge() throws IOException {
         PDRectangle pageSize = PDRectangle.A4;
         try (PDDocument document = new PDDocument()) {
             document.addPage(new PDPage(new PDRectangle(PDRectangle.A1.getWidth(), PDRectangle.A1.getHeight())));
 
             BigDecimal result = pdfHelper.scalingFactor(document.getPage(0), pageSize);
-            assertEquals(new BigDecimal("0.3532").setScale(4, RoundingMode.HALF_EVEN), result);
+            assertThat(result).isEqualTo(new BigDecimal("0.3532").setScale(4, HALF_EVEN));
         }
     }
 
     @Test
-    public void returnCorrectMaxScalingFactorForOversizedPortraitHeight() throws IOException {
+    void returnCorrectMaxScalingFactorForOversizedPortraitHeight() throws IOException {
         PDRectangle pageSize = PDRectangle.A4;
         try (PDDocument document = new PDDocument()) {
             document.addPage(new PDPage(new PDRectangle(pageSize.getWidth() + 50, pageSize.getHeight() + 100)));
 
             BigDecimal result = pdfHelper.scalingFactor(document.getPage(0), pageSize);
-            assertEquals(new BigDecimal("0.8938").setScale(4, RoundingMode.HALF_EVEN), result);
+            assertThat(result).isEqualTo(new BigDecimal("0.8938").setScale(4, HALF_EVEN));
         }
     }
 
     @Test
-    public void scaleDownLandscapeDocumentCorrectly() throws Exception {
+    void scaleDownLandscapeDocumentCorrectly() throws Exception {
 
-        byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("A3 Landscape.pdf"));
+        byte[] pdfBytes = IOUtils.toByteArray(
+            requireNonNull(getClass().getClassLoader().getResourceAsStream("A3 Landscape.pdf")));
 
         PDRectangle pageSize = PDRectangle.A4;
         try (PDDocument document = Loader.loadPDF(pdfBytes)) {
 
             Optional<PDDocument> result = pdfHelper.scaleToPageSize(document, pageSize);
 
-            assertTrue(result.isPresent());
+            assertThat(result).isPresent();
 
             try (PDDocument newDocument = result.get()) {
                 PDRectangle mediaBox = newDocument.getPage(0).getMediaBox();
 
-                assertTrue(pageSize.getHeight() >= mediaBox.getHeight());
-                assertTrue(pageSize.getWidth() >= mediaBox.getWidth());
+                assertThat(mediaBox.getHeight()).isLessThanOrEqualTo(pageSize.getHeight());
+                assertThat(mediaBox.getWidth()).isLessThanOrEqualTo(pageSize.getWidth());
             }
         }
     }
 
     @Test
-    public void scaleDownPortraitDocumentCorrectly() throws Exception {
+    void scaleDownPortraitDocumentCorrectly() throws Exception {
 
-        byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("another-test.pdf"));
+        byte[] pdfBytes = IOUtils.toByteArray(requireNonNull(getClass().getClassLoader().getResourceAsStream("another-test.pdf")));
 
         PDRectangle pageSize = PDRectangle.A4;
         try (PDDocument document = Loader.loadPDF(pdfBytes)) {
 
             Optional<PDDocument> result = pdfHelper.scaleToPageSize(document, pageSize);
 
-            assertTrue(result.isPresent());
+            assertThat(result).isPresent();
             try (PDDocument newDocument = result.get()) {
                 PDRectangle mediaBox = newDocument.getPage(0).getMediaBox();
 
-                assertTrue(pageSize.getHeight() >= mediaBox.getHeight());
-                assertTrue(pageSize.getWidth() >= mediaBox.getWidth());
+                assertThat(mediaBox.getHeight()).isLessThanOrEqualTo(pageSize.getHeight());
+                assertThat(mediaBox.getWidth()).isLessThanOrEqualTo(pageSize.getWidth());
             }
         }
     }
 
     @Test
-    public void scalePageUpCorrectlyPortrait() throws Exception {
+    void scalePageUpCorrectlyPortrait() throws Exception {
 
-        byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("another-test.pdf"));
+        byte[] pdfBytes = IOUtils.toByteArray(requireNonNull(getClass().getClassLoader().getResourceAsStream("another-test.pdf")));
 
         PDRectangle pageSize = PDRectangle.A2;
         try (PDDocument document = Loader.loadPDF(pdfBytes)) {
 
             Optional<PDDocument> result = pdfHelper.scaleToPageSize(document, pageSize);
 
-            assertTrue(result.isPresent());
+            assertThat(result).isPresent();
             try (PDDocument newDocument = result.get()) {
                 PDRectangle mediaBox = newDocument.getPage(0).getMediaBox();
 
-                assertEquals(pageSize.getHeight(), mediaBox.getHeight(), 0.0);
-                assertEquals(pageSize.getWidth(), mediaBox.getWidth(), 0.0);
+                assertThat(mediaBox.getHeight()).isEqualTo(pageSize.getHeight(), within(0.0f));
+                assertThat(mediaBox.getWidth()).isEqualTo(pageSize.getWidth(), within(0.0f));
             }
         }
     }
 
     @Test
-    public void scalePageUpCorrectlyLandscape() throws Exception {
+    void scalePageUpCorrectlyLandscape() throws Exception {
 
-        byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("A3 Landscape.pdf"));
+        byte[] pdfBytes = IOUtils.toByteArray(requireNonNull(getClass().getClassLoader().getResourceAsStream("A3 Landscape.pdf")));
 
         PDRectangle pageSize = PDRectangle.A2;
         try (PDDocument document = Loader.loadPDF(pdfBytes)) {
 
             Optional<PDDocument> result = pdfHelper.scaleToPageSize(document, pageSize);
 
-            assertTrue(result.isPresent());
+            assertThat(result).isPresent();
             try (PDDocument newDocument = result.get()) {
                 PDRectangle mediaBox = newDocument.getPage(0).getMediaBox();
 
-                assertEquals(0.0, pageSize.getHeight(), mediaBox.getHeight());
-                assertEquals(0.0, pageSize.getWidth(), mediaBox.getWidth());
+                assertThat(mediaBox.getHeight()).isEqualTo(pageSize.getHeight(), within(0.0f));
+                assertThat(mediaBox.getWidth()).isEqualTo(pageSize.getWidth(), within(0.0f));
             }
         }
     }
 
     @Test
-    public void doesResizeDownDocumentWhichDoesNeedResizing() throws Exception {
+    void doesResizeDownDocumentWhichDoesNeedResizing() throws Exception {
 
-        byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("another-test.pdf"));
+        byte[] pdfBytes = IOUtils.toByteArray(requireNonNull(getClass().getClassLoader().getResourceAsStream("another-test.pdf")));
 
         try (PDDocument document = Loader.loadPDF(pdfBytes)) {
             PDRectangle pageSize = PDRectangle.A4;
             Optional<PDDocument> result = pdfHelper.scaleToPageSize(document, pageSize);
 
-            assertTrue(result.isPresent());
+            assertThat(result).isPresent();
             try (PDDocument newDocument = result.get()) {
                 PDRectangle mediaBox = newDocument.getPage(0).getMediaBox();
 
-                assertTrue(pageSize.getHeight() >= mediaBox.getHeight());
-                assertTrue(pageSize.getWidth() >= mediaBox.getWidth());
+                assertThat(mediaBox.getHeight()).isLessThanOrEqualTo(pageSize.getHeight());
+                assertThat(mediaBox.getWidth()).isLessThanOrEqualTo(pageSize.getWidth());
             }
         }
     }
 
     @Test
-    public void doesResizeUpDocumentWhichDoesNeedResizing() throws Exception {
+    void doesResizeUpDocumentWhichDoesNeedResizing() throws Exception {
 
-        byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("another-test.pdf"));
+        byte[] pdfBytes = IOUtils.toByteArray(requireNonNull(getClass().getClassLoader().getResourceAsStream("another-test.pdf")));
 
         try (PDDocument document = Loader.loadPDF(pdfBytes)) {
             PDRectangle pageSize = PDRectangle.A2;
             Optional<PDDocument> result = pdfHelper.scaleToPageSize(document, pageSize);
 
-            assertTrue(result.isPresent());
+            assertThat(result).isPresent();
             try (PDDocument newDocument = result.get()) {
                 PDRectangle mediaBox = newDocument.getPage(0).getMediaBox();
 
-                assertTrue(pageSize.getHeight() <= mediaBox.getHeight());
-                assertTrue(pageSize.getWidth() <= mediaBox.getWidth());
+                assertThat(mediaBox.getHeight()).isGreaterThanOrEqualTo(pageSize.getHeight());
+                assertThat(mediaBox.getWidth()).isGreaterThanOrEqualTo(pageSize.getWidth());
             }
         }
     }
 
     @Test
-    public void doesNotResizeDocumentWhichDoesNotNeedResizing() throws Exception {
-        byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("A3 Portrait.pdf"));
+    void doesNotResizeDocumentWhichDoesNotNeedResizing() throws Exception {
+        byte[] pdfBytes = IOUtils.toByteArray(requireNonNull(getClass().getClassLoader().getResourceAsStream("A3 Portrait.pdf")));
 
         try (PDDocument document = Loader.loadPDF(pdfBytes)) {
 
             Optional<PDDocument> result = pdfHelper.scaleToPageSize(document, PDRectangle.A3);
 
-            assertTrue(result.isEmpty());
+            assertThat(result).isEmpty();
         }
     }
 
     @Test
-    public void doesResizeA4DocumentWhichDoesNeedResizing() throws Exception {
+    void doesResizeA4DocumentWhichDoesNeedResizing() throws Exception {
 
-        byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("another-test.pdf"));
+        byte[] pdfBytes = IOUtils.toByteArray(requireNonNull(getClass().getClassLoader().getResourceAsStream("another-test.pdf")));
 
         try (PDDocument document = Loader.loadPDF(pdfBytes)) {
 
             Optional<PDDocument> result = pdfHelper.scaleToA4(document);
 
-            assertTrue(result.isPresent());
+            assertThat(result).isPresent();
             try (PDDocument newDocument = result.get()) {
                 PDRectangle mediaBox = newDocument.getPage(0).getMediaBox();
                 PDRectangle pageSize = PDRectangle.A4;
-                assertTrue(pageSize.getHeight() >= mediaBox.getHeight());
-                assertTrue(pageSize.getWidth() >= mediaBox.getWidth());
+                assertThat(mediaBox.getHeight()).isLessThanOrEqualTo(pageSize.getHeight());
+                assertThat(mediaBox.getWidth()).isLessThanOrEqualTo(pageSize.getWidth());
             }
         }
     }
 
     @Test
-    public void allPagesWillBeScaledToA4() throws Exception {
+    void allPagesWillBeScaledToA4() throws Exception {
         try (PDDocument document = new PDDocument()) {
             document.addPage(new PDPage(new PDRectangle(PDRectangle.A1.getWidth(), PDRectangle.A1.getHeight())));
             document.addPage(new PDPage(new PDRectangle(PDRectangle.A2.getWidth(), PDRectangle.A2.getHeight())));
@@ -327,41 +337,89 @@ public class PdfHelperTest {
             document.addPage(new PDPage(new PDRectangle(PDRectangle.A6.getWidth(), PDRectangle.A5.getHeight())));
 
             Optional<PDDocument> result = pdfHelper.scaleToA4(document);
-            assertThat(result.isPresent(), is(true));
+            assertThat(result).isPresent();
             try (PDDocument newDocument = result.get()) {
-                assertThat(newDocument.getNumberOfPages(), is(6));
-                for (PDPage page: newDocument.getPages()) {
+                assertThat(newDocument.getNumberOfPages()).isEqualTo(6);
+                for (PDPage page : newDocument.getPages()) {
                     PDRectangle mediaBox = page.getMediaBox();
-                    assertThat(mediaBox.getHeight(), is(PDRectangle.A4.getHeight()));
-                    assertThat(mediaBox.getWidth(), is(PDRectangle.A4.getWidth()));
+                    assertThat(mediaBox.getHeight()).isEqualTo(PDRectangle.A4.getHeight());
+                    assertThat(mediaBox.getWidth()).isEqualTo(PDRectangle.A4.getWidth());
                 }
             }
         }
     }
 
     @Test
-    public void resizesDocumentWithMultiPages() throws Exception {
+    void resizesDocumentWithMultiPages() throws Exception {
 
-        byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("MultiPage.pdf"));
+        byte[] pdfBytes = IOUtils.toByteArray(requireNonNull(getClass().getClassLoader().getResourceAsStream("MultiPage.pdf")));
 
         try (PDDocument document = Loader.loadPDF(pdfBytes)) {
 
             Optional<PDDocument> result = pdfHelper.scaleToA4(document);
 
-            assertTrue(result.isPresent());
+            assertThat(result).isPresent();
             try (PDDocument newDocument = result.get()) {
-                assertThat(newDocument.getNumberOfPages(), is(3));
-                for (PDPage page: newDocument.getPages()) {
+                assertThat(newDocument.getNumberOfPages()).isEqualTo(3);
+                for (PDPage page : newDocument.getPages()) {
                     PDRectangle mediaBox = page.getMediaBox();
                     if (mediaBox.getWidth() > mediaBox.getHeight()) {
-                        assertThat(mediaBox.getHeight(), is(PDRectangle.A4.getWidth()));
-                        assertThat(mediaBox.getWidth(), is(PDRectangle.A4.getHeight()));
+                        assertThat(mediaBox.getHeight()).isEqualTo(PDRectangle.A4.getWidth());
+                        assertThat(mediaBox.getWidth()).isEqualTo(PDRectangle.A4.getHeight());
                     } else {
-                        assertThat(mediaBox.getHeight(), is(PDRectangle.A4.getHeight()));
-                        assertThat(mediaBox.getWidth(), is(PDRectangle.A4.getWidth()));
+                        assertThat(mediaBox.getHeight()).isEqualTo(PDRectangle.A4.getHeight());
+                        assertThat(mediaBox.getWidth()).isEqualTo(PDRectangle.A4.getWidth());
                     }
                 }
             }
+        }
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @EmptySource
+    void returnsZeroWhenPdfsIsNullOrEmpty(List<Pdf> pdfs) {
+        assertThat(PdfHelper.getPhysicalPageCount(pdfs)).isZero();
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "1, 1, single-page.pdf",
+        "2, 1, two-page.pdf",
+        "3, 2, three-page.pdf"
+    })
+    void returnsCorrectSheetCountForDocuments(int pageCount, int expectedSheetCount, String filename) throws IOException {
+        final byte[] pdfBytes = createPdfWithPages(pageCount);
+        final List<Pdf> pdfs = List.of(new Pdf(pdfBytes, filename));
+
+        assertThat(PdfHelper.getPhysicalPageCount(pdfs)).isEqualTo(expectedSheetCount);
+    }
+
+    @Test
+    void returnsSumOfSheetCountsAcrossMultiplePdfs() throws IOException {
+        final byte[] threePagePdf = createPdfWithPages(3);
+        final byte[] fourPagePdf = createPdfWithPages(4);
+        final List<Pdf> pdfs = List.of(
+            new Pdf(threePagePdf, "three-page.pdf"),
+            new Pdf(fourPagePdf, "four-page.pdf"));
+
+        assertThat(PdfHelper.getPhysicalPageCount(pdfs)).isEqualTo(4);
+    }
+
+    @Test
+    void throwsBulkPrintExceptionWhenPdfCannotBeLoaded() {
+        final List<Pdf> pdfs = List.of(new Pdf("not a pdf".getBytes(StandardCharsets.UTF_8), "invalid.pdf"));
+
+        assertThatThrownBy(() -> PdfHelper.getPhysicalPageCount(pdfs))
+            .isInstanceOf(PdfException.class)
+            .hasMessageContaining("invalid.pdf");
+    }
+
+    private byte[] createPdfWithPages(int numberOfPages) throws IOException {
+        try (PDDocument document = new PDDocument(); ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            IntStream.range(0, numberOfPages).forEach(i -> document.addPage(new PDPage()));
+            document.save(outputStream);
+            return outputStream.toByteArray();
         }
     }
 }
