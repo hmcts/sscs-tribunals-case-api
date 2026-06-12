@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
+import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -76,12 +77,12 @@ class IssueGenericLetterHandlerTest {
     @Captor
     ArgumentCaptor<String> argumentCaptor;
 
-    private Map<LanguagePreference, Map<String, Map<String, String>>> template = new HashMap<>();
+    private final Map<LanguagePreference, Map<String, Map<String, String>>> template = new HashMap<>();
 
     private byte[] letter = new byte[1];
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         Map<String, String> nameMap = new HashMap<>();
         nameMap.put("name", "TB-SCS-LET-ENG-Issue-Generic-Letter.docx");
         nameMap.put("cover", "TB-SCS-LET-ENG-Cover-Sheet.docx");
@@ -280,7 +281,8 @@ class IssueGenericLetterHandlerTest {
         caseData.setSendToOtherParties(YesNo.NO);
         caseData.setSendToRepresentative(YesNo.NO);
 
-        byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("myPdf.pdf"));
+        byte[] pdfBytes = IOUtils.toByteArray(
+            requireNonNull(getClass().getClassLoader().getResourceAsStream("myPdf.pdf")));
         when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(pdfBytes);
         when(coverLetterService.generateCoverSheet(anyString(), anyString(), any())).thenReturn(pdfBytes);
 
