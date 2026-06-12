@@ -147,7 +147,6 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
 
     private FurtherEvidenceLetterType getLetterType(OtherParty otherParty, String entityId) {
         boolean hasRepresentative = otherParty.hasRepresentative() && entityId.contains(otherParty.getRep().getId());
-
         return hasRepresentative ? FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER : FurtherEvidenceLetterType.OTHER_PARTY_LETTER;
     }
 
