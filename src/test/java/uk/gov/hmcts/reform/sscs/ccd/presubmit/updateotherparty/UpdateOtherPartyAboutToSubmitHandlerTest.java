@@ -21,6 +21,7 @@ import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtilTest.ID_4;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +35,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
@@ -633,11 +635,11 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
         "childSupport",
         "UC"
     })
-    void givenCmConfidentialityEnabledAndChildSupportOrUcBenefit_thenDirectionDueDateAndInterlocSet(String benefitType) {
+    void givenCmConfidentialityEnabledAndAdditionalOtherPartyAdded_thenDirectionDueDateAndInterlocSet(String benefitType) {
         final UpdateOtherPartyAboutToSubmitHandler handlerWithFlag = new UpdateOtherPartyAboutToSubmitHandler(idamService, true);
         final SscsCaseData caseData = SscsCaseData.builder()
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefitType).build()).build())
-            .otherParties(singletonList(buildSscs5OtherParty(ID_1, "PayingParent")))
+            .otherParties(Arrays.asList(buildSscs5OtherParty(ID_1, "PayingParent"), buildSscs5OtherParty(ID_2, "ReceivingParent")))
             .build();
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
@@ -647,6 +649,61 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
         assertThat(response.getData().getDirectionDueDate())
             .isEqualTo(now().plusDays(getHearingResponseExpectedByDays()).toString());
         assertThat(response.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.HEF_ISSUED);
+    }
+
+    @Test
+    void givenCmConfidentialityEnabledAndAdditionalOtherPartyAddedAndAppellantWantsConfidentiality_thenDirectionDueDateAndInterlocNotSet() {
+        final UpdateOtherPartyAboutToSubmitHandler handlerWithFlag = new UpdateOtherPartyAboutToSubmitHandler(idamService, true);
+        final SscsCaseData caseData = SscsCaseData.builder()
+                                                  .appeal(Appeal.builder().appellant(Appellant.builder().confidentialityRequired(YES).build()).benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build())
+                                                  .otherParties(Arrays.asList(buildSscs5OtherParty(ID_1, "PayingParent"), buildSscs5OtherParty(ID_2, "ReceivingParent")))
+                                                  .build();
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response =
+            handlerWithFlag.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getDirectionDueDate()).isNull();
+        assertThat(response.getData().getInterlocReviewState()).isNull();
+    }
+
+    @Test
+    void givenCmConfidentialityEnabledAndOnlyOneOtherParty_thenDirectionDueDateAndInterlocNotSet() {
+        final UpdateOtherPartyAboutToSubmitHandler handlerWithFlag = new UpdateOtherPartyAboutToSubmitHandler(idamService, true);
+        final SscsCaseData caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder().appellant(Appellant.builder().confidentialityRequired(NO).build()).benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build())
+            .otherParties(singletonList(buildSscs5OtherParty(ID_1, "PayingParent")))
+            .build();
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response =
+            handlerWithFlag.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getDirectionDueDate()).isNull();
+        assertThat(response.getData().getInterlocReviewState()).isNull();
+    }
+
+    @Test
+    void givenCmConfidentialityEnabledAndOtherPartiesUnchangedFromBefore_thenDirectionDueDateAndInterlocNotSet() {
+        final UpdateOtherPartyAboutToSubmitHandler handlerWithFlag = new UpdateOtherPartyAboutToSubmitHandler(idamService, true);
+        final List<CcdValue<OtherParty>> otherParties = Arrays.asList(
+            buildSscs5OtherParty(ID_1, "PayingParent"), buildSscs5OtherParty(ID_2, "ReceivingParent"));
+        final SscsCaseData caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder().appellant(Appellant.builder().confidentialityRequired(NO).build()).benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build())
+            .otherParties(otherParties)
+            .build();
+        final SscsCaseData caseDataBefore = SscsCaseData.builder()
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build())
+            .otherParties(otherParties)
+            .build();
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(new CaseDetails<>(1L, "SSCS", null, caseDataBefore, null, "Benefit")));
+
+        final PreSubmitCallbackResponse<SscsCaseData> response =
+            handlerWithFlag.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getDirectionDueDate()).isNull();
+        assertThat(response.getData().getInterlocReviewState()).isNull();
     }
 
     @ParameterizedTest
@@ -659,12 +716,12 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
         final UpdateOtherPartyAboutToSubmitHandler handlerWithFlag =
             new UpdateOtherPartyAboutToSubmitHandler(idamService, cmConfidentialityEnabled);
         final SscsCaseData caseData = SscsCaseData.builder()
-                                                  .appeal(Appeal.builder().benefitType(
+                                                  .appeal(Appeal.builder().appellant(Appellant.builder().confidentialityRequired(NO).build()).benefitType(
                                                       BenefitType
                                                           .builder()
                                                           .code(benefit.getShortName())
                                                           .build()).build())
-                                                  .otherParties(singletonList(buildSscs5OtherParty(ID_1, "PayingParent")))
+                                                  .otherParties(Arrays.asList(buildSscs5OtherParty(ID_1, "PayingParent"), buildSscs5OtherParty(ID_2, "ReceivingParent")))
                                                   .build();
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
