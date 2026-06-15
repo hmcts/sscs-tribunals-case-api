@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.util.predicates;
 
 import static java.util.Collections.emptyList;
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
 import java.util.Optional;
@@ -14,6 +15,6 @@ public class FirstOtherPartyAddedPredicate implements BiPredicate<SscsCaseData, 
     @Override
     public boolean test(final SscsCaseData newSscsCaseData, final SscsCaseData caseDataBefore) {
         return isEmpty(Optional.ofNullable(caseDataBefore).map(SscsCaseData::getOtherParties).orElse(emptyList()))
-            && newSscsCaseData.getOtherParties().size() == FIRST_OTHER_PARTY_COUNT;
+            && emptyIfNull(newSscsCaseData.getOtherParties()).size() == FIRST_OTHER_PARTY_COUNT;
     }
 }
