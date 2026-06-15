@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.helper.PdfHelper.buildBundledLetterFromPdfs;
+import static uk.gov.hmcts.reform.sscs.helper.PdfHelper.getPhysicalPageCount;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_GENERIC_LETTER;
 
@@ -206,29 +207,21 @@ public class NotificationSender {
         throws NotificationClientException {
         byte[] content = buildBundledLetterFromPdfs(pdfs);
         if (content != null) {
-            boolean pageLimitExceeded = false;
 
-            try (PDDocument pdfDoc = Loader.loadPDF(content)) {
-                pageLimitExceeded = pdfDoc.getNumberOfPages() > 10;
-                log.info(pageLimitExceeded ? "{} letter exceeds Gov.Notify 10-page limit for precompiled letters [{}]"
-                        : "Sending {} precompiled letter of [{}] pages",
-                    eventType, pdfDoc.getNumberOfPages());
-            } catch (IOException e) {
-                log.info("Failed to calculate the number of pages contained in the letter {}", e.getMessage());
-            }
+            int physicalPageCount = getPhysicalPageCount(pdfs);
 
             String govNotifyId = null;
             NotificationClient client = null;
 
-            if (pageLimitExceeded) {
+            if (physicalPageCount > 10) {
                 bulkPrintService
                     .sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(caseId, caseData, pdfs, eventType, recipient);
                 log.info("Sending {} Letter for case id : {} via BulkPrint because it exceeds 10 pages",
                     eventType, caseId);
             } else {
+
                 client = getLetterNotificationClient(caseData.getAppeal().getAppellant().getAddress().getPostcode());
-                ByteArrayInputStream inputStream = new ByteArrayInputStream(content);
-                final LetterResponse notifyResponse = sendBundledLetter(caseId.toString(), client, inputStream);
+                final LetterResponse notifyResponse = sendBundledLetter(caseId.toString(), client, new ByteArrayInputStream(buildBundledLetterFromPdfs(pdfs)));
                 govNotifyId = nonNull(notifyResponse) ? notifyResponse.getNotificationId().toString() : null;
 
                 log.info("Letter Notification send for case id : {}, Gov notify id: {} ",
