@@ -160,7 +160,7 @@ class IssueHearingEnquiryFormHandlerTest {
         verify(coverLetterService, times(2)).generateCoverLetterRetry(any(), templateNameCaptor.capture(),
             letterNameCaptor.capture(), eq(placeholders), eq(1));
         verify(coverLetterService).generateCoverSheet("hearing-enquiry-form-cover.docx", "coversheet", placeholders);
-        verify(bulkPrintService).sendToBulkPrint(anyLong(), eq(caseData), sentPdfsCaptor.capture(),
+        verify(bulkPrintService).sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(anyLong(), eq(caseData), sentPdfsCaptor.capture(),
             eq(ISSUE_HEARING_ENQUIRY_FORM), eq("Other Person"));
 
         assertThat(templateNameCaptor.getAllValues()).containsExactlyInAnyOrder("hearing-enquiry-form-letter.docx",
@@ -195,7 +195,7 @@ class IssueHearingEnquiryFormHandlerTest {
         handler.handle(SUBMITTED, callback);
 
         verify(coverLetterService).getSelectedDocuments(caseData);
-        verify(bulkPrintService).sendToBulkPrint(anyLong(), eq(caseData), sentPdfsCaptor.capture(),
+        verify(bulkPrintService).sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(anyLong(), eq(caseData), sentPdfsCaptor.capture(),
             eq(ISSUE_HEARING_ENQUIRY_FORM), eq("Other Person"));
 
         List<Pdf> sentPdfs = sentPdfsCaptor.getValue();
