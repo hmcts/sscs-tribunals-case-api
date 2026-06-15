@@ -9,43 +9,9 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getBenefitByCodeOrThrowException;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists.EVENTS_FOR_ACTION_FURTHER_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists.EVENT_TYPES_FOR_DORMANT_CASES;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists.EVENT_TYPES_NOT_FOR_WELSH_CASES;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.APPELLANT;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.APPOINTEE;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.OTHER_PARTY;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.REPRESENTATIVE;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ACTION_POSTPONEMENT_REQUEST;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADD_OTHER_PARTY_DATA;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADMIN_SEND_TO_VALID_APPEAL;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DECISION_ISSUED;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DECISION_ISSUED_WELSH;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DIRECTION_ISSUED;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DIRECTION_ISSUED_WELSH;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DRAFT_TO_NON_COMPLIANT;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DRAFT_TO_VALID_APPEAL_CREATED;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DWP_RESPONSE_RECEIVED;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DWP_UPLOAD_RESPONSE;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.HEARING_BOOKED;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.HEARING_REMINDER;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.INTERLOC_VALID_APPEAL;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_ADJOURNMENT_NOTICE;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_ADJOURNMENT_NOTICE_WELSH;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION_WELSH;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.NON_COMPLIANT;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.NOTIFY_APPELLANT_VALID_APPEAL;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.NOTIFY_APPELLANT_VALID_APPEAL_WELSH;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.OTHER_PARTY_ADDED_TO_APPEAL;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.POSTPONEMENT;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PROCESS_AUDIO_VIDEO;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.REISSUE_DOCUMENT;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.REQUEST_FOR_INFORMATION;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SUBSCRIPTION_OLD_ID;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.UPDATE_OTHER_PARTY_DATA;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.VALID_APPEAL;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.VALID_APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.getSubscription;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.isOkToSendNotification;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationValidService.isMandatoryLetterEventType;
@@ -56,34 +22,19 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartyOption;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationConfig;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Destination;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notification;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Reference;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Template;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.*;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationFactory;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 import uk.gov.hmcts.reform.sscs.util.predicates.AdditionalOtherPartyAddedPredicate;
+import uk.gov.hmcts.reform.sscs.util.predicates.FirstOtherPartyAddedPredicate;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
 @Service
@@ -103,7 +54,8 @@ public class NotificationService {
     private final SendNotificationService sendNotificationService;
     private final boolean covid19Feature;
     private final boolean cmOtherPartyConfidentialityEnabled;
-    private final BiPredicate<SscsCaseData, SscsCaseData> additionalOtherPartyAddedPredicate;
+    private final AdditionalOtherPartyAddedPredicate additionalOtherPartyAddedPredicate;
+    private final FirstOtherPartyAddedPredicate firstOtherPartyAddedPredicate;
 
     @SuppressWarnings("squid:S107")
     @Autowired
@@ -128,6 +80,7 @@ public class NotificationService {
         this.covid19Feature = covid19Feature;
         this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
         this.additionalOtherPartyAddedPredicate = new AdditionalOtherPartyAddedPredicate();
+        this.firstOtherPartyAddedPredicate = new FirstOtherPartyAddedPredicate();
     }
 
     public void manageNotificationAndSubscription(NotificationWrapper notificationWrapper, boolean fromReminderService) {
@@ -196,12 +149,14 @@ public class NotificationService {
     }
 
     private boolean shouldNotifyAppellantAboutAdditionalOtherParty(final NotificationWrapper notificationWrapper) {
-        if (!cmOtherPartyConfidentialityEnabled
-            || !isBenefitTypeChildSupportOrUc(notificationWrapper.getNewSscsCaseData())
-            || !notificationWrapper.getNotificationType().equals(UPDATE_OTHER_PARTY_DATA)) {
+        if (!cmOtherPartyConfidentialityEnabled || !notificationWrapper.getNotificationType().equals(UPDATE_OTHER_PARTY_DATA)) {
             return false;
         }
-        return additionalOtherPartyAddedPredicate.test(notificationWrapper.getNewSscsCaseData(), notificationWrapper.getOldSscsCaseData());
+        return (notificationWrapper.getNewSscsCaseData().isBenefitType(UC) && firstOtherPartyAddedPredicate.test(
+            notificationWrapper.getNewSscsCaseData(), notificationWrapper.getOldSscsCaseData()))
+            || (isBenefitTypeChildSupportOrUc(notificationWrapper.getNewSscsCaseData())
+            && additionalOtherPartyAddedPredicate.test(notificationWrapper.getNewSscsCaseData(),
+            notificationWrapper.getOldSscsCaseData()));
     }
 
     private void sendNotificationPerSubscription(NotificationWrapper notificationWrapper) {

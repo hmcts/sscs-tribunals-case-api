@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
@@ -37,22 +39,13 @@ class AdditionalOtherPartyAddedPredicateTest {
         assertThat(predicate.test(newData, caseDetailsBefore.getCaseData())).isFalse();
     }
 
-    @Test
-    void givenNewOtherPartyAddedForChildSupport_thenPredicateIsTrue() {
+    @ParameterizedTest
+    @EnumSource(value = Benefit.class, names = {"CHILD_SUPPORT", "UC"})
+    void givenNewOtherPartyAdded_thenPredicateIsTrue(Benefit benefit) {
         final AdditionalOtherPartyAddedPredicate predicate = new AdditionalOtherPartyAddedPredicate();
 
-        final SscsCaseData newData = caseData(Benefit.CHILD_SUPPORT.getShortName(), List.of(EXISTING_PARTY, NEW_PARTY));
-        final CaseDetails<SscsCaseData> caseDetailsBefore = caseDetailsBefore(Benefit.CHILD_SUPPORT.getShortName(), List.of(EXISTING_PARTY));
-
-        assertThat(predicate.test(newData, caseDetailsBefore.getCaseData())).isTrue();
-    }
-
-    @Test
-    void givenNewOtherPartyAddedForUc_thenPredicateIsTrue() {
-        final AdditionalOtherPartyAddedPredicate predicate = new AdditionalOtherPartyAddedPredicate();
-
-        final SscsCaseData newData = caseData(Benefit.UC.getShortName(), List.of(EXISTING_PARTY, NEW_PARTY));
-        final CaseDetails<SscsCaseData> caseDetailsBefore = caseDetailsBefore(Benefit.UC.getShortName(), List.of(EXISTING_PARTY));
+        final SscsCaseData newData = caseData(benefit.getShortName(), List.of(EXISTING_PARTY, NEW_PARTY));
+        final CaseDetails<SscsCaseData> caseDetailsBefore = caseDetailsBefore(benefit.getShortName(), List.of(EXISTING_PARTY));
 
         assertThat(predicate.test(newData, caseDetailsBefore.getCaseData())).isTrue();
     }
