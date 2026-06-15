@@ -5,7 +5,6 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.ADDRESS_NAME;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_NAME;
-import static uk.gov.hmcts.reform.sscs.helper.PdfHelper.getPhysicalPageCount;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -30,6 +29,9 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.CoverLetterService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.GenericLetterPlaceholderService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility;
+import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationSender;
+import uk.gov.service.notify.NotificationClientException;
 
 @Slf4j
 @Service
@@ -41,6 +43,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
     private final CoverLetterService coverLetterService;
 
     private final DocmosisTemplateConfig docmosisTemplateConfig;
+    private final NotificationSender notificationSender;
 
     private String docmosisTemplate;
 
@@ -50,11 +53,12 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
     public IssueGenericLetterHandler(BulkPrintService bulkPrintService,
                                      GenericLetterPlaceholderService genericLetterPlaceholderService,
                                      CoverLetterService coverLetterService,
-                                     DocmosisTemplateConfig docmosisTemplateConfig) {
+                                     DocmosisTemplateConfig docmosisTemplateConfig, NotificationSender notificationSender) {
         this.genericLetterPlaceholderService = genericLetterPlaceholderService;
         this.bulkPrintService = bulkPrintService;
         this.coverLetterService = coverLetterService;
         this.docmosisTemplateConfig = docmosisTemplateConfig;
+        this.notificationSender = notificationSender;
     }
 
     @Override
@@ -172,13 +176,24 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
         sendLetterToNotificationProvider(caseId, caseData, letter, recipient);
     }
 
-    private void sendLetterToNotificationProvider(long caseId, SscsCaseData caseData, List<Pdf> letter, String recipient) {
-        if (getPhysicalPageCount(letter) > 10) {
-            bulkPrintService.sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(caseId, caseData, letter, EventType.ISSUE_GENERIC_LETTER,
-                recipient);
-        } else {
-            System.out.println("Sending letter to notification provider");
+    private void sendLetterToNotificationProvider(Long caseId, SscsCaseData caseData, List<Pdf> letter, String recipient) {
+
+        try {
+            notificationSender.sendBundledLetter(EventType.ISSUE_GENERIC_LETTER, caseData, caseId, letter, recipient);
+        } catch (NotificationClientException ioe) {
+            NotificationServiceException exception = new NotificationServiceException(caseId.toString(), ioe);
+            log.error("Error on GovUKNotify for case id: " + caseId.toString() + ", sendBundledAndDocmosisLetterNotification",
+                exception);
+            throw exception;
         }
+
+        //
+        // if (getPhysicalPageCount(letter) > 10) {
+        //     bulkPrintService.sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(caseId, caseData, letter, EventType.ISSUE_GENERIC_LETTER,
+        //         recipient);
+        // } else {
+        //     System.out.println("Sending letter to notification provider");
+        // }
     }
 
     private static String getLetterName(Map<String, Object> placeholders) {
