@@ -59,6 +59,7 @@ import { CtscActionUnprocessedCorrespondence } from '../fixtures/steps/work-allo
 import { CtscReviewFtaResponse } from '../fixtures/steps/work-allocation/ctsc.review.fta.response';
 import { CtscReviewListingError } from '../fixtures/steps/work-allocation/ctsc.review.listing.error'
 import { CtscReviewAdminAction } from '../fixtures/steps/work-allocation/ctsc.review.admin.action';
+import { UcConfidentiality } from '../fixtures/steps/uc.confidentiality';
 
 type MyStepsFixtures = {
   addNoteSteps: Note;
@@ -121,6 +122,7 @@ type MyStepsFixtures = {
   ctscReviewFtaResponseSteps: CtscReviewFtaResponse;
   ctscReviewListingErrorSteps: CtscReviewListingError;
   ctscReviewAdminActionSteps: CtscReviewAdminAction;
+  ucConfidentialitySteps: UcConfidentiality;
 };
 
 export const test = stepsFactory.extend<MyStepsFixtures>({
@@ -462,5 +464,9 @@ export const test = stepsFactory.extend<MyStepsFixtures>({
   ctscReviewAdminActionSteps: async ({ page }, use) => {
     const ctscReviewAdminActionSteps = new CtscReviewAdminAction(page);
     await use(ctscReviewAdminActionSteps);
+  },
+  ucConfidentialitySteps: async ({ page }, use) => {
+    const ucConfidentialitySteps = new UcConfidentiality(page);
+    await use(ucConfidentialitySteps);
   }
 });
