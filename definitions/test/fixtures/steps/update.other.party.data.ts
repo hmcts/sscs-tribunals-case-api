@@ -334,7 +334,9 @@ export class UpdateOtherPartyData extends BaseStep {
     );
     await this.updateOtherPartyDataPage.applyChildSupportFtaAddOtherPartyData();
 
-    await this.summaryTab.waitForSummaryState('Await Confidentiality Requirements');
+    await this.summaryTab.waitForSummaryState(
+      'Await Confidentiality Requirements'
+    );
   }
 
   async completeChildSupportConfidentialityDeterminationFlow(caseId: string) {
@@ -343,6 +345,7 @@ export class UpdateOtherPartyData extends BaseStep {
 
     await this.loginUserWithCaseId(credentials.dwpResponseWriter, true, caseId);
     await this.summaryTab.waitForSummaryState('Await Other Party Data');
+    await this.homePage.navigateToTab('Confidentiality');
     await this.confidentialityTab.verifyConfidentialityRows([
       {
         party: 'Appellant',
@@ -366,7 +369,10 @@ export class UpdateOtherPartyData extends BaseStep {
         postcode: 'BN19SA'
       }
     );
-    await this.summaryTab.waitForSummaryState('Await Confidentiality Requirements');
+    await this.summaryTab.waitForSummaryState(
+      'Await Confidentiality Requirements'
+    );
+    await this.homePage.navigateToTab('Confidentiality');
     await this.confidentialityTab.verifyConfidentialityRows([
       {
         party: 'Appellant',
@@ -386,7 +392,10 @@ export class UpdateOtherPartyData extends BaseStep {
 
     await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
     await this.reloginIfRedirectedToSignIn(credentials.amCaseWorker, caseId);
-    await this.summaryTab.waitForSummaryState('Await Confidentiality Requirements');
+    await this.summaryTab.waitForSummaryState(
+      'Await Confidentiality Requirements'
+    );
+    await this.homePage.navigateToTab('Confidentiality');
     await this.confidentialityTab.verifyConfidentialityRows([
       {
         party: 'Appellant',
@@ -403,9 +412,11 @@ export class UpdateOtherPartyData extends BaseStep {
     ]);
 
     await this.homePage.chooseEvent('Update other party data');
-    await this.updateOtherPartyDataPage.setConfidentialityForOtherParty(false)
-    await this.submitEventWithOptionalSecondSubmit();
-    await this.summaryTab.waitForSummaryState('Await Confidentiality Requirements');
+    await this.updateOtherPartyDataPage.setConfidentialityForOtherParty(false);
+    await this.summaryTab.waitForSummaryState(
+      'Await Confidentiality Requirements'
+    );
+    await this.homePage.navigateToTab('Confidentiality');
     await this.confidentialityTab.verifyConfidentialityRows([
       {
         party: 'Appellant',
@@ -458,6 +469,7 @@ export class UpdateOtherPartyData extends BaseStep {
       'Confidentiality Required',
       'Yes'
     );
+    await this.homePage.navigateToTab('Confidentiality');
     await this.confidentialityTab.verifyConfidentialityRows([
       {
         party: 'Appellant',

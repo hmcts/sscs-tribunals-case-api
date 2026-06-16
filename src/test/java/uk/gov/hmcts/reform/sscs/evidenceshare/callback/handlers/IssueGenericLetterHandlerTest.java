@@ -1,8 +1,6 @@
 // package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 //
-// import static java.util.Objects.requireNonNull;
-// import static org.assertj.core.api.Assertions.assertThat;
-// import static org.assertj.core.api.Assertions.assertThatThrownBy;
+// import static org.junit.Assert.assertThrows;
 // import static org.mockito.ArgumentMatchers.any;
 // import static org.mockito.ArgumentMatchers.anyInt;
 // import static org.mockito.ArgumentMatchers.anyString;
@@ -21,20 +19,18 @@
 // import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
 // import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 // import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
-// import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
-// import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.OTHER_PARTY_LETTER;
 // import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderHelper.buildJointParty;
 // import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderHelper.buildOtherParty;
 // import static uk.gov.hmcts.reform.sscs.model.PartyItemList.OTHER_PARTY;
 // import static uk.gov.hmcts.reform.sscs.model.PartyItemList.OTHER_PARTY_REPRESENTATIVE;
 //
 // import java.io.IOException;
-// import java.util.EnumMap;
 // import java.util.HashMap;
 // import java.util.List;
 // import java.util.Map;
 // import lombok.extern.slf4j.Slf4j;
 // import org.apache.commons.io.IOUtils;
+// import org.junit.jupiter.api.Assertions;
 // import org.junit.jupiter.api.BeforeEach;
 // import org.junit.jupiter.api.Test;
 // import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,8 +39,6 @@
 // import org.mockito.Mock;
 // import org.mockito.junit.jupiter.MockitoExtension;
 // import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
-// import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
-// import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 // import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 // import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 // import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
@@ -55,7 +49,6 @@
 // import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 // import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 // import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-// import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 // import uk.gov.hmcts.reform.sscs.evidenceshare.config.DocmosisTemplateConfig;
 // import uk.gov.hmcts.reform.sscs.evidenceshare.service.BulkPrintService;
 // import uk.gov.hmcts.reform.sscs.evidenceshare.service.CcdNotificationService;
@@ -83,15 +76,12 @@
 //     @Captor
 //     ArgumentCaptor<String> argumentCaptor;
 //
-//     @Captor
-//     ArgumentCaptor<List<Pdf>> documentsCaptor;
+//     private Map<LanguagePreference, Map<String, Map<String, String>>> template = new HashMap<>();
 //
-//     private final Map<LanguagePreference, Map<String, Map<String, String>>> template = new EnumMap<>(LanguagePreference.class);
-//
-//     private final byte[] letter = new byte[1];
+//     private byte[] letter = new byte[1];
 //
 //     @BeforeEach
-//     void setup() {
+//     public void setup() {
 //         Map<String, String> nameMap = new HashMap<>();
 //         nameMap.put("name", "TB-SCS-LET-ENG-Issue-Generic-Letter.docx");
 //         nameMap.put("cover", "TB-SCS-LET-ENG-Cover-Sheet.docx");
@@ -114,7 +104,7 @@
 //
 //         boolean result = handler.canHandle(ABOUT_TO_SUBMIT, callback);
 //
-//         assertThat(result).isFalse();
+//         Assertions.assertFalse(result);
 //     }
 //
 //     @Test
@@ -125,26 +115,28 @@
 //
 //         boolean result = handler.canHandle(SUBMITTED, callback);
 //
-//         assertThat(result).isFalse();
+//         Assertions.assertFalse(result);
 //     }
 //
 //     @Test
 //     void shouldThrowException_givenCallbackIsNull() {
-//         assertThatThrownBy(() -> handler.canHandle(SUBMITTED, null))
-//             .isInstanceOf(NullPointerException.class);
+//         assertThrows(NullPointerException.class, () ->
+//             handler.canHandle(SUBMITTED, null)
+//         );
 //     }
 //
 //     @Test
 //     void shouldThrowExceptionInHandler_givenCallbackIsNull() {
 //         SscsCaseData caseData = buildCaseData();
-//         Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
-//             ISSUE_ADJOURNMENT_NOTICE);
+//         Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_ADJOURNMENT_NOTICE);
 //
-//         assertThatThrownBy(() -> handler.handle(MID_EVENT, callback))
-//             .isInstanceOf(IllegalStateException.class);
+//         assertThrows(IllegalStateException.class, () ->
+//             handler.handle(MID_EVENT, callback)
+//         );
 //
-//         assertThatThrownBy(() -> handler.handle(SUBMITTED, callback))
-//             .isInstanceOf(IllegalStateException.class);
+//         assertThrows(IllegalStateException.class, () ->
+//             handler.handle(SUBMITTED, callback)
+//         );
 //     }
 //
 //     @Test
@@ -159,34 +151,26 @@
 //
 //         var otherPartyWithRep = buildOtherParty();
 //         Representative representative = Representative.builder()
-//                                                       .hasRepresentative("YES")
-//                                                       .name(Name
-//                                                           .builder()
-//                                                           .firstName("OPRepFirstName")
-//                                                           .lastName("OPRepLastName")
-//                                                           .build())
-//                                                       .build();
+//             .hasRepresentative("YES")
+//             .name(Name.builder().firstName("OPRepFirstName").lastName("OPRepLastName").build())
+//             .build();
 //         otherPartyWithRep.setRep(representative);
 //
 //         caseData.setOtherParties(List.of(otherParty, new CcdValue<>(otherPartyWithRep)));
 //         caseData.setOtherPartySelection(buildOtherPartiesSelection(otherParty, representative));
 //
-//         when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(
-//             Map.of());
-//         when(coverLetterService.generateCoverLetterRetry(eq(APPELLANT_LETTER), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
+//         when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
+//         when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
 //         when(coverLetterService.generateCoverSheet(anyString(), eq("coversheet"), eq(Map.of()))).thenReturn(letter);
 //
-//         Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
-//             ISSUE_GENERIC_LETTER);
+//         Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_GENERIC_LETTER);
 //
 //         handler.handle(SUBMITTED, callback);
 //
-//         verify(bulkPrintService, times(5)).sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(
-//             eq(callback.getCaseDetails().getId()),
+//         verify(bulkPrintService, times(5)).sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(eq(callback.getCaseDetails().getId()),
 //             eq(caseData), any(), eq(ISSUE_GENERIC_LETTER),
 //             argumentCaptor.capture());
-//         assertThat(argumentCaptor.getAllValues()).containsExactly("User Test", "Wendy Giles", "Joint Party", "Other Party",
-//             "OPRepFirstName OPRepLastName");
+//         Assertions.assertEquals(argumentCaptor.getAllValues(), List.of("User Test", "Wendy Giles", "Joint Party", "Other Party", "OPRepFirstName OPRepLastName"));
 //     }
 //
 //     @Test
@@ -204,34 +188,25 @@
 //
 //         var otherPartyWithRep = buildOtherParty();
 //         Representative representative = Representative.builder()
-//                                                       .hasRepresentative("YES")
-//                                                       .name(Name
-//                                                           .builder()
-//                                                           .firstName("OPRepFirstName")
-//                                                           .lastName("OPRepLastName")
-//                                                           .build())
-//                                                       .build();
+//             .hasRepresentative("YES")
+//             .name(Name.builder().firstName("OPRepFirstName").lastName("OPRepLastName").build())
+//             .build();
 //         otherPartyWithRep.setRep(representative);
 //
 //         caseData.setOtherParties(List.of(otherParty, new CcdValue<>(otherPartyWithRep)));
 //         caseData.setOtherPartySelection(buildOtherPartiesSelection(otherParty, representative));
 //
-//         when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(
-//             Map.of());
-//         when(coverLetterService.generateCoverLetterRetry(eq(
-//             APPELLANT_LETTER), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
+//         when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
+//         when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
 //
-//         Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
-//             ISSUE_GENERIC_LETTER);
+//         Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_GENERIC_LETTER);
 //
 //         handler.handle(SUBMITTED, callback);
 //
-//         verify(bulkPrintService, times(5)).sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(
-//             eq(callback.getCaseDetails().getId()),
+//         verify(bulkPrintService, times(5)).sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(eq(callback.getCaseDetails().getId()),
 //             eq(caseData), any(), eq(ISSUE_GENERIC_LETTER),
 //             argumentCaptor.capture());
-//         assertThat(argumentCaptor.getAllValues()).containsExactly("User Test", "Wendy Giles", "Joint Party", "Other Party",
-//             "OPRepFirstName OPRepLastName");
+//         Assertions.assertEquals(argumentCaptor.getAllValues(), List.of("User Test", "Wendy Giles", "Joint Party", "Other Party", "OPRepFirstName OPRepLastName"));
 //     }
 //
 //     @Test
@@ -249,20 +224,15 @@
 //
 //         var otherPartyWithRep = buildOtherParty();
 //         Representative representative = Representative.builder()
-//                                                       .hasRepresentative("YES")
-//                                                       .name(Name
-//                                                           .builder()
-//                                                           .firstName("OPRepFirstName")
-//                                                           .lastName("OPRepLastName")
-//                                                           .build())
-//                                                       .build();
+//             .hasRepresentative("YES")
+//             .name(Name.builder().firstName("OPRepFirstName").lastName("OPRepLastName").build())
+//             .build();
 //         otherPartyWithRep.setRep(representative);
 //
 //         caseData.setOtherParties(List.of(otherParty, new CcdValue<>(otherPartyWithRep)));
 //         caseData.setOtherPartySelection(buildOtherPartiesSelection(otherParty, representative));
 //
-//         Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
-//             ISSUE_GENERIC_LETTER);
+//         Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_GENERIC_LETTER);
 //
 //         handler.handle(SUBMITTED, callback);
 //
@@ -276,20 +246,17 @@
 //         SscsCaseData caseData = buildCaseData();
 //         caseData.setSendToAllParties(YesNo.YES);
 //
-//         when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(
-//             Map.of());
+//         when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
 //
-//         Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
-//             ISSUE_GENERIC_LETTER);
+//         Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_GENERIC_LETTER);
 //
 //         handler.handle(SUBMITTED, callback);
 //
 //         verify(ccdNotificationService, times(0)).storeNotificationLetterIntoCcd(any(), any(), any(), any());
-//         verify(bulkPrintService, times(2)).sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(
-//             eq(callback.getCaseDetails().getId()),
+//         verify(bulkPrintService, times(2)).sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(eq(callback.getCaseDetails().getId()),
 //             eq(caseData), any(), eq(ISSUE_GENERIC_LETTER),
 //             argumentCaptor.capture());
-//         assertThat(argumentCaptor.getAllValues()).containsExactly("User Test", "Wendy Giles");
+//         Assertions.assertEquals(argumentCaptor.getAllValues(), List.of("User Test", "Wendy Giles"));
 //     }
 //
 //     @Test
@@ -300,220 +267,21 @@
 //         caseData.setSendToOtherParties(YesNo.NO);
 //         caseData.setSendToRepresentative(YesNo.NO);
 //
-//         byte[] pdfBytes = IOUtils.toByteArray(
-//             requireNonNull(getClass().getClassLoader().getResourceAsStream("myPdf.pdf")));
-//         when(coverLetterService.generateCoverLetterRetry(eq(APPELLANT_LETTER), anyString(), anyString(), any(), anyInt())).thenReturn(pdfBytes);
+//         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("myPdf.pdf"));
+//         when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(pdfBytes);
 //         when(coverLetterService.generateCoverSheet(anyString(), anyString(), any())).thenReturn(pdfBytes);
 //
-//         Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
-//             ISSUE_GENERIC_LETTER);
+//         Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_GENERIC_LETTER);
 //
 //         handler.handle(SUBMITTED, callback);
 //
-//         verify(bulkPrintService, times(1)).sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(
-//             eq(callback.getCaseDetails().getId()),
+//         verify(bulkPrintService, times(1)).sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(eq(callback.getCaseDetails().getId()),
 //             eq(caseData), any(), eq(ISSUE_GENERIC_LETTER),
 //             argumentCaptor.capture());
-//         assertThat(argumentCaptor.getAllValues()).containsExactly("User Test");
+//         Assertions.assertEquals(argumentCaptor.getAllValues(), List.of("User Test"));
 //     }
 //
-//     @Test
-//     void shouldReturnLatestDispatchPriority() {
-//         assertThat(handler.getPriority()).isEqualTo(DispatchPriority.LATEST);
-//     }
-//
-//     @Test
-//     void shouldIncludeSelectedDocumentsWhenAddDocumentsIsYes() {
-//         SscsCaseData caseData = buildCaseData();
-//         caseData.setAddDocuments(YesNo.YES);
-//         caseData.setSendToApellant(YesNo.YES);
-//         caseData.setSendToJointParty(YesNo.NO);
-//         caseData.setSendToOtherParties(YesNo.NO);
-//         caseData.setSendToRepresentative(YesNo.NO);
-//
-//         Pdf selectedDocument = new Pdf(new byte[]{2}, "selected.pdf");
-//         when(coverLetterService.getSelectedDocuments(caseData)).thenReturn(List.of(selectedDocument));
-//         when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(
-//             Map.of());
-//         when(coverLetterService.generateCoverLetterRetry(eq(APPELLANT_LETTER), eq("TB-SCS-LET-ENG-Issue-Generic-Letter.docx"), anyString(), any(), anyInt())).thenReturn(letter);
-//         when(coverLetterService.generateCoverSheet(eq("TB-SCS-LET-ENG-Cover-Sheet.docx"), anyString(), any())).thenReturn(letter);
-//
-//         Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
-//             ISSUE_GENERIC_LETTER);
-//
-//         handler.handle(SUBMITTED, callback);
-//
-//         verify(bulkPrintService).sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(
-//             eq(callback.getCaseDetails().getId()),
-//             eq(caseData), documentsCaptor.capture(), eq(ISSUE_GENERIC_LETTER), eq("User Test"));
-//
-//         List<Pdf> sentDocuments = documentsCaptor.getValue();
-//         assertThat(sentDocuments).hasSize(2).contains(selectedDocument);
-//
-//         Pdf coverLetterPdf = sentDocuments.stream().filter(pdf -> !pdf.equals(selectedDocument)).findFirst().orElseThrow();
-//         assertThat(coverLetterPdf.getName()).startsWith("Generic Letter to null ");
-//     }
-//
-//     @Test
-//     void shouldNotSendLetterWhenOtherPartyCannotBeFound() {
-//         SscsCaseData caseData = buildCaseData();
-//         caseData.setSendToApellant(YesNo.NO);
-//         caseData.setSendToJointParty(YesNo.NO);
-//         caseData.setSendToRepresentative(YesNo.NO);
-//         caseData.setSendToOtherParties(YesNo.YES);
-//
-//         caseData.setOtherParties(List.of(new CcdValue<>(buildOtherParty())));
-//
-//         var unknownItem = new DynamicListItem(OTHER_PARTY.getCode() + "unknown-id", "test");
-//         var unknownList = new DynamicList(unknownItem, List.of());
-//         caseData.setOtherPartySelection(List.of(new CcdValue<>(new OtherPartySelectionDetails(unknownList))));
-//
-//         Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
-//             ISSUE_GENERIC_LETTER);
-//
-//         handler.handle(SUBMITTED, callback);
-//
-//         verifyNoInteractions(bulkPrintService);
-//     }
-//
-//     @Test
-//     void shouldSendOtherPartyLetterNotRepLetterWhenOtherPartySelectedByOwnId() {
-//         SscsCaseData caseData = buildCaseData();
-//         caseData.setSendToApellant(YesNo.NO);
-//         caseData.setSendToJointParty(YesNo.NO);
-//         caseData.setSendToRepresentative(YesNo.NO);
-//         caseData.setSendToOtherParties(YesNo.YES);
-//
-//         var otherPartyWithRep = buildOtherParty();
-//         Representative representative = Representative.builder()
-//                                                       .hasRepresentative("YES")
-//                                                       .name(Name
-//                                                           .builder()
-//                                                           .firstName("OPRepFirstName")
-//                                                           .lastName("OPRepLastName")
-//                                                           .build())
-//                                                       .build();
-//         otherPartyWithRep.setRep(representative);
-//
-//         caseData.setOtherParties(List.of(new CcdValue<>(otherPartyWithRep)));
-//
-//         var item = new DynamicListItem(OTHER_PARTY.getCode() + otherPartyWithRep.getId(), "test");
-//         var list = new DynamicList(item, List.of());
-//         caseData.setOtherPartySelection(List.of(new CcdValue<>(new OtherPartySelectionDetails(list))));
-//
-//         when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(
-//             Map.of());
-//         when(coverLetterService.generateCoverLetterRetry(eq(OTHER_PARTY_LETTER), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
-//         when(coverLetterService.generateCoverSheet(anyString(), anyString(), any())).thenReturn(letter);
-//
-//         Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
-//             ISSUE_GENERIC_LETTER);
-//
-//         handler.handle(SUBMITTED, callback);
-//
-//         verify(bulkPrintService, times(1)).sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(
-//             eq(callback.getCaseDetails().getId()),
-//             eq(caseData), any(), eq(ISSUE_GENERIC_LETTER),
-//             argumentCaptor.capture());
-//         assertThat(argumentCaptor.getAllValues()).containsExactly("Other Party");
-//     }
-//
-//     @Test
-//     void shouldNotSendLetterWhenOtherPartyWithRepresentativeSelectionIdDoesNotMatch() {
-//         SscsCaseData caseData = buildCaseData();
-//         caseData.setSendToApellant(YesNo.NO);
-//         caseData.setSendToJointParty(YesNo.NO);
-//         caseData.setSendToRepresentative(YesNo.NO);
-//         caseData.setSendToOtherParties(YesNo.YES);
-//
-//         var otherPartyWithRep = buildOtherParty();
-//         Representative representative = Representative.builder()
-//                                                       .hasRepresentative("YES")
-//                                                       .name(Name
-//                                                           .builder()
-//                                                           .firstName("OPRepFirstName")
-//                                                           .lastName("OPRepLastName")
-//                                                           .build())
-//                                                       .build();
-//         otherPartyWithRep.setRep(representative);
-//
-//         caseData.setOtherParties(List.of(new CcdValue<>(otherPartyWithRep)));
-//
-//         var unknownItem = new DynamicListItem(OTHER_PARTY.getCode() + "unknown-id", "test");
-//         var unknownList = new DynamicList(unknownItem, List.of());
-//         caseData.setOtherPartySelection(List.of(new CcdValue<>(new OtherPartySelectionDetails(unknownList))));
-//
-//         Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
-//             ISSUE_GENERIC_LETTER);
-//
-//         handler.handle(SUBMITTED, callback);
-//
-//         verifyNoInteractions(bulkPrintService);
-//     }
-//
-//     @Test
-//     void shouldSendOtherPartyLetterToAppointeeWhenSelectedByAppointeeId() {
-//         SscsCaseData caseData = buildCaseData();
-//         caseData.setSendToApellant(YesNo.NO);
-//         caseData.setSendToJointParty(YesNo.NO);
-//         caseData.setSendToRepresentative(YesNo.NO);
-//         caseData.setSendToOtherParties(YesNo.YES);
-//
-//         var otherPartyWithAppointee = buildOtherParty();
-//         Appointee appointee = Appointee.builder()
-//                                        .name(Name.builder().firstName("AppointeeFirstName").lastName("AppointeeLastName").build())
-//                                        .build();
-//         otherPartyWithAppointee.setAppointee(appointee);
-//         otherPartyWithAppointee.setIsAppointee("Yes");
-//
-//         caseData.setOtherParties(List.of(new CcdValue<>(otherPartyWithAppointee)));
-//
-//         var item = new DynamicListItem(OTHER_PARTY.getCode() + appointee.getId(), "test");
-//         var list = new DynamicList(item, List.of());
-//         caseData.setOtherPartySelection(List.of(new CcdValue<>(new OtherPartySelectionDetails(list))));
-//
-//         when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(
-//             Map.of());
-//         when(coverLetterService.generateCoverLetterRetry(eq(OTHER_PARTY_LETTER), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
-//         when(coverLetterService.generateCoverSheet(anyString(), anyString(), any())).thenReturn(letter);
-//
-//         Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
-//             ISSUE_GENERIC_LETTER);
-//
-//         handler.handle(SUBMITTED, callback);
-//
-//         verify(bulkPrintService, times(1)).sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(
-//             eq(callback.getCaseDetails().getId()),
-//             eq(caseData), any(), eq(ISSUE_GENERIC_LETTER),
-//             argumentCaptor.capture());
-//         assertThat(argumentCaptor.getAllValues()).containsExactly("AppointeeFirstName AppointeeLastName");
-//     }
-//
-//     @Test
-//     void shouldSendAllPartiesExceptRepresentativeWhenThereIsNoRepresentative() {
-//         SscsCaseData caseData = buildCaseData();
-//         caseData.setSendToAllParties(YesNo.YES);
-//         caseData.getAppeal().getRep().setHasRepresentative("No");
-//
-//         when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(
-//             Map.of());
-//         when(coverLetterService.generateCoverLetterRetry(eq(APPELLANT_LETTER), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
-//         when(coverLetterService.generateCoverSheet(anyString(), anyString(), any())).thenReturn(letter);
-//
-//         Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
-//             ISSUE_GENERIC_LETTER);
-//
-//         handler.handle(SUBMITTED, callback);
-//
-//         verify(bulkPrintService, times(1)).sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(
-//             eq(callback.getCaseDetails().getId()),
-//             eq(caseData), any(), eq(ISSUE_GENERIC_LETTER),
-//             argumentCaptor.capture());
-//         assertThat(argumentCaptor.getAllValues()).containsExactly("User Test");
-//     }
-//
-//     static List<CcdValue<OtherPartySelectionDetails>> buildOtherPartiesSelection(CcdValue<OtherParty> otherParty,
-//         Representative representative) {
+//     static List<CcdValue<OtherPartySelectionDetails>> buildOtherPartiesSelection(CcdValue<OtherParty> otherParty, Representative representative) {
 //         var item1 = new DynamicListItem(OTHER_PARTY.getCode() + otherParty.getValue().getId(), "test");
 //         var item2 = new DynamicListItem(OTHER_PARTY_REPRESENTATIVE.getCode() + representative.getId(), "test");
 //
