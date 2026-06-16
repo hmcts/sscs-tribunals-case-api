@@ -172,7 +172,7 @@ public class PdfHelper {
         }
     }
 
-    public static int getPhysicalPageCount(List<Pdf> pdfs) {
+    public static int getPhysicalPageCount(List<Pdf> pdfs) throws PdfException {
         int totalSheets = 0;
         if (pdfs == null) {
             return totalSheets;

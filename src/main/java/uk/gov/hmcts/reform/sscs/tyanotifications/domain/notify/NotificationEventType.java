@@ -51,7 +51,6 @@ public enum NotificationEventType {
     ISSUE_ADJOURNMENT_NOTICE_WELSH(EventType.ISSUE_ADJOURNMENT_NOTICE_WELSH, true, true, true, false, false, 0),
     ISSUE_FINAL_DECISION(EventType.ISSUE_FINAL_DECISION, true, true, true, false, false, 0),
     ISSUE_FINAL_DECISION_WELSH(EventType.ISSUE_FINAL_DECISION_WELSH, true, true, true, false, false, 0),
-    ISSUE_GENERIC_LETTER(EventType.ISSUE_GENERIC_LETTER, false, false, false, false, false, 0),
     JOINT_PARTY_ADDED(EventType.JOINT_PARTY_ADDED, true, true, true, true, false, 0),
     JUDGE_DECISION_APPEAL_TO_PROCEED(EventType.JUDGE_DECISION_APPEAL_TO_PROCEED, true, true, true, false, false, 0),
     LIBERTY_TO_APPLY_REQUEST(EventType.LIBERTY_TO_APPLY_REQUEST, false, false, false, false, false, 0),

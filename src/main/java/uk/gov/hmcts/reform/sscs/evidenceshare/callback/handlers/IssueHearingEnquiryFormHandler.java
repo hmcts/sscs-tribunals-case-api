@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.evidenceshare.config.DocmosisTemplateConfig;
-import uk.gov.hmcts.reform.sscs.evidenceshare.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.CoverLetterService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.HearingEnquiryFormPlaceholderService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility;
@@ -38,19 +37,17 @@ public class IssueHearingEnquiryFormHandler implements CallbackHandler<SscsCaseD
 
     private static final String HEARING_ENQUIRY_FORM = "hearing-enquiry-form";
     private final HearingEnquiryFormPlaceholderService hearingEnquiryFormPlaceholderService;
-    private final BulkPrintService bulkPrintService;
     private final CoverLetterService coverLetterService;
     private final boolean cmOtherPartyConfidentialityEnabled;
     private final DocmosisTemplateConfig docmosisTemplateConfig;
     private final NotificationSender notificationSender;
 
 
-    public IssueHearingEnquiryFormHandler(BulkPrintService bulkPrintService,
+    public IssueHearingEnquiryFormHandler(
         HearingEnquiryFormPlaceholderService hearingEnquiryFormPlaceholderService, CoverLetterService coverLetterService,
         DocmosisTemplateConfig docmosisTemplateConfig,
         NotificationSender notificationSender,
         @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
-        this.bulkPrintService = bulkPrintService;
         this.coverLetterService = coverLetterService;
         this.docmosisTemplateConfig = docmosisTemplateConfig;
         this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;

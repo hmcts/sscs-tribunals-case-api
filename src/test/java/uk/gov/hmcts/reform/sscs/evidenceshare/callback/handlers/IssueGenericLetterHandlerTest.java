@@ -9,6 +9,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -27,6 +28,7 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.OTHER_PARTY;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.OTHER_PARTY_REPRESENTATIVE;
 
+import ch.qos.logback.classic.Level;
 import java.io.IOException;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -37,11 +39,13 @@ import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
@@ -52,17 +56,25 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartySelectionDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.evidenceshare.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.CcdNotificationService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.CoverLetterService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.GenericLetterPlaceholderService;
+import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationSender;
+import uk.gov.hmcts.reform.sscs.util.LogCaptureExtension;
 import uk.gov.service.notify.NotificationClientException;
 
 @ExtendWith(MockitoExtension.class)
 @Slf4j
 class IssueGenericLetterHandlerTest {
+
+    @RegisterExtension
+    private final LogCaptureExtension logCapture =
+        new LogCaptureExtension(IssueGenericLetterHandler.class);
+
     @Mock
     private GenericLetterPlaceholderService genericLetterPlaceholderService;
 
@@ -183,7 +195,7 @@ class IssueGenericLetterHandlerTest {
         handler.handle(SUBMITTED, callback);
 
         verify(notificationSender, times(5)).sendBundledLetter(eq(ISSUE_GENERIC_LETTER), eq(caseData),
-            eq(callback.getCaseDetails().getId()), anyList(), eq("User Test"));
+            eq(callback.getCaseDetails().getId()), anyList(), argumentCaptor.capture());
         assertThat(argumentCaptor.getAllValues()).isEqualTo(
             List.of("User Test", "Wendy Giles", "Joint Party", "Other Party", "OPRepFirstName OPRepLastName"));
     }
@@ -225,7 +237,7 @@ class IssueGenericLetterHandlerTest {
         handler.handle(SUBMITTED, callback);
 
         verify(notificationSender, times(5)).sendBundledLetter(eq(ISSUE_GENERIC_LETTER), eq(caseData),
-            eq(callback.getCaseDetails().getId()), anyList(), eq("User Test"));
+            eq(callback.getCaseDetails().getId()), anyList(), argumentCaptor.capture());
         assertThat(argumentCaptor.getAllValues()).isEqualTo(
             List.of("User Test", "Wendy Giles", "Joint Party", "Other Party", "OPRepFirstName OPRepLastName"));
     }
@@ -282,7 +294,7 @@ class IssueGenericLetterHandlerTest {
 
         verify(ccdNotificationService, times(0)).storeNotificationLetterIntoCcd(any(), any(), any(), any());
         verify(notificationSender, times(2)).sendBundledLetter(eq(ISSUE_GENERIC_LETTER), eq(caseData),
-            eq(callback.getCaseDetails().getId()), anyList(), eq("User Test"));
+            eq(callback.getCaseDetails().getId()), anyList(), argumentCaptor.capture());
         assertThat(argumentCaptor.getAllValues()).isEqualTo(List.of("User Test", "Wendy Giles"));
     }
 
@@ -307,6 +319,102 @@ class IssueGenericLetterHandlerTest {
         verify(notificationSender).sendBundledLetter(eq(ISSUE_GENERIC_LETTER), eq(caseData),
             eq(callback.getCaseDetails().getId()), anyList(), eq("User Test"));
 
+    }
+
+    @Test
+    void shouldReturnDispatchPriorityLatest() {
+        assertThat(handler.getPriority()).isEqualTo(DispatchPriority.LATEST);
+    }
+
+    @Test
+    void shouldReturnTrue_givenSubmittedCallbackTypeAndIssueGenericLetterEvent() {
+        final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder().build(),
+            READY_TO_LIST, ISSUE_GENERIC_LETTER);
+
+        assertThat(handler.canHandle(SUBMITTED, callback)).isTrue();
+    }
+
+    @Test
+    void shouldThrowException_givenCallbackTypeIsNull() {
+        final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder().build(),
+            READY_TO_LIST, ISSUE_GENERIC_LETTER);
+
+        assertThatThrownBy(() -> handler.canHandle(null, callback))
+            .isInstanceOf(NullPointerException.class);
+    }
+
+    @Test
+    void shouldIncludeSelectedDocumentsWhenAddDocumentsIsYes() throws NotificationClientException {
+        final SscsCaseData caseData = buildCaseData();
+        caseData.setSendToApellant(YesNo.YES);
+        caseData.setAddDocuments(YesNo.YES);
+
+        final Pdf selectedDoc = new Pdf(new byte[]{1, 2, 3}, "selectedDoc.pdf");
+        when(coverLetterService.getSelectedDocuments(caseData)).thenReturn(List.of(selectedDoc));
+        when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
+        when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
+
+        final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
+            ISSUE_GENERIC_LETTER);
+
+        handler.handle(SUBMITTED, callback);
+
+        verify(coverLetterService).getSelectedDocuments(caseData);
+        verify(notificationSender).sendBundledLetter(eq(ISSUE_GENERIC_LETTER), eq(caseData),
+            eq(callback.getCaseDetails().getId()), anyList(), eq("User Test"));
+    }
+
+    @Test
+    void shouldThrowNotificationServiceException_whenNotificationClientExceptionOccurs() throws NotificationClientException {
+        final SscsCaseData caseData = buildCaseData();
+        caseData.setSendToApellant(YesNo.YES);
+
+        when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
+        when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
+        doThrow(new NotificationClientException("test error")).when(notificationSender)
+            .sendBundledLetter(any(), any(), any(), anyList(), anyString());
+
+        final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
+            ISSUE_GENERIC_LETTER);
+
+        assertThatThrownBy(() -> handler.handle(SUBMITTED, callback))
+            .isInstanceOf(NotificationServiceException.class);
+
+        logCapture.assertLogContains(
+            "Error sending notification for case id: %s".formatted(callback.getCaseDetails().getId()),
+            Level.ERROR);
+    }
+
+    @Test
+    void shouldNotSendToOtherParties_whenOtherPartySelectionIsNull() {
+        final SscsCaseData caseData = buildCaseData();
+        caseData.setSendToOtherParties(YesNo.YES);
+        caseData.setOtherPartySelection(null);
+
+        final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
+            ISSUE_GENERIC_LETTER);
+
+        handler.handle(SUBMITTED, callback);
+
+        verifyNoInteractions(notificationSender);
+    }
+
+    @Test
+    void shouldSendOnlyToAppellant_inSendToAllPartiesFlow_whenNoRepresentative() throws NotificationClientException {
+        final SscsCaseData caseData = buildCaseData();
+        caseData.setSendToAllParties(YesNo.YES);
+        caseData.getAppeal().getRep().setHasRepresentative("No");
+
+        when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
+        when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
+
+        final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
+            ISSUE_GENERIC_LETTER);
+
+        handler.handle(SUBMITTED, callback);
+
+        verify(notificationSender, times(1)).sendBundledLetter(eq(ISSUE_GENERIC_LETTER), eq(caseData),
+            eq(callback.getCaseDetails().getId()), anyList(), eq("User Test"));
     }
 
     static List<CcdValue<OtherPartySelectionDetails>> buildOtherPartiesSelection(CcdValue<OtherParty> otherParty,

@@ -1,33 +1,27 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.BDDMockito.when;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockito.quality.Strictness;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
@@ -47,11 +41,9 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.exception.UnableToContactThirdPart
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.FurtherEvidencePlaceholderService;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 
-@RunWith(JUnitParamsRunner.class)
-public class CoverLetterServiceTest {
+@ExtendWith(MockitoExtension.class)
+class CoverLetterServiceTest {
 
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
     @Mock
     private FurtherEvidencePlaceholderService furtherEvidencePlaceholderService;
     @Mock
@@ -62,45 +54,41 @@ public class CoverLetterServiceTest {
 
     private CoverLetterService coverLetterService;
 
-    @Before
-    public void initMocks() {
-        MockitoAnnotations.openMocks(this);
+    @BeforeEach
+    void initMocks() {
         coverLetterService = new CoverLetterService(furtherEvidencePlaceholderService, pdfStoreService, pdfGenerationService, 3);
     }
 
-    @Test
-    @Parameters(method = "generateNullScenarios")
-    public void givenNullArgs_shouldThrowException(byte[] coverLetterContent, List<Pdf> pdfsToBulkPrint) {
-        try {
-            coverLetterService.appendCoverLetter(coverLetterContent, pdfsToBulkPrint, "");
-            fail();
-        } catch (NullPointerException e) {
-            assertNotNull(e);
-        }
+    @ParameterizedTest
+    @MethodSource("generateNullScenarios")
+    void givenNullArgs_shouldThrowException(byte[] coverLetterContent, List<Pdf> pdfsToBulkPrint) {
+        assertThatThrownBy(() -> coverLetterService.appendCoverLetter(coverLetterContent, pdfsToBulkPrint, ""))
+            .isInstanceOf(NullPointerException.class);
     }
 
-    private Object[] generateNullScenarios() {
-        return new Object[]{
+    private static Object[][] generateNullScenarios() {
+        return new Object[][]{
             new Object[]{null, buildPdfListWithOneDoc()},
             new Object[]{new byte[]{'d', 'o', 'c'}, null}
         };
     }
 
     @Test
-    public void appendCoverLetter() {
+    void appendCoverLetter() {
         List<Pdf> pdfsToBulkPrint = buildPdfListWithOneDoc();
-        coverLetterService.appendCoverLetter(new byte[]{'l', 'e', 't', 't', 'e', 'r'}, pdfsToBulkPrint, "609_97_OriginalSenderCoverLetter");
+        coverLetterService.appendCoverLetter(new byte[]{'l', 'e', 't', 't', 'e', 'r'}, pdfsToBulkPrint,
+            "609_97_OriginalSenderCoverLetter");
         assertCoverLetterIsFirstDocInList(pdfsToBulkPrint);
-        assertEquals("doc", pdfsToBulkPrint.get(1).getName());
-        assertEquals(Arrays.toString(new byte[]{'d', 'o', 'c'}), Arrays.toString(pdfsToBulkPrint.get(1).getContent()));
+        assertThat(pdfsToBulkPrint.get(1).getName()).isEqualTo("doc");
+        assertThat(pdfsToBulkPrint.get(1).getContent()).isEqualTo(new byte[]{'d', 'o', 'c'});
     }
 
     @Test
-    public void generateCoverLetter() {
+    void generateCoverLetter() {
         SscsCaseData caseData = SscsCaseData.builder().build();
 
         given(furtherEvidencePlaceholderService
-            .populatePlaceholders(eq(caseData), eq(APPELLANT_LETTER), eq(null)))
+            .populatePlaceholders(caseData, APPELLANT_LETTER, null))
             .willReturn(Collections.singletonMap("someKey", "someValue"));
 
         given(pdfGenerationService.generatePdf(any(DocumentHolder.class)))
@@ -109,27 +97,29 @@ public class CoverLetterServiceTest {
         coverLetterService.generateCoverLetter(caseData, APPELLANT_LETTER, "testName.doc", "testDocName", null);
 
         then(furtherEvidencePlaceholderService).should(times(1))
-            .populatePlaceholders(eq(caseData), eq(APPELLANT_LETTER), eq(null));
+                                               .populatePlaceholders(eq(caseData), eq(APPELLANT_LETTER), eq(null));
 
         assertArgumentsForPdfGeneration();
     }
 
-    @Test(expected = UnableToContactThirdPartyException.class)
-    public void generateCoverLetterHandleError() {
+    @Test
+    void generateCoverLetterHandleError() {
         SscsCaseData caseData = SscsCaseData.builder().build();
 
         given(furtherEvidencePlaceholderService
-            .populatePlaceholders(eq(caseData), eq(APPELLANT_LETTER), eq(null)))
+            .populatePlaceholders(caseData, APPELLANT_LETTER, null))
             .willReturn(Collections.singletonMap("someKey", "someValue"));
 
         when(pdfGenerationService.generatePdf(any(DocumentHolder.class)))
             .thenThrow(new HttpClientErrorException(HttpStatus.valueOf(400)));
 
-        coverLetterService.generateCoverLetter(caseData, APPELLANT_LETTER, "testName.doc", "testDocName", null);
+        assertThatThrownBy(
+            () -> coverLetterService.generateCoverLetter(caseData, APPELLANT_LETTER, "testName.doc", "testDocName", null))
+            .isInstanceOf(UnableToContactThirdPartyException.class);
     }
 
     @Test
-    public void givenDocumentLink_returnExpectedDocuments() {
+    void givenDocumentLink_returnExpectedDocuments() {
         String documentFilename1 = "filename1";
         String documentFilename2 = "filename2";
 
@@ -150,19 +140,18 @@ public class CoverLetterServiceTest {
         );
 
         SscsCaseData caseData = SscsCaseData.builder()
-            .documentSelection(documentSelection)
-            .dwpDocuments(List.of(dwpDocument))
-            .sscsDocument(List.of(sscsDocument))
-            .build();
+                                            .documentSelection(documentSelection)
+                                            .dwpDocuments(List.of(dwpDocument))
+                                            .sscsDocument(List.of(sscsDocument))
+                                            .build();
 
         List<Pdf> pdfs = coverLetterService.getSelectedDocuments(caseData);
 
-        assertNotNull(pdfs);
-        assertEquals(2, pdfs.size());
+        assertThat(pdfs).isNotNull().hasSize(2);
     }
 
     @Test
-    public void givenEditedDocs_returnEditedPdfs() {
+    void givenEditedDocs_returnEditedPdfs() {
         String uneditedSscsFilename = "sscs";
         String editedSscsFilename = "sscs_edited";
         String uneditedDwpFilename = "dwp";
@@ -186,20 +175,30 @@ public class CoverLetterServiceTest {
         );
 
         SscsCaseData caseData = SscsCaseData.builder()
-            .documentSelection(documentSelection)
-            .sscsDocument(List.of(sscsDocument))
-            .dwpDocuments(List.of(dwpDocument))
-            .build();
+                                            .documentSelection(documentSelection)
+                                            .sscsDocument(List.of(sscsDocument))
+                                            .dwpDocuments(List.of(dwpDocument))
+                                            .build();
 
         List<Pdf> pdfs = coverLetterService.getSelectedDocuments(caseData);
-        assertNotNull(pdfs);
-        assertNotNull(pdfs.stream().filter(pdf -> editedSscsFilename.equals(pdf.getName())).findAny().get());
-        assertNotNull(pdfs.stream().filter(pdf -> editedDwpFilename.equals(pdf.getName())).findAny().get());
+        assertThat(pdfs).isNotNull();
+        assertThat(pdfs.stream().filter(pdf -> editedSscsFilename.equals(pdf.getName())).findAny()).isPresent();
+        assertThat(pdfs.stream().filter(pdf -> editedDwpFilename.equals(pdf.getName())).findAny()).isPresent();
     }
 
 
     @Test
-    public void givenNoDocumentExist_returnEmptyList() {
+    void givenNullDocumentSelection_returnEmptyList() {
+        final SscsCaseData caseData = SscsCaseData.builder().documentSelection(null).build();
+
+        final List<Pdf> pdfs = coverLetterService.getSelectedDocuments(caseData);
+
+        assertThat(pdfs).isEmpty();
+        then(pdfStoreService).should(never()).download(any());
+    }
+
+    @Test
+    void givenNoDocumentExist_returnEmptyList() {
         String documentFilename1 = "filename1";
 
         DynamicListItem item1 = new DynamicListItem(documentFilename1, null);
@@ -208,13 +207,12 @@ public class CoverLetterServiceTest {
         DocumentSelectionDetails documentSelectionDetails1 = new DocumentSelectionDetails(list1);
 
         SscsCaseData caseData = SscsCaseData.builder()
-            .documentSelection(List.of(new CcdValue<>(documentSelectionDetails1)))
-            .build();
+                                            .documentSelection(List.of(new CcdValue<>(documentSelectionDetails1)))
+                                            .build();
 
         List<Pdf> pdfs = coverLetterService.getSelectedDocuments(caseData);
 
-        assertNotNull(pdfs);
-        assertTrue(pdfs.isEmpty());
+        assertThat(pdfs).isNotNull().isEmpty();
     }
 
     private static DwpDocument getDwpDocument(String documentFilename) {
@@ -224,10 +222,9 @@ public class CoverLetterServiceTest {
             .documentFileName(documentFilename)
             .build();
 
-        DwpDocument document = DwpDocument.builder()
-            .value(details)
-            .build();
-        return document;
+        return DwpDocument.builder()
+                                          .value(details)
+                                          .build();
     }
 
     private static DwpDocument getDwpDocumentEdited(String documentFilename, String editedDocumentFileName) {
@@ -238,10 +235,9 @@ public class CoverLetterServiceTest {
             .editedDocumentLink(new DocumentLink("url2", "url2", editedDocumentFileName, "hash"))
             .build();
 
-        DwpDocument document = DwpDocument.builder()
-            .value(details)
-            .build();
-        return document;
+        return DwpDocument.builder()
+                                          .value(details)
+                                          .build();
     }
 
     private static SscsDocument getSscsDocument(String documentFilename) {
@@ -251,10 +247,9 @@ public class CoverLetterServiceTest {
             .documentFileName(documentFilename)
             .build();
 
-        SscsDocument document = SscsDocument.builder()
-            .value(details)
-            .build();
-        return document;
+        return SscsDocument.builder()
+                                            .value(details)
+                                            .build();
     }
 
     private static SscsDocument getSscsDocumentEdited(String documentFilename, String editedDocumentFileName) {
@@ -265,10 +260,9 @@ public class CoverLetterServiceTest {
             .editedDocumentLink(new DocumentLink("url2", "url2", editedDocumentFileName, "hash"))
             .build();
 
-        SscsDocument document = SscsDocument.builder()
-            .value(details)
-            .build();
-        return document;
+        return SscsDocument.builder()
+                                            .value(details)
+                                            .build();
     }
 
 
@@ -276,26 +270,25 @@ public class CoverLetterServiceTest {
         ArgumentCaptor<DocumentHolder> argumentCaptor = ArgumentCaptor.forClass(DocumentHolder.class);
         then(pdfGenerationService).should(times(1)).generatePdf(argumentCaptor.capture());
         DocumentHolder documentHolder = argumentCaptor.getValue();
-        assertEquals("testName.doc", documentHolder.getTemplate().getTemplateName());
-        assertEquals(Collections.singletonMap("someKey", "someValue").toString(),
-            documentHolder.getPlaceholders().toString());
-        assertTrue(documentHolder.isPdfArchiveMode());
+        assertThat(documentHolder.getTemplate().getTemplateName()).isEqualTo("testName.doc");
+        assertThat(documentHolder.getPlaceholders().toString())
+            .isEqualTo(Collections.singletonMap("someKey", "someValue").toString());
+        assertThat(documentHolder.isPdfArchiveMode()).isTrue();
     }
 
     private void assertCoverLetterIsFirstDocInList(List<Pdf> pdfsToBulkPrint) {
-        assertEquals(2, pdfsToBulkPrint.size());
-        assertEquals("609_97_OriginalSenderCoverLetter", pdfsToBulkPrint.get(0).getName());
-        assertEquals(Arrays.toString(new byte[]{'l', 'e', 't', 't', 'e', 'r'}),
-            Arrays.toString(pdfsToBulkPrint.get(0).getContent()));
+        assertThat(pdfsToBulkPrint).hasSize(2);
+        assertThat(pdfsToBulkPrint.getFirst().getName()).isEqualTo("609_97_OriginalSenderCoverLetter");
+        assertThat(pdfsToBulkPrint.getFirst().getContent()).isEqualTo(new byte[]{'l', 'e', 't', 't', 'e', 'r'});
     }
 
-    private List<Pdf> buildPdfListWithOneDoc() {
+    private static List<Pdf> buildPdfListWithOneDoc() {
         List<Pdf> docList = new ArrayList<>(1);
         docList.add(buildPdf());
         return docList;
     }
 
-    private Pdf buildPdf() {
+    private static Pdf buildPdf() {
         byte[] content = new byte[]{'d', 'o', 'c'};
         return new Pdf(content, "doc");
     }
