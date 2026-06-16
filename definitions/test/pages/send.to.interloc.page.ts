@@ -45,20 +45,29 @@ export class SendToInterlocPage {
     await dropdown.blur();
   }
 
-  async selectPartyConfidentiality(partyConfidentiality: string): Promise<void> {
-    await webAction.chooseOptionByLabel('#selectedConfidentialityParty', partyConfidentiality);
+  async selectPartyConfidentiality(
+    partyConfidentiality: string
+  ): Promise<void> {
+    await webAction.chooseOptionByLabel(
+      '#selectedConfidentialityParty',
+      partyConfidentiality
+    );
   }
 
   async verifyReasonReferredOptions(options: string[]): Promise<void> {
     await webAction.clickElementById('#interlocReferralReason');
 
     const availableOptions = (
-      await this.page.locator('#interlocReferralReason option').allTextContents()
+      await this.page
+        .locator('#interlocReferralReason option')
+        .allTextContents()
     )
       .map((option) => option.trim())
       .filter((option) => option !== '');
 
-    expect(availableOptions).toContain(sendToInterlocData.sendToInterlocReasonReferredValue);
+    expect(availableOptions).toContain(
+      sendToInterlocData.sendToInterlocReasonReferredValue
+    );
 
     options.forEach((option) => {
       expect(availableOptions).toContain(option);
@@ -69,6 +78,14 @@ export class SendToInterlocPage {
     await expect(
       this.page.locator('#interlocReferralReason option:checked')
     ).toHaveText(reasonReferred);
+  }
+
+  async selectSelectedParty(indexOfPartyToBeSelected: number): Promise<void> {
+    await this.page.waitForLoadState('domcontentloaded');
+    await webAction.chooseOptionByIndex(
+      '#selectedConfidentialityParty',
+      indexOfPartyToBeSelected
+    );
   }
 
   async confirmSubmission(): Promise<void> {

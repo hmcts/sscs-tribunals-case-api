@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FURTHER_EVIDEN
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DO_NOT_SEND;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.NOTIFY_APPELLANT_VALID_APPEAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.NOTIFY_APPELLANT_VALID_APPEAL_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.OTHER_PARTY_ADDED_TO_APPEAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.UPDATE_OTHER_PARTY_DATA;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.checkEvent;
@@ -115,7 +116,7 @@ class NotificationEventTypeTest {
 
     private static Stream<Arguments> notificationEventTypeIdMappings() {
         return Arrays.stream(NotificationEventType.values())
-            .filter(n -> n != OTHER_PARTY_ADDED_TO_APPEAL && n != NOTIFY_APPELLANT_VALID_APPEAL)
+            .filter(n -> n != OTHER_PARTY_ADDED_TO_APPEAL && n != NOTIFY_APPELLANT_VALID_APPEAL && n != NOTIFY_APPELLANT_VALID_APPEAL_WELSH)
             .map(n -> Arguments.of(n.getId(), n));
     }
 

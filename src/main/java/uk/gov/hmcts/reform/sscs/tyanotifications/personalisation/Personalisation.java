@@ -9,13 +9,11 @@ import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getBenefitByCodeOrThrowException;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getLongBenefitNameDescriptionWithOptionalAcronym;
@@ -164,6 +162,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.EVIDENCE_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.JUDGE_DECISION_APPEAL_TO_PROCEED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.NOTIFY_APPELLANT_VALID_APPEAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.NOTIFY_APPELLANT_VALID_APPEAL_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.OTHER_PARTY_ADDED_TO_APPEAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PERMISSION_TO_APPEAL_REFUSED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.REVIEW_AND_SET_ASIDE;
@@ -175,6 +174,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getN
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.hasAppointee;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.hasJointParty;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.hasRepresentative;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isBenefitTypeChildSupportOrUc;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -475,7 +475,7 @@ public class Personalisation<E extends NotificationWrapper> {
 
         setConfidentialFields(ccdResponse, subscriptionWithType, personalisation, responseWrapper.getState());
         if (cmOtherPartyConfidentialityEnabled
-            && ccdResponse.isBenefitType(CHILD_SUPPORT)
+            && (isBenefitTypeChildSupportOrUc(ccdResponse))
             && OTHER_PARTY_ADDED_TO_APPEAL.equals(responseWrapper.getNotificationEventType())) {
             setOtherPartyConfidentialityFields(ccdResponse, ccdResponsePrevious, personalisation);
         }
@@ -947,8 +947,10 @@ public class Personalisation<E extends NotificationWrapper> {
             if (DIRECTION_ISSUED.equals(notificationEventType) || DIRECTION_ISSUED_WELSH.equals(notificationEventType)) {
                 return getSubscriptionTemplateNameWithDirection(notificationEventType, directionType, subscriptionType);
             }
-            if (NOTIFY_APPELLANT_VALID_APPEAL.equals(notificationEventType) && DirectionType.APPEAL_TO_PROCEED.toString().equals(directionType)) {
-                return getSubscriptionTemplateNameWithDirection(notificationEventType, "appealToProceedNotifyValidAppeal", subscriptionType);
+            if (DirectionType.APPEAL_TO_PROCEED.toString().equals(directionType)) {
+                if (NOTIFY_APPELLANT_VALID_APPEAL.equals(notificationEventType) || NOTIFY_APPELLANT_VALID_APPEAL_WELSH.equals(notificationEventType)) {
+                    return getSubscriptionTemplateNameWithDirection(notificationEventType, "appealToProceedNotifyValidAppeal", subscriptionType);
+                }
             }
         }
 

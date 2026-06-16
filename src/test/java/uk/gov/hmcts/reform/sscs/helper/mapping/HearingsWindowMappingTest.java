@@ -149,7 +149,7 @@ class HearingsWindowMappingTest {
     void testBuildHearingWindowNotAutoListUrgent() {
         SscsCaseData caseData = SscsCaseData.builder()
             .dwpResponseDate(LocalDate.now().toString())
-            .appeal(new Appeal(null, null, null, new HearingOptions("yes", null, null, null, null, null, null, null, null, null, null, null, null), null, null, null, null, new HearingSubtype("yes", "07444123456", null, null, null), null))
+            .appeal(new Appeal(null, null, null, new HearingOptions("yes", null, null, null, null, null, null, null, null, null, null, null, null), null, null, null, null, new HearingSubtype("yes", "07444123456", null, null, null), null, YES))
             .build();
         HearingWindow result = HearingsWindowMapping.buildHearingWindow(caseData, refData);
 

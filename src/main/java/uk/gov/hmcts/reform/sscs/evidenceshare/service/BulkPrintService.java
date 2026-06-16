@@ -17,6 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -106,6 +108,29 @@ public class BulkPrintService implements PrintService {
         return id;
     }
 
+    public Optional<UUID> sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(long caseId, SscsCaseData caseData, List<Pdf> pdfs, EventType eventType, String recipient) {
+        log.info("Sending {} document(s) to bulk print for case event {} for case {}: {}",
+            pdfs.size(), eventType.getCcdType(), caseId, pdfs.stream().map(Pdf::getName).toList());
+        Optional<UUID> id = sendToBulkPrint(pdfs, caseData, recipient);
+
+        if (id.isPresent()) {
+            ccdNotificationService.storeNotificationLetterIntoCcd(eventType, buildBundledLetterFromPdfs(pdfs), caseId, recipient);
+            log.info("Letter was sent for event {} and case {}, send-letter-service id {}", eventType.getCcdType(), caseId, id.get());
+        } else {
+            log.error("Failed to send Letter to bulk print for event {} for case {}. No print id returned", eventType.getCcdType(), caseId);
+        }
+
+        return id;
+    }
+
+    public byte[] buildBundledLetterFromPdfs(List<Pdf> pdfs) {
+        List<byte[]> pdfDocuments = new ArrayList<>();
+        for (Pdf pdf : pdfs) {
+            pdfDocuments.add(pdf.getContent());
+        }
+        return buildBundledLetter(pdfDocuments);
+    }
+
     public byte[] buildBundledLetter(byte[] coverSheet, byte[] letter) {
         if (coverSheet != null) {
             PDDocument bundledLetter;
@@ -144,6 +169,9 @@ public class BulkPrintService implements PrintService {
             final PDFMergerUtility merger = new PDFMergerUtility();
             for (int i = 1; i < documents.size(); i++) {
                 if (documents.get(i) != null) {
+                    if (bundledLetter.getNumberOfPages() % 2 != 0) {
+                        bundledLetter.addPage(new PDPage(PDRectangle.A4));
+                    }
                     try (PDDocument loadDoc = Loader.loadPDF(documents.get(i))) {
                         merger.appendDocument(bundledLetter, loadDoc);
                     }

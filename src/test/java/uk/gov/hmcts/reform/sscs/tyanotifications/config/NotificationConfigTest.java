@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType.ORAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.UPDATE_OTHER_PARTY_DATA;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.VALID_APPEAL_CREATED;
 
 import org.junit.jupiter.api.Test;
@@ -274,6 +275,89 @@ class NotificationConfigTest {
             "letterTemplateName", "letterTemplateName", Benefit.PIP, wrapper, "readyToList");
 
         assertThat(template.getDocmosisTemplateId()).isEqualTo(expectedDocmosisId);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "uc",
+        "childSupport"
+    })
+    void getTemplateSetsNullDocmosisForUpdateOtherPartyDataWhenBenefitIsUcOrChildSupportAndFlagEnabled(final String benefitCode) {
+        when(env.getProperty("notification.english.oral.updateOtherPartyData.other_party.docmosisId")).thenReturn("docmosisId");
+
+        final CcdNotificationWrapper wrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper
+            .builder()
+            .notificationEventType(UPDATE_OTHER_PARTY_DATA)
+            .newSscsCaseData(SscsCaseData.builder()
+                .appeal(Appeal.builder()
+                    .hearingType(ORAL.name())
+                    .benefitType(BenefitType.builder().code(benefitCode).build())
+                    .build())
+                .build())
+            .build());
+
+        final NotificationConfig config = new NotificationConfig(env);
+        setField(config, "cmOtherPartyConfidentialityEnabled", true);
+
+        final Template template = config.getTemplate("emailTemplateName", "smsTemplateName",
+            "letterTemplateName", "updateOtherPartyData.other_party", Benefit.PIP, wrapper, "readyToList");
+
+        assertThat(template.getDocmosisTemplateId()).isNull();
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "false, uc, UPDATE_OTHER_PARTY_DATA",
+        "true, pip, UPDATE_OTHER_PARTY_DATA",
+        "true, uc, ADD_OTHER_PARTY_DATA"
+    })
+    void getTemplateKeepsDocmosisForUpdateOtherPartyDataWhenConditionsNotMet(
+        final boolean cmFlagEnabled, final String benefitCode, final String eventType) {
+        when(env.getProperty("notification.english.oral.updateOtherPartyData.other_party.docmosisId")).thenReturn("docmosisId");
+
+        final CcdNotificationWrapper wrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper
+            .builder()
+            .notificationEventType(
+                uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.valueOf(eventType))
+            .newSscsCaseData(SscsCaseData.builder()
+                .appeal(Appeal.builder()
+                    .hearingType(ORAL.name())
+                    .benefitType(BenefitType.builder().code(benefitCode).build())
+                    .build())
+                .build())
+            .build());
+
+        final NotificationConfig config = new NotificationConfig(env);
+        setField(config, "cmOtherPartyConfidentialityEnabled", cmFlagEnabled);
+
+        final Template template = config.getTemplate("emailTemplateName", "smsTemplateName",
+            "letterTemplateName", "updateOtherPartyData.other_party", Benefit.PIP, wrapper, "readyToList");
+
+        assertThat(template.getDocmosisTemplateId()).isEqualTo("docmosisId");
+    }
+
+    @Test
+    void getTemplateKeepsDocmosisForUpdateOtherPartyDataWhenTemplateNameDoesNotMatch() {
+        when(env.getProperty("notification.english.oral.letterTemplateName.docmosisId")).thenReturn("docmosisId");
+
+        final CcdNotificationWrapper wrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper
+            .builder()
+            .notificationEventType(UPDATE_OTHER_PARTY_DATA)
+            .newSscsCaseData(SscsCaseData.builder()
+                .appeal(Appeal.builder()
+                    .hearingType(ORAL.name())
+                    .benefitType(BenefitType.builder().code("uc").build())
+                    .build())
+                .build())
+            .build());
+
+        final NotificationConfig config = new NotificationConfig(env);
+        setField(config, "cmOtherPartyConfidentialityEnabled", true);
+
+        final Template template = config.getTemplate("emailTemplateName", "smsTemplateName",
+            "letterTemplateName", "letterTemplateName", Benefit.PIP, wrapper, "readyToList");
+
+        assertThat(template.getDocmosisTemplateId()).isEqualTo("docmosisId");
     }
 
     @Test

@@ -1,6 +1,7 @@
 import { Page } from '@playwright/test';
 import { WebAction } from '../common/web.action';
 import dateUtilsComponent from '../utils/DateUtilsComponent';
+import updateCaseData from './content/update.casedata_en.json';
 
 
 let webAction: WebAction;
@@ -152,6 +153,22 @@ export class CreateUpdateToCaseDataPage {
 
   async isScottishCase(scottishCase): Promise<void> {
     await this.page.getByRole('group', { name: 'Is a Scottish Case? (Optional)' }).getByLabel(scottishCase).check();
+  }
+
+  async setConfidentialityAppellant(isConfidentialityRequired: boolean) {
+    await this.page
+      .locator(
+        `input[id=appeal_appellant_confidentialityRequired_${isConfidentialityRequired ? 'Yes' : 'No'}]`
+      )
+      .click();
+    await webAction.clickSubmitButton();
+    await webAction.waitForSpinnerToDisappear();
+    await webAction.verifyPageLabel(
+      '.govuk-heading-l',
+      updateCaseData.Name
+    );
+    await webAction.clickSubmitButton();
+    await webAction.waitForSpinnerToDisappear();
   }
 
 }

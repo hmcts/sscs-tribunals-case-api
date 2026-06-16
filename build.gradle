@@ -311,16 +311,17 @@ dependencyManagement {
 
 ext {
     set('activemq.version', '6.2.5')
-    set('netty.version', '4.2.13.Final')
+    set('netty.version', '4.2.15.Final')
     set('log4j2.version', '2.26.0')
     set('commons-lang3.version', '3.20.0')
     set('kotlin.version', '2.2.21')
     set('tomcat.version', '10.1.55')
+    set('spring-framework.version', '6.2.19')
 }
 
 def versions = [
         springboot     : springBoot.class.package.implementationVersion,
-        springsecurity : '6.5.10',
+        springsecurity : '6.5.11',
         jackson        : '2.19.0',
         lombok         : '1.18.38',
         commonsio      : '2.19.0',
@@ -381,7 +382,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'pdf-service-client', version: '8.0.2'
     implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '5.1.1'
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.3'
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '6.3.48'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '6.3.51'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '8.0.0'
 
     implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.2.1-RELEASE'

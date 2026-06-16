@@ -16,6 +16,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.getSubscription;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.isOkToSendNotification;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationValidService.isMandatoryLetterEventType;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isBenefitTypeChildSupportOrUc;
 
 import java.time.ZonedDateTime;
 import java.util.Arrays;
@@ -134,12 +135,19 @@ public class NotificationService {
             log.info("Trigger second notification event for {} with {}", DIRECTION_ISSUED.getId(), DirectionType.APPEAL_TO_PROCEED.getLabel());
             notificationWrapper.getSscsCaseDataWrapper().setNotificationEventType(NOTIFY_APPELLANT_VALID_APPEAL);
             sendNotificationPerSubscription(notificationWrapper);
+        } else if (cmOtherPartyConfidentialityEnabled
+            && notificationWrapper.getNotificationType().equals(DIRECTION_ISSUED_WELSH)
+            && notificationWrapper.getSscsCaseDataWrapper().getNewSscsCaseData().isBenefitType(CHILD_SUPPORT)
+            && isAppealToProceed(notificationWrapper)) {
+            log.info("Trigger second notification event for {} with {}", DIRECTION_ISSUED_WELSH.getId(), DirectionType.APPEAL_TO_PROCEED.getLabel());
+            notificationWrapper.getSscsCaseDataWrapper().setNotificationEventType(NOTIFY_APPELLANT_VALID_APPEAL_WELSH);
+            sendNotificationPerSubscription(notificationWrapper);
         }
     }
 
     private boolean shouldNotifyAppellantAboutAdditionalOtherParty(final NotificationWrapper notificationWrapper) {
         if (!cmOtherPartyConfidentialityEnabled
-            || !notificationWrapper.getNewSscsCaseData().isBenefitType(CHILD_SUPPORT)
+            || !isBenefitTypeChildSupportOrUc(notificationWrapper.getNewSscsCaseData())
             || !notificationWrapper.getNotificationType().equals(UPDATE_OTHER_PARTY_DATA)
             || emptyIfNull(notificationWrapper.getNewSscsCaseData().getOtherParties()).size() < MINIMUM_NUMBER_OTHER_PARTIES) {
             return false;
