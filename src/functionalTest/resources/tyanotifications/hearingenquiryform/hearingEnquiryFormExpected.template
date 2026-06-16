@@ -4,7 +4,7 @@ https://www.gov.uk/appeal-benefit-decision
 Johnny Cash
 1 Old Street
 Hendersonville
-DD11 4WR
+TS1 1ST
 ${TODAY_DATE}
 The Child Support appeal for User Test
 Appeal reference number: ${CASE_ID}
@@ -95,13 +95,13 @@ Yes
 No
 Use this box to tell us about any other special arrangements you need. For
 example, hearing loops, or access for people with disabilities.
-Section 5 - Do you want to register a representative?
 Telephone number:
 Language:
 Type of signer:
 Email address:
 Dates:
 Dialect:
+Section 5 - Do you want to register a representative?
  If you have a representative, please give their name and full address. If you do not
 yet have a representative you can send us your representative’s details later.
 Name
@@ -122,4 +122,4 @@ ${CASE_ID}
 Johnny Cash
 1 Old Street
 Hendersonville
-DD11 4WR
+TS1 1ST
