@@ -129,7 +129,7 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
         final SscsCaseData caseDataBefore = callback.getCaseDetailsBefore().map(CaseDetails::getCaseData).orElse(null);
 
         if (cmOtherPartyConfidentialityEnabled && (
-            isChildSupportOrUniversalCreditAndAppellantConfidentialityUnknownOrNotRequiredAndAdditionalOtherPartyAdded(sscsCaseData, caseDataBefore)
+            isChildSupportOrUcAdditionalOtherPartyAdded(sscsCaseData, caseDataBefore)
                 || isUniversalCreditAndFirstOtherPartyAdded(sscsCaseData, caseDataBefore))) {
             sscsCaseData.setDirectionDueDate(now().plusDays(getHearingResponseExpectedByDays()).toString());
             sscsCaseData.setInterlocReviewState(InterlocReviewState.HEF_ISSUED);
@@ -143,7 +143,7 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
             && firstOtherPartyAddedPredicate.test(sscsCaseData, caseDataBefore);
     }
 
-    private boolean isChildSupportOrUniversalCreditAndAppellantConfidentialityUnknownOrNotRequiredAndAdditionalOtherPartyAdded(SscsCaseData sscsCaseData, SscsCaseData caseDataBefore) {
+    private boolean isChildSupportOrUcAdditionalOtherPartyAdded(SscsCaseData sscsCaseData, SscsCaseData caseDataBefore) {
         return isBenefitTypeChildSupportOrUc(sscsCaseData)
             && appellantConfidentialityNotRequiredOrUnknown(sscsCaseData)
             && additionalOtherPartyAddedPredicate.test(sscsCaseData, caseDataBefore);
