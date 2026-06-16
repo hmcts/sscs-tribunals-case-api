@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
@@ -28,6 +29,9 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.CoverLetterService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.HearingEnquiryFormPlaceholderService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility;
+import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationSender;
+import uk.gov.service.notify.NotificationClientException;
 
 @Slf4j
 @Service
@@ -39,17 +43,20 @@ public class IssueHearingEnquiryFormHandler implements CallbackHandler<SscsCaseD
     private final CoverLetterService coverLetterService;
     private final boolean cmOtherPartyConfidentialityEnabled;
     private final DocmosisTemplateConfig docmosisTemplateConfig;
+    private final NotificationSender notificationSender;
 
 
     public IssueHearingEnquiryFormHandler(BulkPrintService bulkPrintService,
         HearingEnquiryFormPlaceholderService hearingEnquiryFormPlaceholderService, CoverLetterService coverLetterService,
         DocmosisTemplateConfig docmosisTemplateConfig,
+        NotificationSender notificationSender,
         @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
         this.bulkPrintService = bulkPrintService;
         this.coverLetterService = coverLetterService;
         this.docmosisTemplateConfig = docmosisTemplateConfig;
         this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
         this.hearingEnquiryFormPlaceholderService = hearingEnquiryFormPlaceholderService;
+        this.notificationSender = notificationSender;
     }
 
     @Override
@@ -102,7 +109,7 @@ public class IssueHearingEnquiryFormHandler implements CallbackHandler<SscsCaseD
             .get("cover");
     }
 
-    private void sendToOtherParties(long caseId, SscsCaseData caseData, List<Pdf> documents) {
+    private void sendToOtherParties(Long caseId, SscsCaseData caseData, List<Pdf> documents) {
         log.info("Sending HEF letter to other parties for case id: {}", caseId);
         final var selectedOtherParties = caseData.getOtherPartySelection();
 
@@ -118,7 +125,13 @@ public class IssueHearingEnquiryFormHandler implements CallbackHandler<SscsCaseD
                 final String recipient = PlaceholderUtility.getName(caseData, OTHER_PARTY_LETTER,
                     entityId);
                 final List<Pdf> letter = getLetterPdfs(caseData, documents, entityId);
-                bulkPrintService.sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(caseId, caseData, letter, ISSUE_HEARING_ENQUIRY_FORM, recipient);
+                try {
+                    notificationSender.sendBundledLetter(EventType.ISSUE_GENERIC_LETTER, caseData, caseId, letter, recipient);
+                } catch (NotificationClientException ioe) {
+                    NotificationServiceException exception = new NotificationServiceException(caseId.toString(), ioe);
+                    log.error("Error sending notification for case id: %s".formatted(caseId), exception);
+                    throw exception;
+                }
             }
         }
     }

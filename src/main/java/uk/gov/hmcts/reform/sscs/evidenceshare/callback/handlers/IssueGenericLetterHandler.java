@@ -17,11 +17,7 @@ import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.evidenceshare.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType;
@@ -131,6 +127,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
             sendToOtherParties(caseId, caseData, documents);
         }
 
+        // TODO check if blank page on odd page ending is needed
     }
 
     private void sendToOtherParties(long caseId, SscsCaseData caseData, List<Pdf> documents) {
@@ -182,8 +179,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
             notificationSender.sendBundledLetter(EventType.ISSUE_GENERIC_LETTER, caseData, caseId, letter, recipient);
         } catch (NotificationClientException ioe) {
             NotificationServiceException exception = new NotificationServiceException(caseId.toString(), ioe);
-            log.error("Error on GovUKNotify for case id: " + caseId.toString() + ", sendBundledAndDocmosisLetterNotification",
-                exception);
+            log.error("Error sending notification for case id: %s".formatted(caseId), exception);
             throw exception;
         }
 
@@ -254,5 +250,6 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
         letter.addAll(documents);
         return letter;
     }
+
 
 }
