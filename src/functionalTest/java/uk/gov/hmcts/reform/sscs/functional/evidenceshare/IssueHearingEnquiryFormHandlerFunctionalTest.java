@@ -36,19 +36,14 @@ class IssueHearingEnquiryFormHandlerFunctionalTest extends AbstractFunctionalTes
         addOtherParties(caseDetails);
         issueHearingEnquiryForm(caseDetails);
 
-        // TODO Re introduce assertion once HEF is stable
-        // assertThatPdfTextIsCorrect(getDocument(caseDetails.getId(), "issueHearingEnquiryForm"), getExpectedContent(caseDetails));
+        assertThatPdfTextIsCorrect(getDocument(caseDetails.getId(), "issueHearingEnquiryForm"), getExpectedContent(caseDetails));
     }
 
     private static @NonNull String getExpectedContent(SscsCaseDetails caseDetails) throws IOException {
-        return new ClassPathResource(
-            "tyanotifications/hearingenquiryform/hearingEnquiryFormExpected.template").getContentAsString(StandardCharsets.UTF_8)
-                                                                                      .replace("${CASE_ID}",
-                                                                                          caseDetails.getId().toString())
-                                                                                      .replace("${TODAY_DATE}", LocalDate
-                                                                                          .now()
-                                                                                          .format(DateTimeFormatter.ofPattern(
-                                                                                              "dd/MM/yyyy")));
+        return new ClassPathResource("tyanotifications/hearingenquiryform/hearingEnquiryFormExpected.template")
+            .getContentAsString(StandardCharsets.UTF_8)
+            .replace("${CASE_ID}", caseDetails.getId().toString())
+            .replace("${TODAY_DATE}", LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
     }
 
     private void issueHearingEnquiryForm(SscsCaseDetails caseDetails) {
@@ -61,23 +56,46 @@ class IssueHearingEnquiryFormHandlerFunctionalTest extends AbstractFunctionalTes
             .map(OtherParty::getId)
             .findFirst()
             .orElseThrow();
-        caseDetails.getData().setOtherPartySelection(List.of(CcdValue.<OtherPartySelectionDetails>builder().value(
-            OtherPartySelectionDetails.builder().otherPartiesList(
-                new DynamicList(new DynamicListItem(firstPartyId, "Johnny Cash"),
-                    List.of(new DynamicListItem(firstPartyId, "Johnny Cash")))).build()).build()));
+        caseDetails
+            .getData()
+            .getAppeal()
+            .getAppellant()
+            .setAddress(Address.builder().line1("3 Old Street").town("Hendersonville").postcode("TS1 1ST").build());
+        caseDetails
+            .getData()
+            .setOtherPartySelection(List.of(CcdValue
+                .<OtherPartySelectionDetails>builder()
+                .value(OtherPartySelectionDetails
+                    .builder()
+                    .otherPartiesList(new DynamicList(new DynamicListItem(firstPartyId, "Johnny Cash"),
+                        List.of(new DynamicListItem(firstPartyId, "Johnny Cash"))))
+                    .build())
+                .build()));
         updateCaseEvent(EventType.ISSUE_HEARING_ENQUIRY_FORM, caseDetails);
     }
 
     private void addOtherParties(SscsCaseDetails caseDetails) {
-        caseDetails.getData().setOtherParties(List.of(CcdValue.<OtherParty>builder().value(
-            OtherParty.builder().role(Role.builder().name("Paying parent").build())
-                      .name(Name.builder().firstName("Johnny").lastName("Cash").build())
-                      .address(Address.builder().line1("1 Old Street").town("Hendersonville").postcode("DD11 4WR").build())
-                      .confidentialityRequired(YesNo.YES).build()).build(), CcdValue.<OtherParty>builder().value(
-            OtherParty.builder().role(Role.builder().name("Other").build())
-                      .name(Name.builder().firstName("June").lastName("Carter-Cash").build())
-                      .address(Address.builder().line1("2 Old Street").town("Hendersonville").postcode("DD12 4WR").build())
-                      .confidentialityRequired(YesNo.YES).build()).build()));
+        caseDetails
+            .getData()
+            .setOtherParties(List.of(CcdValue
+                .<OtherParty>builder()
+                .value(OtherParty
+                    .builder()
+                    .role(Role.builder().name("Paying parent").build())
+                    .name(Name.builder().firstName("Johnny").lastName("Cash").build())
+                    .address(Address.builder().line1("1 Old Street").town("Hendersonville").postcode("TS1 1ST").build())
+                    .confidentialityRequired(YesNo.YES)
+                    .build())
+                .build(), CcdValue
+                .<OtherParty>builder()
+                .value(OtherParty
+                    .builder()
+                    .role(Role.builder().name("Other").build())
+                    .name(Name.builder().firstName("June").lastName("Carter-Cash").build())
+                    .address(Address.builder().line1("2 Old Street").town("Hendersonville").postcode("TS1 1ST").build())
+                    .confidentialityRequired(YesNo.YES)
+                    .build())
+                .build()));
         updateCaseEvent(EventType.UPDATE_OTHER_PARTY_DATA, caseDetails);
     }
 

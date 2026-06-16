@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
@@ -126,7 +125,7 @@ public class IssueHearingEnquiryFormHandler implements CallbackHandler<SscsCaseD
                     entityId);
                 final List<Pdf> letter = getLetterPdfs(caseData, documents, entityId);
                 try {
-                    notificationSender.sendBundledLetter(EventType.ISSUE_GENERIC_LETTER, caseData, caseId, letter, recipient);
+                    notificationSender.sendBundledLetter(ISSUE_HEARING_ENQUIRY_FORM, caseData, caseId, letter, recipient);
                 } catch (NotificationClientException ioe) {
                     NotificationServiceException exception = new NotificationServiceException(caseId.toString(), ioe);
                     log.error("Error sending notification for case id: %s".formatted(caseId), exception);
