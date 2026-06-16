@@ -271,8 +271,6 @@ feature:
         enabled: ${WORK_ALLOCATION_FEATURE:false}
     bypass-evidence-share-service:
         enabled: ${BYPASS_EVIDENCE_SHARE_SERVICE:false}
-    issue-generic-letter:
-        enabled: ${ISSUE_GENERIC_LETTER:false}
     scottish-po-box:
         enabled: ${SCOTTISH_PO_BOX_ENABLED:false}
     urgent-hearing:
