@@ -177,7 +177,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
         } catch (NotificationClientException ioe) {
             NotificationServiceException exception = new NotificationServiceException(caseId.toString(), ioe);
             log.error("Error sending notification for case id: {}", caseId, exception);
-            // throw exception;
+            throw exception;
         }
     }
 

@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
@@ -24,6 +25,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
+import uk.gov.hmcts.reform.sscs.evidenceshare.exception.BulkPrintException;
 import uk.gov.hmcts.reform.sscs.evidenceshare.exception.PdfException;
 
 class PdfHelperTest {
@@ -413,6 +415,95 @@ class PdfHelperTest {
         assertThatThrownBy(() -> PdfHelper.getPhysicalPageCount(pdfs))
             .isInstanceOf(PdfException.class)
             .hasMessageContaining("invalid.pdf");
+    }
+
+    @Test
+    void isDocumentWithinSizeTolerance_returnsTrueForEmptyDocument() throws IOException {
+        try (PDDocument emptyDoc = new PDDocument()) {
+            assertThat(pdfHelper.isDocumentWithinSizeTolerance(emptyDoc, PDRectangle.A4)).isTrue();
+        }
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @EmptySource
+    void throwsBulkPrintExceptionWhenDocumentListIsNullOrEmpty(final List<byte[]> documents) {
+        assertThatThrownBy(() -> PdfHelper.buildBundledLetter(documents))
+            .isInstanceOf(BulkPrintException.class)
+            .hasMessage("Failed to merge documents: document list is empty");
+    }
+
+    @Test
+    void buildBundledLetter_returnsSingleDocumentUnchangedWhenListHasOneElement() throws IOException {
+        final byte[] pdf = createPdfWithPages(1);
+
+        assertThat(PdfHelper.buildBundledLetter(List.of(pdf))).isEqualTo(pdf);
+    }
+
+    @Test
+    void buildBundledLetter_mergesMultipleDocuments() throws IOException {
+        final byte[] first = createPdfWithPages(2);
+        final byte[] second = createPdfWithPages(2);
+
+        final byte[] result = PdfHelper.buildBundledLetter(List.of(first, second));
+
+        try (PDDocument merged = Loader.loadPDF(result)) {
+            assertThat(merged.getNumberOfPages()).isEqualTo(4);
+        }
+    }
+
+    @Test
+    void buildBundledLetter_addsBlankPageBeforeMergingWhenCurrentPageCountIsOdd() throws IOException {
+        final byte[] singlePage = createPdfWithPages(1);
+
+        final byte[] result = PdfHelper.buildBundledLetter(List.of(singlePage, singlePage));
+
+        try (PDDocument merged = Loader.loadPDF(result)) {
+            assertThat(merged.getNumberOfPages()).isEqualTo(3); // 1 + 1 blank + 1
+        }
+    }
+
+    @Test
+    void buildBundledLetter_skipsNullDocumentsInList() throws IOException {
+        final byte[] validPdf = createPdfWithPages(2);
+        final List<byte[]> docs = new ArrayList<>();
+        docs.add(validPdf);
+        docs.add(null);
+
+        final byte[] result = PdfHelper.buildBundledLetter(docs);
+
+        try (PDDocument merged = Loader.loadPDF(result)) {
+            assertThat(merged.getNumberOfPages()).isEqualTo(2);
+        }
+    }
+
+    @Test
+    void buildBundledLetter_throwsBulkPrintExceptionForInvalidPdfBytes() {
+        final byte[] invalidPdf = "not a pdf".getBytes(StandardCharsets.UTF_8);
+
+        assertThatThrownBy(() -> PdfHelper.buildBundledLetter(List.of(invalidPdf, invalidPdf)))
+            .isInstanceOf(BulkPrintException.class)
+            .hasMessageContaining("Failed to merge documents with exception");
+    }
+
+    @Test
+    void buildBundledLetterFromPdfs_returnsSingleDocumentUnchanged() throws IOException {
+        final byte[] pdfBytes = createPdfWithPages(1);
+
+        assertThat(PdfHelper.buildBundledLetterFromPdfs(List.of(new Pdf(pdfBytes, "test.pdf")))).isEqualTo(pdfBytes);
+    }
+
+    @Test
+    void buildBundledLetterFromPdfs_mergesMultiplePdfs() throws IOException {
+        final byte[] first = createPdfWithPages(2);
+        final byte[] second = createPdfWithPages(2);
+
+        final byte[] result = PdfHelper.buildBundledLetterFromPdfs(
+            List.of(new Pdf(first, "first.pdf"), new Pdf(second, "second.pdf")));
+
+        try (PDDocument merged = Loader.loadPDF(result)) {
+            assertThat(merged.getNumberOfPages()).isEqualTo(4);
+        }
     }
 
     private byte[] createPdfWithPages(int numberOfPages) throws IOException {

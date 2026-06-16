@@ -45,7 +45,7 @@ public class BulkPrintService implements PrintService {
     private static final String APPELLANT_NAME = "appellantName";
     private static final String IS_INTERNATIONAL = "isInternational";
     private static final String IS_IBCA = "isIbca";
-    public static final String RECIPIENTS = "recipients";
+    private static final String RECIPIENTS = "recipients";
 
     private final SendLetterApi sendLetterApi;
     private final IdamService idamService;
