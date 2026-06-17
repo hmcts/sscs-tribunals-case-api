@@ -172,7 +172,7 @@ class IssueHearingEnquiryFormHandlerTest {
         verify(coverLetterService, times(2)).generateCoverLetterRetry(any(), templateNameCaptor.capture(),
             letterNameCaptor.capture(), eq(placeholders), eq(1));
         verify(coverLetterService).generateCoverSheet("hearing-enquiry-form-cover.docx", "coversheet", placeholders);
-        verify(notificationSender).sendBundledLetter(eq(ISSUE_HEARING_ENQUIRY_FORM), eq(caseData), eq(callback.getCaseDetails().getId()), sentPdfsCaptor.capture(), eq("Other Person"));
+        verify(notificationSender).sendBundledLetter(eq(ISSUE_HEARING_ENQUIRY_FORM), eq(caseData), sentPdfsCaptor.capture(), eq("Other Person"));
 
         assertThat(templateNameCaptor.getAllValues()).containsExactlyInAnyOrder("hearing-enquiry-form-letter.docx",
             "hearing-enquiry-form.docx");
@@ -205,8 +205,7 @@ class IssueHearingEnquiryFormHandlerTest {
         handler.handle(SUBMITTED, callback);
 
         verify(coverLetterService).getSelectedDocuments(caseData);
-        verify(notificationSender).sendBundledLetter(eq(ISSUE_HEARING_ENQUIRY_FORM), eq(caseData),
-            eq(callback.getCaseDetails().getId()), sentPdfsCaptor.capture(), eq("Other Person"));
+        verify(notificationSender).sendBundledLetter(eq(ISSUE_HEARING_ENQUIRY_FORM), eq(caseData), sentPdfsCaptor.capture(), eq("Other Person"));
 
         List<Pdf> sentPdfs = sentPdfsCaptor.getValue();
         assertThat(sentPdfs).hasSize(2);
@@ -227,7 +226,7 @@ class IssueHearingEnquiryFormHandlerTest {
 
         handler.handle(SUBMITTED, callback);
 
-        verify(notificationSender, never()).sendBundledLetter(any(EventType.class), any(), any(), any(), anyString());
+        verify(notificationSender, never()).sendBundledLetter(any(EventType.class), any(), any(), anyString());
     }
 
     @ParameterizedTest
@@ -240,7 +239,7 @@ class IssueHearingEnquiryFormHandlerTest {
 
         handler.handle(SUBMITTED, callback);
 
-        verify(notificationSender, never()).sendBundledLetter(any(EventType.class), any(), any(), any(), anyString());
+        verify(notificationSender, never()).sendBundledLetter(any(EventType.class), any(), any(), anyString());
         logCapture.assertLogContains("Sending HEF letter to other parties for case id: 1", Level.INFO);
         logCapture.assertLogContains("Skipping party with incomplete selection data for case id: 1", Level.WARN);
     }
@@ -254,7 +253,7 @@ class IssueHearingEnquiryFormHandlerTest {
         when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(COVER_LETTER);
         when(coverLetterService.generateCoverSheet(anyString(), anyString(), any())).thenReturn(COVER_SHEET);
         doThrow(new NotificationClientException("test error")).when(notificationSender)
-            .sendBundledLetter(any(), any(), any(), anyList(), anyString());
+            .sendBundledLetter(any(), any(), anyList(), anyString());
 
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_HEARING_ENQUIRY_FORM);
 

@@ -194,8 +194,7 @@ class IssueGenericLetterHandlerTest {
 
         handler.handle(SUBMITTED, callback);
 
-        verify(notificationSender, times(5)).sendBundledLetter(eq(ISSUE_GENERIC_LETTER), eq(caseData),
-            eq(callback.getCaseDetails().getId()), anyList(), argumentCaptor.capture());
+        verify(notificationSender, times(5)).sendBundledLetter(eq(ISSUE_GENERIC_LETTER), eq(caseData), anyList(), argumentCaptor.capture());
         assertThat(argumentCaptor.getAllValues()).isEqualTo(
             List.of("User Test", "Wendy Giles", "Joint Party", "Other Party", "OPRepFirstName OPRepLastName"));
     }
@@ -236,8 +235,7 @@ class IssueGenericLetterHandlerTest {
 
         handler.handle(SUBMITTED, callback);
 
-        verify(notificationSender, times(5)).sendBundledLetter(eq(ISSUE_GENERIC_LETTER), eq(caseData),
-            eq(callback.getCaseDetails().getId()), anyList(), argumentCaptor.capture());
+        verify(notificationSender, times(5)).sendBundledLetter(eq(ISSUE_GENERIC_LETTER), eq(caseData), anyList(), argumentCaptor.capture());
         assertThat(argumentCaptor.getAllValues()).isEqualTo(
             List.of("User Test", "Wendy Giles", "Joint Party", "Other Party", "OPRepFirstName OPRepLastName"));
     }
@@ -293,8 +291,7 @@ class IssueGenericLetterHandlerTest {
         handler.handle(SUBMITTED, callback);
 
         verify(ccdNotificationService, times(0)).storeNotificationLetterIntoCcd(any(), any(), any(), any());
-        verify(notificationSender, times(2)).sendBundledLetter(eq(ISSUE_GENERIC_LETTER), eq(caseData),
-            eq(callback.getCaseDetails().getId()), anyList(), argumentCaptor.capture());
+        verify(notificationSender, times(2)).sendBundledLetter(eq(ISSUE_GENERIC_LETTER), eq(caseData), anyList(), argumentCaptor.capture());
         assertThat(argumentCaptor.getAllValues()).isEqualTo(List.of("User Test", "Wendy Giles"));
     }
 
@@ -316,8 +313,7 @@ class IssueGenericLetterHandlerTest {
 
         handler.handle(SUBMITTED, callback);
 
-        verify(notificationSender).sendBundledLetter(eq(ISSUE_GENERIC_LETTER), eq(caseData),
-            eq(callback.getCaseDetails().getId()), anyList(), eq("User Test"));
+        verify(notificationSender).sendBundledLetter(eq(ISSUE_GENERIC_LETTER), eq(caseData), anyList(), eq("User Test"));
 
     }
 
@@ -360,8 +356,7 @@ class IssueGenericLetterHandlerTest {
         handler.handle(SUBMITTED, callback);
 
         verify(coverLetterService).getSelectedDocuments(caseData);
-        verify(notificationSender).sendBundledLetter(eq(ISSUE_GENERIC_LETTER), eq(caseData),
-            eq(callback.getCaseDetails().getId()), anyList(), eq("User Test"));
+        verify(notificationSender).sendBundledLetter(eq(ISSUE_GENERIC_LETTER), eq(caseData), anyList(), eq("User Test"));
     }
 
     @Test
@@ -372,7 +367,7 @@ class IssueGenericLetterHandlerTest {
         when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
         when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
         doThrow(new NotificationClientException("test error")).when(notificationSender)
-            .sendBundledLetter(any(), any(), any(), anyList(), anyString());
+            .sendBundledLetter(any(), any(), anyList(), anyString());
 
         final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
             ISSUE_GENERIC_LETTER);
@@ -413,8 +408,7 @@ class IssueGenericLetterHandlerTest {
 
         handler.handle(SUBMITTED, callback);
 
-        verify(notificationSender, times(1)).sendBundledLetter(eq(ISSUE_GENERIC_LETTER), eq(caseData),
-            eq(callback.getCaseDetails().getId()), anyList(), eq("User Test"));
+        verify(notificationSender, times(1)).sendBundledLetter(eq(ISSUE_GENERIC_LETTER), eq(caseData), anyList(), eq("User Test"));
     }
 
     static List<CcdValue<OtherPartySelectionDetails>> buildOtherPartiesSelection(CcdValue<OtherParty> otherParty,

@@ -122,7 +122,7 @@ public class IssueHearingEnquiryFormHandler implements CallbackHandler<SscsCaseD
                     entityId);
                 final List<Pdf> letter = getLetterPdfs(caseData, documents, entityId);
                 try {
-                    notificationSender.sendBundledLetter(ISSUE_HEARING_ENQUIRY_FORM, caseData, caseId, letter, recipient);
+                    notificationSender.sendBundledLetter(ISSUE_HEARING_ENQUIRY_FORM, caseData, letter, recipient);
                 } catch (NotificationClientException ioe) {
                     NotificationServiceException exception = new NotificationServiceException(caseId.toString(), ioe);
                     log.error("Error sending notification for case id: %s".formatted(caseId), exception);

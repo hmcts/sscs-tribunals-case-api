@@ -14,6 +14,8 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -104,6 +106,21 @@ public class NotificationSender {
             (sendEmailResponse != null) ? sendEmailResponse.getNotificationId() : null);
     }
 
+    @Retryable
+    private SendEmailResponse getSendEmailResponse(String templateId, String emailAddress,
+        Map<String, Object> personalisation, String reference,
+        NotificationClient client) throws NotificationClientException {
+        final SendEmailResponse sendEmailResponse;
+        try {
+            sendEmailResponse = client.sendEmail(templateId, emailAddress, personalisation, reference);
+        } catch (NotificationClientException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new NotificationClientException(e);
+        }
+        return sendEmailResponse;
+    }
+
     public void sendSms(
         String templateId,
         String phoneNumber,
@@ -137,6 +154,27 @@ public class NotificationSender {
             (sendSmsResponse != null) ? sendSmsResponse.getNotificationId() : null);
     }
 
+    @Retryable
+    private SendSmsResponse getSendSmsResponse(String templateId, String phoneNumber,
+        Map<String, Object> personalisation, String reference, String smsSender,
+        NotificationClient client) throws NotificationClientException {
+        final SendSmsResponse sendSmsResponse;
+        try {
+            sendSmsResponse = client.sendSms(
+                templateId,
+                phoneNumber,
+                personalisation,
+                reference,
+                smsSender
+            );
+        } catch (NotificationClientException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new NotificationClientException(e);
+        }
+        return sendSmsResponse;
+    }
+
     public void sendLetter(String templateId, Address address, Map<String, Object> personalisation,
         NotificationEventType notificationEventType,
         String name, String ccdCaseId) throws NotificationClientException {
@@ -156,35 +194,19 @@ public class NotificationSender {
             ccdCaseId, (sendLetterResponse != null) ? sendLetterResponse.getNotificationId() : null);
     }
 
-    public void sendBundledLetter(EventType eventType, SscsCaseData caseData, Long caseId, List<Pdf> pdfs, String recipient)
+    @Retryable
+    private SendLetterResponse sendLetterViaGovNotify(String templateId, Map<String, Object> personalisation,
+        String ccdCaseId, NotificationClient client)
         throws NotificationClientException {
-        if (isNotEmpty(pdfs)) {
-
-            String govNotifyId = null;
-            NotificationClient client = null;
-
-            byte[] content = buildBundledLetterFromPdfs(pdfs);
-            if (getPhysicalPageCount(pdfs) > 10) {
-                bulkPrintService
-                    .sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(caseId, caseData, pdfs, eventType, recipient);
-                logSendingToBulkPrint(caseId.toString(), eventType.getCcdType());
-            } else {
-                client = getLetterNotificationClient(caseData.getAppeal().getAppellant().getAddress().getPostcode());
-                final LetterResponse notifyResponse = sendBundledLetter(caseId.toString(), client,
-                    new ByteArrayInputStream(content));
-                govNotifyId = nonNull(notifyResponse) ? notifyResponse.getNotificationId().toString() : null;
-                logSendingToGovNotify(caseId.toString(), govNotifyId);
-            }
-
-            if (saveCorrespondence) {
-                final var correspondence = getLetterCorrespondence(eventType, recipient, null);
-                if (isNull(govNotifyId)) {
-                    saveCorrespondenceAsyncService.saveLetter(content, correspondence, caseId.toString());
-                } else {
-                    saveCorrespondenceAsyncService.saveLetter(client, govNotifyId, correspondence, caseId.toString());
-                }
-            }
+        final SendLetterResponse sendLetterResponse;
+        try {
+            sendLetterResponse = client.sendLetter(templateId, personalisation, ccdCaseId);
+        } catch (NotificationClientException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new NotificationClientException(e);
         }
+        return sendLetterResponse;
     }
 
     public void sendBundledLetter(NotificationWrapper wrapper, byte[] content, String recipient)
@@ -208,14 +230,16 @@ public class NotificationSender {
             if (wrapper.getNotificationType().equals(ISSUE_FINAL_DECISION) && pageLimitExceeded) {
                 bulkPrintService
                     .sendToBulkPrint(List.of(new Pdf(content, ISSUE_FINAL_DECISION.name())), caseData, recipient);
-                logSendingToBulkPrint(wrapper.getCaseId(), wrapper.getNotificationType().getId());
+                log.info("Sending {} Letter for case id : {} via BulkPrint because it exceeds 10 pages",
+                    wrapper.getNotificationType(), wrapper.getCaseId());
             } else {
                 client = getLetterNotificationClient(caseData.getAppeal().getAppellant().getAddress().getPostcode());
                 ByteArrayInputStream inputStream = new ByteArrayInputStream(content);
                 final LetterResponse notifyResponse = sendBundledLetter(wrapper.getCaseId(), client, inputStream);
                 govNotifyId = nonNull(notifyResponse) ? notifyResponse.getNotificationId().toString() : null;
 
-                logSendingToGovNotify(wrapper.getCaseId(), govNotifyId);
+                log.info("Letter Notification send for case id : {}, Gov notify id: {} ",
+                        wrapper.getCaseId(), govNotifyId);
             }
 
             if (saveCorrespondence) {
@@ -243,6 +267,62 @@ public class NotificationSender {
         return sendLetterResponse;
     }
 
+    public void sendBundledLetter(EventType eventType, SscsCaseData caseData, List<Pdf> pdfs,
+        String recipient) throws NotificationClientException {
+        if (isNotEmpty(pdfs)) {
+            int physicalPageCount = getPhysicalPageCount(pdfs);
+            if (physicalPageCount > 10) {
+                sendUsingBulkPrint(eventType, caseData, pdfs, recipient, physicalPageCount);
+            } else {
+                sendUsingGovNotify(eventType, caseData, pdfs, recipient, physicalPageCount);
+            }
+        }
+    }
+
+    private void sendUsingBulkPrint(EventType eventType, SscsCaseData caseData, List<Pdf> pdfs, String recipient,
+        int physicalPageCount) {
+        log.info("Sending {} Letter for case id {} via BulkPrint because it exceeds 10 pages ({} pages).", eventType.getCcdType(),
+            caseData.getCcdCaseId(), physicalPageCount);
+        Optional<UUID> uuid = bulkPrintService.sendToBulkPrint(pdfs, caseData, recipient);
+        if (uuid.isPresent()) {
+            log.info("Letter Notification sent via Bulk Print for Letter {}, case id {} and Bulk print id {}",
+                eventType.getCcdType(), caseData.getCcdCaseId(), uuid.get());
+            saveLetterToCcd(eventType, Long.valueOf(caseData.getCcdCaseId()), pdfs, recipient, uuid.get());
+        } else {
+            log.error("Failed to send to bulk print for case {}. No print id returned", caseData.getCcdCaseId());
+        }
+    }
+
+    private void sendUsingGovNotify(EventType eventType, SscsCaseData caseData, List<Pdf> pdfs, String recipient,
+        int physicalPageCount) throws NotificationClientException {
+        log.info("Sending {} Letter for case id {} via Gov Notify because it is less than or equal to 10 pages ({} pages).",
+            eventType.getCcdType(), caseData.getCcdCaseId(), physicalPageCount);
+        NotificationClient client = getLetterNotificationClient(caseData.getAppeal().getAppellant().getAddress().getPostcode());
+        final LetterResponse notifyResponse = sendBundledLetter(caseData.getCcdCaseId(), client, new ByteArrayInputStream(buildBundledLetterFromPdfs(pdfs)));
+        String govNotifyId = nonNull(notifyResponse) ? notifyResponse.getNotificationId().toString() : null;
+        if (nonNull(govNotifyId)) {
+            saveLetterToCcd(eventType, Long.valueOf(caseData.getCcdCaseId()), recipient, govNotifyId, client);
+        } else {
+            log.error("Failed to send letter for case {}. Gov notify id is null", caseData.getCcdCaseId());
+        }
+    }
+
+    private void saveLetterToCcd(EventType eventType, Long caseId, List<Pdf> pdfs, String recipient, UUID uuid) {
+        saveCorrespondenceAsyncService.saveLetter(buildBundledLetterFromPdfs(pdfs), getLetterCorrespondence(eventType, recipient), caseId.toString());
+        log.info("Letter Notification recorded in CCD for Letter {}, case id {} and Bulk print id {}", eventType.getCcdType(),
+            caseId, uuid);
+    }
+
+    private void saveLetterToCcd(EventType eventType, Long caseId, String recipient, String govNotifyId,
+        NotificationClient client) throws NotificationClientException {
+        log.info("Letter Notification sent via Gov Notify for Letter {}, case id {} and Gov Notify id {}",
+            eventType.getCcdType(), caseId, govNotifyId);
+        saveCorrespondenceAsyncService.saveLetter(client, govNotifyId, getLetterCorrespondence(eventType, recipient),
+            caseId.toString());
+        log.info("Letter Notification recorded in CCD for Letter {}, case id {} and Gov Notify id {}", eventType.getCcdType(),
+            caseId, govNotifyId);
+    }
+
     public void saveLettersToReasonableAdjustment(byte[] pdfForLetter, NotificationEventType notificationEventType,
         String name, String ccdCaseId, SubscriptionType subscriptionType) {
         if (pdfForLetter != null) {
@@ -253,70 +333,6 @@ public class NotificationSender {
 
             log.info("Letter Notification saved for case id : {}", ccdCaseId);
         }
-    }
-
-    @Recover
-    public void getBackendResponseFallback(Throwable e) {
-        log.error("Failed sending.....", e);
-    }
-
-    private static void logSendingToGovNotify(String caseId, String govNotifyId) {
-        log.info("Letter Notification send for case id : {}, Gov notify id: {} ", caseId, govNotifyId);
-    }
-
-    private static void logSendingToBulkPrint(String caseId, String eventType) {
-        log.info("Sending {} Letter for case id : {} via BulkPrint because it exceeds 10 pages", eventType, caseId);
-    }
-
-    @Retryable
-    private SendEmailResponse getSendEmailResponse(String templateId, String emailAddress,
-        Map<String, Object> personalisation, String reference,
-        NotificationClient client) throws NotificationClientException {
-        final SendEmailResponse sendEmailResponse;
-        try {
-            sendEmailResponse = client.sendEmail(templateId, emailAddress, personalisation, reference);
-        } catch (NotificationClientException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new NotificationClientException(e);
-        }
-        return sendEmailResponse;
-    }
-
-    @Retryable
-    private SendSmsResponse getSendSmsResponse(String templateId, String phoneNumber,
-        Map<String, Object> personalisation, String reference, String smsSender,
-        NotificationClient client) throws NotificationClientException {
-        final SendSmsResponse sendSmsResponse;
-        try {
-            sendSmsResponse = client.sendSms(
-                templateId,
-                phoneNumber,
-                personalisation,
-                reference,
-                smsSender
-            );
-        } catch (NotificationClientException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new NotificationClientException(e);
-        }
-        return sendSmsResponse;
-    }
-
-    @Retryable
-    private SendLetterResponse sendLetterViaGovNotify(String templateId, Map<String, Object> personalisation,
-        String ccdCaseId, NotificationClient client)
-        throws NotificationClientException {
-        final SendLetterResponse sendLetterResponse;
-        try {
-            sendLetterResponse = client.sendLetter(templateId, personalisation, ccdCaseId);
-        } catch (NotificationClientException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new NotificationClientException(e);
-        }
-        return sendLetterResponse;
     }
 
     private Correspondence getEmailCorrespondence(final SendEmailResponse sendEmailResponse, final String emailAddress,
@@ -362,15 +378,13 @@ public class NotificationSender {
         ).build();
     }
 
-    private Correspondence getLetterCorrespondence(EventType eventType, String name,
-        ReasonableAdjustmentStatus status) {
+    private Correspondence getLetterCorrespondence(EventType eventType, String name) {
         return Correspondence.builder().value(
             CorrespondenceDetails.builder()
                                  .eventType(eventType.getCcdType())
                                  .to(name)
                                  .correspondenceType(CorrespondenceType.Letter)
                                  .sentOn(LocalDateTime.now(ZONE_ID_LONDON).format(DATE_TIME_FORMATTER))
-                                 .reasonableAdjustmentStatus(status)
                                  .build()
         ).build();
     }
@@ -385,5 +399,10 @@ public class NotificationSender {
             client = notificationClient;
         }
         return client;
+    }
+
+    @Recover
+    public void getBackendResponseFallback(Throwable e) {
+        log.error("Failed sending.....", e);
     }
 }
