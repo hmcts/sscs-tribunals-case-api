@@ -380,7 +380,7 @@ class PdfHelperTest {
     @ParameterizedTest
     @NullSource
     @EmptySource
-    void returnsZeroWhenPdfsIsNullOrEmpty(List<Pdf> pdfs) {
+    void returnsZeroWhenPdfsIsNullOrEmpty(List<Pdf> pdfs) throws PdfException {
         assertThat(PdfHelper.getPhysicalPageCount(pdfs)).isZero();
     }
 
@@ -390,7 +390,7 @@ class PdfHelperTest {
         "2, 1, two-page.pdf",
         "3, 2, three-page.pdf"
     })
-    void returnsCorrectSheetCountForDocuments(int pageCount, int expectedSheetCount, String filename) throws IOException {
+    void returnsCorrectSheetCountForDocuments(int pageCount, int expectedSheetCount, String filename) throws IOException, PdfException {
         final byte[] pdfBytes = createPdfWithPages(pageCount);
         final List<Pdf> pdfs = List.of(new Pdf(pdfBytes, filename));
 
@@ -398,7 +398,7 @@ class PdfHelperTest {
     }
 
     @Test
-    void returnsSumOfSheetCountsAcrossMultiplePdfs() throws IOException {
+    void returnsSumOfSheetCountsAcrossMultiplePdfs() throws IOException, PdfException {
         final byte[] threePagePdf = createPdfWithPages(3);
         final byte[] fourPagePdf = createPdfWithPages(4);
         final List<Pdf> pdfs = List.of(

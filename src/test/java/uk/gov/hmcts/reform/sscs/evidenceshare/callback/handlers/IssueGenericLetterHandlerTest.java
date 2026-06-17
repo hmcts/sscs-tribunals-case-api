@@ -9,7 +9,6 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -28,7 +27,6 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.OTHER_PARTY;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.OTHER_PARTY_REPRESENTATIVE;
 
-import ch.qos.logback.classic.Level;
 import java.io.IOException;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -62,7 +60,6 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.CcdNotificationService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.CoverLetterService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.GenericLetterPlaceholderService;
-import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationSender;
 import uk.gov.hmcts.reform.sscs.util.LogCaptureExtension;
 import uk.gov.service.notify.NotificationClientException;
@@ -340,7 +337,7 @@ class IssueGenericLetterHandlerTest {
     }
 
     @Test
-    void shouldIncludeSelectedDocumentsWhenAddDocumentsIsYes() throws NotificationClientException {
+    void shouldIncludeSelectedDocumentsWhenAddDocumentsIsYes() {
         final SscsCaseData caseData = buildCaseData();
         caseData.setSendToApellant(YesNo.YES);
         caseData.setAddDocuments(YesNo.YES);
@@ -357,27 +354,6 @@ class IssueGenericLetterHandlerTest {
 
         verify(coverLetterService).getSelectedDocuments(caseData);
         verify(notificationSender).sendBundledLetter(eq(ISSUE_GENERIC_LETTER), eq(caseData), anyList(), eq("User Test"));
-    }
-
-    @Test
-    void shouldThrowNotificationServiceException_whenNotificationClientExceptionOccurs() throws NotificationClientException {
-        final SscsCaseData caseData = buildCaseData();
-        caseData.setSendToApellant(YesNo.YES);
-
-        when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
-        when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
-        doThrow(new NotificationClientException("test error")).when(notificationSender)
-            .sendBundledLetter(any(), any(), anyList(), anyString());
-
-        final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
-            ISSUE_GENERIC_LETTER);
-
-        assertThatThrownBy(() -> handler.handle(SUBMITTED, callback))
-            .isInstanceOf(NotificationServiceException.class);
-
-        logCapture.assertLogContains(
-            "Error sending notification for case id: %s".formatted(callback.getCaseDetails().getId()),
-            Level.ERROR);
     }
 
     @Test

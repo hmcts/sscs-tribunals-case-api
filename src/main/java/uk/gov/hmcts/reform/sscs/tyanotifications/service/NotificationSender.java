@@ -4,7 +4,6 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.helper.PdfHelper.buildBundledLetterFromPdfs;
-import static uk.gov.hmcts.reform.sscs.helper.PdfHelper.getPhysicalPageCount;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION;
 
 import java.io.ByteArrayInputStream;
@@ -33,10 +32,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReasonableAdjustmentStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
+import uk.gov.hmcts.reform.sscs.evidenceshare.exception.PdfException;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.BulkPrintService;
+import uk.gov.hmcts.reform.sscs.helper.PdfHelper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationTestRecipients;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
+import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 import uk.gov.service.notify.LetterResponse;
 import uk.gov.service.notify.NotificationClient;
@@ -268,13 +270,25 @@ public class NotificationSender {
     }
 
     public void sendBundledLetter(EventType eventType, SscsCaseData caseData, List<Pdf> pdfs,
-        String recipient) throws NotificationClientException {
+        String recipient) {
         if (isNotEmpty(pdfs)) {
-            int physicalPageCount = getPhysicalPageCount(pdfs);
+            int physicalPageCount;
+            try {
+                physicalPageCount = PdfHelper.getPhysicalPageCount(pdfs);
+            } catch (PdfException e) {
+                log.error("Failed to calculate the number of pages contained in the letter {} for case id {} and notification {}", e.getMessage(), caseData.getCcdCaseId(), eventType.getCcdType());
+                throw new NotificationServiceException("Failed to calculate the number of pages contained in the letter %s for case id %s and notification %s".formatted(e.getMessage(), caseData.getCcdCaseId(), eventType.getCcdType()), e);
+            }
             if (physicalPageCount > 10) {
                 sendUsingBulkPrint(eventType, caseData, pdfs, recipient, physicalPageCount);
             } else {
-                sendUsingGovNotify(eventType, caseData, pdfs, recipient, physicalPageCount);
+                try {
+                    sendUsingGovNotify(eventType, caseData, pdfs, recipient, physicalPageCount);
+                } catch (NotificationClientException e) {
+                    final NotificationServiceException exception = new NotificationServiceException(caseData.getCcdCaseId(), e);
+                    log.error("Error sending notification for case id: {}", caseData.getCcdCaseId(), exception);
+                    throw exception;
+                }
             }
         }
     }

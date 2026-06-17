@@ -27,9 +27,7 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.CoverLetterService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.HearingEnquiryFormPlaceholderService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility;
-import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationSender;
-import uk.gov.service.notify.NotificationClientException;
 
 @Slf4j
 @Service
@@ -121,13 +119,7 @@ public class IssueHearingEnquiryFormHandler implements CallbackHandler<SscsCaseD
                 final String recipient = PlaceholderUtility.getName(caseData, OTHER_PARTY_LETTER,
                     entityId);
                 final List<Pdf> letter = getLetterPdfs(caseData, documents, entityId);
-                try {
-                    notificationSender.sendBundledLetter(ISSUE_HEARING_ENQUIRY_FORM, caseData, letter, recipient);
-                } catch (NotificationClientException ioe) {
-                    NotificationServiceException exception = new NotificationServiceException(caseId.toString(), ioe);
-                    log.error("Error sending notification for case id: %s".formatted(caseId), exception);
-                    throw exception;
-                }
+                notificationSender.sendBundledLetter(ISSUE_HEARING_ENQUIRY_FORM, caseData, letter, recipient);
             }
         }
     }

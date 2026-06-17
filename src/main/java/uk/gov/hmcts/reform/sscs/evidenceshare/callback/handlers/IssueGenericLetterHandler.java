@@ -18,7 +18,10 @@ import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.evidenceshare.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType;
@@ -26,9 +29,7 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.CoverLetterService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.GenericLetterPlaceholderService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility;
-import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationSender;
-import uk.gov.service.notify.NotificationClientException;
 
 @Slf4j
 @Service
@@ -172,13 +173,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
     }
 
     private void sendLetterToNotificationProvider(Long caseId, SscsCaseData caseData, List<Pdf> letter, String recipient) {
-        try {
-            notificationSender.sendBundledLetter(ISSUE_GENERIC_LETTER, caseData, letter, recipient);
-        } catch (NotificationClientException ioe) {
-            NotificationServiceException exception = new NotificationServiceException(caseId.toString(), ioe);
-            log.error("Error sending notification for case id: {}", caseId, exception);
-            throw exception;
-        }
+        notificationSender.sendBundledLetter(ISSUE_GENERIC_LETTER, caseData, letter, recipient);
     }
 
     private static String getLetterName(Map<String, Object> placeholders) {

@@ -51,11 +51,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReasonableAdjustmentStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
+import uk.gov.hmcts.reform.sscs.evidenceshare.exception.PdfException;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.helper.PdfHelper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationTestRecipients;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
+import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 import uk.gov.hmcts.reform.sscs.util.LogCaptureExtension;
@@ -525,7 +527,7 @@ class NotificationSenderTest {
     }
 
     @Test
-    void sendBundledLetter_eventType_doesNothingWhenPdfsIsEmpty() throws NotificationClientException {
+    void sendBundledLetter_eventType_doesNothingWhenPdfsIsEmpty() {
         notificationSender.sendBundledLetter(
             EventType.ISSUE_GENERIC_LETTER, SSCS_CASE_DATA, List.of(), "Bob Squires");
 
@@ -560,7 +562,7 @@ class NotificationSenderTest {
     }
 
     @Test
-    void sendBundledLetter_eventType_sendsToBulkPrintWhenExceedsPageLimit() throws NotificationClientException {
+    void sendBundledLetter_eventType_sendsToBulkPrintWhenExceedsPageLimit() {
         final byte[] content = "pdf-content".getBytes();
         final List<Pdf> pdfs = List.of(new Pdf(content, "letter.pdf"));
         final SscsCaseData caseData = buildCaseDataWithPostcode("LN8 4DX");
@@ -585,7 +587,7 @@ class NotificationSenderTest {
     }
 
     @Test
-    void sendBundledLetter_eventType_doesNotSaveToCcdWhenBulkPrintIdNotReturned() throws NotificationClientException {
+    void sendBundledLetter_eventType_doesNotSaveToCcdWhenBulkPrintIdNotReturned() {
         final byte[] content = "pdf-content".getBytes();
         final List<Pdf> pdfs = List.of(new Pdf(content, "letter.pdf"));
         final SscsCaseData caseData = buildCaseDataWithPostcode("LN8 4DX");
@@ -627,6 +629,52 @@ class NotificationSenderTest {
 
         logCapture.assertLogContains(
             "Failed to send letter for case %s. Gov notify id is null".formatted(caseData.getCcdCaseId()),
+            Level.ERROR);
+    }
+
+    @Test
+    void sendBundledLetter_eventType_wrapsPdfExceptionWhenPageCountCalculationFails() {
+        final List<Pdf> pdfs = List.of(new Pdf("pdf-content".getBytes(), "letter.pdf"));
+        final SscsCaseData caseData = buildCaseDataWithPostcode("LN8 4DX");
+        final PdfException pdfException = new PdfException("boom", new IOException("broken"));
+
+        try (final MockedStatic<PdfHelper> pdfHelper = mockStatic(PdfHelper.class)) {
+            pdfHelper.when(() -> PdfHelper.getPhysicalPageCount(any())).thenThrow(pdfException);
+
+            assertThatThrownBy(() -> notificationSender.sendBundledLetter(
+                EventType.ISSUE_GENERIC_LETTER, caseData, pdfs, "Bob Squires"))
+                .isInstanceOf(NotificationServiceException.class)
+                .hasCause(pdfException);
+        }
+
+        verifyNoInteractions(notificationClient, testNotificationClient, bulkPrintService, saveCorrespondenceAsyncService);
+        logCapture.assertLogContains(
+            "Failed to calculate the number of pages contained in the letter %s for case id %s and notification %s"
+                .formatted(pdfException.getMessage(), caseData.getCcdCaseId(), EventType.ISSUE_GENERIC_LETTER.getCcdType()),
+            Level.ERROR);
+    }
+
+    @Test
+    void sendBundledLetter_eventType_wrapsNotificationClientExceptionFromGovNotify() throws NotificationClientException {
+        final byte[] content = "pdf-content".getBytes();
+        final List<Pdf> pdfs = List.of(new Pdf(content, "letter.pdf"));
+        final SscsCaseData caseData = buildCaseDataWithPostcode("LN8 4DX");
+        final NotificationClientException notifyException = new NotificationClientException("boom");
+        when(notificationClient.sendPrecompiledLetterWithInputStream(any(), any())).thenThrow(notifyException);
+
+        try (final MockedStatic<PdfHelper> pdfHelper = mockStatic(PdfHelper.class)) {
+            pdfHelper.when(() -> PdfHelper.buildBundledLetterFromPdfs(any())).thenReturn(content);
+            pdfHelper.when(() -> PdfHelper.getPhysicalPageCount(any())).thenReturn(5);
+
+            assertThatThrownBy(() -> notificationSender.sendBundledLetter(
+                EventType.ISSUE_GENERIC_LETTER, caseData, pdfs, "Bob Squires"))
+                .isInstanceOf(NotificationServiceException.class)
+                .hasCause(notifyException);
+        }
+
+        verifyNoInteractions(testNotificationClient, bulkPrintService, saveCorrespondenceAsyncService);
+        logCapture.assertLogContains(
+            "Error sending notification for case id: %s".formatted(caseData.getCcdCaseId()),
             Level.ERROR);
     }
 

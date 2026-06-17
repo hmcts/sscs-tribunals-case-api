@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
@@ -62,7 +61,6 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.CoverLetterService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.HearingEnquiryFormPlaceholderService;
 import uk.gov.hmcts.reform.sscs.helper.PdfHelper;
-import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationSender;
 import uk.gov.hmcts.reform.sscs.util.LogCaptureExtension;
 import uk.gov.service.notify.NotificationClientException;
@@ -242,27 +240,6 @@ class IssueHearingEnquiryFormHandlerTest {
         verify(notificationSender, never()).sendBundledLetter(any(EventType.class), any(), any(), anyString());
         logCapture.assertLogContains("Sending HEF letter to other parties for case id: 1", Level.INFO);
         logCapture.assertLogContains("Skipping party with incomplete selection data for case id: 1", Level.WARN);
-    }
-
-    @Test
-    void shouldThrowNotificationServiceException_whenNotificationClientExceptionOccurs() throws NotificationClientException {
-        final SscsCaseData caseData = baseCaseData();
-        caseData.setAddDocuments(YesNo.NO);
-
-        when(hearingEnquiryFormPlaceholderService.populatePlaceholders(any(), any(), anyString())).thenReturn(Map.of("address_name", "Other Party"));
-        when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(COVER_LETTER);
-        when(coverLetterService.generateCoverSheet(anyString(), anyString(), any())).thenReturn(COVER_SHEET);
-        doThrow(new NotificationClientException("test error")).when(notificationSender)
-            .sendBundledLetter(any(), any(), anyList(), anyString());
-
-        final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_HEARING_ENQUIRY_FORM);
-
-        assertThatThrownBy(() -> handler.handle(SUBMITTED, callback))
-            .isInstanceOf(NotificationServiceException.class);
-
-        logCapture.assertLogContains(
-            "Error sending notification for case id: %s".formatted(callback.getCaseDetails().getId()),
-            Level.ERROR);
     }
 
     @SuppressWarnings("unchecked")
