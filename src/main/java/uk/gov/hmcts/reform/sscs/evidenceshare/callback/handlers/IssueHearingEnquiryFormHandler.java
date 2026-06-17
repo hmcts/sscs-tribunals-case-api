@@ -117,7 +117,7 @@ public class IssueHearingEnquiryFormHandler implements CallbackHandler<SscsCaseD
                 final String recipient = PlaceholderUtility.getName(caseData, OTHER_PARTY_LETTER,
                     entityId);
                 final List<Pdf> letter = getLetterPdfs(caseData, documents, entityId);
-                bulkPrintService.sendToBulkPrint(caseId, caseData, letter, ISSUE_HEARING_ENQUIRY_FORM, recipient);
+                bulkPrintService.sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(caseId, caseData, letter, ISSUE_HEARING_ENQUIRY_FORM, recipient);
             }
         }
     }

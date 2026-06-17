@@ -19,10 +19,7 @@ export class updateOtherPartyDataPage {
     const captionCount = await this.page.locator('.govuk-caption-l').count();
 
     if (captionCount > 0) {
-      await webAction.verifyPageLabel(
-        '.govuk-caption-l',
-        heading
-      );
+      await webAction.verifyPageLabel('.govuk-caption-l', heading);
     } else {
       await expect(
         this.page.getByRole('heading', { name: heading, exact: true }).first()
@@ -34,7 +31,7 @@ export class updateOtherPartyDataPage {
 
   // Applying other party data for the Mandatory fields only
   async applyOtherPartyData(
-    caseType: string = "NONIBC",
+    caseType: string = 'NONIBC',
     confidentialityRequired: string = addUpdateOtherPartyData.updateOtherPartyDataConfidentiality
   ) {
     await this.page.getByRole('button', { name: 'Add new' }).click(); //fields are expanded here
@@ -51,14 +48,14 @@ export class updateOtherPartyDataPage {
     await this.page
       .locator('#otherParties_0_address_town')
       .fill(addUpdateOtherPartyData.updateOtherPartyDataAddressTown);
-    if( caseType != "NONIBC") {
+    if (caseType != 'NONIBC') {
       await this.page
         .locator('#otherParties_0_address_country')
         .fill(addUpdateOtherPartyData.updateOtherPartyDataAddressCountry);
     }
     await this.page
       .locator('#otherParties_0_address_postcode')
-      .fill(addUpdateOtherPartyData.updateOtherPartyDataAddressPostCode);      
+      .fill(addUpdateOtherPartyData.updateOtherPartyDataAddressPostCode);
     await this.page
       .locator(
         confidentialityRequired ===
@@ -70,18 +67,18 @@ export class updateOtherPartyDataPage {
     await this.page
       .locator('#otherParties_0_unacceptableCustomerBehaviour_No')
       .click();
-      if( caseType == "NONIBC") {
-        await this.page
-          .locator('#otherParties_0_role_name')
-          .selectOption({ label: 'Paying parent' }); //selecting role drop down
-      } else if( caseType == "IBC" ) {
-        await this.page
-          .locator('#otherParties_0_name_title')
-          .fill(addUpdateOtherPartyData.updateOtherPartyDataTitle);
-        await this.page
-          .locator('#otherParties_0_address_inMainlandUk_Yes')
-          .click(); //ToDo : Change to dynamic value
-      }
+    if (caseType == 'NONIBC') {
+      await this.page
+        .locator('#otherParties_0_role_name')
+        .selectOption({ label: 'Paying parent' }); //selecting role drop down
+    } else if (caseType == 'IBC') {
+      await this.page
+        .locator('#otherParties_0_name_title')
+        .fill(addUpdateOtherPartyData.updateOtherPartyDataTitle);
+      await this.page
+        .locator('#otherParties_0_address_inMainlandUk_Yes')
+        .click(); //ToDo : Change to dynamic value
+    }
     await this.page
       .locator('#otherParties_0_domesticViolenceMarker-No')
       .click();
@@ -106,11 +103,15 @@ export class updateOtherPartyDataPage {
     await this.page
       .locator('#otherParties_0_address_postcode')
       .fill(addUpdateOtherPartyData.updateOtherPartyDataAddressPostCode);
-    await this.page.locator('#otherParties_0_confidentialityRequired_Yes').click();
+    await this.page
+      .locator('#otherParties_0_confidentialityRequired_Yes')
+      .click();
     await this.page
       .locator('#otherParties_0_unacceptableCustomerBehaviour_No')
       .click();
-    await this.page.locator('#otherParties_0_role_name').selectOption({ label: 'Paying parent' });
+    await this.page
+      .locator('#otherParties_0_role_name')
+      .selectOption({ label: 'Paying parent' });
     await this.page
       .getByRole('group', { name: /Wants To Attend/i })
       .getByLabel('Yes')
@@ -137,14 +138,16 @@ export class updateOtherPartyDataPage {
     await this.applyChildSupportFtaAddOtherPartyDataWithValues();
   }
 
-  async applyChildSupportFtaAddOtherPartyDataWithValues(values = {
-    title: addUpdateOtherPartyData.updateOtherPartyDataTitle,
-    firstName: addUpdateOtherPartyData.updateOtherPartyDataFirstName,
-    lastName: addUpdateOtherPartyData.updateOtherPartyDataLastName,
-    addressLine1: addUpdateOtherPartyData.updateOtherPartyDataAddressLine,
-    town: addUpdateOtherPartyData.updateOtherPartyDataAddressTown,
-    postcode: addUpdateOtherPartyData.updateOtherPartyDataAddressPostCode
-  }) {
+  async applyChildSupportFtaAddOtherPartyDataWithValues(
+    values = {
+      title: addUpdateOtherPartyData.updateOtherPartyDataTitle,
+      firstName: addUpdateOtherPartyData.updateOtherPartyDataFirstName,
+      lastName: addUpdateOtherPartyData.updateOtherPartyDataLastName,
+      addressLine1: addUpdateOtherPartyData.updateOtherPartyDataAddressLine,
+      town: addUpdateOtherPartyData.updateOtherPartyDataAddressTown,
+      postcode: addUpdateOtherPartyData.updateOtherPartyDataAddressPostCode
+    }
+  ) {
     await this.page.getByRole('button', { name: 'Add new' }).click();
     await this.page.locator('#otherParties_0_name_title').fill(values.title);
     await this.page
@@ -156,9 +159,7 @@ export class updateOtherPartyDataPage {
     await this.page
       .locator('#otherParties_0_address_line1')
       .fill(values.addressLine1);
-    await this.page
-      .locator('#otherParties_0_address_town')
-      .fill(values.town);
+    await this.page.locator('#otherParties_0_address_town').fill(values.town);
     await this.page
       .locator('#otherParties_0_address_postcode')
       .fill(values.postcode);
@@ -167,7 +168,9 @@ export class updateOtherPartyDataPage {
       .click();
     await this.page
       .locator('#otherParties_0_role_name')
-      .selectOption({ label: addUpdateOtherPartyData.updateOtherPartyDataDropdownValue });
+      .selectOption({
+        label: addUpdateOtherPartyData.updateOtherPartyDataDropdownValue
+      });
     await this.page
       .locator('#otherParties_0_domesticViolenceMarker-No')
       .click();
@@ -236,5 +239,21 @@ export class updateOtherPartyDataPage {
 
   async confirmSubmission(): Promise<void> {
     await webAction.clickSubmitButton();
+  }
+
+  async setConfidentialityForOtherParty(isConfidentialityRequired: boolean) {
+    await this.page
+      .locator(
+        `#otherParties_0_confidentialityRequired_${isConfidentialityRequired ? 'Yes' : 'No'}`
+      )
+      .click();
+    await webAction.clickSubmitButton();
+    await webAction.waitForSpinnerToDisappear();
+    await webAction.verifyPageLabel(
+      '.govuk-heading-l',
+      addUpdateOtherPartyData.updateOtherPartyDataHeading
+    );
+    await webAction.clickSubmitButton();
+    await webAction.waitForSpinnerToDisappear();
   }
 }

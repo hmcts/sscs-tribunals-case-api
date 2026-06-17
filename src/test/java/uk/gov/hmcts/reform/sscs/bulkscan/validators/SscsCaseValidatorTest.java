@@ -1180,8 +1180,8 @@ public class SscsCaseValidatorTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"A12112", "A11A12", "A12b12", "A12012"})
-    public void givenSscs8ContainValidIbcaReferenceWithFourthCharacterAsDigitOrNumber_thenDoNotAddAWarningOrError(String ibcaReference) {
+    @ValueSource(strings = {"A12112", "A11A12", "A12b12", "A12012", "123456", "ABCDEF"})
+    public void givenSscs8ContainValidIbcaReferenceWithSixAlphanumericCharacters_thenDoNotAddAWarningOrError(String ibcaReference) {
         Appellant appellant = buildAppellant(false);
         appellant.getIdentity().setIbcaReference(ibcaReference);
         ocrCaseData.put(IBC_ROLE_FOR_SELF, true);
@@ -1193,20 +1193,6 @@ public class SscsCaseValidatorTest {
                         false);
 
         assertThat(response.getWarnings()).isEmpty();
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"A1211R", "A11A1F"})
-    public void givenSscs8ContainInValidIbcaReferenceWithFourthCharacterAsDigitOrNumber_thenAddAWarnings(String ibcaReference) {
-        Appellant appellant = buildAppellant(false);
-        appellant.getIdentity().setIbcaReference(ibcaReference);
-        ocrCaseData.put(IBC_ROLE_FOR_SELF, true);
-
-        CaseResponse response = validator
-                .validateExceptionRecord(transformResponse, exceptionRecord, buildMinimumAppealData(appellant, true, FormType.SSCS8),
-                        false);
-
-        assertThat(response.getWarnings()).contains("person1_ibca_reference is invalid");
     }
 
     @Test

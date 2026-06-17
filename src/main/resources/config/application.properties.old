@@ -214,7 +214,6 @@ exela.scottishPostcode=CM20 9TT
 feature.urgent-hearing.enabled=${URGENT_HEARING_ENABLED:false}
 feature.scottish-po-box.enabled=${SCOTTISH_PO_BOX_ENABLED:false}
 
-feature.issue-generic-letter.enabled=${ISSUE_GENERIC_LETTER:false}
 helpline.telephone=0300 123 1142
 http.connect.timeout=5000
 http.connect.request.timeout=5000

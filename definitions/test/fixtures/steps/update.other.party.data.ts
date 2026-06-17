@@ -22,29 +22,6 @@ export class UpdateOtherPartyData extends BaseStep {
       : 'With FTA';
   }
 
-  private async waitForSummaryState(expectedState: string) {
-    for (let attempt = 0; attempt < 8; attempt++) {
-      await this.homePage.navigateToTab('Summary');
-      const summaryState = await this.page
-        .locator('#summaryState')
-        .textContent()
-        .catch(() => '');
-
-      if (summaryState?.includes(expectedState)) {
-        return;
-      }
-
-      await this.homePage.delay(5000);
-      await this.homePage.reloadPage();
-    }
-
-    await this.homePage.navigateToTab('Summary');
-    await this.summaryTab.verifyPageSectionByKeyValue(
-      'Appeal status',
-      expectedState
-    );
-  }
-
   private async navigateToConfidentialityTab() {
     const confidentialityTab = this.page.getByRole('tab', {
       name: /^Confidentiality$/
@@ -52,69 +29,17 @@ export class UpdateOtherPartyData extends BaseStep {
 
     if (await confidentialityTab.isVisible().catch(() => false)) {
       await confidentialityTab.click();
-      await expect(this.confidentialityStatusHeader()).toBeVisible();
+      await expect(
+        this.confidentialityTab.confidentialityStatusHeader()
+      ).toBeVisible();
       return;
     }
 
     const caseUrl = this.page.url().split('#')[0];
     await this.page.goto(`${caseUrl}#Confidentiality`);
-    await expect(this.confidentialityStatusHeader()).toBeVisible();
-  }
-
-  private async getConfidentialityRowCells(rowIndex: number) {
-    const table = this.page
-      .locator('table:visible')
-      .filter({
-        has: this.confidentialityStatusHeader()
-      })
-      .last();
-    const row = table.locator('tr').nth(rowIndex + 1);
-    await expect(row).toBeVisible();
-    const cellTexts = await row.locator('td').allTextContents();
-    return cellTexts.map((text) => text.replace(/\s+/g, ' ').trim());
-  }
-
-  private confidentialityStatusHeader() {
-    return this.page.locator('th').filter(
-      {hasText: /^Confidentiality Status$/}
-    );
-  }
-
-  private getTodayLondonDate() {
-    return new Intl.DateTimeFormat('en-GB', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-      timeZone: 'Europe/London'
-    }).format(new Date());
-  }
-
-  private async verifyConfidentialityRows(rows: Array<{
-    party: string;
-    name: string;
-    status: string;
-    confirmed?: 'blank' | 'today';
-  }>) {
-    await this.navigateToConfidentialityTab();
-
-    const todayDate = this.getTodayLondonDate().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const todayPattern = new RegExp(
-      `^${todayDate}, \\d{1,2}:\\d{2}(?::\\d{2})? [ap]m$`,
-      'i'
-    );
-
-    for (let i = 0; i < rows.length; i++) {
-      const cells = await this.getConfidentialityRowCells(i);
-      expect(cells[0]).toBe(rows[i].party);
-      expect(cells[1]).toBe(rows[i].name);
-      expect(cells[2]).toBe(rows[i].status);
-
-      if (rows[i].confirmed === 'blank') {
-        expect(cells[3] || '').toBe('');
-      } else if (rows[i].confirmed === 'today') {
-        expect(cells[3] || '').toMatch(todayPattern);
-      }
-    }
+    await expect(
+      this.confidentialityTab.confidentialityStatusHeader()
+    ).toBeVisible();
   }
 
   private async submitEventWithOptionalSecondSubmit(attempts: number = 5) {
@@ -122,7 +47,9 @@ export class UpdateOtherPartyData extends BaseStep {
 
     for (let attempt = 1; attempt <= attempts; attempt++) {
       try {
-        await this.page.getByRole('button', { name: 'Submit', exact: true }).click();
+        await this.page
+          .getByRole('button', { name: 'Submit', exact: true })
+          .click();
         await this.homePage.delay(5000);
 
         const secondSubmit = this.page.getByRole('button', {
@@ -164,7 +91,10 @@ export class UpdateOtherPartyData extends BaseStep {
 
   private async reloginIfRedirectedToSignIn(user, caseId: string) {
     const onSignInPage =
-      (await this.page.locator('#username').isVisible().catch(() => false)) ||
+      (await this.page
+        .locator('#username')
+        .isVisible()
+        .catch(() => false)) ||
       (await this.page
         .getByRole('heading', { name: 'Sign in or create an account' })
         .isVisible()
@@ -182,8 +112,7 @@ export class UpdateOtherPartyData extends BaseStep {
     of benefit type - Rohith - 07/02/2025
   */
 
-    async performUpdateOtherPartyData(caseId: string, benefitType: string) {
-
+  async performUpdateOtherPartyData(caseId: string, benefitType: string) {
     // Starting event
     await this.goToUpdateOtherPartyData(caseId);
     await this.updateOtherPartyDataPage.verifyPageContent();
@@ -270,7 +199,7 @@ export class UpdateOtherPartyData extends BaseStep {
       await this.otherPartyDetailsTab.verifyPageContentByRoleWithLocator(
         'DV marker?',
         'No'
-        );
+      );
     }
   }
 
@@ -358,8 +287,8 @@ export class UpdateOtherPartyData extends BaseStep {
 
   async performUpdateOtherPartyDataIBC(caseId: string) {
     // await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
-    await this.homePage.chooseEvent("Update other party data");
-    await this.updateOtherPartyDataPage.applyOtherPartyData("IBC");
+    await this.homePage.chooseEvent('Update other party data');
+    await this.updateOtherPartyDataPage.applyOtherPartyData('IBC');
     await this.eventNameAndDescriptionPage.inputData(
       eventTestData.eventSummaryInput,
       eventTestData.eventDescriptionInput
@@ -390,16 +319,24 @@ export class UpdateOtherPartyData extends BaseStep {
     await this.homePage.delay(3000);
   }
 
-  async addOtherPartyDataForAwaitOtherPartyData(caseId: string, user, benefitType: string) {
+  async addOtherPartyDataForAwaitOtherPartyData(
+    caseId: string,
+    user,
+    benefitType: string
+  ) {
     await this.loginUserWithCaseId(user, true, caseId);
     await (benefitType === 'Child Support'
-         ? this.waitForSummaryState('Await Other Party Data')
-         : this.waitForSummaryState('With FTA'));
+      ? this.summaryTab.waitForSummaryState('Await Other Party Data')
+      : this.summaryTab.waitForSummaryState('With FTA'));
     await this.homePage.chooseEvent('Add other party data');
-    await this.updateOtherPartyDataPage.verifyPageContent('Add other party data');
+    await this.updateOtherPartyDataPage.verifyPageContent(
+      'Add other party data'
+    );
     await this.updateOtherPartyDataPage.applyChildSupportFtaAddOtherPartyData();
 
-    await this.waitForSummaryState('Await Confidentiality Requirements');
+    await this.summaryTab.waitForSummaryState(
+      'Await Confidentiality Requirements'
+    );
   }
 
   async completeChildSupportConfidentialityDeterminationFlow(caseId: string) {
@@ -407,8 +344,9 @@ export class UpdateOtherPartyData extends BaseStep {
     const otherPartyName = 'Test1 Test1';
 
     await this.loginUserWithCaseId(credentials.dwpResponseWriter, true, caseId);
-    await this.waitForSummaryState('Await Other Party Data');
-    await this.verifyConfidentialityRows([
+    await this.summaryTab.waitForSummaryState('Await Other Party Data');
+    await this.homePage.navigateToTab('Confidentiality');
+    await this.confidentialityTab.verifyConfidentialityRows([
       {
         party: 'Appellant',
         name: appellantName,
@@ -418,17 +356,24 @@ export class UpdateOtherPartyData extends BaseStep {
     ]);
 
     await this.homePage.chooseEvent('Add other party data');
-    await this.updateOtherPartyDataPage.verifyPageContent('Add other party data');
-    await this.updateOtherPartyDataPage.applyChildSupportFtaAddOtherPartyDataWithValues({
-      title: 'Mr',
-      firstName: 'Test1',
-      lastName: 'Test1',
-      addressLine1: 'Test1',
-      town: 'Test1',
-      postcode: 'BN19SA'
-    });
-    await this.waitForSummaryState('Await Confidentiality Requirements');
-    await this.verifyConfidentialityRows([
+    await this.updateOtherPartyDataPage.verifyPageContent(
+      'Add other party data'
+    );
+    await this.updateOtherPartyDataPage.applyChildSupportFtaAddOtherPartyDataWithValues(
+      {
+        title: 'Mr',
+        firstName: 'Test1',
+        lastName: 'Test1',
+        addressLine1: 'Test1',
+        town: 'Test1',
+        postcode: 'BN19SA'
+      }
+    );
+    await this.summaryTab.waitForSummaryState(
+      'Await Confidentiality Requirements'
+    );
+    await this.homePage.navigateToTab('Confidentiality');
+    await this.confidentialityTab.verifyConfidentialityRows([
       {
         party: 'Appellant',
         name: appellantName,
@@ -447,8 +392,11 @@ export class UpdateOtherPartyData extends BaseStep {
 
     await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
     await this.reloginIfRedirectedToSignIn(credentials.amCaseWorker, caseId);
-    await this.waitForSummaryState('Await Confidentiality Requirements');
-    await this.verifyConfidentialityRows([
+    await this.summaryTab.waitForSummaryState(
+      'Await Confidentiality Requirements'
+    );
+    await this.homePage.navigateToTab('Confidentiality');
+    await this.confidentialityTab.verifyConfidentialityRows([
       {
         party: 'Appellant',
         name: appellantName,
@@ -464,10 +412,12 @@ export class UpdateOtherPartyData extends BaseStep {
     ]);
 
     await this.homePage.chooseEvent('Update other party data');
-    await this.page.locator('#otherParties_0_confidentialityRequired_No').click();
-    await this.submitEventWithOptionalSecondSubmit();
-    await this.waitForSummaryState('Await Confidentiality Requirements');
-    await this.verifyConfidentialityRows([
+    await this.updateOtherPartyDataPage.setConfidentialityForOtherParty(false);
+    await this.summaryTab.waitForSummaryState(
+      'Await Confidentiality Requirements'
+    );
+    await this.homePage.navigateToTab('Confidentiality');
+    await this.confidentialityTab.verifyConfidentialityRows([
       {
         party: 'Appellant',
         name: appellantName,
@@ -483,13 +433,17 @@ export class UpdateOtherPartyData extends BaseStep {
     ]);
 
     await this.homePage.chooseEvent('Confidentiality Confirmed');
-    await this.page.getByRole('button', { name: 'Submit', exact: true }).click();
+    await this.page
+      .getByRole('button', { name: 'Submit', exact: true })
+      .click();
     await expect(
       this.page.getByText(
         'Confidentiality for all parties must be determined to either Yes or No.'
       )
     ).toBeVisible();
-    await this.page.getByRole('button', { name: 'Cancel', exact: true }).click();
+    await this.page
+      .getByRole('button', { name: 'Cancel', exact: true })
+      .click();
 
     await this.homePage.chooseEvent('Update to case data');
     await this.page
@@ -515,7 +469,8 @@ export class UpdateOtherPartyData extends BaseStep {
       'Confidentiality Required',
       'Yes'
     );
-    await this.verifyConfidentialityRows([
+    await this.homePage.navigateToTab('Confidentiality');
+    await this.confidentialityTab.verifyConfidentialityRows([
       {
         party: 'Appellant',
         name: appellantName,
@@ -533,35 +488,66 @@ export class UpdateOtherPartyData extends BaseStep {
     await this.homePage.chooseEvent('Confidentiality Confirmed');
     await this.submitEventWithOptionalSecondSubmit();
     await this.reloginIfRedirectedToSignIn(credentials.amCaseWorker, caseId);
-    await this.waitForSummaryState('With FTA');
+    await this.summaryTab.waitForSummaryState('With FTA');
     await this.homePage.navigateToTab('Appeal Details');
     await this.appealDetailsTab.verifyAppealDetailsPageContentByKeyValue(
       'FTA State',
       'Appeal to-be registered'
     );
   }
-  
-  async verifyOtherPartyDetailsIBC(){
+
+  async verifyOtherPartyDetailsIBC() {
     // Navigate to Other Party Details tab + validations
-    await this.homePage.navigateToTab("Other Party Details");
-    await this.otherPartyDetailsTab.verifyPageContentByKeyValue('Title', addUpdateOtherPartyData.updateOtherPartyDataTitle);
-    await this.otherPartyDetailsTab.verifyPageContentByKeyValue('First Name', addUpdateOtherPartyData.updateOtherPartyDataFirstName);
-    await this.otherPartyDetailsTab.verifyPageContentByKeyValue('Last Name', addUpdateOtherPartyData.updateOtherPartyDataLastName);
+    await this.homePage.navigateToTab('Other Party Details');
+    await this.otherPartyDetailsTab.verifyPageContentByKeyValue(
+      'Title',
+      addUpdateOtherPartyData.updateOtherPartyDataTitle
+    );
+    await this.otherPartyDetailsTab.verifyPageContentByKeyValue(
+      'First Name',
+      addUpdateOtherPartyData.updateOtherPartyDataFirstName
+    );
+    await this.otherPartyDetailsTab.verifyPageContentByKeyValue(
+      'Last Name',
+      addUpdateOtherPartyData.updateOtherPartyDataLastName
+    );
 
-    await this.otherPartyDetailsTab.verifyPageContentByKeyValue('Address Line 1', addUpdateOtherPartyData.updateOtherPartyDataAddressLine);
-    await this.otherPartyDetailsTab.verifyPageContentByKeyValue('Town', addUpdateOtherPartyData.updateOtherPartyDataAddressTown);
-    await this.otherPartyDetailsTab.verifyPageContentByKeyValue('Postcode', addUpdateOtherPartyData.updateOtherPartyDataAddressPostCode);
-    await this.otherPartyDetailsTab.verifyPageContentByKeyValue('Country', addUpdateOtherPartyData.updateOtherPartyDataAddressCountry);
-    await this.otherPartyDetailsTab.verifyPageContentByKeyValue('Living in England, Scotland, Wales or Northern Ireland', addUpdateOtherPartyData.updateOtherPartyDataLivingInUK);
+    await this.otherPartyDetailsTab.verifyPageContentByKeyValue(
+      'Address Line 1',
+      addUpdateOtherPartyData.updateOtherPartyDataAddressLine
+    );
+    await this.otherPartyDetailsTab.verifyPageContentByKeyValue(
+      'Town',
+      addUpdateOtherPartyData.updateOtherPartyDataAddressTown
+    );
+    await this.otherPartyDetailsTab.verifyPageContentByKeyValue(
+      'Postcode',
+      addUpdateOtherPartyData.updateOtherPartyDataAddressPostCode
+    );
+    await this.otherPartyDetailsTab.verifyPageContentByKeyValue(
+      'Country',
+      addUpdateOtherPartyData.updateOtherPartyDataAddressCountry
+    );
+    await this.otherPartyDetailsTab.verifyPageContentByKeyValue(
+      'Living in England, Scotland, Wales or Northern Ireland',
+      addUpdateOtherPartyData.updateOtherPartyDataLivingInUK
+    );
 
-    await this.page.getByRole('row', { name: 'Confidentiality Required No', exact: true }).locator(`//tr[.='Confidentiality RequiredNo']`); // couldn't use the same method as other options for these 2 lines 58, 59
-    await this.page.getByRole('row', { name: 'Unacceptable Customer Behaviour No', exact: true }).locator(`//span[.='Unacceptable Customer Behaviour']`);
+    await this.page
+      .getByRole('row', { name: 'Confidentiality Required No', exact: true })
+      .locator(`//tr[.='Confidentiality RequiredNo']`); // couldn't use the same method as other options for these 2 lines 58, 59
+    await this.page
+      .getByRole('row', {
+        name: 'Unacceptable Customer Behaviour No',
+        exact: true
+      })
+      .locator(`//span[.='Unacceptable Customer Behaviour']`);
     // await this.otherPartyDetailsTab.verifyPageContentByKeyValue('Role', addUpdateOtherPartyData.updateOtherPartyDataRole);
     // await this.otherPartyDetailsTab.verifyPageContentByKeyValue('Track Your Appeal Number', addUpdateSubscriptionData.updateSubscriptionTrackYAotherParty);
     // await this.otherPartyDetailsTab.verifyPageContentByKeyValue('Email Address', addUpdateSubscriptionData.updateSubscriptionEmailotherParty);
     // await this.otherPartyDetailsTab.verifyPageContentByKeyValue('Mobile Number', addUpdateSubscriptionData.updateSubscriptionMobileNumberotherParty);
   }
-  
+
   // Event created to select Update other party data event from next steps dropdown menu:
   private async chooseEventWithRetry(eventName: string, attempts: number = 5) {
     let lastError;
@@ -581,9 +567,7 @@ export class UpdateOtherPartyData extends BaseStep {
     }
   }
 
-  private async goToUpdateOtherPartyData(
-    caseId: string
-  ) {
+  private async goToUpdateOtherPartyData(caseId: string) {
     await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
     await this.chooseEventWithRetry('Update other party data');
   }
