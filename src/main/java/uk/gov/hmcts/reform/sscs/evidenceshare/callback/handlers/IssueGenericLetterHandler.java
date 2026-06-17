@@ -47,7 +47,8 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
     public IssueGenericLetterHandler(BulkPrintService bulkPrintService,
                                      GenericLetterPlaceholderService genericLetterPlaceholderService,
                                      CoverLetterService coverLetterService,
-                                     DocmosisTemplateConfig docmosisTemplateConfig, NotificationSender notificationSender) {
+                                     DocmosisTemplateConfig docmosisTemplateConfig,
+                                     NotificationSender notificationSender) {
         this.genericLetterPlaceholderService = genericLetterPlaceholderService;
         this.bulkPrintService = bulkPrintService;
         this.coverLetterService = coverLetterService;
