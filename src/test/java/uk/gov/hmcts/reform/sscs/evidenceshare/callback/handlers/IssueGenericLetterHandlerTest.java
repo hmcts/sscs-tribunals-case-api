@@ -57,12 +57,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.evidenceshare.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.BulkPrintService;
-import uk.gov.hmcts.reform.sscs.evidenceshare.service.CcdNotificationService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.CoverLetterService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.GenericLetterPlaceholderService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationSender;
 import uk.gov.hmcts.reform.sscs.util.LogCaptureExtension;
-import uk.gov.service.notify.NotificationClientException;
 
 @ExtendWith(MockitoExtension.class)
 @Slf4j
@@ -83,9 +81,6 @@ class IssueGenericLetterHandlerTest {
 
     @Mock
     private CoverLetterService coverLetterService;
-
-    @Mock
-    private CcdNotificationService ccdNotificationService;
 
     @Mock
     private NotificationSender notificationSender;
@@ -158,7 +153,7 @@ class IssueGenericLetterHandlerTest {
     }
 
     @Test
-    void shouldSendLettersToAllPartiesWhenAllPartiesSelected() throws NotificationClientException {
+    void shouldSendLettersToAllPartiesWhenAllPartiesSelected() {
         SscsCaseData caseData = buildCaseData();
         caseData.setSendToAllParties(YesNo.YES);
 
@@ -197,7 +192,7 @@ class IssueGenericLetterHandlerTest {
     }
 
     @Test
-    void shouldSendToSelectedParties() throws NotificationClientException {
+    void shouldSendToSelectedParties() {
         SscsCaseData caseData = buildCaseData();
         caseData.setSendToApellant(YesNo.YES);
         caseData.setSendToJointParty(YesNo.YES);
@@ -269,13 +264,12 @@ class IssueGenericLetterHandlerTest {
 
         handler.handle(SUBMITTED, callback);
 
-        verifyNoInteractions(ccdNotificationService);
         verifyNoInteractions(bulkPrintService);
     }
 
 
     @Test
-    void shouldLogErrorWhenIdIsEmpty() throws NotificationClientException {
+    void shouldLogErrorWhenIdIsEmpty() {
         SscsCaseData caseData = buildCaseData();
         caseData.setSendToAllParties(YesNo.YES);
 
@@ -287,13 +281,12 @@ class IssueGenericLetterHandlerTest {
 
         handler.handle(SUBMITTED, callback);
 
-        verify(ccdNotificationService, times(0)).storeNotificationLetterIntoCcd(any(), any(), any(), any());
         verify(notificationSender, times(2)).sendBundledLetter(eq(ISSUE_GENERIC_LETTER), eq(caseData), anyList(), argumentCaptor.capture());
         assertThat(argumentCaptor.getAllValues()).isEqualTo(List.of("User Test", "Wendy Giles"));
     }
 
     @Test
-    void shouldBundleCoverLetter() throws IOException, NotificationClientException {
+    void shouldBundleCoverLetter() throws IOException {
         SscsCaseData caseData = buildCaseData();
         caseData.setSendToApellant(YesNo.YES);
         caseData.setSendToJointParty(YesNo.NO);
@@ -371,7 +364,7 @@ class IssueGenericLetterHandlerTest {
     }
 
     @Test
-    void shouldSendOnlyToAppellant_inSendToAllPartiesFlow_whenNoRepresentative() throws NotificationClientException {
+    void shouldSendOnlyToAppellant_inSendToAllPartiesFlow_whenNoRepresentative() {
         final SscsCaseData caseData = buildCaseData();
         caseData.setSendToAllParties(YesNo.YES);
         caseData.getAppeal().getRep().setHasRepresentative("No");

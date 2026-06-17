@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 import static java.lang.String.format;
 import static java.util.Base64.getEncoder;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
-import static uk.gov.hmcts.reform.sscs.helper.PdfHelper.buildBundledLetterFromPdfs;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -101,21 +100,6 @@ public class BulkPrintService implements PrintService {
             log.info("Letter was sent for event {} and case {}, send-letter-service id {}", eventType.getCcdType(), caseId, id.get());
         } else {
             log.error("Failed to send to bulk print for case {}. No print id returned", caseId);
-        }
-
-        return id;
-    }
-
-    public Optional<UUID> sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(long caseId, SscsCaseData caseData, List<Pdf> pdfs, EventType eventType, String recipient) {
-        log.info("Sending {} document(s) to bulk print for case event {} for case {}: {}",
-            pdfs.size(), eventType.getCcdType(), caseId, pdfs.stream().map(Pdf::getName).toList());
-        Optional<UUID> id = sendToBulkPrint(pdfs, caseData, recipient);
-
-        if (id.isPresent()) {
-            ccdNotificationService.storeNotificationLetterIntoCcd(eventType, buildBundledLetterFromPdfs(pdfs), caseId, recipient);
-            log.info("Letter was sent for event {} and case {}, send-letter-service id {}", eventType.getCcdType(), caseId, id.get());
-        } else {
-            log.error("Failed to send Letter to bulk print for event {} for case {}. No print id returned", eventType.getCcdType(), caseId);
         }
 
         return id;
