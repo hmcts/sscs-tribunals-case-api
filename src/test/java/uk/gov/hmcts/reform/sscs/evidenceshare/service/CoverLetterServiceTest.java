@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
+import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -12,7 +13,6 @@ import static org.mockito.Mockito.times;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -89,7 +89,7 @@ class CoverLetterServiceTest {
 
         given(furtherEvidencePlaceholderService
             .populatePlaceholders(caseData, APPELLANT_LETTER, null))
-            .willReturn(Collections.singletonMap("someKey", "someValue"));
+            .willReturn(singletonMap("someKey", "someValue"));
 
         given(pdfGenerationService.generatePdf(any(DocumentHolder.class)))
             .willReturn(new byte[]{'l', 'e', 't', 't', 'e', 'r'});
@@ -108,7 +108,7 @@ class CoverLetterServiceTest {
 
         given(furtherEvidencePlaceholderService
             .populatePlaceholders(caseData, APPELLANT_LETTER, null))
-            .willReturn(Collections.singletonMap("someKey", "someValue"));
+            .willReturn(singletonMap("someKey", "someValue"));
 
         when(pdfGenerationService.generatePdf(any(DocumentHolder.class)))
             .thenThrow(new HttpClientErrorException(HttpStatus.valueOf(400)));
@@ -272,7 +272,7 @@ class CoverLetterServiceTest {
         DocumentHolder documentHolder = argumentCaptor.getValue();
         assertThat(documentHolder.getTemplate().getTemplateName()).isEqualTo("testName.doc");
         assertThat(documentHolder.getPlaceholders().toString())
-            .isEqualTo(Collections.singletonMap("someKey", "someValue").toString());
+            .hasToString(singletonMap("someKey", "someValue").toString());
         assertThat(documentHolder.isPdfArchiveMode()).isTrue();
     }
 

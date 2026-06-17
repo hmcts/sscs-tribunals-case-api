@@ -433,8 +433,9 @@ class BulkPrintServiceTest {
     void buildBundledLetter_invalidFirstDocument_throwsBulkPrintException() {
         final byte[] firstDocument = "not a pdf".getBytes();
         final byte[] secondDocument = "also not a pdf".getBytes();
+        List<byte[]> documents = List.of(firstDocument, secondDocument);
 
-        assertThatThrownBy(() -> buildBundledLetter(List.of(firstDocument, secondDocument))).isInstanceOf(
+        assertThatThrownBy(() -> buildBundledLetter(documents)).isInstanceOf(
             BulkPrintException.class);
     }
 
@@ -442,8 +443,9 @@ class BulkPrintServiceTest {
     void buildBundledLetter_validFirstDocumentWithInvalidSubsequentDocument_throwsBulkPrintException() throws IOException {
         final byte[] validFirst = createPdf(1);
         final byte[] invalidSecond = "not a pdf".getBytes();
+        List<byte[]> documents = List.of(validFirst, invalidSecond);
 
-        assertThatThrownBy(() -> buildBundledLetter(List.of(validFirst, invalidSecond))).isInstanceOf(
+        assertThatThrownBy(() -> buildBundledLetter(documents)).isInstanceOf(
             BulkPrintException.class);
     }
 

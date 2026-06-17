@@ -480,8 +480,9 @@ class PdfHelperTest {
     @Test
     void buildBundledLetter_throwsBulkPrintExceptionForInvalidPdfBytes() {
         final byte[] invalidPdf = "not a pdf".getBytes(StandardCharsets.UTF_8);
+        List<byte[]> invalidPdfList = List.of(invalidPdf, invalidPdf);
 
-        assertThatThrownBy(() -> PdfHelper.buildBundledLetter(List.of(invalidPdf, invalidPdf)))
+        assertThatThrownBy(() -> PdfHelper.buildBundledLetter(invalidPdfList))
             .isInstanceOf(BulkPrintException.class)
             .hasMessageContaining("Failed to merge documents with exception");
     }
