@@ -226,4 +226,5 @@ public class PdfHelper {
             throw new BulkPrintException("Failed to merge documents with exception " + e.getMessage(), e);
         }
     }
+
 }

@@ -173,7 +173,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
 
     private void sendLetterToNotificationProvider(Long caseId, SscsCaseData caseData, List<Pdf> letter, String recipient) {
         try {
-            notificationSender.sendBundledLetter(ISSUE_GENERIC_LETTER, caseData, caseId, letter, recipient);
+            notificationSender.sendBundledLetter(ISSUE_GENERIC_LETTER, caseData, letter, recipient);
         } catch (NotificationClientException ioe) {
             NotificationServiceException exception = new NotificationServiceException(caseId.toString(), ioe);
             log.error("Error sending notification for case id: {}", caseId, exception);
@@ -239,6 +239,5 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
         letter.addAll(documents);
         return letter;
     }
-
 
 }
