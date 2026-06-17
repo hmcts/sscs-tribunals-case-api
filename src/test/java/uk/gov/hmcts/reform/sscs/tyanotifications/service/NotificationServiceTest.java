@@ -1871,6 +1871,33 @@ public class NotificationServiceTest {
                 UPDATE_OTHER_PARTY_DATA,
                 UPDATE_OTHER_PARTY_DATA,
                 Benefit.PIP.getShortName()
+            },
+            new Object[]{
+                "UC - First other party added with no previous other parties via UPDATE_OTHER_PARTY_DATA event",
+                List.of(),
+                List.of(new CcdValue<>(newParty)),
+                null,
+                UPDATE_OTHER_PARTY_DATA,
+                OTHER_PARTY_ADDED_TO_APPEAL,
+                Benefit.UC.getShortName()
+            },
+            new Object[]{
+                "Child Support - First other party added with no previous other parties is not notified",
+                List.of(),
+                List.of(new CcdValue<>(newParty)),
+                null,
+                UPDATE_OTHER_PARTY_DATA,
+                UPDATE_OTHER_PARTY_DATA,
+                Benefit.CHILD_SUPPORT.getShortName()
+            },
+            new Object[]{
+                "UC - Single other party unchanged from before is not notified",
+                List.of(new CcdValue<>(existingParty)),
+                List.of(new CcdValue<>(existingParty)),
+                null,
+                UPDATE_OTHER_PARTY_DATA,
+                UPDATE_OTHER_PARTY_DATA,
+                Benefit.UC.getShortName()
             }
         };
     }
