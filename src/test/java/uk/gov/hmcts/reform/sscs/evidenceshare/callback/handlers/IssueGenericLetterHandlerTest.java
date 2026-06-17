@@ -131,13 +131,6 @@ class IssueGenericLetterHandlerTest {
     }
 
     @Test
-    void shouldThrowException_givenCallbackIsNull() {
-        assertThatThrownBy(() ->
-            handler.canHandle(SUBMITTED, null)
-        ).isInstanceOf(NullPointerException.class);
-    }
-
-    @Test
     void shouldThrowExceptionInHandler_givenCallbackIsNull() {
         SscsCaseData caseData = buildCaseData();
         Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,

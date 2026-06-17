@@ -105,30 +105,30 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
         }
 
         if (YesNo.isYes(caseData.getSendToAllParties())) {
-            sendToAllParties(caseId, caseData, documents);
+            sendToAllParties(caseData, documents);
             return;
         }
 
         if (YesNo.isYes(caseData.getSendToApellant())) {
-            sendToAppellant(caseId, caseData, documents);
+            sendToAppellant(caseData, documents);
         }
 
         if (YesNo.isYes(caseData.getSendToRepresentative())) {
-            sendToRepresentative(caseId, caseData, documents);
+            sendToRepresentative(caseData, documents);
         }
 
         if (YesNo.isYes(caseData.getSendToJointParty())) {
-            sendToJointParty(caseId, caseData, documents);
+            sendToJointParty(caseData, documents);
         }
 
         if (YesNo.isYes(caseData.getSendToOtherParties())) {
-            sendToOtherParties(caseId, caseData, documents);
+            sendToOtherParties(caseData, documents);
         }
 
         // TODO check if blank page on odd page ending is needed
     }
 
-    private void sendToOtherParties(long caseId, SscsCaseData caseData, List<Pdf> documents) {
+    private void sendToOtherParties(SscsCaseData caseData, List<Pdf> documents) {
         log.info("Sending letter to other party");
         var selectedOtherParties = caseData.getOtherPartySelection();
         List<CcdValue<OtherParty>> otherParties = caseData.getOtherParties();
@@ -142,7 +142,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
                     FurtherEvidenceLetterType letterType = getLetterType(otherParty, entityId);
                     String recipient = PlaceholderUtility.getName(caseData, letterType, entityId);
                     List<Pdf> letter = getLetterPdfs(caseData, documents, letterType, entityId);
-                    sendLetterToNotificationProvider(caseId, caseData, letter, recipient);
+                    sendLetterToNotificationProvider(caseData, letter, recipient);
                 }
             }
         }
@@ -154,25 +154,25 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
         return hasRepresentative ? FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER : FurtherEvidenceLetterType.OTHER_PARTY_LETTER;
     }
 
-    private void sendToJointParty(long caseId, SscsCaseData caseData, List<Pdf> documents) {
+    private void sendToJointParty(SscsCaseData caseData, List<Pdf> documents) {
         List<Pdf> letter = getLetterPdfs(caseData, documents, FurtherEvidenceLetterType.JOINT_PARTY_LETTER);
         String recipient = PlaceholderUtility.getName(caseData, FurtherEvidenceLetterType.JOINT_PARTY_LETTER, null);
-        sendLetterToNotificationProvider(caseId, caseData, letter, recipient);
+        sendLetterToNotificationProvider(caseData, letter, recipient);
     }
 
-    private void sendToRepresentative(long caseId, SscsCaseData caseData, List<Pdf> documents) {
+    private void sendToRepresentative(SscsCaseData caseData, List<Pdf> documents) {
         List<Pdf> letter = getLetterPdfs(caseData, documents, FurtherEvidenceLetterType.REPRESENTATIVE_LETTER);
         String recipient = PlaceholderUtility.getName(caseData, FurtherEvidenceLetterType.REPRESENTATIVE_LETTER, null);
-        sendLetterToNotificationProvider(caseId, caseData, letter, recipient);
+        sendLetterToNotificationProvider(caseData, letter, recipient);
     }
 
-    private void sendToAppellant(long caseId, SscsCaseData caseData, List<Pdf> documents) {
+    private void sendToAppellant(SscsCaseData caseData, List<Pdf> documents) {
         List<Pdf> letter = getLetterPdfs(caseData, documents, FurtherEvidenceLetterType.APPELLANT_LETTER);
         String recipient = PlaceholderUtility.getName(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER, null);
-        sendLetterToNotificationProvider(caseId, caseData, letter, recipient);
+        sendLetterToNotificationProvider(caseData, letter, recipient);
     }
 
-    private void sendLetterToNotificationProvider(Long caseId, SscsCaseData caseData, List<Pdf> letter, String recipient) {
+    private void sendLetterToNotificationProvider(SscsCaseData caseData, List<Pdf> letter, String recipient) {
         notificationSender.sendBundledLetter(ISSUE_GENERIC_LETTER, caseData, letter, recipient);
     }
 
@@ -180,19 +180,19 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
         return String.format(LETTER_NAME, placeholders.get(ADDRESS_NAME), LocalDateTime.now());
     }
 
-    private void sendToAllParties(long caseId, SscsCaseData caseData, List<Pdf> documents) {
-        sendToAppellant(caseId, caseData, documents);
+    private void sendToAllParties(SscsCaseData caseData, List<Pdf> documents) {
+        sendToAppellant(caseData, documents);
 
         if (caseData.isThereARepresentative()) {
-            sendToRepresentative(caseId, caseData, documents);
+            sendToRepresentative(caseData, documents);
         }
 
         if (caseData.isThereAJointParty()) {
-            sendToJointParty(caseId, caseData, documents);
+            sendToJointParty(caseData, documents);
         }
 
         if (isNotEmpty(caseData.getOtherParties())) {
-            sendToOtherParties(caseId, caseData, documents);
+            sendToOtherParties(caseData, documents);
         }
     }
 

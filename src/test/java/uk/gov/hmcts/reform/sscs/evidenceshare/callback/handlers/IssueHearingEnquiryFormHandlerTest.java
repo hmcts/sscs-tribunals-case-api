@@ -63,7 +63,6 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.HearingEnquir
 import uk.gov.hmcts.reform.sscs.helper.PdfHelper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationSender;
 import uk.gov.hmcts.reform.sscs.util.LogCaptureExtension;
-import uk.gov.service.notify.NotificationClientException;
 
 @ExtendWith(MockitoExtension.class)
 class IssueHearingEnquiryFormHandlerTest {
@@ -151,7 +150,7 @@ class IssueHearingEnquiryFormHandlerTest {
     }
 
     @Test
-    void shouldSendLetterWithoutSelectedDocumentsWhenAddDocumentsIsNo() throws NotificationClientException {
+    void shouldSendLetterWithoutSelectedDocumentsWhenAddDocumentsIsNo() {
         final SscsCaseData caseData = baseCaseData();
         caseData.setAddDocuments(YesNo.NO);
         final Map<String, Object> placeholders = Map.of("address_name", "Other Party");
@@ -187,7 +186,7 @@ class IssueHearingEnquiryFormHandlerTest {
     }
 
     @Test
-    void shouldSendLetterAndIncludeSelectedDocumentsWhenAddDocumentsIsYes() throws NotificationClientException {
+    void shouldSendLetterAndIncludeSelectedDocumentsWhenAddDocumentsIsYes() {
         final SscsCaseData caseData = baseCaseData();
         caseData.setAddDocuments(YesNo.YES);
         final List<Pdf> selectedDocuments = List.of(new Pdf(new byte[]{9}, "selected.pdf"));
@@ -217,7 +216,7 @@ class IssueHearingEnquiryFormHandlerTest {
     @ParameterizedTest
     @NullAndEmptySource
     void shouldNotSendAnythingWhenOtherPartySelectionIsNullOrEmpty(
-        final List<CcdValue<OtherPartySelectionDetails>> otherPartySelection) throws NotificationClientException {
+        final List<CcdValue<OtherPartySelectionDetails>> otherPartySelection) {
         SscsCaseData caseData = baseCaseData();
         caseData.setOtherPartySelection(otherPartySelection);
         Callback<SscsCaseData> callback = buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_HEARING_ENQUIRY_FORM);
@@ -229,7 +228,7 @@ class IssueHearingEnquiryFormHandlerTest {
 
     @ParameterizedTest
     @MethodSource("incompletePartySelectionScenarios")
-    void shouldSkipPartyWithIncompleteSelection(CcdValue<OtherPartySelectionDetails> incompleteEntry) throws NotificationClientException {
+    void shouldSkipPartyWithIncompleteSelection(CcdValue<OtherPartySelectionDetails> incompleteEntry) {
         SscsCaseData caseData = baseCaseData();
         caseData.setAddDocuments(YesNo.NO);
         caseData.setOtherPartySelection(List.of(incompleteEntry));
