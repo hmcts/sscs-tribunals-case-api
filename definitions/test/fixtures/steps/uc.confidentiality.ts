@@ -87,6 +87,7 @@ export class UcConfidentiality extends BaseStep {
       'Event',
       'Update other party data'
     );
+    await this.homePage.signOut();
   }
 
   async confirmConfidentialityGrantedSetSuccessfully() {
