@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_TO_PROCEED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
 
@@ -13,11 +16,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 @Slf4j
 class AppealToProceedFunctionalTest extends AbstractFunctionalTest {
 
-    AppealToProceedFunctionalTest() {
-        super();
-    }
-
-    // Need tribunals running to pass this functional test
     @Test
     void processAnAppealToProceedEvent_shouldUpdateHmctsDwpState() throws IOException {
 
@@ -29,10 +27,12 @@ class AppealToProceedFunctionalTest extends AbstractFunctionalTest {
 
         simulateCcdCallback(json);
 
-        defaultAwait().untilAsserted(() -> {
-            SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
-            assertThat(caseDetails.getData().getHmctsDwpState()).isEqualTo("sentToDwp");
-            assertThat(caseDetails.getState()).isEqualTo("withDwp");
-        });
+        await()
+            .atMost(2, MINUTES)
+            .pollInterval(2, SECONDS).untilAsserted(() -> {
+                SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
+                assertThat(caseDetails.getData().getHmctsDwpState()).isEqualTo("sentToDwp");
+                assertThat(caseDetails.getState()).isEqualTo("withDwp");
+            });
     }
 }
