@@ -3,9 +3,8 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
-import static uk.gov.hmcts.reform.sscs.helper.PdfHelper.buildBundledLetterFromPdfs;
-import static uk.gov.hmcts.reform.sscs.helper.PdfHelper.getPhysicalPageCount;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.buildBundledLetterFromPdfs;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -33,7 +32,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReasonableAdjustmentStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
-import uk.gov.hmcts.reform.sscs.evidenceshare.exception.PdfException;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationTestRecipients;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType;
@@ -272,22 +270,24 @@ public class NotificationSender {
     public void sendBundledLetter(EventType eventType, SscsCaseData caseData, List<Pdf> pdfs,
         String recipient) {
         if (isNotEmpty(pdfs)) {
+            byte[] pdfContent = buildBundledLetterFromPdfs(pdfs);
             int physicalPageCount;
-            try {
-                physicalPageCount = getPhysicalPageCount(pdfs);
-            } catch (PdfException e) {
+            try (PDDocument pdfDoc = Loader.loadPDF(pdfContent)) {
+                physicalPageCount = pdfDoc.getNumberOfPages();
+            } catch (IOException e) {
                 log.error("Failed to calculate the number of pages contained in the letter {} for case id {} and notification {}", e.getMessage(), caseData.getCcdCaseId(), eventType.getCcdType());
                 throw new NotificationServiceException("Failed to calculate the number of pages contained in the letter %s for case id %s and notification %s".formatted(e.getMessage(), caseData.getCcdCaseId(), eventType.getCcdType()), e);
             }
+
             if (physicalPageCount > 10) {
                 log.info("Sending {} Letter for case id {} via BulkPrint because it exceeds 10 pages ({} pages).", eventType.getCcdType(),
                     caseData.getCcdCaseId(), physicalPageCount);
-                sendUsingBulkPrint(eventType, caseData, pdfs, recipient, physicalPageCount);
+                sendUsingBulkPrint(eventType, caseData, pdfs, pdfContent, recipient);
             } else {
                 log.info("Sending {} Letter for case id {} via Gov Notify because it is less than or equal to 10 pages ({} pages).",
                     eventType.getCcdType(), caseData.getCcdCaseId(), physicalPageCount);
                 try {
-                    sendUsingGovNotify(eventType, caseData, pdfs, recipient);
+                    sendUsingGovNotify(eventType, caseData, pdfContent, recipient);
                 } catch (NotificationClientException e) {
                     final NotificationServiceException exception = new NotificationServiceException(caseData.getCcdCaseId(), e);
                     log.error("Error sending notification for case id: {}", caseData.getCcdCaseId(), exception);
@@ -297,21 +297,20 @@ public class NotificationSender {
         }
     }
 
-    private void sendUsingBulkPrint(EventType eventType, SscsCaseData caseData, List<Pdf> pdfs, String recipient,
-        int physicalPageCount) {
+    private void sendUsingBulkPrint(EventType eventType, SscsCaseData caseData, List<Pdf> pdfs, byte[] pdfContent, String recipient) {
         final Optional<UUID> uuid = bulkPrintService.sendToBulkPrint(pdfs, caseData, recipient);
         if (uuid.isPresent()) {
             log.info("Letter Notification sent via Bulk Print for Letter {}, case id {} and Bulk print id {}",
                 eventType.getCcdType(), caseData.getCcdCaseId(), uuid.get());
-            saveLetterToCcd(eventType, Long.valueOf(caseData.getCcdCaseId()), pdfs, recipient, uuid.get());
+            saveLetterToCcd(eventType, Long.valueOf(caseData.getCcdCaseId()), pdfContent, recipient, uuid.get());
         } else {
             log.error("Failed to send to bulk print for case {}. No print id returned", caseData.getCcdCaseId());
         }
     }
 
-    private void sendUsingGovNotify(EventType eventType, SscsCaseData caseData, List<Pdf> pdfs, String recipient) throws NotificationClientException {
+    private void sendUsingGovNotify(EventType eventType, SscsCaseData caseData, byte[] pdfContent, String recipient) throws NotificationClientException {
         final NotificationClient client = getLetterNotificationClient(caseData.getAppeal().getAppellant().getAddress().getPostcode());
-        final LetterResponse notifyResponse = sendBundledLetter(caseData.getCcdCaseId(), client, new ByteArrayInputStream(buildBundledLetterFromPdfs(pdfs)));
+        final LetterResponse notifyResponse = sendBundledLetter(caseData.getCcdCaseId(), client, new ByteArrayInputStream(pdfContent));
         final String govNotifyId = nonNull(notifyResponse) ? notifyResponse.getNotificationId().toString() : null;
         if (nonNull(govNotifyId)) {
             log.info("Letter Notification sent via Gov Notify for Letter {}, case id {} and Gov Notify id {}",
@@ -322,8 +321,8 @@ public class NotificationSender {
         }
     }
 
-    private void saveLetterToCcd(EventType eventType, Long caseId, List<Pdf> pdfs, String recipient, UUID uuid) {
-        saveCorrespondenceAsyncService.saveLetter(buildBundledLetterFromPdfs(pdfs), getLetterCorrespondence(eventType, recipient), caseId.toString());
+    private void saveLetterToCcd(EventType eventType, Long caseId, byte[] pdfContent, String recipient, UUID uuid) {
+        saveCorrespondenceAsyncService.saveLetter(pdfContent, getLetterCorrespondence(eventType, recipient), caseId.toString());
         log.info("Letter Notification recorded in CCD for Letter {}, case id {} and Bulk print id {}", eventType.getCcdType(),
             caseId, uuid);
     }

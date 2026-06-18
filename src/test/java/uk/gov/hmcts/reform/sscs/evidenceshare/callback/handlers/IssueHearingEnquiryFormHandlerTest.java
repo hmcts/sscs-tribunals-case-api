@@ -19,6 +19,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_HEARING_ENQUIRY_FORM;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.HandlerHelper.buildTestCallbackForGivenData;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.buildBundledLetter;
 
 import ch.qos.logback.classic.Level;
 import java.util.EnumMap;
@@ -60,7 +61,7 @@ import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.evidenceshare.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.CoverLetterService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.HearingEnquiryFormPlaceholderService;
-import uk.gov.hmcts.reform.sscs.helper.PdfHelper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationSender;
 import uk.gov.hmcts.reform.sscs.util.LogCaptureExtension;
 
@@ -86,12 +87,12 @@ class IssueHearingEnquiryFormHandlerTest {
     @Captor
     private ArgumentCaptor<String> letterNameCaptor;
     private IssueHearingEnquiryFormHandler handler;
-    private MockedStatic<PdfHelper> pdfHelperMock;
+    private MockedStatic<LetterUtils> pdfHelperMock;
 
     @BeforeEach
     void setUp() {
-        pdfHelperMock = mockStatic(PdfHelper.class);
-        pdfHelperMock.when(() -> PdfHelper.buildBundledLetter(anyList())).thenReturn(BUNDLED_LETTER);
+        pdfHelperMock = mockStatic(LetterUtils.class);
+        pdfHelperMock.when(() -> buildBundledLetter(anyList())).thenReturn(BUNDLED_LETTER);
         handler = new IssueHearingEnquiryFormHandler(hearingEnquiryFormPlaceholderService, coverLetterService,
             buildTemplateConfig(), notificationSender, true);
     }

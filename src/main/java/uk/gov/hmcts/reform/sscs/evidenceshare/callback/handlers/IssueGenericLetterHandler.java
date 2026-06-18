@@ -6,6 +6,7 @@ import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_GENERIC_LETTER;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.ADDRESS_NAME;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_NAME;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.buildBundledLetter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -227,7 +228,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
         var coverSheet = coverLetterService.generateCoverSheet(docmosisCoverSheetTemplate,
             "coversheet", placeholders);
 
-        var bundledLetter = bulkPrintService.buildBundledLetter(coverSheet, generatedPdf);
+        var bundledLetter = buildBundledLetter(List.of(generatedPdf, coverSheet));
 
         Pdf pdf = new Pdf(bundledLetter, letterName);
         List<Pdf> letter = new ArrayList<>();
