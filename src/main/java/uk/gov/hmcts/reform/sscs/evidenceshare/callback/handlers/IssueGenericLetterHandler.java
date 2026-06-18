@@ -26,7 +26,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.evidenceshare.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType;
-import uk.gov.hmcts.reform.sscs.evidenceshare.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.CoverLetterService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.GenericLetterPlaceholderService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility;
@@ -36,7 +35,6 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationSender;
 @Service
 public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> {
     private final GenericLetterPlaceholderService genericLetterPlaceholderService;
-    private final BulkPrintService bulkPrintService;
     private final CoverLetterService coverLetterService;
     private final DocmosisTemplateConfig docmosisTemplateConfig;
     private final NotificationSender notificationSender;
@@ -45,13 +43,11 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
     private String docmosisCoverSheetTemplate;
 
     @Autowired
-    public IssueGenericLetterHandler(BulkPrintService bulkPrintService,
-                                     GenericLetterPlaceholderService genericLetterPlaceholderService,
+    public IssueGenericLetterHandler(GenericLetterPlaceholderService genericLetterPlaceholderService,
                                      CoverLetterService coverLetterService,
                                      DocmosisTemplateConfig docmosisTemplateConfig,
                                      NotificationSender notificationSender) {
         this.genericLetterPlaceholderService = genericLetterPlaceholderService;
-        this.bulkPrintService = bulkPrintService;
         this.coverLetterService = coverLetterService;
         this.docmosisTemplateConfig = docmosisTemplateConfig;
         this.notificationSender = notificationSender;

@@ -27,6 +27,7 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.OTHER_PARTY;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.OTHER_PARTY_REPRESENTATIVE;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -34,6 +35,9 @@ import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -56,7 +60,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.evidenceshare.config.DocmosisTemplateConfig;
-import uk.gov.hmcts.reform.sscs.evidenceshare.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.CoverLetterService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.GenericLetterPlaceholderService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationSender;
@@ -77,9 +80,6 @@ class IssueGenericLetterHandlerTest {
     private IssueGenericLetterHandler handler;
 
     @Mock
-    private BulkPrintService bulkPrintService;
-
-    @Mock
     private CoverLetterService coverLetterService;
 
     @Mock
@@ -90,7 +90,7 @@ class IssueGenericLetterHandlerTest {
 
     private final Map<LanguagePreference, Map<String, Map<String, String>>> template = new EnumMap<>(LanguagePreference.class);
 
-    private final byte[] letter = new byte[1];
+    private final byte[] letter = createPdfBytes(1);
 
     @BeforeEach
     void setup() {
@@ -104,7 +104,7 @@ class IssueGenericLetterHandlerTest {
         DocmosisTemplateConfig docmosisTemplateConfig = new DocmosisTemplateConfig();
         docmosisTemplateConfig.setTemplate(template);
 
-        handler = new IssueGenericLetterHandler(bulkPrintService, genericLetterPlaceholderService, coverLetterService,
+        handler = new IssueGenericLetterHandler(genericLetterPlaceholderService, coverLetterService,
             docmosisTemplateConfig, notificationSender);
     }
 
@@ -214,6 +214,7 @@ class IssueGenericLetterHandlerTest {
         when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(
             Map.of());
         when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
+        when(coverLetterService.generateCoverSheet(anyString(), eq("coversheet"), eq(Map.of()))).thenReturn(letter);
 
         Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
             ISSUE_GENERIC_LETTER);
@@ -257,7 +258,6 @@ class IssueGenericLetterHandlerTest {
 
         handler.handle(SUBMITTED, callback);
 
-        verifyNoInteractions(bulkPrintService);
     }
 
 
@@ -268,6 +268,8 @@ class IssueGenericLetterHandlerTest {
 
         when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(
             Map.of());
+        when(coverLetterService.generateCoverSheet(anyString(), eq("coversheet"), eq(Map.of()))).thenReturn(letter);
+        when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
 
         Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
             ISSUE_GENERIC_LETTER);
@@ -323,15 +325,15 @@ class IssueGenericLetterHandlerTest {
     }
 
     @Test
-    void shouldIncludeSelectedDocumentsWhenAddDocumentsIsYes() {
+    void shouldIncludeSelectedDocumentsWhenAddDocumentsIsYes() throws IOException {
         final SscsCaseData caseData = buildCaseData();
         caseData.setSendToApellant(YesNo.YES);
         caseData.setAddDocuments(YesNo.YES);
 
-        final Pdf selectedDoc = new Pdf(new byte[]{1, 2, 3}, "selectedDoc.pdf");
-        when(coverLetterService.getSelectedDocuments(caseData)).thenReturn(List.of(selectedDoc));
+        when(coverLetterService.getSelectedDocuments(caseData)).thenReturn(List.of(createPdfWithPages(3)));
         when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
         when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
+        when(coverLetterService.generateCoverSheet(anyString(), eq("coversheet"), eq(Map.of()))).thenReturn(letter);
 
         final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
             ISSUE_GENERIC_LETTER);
@@ -364,6 +366,7 @@ class IssueGenericLetterHandlerTest {
 
         when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
         when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
+        when(coverLetterService.generateCoverSheet(anyString(), eq("coversheet"), eq(Map.of()))).thenReturn(letter);
 
         final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
             ISSUE_GENERIC_LETTER);
@@ -386,4 +389,27 @@ class IssueGenericLetterHandlerTest {
 
         return List.of(otherParties1, otherParties2);
     }
+
+    private Pdf createPdfWithPages(final int numberOfPages) throws IOException {
+        try (PDDocument document = new PDDocument(); ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            for (int i = 0; i < numberOfPages; i++) {
+                document.addPage(new PDPage(PDRectangle.A4));
+            }
+            document.save(outputStream);
+            return new Pdf(outputStream.toByteArray(), "letter.pdf");
+        }
+    }
+
+    private byte[] createPdfBytes(final int numberOfPages)  {
+        try (PDDocument document = new PDDocument(); ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            for (int i = 0; i < numberOfPages; i++) {
+                document.addPage(new PDPage(PDRectangle.A4));
+            }
+            document.save(outputStream);
+            return outputStream.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }
