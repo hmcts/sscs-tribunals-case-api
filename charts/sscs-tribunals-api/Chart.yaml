@@ -37,7 +37,7 @@ dependencies:
     repository: "oci://hmctsprod.azurecr.io/helm"
     condition: hmcts-redis.enabled
   - name: em-ccdorc
-    version: 2.1.2
+    version: 2.1.3
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: em-ccdorc.enabled
   - name: em-stitching
