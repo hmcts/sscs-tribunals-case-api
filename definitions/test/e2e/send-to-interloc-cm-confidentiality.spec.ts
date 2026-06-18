@@ -51,7 +51,7 @@ test.describe('CM confidentiality send to interloc', () => {
           } else {
             await readyToListSteps.loginUserWithCaseId(
               credentials.amCaseWorker,
-              true,
+              false,
               caseId
             );
             await readyToListSteps.performReadyToListEvent(
