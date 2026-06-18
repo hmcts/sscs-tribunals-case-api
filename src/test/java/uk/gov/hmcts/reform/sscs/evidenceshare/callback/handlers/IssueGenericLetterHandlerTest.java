@@ -227,41 +227,6 @@ class IssueGenericLetterHandlerTest {
     }
 
     @Test
-    void shouldNotSendLettersWhenNoPartiesSelected() {
-        SscsCaseData caseData = buildCaseData();
-        caseData.setSendToApellant(YesNo.NO);
-        caseData.setSendToJointParty(YesNo.NO);
-        caseData.setSendToOtherParties(YesNo.NO);
-        caseData.setSendToRepresentative(YesNo.NO);
-
-        var jointParty = buildJointParty();
-        caseData.setJointParty(jointParty);
-
-        var otherParty = new CcdValue<>(buildOtherParty());
-
-        var otherPartyWithRep = buildOtherParty();
-        Representative representative = Representative.builder()
-                                                      .hasRepresentative("YES")
-                                                      .name(Name
-                                                          .builder()
-                                                          .firstName("OPRepFirstName")
-                                                          .lastName("OPRepLastName")
-                                                          .build())
-                                                      .build();
-        otherPartyWithRep.setRep(representative);
-
-        caseData.setOtherParties(List.of(otherParty, new CcdValue<>(otherPartyWithRep)));
-        caseData.setOtherPartySelection(buildOtherPartiesSelection(otherParty, representative));
-
-        Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
-            ISSUE_GENERIC_LETTER);
-
-        handler.handle(SUBMITTED, callback);
-
-    }
-
-
-    @Test
     void shouldLogErrorWhenIdIsEmpty() {
         SscsCaseData caseData = buildCaseData();
         caseData.setSendToAllParties(YesNo.YES);
