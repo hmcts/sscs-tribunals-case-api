@@ -168,7 +168,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     }
 
     private void checkSscs2AndSscs5Confidentiality(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, SscsCaseData sscsCaseData) {
-        if (isValidBenefitTypeForConfidentiality(sscsCaseData.getAppeal().getBenefitType())) {
+        if (isValidBenefitTypeForConfidentiality(sscsCaseData.getAppeal().getBenefitType(), true)) {
             if (sscsCaseData.getDwpEditedEvidenceReason() == null) {
                 if (otherPartyHasConfidentiality(sscsCaseData)) {
                     preSubmitCallbackResponse.addError("Other Party requires confidentiality, upload edited and unedited responses");
