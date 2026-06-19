@@ -15,7 +15,7 @@ export class UcConfidentiality extends BaseStep {
   }
 
   async addOtherPartyToUcCase(caseId: string) {
-    await this.loginUserWithCaseId(credentials.dwpResponseWriter, true, caseId);
+    await this.loginUserWithCaseId(credentials.dwpResponseWriter, false, caseId);
     //it is a known bug that it is visible for the user before other party added, so not asserting on it here
     //await expect(this.homePage.summaryTab).not.toBeVisible();
     await this.homePage.chooseEvent('Add other party data');
@@ -87,6 +87,7 @@ export class UcConfidentiality extends BaseStep {
       'Event',
       'Update other party data'
     );
+    if(!isConfidentialityRequired) await this.homePage.signOut();
   }
 
   async confirmConfidentialityGrantedSetSuccessfully() {
