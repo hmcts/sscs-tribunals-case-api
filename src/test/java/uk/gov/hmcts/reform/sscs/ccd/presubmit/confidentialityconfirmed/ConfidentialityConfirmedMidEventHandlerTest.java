@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CONFIDENTIALITY_CONFIRMED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUnknown.YES;
 
 import java.util.Collections;
 import java.util.List;
@@ -88,7 +87,7 @@ class ConfidentialityConfirmedMidEventHandlerTest {
     @EnumSource(value = Benefit.class, names = {"CHILD_SUPPORT", "UC"})
     void givenConfidentialityConfirmedEventWithSingleOtherPartyAndConfidentialitySet_thenRunSuccessfully(Benefit benefit) {
         var sscsCaseData = caseDataWithBenefit(benefit.getShortName());
-        sscsCaseData.setOtherParties(Collections.singletonList(buildOtherParty("1", YES)));
+        sscsCaseData.setOtherParties(Collections.singletonList(buildOtherParty("1", YesNoUnknown.YES)));
 
         when(callback.getEvent()).thenReturn(CONFIDENTIALITY_CONFIRMED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -103,7 +102,7 @@ class ConfidentialityConfirmedMidEventHandlerTest {
     @EnumSource(value = Benefit.class, names = {"CHILD_SUPPORT", "UC"})
     void givenConfidentialityConfirmedEventWithNoOtherPartyAndConfidentialitySet_thenRunSuccessfully(Benefit benefit) {
         var sscsCaseData = caseDataWithBenefit(benefit.getShortName());
-        sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequirement(YES).build());
+        sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequirement(YesNoUnknown.YES).build());
 
         when(callback.getEvent()).thenReturn(CONFIDENTIALITY_CONFIRMED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
