@@ -739,7 +739,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         when(venueService.getVenueDetailsForActiveVenueByEpimsId(venueEpimsId)).thenReturn(VenueDetails.builder().build());
         when(airLookupService.lookupAirVenueNameByPostCode("AB12 00B", sscsCaseData.getAppeal().getBenefitType())).thenReturn(
                 venueB);
-
+        when(refDataService.getCourtVenueRefDataByEpimsId("698118")).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("regionId").build());
         when(refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId)).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("regionId").build());
 
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("AB12 00B");
@@ -797,7 +797,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         when(venueService.getVenueDetailsForActiveVenueByEpimsId(venueEpimsId)).thenReturn(VenueDetails.builder().venName(venueB).build());
         when(airLookupService.lookupAirVenueNameByPostCode("AB12 00B", sscsCaseData.getAppeal().getBenefitType())).thenReturn(
                 venueB);
-
+        when(refDataService.getCourtVenueRefDataByEpimsId("698118")).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("regionId").build());
         when(refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId)).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("regionId").build());
 
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("AB12 00B");
@@ -860,7 +860,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(venueA, response.getData().getProcessingVenue());
-        verify(refDataService, times(0)).getCourtVenueRefDataByEpimsId(any());
+        verify(refDataService, times(1)).getCourtVenueRefDataByEpimsId(any());
     }
 
     @Test
@@ -878,6 +878,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         when(venueService.getEpimsIdForVenue(venueB)).thenReturn(venueEpimsId);
         when(venueService.getVenueDetailsForActiveVenueByEpimsId(venueEpimsId)).thenReturn(VenueDetails.builder().build());
         when(airLookupService.lookupAirVenueNameByPostCode("AB12 00B", sscsCaseData.getAppeal().getBenefitType())).thenReturn(venueB);
+        when(refDataService.getCourtVenueRefDataByEpimsId("698118")).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("regionId").build());
         when(refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId)).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("regionId").build());
 
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIsAppointee("Yes");
@@ -933,6 +934,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         when(venueService.getVenueDetailsForActiveVenueByEpimsId(venueEpimsId)).thenReturn(VenueDetails.builder().build());
         when(airLookupService.lookupAirVenueNameByPostCode("AB12 00B", sscsCaseData.getAppeal().getBenefitType()))
                 .thenReturn(venueB);
+        when(refDataService.getCourtVenueRefDataByEpimsId("698118")).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("regionId").build());
         when(refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId)).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("regionId").build());
 
 
