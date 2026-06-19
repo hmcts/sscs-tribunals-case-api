@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.util;
 import static java.time.LocalDateTime.now;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static java.util.Objects.nonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
@@ -27,6 +28,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
@@ -399,7 +401,7 @@ public class OtherPartyDataUtilTest {
     private static CcdValue<OtherParty> buildOtherParty(String id, boolean ucb, YesNoUnknown confidentialityRequired) {
         return CcdValue.<OtherParty>builder().value(
             OtherParty.builder().id(id).name(name("OtherParty", id)).unacceptableCustomerBehaviour(ucb ? YesNo.YES : YesNo.NO)
-                .confidentialityRequirement(confidentialityRequired)
+                .confidentialityRequirement(nonNull(confidentialityRequired) ? new DynamicList(confidentialityRequired.name()) : null)
                 .build()).build();
     }
 
@@ -429,7 +431,7 @@ public class OtherPartyDataUtilTest {
     private CcdValue<OtherParty> buildOtherPartyWithConfidentiality(final String id, final YesNoUnknown confidentiality,
         final LocalDateTime changedDate) {
         return CcdValue.<OtherParty>builder().value(
-            OtherParty.builder().id(id).confidentialityRequirement(confidentiality).confidentialityRequiredChangedDate(changedDate)
+            OtherParty.builder().id(id).confidentialityRequirement(new DynamicList(confidentiality.name())).confidentialityRequiredChangedDate(changedDate)
                 .build()).build();
     }
 
@@ -450,7 +452,7 @@ public class OtherPartyDataUtilTest {
                     .address(Address.builder().line1("Line1").line2("Line2").postcode("CM120NS").build())
                     .identity(Identity.builder().nino("AB223344B").dob("1995-12-20").build())
                     .isAppointee("Yes")
-                    .confidentialityRequirement(confidentialityRequired)
+                    .confidentialityRequirement(nonNull(confidentialityRequired) ? (new DynamicList(confidentialityRequired.name())) : null)
                     .appointee(Appointee.builder()
                         .address(Address.builder().line1("123 the Street").postcode("CM120NS").build())
                         .build()).build())

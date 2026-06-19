@@ -4,6 +4,7 @@ import static ch.qos.logback.classic.Level.ERROR;
 import static ch.qos.logback.classic.Level.INFO;
 import static ch.qos.logback.classic.Level.WARN;
 import static java.util.Collections.emptySet;
+import static java.util.Objects.nonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -1051,7 +1052,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
             assertThat(response.getData().getAppellant())
                 .isPresent()
-                .map(Appellant::getConfidentialityRequirement)
+                .map(Appellant::getConfidentialityRequiredAnswer)
                 .hasValue(expectedConfidentialityRequired);
             assertThat(response
                 .getData()
@@ -1115,7 +1116,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
                 .toList();
 
             assertThat(otherPartyUpdated.getFirst().getValue().getConfidentialityRequirement()).isEqualTo(
-                expectedConfidentialityRequired);
+                new DynamicList(new DynamicListItem(expectedConfidentialityRequired.name(), expectedConfidentialityRequired.toString()), null));
             assertThat(otherPartyUpdated.getFirst().getValue().getConfidentialityRequiredChangedDate()).isAfterOrEqualTo(
                 testStartDateTime);
 
@@ -1155,7 +1156,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
                 .getCaseData()
                 .getAppeal()
                 .setBenefitType(BenefitType.builder().code(CHILD_SUPPORT.getShortName()).build());
-            callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(YesNoUnknown.YES);
+            callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(new DynamicList(YES.name()));
 
             final var selectedConfidentialityParty = new DynamicList(new DynamicListItem("appellant", "Appellant (or Appointee)"),
                 null);
@@ -1170,7 +1171,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
             assertThat(response.getData().getAppellant()).isPresent().map(Appellant::getConfidentialityRequirement).hasValue(
-                YesNoUnknown.YES);
+                new DynamicList(YES.name()));
             assertThat(response
                 .getData()
                 .getAppellant()
@@ -1206,7 +1207,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
             final var updatedParty = response.getData().getOtherParties().getFirst();
-            assertThat(updatedParty.getValue().getConfidentialityRequirement()).isEqualTo(YesNoUnknown.YES);
+            assertThat(updatedParty.getValue().getConfidentialityRequirement()).isEqualTo(new DynamicList(YES.name()));
             assertThat(updatedParty.getValue().getConfidentialityRequiredChangedDate()).isNull();
             logCapture.assertLogContains("Users confidentiality status is not changed so not updating confidentiality required fields.", INFO);
         }
@@ -1439,7 +1440,8 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList("confidentialityRefusedSendToAdmin"));
             callback.getCaseDetails().getCaseData().getAppeal()
                 .setBenefitType(BenefitType.builder().code(CHILD_SUPPORT.getShortName()).build());
-            callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(YesNoUnknown.YES);
+            callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(
+                new DynamicList(YES.name()));
             callback.getCaseDetails().getCaseData().setConfidentialCaseStatus(YesNoUnknown.YES);
             var selectedConfidentialityParty = new DynamicList(new DynamicListItem("appellant", "Appellant (or Appointee)"), null);
             callback.getCaseDetails().getCaseData()
@@ -1461,7 +1463,8 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList("confidentialityRefusedSendToAdmin"));
             callback.getCaseDetails().getCaseData().getAppeal()
                 .setBenefitType(BenefitType.builder().code(CHILD_SUPPORT.getShortName()).build());
-            callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(YesNoUnknown.YES);
+            callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(
+                new DynamicList(YES.name()));
             callback.getCaseDetails().getCaseData().setConfidentialCaseStatus(YesNoUnknown.YES);
             callback.getCaseDetails().getCaseData().setOtherParties(
                 List.of(buildOtherParty("111-111-111", "Other", "Party", YesNoUnknown.YES)));
@@ -1541,7 +1544,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
                 .builder()
                 .id(id)
                 .name(Name.builder().firstName(firstName).lastName(lastName).build())
-                .confidentialityRequirement(confidentialityRequired)
+                .confidentialityRequirement(nonNull(confidentialityRequired) ? new DynamicList(confidentialityRequired.name()) : null)
                 .build())
             .build();
     }

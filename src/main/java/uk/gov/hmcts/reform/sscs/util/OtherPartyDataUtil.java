@@ -112,7 +112,7 @@ public class OtherPartyDataUtil {
         if (isValidBenefitTypeForConfidentiality(appeal.getBenefitType(), cmOtherPartyConfidentialityEnabled)) {
             if ((appeal.getAppellant() != null
                 && appeal.getAppellant().getConfidentialityRequirement() != null
-                && YesNoUnknown.isYes(appeal.getAppellant().getConfidentialityRequirement()))
+                && YesNoUnknown.isYes(appeal.getAppellant().getConfidentialityRequiredAnswer()))
                 || otherPartyHasConfidentiality(sscsCaseData)) {
                 return YesNoUnknown.YES;
             }
@@ -146,7 +146,7 @@ public class OtherPartyDataUtil {
     private static boolean otherPartyHasConfidentiality(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getOtherParties() != null) {
             return sscsCaseData.getOtherParties().stream()
-                    .anyMatch(op -> YesNoUnknown.isYes(op.getValue().getConfidentialityRequirement()));
+                    .anyMatch(op -> YesNoUnknown.isYes(op.getValue().getConfidentialityRequiredAnswer()));
         }
         return false;
     }
@@ -303,7 +303,7 @@ public class OtherPartyDataUtil {
                 final YesNoUnknown priorConfidentiality = confidentialityBefore.get(current.getId());
                 if (nonNull(current.getConfidentialityRequirement())
                     && (priorConfidentiality == null
-                        || !Objects.equals(priorConfidentiality, current.getConfidentialityRequirement()))) {
+                        || !Objects.equals(priorConfidentiality, YesNoUnknown.valueOf(current.getConfidentialityRequirement().getValue().getCode())))) {
                     current.setConfidentialityRequiredChangedDate(getLocalDateTime());
                 }
             });
@@ -318,7 +318,7 @@ public class OtherPartyDataUtil {
             .filter(Objects::nonNull)
             .map(CcdValue::getValue)
             .filter(Objects::nonNull)
-            .forEach(prior -> byId.put(prior.getId(), prior.getConfidentialityRequirement()));
+            .forEach(prior -> byId.put(prior.getId(), prior.getConfidentialityRequiredAnswer()));
         return byId;
     }
 

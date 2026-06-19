@@ -190,8 +190,7 @@ public class SscsDataHelperTest {
     @Test
     public void givenAppellantRequestsConfidentialityOnSscs2_thenIsConfidentialCase() {
         Map<String, Object> transformedCase = new HashMap<>();
-        Appeal appeal = Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build()).appellant(Appellant.builder().confidentialityRequirement(
-            YES).build()).build();
+        Appeal appeal = Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build()).appellant(Appellant.builder().confidentialityRequirement(new DynamicList(YES.name())).build()).build();
 
         sscsDataHelper.addSscsDataToMap(transformedCase, appeal, null, null, FormType.SSCS2, "", null);
 
@@ -202,7 +201,7 @@ public class SscsDataHelperTest {
     public void givenAppellantRequestsConfidentialityOnSscs5_thenIsConfidentialCase() {
         Map<String, Object> transformedCase = new HashMap<>();
         Appeal appeal = Appeal.builder().benefitType(BenefitType.builder().code("taxCredit").build()).appellant(Appellant.builder().confidentialityRequirement(
-            YES).build()).build();
+            new DynamicList(YES.name())).build()).build();
 
         sscsDataHelper.addSscsDataToMap(transformedCase, appeal, null, null, FormType.SSCS5, "", null);
 
@@ -212,7 +211,7 @@ public class SscsDataHelperTest {
     @Test
     public void givenAppellantDoesNotRequestConfidentialityOnSscs2_thenIsConfidentialCase() {
         Map<String, Object> transformedCase = new HashMap<>();
-        Appeal appeal = Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build()).appellant(Appellant.builder().confidentialityRequirement(NO).build()).build();
+        Appeal appeal = Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build()).appellant(Appellant.builder().confidentialityRequirement(new DynamicList(NO.name())).build()).build();
 
         sscsDataHelper.addSscsDataToMap(transformedCase, appeal, null, null, FormType.SSCS2, "", null);
 
@@ -223,7 +222,7 @@ public class SscsDataHelperTest {
     public void givenAppellantRequestsConfidentialityOnSscs1_thenIsNotConfidentialCase() {
         Map<String, Object> transformedCase = new HashMap<>();
         Appeal appeal = Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build()).appellant(Appellant.builder().confidentialityRequirement(
-            YES).build()).build();
+            new DynamicList(YES.toString())).build()).build();
 
         sscsDataHelper.addSscsDataToMap(transformedCase, appeal, null, null, FormType.SSCS1PEU, "", null);
 
@@ -235,7 +234,7 @@ public class SscsDataHelperTest {
     public void givenOtherPartiesAndChildMaintenanceOnSscs2_thenSetOtherPartiesAndChildMaintenanceOnCase() {
         Map<String, Object> transformedCase = new HashMap<>();
         Appeal appeal = Appeal.builder().benefitType(BenefitType.builder().code("benefit").build()).appellant(Appellant.builder().confidentialityRequirement(
-            YES).build()).build();
+            new DynamicList(YES.name())).build()).build();
 
         List<CcdValue<OtherParty>> otherParties =
             List.of(CcdValue.<OtherParty>builder().value(OtherParty.builder().id("other_party_1").build()).build());

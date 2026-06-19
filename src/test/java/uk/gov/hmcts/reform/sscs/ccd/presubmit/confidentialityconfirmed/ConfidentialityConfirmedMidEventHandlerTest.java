@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.confidentialityconfirmed;
 
+import static java.util.Objects.nonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
@@ -25,6 +26,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -103,7 +105,7 @@ class ConfidentialityConfirmedMidEventHandlerTest {
     @EnumSource(value = Benefit.class, names = {"CHILD_SUPPORT", "UC"})
     void givenConfidentialityConfirmedEventWithNoOtherPartyAndConfidentialitySet_thenRunSuccessfully(Benefit benefit) {
         var sscsCaseData = caseDataWithBenefit(benefit.getShortName());
-        sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequirement(YES).build());
+        sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequirement(new DynamicList(YES.toString())).build());
 
         when(callback.getEvent()).thenReturn(CONFIDENTIALITY_CONFIRMED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -179,7 +181,11 @@ class ConfidentialityConfirmedMidEventHandlerTest {
     private CcdValue<OtherParty> buildOtherParty(String id, YesNoUnknown confidentiality) {
         return CcdValue
             .<OtherParty>builder()
-            .value(OtherParty.builder().id(id).confidentialityRequirement(confidentiality).build())
+            .value(OtherParty
+                .builder()
+                .id(id)
+                .confidentialityRequirement(nonNull(confidentiality) ? new DynamicList(confidentiality.name()) : null)
+                .build())
             .build();
     }
 

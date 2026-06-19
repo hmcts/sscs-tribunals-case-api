@@ -51,7 +51,6 @@
         "organisation": null
       },
       "role": {},
-
       "isAddressSameAsAppointee": "No"
     },
     "benefitType": {
@@ -62,7 +61,9 @@
       "wantsToAttend": "Yes",
       "wantsSupport": "Yes",
       "languages": null,
-      "arrangements": ["hearingLoop"],
+      "arrangements": [
+        "hearingLoop"
+      ],
       "scheduleHearing": "Yes",
       "excludeDates": [
         {

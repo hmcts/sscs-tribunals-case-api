@@ -42,6 +42,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DateRange;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
@@ -272,7 +273,7 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
         return CcdValue.<OtherParty>builder()
             .value(OtherParty.builder()
                 .id(id)
-                .confidentialityRequirement(confidentialityRequired)
+                .confidentialityRequirement(new DynamicList(confidentialityRequired.name()))
                 .role(Role.builder().name("PayingParent").build())
                 .build())
             .build();
@@ -656,7 +657,8 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
     void givenCmConfidentialityEnabledAndAdditionalOtherPartyAddedAndAppellantWantsConfidentiality_thenDirectionDueDateAndInterlocNotSet() {
         final UpdateOtherPartyAboutToSubmitHandler handlerWithFlag = new UpdateOtherPartyAboutToSubmitHandler(idamService, true);
         final SscsCaseData caseData = SscsCaseData.builder()
-                                                  .appeal(Appeal.builder().appellant(Appellant.builder().confidentialityRequirement(YesNoUnknown.YES).build()).benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build())
+                                                  .appeal(Appeal.builder().appellant(Appellant.builder().confidentialityRequirement(new DynamicList(
+                                                      YesNoUnknown.YES.name())).build()).benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build())
                                                   .otherParties(Arrays.asList(buildSscs5OtherParty(ID_1, "PayingParent"), buildSscs5OtherParty(ID_2, "ReceivingParent")))
                                                   .build();
         when(caseDetails.getCaseData()).thenReturn(caseData);
@@ -672,7 +674,7 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
     void givenCmConfidentialityEnabledUcAndFirstOtherPartyAdded_thenDirectionDueDateAndInterlocSet() {
         final UpdateOtherPartyAboutToSubmitHandler handlerWithFlag = new UpdateOtherPartyAboutToSubmitHandler(idamService, true);
         final SscsCaseData caseData = SscsCaseData.builder()
-            .appeal(Appeal.builder().appellant(Appellant.builder().confidentialityRequirement(YesNoUnknown.NO).build()).benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build())
+            .appeal(Appeal.builder().appellant(Appellant.builder().confidentialityRequirement(new DynamicList(YesNoUnknown.NO.name())).build()).benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build())
             .otherParties(singletonList(buildSscs5OtherParty(ID_1, "PayingParent")))
             .build();
         when(caseDetails.getCaseData()).thenReturn(caseData);
@@ -689,7 +691,7 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
     void givenCmConfidentialityDisabledUcAndFirstOtherPartyAdded_thenDirectionDueDateAndInterlocNotSet() {
         final UpdateOtherPartyAboutToSubmitHandler handlerWithFlag = new UpdateOtherPartyAboutToSubmitHandler(idamService, false);
         final SscsCaseData caseData = SscsCaseData.builder()
-            .appeal(Appeal.builder().appellant(Appellant.builder().confidentialityRequirement(YesNoUnknown.NO).build()).benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build())
+            .appeal(Appeal.builder().appellant(Appellant.builder().confidentialityRequirement(new DynamicList(YesNoUnknown.NO.name())).build()).benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build())
             .otherParties(singletonList(buildSscs5OtherParty(ID_1, "PayingParent")))
             .build();
         when(caseDetails.getCaseData()).thenReturn(caseData);
@@ -705,7 +707,7 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
     void givenCmConfidentialityEnabledUcAndFirstOtherPartyAddedButCaseDetailsBeforeHadOne_thenDirectionDueDateAndInterlocNotSet() {
         final UpdateOtherPartyAboutToSubmitHandler handlerWithFlag = new UpdateOtherPartyAboutToSubmitHandler(idamService, true);
         final SscsCaseData caseData = SscsCaseData.builder()
-            .appeal(Appeal.builder().appellant(Appellant.builder().confidentialityRequirement(YesNoUnknown.NO).build()).benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build())
+            .appeal(Appeal.builder().appellant(Appellant.builder().confidentialityRequirement(new DynamicList(YesNoUnknown.NO.name())).build()).benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build())
             .otherParties(singletonList(buildSscs5OtherParty(ID_1, "PayingParent")))
             .build();
         final SscsCaseData caseDataBefore = SscsCaseData.builder()
@@ -728,7 +730,7 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
         final List<CcdValue<OtherParty>> otherParties = Arrays.asList(
             buildSscs5OtherParty(ID_1, "PayingParent"), buildSscs5OtherParty(ID_2, "ReceivingParent"));
         final SscsCaseData caseData = SscsCaseData.builder()
-            .appeal(Appeal.builder().appellant(Appellant.builder().confidentialityRequirement(YesNoUnknown.NO).build()).benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build())
+            .appeal(Appeal.builder().appellant(Appellant.builder().confidentialityRequirement(new DynamicList(YesNoUnknown.NO.name())).build()).benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build())
             .otherParties(otherParties)
             .build();
         final SscsCaseData caseDataBefore = SscsCaseData.builder()
@@ -755,7 +757,7 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
         final UpdateOtherPartyAboutToSubmitHandler handlerWithFlag =
             new UpdateOtherPartyAboutToSubmitHandler(idamService, cmConfidentialityEnabled);
         final SscsCaseData caseData = SscsCaseData.builder()
-                                                  .appeal(Appeal.builder().appellant(Appellant.builder().confidentialityRequirement(YesNoUnknown.NO).build()).benefitType(
+                                                  .appeal(Appeal.builder().appellant(Appellant.builder().confidentialityRequirement(new DynamicList(YesNoUnknown.NO.name())).build()).benefitType(
                                                       BenefitType
                                                           .builder()
                                                           .code(benefit.getShortName())
@@ -779,7 +781,7 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
     void givenCmConfidentialityEnabledUcAdditionalOtherPartyAddedAndAppellantConfidentialityNotRequired_thenDirectionDueDateAndInterlocSet() {
         final UpdateOtherPartyAboutToSubmitHandler handlerWithFlag = new UpdateOtherPartyAboutToSubmitHandler(idamService, true);
         final SscsCaseData caseData = SscsCaseData.builder()
-            .appeal(Appeal.builder().appellant(Appellant.builder().confidentialityRequirement(YesNoUnknown.NO).build()).benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build())
+            .appeal(Appeal.builder().appellant(Appellant.builder().confidentialityRequirement(new DynamicList(YesNoUnknown.NO.name())).build()).benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build())
             .otherParties(Arrays.asList(buildSscs5OtherParty(ID_1, "PayingParent"), buildSscs5OtherParty(ID_2, "ReceivingParent")))
             .build();
         when(caseDetails.getCaseData()).thenReturn(caseData);
@@ -814,7 +816,7 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
         final UpdateOtherPartyAboutToSubmitHandler handlerWithFlag = new UpdateOtherPartyAboutToSubmitHandler(idamService, true);
         final String nearTermDueDate = now().plusDays(5).toString();
         final SscsCaseData caseData = SscsCaseData.builder()
-            .appeal(Appeal.builder().appellant(Appellant.builder().confidentialityRequirement(YesNoUnknown.NO).build()).benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build()).build())
+            .appeal(Appeal.builder().appellant(Appellant.builder().confidentialityRequirement(new DynamicList(YesNoUnknown.NO.name())).build()).benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build()).build())
             .directionDueDate(nearTermDueDate)
             .otherParties(singletonList(buildSscs5OtherParty(ID_1, "PayingParent")))
             .build();
@@ -831,7 +833,7 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
     void givenCmConfidentialityDisabledChildSupportCase_thenDirectionDueDateIsRecalculated() {
         final UpdateOtherPartyAboutToSubmitHandler handlerWithFlag = new UpdateOtherPartyAboutToSubmitHandler(idamService, false);
         final SscsCaseData caseData = SscsCaseData.builder()
-            .appeal(Appeal.builder().appellant(Appellant.builder().confidentialityRequirement(YesNoUnknown.NO).build()).benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build()).build())
+            .appeal(Appeal.builder().appellant(Appellant.builder().confidentialityRequirement(new DynamicList(YesNoUnknown.NO.name())).build()).benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build()).build())
             .directionDueDate(now().plusDays(5).toString())
             .otherParties(singletonList(buildSscs5OtherParty(ID_1, "PayingParent")))
             .build();
@@ -853,7 +855,8 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
 
     private CcdValue<OtherParty> buildOtherParty(final String wantsToAttend, final YesNoUnknown confidentiality) {
         return CcdValue.<OtherParty>builder().value(OtherParty.builder()
-            .confidentialityRequirement(confidentiality != null ? confidentiality : YesNoUnknown.NO)
+            .confidentialityRequirement(confidentiality != null ? new DynamicList(
+                confidentiality.name()) : new DynamicList(YesNoUnknown.NO.name()))
             .hearingOptions(HearingOptions.builder().wantsToAttend(wantsToAttend).build())
             .build()).build();
     }
@@ -873,7 +876,7 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
             .value(OtherParty.builder()
                 .id(id)
                 .unacceptableCustomerBehaviour(YesNo.NO)
-                .confidentialityRequirement(YesNoUnknown.NO)
+                .confidentialityRequirement(new DynamicList(YesNoUnknown.NO.name()))
                 .role(Role.builder().name(role).build())
                 .build())
             .build();

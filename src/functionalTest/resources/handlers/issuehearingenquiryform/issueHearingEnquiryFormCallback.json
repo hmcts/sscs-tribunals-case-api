@@ -67,7 +67,26 @@
           "role": {
             "name": "Paying parent"
           },
-          "confidentialityRequirement": "Yes",
+          "confidentialityRequirement": {
+            "value": {
+              "code": "YES",
+              "label": "Yes"
+            },
+            "list_items": [
+              {
+                "code": "YES",
+                "label": "Yes"
+              },
+              {
+                "code": "UNKNOWN",
+                "label": "Unknown"
+              },
+              {
+                "code": "NO",
+                "label": "No"
+              }
+            ]
+          },
           "isAddressSameAsAppointee": "Yes"
         },
         "benefitType": {
@@ -226,7 +245,26 @@
             "role": {
               "name": "Receiving parent"
             },
-            "confidentialityRequirement": "No",
+            "confidentialityRequirement": {
+              "value": {
+                "code": "NO",
+                "label": "No"
+              },
+              "list_items": [
+                {
+                  "code": "YES",
+                  "label": "Yes"
+                },
+                {
+                  "code": "UNKNOWN",
+                  "label": "Unknown"
+                },
+                {
+                  "code": "NO",
+                  "label": "No"
+                }
+              ]
+            },
             "confidentialityRequiredConfirmedDate": "2026-03-10T16:35:05.721959",
             "unacceptableCustomerBehaviour": "No",
             "hearingOptions": {
@@ -306,7 +344,26 @@
             "role": {
               "name": "Receiving parent"
             },
-            "confidentialityRequirement": "No",
+            "confidentialityRequirement": {
+              "value": {
+                "code": "NO",
+                "label": "No"
+              },
+              "list_items": [
+                {
+                  "code": "YES",
+                  "label": "Yes"
+                },
+                {
+                  "code": "UNKNOWN",
+                  "label": "Unknown"
+                },
+                {
+                  "code": "NO",
+                  "label": "No"
+                }
+              ]
+            },
             "confidentialityRequiredConfirmedDate": "2026-03-10T16:35:22.09551",
             "unacceptableCustomerBehaviour": "No",
             "hearingOptions": {

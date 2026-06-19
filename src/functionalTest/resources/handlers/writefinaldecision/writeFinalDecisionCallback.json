@@ -34,7 +34,7 @@
       "pipWriteFinalDecisionMobilityActivitiesQuestion": [
         "planningAndFollowing"
       ],
-      "writeFinalDecisionIsDescriptorFlow" : "Yes",
+      "writeFinalDecisionIsDescriptorFlow": "Yes",
       "writeFinalDecisionAllowedOrRefused": "allowed",
       "pipWriteFinalDecisionMobilityQuestion": "standardRate",
       "pipWriteFinalDecisionPlanningAndFollowingQuestion": "planningAndFollowing11d",
@@ -51,8 +51,12 @@
       "writeFinalDecisionPresentingOfficerAttendedQuestion": "Yes",
       "writeFinalDecisionDetailsOfDecision": "The details of the decision.",
       "writeFinalDecisionAnythingElse": "Something else.",
-      "writeFinalDecisionReasons": [{"id" :  null,
-        "value": "Because appellant has trouble walking"}],
+      "writeFinalDecisionReasons": [
+        {
+          "id": null,
+          "value": "Because appellant has trouble walking"
+        }
+      ],
       "writeFinalDecisionStartDate": "2019-10-10",
       "writeFinalDecisionTypeOfHearing": "telephone",
       "writeFinalDecisionPreviewDocument": {
@@ -199,7 +203,6 @@
             "nino": "JT 12 34 56 D"
           },
           "appointee": null,
-
           "isAddressSameAsAppointee": null
         },
         "benefitType": {

@@ -2585,7 +2585,7 @@ public class SscsCaseTransformerTest {
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
         assertNoErrorsOrWarnings(result);
 
-        YesNoUnknown appellantConfidentialityRequired = ((Appeal) result.getTransformedCase().get("appeal")).getAppellant().getConfidentialityRequirement();
+        YesNoUnknown appellantConfidentialityRequired = ((Appeal) result.getTransformedCase().get("appeal")).getAppellant().getConfidentialityRequiredAnswer();
         assertEquals(expected, appellantConfidentialityRequired.toString());
     }
 
@@ -2614,7 +2614,7 @@ public class SscsCaseTransformerTest {
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
         assertNoErrorsOrWarnings(result);
 
-        YesNoUnknown appellantConfidentialityRequired = ((Appeal) result.getTransformedCase().get("appeal")).getAppellant().getConfidentialityRequirement();
+        YesNoUnknown appellantConfidentialityRequired = ((Appeal) result.getTransformedCase().get("appeal")).getAppellant().getConfidentialityRequiredAnswer();
         assertNull(appellantConfidentialityRequired);
     }
 
@@ -2642,7 +2642,7 @@ public class SscsCaseTransformerTest {
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
         assertNoErrorsOrWarnings(result);
 
-        YesNoUnknown appellantConfidentialityRequired = ((Appeal) result.getTransformedCase().get("appeal")).getAppellant().getConfidentialityRequirement();
+        YesNoUnknown appellantConfidentialityRequired = ((Appeal) result.getTransformedCase().get("appeal")).getAppellant().getConfidentialityRequiredAnswer();
         assertNull(appellantConfidentialityRequired);
     }
 

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADD_OTHER_PARTY_DATA;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CONFIDENTIALITY_CONFIRMED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUnknown.YES;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
@@ -23,7 +25,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUnknown;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
@@ -77,7 +78,7 @@ class ConfidentialityConfirmedFunctionalTest extends AbstractFunctionalTest {
 
             updateCcdCaseService.updateCaseV2(caseWithState.getId(), CONFIDENTIALITY_CONFIRMED.getCcdType(),
                 idamService.getIdamTokens(), cd -> {
-                    cd.getData().getOtherParties().getFirst().getValue().setConfidentialityRequirement(YesNoUnknown.YES);
+                    cd.getData().getOtherParties().getFirst().getValue().setConfidentialityRequirement(new DynamicList(YES.name()));
                     return new UpdateCcdCaseService.UpdateResult(CONFIRMED, CONFIRMED);
                 });
 

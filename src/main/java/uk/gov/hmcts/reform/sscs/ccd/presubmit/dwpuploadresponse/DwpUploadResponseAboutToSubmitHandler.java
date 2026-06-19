@@ -175,7 +175,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                     preSubmitCallbackResponse.addError("Other Party requires confidentiality, upload edited and unedited responses");
                     sscsCaseData.setConfidentialCaseStatus(YesNoUnknown.YES);
                 }
-                if (sscsCaseData.getAppeal().getAppellant() != null && YesNoUnknown.isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequirement())) {
+                if (sscsCaseData.getAppeal().getAppellant() != null && YesNoUnknown.isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequiredAnswer())) {
                     preSubmitCallbackResponse.addError("Appellant requires confidentiality, upload edited and unedited responses");
                     sscsCaseData.setConfidentialCaseStatus(YesNoUnknown.YES);
                 }
@@ -183,7 +183,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                 if (otherPartyHasConfidentiality(sscsCaseData)) {
                     sscsCaseData.setConfidentialCaseStatus(YesNoUnknown.YES);
                 }
-                if (sscsCaseData.getAppeal().getAppellant() != null && YesNoUnknown.isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequirement())) {
+                if (sscsCaseData.getAppeal().getAppellant() != null && YesNoUnknown.isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequiredAnswer())) {
                     sscsCaseData.setConfidentialCaseStatus(YesNoUnknown.YES);
                 }
             }
@@ -192,7 +192,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
     private boolean otherPartyHasConfidentiality(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getOtherParties() != null) {
-            Optional<CcdValue<OtherParty>> otherParty = sscsCaseData.getOtherParties().stream().filter(op -> YesNoUnknown.isYes(op.getValue().getConfidentialityRequirement())).findAny();
+            Optional<CcdValue<OtherParty>> otherParty = sscsCaseData.getOtherParties().stream().filter(op -> YesNoUnknown.isYes(op.getValue().getConfidentialityRequiredAnswer())).findAny();
             return otherParty.isPresent();
         }
         return false;

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.bulkscan.transformers;
 
+import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.*;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.WarningMessage.getMessageByCallbackType;
@@ -75,6 +76,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseManagementLocation;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Contact;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DateRange;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FormType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
@@ -527,13 +530,14 @@ public class SscsCaseTransformer implements CaseTransformer {
 
     private Appellant buildAppellant(Map<String, Object> pairs, String personType, Appointee appointee,
                                      Contact contact, String formType, boolean ignoreWarnings, boolean isSscs8) {
+        YesNoUnknown confidentialityRequired = getConfidentialityRequired(pairs, errors);
         return Appellant.builder()
             .name(buildPersonName(pairs, personType))
             .isAppointee(convertBooleanToYesNoString(appointee != null))
             .address(buildPersonAddress(pairs, personType, isSscs8))
             .identity(buildPersonIdentity(pairs, personType))
             .contact(contact)
-            .confidentialityRequirement(getConfidentialityRequired(pairs, errors))
+            .confidentialityRequirement(nonNull(confidentialityRequired) ? new DynamicList(new DynamicListItem(confidentialityRequired.name(), confidentialityRequired.toString()), null) : null)
             .appointee(appointee)
             .role(buildAppellantRole(pairs, formType, ignoreWarnings))
             .ibcRole(buildIbcRole(pairs, personType, isSscs8))

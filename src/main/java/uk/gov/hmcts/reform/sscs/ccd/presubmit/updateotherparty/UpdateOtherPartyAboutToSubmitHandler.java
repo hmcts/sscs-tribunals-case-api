@@ -151,7 +151,7 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
 
     private static boolean appellantConfidentialityNotRequiredOrUnknown(SscsCaseData sscsCaseData) {
         return isNull(sscsCaseData.getAppeal().getAppellant()) || isNoOrNullOrUnknown(
-            sscsCaseData.getAppeal().getAppellant().getConfidentialityRequirement());
+            sscsCaseData.getAppeal().getAppellant().getConfidentialityRequiredAnswer());
     }
 
     private List<String> verifyHearingUnavailableDates(final List<CcdValue<OtherParty>> otherParties) {

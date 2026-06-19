@@ -33,9 +33,9 @@
       "formType": "sscs1peu",
       "dwpRegionalCentre": "Universal Credit",
       "bulkScanCaseReference": "id",
-      "caseManagementLocation":{
-        "region":"8",
-        "baseLocation":"372653"
+      "caseManagementLocation": {
+        "region": "8",
+        "baseLocation": "372653"
       },
       "CaseAccessCategory": "universalCredit",
       "caseManagementCategory": {
@@ -87,7 +87,6 @@
           },
           "isAppointee": "No",
           "appointee": null,
-
           "isAddressSameAsAppointee": null,
           "role": null
         },
@@ -198,7 +197,7 @@
   },
   "warnings": [],
   "supplementary_data": {
-    "$set" : {
+    "$set": {
       "HMCTSServiceId": "BBA3"
     }
   }

@@ -68,7 +68,6 @@
           },
           "isAddressSameAsAppointee": null,
           "isAppointee": "No",
-
           "appointee": null,
           "name": {
             "firstName": "Frederick",
@@ -121,7 +120,7 @@
         "receivedVia": "Paper",
         "rep": {
           "id": null,
-          "identity":null,
+          "identity": null,
           "address": {
             "county": "Surrey",
             "line1": "63 Grove Hill Road",
@@ -146,9 +145,9 @@
       },
       "benefitCode": "022",
       "bulkScanCaseReference": "id",
-      "caseManagementLocation":{
-        "region":"8",
-        "baseLocation":"372653"
+      "caseManagementLocation": {
+        "region": "8",
+        "baseLocation": "372653"
       },
       "caseCode": "022DD",
       "caseCreated": "2019-08-02",
@@ -220,7 +219,7 @@
   },
   "warnings": [],
   "supplementary_data": {
-    "$set" : {
+    "$set": {
       "HMCTSServiceId": "BBA3"
     }
   }

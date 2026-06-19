@@ -50,7 +50,13 @@
           },
           "isAddressSameAsAppointee": null,
           "isAppointee": "No",
-          "confidentialityRequirement": "Yes",
+          "confidentialityRequirement": {
+            "value": {
+              "code": "YES",
+              "label": "Yes"
+            },
+            "list_items": null
+          },
           "appointee": null,
           "name": {
             "firstName": "Frederick",
@@ -126,7 +132,7 @@
       "benefitCode": "053",
       "bulkScanCaseReference": "id",
       "caseManagementLocation":{
-        "region":"8",
+        "region":"7",
         "baseLocation":"372653"
       },
       "caseCode": "053DD",
@@ -150,7 +156,8 @@
         "postcode": "CF24 0AB",
         "city": "CARDIFF",
         "email": "Cardiff_SYA_Respon@justice.gov.uk",
-        "hearingRoute": "gaps"
+        "hearingRoute": "listAssist",
+        "epimsId": "372653"
       },
       "processingVenue": "Cardiff",
       "isScottishCase": "No",

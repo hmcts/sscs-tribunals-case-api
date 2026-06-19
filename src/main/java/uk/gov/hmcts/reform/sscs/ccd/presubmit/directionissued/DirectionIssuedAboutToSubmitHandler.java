@@ -452,11 +452,11 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     }
 
     private static void setConfidentialityFields(YesNoUnknown confidentialityRequired, Party party) {
-        if (confidentialityRequired == party.getConfidentialityRequirement()) {
+        if (confidentialityRequired == party.getConfidentialityRequiredAnswer()) {
             log.info("Users confidentiality status is not changed so not updating confidentiality required fields.");
             return;
         }
-        party.setConfidentialityRequirement(confidentialityRequired);
+        party.setConfidentialityRequirement(new DynamicList(new DynamicListItem(confidentialityRequired.name(), confidentialityRequired.getValue()), null));
         party.setConfidentialityRequiredChangedDate(getLocalDateTime());
     }
 
