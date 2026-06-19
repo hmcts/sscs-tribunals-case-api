@@ -492,6 +492,37 @@ class DirectionIssuedAboutToStartHandlerTest {
     }
 
     @Test
+    void givenCmCaseWithOtherParties_thenSeedsOtherPartySelectionForThePicker() {
+        handler = new DirectionIssuedAboutToStartHandler(false, true, idamService);
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(CHILD_SUPPORT.getShortName()).build());
+        CcdValue<OtherParty> op1 = CcdValue.<OtherParty>builder()
+                .value(OtherParty.builder().id("1").name(Name.builder().firstName("Harry").lastName("Kane").build()).build()).build();
+        CcdValue<OtherParty> op2 = CcdValue.<OtherParty>builder()
+                .value(OtherParty.builder().id("2").name(Name.builder().firstName("Son").lastName("Heung-min").build()).build()).build();
+        sscsCaseData.setOtherParties(List.of(op1, op2));
+
+        handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getOtherPartySelection()).hasSize(1);
+        assertThat(sscsCaseData.getOtherPartySelection().get(0).getValue().getOtherPartiesList().getListItems())
+                .extracting(DynamicListItem::getCode)
+                .containsExactlyInAnyOrder("otherParty1", "otherParty2");
+    }
+
+    @Test
+    void givenNonCmCase_thenOtherPartySelectionNotSeeded() {
+        handler = new DirectionIssuedAboutToStartHandler(false, true, idamService);
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(PIP.getShortName()).build());
+        CcdValue<OtherParty> op = CcdValue.<OtherParty>builder()
+                .value(OtherParty.builder().id("1").name(Name.builder().firstName("Harry").lastName("Kane").build()).build()).build();
+        sscsCaseData.setOtherParties(List.of(op));
+
+        handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertNull(sscsCaseData.getOtherPartySelection());
+    }
+
+    @Test
     void givenAValidCallbackType_NoAdditionalPartiesForOtherParty() {
         handler = new DirectionIssuedAboutToStartHandler(false, false, idamService);
 

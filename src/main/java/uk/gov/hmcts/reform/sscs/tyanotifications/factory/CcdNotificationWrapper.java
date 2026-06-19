@@ -152,17 +152,21 @@ public class CcdNotificationWrapper implements NotificationWrapper {
 
         boolean isSendNewOtherPartyNotification = YesNo.isYes(otherParty.getSendNewOtherPartyNotification());
 
+        String appointeeId = otherParty.getAppointee() != null ? otherParty.getAppointee().getId() : null;
         if (hasAppointee(otherParty.getAppointee(), otherParty.getIsAppointee())
-            && isNotificationEventValidToSendToOtherPartySubscription(otherParty.getOtherPartyAppointeeSubscription(), isSendNewOtherPartyNotification, newSscsCaseData, notificationEventType, ConfidentialityPartyMembers.OTHER_PARTY_APPOINTEE.getCode())) {
+            && isNotificationEventValidToSendToOtherPartySubscription(otherParty.getOtherPartyAppointeeSubscription(), isSendNewOtherPartyNotification, newSscsCaseData, notificationEventType, ConfidentialityPartyMembers.OTHER_PARTY_APPOINTEE.getCode())
+            && isOtherPartySelectedForDirectionNotice(newSscsCaseData, notificationEventType, otherParty.getAppointee().getId(), otherParty.getId())) {
             otherPartySubscription.add(new SubscriptionWithType(otherParty.getOtherPartyAppointeeSubscription(),
                 OTHER_PARTY, otherParty, otherParty.getAppointee(), otherParty.getAppointee().getId()));
-        } else if (isNotificationEventValidToSendToOtherPartySubscription(otherParty.getOtherPartySubscription(), isSendNewOtherPartyNotification, newSscsCaseData, notificationEventType, ConfidentialityPartyMembers.OTHER_PARTY.getCode())) {
+        } else if (isNotificationEventValidToSendToOtherPartySubscription(otherParty.getOtherPartySubscription(), isSendNewOtherPartyNotification, newSscsCaseData, notificationEventType, ConfidentialityPartyMembers.OTHER_PARTY.getCode())
+            && isOtherPartySelectedForDirectionNotice(newSscsCaseData, notificationEventType, otherParty.getId(), appointeeId)) {
             otherPartySubscription.add(new SubscriptionWithType(otherParty.getOtherPartySubscription(), OTHER_PARTY,
                 otherParty, otherParty, otherParty.getId()));
         }
 
         if (hasRepresentative(otherParty)
-            && isNotificationEventValidToSendToOtherPartySubscription(otherParty.getOtherPartyRepresentativeSubscription(), isSendNewOtherPartyNotification, newSscsCaseData, notificationEventType, ConfidentialityPartyMembers.OTHER_PARTY_REP.getCode())) {
+            && isNotificationEventValidToSendToOtherPartySubscription(otherParty.getOtherPartyRepresentativeSubscription(), isSendNewOtherPartyNotification, newSscsCaseData, notificationEventType, ConfidentialityPartyMembers.OTHER_PARTY_REP.getCode())
+            && isOtherPartySelectedForDirectionNotice(newSscsCaseData, notificationEventType, otherParty.getRep().getId())) {
             otherPartySubscription.add(new SubscriptionWithType(otherParty.getOtherPartyRepresentativeSubscription(),
                 OTHER_PARTY, otherParty, otherParty.getRep(), otherParty.getRep().getId()));
         }
@@ -170,6 +174,37 @@ public class CcdNotificationWrapper implements NotificationWrapper {
         log.info("Number of subscription {}", otherPartySubscription.size());
 
         return otherPartySubscription;
+    }
+
+    // SSCSCI-2659: on a direction notice, only notify the other parties the caseworker actually picked.
+    // No selection, or any other event, means no filtering. Same idea as reissue's isResendTo.
+    private boolean isOtherPartySelectedForDirectionNotice(SscsCaseData caseData, NotificationEventType eventType, String... partyIds) {
+        if (!(DIRECTION_ISSUED.equals(eventType) || DIRECTION_ISSUED_WELSH.equals(eventType))) {
+            return true;
+        }
+        List<String> selectedCodes = emptyIfNull(caseData.getOtherPartySelection()).stream()
+            .map(CcdValue::getValue)
+            .map(OtherPartySelectionDetails::getOtherPartiesList)
+            .filter(Objects::nonNull)
+            .map(DynamicList::getValue)
+            .filter(Objects::nonNull)
+            .map(DynamicListItem::getCode)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+        // No specific other party chosen (picker not shown, or seeded row with nothing selected) -> don't filter.
+        if (selectedCodes.isEmpty()) {
+            return true;
+        }
+        // Match on any of the party's ids: the picker and the appointee/other-party branch logic can disagree
+        // on which id to use when appointee data is malformed, so accepting either avoids dropping a valid pick.
+        for (String partyId : partyIds) {
+            if (Objects.nonNull(partyId)
+                && (selectedCodes.contains(PartyItemList.OTHER_PARTY.getCode() + partyId)
+                    || selectedCodes.contains(PartyItemList.OTHER_PARTY_REPRESENTATIVE.getCode() + partyId))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean isOtherPartyPresent(SscsCaseData sscsCaseData) {

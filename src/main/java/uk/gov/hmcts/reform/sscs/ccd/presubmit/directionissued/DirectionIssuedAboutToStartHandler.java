@@ -10,6 +10,7 @@ import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.JUDGE;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.TCW;
+import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.addOtherPartiesToListOptions;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isBenefitTypeChildSupportOrUc;
 
 import java.util.ArrayList;
@@ -70,6 +71,7 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
         if (callbackType.equals(CallbackType.ABOUT_TO_START)) {
             sscsCaseData.getExtendedSscsCaseData().setSelectNextHmcHearingType(NO);
             sscsCaseData.setHmcHearingType(null);
+            setOtherPartySelectionList(sscsCaseData);
         }
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
@@ -148,6 +150,22 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
         sscsCaseData.setSendDirectionNoticeToOtherParty(null);
         sscsCaseData.setSendDirectionNoticeToJointParty(null);
         sscsCaseData.setSendDirectionNoticeToAppellantOrAppointee(null);
+    }
+
+    // SSCSCI-2659: build the other party picker on about-to-start only - a mid-event would wipe the selection.
+    // CM/UC with other parties, otherwise clear it. Same as issue generic letter.
+    private void setOtherPartySelectionList(SscsCaseData sscsCaseData) {
+        if (cmDirectionTypesConfidentiality
+            && isBenefitTypeChildSupportOrUc(sscsCaseData)
+            && OtherPartyDataUtil.isOtherPartyPresent(sscsCaseData)) {
+            List<DynamicListItem> listOptions = new ArrayList<>();
+            addOtherPartiesToListOptions(sscsCaseData, listOptions, true);
+            List<CcdValue<OtherPartySelectionDetails>> selection = new ArrayList<>();
+            selection.add(new CcdValue<>(new OtherPartySelectionDetails(new DynamicList(null, listOptions))));
+            sscsCaseData.setOtherPartySelection(selection);
+        } else {
+            sscsCaseData.setOtherPartySelection(null);
+        }
     }
 
     private void setPartiesToSendLetter(SscsCaseData sscsCaseData) {

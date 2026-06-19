@@ -15,6 +15,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -31,6 +32,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
@@ -40,6 +42,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartySelectionDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsInterlocDirectionDocument;
@@ -133,6 +136,31 @@ public class DirectionIssuedMidEventHandlerTest {
     @Test
     public void givenGenerateNoticeIsYes_thenReturnTrue() {
         assertTrue(handler.canHandle(MID_EVENT, callback));
+    }
+
+    @Test
+    public void givenDuplicateOtherPartySelection_thenReturnsError() {
+        DynamicListItem item = new DynamicListItem("otherParty1", "Other party 1");
+        CcdValue<OtherPartySelectionDetails> row =
+            new CcdValue<>(new OtherPartySelectionDetails(new DynamicList(item, List.of(item))));
+        sscsCaseData.setOtherPartySelection(List.of(row, row));
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getErrors().contains("Other parties cannot be selected more than once"));
+    }
+
+    @Test
+    public void givenDistinctOtherPartySelection_thenNoDuplicateError() {
+        DynamicListItem item1 = new DynamicListItem("otherParty1", "Other party 1");
+        DynamicListItem item2 = new DynamicListItem("otherParty2", "Other party 2");
+        sscsCaseData.setOtherPartySelection(List.of(
+            new CcdValue<>(new OtherPartySelectionDetails(new DynamicList(item1, List.of(item1, item2)))),
+            new CcdValue<>(new OtherPartySelectionDetails(new DynamicList(item2, List.of(item1, item2))))));
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertFalse(response.getErrors().contains("Other parties cannot be selected more than once"));
     }
 
     @Test
