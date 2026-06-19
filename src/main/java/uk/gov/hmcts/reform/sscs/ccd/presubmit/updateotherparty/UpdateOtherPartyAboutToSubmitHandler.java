@@ -4,7 +4,9 @@ import static java.time.LocalDate.now;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_OTHER_PARTY_DATA;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.issuehearingenquiryform.IssueHearingEnquiryFormAboutToSubmit.getHearingResponseExpectedByDays;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getUpdatedDirectionDueDate;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.validateHearingOptionsAndExcludeDates;
@@ -30,6 +32,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
@@ -40,6 +43,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.util.predicates.AdditionalOtherPartyAddedPredicate;
+import uk.gov.hmcts.reform.sscs.util.predicates.FirstOtherPartyAddedPredicate;
 
 
 @Component
@@ -56,11 +61,15 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
 
     private IdamService idamService;
     private final boolean cmOtherPartyConfidentialityEnabled;
+    private final AdditionalOtherPartyAddedPredicate additionalOtherPartyAddedPredicate;
+    private final FirstOtherPartyAddedPredicate firstOtherPartyAddedPredicate;
 
     @Autowired
     UpdateOtherPartyAboutToSubmitHandler(IdamService idamService, @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
         this.idamService = idamService;
         this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
+        this.additionalOtherPartyAddedPredicate = new AdditionalOtherPartyAddedPredicate();
+        this.firstOtherPartyAddedPredicate = new FirstOtherPartyAddedPredicate();
     }
 
     @Override
@@ -95,7 +104,9 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
             response.addWarnings(!user.hasRole(SYSTEM_USER) ? List.of(WARN_NON_SSCS1_PAPER_TO_ORAL) : List.of());
         }
 
-        sscsCaseData.setDirectionDueDate(getUpdatedDirectionDueDate(sscsCaseData));
+        if (!(cmOtherPartyConfidentialityEnabled && isBenefitTypeChildSupportOrUc(sscsCaseData))) {
+            sscsCaseData.setDirectionDueDate(getUpdatedDirectionDueDate(sscsCaseData));
+        }
 
         if (sscsCaseData.getAppeal() != null && sscsCaseData.getAppeal().getBenefitType() != null
             && isBenefitTypeValidForOtherPartyValidation(sscsCaseData.getBenefitType())) {
@@ -115,13 +126,32 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
             response.addError(ERR_ROLE_REQUIRED);
         }
 
-        if (cmOtherPartyConfidentialityEnabled
-                && (isBenefitTypeChildSupportOrUc(sscsCaseData))) {
+        final SscsCaseData caseDataBefore = callback.getCaseDetailsBefore().map(CaseDetails::getCaseData).orElse(null);
+
+        if (cmOtherPartyConfidentialityEnabled && (
+            isChildSupportOrUcAdditionalOtherPartyAdded(sscsCaseData, caseDataBefore)
+                || isUniversalCreditAndFirstOtherPartyAdded(sscsCaseData, caseDataBefore))) {
             sscsCaseData.setDirectionDueDate(now().plusDays(getHearingResponseExpectedByDays()).toString());
             sscsCaseData.setInterlocReviewState(InterlocReviewState.HEF_ISSUED);
         }
 
         return response;
+    }
+
+    private boolean isUniversalCreditAndFirstOtherPartyAdded(SscsCaseData sscsCaseData, SscsCaseData caseDataBefore) {
+        return sscsCaseData.isBenefitType(UC)
+            && firstOtherPartyAddedPredicate.test(sscsCaseData, caseDataBefore);
+    }
+
+    private boolean isChildSupportOrUcAdditionalOtherPartyAdded(SscsCaseData sscsCaseData, SscsCaseData caseDataBefore) {
+        return isBenefitTypeChildSupportOrUc(sscsCaseData)
+            && appellantConfidentialityNotRequiredOrUnknown(sscsCaseData)
+            && additionalOtherPartyAddedPredicate.test(sscsCaseData, caseDataBefore);
+    }
+
+    private static boolean appellantConfidentialityNotRequiredOrUnknown(SscsCaseData sscsCaseData) {
+        return isNull(sscsCaseData.getAppeal().getAppellant()) || isNoOrNull(
+            sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired());
     }
 
     private List<String> verifyHearingUnavailableDates(final List<CcdValue<OtherParty>> otherParties) {
