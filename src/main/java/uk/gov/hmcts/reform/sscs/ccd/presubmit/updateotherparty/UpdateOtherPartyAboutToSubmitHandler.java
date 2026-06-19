@@ -6,6 +6,7 @@ import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_OTHER_PARTY_DATA;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUnknown.isNoOrNullOrUnknown;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.issuehearingenquiryform.IssueHearingEnquiryFormAboutToSubmit.getHearingResponseExpectedByDays;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getUpdatedDirectionDueDate;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.validateHearingOptionsAndExcludeDates;
@@ -39,7 +40,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUnknown;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
@@ -150,7 +150,7 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
     }
 
     private static boolean appellantConfidentialityNotRequiredOrUnknown(SscsCaseData sscsCaseData) {
-        return isNull(sscsCaseData.getAppeal().getAppellant()) || YesNoUnknown.isNoOrNullOrUnknown(
+        return isNull(sscsCaseData.getAppeal().getAppellant()) || isNoOrNullOrUnknown(
             sscsCaseData.getAppeal().getAppellant().getConfidentialityRequirement());
     }
 

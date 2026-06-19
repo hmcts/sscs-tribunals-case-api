@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.helper.mapping;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUnknown.isYes;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsDetailsMapping.isCaseUrgent;
 import static uk.gov.hmcts.reform.sscs.model.service.hearingvalues.PartyFlagsMap.DISABLED_ACCESS;
 import static uk.gov.hmcts.reform.sscs.model.service.hearingvalues.PartyFlagsMap.DWP_PHME;
@@ -22,7 +23,6 @@ import java.util.stream.Stream;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUnknown;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.CaseFlags;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.PartyFlags;
 
@@ -92,7 +92,7 @@ public final class PartyFlagsMapping {
 
     public static PartyFlags confidentialCase(SscsCaseData caseData) {
         PartyFlags confidentialCaseFlag = null;
-        if (YesNoUnknown.isYes(caseData.getConfidentialCaseStatus())) {
+        if (isYes(caseData.getConfidentialCaseStatus())) {
             confidentialCaseFlag = PartyFlags.builder()
                     .flagId(IS_CONFIDENTIAL_CASE.getFlagId())
                     .flagDescription(IS_CONFIDENTIAL_CASE.getFlagDescription())
