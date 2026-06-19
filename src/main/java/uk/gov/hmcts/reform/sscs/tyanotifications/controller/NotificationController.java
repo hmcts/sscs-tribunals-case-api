@@ -52,7 +52,8 @@ public class NotificationController {
         try {
             Callback<SscsCaseData> callback = deserializer.deserialize(message);
 
-            CaseDetails<SscsCaseData> caseDetailsBefore = callback.getCaseDetailsBefore().orElse(null);
+            CaseDetails<SscsCaseData> caseDetailsBefore = callback.getCaseDetailsBefore()
+                    .orElse(null);
 
             NotificationSscsCaseDataWrapper notificationSscsCaseDataWrapper = buildSscsCaseDataWrapper(
                 callback.getCaseDetails().getCaseData(),
