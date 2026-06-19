@@ -56,12 +56,12 @@ class ConfidentialityConfirmedMidEventHandler implements PreSubmitCallbackHandle
                 .filter(Objects::nonNull)
                 .map(CcdValue::getValue)
                 .filter(Objects::nonNull)
-                .anyMatch(value -> value.getConfidentialityRequired() == null))
+                .anyMatch(value -> value.getConfidentialityRequirement() == null))
                 .orElse(false);
 
         boolean appellantConfidentialityMissing = Optional.ofNullable(caseData.getAppeal())
             .map(Appeal::getAppellant)
-            .map(appellant -> appellant.getConfidentialityRequired() == null)
+            .map(appellant -> appellant.getConfidentialityRequirement() == null)
             .orElse(false);
 
         if (otherPartyConfidentialityMissing || appellantConfidentialityMissing) {

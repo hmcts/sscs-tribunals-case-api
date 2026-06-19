@@ -50,7 +50,7 @@
             "nino": "BB000000B"
           },
           "appointee": null,
-          "confidentialityRequired": null,
+
           "isAppointee": "No",
           "isAddressSameAsAppointee": null,
           "role": null

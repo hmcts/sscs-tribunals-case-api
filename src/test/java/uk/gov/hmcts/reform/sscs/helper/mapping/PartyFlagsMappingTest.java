@@ -25,9 +25,10 @@ import org.mockito.Mockito;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ExtendedSscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUnknown;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.CaseFlags;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.PartyFlags;
 
@@ -44,7 +45,7 @@ class PartyFlagsMappingTest extends HearingsMappingBase {
             .adjournment(Adjournment.builder()
                 .interpreterLanguage(new DynamicList("adjournCaseInterpreterLanguage"))
                 .build())
-            .isConfidentialCase(YES)
+            .extendedSscsCaseData(ExtendedSscsCaseData.builder().confidentialCaseStatus(YesNoUnknown.YES).build())
             .appeal(Appeal.builder().hearingOptions(
                 HearingOptions.builder()
                     .signLanguageType("signLanguageType")
@@ -77,7 +78,7 @@ class PartyFlagsMappingTest extends HearingsMappingBase {
             .adjournment(Adjournment.builder()
                 .interpreterLanguage(null)
                 .build())
-            .isConfidentialCase(null)
+            .extendedSscsCaseData(ExtendedSscsCaseData.builder().confidentialCaseStatus(null).build())
             .appeal(Appeal.builder().hearingOptions(
                 HearingOptions.builder()
                     .signLanguageType(null)
@@ -244,7 +245,7 @@ class PartyFlagsMappingTest extends HearingsMappingBase {
     @Test
     void confidentialCase() {
         SscsCaseData caseData = SscsCaseData.builder()
-            .isConfidentialCase(YES)
+            .extendedSscsCaseData(ExtendedSscsCaseData.builder().confidentialCaseStatus(YesNoUnknown.YES).build())
             .build();
 
         PartyFlags result = PartyFlagsMapping.confidentialCase(caseData);
@@ -258,11 +259,11 @@ class PartyFlagsMappingTest extends HearingsMappingBase {
 
     @DisplayName("confidentialCase returns null Parameterised Tests")
     @ParameterizedTest
-    @EnumSource(value = YesNo.class, names = {"NO"})
+    @EnumSource(value = YesNoUnknown.class, names = {"NO"})
     @NullSource
-    void confidentialCase(YesNo isConfidentialCase) {
+    void confidentialCase(YesNoUnknown isConfidentialCase) {
         SscsCaseData caseData = SscsCaseData.builder()
-            .isConfidentialCase(isConfidentialCase)
+            .extendedSscsCaseData(ExtendedSscsCaseData.builder().confidentialCaseStatus(isConfidentialCase).build())
             .build();
 
         PartyFlags result = PartyFlagsMapping.confidentialCase(caseData);

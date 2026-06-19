@@ -87,7 +87,7 @@
           },
           "isAppointee": "No",
           "appointee": null,
-          "confidentialityRequired": null,
+
           "isAddressSameAsAppointee": null,
           "role": null
         },

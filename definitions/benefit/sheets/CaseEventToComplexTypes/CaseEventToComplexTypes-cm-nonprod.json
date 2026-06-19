@@ -178,7 +178,7 @@
     "CaseEventID": "caseUpdated",
     "CaseFieldID": "appeal",
     "CaseTypeID": "Benefit",
-    "ListElementCode": "appellant.confidentialityRequired",
+    "ListElementCode": "appellant.confidentialityRequirement",
     "ID": "appealAppellantConfidentiality",
     "FieldShowCondition": "appeal.isOtherPartyAddedForChildMaintUCCase=\"Yes\" OR appeal.benefitType.code=\"childSupport\" OR appeal.benefitType.code=\"taxCredit\" OR appeal.benefitType.code=\"guardiansAllowance\" OR appeal.benefitType.code=\"taxFreeChildcare\" OR appeal.benefitType.code=\"homeResponsibilitiesProtection\" OR appeal.benefitType.code=\"childBenefit\" OR appeal.benefitType.code=\"thirtyHoursFreeChildcare\" OR appeal.benefitType.code=\"guaranteedMinimumPension\" OR appeal.benefitType.code=\"nationalInsuranceCredits\"",
     "DisplayContext": "MANDATORY",

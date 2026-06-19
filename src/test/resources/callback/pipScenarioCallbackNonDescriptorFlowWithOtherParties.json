@@ -141,7 +141,7 @@
               "lastLoggedIntoMya": null,
               "wantSmsNotifications": null
             },
-            "confidentialityRequired": "No",
+            "confidentialityRequirement": "No",
             "repReasonableAdjustment": {
               "wantsReasonableAdjustment": null,
               "reasonableAdjustmentRequirements": null
@@ -205,7 +205,7 @@
               "lastLoggedIntoMya": null,
               "wantSmsNotifications": null
             },
-            "confidentialityRequired": "No",
+            "confidentialityRequirement": "No",
             "repReasonableAdjustment": {
               "wantsReasonableAdjustment": null,
               "reasonableAdjustmentRequirements": null
@@ -269,7 +269,7 @@
               "lastLoggedIntoMya": null,
               "wantSmsNotifications": null
             },
-            "confidentialityRequired": "No",
+            "confidentialityRequirement": "No",
             "repReasonableAdjustment": {
               "wantsReasonableAdjustment": null,
               "reasonableAdjustmentRequirements": null
@@ -332,7 +332,7 @@
               "lastLoggedIntoMya": null,
               "wantSmsNotifications": null
             },
-            "confidentialityRequired": "No",
+            "confidentialityRequirement": "No",
             "repReasonableAdjustment": {
               "wantsReasonableAdjustment": null,
               "reasonableAdjustmentRequirements": null

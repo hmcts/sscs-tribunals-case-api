@@ -74,7 +74,7 @@
       },
       "isAppointee": "No",
       "role": {},
-      "confidentialityRequired": null,
+
       "isAddressSameAsAppointee": "No",
       "appointee": {
         "name": {

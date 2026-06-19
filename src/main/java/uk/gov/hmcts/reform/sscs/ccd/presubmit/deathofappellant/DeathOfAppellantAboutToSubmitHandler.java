@@ -109,7 +109,7 @@ public class DeathOfAppellantAboutToSubmitHandler implements PreSubmitCallbackHa
         preSubmitCallbackResponse.getData().setIsAppellantDeceased(YesNo.YES);
 
         if (!shouldKeepConfidentialCaseFlag(caseDataAfter)) {
-            preSubmitCallbackResponse.getData().setIsConfidentialCase(null);
+            preSubmitCallbackResponse.getData().setConfidentialCaseStatus(null);
         }
         clearPostponementTransientFields(sscsCaseData);
         cancelHearing(callback);

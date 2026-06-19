@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.sscs.helper;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUnknown.NO;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getUpdatedDirectionDueDate;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.hasHearingScheduledInTheFuture;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.validateHearingOptionsAndExcludeDates;
@@ -54,7 +54,7 @@ public class SscsHelperTest {
     private CcdValue<OtherParty> buildOtherParty() {
         return CcdValue.<OtherParty>builder().value(OtherParty.builder()
                 .sendNewOtherPartyNotification(YES)
-                .confidentialityRequired(NO)
+                .confidentialityRequirement(NO)
                 .hearingOptions(HearingOptions.builder().wantsToAttend(YES.toString()).build())
                 .build()).build();
     }

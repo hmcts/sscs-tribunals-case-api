@@ -26,7 +26,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUnknown;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Component
@@ -84,12 +84,12 @@ public class ConfidentialityTabAboutToSubmitHandler implements PreSubmitCallback
     }
 
     private static void updateAppellantConfidentialityRequiredChangedDate(final Callback<SscsCaseData> callback) {
-        final YesNo confidentialityRequiredBefore = callback.getCaseDetailsBefore()
-                                                            .map(CaseDetails::getCaseData)
-                                                            .flatMap(SscsCaseData::getAppellantConfidentialityRequired)
-                                                            .orElse(null);
+        final YesNoUnknown confidentialityRequiredBefore = callback.getCaseDetailsBefore()
+                                                                   .map(CaseDetails::getCaseData)
+                                                                   .flatMap(SscsCaseData::getAppellantConfidentialityRequired)
+                                                                   .orElse(null);
         final SscsCaseData currentCaseData = callback.getCaseDetails().getCaseData();
-        final YesNo confidentialityRequired = currentCaseData.getAppellantConfidentialityRequired().orElse(null);
+        final YesNoUnknown confidentialityRequired = currentCaseData.getAppellantConfidentialityRequired().orElse(null);
         if (nonNull(confidentialityRequired) && (confidentialityRequiredBefore == null || !Objects.equals(
             confidentialityRequiredBefore, confidentialityRequired))) {
             currentCaseData.getAppellant().ifPresent(appellant -> appellant.setConfidentialityRequiredChangedDate(

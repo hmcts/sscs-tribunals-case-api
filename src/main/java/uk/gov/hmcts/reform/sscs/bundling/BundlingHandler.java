@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Bundle;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MultiBundleConfig;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUnknown;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 import uk.gov.hmcts.reform.sscs.service.bundle.BundleAudioVideoPdfService;
@@ -219,7 +220,7 @@ public class BundlingHandler {
     }
 
     private boolean isConfidentialCase(SscsCaseData sscsCaseData) {
-        return isYes(sscsCaseData.getIsConfidentialCase());
+        return YesNoUnknown.isYes(sscsCaseData.getConfidentialCaseStatus());
     }
 
     private List<MultiBundleConfig> getUneditedConfigs(SscsCaseData sscsCaseData) {

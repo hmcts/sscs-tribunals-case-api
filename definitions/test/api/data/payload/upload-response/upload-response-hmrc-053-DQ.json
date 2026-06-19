@@ -51,7 +51,7 @@
         "organisation": null
       },
       "role": {},
-      "confidentialityRequired": null,
+
       "isAddressSameAsAppointee": null
     },
     "benefitType": {
@@ -305,7 +305,7 @@
   "otherParties": [
     {
       "value": {
-        "confidentialityRequired": "No",
+        "confidentialityRequirement": "No",
         "unacceptableCustomerBehaviour": "No",
         "isAppointee": null,
         "id": "13e1b3d7-c593-4e6a-b51a-99f35cac69e9",

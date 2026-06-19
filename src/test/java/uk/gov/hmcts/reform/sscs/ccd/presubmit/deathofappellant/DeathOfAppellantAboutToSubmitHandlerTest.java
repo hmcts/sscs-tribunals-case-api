@@ -45,6 +45,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUnknown;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 
@@ -269,20 +270,20 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
 
     @Test
     public void givenADeathOfAppellantWithNoJointPartyOnCase_thenClearConfidentialFlags() {
-        callback.getCaseDetails().getCaseData().setIsConfidentialCase(YesNo.YES);
+        callback.getCaseDetails().getCaseData().setConfidentialCaseStatus(YesNoUnknown.YES);
         callback.getCaseDetails().getCaseData().setConfidentialityRequestOutcomeAppellant(
                 DatedRequestOutcome.builder().date(LocalDate.now()).requestOutcome(RequestOutcome.GRANTED).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertNull(response.getData().getIsConfidentialCase());
+        assertNull(response.getData().getConfidentialCaseStatus());
         assertEquals(YesNo.YES, response.getData().getIsAppellantDeceased());
         assertNull(response.getData().getConfidentialityRequestOutcomeAppellant());
     }
 
     @Test
     public void givenADeathOfAppellantWithJointPartyConfidentialRequestNotGranted_thenClearConfidentialFlagsForAppellant() {
-        callback.getCaseDetails().getCaseData().setIsConfidentialCase(YesNo.YES);
+        callback.getCaseDetails().getCaseData().setConfidentialCaseStatus(YesNoUnknown.YES);
         callback.getCaseDetails().getCaseData().setConfidentialityRequestOutcomeAppellant(
                 DatedRequestOutcome.builder().date(LocalDate.now()).requestOutcome(RequestOutcome.GRANTED).build());
         callback.getCaseDetails().getCaseData().setConfidentialityRequestOutcomeJointParty(
@@ -290,7 +291,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertNull(response.getData().getIsConfidentialCase());
+        assertNull(response.getData().getConfidentialCaseStatus());
         assertEquals(YesNo.YES, response.getData().getIsAppellantDeceased());
         assertNull(response.getData().getConfidentialityRequestOutcomeAppellant());
         assertEquals(RequestOutcome.IN_PROGRESS, response.getData().getConfidentialityRequestOutcomeJointParty().getRequestOutcome());
@@ -298,7 +299,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
 
     @Test
     public void givenADeathOfAppellantWithJointPartyOnCaseAndConfidentialRequestGranted_thenClearConfidentialFlagForAppellantAndDoNotClearConfidentialFlagOnCase() {
-        callback.getCaseDetails().getCaseData().setIsConfidentialCase(YesNo.YES);
+        callback.getCaseDetails().getCaseData().setConfidentialCaseStatus(YesNoUnknown.YES);
         callback.getCaseDetails().getCaseData().setConfidentialityRequestOutcomeAppellant(
                 DatedRequestOutcome.builder().date(LocalDate.now()).requestOutcome(RequestOutcome.GRANTED).build());
         callback.getCaseDetails().getCaseData().setConfidentialityRequestOutcomeJointParty(
@@ -306,7 +307,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(YesNo.YES, response.getData().getIsConfidentialCase());
+        assertEquals(YesNoUnknown.YES, response.getData().getConfidentialCaseStatus());
         assertEquals(YesNo.YES, response.getData().getIsAppellantDeceased());
         assertNull(response.getData().getConfidentialityRequestOutcomeAppellant());
         assertEquals(RequestOutcome.GRANTED, response.getData().getConfidentialityRequestOutcomeJointParty().getRequestOutcome());

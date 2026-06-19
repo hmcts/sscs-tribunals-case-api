@@ -73,7 +73,7 @@
             "dob": "1979-12-09",
             "nino": "{PERSON2_NINO}"
           },
-          "confidentialityRequired": null,
+
           "isAddressSameAsAppointee": null,
           "isAppointee": "Yes",
           "name": {

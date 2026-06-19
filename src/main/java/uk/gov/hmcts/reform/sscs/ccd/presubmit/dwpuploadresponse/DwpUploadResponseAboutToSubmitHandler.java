@@ -47,6 +47,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUnknown;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
@@ -172,18 +173,18 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             if (sscsCaseData.getDwpEditedEvidenceReason() == null) {
                 if (otherPartyHasConfidentiality(sscsCaseData)) {
                     preSubmitCallbackResponse.addError("Other Party requires confidentiality, upload edited and unedited responses");
-                    sscsCaseData.setIsConfidentialCase(YesNo.YES);
+                    sscsCaseData.setConfidentialCaseStatus(YesNoUnknown.YES);
                 }
-                if (sscsCaseData.getAppeal().getAppellant() != null && YesNo.isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired())) {
+                if (sscsCaseData.getAppeal().getAppellant() != null && YesNoUnknown.isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequirement())) {
                     preSubmitCallbackResponse.addError("Appellant requires confidentiality, upload edited and unedited responses");
-                    sscsCaseData.setIsConfidentialCase(YesNo.YES);
+                    sscsCaseData.setConfidentialCaseStatus(YesNoUnknown.YES);
                 }
             } else {
                 if (otherPartyHasConfidentiality(sscsCaseData)) {
-                    sscsCaseData.setIsConfidentialCase(YesNo.YES);
+                    sscsCaseData.setConfidentialCaseStatus(YesNoUnknown.YES);
                 }
-                if (sscsCaseData.getAppeal().getAppellant() != null && YesNo.isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired())) {
-                    sscsCaseData.setIsConfidentialCase(YesNo.YES);
+                if (sscsCaseData.getAppeal().getAppellant() != null && YesNoUnknown.isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequirement())) {
+                    sscsCaseData.setConfidentialCaseStatus(YesNoUnknown.YES);
                 }
             }
         }
@@ -191,7 +192,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
     private boolean otherPartyHasConfidentiality(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getOtherParties() != null) {
-            Optional<CcdValue<OtherParty>> otherParty = sscsCaseData.getOtherParties().stream().filter(op -> YesNo.isYes(op.getValue().getConfidentialityRequired())).findAny();
+            Optional<CcdValue<OtherParty>> otherParty = sscsCaseData.getOtherParties().stream().filter(op -> YesNoUnknown.isYes(op.getValue().getConfidentialityRequirement())).findAny();
             return otherParty.isPresent();
         }
         return false;

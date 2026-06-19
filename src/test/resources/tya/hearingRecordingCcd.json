@@ -278,7 +278,7 @@
     "otherParties": [
       {
         "value": {
-          "confidentialityRequired": "Yes",
+          "confidentialityRequirement": "Yes",
           "unacceptableCustomerBehaviour": "Yes",
           "isAppointee": "Yes",
           "id": "1",
@@ -394,7 +394,7 @@
       },
       {
         "value": {
-          "confidentialityRequired": "No",
+          "confidentialityRequirement": "No",
           "unacceptableCustomerBehaviour": "Yes",
           "isAppointee": null,
           "id": null,
