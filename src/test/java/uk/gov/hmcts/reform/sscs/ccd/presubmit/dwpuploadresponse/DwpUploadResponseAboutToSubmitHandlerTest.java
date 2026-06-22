@@ -1105,7 +1105,7 @@ class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenADwpUploadResponseEventChildSupConfNonChildSupportThenNoErrorAdded() {
+    void givenADwpUploadResponseEventChildSupConfNonChildSupporOrUctThenNoErrorAdded() {
         callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder()
                 .code(Benefit.PENSION_CREDIT.getShortName())
                 .description(Benefit.PENSION_CREDIT.getDescription()).build());
@@ -1134,13 +1134,14 @@ class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals(0, response.getErrors().size());
     }
 
-    @Test
-    void givenADwpUploadResponseEventChildSupConfChildSupportThenNoErrorAdded() {
+    @ParameterizedTest
+    @ValueSource(strings = {"UC", "CHILD_SUPPORT"})
+    void givenADwpUploadResponseEventChildSupConfChildSupportOrUcThenNoErrorAdded(Benefit benefit) {
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName())
-                .description(Benefit.CHILD_SUPPORT.getDescription()).build());
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(benefit.getShortName())
+                .description(benefit.getDescription()).build());
         sscsCaseData.setDwpEditedResponseDocument(getPdfDocument());
         sscsCaseData.setDwpEditedEvidenceBundleDocument(getPdfDocument());
         sscsCaseData.setDwpEditedEvidenceReason("childSupportConfidentiality");

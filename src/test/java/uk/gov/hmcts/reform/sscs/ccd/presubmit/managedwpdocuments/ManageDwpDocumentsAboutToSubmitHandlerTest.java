@@ -193,7 +193,7 @@ public class ManageDwpDocumentsAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenADwpDocumentChildSupConfEditedReasonInNonChildSupportCaseThenErrorAdded() {
+    public void givenADwpDocumentChildSupConfEditedReasonInNonChildSupportOrUcCaseThenErrorAdded() {
         addMandatoryDwpDocuments();
         addEditedDwpDocuments();
 
