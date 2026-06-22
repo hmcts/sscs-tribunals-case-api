@@ -96,6 +96,10 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
                 .setIsOtherPartyAddedForChildMaintUCCase(isOtherPartyPresent(sscsCaseData) ? YES : NO);
         }
 
+        if (isNull(appeal.getAppellant().getConfidentialityRequirement())) {
+            sscsCaseData.getAppeal().getAppellant().setConfidentialityRequirement(new DynamicList(new DynamicListItem(null, null), sscsCaseData.confidentialityOptions()));
+        }
+
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 

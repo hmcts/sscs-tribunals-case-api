@@ -18,6 +18,7 @@ import static uk.gov.hmcts.reform.sscs.util.SscsUtil.generateUniqueIbcaId;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getSscsType;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleBenefitType;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleIbcaCase;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isBenefitTypeChildSupportOrUc;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -35,6 +36,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Issue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUnknown;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
@@ -103,6 +105,18 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
             log.info("Setting isScottishCase field to {} for case {}",
                     caseData.getIsScottishCase(), callback.getCaseDetails().getId());
         }
+
+        if (VALID_APPEAL_CREATED.equals(callback.getEvent())) {
+            if (!isBenefitTypeChildSupportOrUc(caseData)
+                && caseData.getAppeal().getAppellant().getConfidentialityRequiredAnswer() == YesNoUnknown.UNKNOWN) {
+                preSubmitCallbackResponse.addError(
+                    "Confidentiality status Unknown is only applicable to Child Support and Universal Credit appeal types");
+            }
+
+            // Reset the confidentiality options now that we know the benefit type
+            caseData.getAppeal().getAppellant().getConfidentialityRequirement().setListItems(caseData.confidentialityOptions());
+        }
+
         return preSubmitCallbackResponse;
     }
 
