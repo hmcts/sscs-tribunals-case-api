@@ -15,7 +15,7 @@ A Spring Boot application for creating new appeals for SSCS appellants.
 
 ## Background
 
-The SSCS Tribunals Case API is part of the SSCS ecosystem, enabling appellants to submit appeals and interact with the tribunal system. It integrates with CCD and other services to manage appeals.
+The SSCS Tribunals Case API is part of the SSCS ecosystem, enabling appellants to submit appeals and interact with the tribunal system. It integrates with CCD and other services to manage appeals!
 
 ## Prerequisites
 
