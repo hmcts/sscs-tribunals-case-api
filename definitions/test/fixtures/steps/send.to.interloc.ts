@@ -17,7 +17,7 @@ export class SendToInterloc extends BaseStep {
   }
 
   async performSendToInterloc(caseId: string) {
-    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
+    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
     await this.homePage.chooseEvent('Send to interloc');
 
     await this.sendToInterlocPage.verifyPageContent();
@@ -51,7 +51,7 @@ export class SendToInterloc extends BaseStep {
   async performSendToInterlocReferralReasonOver300Pages(caseId: string) {
     await this.loginUserWithCaseId(
       credentials.amTribunalCaseWorker,
-      true,
+      false,
       caseId
     );
     await this.homePage.chooseEvent('Send to interloc');
@@ -85,7 +85,7 @@ export class SendToInterloc extends BaseStep {
   }
 
   async performSendToInterlocReferralReasonComplexCase(caseId: string) {
-    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
+    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
     await this.homePage.chooseEvent('Send to interloc');
 
     await this.sendToInterlocPage.verifyPageContent();
@@ -117,7 +117,7 @@ export class SendToInterloc extends BaseStep {
   }
 
   async performSendToInterlocJudge(caseId: string) {
-    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
+    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
     await this.homePage.chooseEvent('Send to interloc');
 
     await this.sendToInterlocPage.verifyPageContent();
@@ -149,7 +149,7 @@ export class SendToInterloc extends BaseStep {
   }
 
   async verifyConfidentialityReferralReasons(caseId: string, user) {
-    await this.loginUserWithCaseId(user, true, caseId);
+    await this.loginUserWithCaseId(user, false, caseId);
     await this.homePage.chooseEvent('Send to interloc');
 
     await this.sendToInterlocPage.verifyPageContent();
@@ -172,7 +172,7 @@ export class SendToInterloc extends BaseStep {
   }
 
   async submitConfidentialityReferralAndVerifySummary(caseId: string, user) {
-    await this.loginUserWithCaseId(user, true, caseId);
+    await this.loginUserWithCaseId(user, false, caseId);
     await this.homePage.chooseEvent('Send to interloc');
 
     await this.sendToInterlocPage.verifyPageContent();
@@ -221,7 +221,7 @@ export class SendToInterloc extends BaseStep {
     caseId: string,
     user
   ) {
-    await this.loginUserWithCaseId(user, true, caseId);
+    await this.loginUserWithCaseId(user, false, caseId);
     await this.homePage.chooseEvent('Send to interloc');
 
     await this.sendToInterlocPage.verifyPageContent();
@@ -260,7 +260,7 @@ export class SendToInterloc extends BaseStep {
   }
 
   async verifyPreValidConfidentialityReferralReasons(caseId: string, user) {
-    await this.loginUserWithCaseId(user, true, caseId);
+    await this.loginUserWithCaseId(user, false, caseId);
     await this.homePage.chooseEvent('Send to interloc - pre-valid');
 
     await this.sendToInterlocPrevalidPage.verifyPageContentForTheInterlocReferralPage();

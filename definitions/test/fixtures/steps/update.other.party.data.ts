@@ -390,7 +390,7 @@ export class UpdateOtherPartyData extends BaseStep {
 
     await this.homePage.signOut();
 
-    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
+    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
     await this.reloginIfRedirectedToSignIn(credentials.amCaseWorker, caseId);
     await this.summaryTab.waitForSummaryState(
       'Await Confidentiality Requirements'

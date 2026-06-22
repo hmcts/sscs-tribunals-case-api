@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
@@ -23,7 +22,6 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +33,8 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.*;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationFactory;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
+import uk.gov.hmcts.reform.sscs.util.predicates.AdditionalOtherPartyAddedPredicate;
+import uk.gov.hmcts.reform.sscs.util.predicates.FirstOtherPartyAddedPredicate;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
 @Service
@@ -44,7 +44,6 @@ public class NotificationService {
     private static final String READY_TO_LIST = "readyToList";
     private static final EnumSet<NotificationEventType> SEND_TO_VALID_APPEAL = EnumSet.of(ADMIN_SEND_TO_VALID_APPEAL,
         INTERLOC_VALID_APPEAL, VALID_APPEAL);
-    private static final int MINIMUM_NUMBER_OTHER_PARTIES = 2;
 
     private final NotificationFactory notificationFactory;
     private final ReminderService reminderService;
@@ -55,6 +54,8 @@ public class NotificationService {
     private final SendNotificationService sendNotificationService;
     private final boolean covid19Feature;
     private final boolean cmOtherPartyConfidentialityEnabled;
+    private final AdditionalOtherPartyAddedPredicate additionalOtherPartyAddedPredicate;
+    private final FirstOtherPartyAddedPredicate firstOtherPartyAddedPredicate;
 
     @SuppressWarnings("squid:S107")
     @Autowired
@@ -78,6 +79,8 @@ public class NotificationService {
         this.sendNotificationService = sendNotificationService;
         this.covid19Feature = covid19Feature;
         this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
+        this.additionalOtherPartyAddedPredicate = new AdditionalOtherPartyAddedPredicate();
+        this.firstOtherPartyAddedPredicate = new FirstOtherPartyAddedPredicate();
     }
 
     public void manageNotificationAndSubscription(NotificationWrapper notificationWrapper, boolean fromReminderService) {
@@ -146,23 +149,14 @@ public class NotificationService {
     }
 
     private boolean shouldNotifyAppellantAboutAdditionalOtherParty(final NotificationWrapper notificationWrapper) {
-        if (!cmOtherPartyConfidentialityEnabled
-            || !isBenefitTypeChildSupportOrUc(notificationWrapper.getNewSscsCaseData())
-            || !notificationWrapper.getNotificationType().equals(UPDATE_OTHER_PARTY_DATA)
-            || emptyIfNull(notificationWrapper.getNewSscsCaseData().getOtherParties()).size() < MINIMUM_NUMBER_OTHER_PARTIES) {
+        if (!cmOtherPartyConfidentialityEnabled || !notificationWrapper.getNotificationType().equals(UPDATE_OTHER_PARTY_DATA)) {
             return false;
         }
-        final Set<String> newParties = getUniqueOtherPartyIds(notificationWrapper.getNewSscsCaseData().getOtherParties());
-        final Set<String> previousParties = getUniqueOtherPartyIds(
-            Optional.ofNullable(notificationWrapper.getOldSscsCaseData()).map(SscsCaseData::getOtherParties).orElse(emptyList()));
-        return !newParties.equals(previousParties);
-    }
-
-    private Set<String> getUniqueOtherPartyIds(final List<CcdValue<OtherParty>> otherParties) {
-        return emptyIfNull(otherParties).stream()
-            .map(CcdValue::getValue)
-            .map(Entity::getId)
-            .collect(Collectors.toSet());
+        return (notificationWrapper.getNewSscsCaseData().isBenefitType(UC) && firstOtherPartyAddedPredicate.test(
+            notificationWrapper.getNewSscsCaseData(), notificationWrapper.getOldSscsCaseData()))
+            || (isBenefitTypeChildSupportOrUc(notificationWrapper.getNewSscsCaseData())
+            && additionalOtherPartyAddedPredicate.test(notificationWrapper.getNewSscsCaseData(),
+            notificationWrapper.getOldSscsCaseData()));
     }
 
     private void sendNotificationPerSubscription(NotificationWrapper notificationWrapper) {
