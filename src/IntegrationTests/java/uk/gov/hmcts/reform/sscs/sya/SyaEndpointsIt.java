@@ -158,7 +158,7 @@ public class SyaEndpointsIt extends AbstractEventIt {
                 .willReturn(new UserInfo("16","userId", "dummy@email.com", "test", "test",
                 Arrays.asList("caseworker", "citizen")));
 
-        given(refDataApi.courtVenueByEpimsId("token", "authToken", "239985"))
+        given(refDataApi.courtVenueByEpimsId("token", "authToken", "BBA3", "239985"))
             .willReturn(List.of(CourtVenue.builder()
                 .regionId("2")
                 .courtTypeId("31")
