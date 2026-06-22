@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -50,6 +51,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
@@ -335,6 +337,36 @@ class BulkPrintServiceTest {
 
         assertThat(letterIdOptional).isEqualTo(Optional.of(LETTER_ID));
         assertThat(captor.getValue().getAdditionalData()).containsEntry("isIbca", isIbca);
+    }
+
+    @Test
+    void buildBundledLetterFromPdfs_returnsCorrectNumberOfPages() throws IOException {
+        final byte[] firstDocument = createPdf(2);
+        final byte[] secondDocument = createPdf(2);
+        final byte[] thirdDocument = createPdf(1);
+        final byte[] result = bulkPrintService.buildBundledLetterFromPdfs(List.of(new Pdf(firstDocument, "file.pdf"),
+                new Pdf(secondDocument, "file2.pdf"), new Pdf(thirdDocument, "file3.pdf")));
+        assertThat(result).isNotNull();
+        try (PDDocument merged = Loader.loadPDF(result)) {
+            assertThat(merged.getNumberOfPages()).isEqualTo(5);
+        }
+    }
+
+    @Test
+    void sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification_returnsIdAndStoresNotificationLetter() throws IOException {
+        when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), captor.capture())).thenReturn(new SendLetterResponse(LETTER_ID));
+        Optional<UUID> id = bulkPrintService.sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(234, SSCS_CASE_DATA, PDF_LIST, EventType.ISSUE_GENERIC_LETTER, "appellant");
+        assertThat(id).isEqualTo(Optional.of(LETTER_ID));
+        verify(ccdNotificationService, times(1)).storeNotificationLetterIntoCcd(any(), any(), any(), any());
+    }
+
+    @Test
+    void sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification_whenSendLetterDisabled_returnsEmpty() {
+        BulkPrintService notEnabledBulkPrint = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper, false, 1,
+                ccdNotificationService);
+        Optional<UUID> id = notEnabledBulkPrint.sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(234, SSCS_CASE_DATA, PDF_LIST, EventType.ISSUE_GENERIC_LETTER, "appellant");
+        assertThat(id).isEqualTo(Optional.empty());
+        verifyNoInteractions(ccdNotificationService);
     }
 
     @ParameterizedTest
