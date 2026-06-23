@@ -48,7 +48,6 @@ public class DirectionIssuedMidEventHandler extends IssueDocumentHandler impleme
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
 
-        // SSCSCI-2659: stop the caseworker picking the same other party more than once on the recipient list.
         if (otherPartySelectionContainsDuplicates(caseData.getOtherPartySelection())) {
             errorResponse.addError("Other parties cannot be selected more than once");
             return errorResponse;

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.factory;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType.ORAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType.PAPER;
@@ -176,8 +177,6 @@ public class CcdNotificationWrapper implements NotificationWrapper {
         return otherPartySubscription;
     }
 
-    // SSCSCI-2659: on a direction notice, only notify the other parties the caseworker actually picked.
-    // No selection, or any other event, means no filtering. Same idea as reissue's isResendTo.
     private boolean isOtherPartySelectedForDirectionNotice(SscsCaseData caseData, NotificationEventType eventType, String... partyIds) {
         if (!(DIRECTION_ISSUED.equals(eventType) || DIRECTION_ISSUED_WELSH.equals(eventType))) {
             return true;
@@ -190,15 +189,15 @@ public class CcdNotificationWrapper implements NotificationWrapper {
             .filter(Objects::nonNull)
             .map(DynamicListItem::getCode)
             .filter(Objects::nonNull)
-            .collect(Collectors.toList());
-        // No specific other party chosen (picker not shown, or seeded row with nothing selected) -> don't filter.
+            .toList();
         if (selectedCodes.isEmpty()) {
             return true;
         }
-        // Match on any of the party's ids: the picker and the appointee/other-party branch logic can disagree
-        // on which id to use when appointee data is malformed, so accepting either avoids dropping a valid pick.
+        if (partyIds == null) {
+            return false;
+        }
         for (String partyId : partyIds) {
-            if (Objects.nonNull(partyId)
+            if (nonNull(partyId)
                 && (selectedCodes.contains(PartyItemList.OTHER_PARTY.getCode() + partyId)
                     || selectedCodes.contains(PartyItemList.OTHER_PARTY_REPRESENTATIVE.getCode() + partyId))) {
                 return true;
