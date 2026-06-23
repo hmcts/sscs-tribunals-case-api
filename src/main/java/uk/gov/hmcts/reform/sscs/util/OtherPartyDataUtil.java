@@ -107,17 +107,23 @@ public class OtherPartyDataUtil {
         return isConfidential(sscsCaseData, false);
     }
 
-    public static YesNoUndetermined isConfidential(final SscsCaseData sscsCaseData, final boolean cmOtherPartyConfidentialityEnabled) {
-        var appeal = sscsCaseData.getAppeal();
-        if (isValidBenefitTypeForConfidentiality(appeal.getBenefitType(), cmOtherPartyConfidentialityEnabled)) {
-            if ((appeal.getAppellant() != null
-                && appeal.getAppellant().getConfidentialityRequirement() != null
-                && YesNoUndetermined.isYes(appeal.getAppellant().getConfidentialityRequirement()))
-                || otherPartyHasConfidentiality(sscsCaseData)) {
-                return YesNoUndetermined.YES;
-            }
+    public static YesNoUndetermined isConfidential(final SscsCaseData sscsCaseData,
+        final boolean cmOtherPartyConfidentialityEnabled) {
+        if (sscsCaseData == null || sscsCaseData.getAppeal() == null) {
+            return null;
         }
-        return null;
+        if (!isValidBenefitTypeForConfidentiality(sscsCaseData.getAppeal().getBenefitType(),
+            cmOtherPartyConfidentialityEnabled)) {
+            return null;
+        }
+        final YesNoUndetermined appellantConfidentiality = sscsCaseData.getAppellantConfidentiality().orElse(null);
+        if (appellantConfidentiality == YesNoUndetermined.YES || otherPartyHasConfidentiality(sscsCaseData)) {
+            return YesNoUndetermined.YES;
+        }
+        if (appellantConfidentiality == YesNoUndetermined.NO && allOtherPartiesDoNotWantConfidentiality(sscsCaseData)) {
+            return YesNoUndetermined.NO;
+        }
+        return YesNoUndetermined.UNDETERMINED;
     }
 
     public static boolean isValidBenefitTypeForConfidentiality(final BenefitType benefitType) {
@@ -141,6 +147,14 @@ public class OtherPartyDataUtil {
 
     public static boolean isOtherPartyPresent(SscsCaseData sscsCaseData) {
         return sscsCaseData.getOtherParties() != null && !sscsCaseData.getOtherParties().isEmpty();
+    }
+
+    private static boolean allOtherPartiesDoNotWantConfidentiality(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getOtherParties() != null) {
+            return sscsCaseData.getOtherParties().stream()
+                               .allMatch(op -> YesNoUndetermined.isNo(op.getValue().getConfidentialityRequirement()));
+        }
+        return true;
     }
 
     private static boolean otherPartyHasConfidentiality(SscsCaseData sscsCaseData) {

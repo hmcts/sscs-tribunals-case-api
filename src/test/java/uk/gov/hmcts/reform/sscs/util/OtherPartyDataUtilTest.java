@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -294,78 +295,43 @@ public class OtherPartyDataUtilTest {
         assertThat(current.getFirst().getValue().getConfidentialityRequiredChangedDate()).isAfter(originalDate);
     }
 
-    @ParameterizedTest
-    @MethodSource("benefitsWithSsCsType2And5")
-    void givenACaseAppellantConfidentialityIsRequired_thenCaseConfidentialYes(Benefit benefit) {
-        var caseData = buildSscsCaseData(benefit, YesNoUndetermined.YES);
-
-        assertThat(isConfidential(caseData,false)).isEqualTo(YesNoUndetermined.YES);
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("isConfidentialScenarios")
+    void isConfidential_returnsExpectedResult(final String scenario, final SscsCaseData caseData,
+        final boolean cmOtherPartyConfidentialityEnabled, final YesNoUndetermined expected) {
+        assertThat(isConfidential(caseData, cmOtherPartyConfidentialityEnabled)).isEqualTo(expected);
     }
 
-    @ParameterizedTest
-    @MethodSource("benefitsWithSsCsType2And5")
-    void givenACaseWithOtherPartyButConfidentialityIsNotRequired_thenCaseConfidentialNull(Benefit benefit) {
-        var caseData = buildSscsCaseData(benefit);
-        caseData.setOtherParties(List.of(buildOtherParty("otherparty-1", true, null)));
-
-        assertThat(isConfidential(caseData,false)).isNull();
+    static Stream<Arguments> isConfidentialScenarios() {
+        return Stream.of(
+            Arguments.of("null case data returns null", null, false, null),
+            Arguments.of("null appeal returns null", SscsCaseData.builder().build(), false, null),
+            Arguments.of("null benefit type returns null", buildSscsCaseData(null), false, null),
+            Arguments.of("universal credit without confidentiality flag returns null", buildSscsCaseData(Benefit.UC), false, null),
+            Arguments.of("appellant confidentiality yes returns yes",
+                buildSscsCaseData(Benefit.CHILD_SUPPORT, YesNoUndetermined.YES), false, YesNoUndetermined.YES),
+            Arguments.of("other party confidentiality yes with appellant not yes returns yes",
+                withOtherParties(buildSscsCaseData(Benefit.CHILD_SUPPORT),
+                    buildOtherParty("otherparty-1", true, YesNoUndetermined.YES)), false, YesNoUndetermined.YES),
+            Arguments.of("appellant no and no other parties returns no",
+                buildSscsCaseData(Benefit.CHILD_SUPPORT, YesNoUndetermined.NO), false, YesNoUndetermined.NO),
+            Arguments.of("appellant no but other party undetermined returns undetermined",
+                withOtherParties(buildSscsCaseData(Benefit.CHILD_SUPPORT, YesNoUndetermined.NO),
+                    buildOtherParty("otherparty-1", true, YesNoUndetermined.UNDETERMINED)), false, YesNoUndetermined.UNDETERMINED),
+            Arguments.of("appellant undetermined and no other party confidentiality returns undetermined",
+                buildSscsCaseData(Benefit.CHILD_SUPPORT), false, YesNoUndetermined.UNDETERMINED),
+            Arguments.of("universal credit with confidentiality flag enabled and appellant yes returns yes",
+                buildSscsCaseData(Benefit.UC, YesNoUndetermined.YES), true, YesNoUndetermined.YES),
+            Arguments.of("universal credit with confidentiality flag enabled and appellant no returns no",
+                buildSscsCaseData(Benefit.UC, YesNoUndetermined.NO), true, YesNoUndetermined.NO),
+            Arguments.of("universal credit with confidentiality flag enabled and no confidentiality returns undetermined",
+                buildSscsCaseData(Benefit.UC), true, YesNoUndetermined.UNDETERMINED)
+        );
     }
 
-    @ParameterizedTest
-    @MethodSource("benefitsWithSsCsType2And5")
-    void givenACaseWithOtherPartyConfidentialityYesAndCmFlagEnabled_thenCaseConfidentialYes(Benefit benefit) {
-        var caseData = buildSscsCaseData(benefit);
-        caseData.setOtherParties(List.of(buildOtherParty("otherparty-1", true, YesNoUndetermined.YES)));
-
-        assertThat(isConfidential(caseData,false)).isEqualTo(YesNoUndetermined.YES);
-    }
-
-    @ParameterizedTest
-    @ValueSource (booleans = {true, false})
-    void givenACaseWithoutBenefitType_thenCaseConfidentialNull(boolean cmOtherPartyConfidentialityEnabled) {
-        var caseData = buildSscsCaseData(null);
-        caseData.setOtherParties(List.of(buildOtherParty("otherparty-1", true, YesNoUndetermined.YES)));
-
-        assertThat(isConfidential(caseData,cmOtherPartyConfidentialityEnabled)).isNull();
-    }
-
-    @Test
-    void givenUniversalCreditCaseOtherPartyConfidentialityYesAndCmFlagEnabled_thenCaseConfidentialYes() {
-        var caseData = buildSscsCaseData(Benefit.UC);
-        caseData.setOtherParties(List.of(buildOtherParty("otherparty-1", true, YesNoUndetermined.YES)));
-
-        assertThat(isConfidential(caseData,true)).isEqualTo(YesNoUndetermined.YES);
-    }
-
-    @Test
-    void givenUniversalCreditCaseWithoutOtherPartiesAndCmFlagEnabled_thenCaseConfidentialIsNull() {
-        var caseData = buildSscsCaseData(Benefit.UC);
-
-        assertThat(isConfidential(caseData,true)).isNull();
-    }
-
-    @Test
-    void givenUniversalCreditCaseWithOtherPartiesButConfidentialityIsNotRequiredAndCmFlagEnabled_thenCaseConfidentialIsNull() {
-        var caseData = buildSscsCaseData(Benefit.UC);
-        caseData.setOtherParties(List.of(buildOtherParty("otherparty-1", true, YesNoUndetermined.NO)));
-
-        assertThat(isConfidential(caseData,true)).isNull();
-    }
-
-    @Test
-    void givenUniversalCreditCaseWithOtherPartiesConfidentialityRequiredButCmFlagDisabled_thenCaseConfidentialIsNull() {
-        var caseData = buildSscsCaseData(Benefit.UC);
-        caseData.setOtherParties(List.of(buildOtherParty("otherparty-1", true, YesNoUndetermined.YES)));
-
-        assertThat(isConfidential(caseData,false)).isNull();
-    }
-
-    @Test
-    void givenUniversalCreditCaseWithOtherPartiesButConfidentialityIsNotRequiredAndCmFlagDisabled_thenCaseConfidentialIsNul() {
-        var caseData = buildSscsCaseData(Benefit.UC);
-        caseData.setOtherParties(List.of(buildOtherParty("otherparty-1", true, YesNoUndetermined.NO), buildOtherParty("otherparty-2", true, null)));
-
-        assertThat(isConfidential(caseData,false)).isNull();
+    private static SscsCaseData withOtherParties(final SscsCaseData caseData, final CcdValue<OtherParty> otherParty) {
+        caseData.setOtherParties(List.of(otherParty));
+        return caseData;
     }
 
     @ParameterizedTest
@@ -437,11 +403,11 @@ public class OtherPartyDataUtilTest {
                 .build()).build();
     }
 
-    private SscsCaseData buildSscsCaseData(Benefit benefit) {
+    private static SscsCaseData buildSscsCaseData(Benefit benefit) {
         return buildSscsCaseData(benefit, null);
     }
 
-    private SscsCaseData buildSscsCaseData(Benefit benefit, YesNoUndetermined confidentialityRequired) {
+    private static SscsCaseData buildSscsCaseData(Benefit benefit, YesNoUndetermined confidentialityRequired) {
         var benefitType = benefit != null
             ? buildBenefitType(benefit)
             : null;
