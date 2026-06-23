@@ -1446,7 +1446,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
             var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-            assertThat(response.getData().getConfidentialCaseStatus()).isNull();
+            assertThat(response.getData().getConfidentialCaseStatus()).isEqualTo(YesNoUndetermined.NO);
         }
 
         @Test

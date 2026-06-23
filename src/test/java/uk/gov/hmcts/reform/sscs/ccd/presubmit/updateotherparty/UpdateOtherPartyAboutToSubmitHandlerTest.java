@@ -291,14 +291,14 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenNoOtherPartyWantsConfidentiality_thenCaseIsNotConfidential() {
+    void givenNoOtherPartyWantsConfidentiality_thenCaseIsUndetermined() {
         final SscsCaseData caseData = SscsCaseData.builder()
                 .appeal(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build()).build())
                 .otherParties(Arrays.asList(buildConfidentialOtherParty(ID_2, YesNoUndetermined.NO), buildConfidentialOtherParty(ID_1, YesNoUndetermined.NO))).build();
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertThat(response.getData().getConfidentialCaseStatus()).isNull();
+        assertThat(response.getData().getConfidentialCaseStatus()).isEqualTo(YesNoUndetermined.UNDETERMINED);
         assertThat(response.getErrors()).isEmpty();
     }
 
@@ -617,7 +617,7 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenUcCaseWithAllNonConfidentialPartiesAndCmFlagOn_thenIsConfidentialCaseNotSet() {
+    void givenUcCaseWithAllNonConfidentialPartiesAndCmFlagOn_thenIsConfidentialCaseUndetermined() {
         final UpdateOtherPartyAboutToSubmitHandler handlerWithFlag = new UpdateOtherPartyAboutToSubmitHandler(idamService, true);
         final SscsCaseData caseData = SscsCaseData.builder()
                                                   .appeal(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build())
@@ -628,7 +628,7 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response =
             handlerWithFlag.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getConfidentialCaseStatus()).isNull();
+        assertThat(response.getData().getConfidentialCaseStatus()).isEqualTo(YesNoUndetermined.UNDETERMINED);
     }
 
     @ParameterizedTest

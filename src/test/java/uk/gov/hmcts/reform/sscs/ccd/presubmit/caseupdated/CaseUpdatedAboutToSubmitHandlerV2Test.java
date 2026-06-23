@@ -1392,13 +1392,13 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         "taxFreeChildcare,Tax-Free Childcare", "homeResponsibilitiesProtection,Home Responsibilities Protection",
         "childBenefit,Child Benefit","thirtyHoursFreeChildcare,30 Hours Free Childcare",
         "guaranteedMinimumPension,Guaranteed Minimum Pension (COEG)","nationalInsuranceCredits,National Insurance Credits"})
-    void givenACaseAppellantConfidentialityNo_thenCaseConfidentialNull(String shortName, String benefitDescription) {
+    void givenACaseAppellantConfidentialityNo_thenCaseConfidentialNo(String shortName, String benefitDescription) {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(YesNoUndetermined.NO);
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefitDescription);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertNull(response.getData().getConfidentialCaseStatus());
+        assertEquals(YesNoUndetermined.NO, response.getData().getConfidentialCaseStatus());
     }
 
     @ParameterizedTest
@@ -1450,7 +1450,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertNull(response.getData().getConfidentialCaseStatus());
+        assertEquals(YesNoUndetermined.UNDETERMINED, response.getData().getConfidentialCaseStatus());
     }
 
     @ParameterizedTest
