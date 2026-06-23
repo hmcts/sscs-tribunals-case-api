@@ -14,6 +14,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.isScottishCase;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isConfidential;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.generateUniqueIbcaId;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getSscsType;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleBenefitType;
@@ -49,6 +50,8 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
 
     @Value("${feature.work-allocation.enabled}")
     private final boolean workAllocationFeature;
+    @Value("${feature.cm-other-party-confidentiality.enabled}")
+    private final boolean cmOtherPartyConfidentialityEnabled;
 
     private static final List<EventType> NON_PAPER_EVENTS = of(VALID_APPEAL_CREATED, DRAFT_TO_VALID_APPEAL_CREATED,
             NON_COMPLIANT, DRAFT_TO_NON_COMPLIANT, INCOMPLETE_APPLICATION_RECEIVED, DRAFT_TO_INCOMPLETE_APPLICATION);
@@ -103,6 +106,8 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
             log.info("Setting isScottishCase field to {} for case {}",
                     caseData.getIsScottishCase(), callback.getCaseDetails().getId());
         }
+
+        caseData.setConfidentialCaseStatus(isConfidential(caseData, cmOtherPartyConfidentialityEnabled));
 
         return preSubmitCallbackResponse;
     }
