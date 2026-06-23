@@ -2274,7 +2274,7 @@
     "CaseEventID": "directionIssued",
     "CaseFieldID": "sendDirectionNoticeToOtherParty",
     "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
+    "DisplayContext": "OPTIONAL",
     "FieldShowCondition": "hasOtherParties = \"Yes\"",
     "LiveFrom": "23/06/2026",
     "PageDisplayOrder": 1,

@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
@@ -161,6 +162,36 @@ public class DirectionIssuedMidEventHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertFalse(response.getErrors().contains("Other parties cannot be selected more than once"));
+    }
+
+    @Test
+    public void givenOtherPartiesButSendDirectionNoticeToOtherPartyNotAnswered_thenReturnsError() {
+        sscsCaseData.setHasOtherParties(YES);
+        sscsCaseData.setSendDirectionNoticeToOtherParty(null);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getErrors().contains("Select whether to send the direction notice to the other party"));
+    }
+
+    @Test
+    public void givenSendDirectionNoticeToOtherPartyAnswered_thenNoError() {
+        sscsCaseData.setHasOtherParties(YES);
+        sscsCaseData.setSendDirectionNoticeToOtherParty(NO);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertFalse(response.getErrors().contains("Select whether to send the direction notice to the other party"));
+    }
+
+    @Test
+    public void givenNoOtherParties_thenSendDirectionNoticeToOtherPartyNotRequired() {
+        sscsCaseData.setHasOtherParties(NO);
+        sscsCaseData.setSendDirectionNoticeToOtherParty(null);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertFalse(response.getErrors().contains("Select whether to send the direction notice to the other party"));
     }
 
     @Test

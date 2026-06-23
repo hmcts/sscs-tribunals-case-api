@@ -48,6 +48,11 @@ public class DirectionIssuedMidEventHandler extends IssueDocumentHandler impleme
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
 
+        if (isYes(caseData.getHasOtherParties()) && caseData.getSendDirectionNoticeToOtherParty() == null) {
+            errorResponse.addError("Select whether to send the direction notice to the other party");
+            return errorResponse;
+        }
+
         if (otherPartySelectionContainsDuplicates(caseData.getOtherPartySelection())) {
             errorResponse.addError("Other parties cannot be selected more than once");
             return errorResponse;
