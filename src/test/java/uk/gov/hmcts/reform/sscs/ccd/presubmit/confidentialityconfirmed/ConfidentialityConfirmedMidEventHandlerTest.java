@@ -1,12 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.confidentialityconfirmed;
 
-import static java.util.Objects.nonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CONFIDENTIALITY_CONFIRMED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUnknown.YES;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,11 +24,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUnknown;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
 
 @ExtendWith(MockitoExtension.class)
 class ConfidentialityConfirmedMidEventHandlerTest {
@@ -90,7 +87,7 @@ class ConfidentialityConfirmedMidEventHandlerTest {
     @EnumSource(value = Benefit.class, names = {"CHILD_SUPPORT", "UC"})
     void givenConfidentialityConfirmedEventWithSingleOtherPartyAndConfidentialitySet_thenRunSuccessfully(Benefit benefit) {
         var sscsCaseData = caseDataWithBenefit(benefit.getShortName());
-        sscsCaseData.setOtherParties(Collections.singletonList(buildOtherParty("1", YES)));
+        sscsCaseData.setOtherParties(Collections.singletonList(buildOtherParty("1", YesNoUndetermined.YES)));
 
         when(callback.getEvent()).thenReturn(CONFIDENTIALITY_CONFIRMED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -105,7 +102,7 @@ class ConfidentialityConfirmedMidEventHandlerTest {
     @EnumSource(value = Benefit.class, names = {"CHILD_SUPPORT", "UC"})
     void givenConfidentialityConfirmedEventWithNoOtherPartyAndConfidentialitySet_thenRunSuccessfully(Benefit benefit) {
         var sscsCaseData = caseDataWithBenefit(benefit.getShortName());
-        sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequirement(new DynamicList(YES.toString())).build());
+        sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequirement(YesNoUndetermined.YES).build());
 
         when(callback.getEvent()).thenReturn(CONFIDENTIALITY_CONFIRMED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -137,7 +134,7 @@ class ConfidentialityConfirmedMidEventHandlerTest {
     void givenConfidentialityConfirmedEventWithConfidentialityMissing_thenReturnError(Benefit benefit) {
         var sscsCaseData = caseDataWithBenefit(benefit.getShortName());
 
-        CcdValue<OtherParty> otherPartyWithConfidentiality = buildOtherParty("1", YesNoUnknown.NO);
+        CcdValue<OtherParty> otherPartyWithConfidentiality = buildOtherParty("1", YesNoUndetermined.NO);
         CcdValue<OtherParty> otherPartyWithoutConfidentiality = buildOtherParty("2", null);
         sscsCaseData.setOtherParties(List.of(otherPartyWithConfidentiality, otherPartyWithoutConfidentiality));
 
@@ -178,13 +175,13 @@ class ConfidentialityConfirmedMidEventHandlerTest {
         assertThat(new ConfidentialityConfirmedMidEventHandler(false).canHandle(MID_EVENT, callback)).isFalse();
     }
 
-    private CcdValue<OtherParty> buildOtherParty(String id, YesNoUnknown confidentiality) {
+    private CcdValue<OtherParty> buildOtherParty(String id, YesNoUndetermined confidentiality) {
         return CcdValue
             .<OtherParty>builder()
             .value(OtherParty
                 .builder()
                 .id(id)
-                .confidentialityRequirement(nonNull(confidentiality) ? new DynamicList(confidentiality.name()) : null)
+                .confidentialityRequirement(confidentiality)
                 .build())
             .build();
     }

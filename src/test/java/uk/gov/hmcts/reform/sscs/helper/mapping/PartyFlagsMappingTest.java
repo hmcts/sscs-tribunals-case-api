@@ -28,7 +28,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ExtendedSscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUnknown;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.CaseFlags;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.PartyFlags;
 
@@ -45,7 +45,7 @@ class PartyFlagsMappingTest extends HearingsMappingBase {
             .adjournment(Adjournment.builder()
                 .interpreterLanguage(new DynamicList("adjournCaseInterpreterLanguage"))
                 .build())
-            .extendedSscsCaseData(ExtendedSscsCaseData.builder().confidentialCaseStatus(YesNoUnknown.YES).build())
+            .extendedSscsCaseData(ExtendedSscsCaseData.builder().confidentialCaseStatus(YesNoUndetermined.YES).build())
             .appeal(Appeal.builder().hearingOptions(
                 HearingOptions.builder()
                     .signLanguageType("signLanguageType")
@@ -245,7 +245,7 @@ class PartyFlagsMappingTest extends HearingsMappingBase {
     @Test
     void confidentialCase() {
         SscsCaseData caseData = SscsCaseData.builder()
-            .extendedSscsCaseData(ExtendedSscsCaseData.builder().confidentialCaseStatus(YesNoUnknown.YES).build())
+            .extendedSscsCaseData(ExtendedSscsCaseData.builder().confidentialCaseStatus(YesNoUndetermined.YES).build())
             .build();
 
         PartyFlags result = PartyFlagsMapping.confidentialCase(caseData);
@@ -259,9 +259,9 @@ class PartyFlagsMappingTest extends HearingsMappingBase {
 
     @DisplayName("confidentialCase returns null Parameterised Tests")
     @ParameterizedTest
-    @EnumSource(value = YesNoUnknown.class, names = {"NO"})
+    @EnumSource(value = YesNoUndetermined.class, names = {"NO"})
     @NullSource
-    void confidentialCase(YesNoUnknown isConfidentialCase) {
+    void confidentialCase(YesNoUndetermined isConfidentialCase) {
         SscsCaseData caseData = SscsCaseData.builder()
             .extendedSscsCaseData(ExtendedSscsCaseData.builder().confidentialCaseStatus(isConfidentialCase).build())
             .build();

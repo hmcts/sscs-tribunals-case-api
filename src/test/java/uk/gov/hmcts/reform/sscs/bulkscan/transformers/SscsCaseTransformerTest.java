@@ -12,7 +12,83 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
-import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.*;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.AGREE_LESS_HEARING_NOTICE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPEAL_LATE_REASON;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPEAL_REASON;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_ADDRESS_COUNTRY;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_ADDRESS_LINE1;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_ADDRESS_LINE2;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_ADDRESS_LINE3;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_ADDRESS_LINE4;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_DATE_OF_BIRTH;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_EMAIL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_FIRST_NAME;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_IBCA_REFERENCE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_IBC_ROLE_FOR_DECEASED;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_IBC_ROLE_FOR_LACKING_CAPACITY;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_IBC_ROLE_FOR_POA;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_IBC_ROLE_FOR_SELF;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_IBC_ROLE_FOR_U18;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_LAST_NAME;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_MOBILE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_NINO;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_PHONE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_PORT_OF_ENTRY;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_POSTCODE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPELLANT_TITLE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPOINTEE_ADDRESS_LINE1;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPOINTEE_ADDRESS_LINE2;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPOINTEE_ADDRESS_LINE3;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPOINTEE_ADDRESS_LINE4;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPOINTEE_DATE_OF_BIRTH;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPOINTEE_FIRST_NAME;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPOINTEE_LAST_NAME;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPOINTEE_MOBILE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPOINTEE_PHONE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPOINTEE_POSTCODE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.APPOINTEE_TITLE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.BENEFIT_CODE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.BENEFIT_TYPE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.BENEFIT_TYPE_DESCRIPTION;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.CASE_CODE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.CHILD_MAINTENANCE_NUMBER;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.DWP_REGIONAL_CENTRE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.HEARING_LOOP;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.HEARING_OPTIONS_DIALECT_TYPE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.HEARING_OPTIONS_EXCLUDE_DATES;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.HEARING_OPTIONS_LANGUAGE_TYPE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.HEARING_TELEPHONE_NUMBER;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.HEARING_VIDEO_EMAIL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.ISSUE_CODE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.IS_HEARING_TYPE_ORAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.IS_HEARING_TYPE_PAPER;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.MRN_DATE_VALUE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.OFFICE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.OTHER_PARTY_ADDRESS_LINE1;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.OTHER_PARTY_ADDRESS_LINE2;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.OTHER_PARTY_ADDRESS_LINE3;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.OTHER_PARTY_FIRST_NAME;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.OTHER_PARTY_ID_ONE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.OTHER_PARTY_LAST_NAME;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.OTHER_PARTY_POSTCODE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.OTHER_PARTY_TITLE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.PROCESSING_VENUE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.REGION_ID;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.REPRESENTATIVE_ADDRESS_LINE1;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.REPRESENTATIVE_ADDRESS_LINE2;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.REPRESENTATIVE_ADDRESS_LINE3;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.REPRESENTATIVE_ADDRESS_LINE4;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.REPRESENTATIVE_EMAIL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.REPRESENTATIVE_NAME;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.REPRESENTATIVE_PERSON_FIRST_NAME;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.REPRESENTATIVE_PERSON_LAST_NAME;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.REPRESENTATIVE_PERSON_TITLE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.REPRESENTATIVE_PHONE_NUMBER;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.REPRESENTATIVE_POSTCODE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.SIGNATURE_NAME;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.SIGN_LANGUAGE_REQUIRED;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.SIGN_LANGUAGE_TYPE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.SSCS8_FORM_TYPE;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.APPEAL_GROUNDS;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.APPEAL_GROUNDS_2;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.BENEFIT_TYPE_OTHER;
@@ -124,7 +200,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUnknown;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.CaseResponse;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -2585,7 +2661,7 @@ public class SscsCaseTransformerTest {
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
         assertNoErrorsOrWarnings(result);
 
-        YesNoUnknown appellantConfidentialityRequired = ((Appeal) result.getTransformedCase().get("appeal")).getAppellant().getConfidentialityRequiredAnswer();
+        YesNoUndetermined appellantConfidentialityRequired = ((Appeal) result.getTransformedCase().get("appeal")).getAppellant().getConfidentialityRequirement();
         assertEquals(expected, appellantConfidentialityRequired.toString());
     }
 
@@ -2614,7 +2690,7 @@ public class SscsCaseTransformerTest {
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
         assertNoErrorsOrWarnings(result);
 
-        YesNoUnknown appellantConfidentialityRequired = ((Appeal) result.getTransformedCase().get("appeal")).getAppellant().getConfidentialityRequiredAnswer();
+        YesNoUndetermined appellantConfidentialityRequired = ((Appeal) result.getTransformedCase().get("appeal")).getAppellant().getConfidentialityRequirement();
         assertNull(appellantConfidentialityRequired);
     }
 
@@ -2642,7 +2718,7 @@ public class SscsCaseTransformerTest {
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
         assertNoErrorsOrWarnings(result);
 
-        YesNoUnknown appellantConfidentialityRequired = ((Appeal) result.getTransformedCase().get("appeal")).getAppellant().getConfidentialityRequiredAnswer();
+        YesNoUndetermined appellantConfidentialityRequired = ((Appeal) result.getTransformedCase().get("appeal")).getAppellant().getConfidentialityRequirement();
         assertNull(appellantConfidentialityRequired);
     }
 

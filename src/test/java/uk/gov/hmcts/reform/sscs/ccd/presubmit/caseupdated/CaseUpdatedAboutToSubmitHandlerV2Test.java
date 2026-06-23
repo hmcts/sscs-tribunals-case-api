@@ -89,7 +89,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUnknown;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.AssociatedCaseLinkHelper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -1379,12 +1379,12 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         "childBenefit,Child Benefit","thirtyHoursFreeChildcare,30 Hours Free Childcare",
         "guaranteedMinimumPension,Guaranteed Minimum Pension (COEG)","nationalInsuranceCredits,National Insurance Credits"})
     void givenACaseAppellantConfidentialityYes_thenCaseConfidentialYes(String shortName, String benefitDescription) {
-        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(new DynamicList(YesNoUnknown.YES.name()));
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(YesNoUndetermined.YES);
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefitDescription);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(YesNoUnknown.YES, response.getData().getConfidentialCaseStatus());
+        assertEquals(YesNoUndetermined.YES, response.getData().getConfidentialCaseStatus());
     }
 
     @ParameterizedTest
@@ -1393,7 +1393,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         "childBenefit,Child Benefit","thirtyHoursFreeChildcare,30 Hours Free Childcare",
         "guaranteedMinimumPension,Guaranteed Minimum Pension (COEG)","nationalInsuranceCredits,National Insurance Credits"})
     void givenACaseAppellantConfidentialityNo_thenCaseConfidentialNull(String shortName, String benefitDescription) {
-        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(new DynamicList(YesNoUnknown.NO.name()));
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(YesNoUndetermined.NO);
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefitDescription);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -1407,16 +1407,16 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         "childBenefit,Child Benefit","thirtyHoursFreeChildcare,30 Hours Free Childcare",
         "guaranteedMinimumPension,Guaranteed Minimum Pension","nationalInsuranceCredits,National Insurance Credits"})
     void givenACaseAppellantConfidentialityNoOtherPartyYes_thenCaseConfidentialYes(String shortName, String benefitDescription) {
-        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(new DynamicList(YesNoUnknown.NO.name()));
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(YesNoUndetermined.NO);
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefitDescription);
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
-        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequirement(new DynamicList(YesNoUnknown.YES.name())).build()).build();
+        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequirement(YesNoUndetermined.YES).build()).build();
         otherPartyList.add(ccdValue);
         callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(YesNoUnknown.YES, response.getData().getConfidentialCaseStatus());
+        assertEquals(YesNoUndetermined.YES, response.getData().getConfidentialCaseStatus());
     }
 
     @ParameterizedTest
@@ -1428,12 +1428,12 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefitDescription);
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
-        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequirement(new DynamicList(YesNoUnknown.YES.name())).build()).build();
+        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequirement(YesNoUndetermined.YES).build()).build();
         otherPartyList.add(ccdValue);
         callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(YesNoUnknown.YES, response.getData().getConfidentialCaseStatus());
+        assertEquals(YesNoUndetermined.YES, response.getData().getConfidentialCaseStatus());
     }
 
     @ParameterizedTest
@@ -1445,7 +1445,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefitDescription);
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
-        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequirement(new DynamicList(YesNoUnknown.NO.name())).build()).build();
+        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequirement(YesNoUndetermined.NO).build()).build();
         otherPartyList.add(ccdValue);
         callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -1462,14 +1462,14 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefitDescription);
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
-        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequirement(new DynamicList(YesNoUnknown.NO.name())).build()).build();
+        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequirement(YesNoUndetermined.NO).build()).build();
         otherPartyList.add(ccdValue);
-        CcdValue<OtherParty> ccdValue1 = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequirement(new DynamicList(YesNoUnknown.YES.name())).build()).build();
+        CcdValue<OtherParty> ccdValue1 = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequirement(YesNoUndetermined.YES).build()).build();
         otherPartyList.add(ccdValue1);
         callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(YesNoUnknown.YES, response.getData().getConfidentialCaseStatus());
+        assertEquals(YesNoUndetermined.YES, response.getData().getConfidentialCaseStatus());
     }
 
     @Test
@@ -1651,7 +1651,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(description);
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
         otherPartyList.add(buildOtherParty("No",null));
-        otherPartyList.add(buildOtherParty("No", YesNoUnknown.NO));
+        otherPartyList.add(buildOtherParty("No", YesNoUndetermined.NO));
         callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
         callback.getCaseDetails().getCaseData().getAppeal().setHearingType(HearingType.PAPER.getValue());
         callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(
@@ -1672,7 +1672,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode("childSupport");
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
         otherPartyList.add(buildOtherParty("No",null));
-        otherPartyList.add(buildOtherParty("No", YesNoUnknown.NO));
+        otherPartyList.add(buildOtherParty("No", YesNoUndetermined.NO));
         callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
         callback.getCaseDetails().getCaseData().getAppeal().setHearingType(HearingType.PAPER.getValue());
         callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(
@@ -1721,9 +1721,9 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         assertEquals(hearingType, response.getData().getAppeal().getHearingType());
     }
 
-    private CcdValue<OtherParty> buildOtherParty(String wantsToAttend, YesNoUnknown confidentiality) {
+    private CcdValue<OtherParty> buildOtherParty(String wantsToAttend, YesNoUndetermined confidentiality) {
         return CcdValue.<OtherParty>builder().value(OtherParty.builder()
-                .confidentialityRequirement(confidentiality != null ? new DynamicList(confidentiality.name()) : new DynamicList(YesNoUnknown.NO.name()))
+                .confidentialityRequirement(confidentiality)
                 .hearingOptions(HearingOptions.builder().wantsToAttend(wantsToAttend).build())
                 .build()).build();
     }
@@ -2072,11 +2072,11 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
                 .setDescription(Benefit.UC.getDescription());
             List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
             CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder()
-                .value(OtherParty.builder().confidentialityRequirement(new DynamicList(YesNoUnknown.NO.name())).build())
+                .value(OtherParty.builder().confidentialityRequirement(YesNoUndetermined.NO).build())
                 .build();
             otherPartyList.add(ccdValue);
             CcdValue<OtherParty> ccdValue1 = CcdValue.<OtherParty>builder()
-                .value(OtherParty.builder().confidentialityRequirement(new DynamicList(YesNoUnknown.YES.name())).build())
+                .value(OtherParty.builder().confidentialityRequirement(YesNoUndetermined.YES).build())
                 .build();
             otherPartyList.add(ccdValue1);
             callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
@@ -2105,31 +2105,31 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         @ParameterizedTest
         @MethodSource("benefits")
         void givenACaseAppellantConfidentialityYes_thenCaseConfidentialYes(Benefit benefit) {
-            callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(new DynamicList(YesNoUnknown.YES.name()));
+            callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(YesNoUndetermined.YES);
             callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(benefit.getShortName());
             callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefit.getDescription());
             PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
                 USER_AUTHORISATION);
 
-            Assertions.assertThat(response.getData().getConfidentialCaseStatus()).isEqualTo(YesNoUnknown.YES);
+            Assertions.assertThat(response.getData().getConfidentialCaseStatus()).isEqualTo(YesNoUndetermined.YES);
         }
 
         @ParameterizedTest
         @MethodSource("benefits")
         void givenACaseAppellantConfidentialityNoOtherPartyYes_thenCaseConfidentialYes(Benefit benefit) {
-            callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(new DynamicList(YesNoUnknown.NO.name()));
+            callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(YesNoUndetermined.NO);
             callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(benefit.getShortName());
             callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefit.getDescription());
             List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
             CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder()
-                .value(OtherParty.builder().confidentialityRequirement(new DynamicList(YesNoUnknown.YES.name())).build())
+                .value(OtherParty.builder().confidentialityRequirement(YesNoUndetermined.YES).build())
                 .build();
             otherPartyList.add(ccdValue);
             callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
             PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
                 USER_AUTHORISATION);
 
-            Assertions.assertThat(response.getData().getConfidentialCaseStatus()).isEqualTo(YesNoUnknown.YES);
+            Assertions.assertThat(response.getData().getConfidentialCaseStatus()).isEqualTo(YesNoUndetermined.YES);
         }
     }
 

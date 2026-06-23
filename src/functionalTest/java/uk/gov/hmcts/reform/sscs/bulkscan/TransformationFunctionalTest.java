@@ -22,8 +22,8 @@ import org.springframework.test.context.TestPropertySource;
 @RunWith(JUnitParamsRunner.class)
 @Slf4j
 public class TransformationFunctionalTest extends BaseFunctionalTest {
-    public static final String MRN_DATE_YESTERDAY_YYYY_MM_DD = LocalDate.now().minusDays(1).toString();
-    public static final String MRN_DATE_YESTERDAY_DD_MM_YYYY = LocalDate.now().minusDays(1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    private static final String MRN_DATE_YESTERDAY_YYYY_MM_DD = LocalDate.now().minusDays(1).toString();
+    private static final String MRN_DATE_YESTERDAY_DD_MM_YYYY = LocalDate.now().minusDays(1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
     @Test
     public void transform_appeal_created_case_when_all_fields_entered() throws IOException {

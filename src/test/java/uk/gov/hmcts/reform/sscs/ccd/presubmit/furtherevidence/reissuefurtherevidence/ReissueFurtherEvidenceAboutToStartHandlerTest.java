@@ -14,7 +14,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DWP_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.OTHER_PARTY_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.OTHER_PARTY_REPRESENTATIVE_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUnknown.YES;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,6 +37,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.reissueartifact.ReissueArtifactHandlerTest;
 
 @RunWith(JUnitParamsRunner.class)
@@ -252,7 +252,7 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest extends ReissueArtifa
             .build()).build();
 
         sscsCaseData.setSscsDocument(Arrays.asList(documentWithEditedDoc, document));
-        sscsCaseData.setConfidentialCaseStatus(YES);
+        sscsCaseData.setConfidentialCaseStatus(YesNoUndetermined.YES);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 

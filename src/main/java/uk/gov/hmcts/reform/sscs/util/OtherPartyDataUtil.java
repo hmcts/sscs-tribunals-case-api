@@ -36,7 +36,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUnknown;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
 
 public class OtherPartyDataUtil {
 
@@ -103,18 +103,18 @@ public class OtherPartyDataUtil {
             .collect(toSet());
     }
 
-    public static YesNoUnknown isConfidential(final SscsCaseData sscsCaseData) {
+    public static YesNoUndetermined isConfidential(final SscsCaseData sscsCaseData) {
         return isConfidential(sscsCaseData, false);
     }
 
-    public static YesNoUnknown isConfidential(final SscsCaseData sscsCaseData, final boolean cmOtherPartyConfidentialityEnabled) {
+    public static YesNoUndetermined isConfidential(final SscsCaseData sscsCaseData, final boolean cmOtherPartyConfidentialityEnabled) {
         var appeal = sscsCaseData.getAppeal();
         if (isValidBenefitTypeForConfidentiality(appeal.getBenefitType(), cmOtherPartyConfidentialityEnabled)) {
             if ((appeal.getAppellant() != null
                 && appeal.getAppellant().getConfidentialityRequirement() != null
-                && YesNoUnknown.isYes(appeal.getAppellant().getConfidentialityRequiredAnswer()))
+                && YesNoUndetermined.isYes(appeal.getAppellant().getConfidentialityRequirement()))
                 || otherPartyHasConfidentiality(sscsCaseData)) {
-                return YesNoUnknown.YES;
+                return YesNoUndetermined.YES;
             }
         }
         return null;
@@ -146,7 +146,7 @@ public class OtherPartyDataUtil {
     private static boolean otherPartyHasConfidentiality(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getOtherParties() != null) {
             return sscsCaseData.getOtherParties().stream()
-                    .anyMatch(op -> YesNoUnknown.isYes(op.getValue().getConfidentialityRequiredAnswer()));
+                    .anyMatch(op -> YesNoUndetermined.isYes(op.getValue().getConfidentialityRequirement()));
         }
         return false;
     }
@@ -294,31 +294,31 @@ public class OtherPartyDataUtil {
         if (isEmpty(currentOtherParties)) {
             return;
         }
-        final Map<String, YesNoUnknown> confidentialityBefore = buildConfidentialityMap(previousOtherParties);
+        final Map<String, YesNoUndetermined> confidentialityBefore = buildConfidentialityMap(previousOtherParties);
         currentOtherParties.stream()
             .filter(Objects::nonNull)
             .map(CcdValue::getValue)
             .filter(Objects::nonNull)
             .forEach(current -> {
-                final YesNoUnknown priorConfidentiality = confidentialityBefore.get(current.getId());
+                final YesNoUndetermined priorConfidentiality = confidentialityBefore.get(current.getId());
                 if (nonNull(current.getConfidentialityRequirement())
                     && (priorConfidentiality == null
-                        || !Objects.equals(priorConfidentiality, YesNoUnknown.valueOf(current.getConfidentialityRequirement().getValue().getCode())))) {
+                        || !Objects.equals(priorConfidentiality, current.getConfidentialityRequirement()))) {
                     current.setConfidentialityRequiredChangedDate(getLocalDateTime());
                 }
             });
     }
 
-    private static Map<String, YesNoUnknown> buildConfidentialityMap(final List<CcdValue<OtherParty>> otherParties) {
+    private static Map<String, YesNoUndetermined> buildConfidentialityMap(final List<CcdValue<OtherParty>> otherParties) {
         if (isEmpty(otherParties)) {
             return Collections.emptyMap();
         }
-        final Map<String, YesNoUnknown> byId = new HashMap<>();
+        final Map<String, YesNoUndetermined> byId = new HashMap<>();
         otherParties.stream()
             .filter(Objects::nonNull)
             .map(CcdValue::getValue)
             .filter(Objects::nonNull)
-            .forEach(prior -> byId.put(prior.getId(), prior.getConfidentialityRequiredAnswer()));
+            .forEach(prior -> byId.put(prior.getId(), prior.getConfidentialityRequirement()));
         return byId;
     }
 

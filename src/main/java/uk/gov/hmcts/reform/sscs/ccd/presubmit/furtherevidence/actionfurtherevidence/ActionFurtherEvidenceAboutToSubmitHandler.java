@@ -98,7 +98,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             preSubmitCallbackResponse.addError("No document URL so could not process");
         }
 
-        if (!YesNoUnknown.YES.equals(preSubmitCallbackResponse.getData().getConfidentialCaseStatus())
+        if (!YesNoUndetermined.YES.equals(preSubmitCallbackResponse.getData().getConfidentialCaseStatus())
             && scannedDocument.getValue().getEditedUrl() != null) {
             preSubmitCallbackResponse
                 .addError("Case is not marked as confidential so cannot upload an edited document");
@@ -389,7 +389,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     private boolean isConfidentialChildSupportCase(SscsCaseData sscsCaseData) {
         return sscsCaseData.getAppeal().getBenefitType() != null
             && Benefit.CHILD_SUPPORT.getShortName().equalsIgnoreCase(sscsCaseData.getAppeal().getBenefitType().getCode())
-            && YesNoUnknown.YES.equals(sscsCaseData.getConfidentialCaseStatus());
+            && YesNoUndetermined.YES.equals(sscsCaseData.getConfidentialCaseStatus());
     }
 
     private boolean isFurtherEvidenceActionCode(DynamicList furtherEvidenceActionList, String code) {

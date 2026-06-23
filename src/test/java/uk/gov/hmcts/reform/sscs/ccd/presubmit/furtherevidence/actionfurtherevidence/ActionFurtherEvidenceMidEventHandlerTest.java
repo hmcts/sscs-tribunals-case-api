@@ -13,7 +13,6 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.ScannedDocumentType.REINSTATEMENT_REQUEST;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUnknown.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.ActionFurtherEvidenceAboutToSubmitHandlerTest.buildOriginalSenderItemListForGivenOption;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.ActionFurtherEvidenceMidEventHandler.FURTHER_ACTION_INVALID_INTERNAL_ERROR;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.ActionFurtherEvidenceMidEventHandler.INCLUDE_BUNDLE_AND_INTERNAL_ERROR;
@@ -51,6 +50,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.pdf.PdfState;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
@@ -395,7 +395,7 @@ class ActionFurtherEvidenceMidEventHandlerTest {
         docs.add(scannedDocument);
 
         sscsCaseData.setScannedDocuments(docs);
-        sscsCaseData.setConfidentialCaseStatus(NO);
+        sscsCaseData.setConfidentialCaseStatus(YesNoUndetermined.NO);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 

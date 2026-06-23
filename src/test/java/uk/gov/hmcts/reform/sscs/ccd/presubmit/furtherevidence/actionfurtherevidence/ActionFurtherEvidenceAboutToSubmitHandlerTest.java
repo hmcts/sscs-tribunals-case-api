@@ -98,7 +98,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.WorkAllocationFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUnknown;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.service.BundleAdditionFilenameBuilder;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
@@ -722,7 +722,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
     @Test
     public void givenAConfidentialCaseWithScannedDocumentsAndEditedDocument_shouldMoveToSscsDocumentsWithEditedDocument() {
-        sscsCaseData.setConfidentialCaseStatus(YesNoUnknown.YES);
+        sscsCaseData.setConfidentialCaseStatus(YesNoUndetermined.YES);
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder()
@@ -1151,7 +1151,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         docs.add(scannedDocument);
 
         sscsCaseData.setScannedDocuments(docs);
-        sscsCaseData.setConfidentialCaseStatus(YesNoUnknown.NO);
+        sscsCaseData.setConfidentialCaseStatus(YesNoUndetermined.NO);
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -1173,7 +1173,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         docs.add(scannedDocument);
 
         sscsCaseData.setScannedDocuments(docs);
-        sscsCaseData.setConfidentialCaseStatus(YesNoUnknown.YES);
+        sscsCaseData.setConfidentialCaseStatus(YesNoUndetermined.YES);
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -1530,7 +1530,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
-        sscsCaseData.setConfidentialCaseStatus(YesNoUnknown.YES);
+        sscsCaseData.setConfidentialCaseStatus(YesNoUndetermined.YES);
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
@@ -1584,7 +1584,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
-        sscsCaseData.setConfidentialCaseStatus(YesNoUnknown.NO);
+        sscsCaseData.setConfidentialCaseStatus(YesNoUndetermined.NO);
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())

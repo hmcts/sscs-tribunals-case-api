@@ -224,7 +224,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUnknown;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
 import uk.gov.hmcts.reform.sscs.exception.BenefitMappingException;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
@@ -626,7 +626,7 @@ public class Personalisation<E extends NotificationWrapper> {
         Map<String, Object> personalisation) {
 
         personalisation.put(APPELLANT_CONFIDENTIALITY_REQUIRED,
-            YesNoUnknown.YES == ccdResponse.getAppellantConfidentialityRequired().orElse(null));
+            YesNoUndetermined.YES == ccdResponse.getAppellantConfidentiality().orElse(null));
 
         final List<CcdValue<OtherParty>> otherParties = getNewlyAddedParties(ccdResponse, ccdResponsePrevious);
         personalisation.put(OTHER_PARTY_SIZE, otherParties.size());

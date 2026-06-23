@@ -62,7 +62,7 @@ public class ReviewConfidentialityRequestAboutToSubmitHandler implements PreSubm
                         ? InterlocReviewState.AWAITING_ADMIN_ACTION : null;
 
                     sscsCaseData.setInterlocReviewState(interlocReviewState);
-                    sscsCaseData.setConfidentialCaseStatus(YesNoUnknown.YES);
+                    sscsCaseData.setConfidentialCaseStatus(YesNoUndetermined.YES);
 
                     if (!enhancedConfidentialityFeature) {
                         sscsCaseData.setIsProgressingViaGaps(YesNo.YES.getValue());

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.bulkscan.transformers;
 
-import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.*;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.WarningMessage.getMessageByCallbackType;
@@ -76,8 +75,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseManagementLocation;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Contact;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DateRange;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FormType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
@@ -95,7 +92,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUnknown;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.CaseResponse;
 import uk.gov.hmcts.reform.sscs.exception.UnknownFileTypeException;
@@ -530,21 +527,20 @@ public class SscsCaseTransformer implements CaseTransformer {
 
     private Appellant buildAppellant(Map<String, Object> pairs, String personType, Appointee appointee,
                                      Contact contact, String formType, boolean ignoreWarnings, boolean isSscs8) {
-        YesNoUnknown confidentialityRequired = getConfidentialityRequired(pairs, errors);
         return Appellant.builder()
             .name(buildPersonName(pairs, personType))
             .isAppointee(convertBooleanToYesNoString(appointee != null))
             .address(buildPersonAddress(pairs, personType, isSscs8))
             .identity(buildPersonIdentity(pairs, personType))
             .contact(contact)
-            .confidentialityRequirement(nonNull(confidentialityRequired) ? new DynamicList(new DynamicListItem(confidentialityRequired.name(), confidentialityRequired.toString()), null) : null)
+            .confidentialityRequirement(getConfidentialityRequired(pairs, errors))
             .appointee(appointee)
             .role(buildAppellantRole(pairs, formType, ignoreWarnings))
             .ibcRole(buildIbcRole(pairs, personType, isSscs8))
             .build();
     }
 
-    private YesNoUnknown getConfidentialityRequired(Map<String, Object> pairs, Set<String> errors) {
+    private YesNoUndetermined getConfidentialityRequired(Map<String, Object> pairs, Set<String> errors) {
         String keepHomeAddressConfidential = (String) pairs.get(KEEP_HOME_ADDRESS_CONFIDENTIAL);
         return isNotBlank(keepHomeAddressConfidential)
             ? convertBooleanToYesNo(getBoolean(pairs, errors, KEEP_HOME_ADDRESS_CONFIDENTIAL)) : null;

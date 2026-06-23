@@ -85,7 +85,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.WorkAllocationFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUnknown;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
 import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
@@ -1361,8 +1361,8 @@ class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     void givenChildSupportCaseAppellantWantsConfidentialWithEditedDocs_thenNoError() {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
-        sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequirement(new DynamicList(YesNoUnknown.YES.name())).build());
-        sscsCaseData.setConfidentialCaseStatus(YesNoUnknown.YES);
+        sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequirement(YesNoUndetermined.YES).build());
+        sscsCaseData.setConfidentialCaseStatus(YesNoUndetermined.YES);
         sscsCaseData.setDwpEditedEvidenceReason("childSupportConfidentiality");
         sscsCaseData.setDwpEditedResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("a.pdf").documentFilename("a.pdf").build()).build());
         sscsCaseData.setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("a.pdf").documentFilename("a.pdf").build()).build());
@@ -1371,8 +1371,8 @@ class DwpUploadResponseAboutToSubmitHandlerTest {
 
         assertThat(response.getErrors().size(), is(0));
         assertThat(response.getWarnings().size(), is(0));
-        assertThat(new DynamicList(YesNoUnknown.YES.name()), is(response.getData().getAppeal().getAppellant().getConfidentialityRequirement()));
-        assertThat(YesNoUnknown.YES, is(response.getData().getConfidentialCaseStatus()));
+        assertThat(YesNoUndetermined.YES, is(response.getData().getAppeal().getAppellant().getConfidentialityRequirement()));
+        assertThat(YesNoUndetermined.YES, is(response.getData().getConfidentialCaseStatus()));
     }
 
     @ParameterizedTest
@@ -1412,27 +1412,27 @@ class DwpUploadResponseAboutToSubmitHandlerTest {
         "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
     void givenChildSupportCaseAppellantWantsConfidentialNoEditedDocs_thenShowError(String shortName) {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(shortName).build());
-        sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequirement(new DynamicList(YesNoUnknown.YES.name())).build());
-        sscsCaseData.setConfidentialCaseStatus(YesNoUnknown.YES);
+        sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequirement(YesNoUndetermined.YES).build());
+        sscsCaseData.setConfidentialCaseStatus(YesNoUndetermined.YES);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(1));
         assertTrue(response.getErrors().contains("Appellant requires confidentiality, upload edited and unedited responses"));
         assertThat(response.getWarnings().size(), is(0));
-        assertThat(new DynamicList(YesNoUnknown.YES.name()), is(response.getData().getAppeal().getAppellant().getConfidentialityRequirement()));
-        assertThat(YesNoUnknown.YES, is(response.getData().getConfidentialCaseStatus()));
+        assertThat(YesNoUndetermined.YES, is(response.getData().getAppeal().getAppellant().getConfidentialityRequirement()));
+        assertThat(YesNoUndetermined.YES, is(response.getData().getConfidentialCaseStatus()));
     }
 
     @Test
     void givenChildSupportCaseOtherPartyWantsConfidentialWithEditedDocs_thenNoError() {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
-        sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequirement(new DynamicList(YesNoUnknown.NO.name())).build());
-        sscsCaseData.setConfidentialCaseStatus(YesNoUnknown.NO);
+        sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequirement(YesNoUndetermined.NO).build());
+        sscsCaseData.setConfidentialCaseStatus(YesNoUndetermined.NO);
 
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
-        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequirement(new DynamicList(
-            YesNoUnknown.YES.name())).build()).build();
+        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequirement(
+            YesNoUndetermined.YES).build()).build();
         otherPartyList.add(ccdValue);
         sscsCaseData.setOtherParties(otherPartyList);
 
@@ -1444,8 +1444,8 @@ class DwpUploadResponseAboutToSubmitHandlerTest {
 
         assertThat(response.getErrors().size(), is(0));
         assertThat(response.getWarnings().size(), is(0));
-        assertThat(new DynamicList(YesNoUnknown.NO.name()), is(response.getData().getAppeal().getAppellant().getConfidentialityRequirement()));
-        assertThat(YesNoUnknown.YES, is(response.getData().getConfidentialCaseStatus()));
+        assertThat(YesNoUndetermined.NO, is(response.getData().getAppeal().getAppellant().getConfidentialityRequirement()));
+        assertThat(YesNoUndetermined.YES, is(response.getData().getConfidentialCaseStatus()));
     }
 
     @ParameterizedTest
@@ -1453,12 +1453,11 @@ class DwpUploadResponseAboutToSubmitHandlerTest {
         "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
     void givenChildSupportCaseOtherPartyWantsConfidentialNoEditedDocs_thenShowError(String shortName) {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(shortName).build());
-        sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequirement(new DynamicList(YesNoUnknown.NO.name())).build());
-        sscsCaseData.setConfidentialCaseStatus(YesNoUnknown.NO);
+        sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequirement(YesNoUndetermined.NO).build());
+        sscsCaseData.setConfidentialCaseStatus(YesNoUndetermined.NO);
 
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
-        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequirement(new DynamicList(
-            YesNoUnknown.YES.name())).build()).build();
+        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequirement(YesNoUndetermined.YES).build()).build();
         otherPartyList.add(ccdValue);
         sscsCaseData.setOtherParties(otherPartyList);
 
@@ -1467,8 +1466,8 @@ class DwpUploadResponseAboutToSubmitHandlerTest {
         assertThat(response.getErrors().size(), is(1));
         assertTrue(response.getErrors().contains("Other Party requires confidentiality, upload edited and unedited responses"));
         assertThat(response.getWarnings().size(), is(0));
-        assertThat(new DynamicList(YesNoUnknown.NO.name()), is(response.getData().getAppeal().getAppellant().getConfidentialityRequirement()));
-        assertThat(YesNoUnknown.YES, is(response.getData().getConfidentialCaseStatus()));
+        assertThat(YesNoUndetermined.NO, is(response.getData().getAppeal().getAppellant().getConfidentialityRequirement()));
+        assertThat(YesNoUndetermined.YES, is(response.getData().getConfidentialCaseStatus()));
     }
 
     @ParameterizedTest
@@ -1476,12 +1475,11 @@ class DwpUploadResponseAboutToSubmitHandlerTest {
         "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
     void givenChildSupportCaseAppellantAndOtherPartyWantsConfidentialNoEditedDocs_thenShow2Error(String shortName) {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(shortName).build());
-        sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequirement(new DynamicList(YesNoUnknown.YES.name())).build());
-        sscsCaseData.setConfidentialCaseStatus(YesNoUnknown.YES);
+        sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequirement(YesNoUndetermined.YES).build());
+        sscsCaseData.setConfidentialCaseStatus(YesNoUndetermined.YES);
 
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
-        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequirement(new DynamicList(
-            YesNoUnknown.YES.name())).build()).build();
+        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(OtherParty.builder().confidentialityRequirement(YesNoUndetermined.YES).build()).build();
         otherPartyList.add(ccdValue);
         sscsCaseData.setOtherParties(otherPartyList);
 
@@ -1492,8 +1490,8 @@ class DwpUploadResponseAboutToSubmitHandlerTest {
         assertTrue(response.getErrors().contains("Other Party requires confidentiality, upload edited and unedited responses"));
 
         assertThat(response.getWarnings().size(), is(0));
-        assertThat(new DynamicList(YesNoUnknown.YES.name()), is(response.getData().getAppeal().getAppellant().getConfidentialityRequirement()));
-        assertThat(YesNoUnknown.YES, is(response.getData().getConfidentialCaseStatus()));
+        assertThat(YesNoUndetermined.YES, is(response.getData().getAppeal().getAppellant().getConfidentialityRequirement()));
+        assertThat(YesNoUndetermined.YES, is(response.getData().getConfidentialCaseStatus()));
     }
 
     @ParameterizedTest
@@ -1501,13 +1499,13 @@ class DwpUploadResponseAboutToSubmitHandlerTest {
         "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
     void givenChildSupportCaseThatIsNotConfidentialNoEditedDocs_thenNoWarning(String shortName) {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(shortName).build());
-        sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequirement(new DynamicList(YesNoUnknown.NO.name())).build());
+        sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequirement(YesNoUndetermined.NO).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(0));
         assertThat(response.getWarnings().size(), is(0));
-        assertThat(new DynamicList(YesNoUnknown.NO.name()), is(response.getData().getAppeal().getAppellant().getConfidentialityRequirement()));
+        assertThat(YesNoUndetermined.NO, is(response.getData().getAppeal().getAppellant().getConfidentialityRequirement()));
         assertThat(null, is(response.getData().getConfidentialCaseStatus()));
     }
 

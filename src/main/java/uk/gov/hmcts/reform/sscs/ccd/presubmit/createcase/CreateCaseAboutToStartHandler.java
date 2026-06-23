@@ -71,15 +71,6 @@ public class CreateCaseAboutToStartHandler implements PreSubmitCallbackHandler<S
 
         appeal.getAppellant().getAddress().setUkPortOfEntryList(SscsUtil.getPortsOfEntry());
 
-        if (VALID_APPEAL_CREATED.equals(callback.getEvent())) {
-            caseData
-                .getAppeal()
-                .getAppellant()
-                .setConfidentialityRequirement(
-                    new DynamicList(new DynamicListItem(null, null),
-                        caseData.confidentialityOptions()));
-        }
-
         return new PreSubmitCallbackResponse<>(caseData);
     }
 }

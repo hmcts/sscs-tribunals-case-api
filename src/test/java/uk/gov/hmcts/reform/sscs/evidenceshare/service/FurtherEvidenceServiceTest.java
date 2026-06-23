@@ -62,7 +62,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUnknown;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.evidenceshare.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType;
@@ -639,7 +639,7 @@ public class FurtherEvidenceServiceTest {
         caseData = SscsCaseData.builder()
             .ccdCaseId("1563382899630221")
             .languagePreferenceWelsh(languagePreferenceFlag)
-            .extendedSscsCaseData(ExtendedSscsCaseData.builder().confidentialCaseStatus(isConfidentialCase ? YesNoUnknown.YES : YesNoUnknown.NO).build())
+            .extendedSscsCaseData(ExtendedSscsCaseData.builder().confidentialCaseStatus(isConfidentialCase ? YesNoUndetermined.YES : YesNoUndetermined.NO).build())
             .sscsDocument(Collections.singletonList(sscsDocument1WithAppellantEvidenceAndNoIssued))
             .appeal(Appeal.builder().appellant(appellant).build())
             .build();
