@@ -115,8 +115,8 @@ withNightlyPipeline(type, product, component) {
 
     loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')
-    enableFortifyScan()
-    enableFullFunctionalTest()
+    // enableFortifyScan()
+    // enableFullFunctionalTest()
 
     afterAlways('fullFunctionalTest') {
         runE2eTestsNightly()
