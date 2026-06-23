@@ -2276,7 +2276,7 @@
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
     "FieldShowCondition": "hasOtherParties = \"Yes\"",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "23/06/2026",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 8,
     "PageID": "1.0",
