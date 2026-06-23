@@ -2289,7 +2289,7 @@
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
     "FieldShowCondition": "sendDirectionNoticeToOtherParty = \"Yes\"",
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "23/06/2026",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 9,
     "PageID": "1.0",

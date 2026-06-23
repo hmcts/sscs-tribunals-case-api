@@ -519,7 +519,7 @@ class DirectionIssuedAboutToStartHandlerTest {
 
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertNull(sscsCaseData.getOtherPartySelection());
+        assertThat(sscsCaseData.getOtherPartySelection()).isNull();
     }
 
     @Test
