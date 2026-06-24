@@ -147,6 +147,8 @@ fi
 
 echo "$excludedFilenamePatterns"
 
+az login --identity
+
 az acr login --name hmctsprod --subscription 8999dec3-0104-4a27-94ee-6588559729d1
 
 docker run --rm --name json2xlsx \
