@@ -10,6 +10,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.PHE_REQ
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_TCW;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined.isYes;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getUpdatedDirectionDueDate;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
@@ -47,7 +49,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
@@ -173,18 +174,18 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             if (sscsCaseData.getDwpEditedEvidenceReason() == null) {
                 if (otherPartyHasConfidentiality(sscsCaseData)) {
                     preSubmitCallbackResponse.addError("Other Party requires confidentiality, upload edited and unedited responses");
-                    sscsCaseData.setConfidentialCaseStatus(YesNoUndetermined.YES);
+                    sscsCaseData.setConfidentialCaseStatus(YES);
                 }
-                if (sscsCaseData.getAppeal().getAppellant() != null && YesNoUndetermined.isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequirement())) {
+                if (sscsCaseData.getAppeal().getAppellant() != null && isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequirement())) {
                     preSubmitCallbackResponse.addError("Appellant requires confidentiality, upload edited and unedited responses");
-                    sscsCaseData.setConfidentialCaseStatus(YesNoUndetermined.YES);
+                    sscsCaseData.setConfidentialCaseStatus(YES);
                 }
             } else {
                 if (otherPartyHasConfidentiality(sscsCaseData)) {
-                    sscsCaseData.setConfidentialCaseStatus(YesNoUndetermined.YES);
+                    sscsCaseData.setConfidentialCaseStatus(YES);
                 }
-                if (sscsCaseData.getAppeal().getAppellant() != null && YesNoUndetermined.isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequirement())) {
-                    sscsCaseData.setConfidentialCaseStatus(YesNoUndetermined.YES);
+                if (sscsCaseData.getAppeal().getAppellant() != null && isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequirement())) {
+                    sscsCaseData.setConfidentialCaseStatus(YES);
                 }
             }
         }
@@ -192,7 +193,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
     private boolean otherPartyHasConfidentiality(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getOtherParties() != null) {
-            Optional<CcdValue<OtherParty>> otherParty = sscsCaseData.getOtherParties().stream().filter(op -> YesNoUndetermined.isYes(op.getValue().getConfidentialityRequirement())).findAny();
+            Optional<CcdValue<OtherParty>> otherParty = sscsCaseData.getOtherParties().stream().filter(op -> isYes(op.getValue().getConfidentialityRequirement())).findAny();
             return otherParty.isPresent();
         }
         return false;

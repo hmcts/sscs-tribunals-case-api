@@ -102,7 +102,6 @@
           },
           "isAppointee": "No",
           "organisation": null,
-
           "isAddressSameAsAppointee": null
         },
         "mrnDetails": {
@@ -1703,7 +1702,6 @@
           },
           "isAppointee": "No",
           "organisation": null,
-
           "isAddressSameAsAppointee": null
         },
         "mrnDetails": {

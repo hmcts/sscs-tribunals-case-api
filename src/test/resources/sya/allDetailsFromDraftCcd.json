@@ -1,5 +1,5 @@
 {
-  "caseCreated" : "${json-unit.ignore}",
+  "caseCreated": "${json-unit.ignore}",
   "CaseAccessCategory": "personalIndependencePayment",
   "caseManagementCategory": {
     "value": {
@@ -14,28 +14,28 @@
     ]
   },
   "caseManagementLocation": {
-    "baseLocation":"698118",
-    "region":"6"
+    "baseLocation": "698118",
+    "region": "6"
   },
   "addedDocuments": null,
   "caseNameHmctsInternal": "Joe Bloggs",
   "caseNameHmctsRestricted": "Joe Bloggs",
   "caseNamePublic": "Joe Bloggs",
   "ogdType": "DWP",
-  "benefitCode" : "002",
-  "issueCode" : "DD",
-  "caseCode" : "002DD",
+  "benefitCode": "002",
+  "issueCode": "DD",
+  "caseCode": "002DD",
   "region": "BRADFORD",
   "regionalProcessingCenter": {
-    "name" : "BRADFORD",
-    "address1" : "HM Courts & Tribunals Service",
-    "address2" : "Social Security & Child Support Appeals",
-    "address3" : "Phoenix House",
-    "address4" : "Rushton Avenue",
-    "city" : "BRADFORD",
-    "postcode" : "BD3 7BH",
-    "phoneNumber" : "0300 123 1142",
-    "faxNumber" : "0126 434 7983",
+    "name": "BRADFORD",
+    "address1": "HM Courts & Tribunals Service",
+    "address2": "Social Security & Child Support Appeals",
+    "address3": "Phoenix House",
+    "address4": "Rushton Avenue",
+    "city": "BRADFORD",
+    "postcode": "BD3 7BH",
+    "phoneNumber": "0300 123 1142",
+    "faxNumber": "0126 434 7983",
     "email": "SSCS_Bradford@justice.gov.uk",
     "hearingRoute": null,
     "epimsId": null
@@ -72,8 +72,7 @@
         "nino": "ZRPVJDDBS"
       },
       "isAppointee": "No",
-      "role":{},
-
+      "role": {},
       "isAddressSameAsAppointee": "No",
       "appointee": {
         "id": null,
@@ -204,58 +203,58 @@
     },
     "supporterSubscription": {
       "wantSmsNotifications": null,
-      "tya":null,
+      "tya": null,
       "email": null,
       "mobile": null,
       "subscribeEmail": null,
       "subscribeSms": null,
-      "reason":null,
+      "reason": null,
       "lastLoggedIntoMya": null
     },
     "appointeeSubscription": {
       "wantSmsNotifications": null,
-      "tya":null,
+      "tya": null,
       "email": null,
       "mobile": null,
       "subscribeEmail": null,
       "subscribeSms": null,
-      "reason":null,
+      "reason": null,
       "lastLoggedIntoMya": null
     },
     "representativeSubscription": {
-      "wantSmsNotifications":"Yes",
+      "wantSmsNotifications": "Yes",
       "tya": "${json-unit.ignore}",
-      "email":"harry.potter@wizards.com",
-      "mobile":"+447411999999",
-      "subscribeEmail":"Yes",
-      "subscribeSms":"Yes",
-      "reason":null,
+      "email": "harry.potter@wizards.com",
+      "mobile": "+447411999999",
+      "subscribeEmail": "Yes",
+      "subscribeSms": "Yes",
+      "reason": null,
       "lastLoggedIntoMya": null
     },
     "jointPartySubscription": {
       "wantSmsNotifications": null,
-      "tya":null,
+      "tya": null,
       "email": null,
       "mobile": null,
       "subscribeEmail": null,
       "subscribeSms": null,
-      "reason":null,
+      "reason": null,
       "lastLoggedIntoMya": null
     }
   },
-  "evidencePresent" : "No",
-  "sscsDocument":[
+  "evidencePresent": "No",
+  "sscsDocument": [
     {
-      "id":"e0a86d4b-f0ab-4373-8b44-de6a670ac0b7",
-      "value":{
-        "documentLink":{
-          "document_url":"http://dm-store:5005/documents/deed8cc2-9d9e-4f5e-8c26-941010f4f9f6",
-          "document_filename":"Bloggs_8Q6.pdf",
-          "document_binary_url":"http://dm-store:5005/documents/deed8cc2-9d9e-4f5e-8c26-941010f4f9f6/binary"
+      "id": "e0a86d4b-f0ab-4373-8b44-de6a670ac0b7",
+      "value": {
+        "documentLink": {
+          "document_url": "http://dm-store:5005/documents/deed8cc2-9d9e-4f5e-8c26-941010f4f9f6",
+          "document_filename": "Bloggs_8Q6.pdf",
+          "document_binary_url": "http://dm-store:5005/documents/deed8cc2-9d9e-4f5e-8c26-941010f4f9f6/binary"
         },
-        "documentType":"sscs1",
-        "documentFileName":"Bloggs_8Q6.pdf",
-        "documentDateAdded":"2020-11-05"
+        "documentType": "sscs1",
+        "documentFileName": "Bloggs_8Q6.pdf",
+        "documentDateAdded": "2020-11-05"
       }
     }
   ],
@@ -264,7 +263,7 @@
   "languagePreferenceWelsh": "No",
   "createdInGapsFrom": "readyToList",
   "processingVenue": "Ashford",
-  "isScottishCase" : "No",
+  "isScottishCase": "No",
   "workBasketHearingDate": null,
   "workBasketHearingDateIssued": null,
   "workBasketHearingEpimsId": null,

@@ -126,7 +126,7 @@
       "benefitCode": "053",
       "bulkScanCaseReference": "id",
       "caseManagementLocation":{
-        "region":"7",
+        "region":"8",
         "baseLocation":"372653"
       },
       "caseCode": "053DD",
@@ -150,8 +150,7 @@
         "postcode": "CF24 0AB",
         "city": "CARDIFF",
         "email": "Cardiff_SYA_Respon@justice.gov.uk",
-        "hearingRoute": "listAssist",
-        "epimsId": "372653"
+        "hearingRoute": "gaps"
       },
       "processingVenue": "Cardiff",
       "isScottishCase": "No",

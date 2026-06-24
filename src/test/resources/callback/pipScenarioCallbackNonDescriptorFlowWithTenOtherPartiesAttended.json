@@ -373,7 +373,6 @@
             "organisation": null
           },
           "role": {},
-
           "isAddressSameAsAppointee": "No"
         },
         "benefitType": {
@@ -3007,7 +3006,6 @@
           },
           "isAppointee": "No",
           "organisation": null,
-
           "isAddressSameAsAppointee": "No"
         },
         "mrnDetails": {

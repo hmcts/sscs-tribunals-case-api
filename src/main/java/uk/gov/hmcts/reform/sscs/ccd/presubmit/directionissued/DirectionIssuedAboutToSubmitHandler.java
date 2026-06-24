@@ -16,6 +16,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined.YES;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.JUDGE;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
@@ -464,7 +466,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         final String directionTypeCode = getDirectionTypeCode(caseData);
         final YesNoUndetermined confidentialityRequired = CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN
             .toString()
-            .equals(directionTypeCode) ? YesNoUndetermined.YES : YesNoUndetermined.NO;
+            .equals(directionTypeCode) ? YES : NO;
         final String selectedConfidentialityPartyCode = getSelectedConfidentialityPartyCode(caseData);
         log.info("Applying confidentiality decision for case id {} with direction type {} and selected party {}", caseData.getCcdCaseId(), directionTypeCode, selectedConfidentialityPartyCode);
         if (isNotBlank(selectedConfidentialityPartyCode)) {

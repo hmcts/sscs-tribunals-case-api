@@ -1,16 +1,16 @@
 {
-  "caseCreated" : "${json-unit.ignore}",
+  "caseCreated": "${json-unit.ignore}",
   "region": "CARDIFF",
   "regionalProcessingCenter": {
-    "name" : "CARDIFF",
-    "address1" : "HM Courts & Tribunals Service",
-    "address2" : "Social Security & Child Support Appeals",
-    "address3" : "Eastgate House",
-    "address4" : "Newport Road",
-    "city" : "CARDIFF",
-    "postcode" : "CF24 0AB",
-    "phoneNumber" : "0300 123 1142",
-    "faxNumber" : "0870 739 4438",
+    "name": "CARDIFF",
+    "address1": "HM Courts & Tribunals Service",
+    "address2": "Social Security & Child Support Appeals",
+    "address3": "Eastgate House",
+    "address4": "Newport Road",
+    "city": "CARDIFF",
+    "postcode": "CF24 0AB",
+    "phoneNumber": "0300 123 1142",
+    "faxNumber": "0870 739 4438",
     "email": "Cardiff_SYA_Respon@justice.gov.uk"
   },
   "appeal": {
@@ -43,7 +43,6 @@
         "nino": "AB877533C"
       },
       "isAddressSameAsAppointee": "No",
-
       "role": null,
       "appointee": null
     },
@@ -134,7 +133,7 @@
     "appointeeSubscription": null,
     "representativeSubscription": null
   },
-  "evidencePresent" : "No",
-  "sscsDocument":[],
+  "evidencePresent": "No",
+  "sscsDocument": [],
   "dwpRegionalCentre": "Newcastle"
 }

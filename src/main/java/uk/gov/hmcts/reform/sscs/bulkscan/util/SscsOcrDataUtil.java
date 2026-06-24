@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.sscs.bulkscan.util;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined.YES;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -131,7 +134,7 @@ public final class SscsOcrDataUtil {
     }
 
     public static YesNoUndetermined convertBooleanToYesNo(boolean value) {
-        return value ? YesNoUndetermined.YES : YesNoUndetermined.NO;
+        return value ? YES : NO;
     }
 
     public static String generateDateForCcd(Map<String, Object> pairs, Set<String> errors, String fieldName) {
