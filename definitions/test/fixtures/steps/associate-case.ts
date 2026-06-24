@@ -70,7 +70,7 @@ export class AssociateCase extends BaseStep {
   }
 
   private async goToAssociateCasePage(caseId: string) {
-    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
+    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
     await this.homePage.chooseEvent('Associate case');
   }
 }
