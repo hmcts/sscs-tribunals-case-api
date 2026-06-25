@@ -271,9 +271,9 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
             .getValue()));
     }
 
-    private boolean isValidUrgentDocument(Callback callback) {
-        SscsCaseData caseData = (SscsCaseData) callback.getCaseDetails().getCaseData();
-        CaseDetails<SscsCaseData> caseDetailsBefore = (CaseDetails<SscsCaseData>) callback.getCaseDetailsBefore().get();
+    private boolean isValidUrgentDocument(Callback<SscsCaseData> callback) {
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        CaseDetails<SscsCaseData> caseDetailsBefore = callback.getCaseDetailsBefore().get();
         SscsDocument furtherEvidenceDoc = caseData.getSscsDocument() == null ? null : caseData.getSscsDocument().stream()
             .filter(d -> emptyIfNull(caseDetailsBefore.getCaseData().getSscsDocument()).stream().noneMatch(db -> db.getId().equals(d.getId())))
             .filter(d -> DocumentType.URGENT_HEARING_REQUEST.getValue().equals(d.getValue().getDocumentType()))

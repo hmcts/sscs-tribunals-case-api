@@ -19,7 +19,7 @@ export class UpdateSubscriptionPage {
       '.govuk-caption-l',
       addUpdateSubscriptionData.updateSubscriptionHeading
     ); //Above heading Text
-    await webAction.isLinkClickable('Cancel');
+    await webAction.isButtonClickable('Cancel');
   }
 
   // Applying subscription Yes to email + sms

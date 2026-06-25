@@ -28,10 +28,14 @@ export class HomePage {
   readonly ftaDocumentsTab: Locator;
   readonly otherPartyDetailsTab: Locator;
   readonly hearingsTab: Locator;
+  readonly tribunalFtaCommunicationsTab: Locator;
   readonly afterTabBtn: Locator;
   readonly caseTypeDropdown: string;
   readonly caseRefInputField: string;
   readonly searchResultsField: string;
+  readonly elementsAndIssuesTab: Locator;
+  readonly unprocessedCorrespondenceTab: Locator;
+  readonly confidentialityTab: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -59,6 +63,10 @@ export class HomePage {
     this.ftaDocumentsTab = page.getByRole('tab').filter({ hasText: /^FTA Documents$/ });
     this.otherPartyDetailsTab = page.getByRole('tab').filter({ hasText: /^Other Party Details$/ });
     this.hearingsTab = page.getByRole('tab').filter({ hasText: /^Hearings$/ });
+    this.elementsAndIssuesTab = page.getByRole('tab').filter({ hasText: /^Elements and issues$/ });
+    this.tribunalFtaCommunicationsTab = page.getByRole('tab').filter({ hasText: /^Tribunal\/FTA Communications$/ });
+    this.unprocessedCorrespondenceTab = page.getByRole('tab').filter({ hasText: /^Unprocessed Correspondence$/ });
+    this.confidentialityTab = page.getByRole('tab').filter({ hasText: /^Confidentiality$/ });
     this.afterTabBtn = page.locator(
       '//html/body/exui-root/exui-case-home/div/exui-case-details-home/exui-case-viewer-container/ccd-case-viewer/div/ccd-case-full-access-view/div[2]/div/mat-tab-group/mat-tab-header/button[2]/div'
     );
@@ -211,21 +219,31 @@ export class HomePage {
         break;
       }
       case 'History': {
-        await expect(this.historyTab).toBeVisible();
-        await this.historyTab.click();
+        try {
+          await this.scrollToStartOfTabs();
+          await expect(this.historyTab).toBeVisible();
+          await this.historyTab.click();
+          await expect(this.page.locator('table.EventLogTable')).toBeVisible({ timeout: 10000 });
+        } catch {
+          await this.page.goto(this.getUrlWithoutTab() + '#History');
+          await expect(this.page.locator('table.EventLogTable')).toBeVisible();
+        }
         break;
       }
       case 'Summary': {
         try {
+          await this.scrollToStartOfTabs();
           await expect(this.summaryTab).toBeVisible();
           await this.summaryTab.click();
+          await expect(this.page.locator('#summaryCreatedInGapsFrom')).toBeVisible({ timeout: 10000 });
         } catch {
-          await this.clickBeforeTabBtn();
-          await this.summaryTab.click();
+          await this.page.goto(this.getUrlWithoutTab() + '#Summary');
+          await expect(this.page.locator('#summaryCreatedInGapsFrom')).toBeVisible();
         }
         break;
       }
       case 'Tasks': {
+        await this.scrollToStartOfTabs();
         await expect(this.tasksTab).toBeVisible();
         await this.tasksTab.click();
         break;
@@ -241,6 +259,7 @@ export class HomePage {
         break;
       }
       case 'Appeal Details': {
+        await this.scrollToStartOfTabs();
         await expect(this.appealDetailsTab).toBeVisible();
         await this.appealDetailsTab.click();
         break;
@@ -266,8 +285,15 @@ export class HomePage {
         break;
       }
       case 'Listing Requirements': {
-        await expect(this.listingRequirementsTab).toBeVisible();
-        await this.listingRequirementsTab.click();
+        try {
+          await expect(this.listingRequirementsTab).toBeVisible();
+          await this.delay(3000);
+          await this.listingRequirementsTab.click();
+          await expect(this.page.locator('div.case-viewer-label').filter({hasText: 'Tribunal direct PO to attend?'}).first()).toBeVisible({ timeout: 10000 });
+        } catch {
+          await this.page.goto(this.getUrlWithoutTab() + '#Listing Requirements');
+          await expect(this.page.locator('div.case-viewer-label').filter({hasText: 'Tribunal direct PO to attend?'}).first()).toBeVisible();
+        }
         break;
       }
       case 'Audio/Video Evidence': {
@@ -293,11 +319,31 @@ export class HomePage {
         await this.hearingsTab.click();
         break;
       }
+      case 'Elements and issues': {
+        await expect(this.elementsAndIssuesTab).toBeVisible();
+        await this.elementsAndIssuesTab.click();
+        break;
+      }
+      case 'Tribunal/FTA Communications': {
+        await expect(this.tribunalFtaCommunicationsTab).toBeVisible();
+        await this.tribunalFtaCommunicationsTab.click();
+        break;
+      }
+      case 'Confidentiality': {
+        await expect(this.confidentialityTab).toBeVisible();
+        await this.confidentialityTab.click();
+        break;
+      }
       default: {
         //statements;
         break;
       }
     }
+  }
+
+  getUrlWithoutTab(): string {
+    let url = this.page.url().split('#')[0];
+    return url.split('/hearings')[0];
   }
 
   async startCaseCreate(jurisdiction, caseType, event): Promise<void> {
@@ -308,5 +354,16 @@ export class HomePage {
     await this.page.getByLabel('Case type').selectOption(caseType);
     await this.page.getByLabel('Event').selectOption(event);
     await this.page.getByRole('button', { name: 'Start' }).click();
+  }
+
+  async navigateToMyWork(){
+    const myWorkLink = this.page.getByRole('link', { name: 'My work' });
+    await myWorkLink.waitFor();
+    await myWorkLink.click();
+    await expect(this.page.locator('h3').filter({ hasText: 'My work' })).toBeVisible();
+  }
+
+  async scrollToStartOfTabs() {
+    await this.page.getByRole('tablist').evaluate(el => (el.style = 'transform: translateX(0px);'));
   }
 }

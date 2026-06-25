@@ -8,6 +8,20 @@ test.describe(
   'Create a new hearing for an List assist case',
   { tag: '@nightly-pipeline' },
   async () => {
+    test.beforeEach(
+      'Check HMC environment',
+      async ({ uploadResponseSteps, request }) => {
+        await uploadResponseSteps.checkHmcEnvironment(request);
+      }
+    );
+
+    test.afterEach(
+      'Cancel the hearings after test run',
+      async({ hearingSteps }, testInfo) => {
+        (testInfo.title.includes("#executeTearDown")) && await hearingSteps.cancelHearingForCleanUp();
+      }
+    )
+
     test(
       'Trigger a new hearing & cancellation for DLA case',
       { tag: '@aat-regression' },
@@ -19,7 +33,7 @@ test.describe(
       }
     );
 
-    test('Trigger a new hearing for UC case', async ({
+    test('Trigger a new hearing for UC case #executeTearDown', async ({
       uploadResponseSteps,
       hearingSteps
     }) => {
@@ -28,26 +42,40 @@ test.describe(
       await hearingSteps.verifyHearingIsTriggeredForUCCase(false);
     });
 
-    test('Trigger a new direction hearing via issue direction notice for UC case', async ({
+    test.skip('Trigger a new direction hearing via issue direction notice for UC case #executeTearDown', async ({
       uploadResponseSteps,
       hearingSteps,
       issueDirectionsNoticeSteps
     }) => {
       caseId = await createCaseBasedOnCaseType('UCSANDL');
-      await issueDirectionsNoticeSteps.fastLoginUserWithCaseId(credentials.hmrcSuperUser, caseId);
+      await issueDirectionsNoticeSteps.loginUserWithCaseId(
+        credentials.hmrcSuperUser,
+        false,
+        caseId
+      );
       await issueDirectionsNoticeSteps.performIssueDirectionNoticeDirectionHearing();
-      await uploadResponseSteps.performUploadResponseOnAUniversalCredit(caseId, false);
+      await uploadResponseSteps.performUploadResponseOnAUniversalCredit(
+        caseId,
+        false
+      );
       await hearingSteps.verifyHearingIsTriggeredForUCCase(true);
     });
 
-    test('Trigger a new direction hearing via update listing reqs for UC case', async ({
+    test.skip('Trigger a new direction hearing via update listing reqs for UC case #executeTearDown', async ({
       uploadResponseSteps,
       hearingSteps
     }) => {
       caseId = await createCaseBasedOnCaseType('UCSANDL');
-      await hearingSteps.fastLoginUserWithCaseId(credentials.hmrcSuperUser, caseId);
+      await hearingSteps.loginUserWithCaseId(
+        credentials.hmrcSuperUser,
+        false,
+        caseId
+      );
       await hearingSteps.updateHearingToDirectionViaEvent();
-      await uploadResponseSteps.performUploadResponseOnAUniversalCredit(caseId, false);
+      await uploadResponseSteps.performUploadResponseOnAUniversalCredit(
+        caseId,
+        false
+      );
       await hearingSteps.verifyHearingIsTriggeredForUCCase(true);
     });
 
@@ -63,7 +91,7 @@ test.describe(
       await hearingSteps.verifyAutoHearingCancellation();
     });
 
-    test('Manually Update an hearing for DLA case', async ({
+    test('Manually Update an hearing for DLA case #executeTearDown', async ({
       uploadResponseSteps,
       hearingSteps
     }) => {
@@ -74,10 +102,11 @@ test.describe(
       await hearingSteps.verifyUpdatedHearingStatus();
     });
 
-    test('Auto Update an hearing for DLA case', async ({
+    test('Auto Update an hearing for DLA case #executeTearDown', async ({
       uploadResponseSteps,
       hearingSteps
     }) => {
+      test.slow();
       caseId = await createCaseBasedOnCaseType('DLASANDL');
       await uploadResponseSteps.performUploadResponse(caseId, 'dla');
       await hearingSteps.verifyHearingIsTriggered(caseId, 'dla');

@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.transform.deserialize;
 
 import static junit.framework.TestCase.assertNull;
-import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -81,7 +81,7 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 public class SubmitYourAppealToCcdCaseDataDeserializerTestV1 {
 
     private static final String NO = "No";
-    public static final String[] IGNORED_PATHS = {
+    private static final String[] IGNORED_PATHS = {
         "jointPartyId",
         "appeal.appellant.appointee.id",
         "appeal.appellant.id",

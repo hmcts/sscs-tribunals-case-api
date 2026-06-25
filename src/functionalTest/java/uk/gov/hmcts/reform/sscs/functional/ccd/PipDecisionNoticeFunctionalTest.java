@@ -10,52 +10,40 @@ import static uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler.getJsonCa
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Arrays;
-import junitparams.JUnitParamsRunner;
-import junitparams.NamedParameters;
-import junitparams.Parameters;
 import org.apache.http.HttpResponse;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication;
 import uk.gov.hmcts.reform.sscs.functional.mya.BaseFunctionTest;
+import uk.gov.hmcts.reform.sscs.functional.mya.CitizenIdamService;
 
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(classes = {TribunalsCaseApiApplication.class, CitizenIdamService.class})
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
-
-    @ClassRule
-    public static final SpringClassRule scr = new SpringClassRule();
-
-    @Rule
-    public final SpringMethodRule smr = new SpringMethodRule();
 
     @Autowired
     protected ObjectMapper objectMapper;
 
-    @NamedParameters("allowed")
-    @SuppressWarnings("unused")
-    private Boolean[] allowed() {
-        return new Boolean[] { false, true};
-    }
-
-    @Test
-    @Parameters(named = "allowed")
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
     public void nonDescriptorFlow_shouldGeneratePdfWithExpectedText(boolean allowed) throws IOException {
 
         String json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenarioCallbackNonDescriptorFlow.json", Arrays.asList("ALLOWED_OR_REFUSED"),
             Arrays.asList(allowed ? "allowed" : "refused"));
 
         byte[] bytes = callPreviewFinalDecision(json);
-        try (PDDocument document = PDDocument.load(bytes)) {
+        try (PDDocument document = Loader.loadPDF(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             if (allowed) {
@@ -69,8 +57,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("4. Reasons for decision 1"));
             assertThat(pdfTextWithoutNewLines, containsString("5. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("6. Anything else."));
-            assertThat(pdfTextWithoutNewLines, containsString(
-                    "7. This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent."));
+            assertThat(pdfTextWithoutNewLines, containsString("7. This has been a remote hearing in the form of a video hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7."));
             assertThat(pdfTextWithoutNewLines, not(containsString("8.")));
         }
     }

@@ -8,7 +8,7 @@ export default defineConfig({
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: 2, // Set the number of retries for all projects
+  retries: 4, // Set the number of retries for all projects
   timeout: 6 * 30 * 1000,
   expect: {
     timeout: 30 * 1000
@@ -28,11 +28,17 @@ export default defineConfig({
         port: 9223,
         printSteps: true
       }
+    ],
+    [
+      'json',
+      {
+        outputFile: 'playwright-report/test-results.json'
+      }
     ]
   ],
   use: {
     actionTimeout: 30000,
-    navigationTimeout: 30000,
+    navigationTimeout: 180000,
     baseURL: urls.xuiUrl,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',

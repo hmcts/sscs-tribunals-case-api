@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.issueadjournment;
 
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
@@ -13,6 +15,7 @@ import jakarta.validation.Validator;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,18 +33,20 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingVenue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.reference.data.model.HearingDuration;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
@@ -55,11 +60,9 @@ abstract class IssueAdjournmentNoticeAboutToSubmitHandlerTestBase {
     protected static final String SPANISH = "Spanish";
     protected IssueAdjournmentNoticeAboutToSubmitHandler handler;
 
-    @Mock
     protected Callback<SscsCaseData> callback;
 
-    @Mock
-    protected CaseDetails<SscsCaseData> caseDetails;
+    protected CaseDetails<CaseData> caseDetails;
 
     @Mock
     protected FooterService footerService;
@@ -131,10 +134,18 @@ abstract class IssueAdjournmentNoticeAboutToSubmitHandlerTestBase {
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
                 .defaultListingValues(OverrideFields.builder().duration(45).build()).build())
         .build();
+        CaseData sscsCaseDataBefore = SscsCaseData.builder()
+                .ccdCaseId("ccdId")
+                .appeal(Appeal.builder().hearingOptions(HearingOptions.builder().languageInterpreter("YES").build()).build())
+                .dwpUcb("yes")
+                .build();
+        caseDetails = new CaseDetails<>(1L, "", null, sscsCaseData, null, null);
+        var caseDetailsBefore = new CaseDetails<>(1L, "", null, sscsCaseDataBefore, null, null);
+
+        callback = new Callback(caseDetails, Optional.of(caseDetailsBefore), ISSUE_ADJOURNMENT_NOTICE, true);
     }
 
     protected PreSubmitCallbackResponse<SscsCaseData> cannotBeListedAndNoDirectionsGiven() {
-        when(callback.getEvent()).thenReturn(EventType.ISSUE_ADJOURNMENT_NOTICE);
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
         sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(NO);
         sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(NO);
@@ -143,7 +154,6 @@ abstract class IssueAdjournmentNoticeAboutToSubmitHandlerTestBase {
     }
 
     protected PreSubmitCallbackResponse<SscsCaseData> canBeListed() {
-        when(callback.getEvent()).thenReturn(EventType.ISSUE_ADJOURNMENT_NOTICE);
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
         sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(YES);
         sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(NO);
@@ -152,12 +162,20 @@ abstract class IssueAdjournmentNoticeAboutToSubmitHandlerTestBase {
     }
 
     protected PreSubmitCallbackResponse<SscsCaseData> cannotBeListedAndDirectionsGiven() {
-        when(callback.getEvent()).thenReturn(EventType.ISSUE_ADJOURNMENT_NOTICE);
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
         sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(NO);
         sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(YES);
 
         return handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+    }
+
+    protected void setupHearingDurationValues() {
+        HearingDuration hearingDuration = new HearingDuration();
+        hearingDuration.setDurationPaper(30);
+        hearingDuration.setDurationInterpreter(90);
+        hearingDuration.setDurationFaceToFace(60);
+        when(hearingDurationsService.getHearingDuration(eq(sscsCaseData.getBenefitCode()), eq(sscsCaseData.getIssueCode()))).thenReturn(hearingDuration);
+
     }
 
 }

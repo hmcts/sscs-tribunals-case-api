@@ -58,6 +58,7 @@ import java.util.stream.Stream;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.io.IOUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -278,7 +279,7 @@ public class LetterUtilsTest {
         baos.close();
 
         byte[] newBytes = addBlankPageAtTheEndIfOddPage(bytes);
-        PDDocument newDocument = PDDocument.load(newBytes);
+        PDDocument newDocument = Loader.loadPDF(newBytes);
         int expectedPages = (pages % 2 == 0) ? pages : pages + 1;
         assertEquals(expectedPages, newDocument.getNumberOfPages());
     }

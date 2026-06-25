@@ -12,8 +12,9 @@ test.describe(
       manageDocumentsSteps
     }) => {
       caseId = await createCaseBasedOnCaseType('PIPREPSANDL');
-      await manageDocumentsSteps.fastLoginUserWithCaseId(
+      await manageDocumentsSteps.loginUserWithCaseId(
         credentials.caseWorker,
+        false,
         caseId
       );
       let documentType = 'Other document';
@@ -42,8 +43,9 @@ test.describe(
       manageDocumentsSteps
     }) => {
       caseId = await createCaseBasedOnCaseType('PIPREPSANDL');
-      await manageDocumentsSteps.fastLoginUserWithCaseId(
+      await manageDocumentsSteps.loginUserWithCaseId(
         credentials.caseWorker,
+        false,
         caseId
       );
       let documentType = 'Other document';
@@ -57,14 +59,16 @@ test.describe(
       );
       await manageDocumentsSteps.verifyFileInTab(tab, documentType, fileName);
       await manageDocumentsSteps.signOut();
-      await manageDocumentsSteps.fastLoginUserWithCaseId(
+      await manageDocumentsSteps.loginUserWithCaseId(
         credentials.dwpResponseWriter,
+        false,
         caseId
       );
       await manageDocumentsSteps.verifyInternalDocumentsTabHidden();
       await manageDocumentsSteps.signOut();
-      await manageDocumentsSteps.fastLoginUserWithCaseId(
+      await manageDocumentsSteps.loginUserWithCaseId(
         credentials.caseWorker,
+        false,
         caseId
       );
       await manageDocumentsSteps.verifyFileInTab(tab, documentType, fileName);
@@ -76,8 +80,9 @@ test.describe(
       manageDocumentsSteps
     }) => {
       caseId = await createCaseBasedOnCaseType('PIPREPSANDL');
-      await manageDocumentsSteps.fastLoginUserWithCaseId(
+      await manageDocumentsSteps.loginUserWithCaseId(
         credentials.caseWorker,
+        false,
         caseId
       );
       let documentType = 'Other document';
@@ -114,8 +119,9 @@ test.describe(
       manageDocumentsSteps
     }) => {
       caseId = await createCaseBasedOnCaseType('PIPREPSANDL');
-      await manageDocumentsSteps.fastLoginUserWithCaseId(
+      await manageDocumentsSteps.loginUserWithCaseId(
         credentials.caseWorker,
+        false,
         caseId
       );
       let documentType = 'Other document';
@@ -138,8 +144,9 @@ test.describe(
       manageDocumentsSteps
     }) => {
       caseId = await createCaseBasedOnCaseType('PIPREPSANDL');
-      await manageDocumentsSteps.fastLoginUserWithCaseId(
+      await manageDocumentsSteps.loginUserWithCaseId(
         credentials.caseWorker,
+        false,
         caseId
       );
       await manageDocumentsSteps.removeDocumentFromTab('Documents', 'SSCS1');

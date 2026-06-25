@@ -29,7 +29,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 class UploadDocumentSubmittedCallbackHandlerTest {
     private UploadDocumentSubmittedCallbackHandler handler;
-
+    private final String userAuthorisation = "user_auth";
     @Mock
     private Callback<SscsCaseData> callback;
     @Mock
@@ -85,14 +85,14 @@ class UploadDocumentSubmittedCallbackHandlerTest {
 
     @Test
     void handleThrowsIfCannotHandle() {
-        assertThrows(IllegalStateException.class, () -> handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback), "Cannot handle callback");
+        assertThrows(IllegalStateException.class, () -> handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, userAuthorisation), "Cannot handle callback");
     }
 
     @Test
     void doesNothingIfInternalDocumentFlagOff() {
         handler = new UploadDocumentSubmittedCallbackHandler(updateCcdCaseService, idamService, false);
         when(callback.getPageId()).thenReturn("moveDocumentTo");
-        handler.handle(CallbackType.SUBMITTED, callback);
+        handler.handle(CallbackType.SUBMITTED, callback, userAuthorisation);
         verify(updateCcdCaseService, never()).triggerCaseEventV2(any(), any(), any(), any(), any());
     }
 
@@ -100,7 +100,7 @@ class UploadDocumentSubmittedCallbackHandlerTest {
     void doesNothingIfFlagOnButMoveToInternal() {
         when(callback.getPageId()).thenReturn("moveDocumentTo");
         sscsCaseData.getInternalCaseDocumentData().setMoveDocumentTo(INTERNAL);
-        handler.handle(CallbackType.SUBMITTED, callback);
+        handler.handle(CallbackType.SUBMITTED, callback, userAuthorisation);
         verify(updateCcdCaseService, never()).triggerCaseEventV2(any(), any(), any(), any(), any());
     }
 
@@ -109,7 +109,7 @@ class UploadDocumentSubmittedCallbackHandlerTest {
         when(callback.getPageId()).thenReturn("moveDocumentTo");
         sscsCaseData.getInternalCaseDocumentData().setMoveDocumentTo(REGULAR);
         sscsCaseData.getInternalCaseDocumentData().setShouldBeIssued(NO);
-        handler.handle(CallbackType.SUBMITTED, callback);
+        handler.handle(CallbackType.SUBMITTED, callback, userAuthorisation);
         verify(updateCcdCaseService, never()).triggerCaseEventV2(any(), any(), any(), any(), any());
     }
 
@@ -120,7 +120,7 @@ class UploadDocumentSubmittedCallbackHandlerTest {
         when(updateCcdCaseService.triggerCaseEventV2(any(), any(), any(), any(), any())).thenReturn(sscsCaseDetails);
         sscsCaseData.getInternalCaseDocumentData().setMoveDocumentTo(REGULAR);
         sscsCaseData.getInternalCaseDocumentData().setShouldBeIssued(YES);
-        handler.handle(CallbackType.SUBMITTED, callback);
+        handler.handle(CallbackType.SUBMITTED, callback, userAuthorisation);
         verify(updateCcdCaseService).triggerCaseEventV2(1234L, EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(),
             "Issue to all parties", "Issue to all parties", idamService.getIdamTokens());
     }

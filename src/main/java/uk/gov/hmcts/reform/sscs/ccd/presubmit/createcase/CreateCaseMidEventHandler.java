@@ -27,17 +27,15 @@ import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
 @Slf4j
 public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    public static final String IBCA_REFERENCE_EMPTY_ERROR =
-            "An IBCA reference is required to update this case. The IBCA Reference format is 1 letter, 2 digits, 1 letter, 2 digits e.g. E24A45.";
+    static final String IBCA_REFERENCE_EMPTY_ERROR = "An IBCA reference is required to update this case";
 
-    public static final String IBCA_REFERENCE_VALIDATION_ERROR =
-            "The IBCA reference must be 6 characters and match the format. The IBCA Reference format is 1 letter, 2 digits, 1 letter, 2 digits e.g. E24A45";
+    static final String IBCA_REFERENCE_VALIDATION_ERROR = "An IBCA reference must be 6 characters";
 
     private static final String HEARING_ROUTE_ERROR_MESSAGE = "Hearing route must be List Assist";
 
     private final PostcodeValidator postcodeValidator = new PostcodeValidator();
 
-    private static final Pattern IBCA_REFERENCE_REGEX = Pattern.compile("^[A-Za-z]\\d{2}[A-HJKMNP-Z]\\d{2}$");
+    private static final Pattern IBCA_REFERENCE_REGEX = Pattern.compile("^[A-Za-z0-9]{6}$");
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -57,8 +55,12 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
         PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
 
         if (NO.equals(caseData.getAppeal().getAppellant().getAddress().getInMainlandUk())) {
-            final String selectedPortOfEntryLocationCode = caseData.getAppeal().getAppellant().getAddress().getUkPortOfEntryList().getValue().getCode();
-            caseData.getAppeal().getAppellant().getAddress().setPortOfEntry(selectedPortOfEntryLocationCode);
+            if (caseData.getAppeal().getAppellant().getAddress().getUkPortOfEntryList() == null) {
+                errorResponse.addError("A port of entry must be selected if the appellant does not live in England, Wales or Scotland");
+            } else {
+                final String selectedPortOfEntryLocationCode = caseData.getAppeal().getAppellant().getAddress().getUkPortOfEntryList().getValue().getCode();
+                caseData.getAppeal().getAppellant().getAddress().setPortOfEntry(selectedPortOfEntryLocationCode);
+            }
         }
 
         if (callback.getEvent() == EventType.CASE_UPDATED && caseData.getRegionalProcessingCenter() != null && HearingRoute.GAPS.equals(caseData.getRegionalProcessingCenter().getHearingRoute())) {
@@ -67,7 +69,7 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
 
         errorResponse.addErrors(validateAddress(caseData.getAppeal().getAppellant()));
 
-        if (isYes(caseData.getAppeal().getRep().getHasRepresentative())
+        if (!isEmpty(caseData.getAppeal().getRep()) && isYes(caseData.getAppeal().getRep().getHasRepresentative())
                 && (isEmpty(caseData.getAppeal().getRep().getAddress())
                 || isEmpty(caseData.getAppeal().getRep().getAddress().getInMainlandUk()))) {
             errorResponse.addError("You must enter Living in the UK for the representative");

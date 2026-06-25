@@ -18,17 +18,15 @@ import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.service.event.EventPublisher;
+import uk.gov.hmcts.reform.sscs.service.servicebus.SendCallbackHandler;
 
 
 public class CcdCallbackOrchestratorControllerTest {
 
-    private static final String MESSAGE = "a message";
-
     private CcdCallbackOrchestratorController controller;
 
     @Mock
-    private EventPublisher eventPublisher;
+    private SendCallbackHandler callbackHandler;
 
     @Mock
     private SscsCaseCallbackDeserializer deserializer;
@@ -36,7 +34,7 @@ public class CcdCallbackOrchestratorControllerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        controller = new CcdCallbackOrchestratorController(eventPublisher, deserializer);
+        controller = new CcdCallbackOrchestratorController(callbackHandler, deserializer);
     }
 
     @Test
@@ -47,7 +45,7 @@ public class CcdCallbackOrchestratorControllerTest {
         EventType eventType = EventType.APPEAL_RECEIVED;
         when(deserializer.deserialize(anyString())).thenReturn(new Callback<>(details, Optional.empty(), eventType, false));
         ResponseEntity<String> responseEntity = controller.send("");
-        verify(eventPublisher).publishEvent(any());
+        verify(callbackHandler).handle(any());
         assertEquals(200, responseEntity.getStatusCode().value());
         assertEquals("{}", responseEntity.getBody());
     }

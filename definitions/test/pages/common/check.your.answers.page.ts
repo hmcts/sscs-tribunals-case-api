@@ -24,7 +24,7 @@ export class CheckYourAnswersPage {
       'form.check-your-answers h2.heading-h2',
       eventTestData.eventSummarycheckYourAnswersHeading
     ); //Check your answers Text.
-    await webActions.verifyPageLabel('//self::ccd-read-document-field/a', [
+    await webActions.verifyPageLabel('//self::ccd-read-document-field/button', [
       uploadResponseTestdata.testfileone,
       uploadResponseTestdata.testfiletwo,
       uploadResponseTestdata.testfilethree

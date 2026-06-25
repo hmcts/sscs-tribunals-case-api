@@ -1,7 +1,13 @@
 package uk.gov.hmcts.reform.sscs;
 
+import static com.fasterxml.jackson.databind.DeserializationFeature.READ_ENUMS_USING_TO_STRING;
+import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE;
+import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_ENUMS_USING_TO_STRING;
 import static java.util.Arrays.asList;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.ValidatorFactory;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +37,7 @@ import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
 import org.springframework.http.converter.xml.SourceHttpMessageConverter;
@@ -229,6 +236,25 @@ public class TribunalsCaseApiApplication implements CommandLineRunner {
     }
 
     @Bean
+    public SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer() {
+        return new SscsCaseCallbackDeserializer(mapper());
+    }
+
+    private ObjectMapper mapper() {
+        Jackson2ObjectMapperBuilder objectMapperBuilder =
+            new Jackson2ObjectMapperBuilder()
+                .featuresToEnable(READ_ENUMS_USING_TO_STRING)
+                .featuresToEnable(READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE)
+                .featuresToEnable(WRITE_ENUMS_USING_TO_STRING)
+                .serializationInclusion(JsonInclude.Include.NON_ABSENT);
+
+        ObjectMapper mapper = objectMapperBuilder.createXmlMapper(false).build();
+        mapper.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
+        mapper.findAndRegisterModules();
+        return mapper;
+    }
+
+    @Bean
     public JobMapper getJobMapper(CcdActionDeserializer ccdActionDeserializer,
                                   NotificationService notificationService,
                                   RetryNotificationService retryNotificationService,
@@ -238,7 +264,7 @@ public class TribunalsCaseApiApplication implements CommandLineRunner {
                                   SscsCaseCallbackDeserializer deserializer) {
         // Had to wire these up like this Spring will not wire up CcdActionExecutor otherwise.
         CcdActionExecutor ccdActionExecutor = new CcdActionExecutor(notificationService, retryNotificationService, ccdService, updateCcdCaseService, idamService, deserializer);
-        return new JobMapper(asList(
+        return new JobMapper(List.of(
             new JobMapping<>(payload -> !payload.contains("onlineHearingId"), ccdActionDeserializer, ccdActionExecutor)
         ));
     }

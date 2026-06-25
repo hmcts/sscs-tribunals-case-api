@@ -75,7 +75,7 @@ export class ManageDocuments extends BaseStep {
     await this.moveToTabPage.verifyMovePage();
     await this.moveToTabPage.selectDocumentsTab();
     await this.moveToTabPage.verifyErrorNoInternalDocuments();
-    await this.moveToTabPage.page.getByRole('link', {name: 'Cancel', exact: true}).click();
+    await this.moveToTabPage.page.getByRole('button', {name: 'Cancel', exact: true}).click();
   }
 
   async moveDocumentNoneFoundErrorCheck() {
@@ -85,7 +85,7 @@ export class ManageDocuments extends BaseStep {
     await this.moveToTabPage.verifyMovePage();
     await this.moveToTabPage.selectInternalDocumentsTab();
     await this.moveToTabPage.verifyErrorNoDocuments();
-    await this.moveToTabPage.page.getByRole('link', {name: 'Cancel', exact: true}).click();
+    await this.moveToTabPage.page.getByRole('button', {name: 'Cancel', exact: true}).click();
   }
 
   async moveDocumentNoneSelectedErrorChecks(filename: string) {

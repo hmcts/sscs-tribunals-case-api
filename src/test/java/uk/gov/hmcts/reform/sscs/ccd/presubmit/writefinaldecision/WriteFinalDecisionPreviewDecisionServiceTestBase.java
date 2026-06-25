@@ -26,6 +26,7 @@ import java.util.Map;
 import junitparams.JUnitParamsRunner;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -106,16 +107,17 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     protected abstract Map<LanguagePreference, Map<EventType, String>> getBenefitSpecificDocuments();
 
     @Before
+    @BeforeEach
     public void setUp() throws IOException {
         openMocks(this);
         final Map<EventType, String> englishEventTypeDocs = new HashMap<>();
-        englishEventTypeDocs.put(EventType.CORRECTION_GRANTED, "TB-SCS-GNO-ENG-corrected-decision-notice.docx");
+        englishEventTypeDocs.put(EventType.CORRECTION_GRANTED, "TB-SCS-GNO-ENG-corrected-decision-notice-v2.docx");
         englishEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-ENG-directions-notice-v2.docx");
-        englishEventTypeDocs.put(EventType.DECISION_ISSUED, "TB-SCS-GNO-ENG-draft-decision-notice.docx");
+        englishEventTypeDocs.put(EventType.DECISION_ISSUED, "TB-SCS-GNO-ENG-draft-decision-notice-v2.docx");
         Map<EventType, String> welshEventTypeDocs = new HashMap<>();
-        welshEventTypeDocs.put(EventType.CORRECTION_GRANTED, "TB-SCS-GNO-ENG-corrected-decision-notice.docx");
+        welshEventTypeDocs.put(EventType.CORRECTION_GRANTED, "TB-SCS-GNO-ENG-corrected-decision-notice-v2.docx");
         welshEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-ENG-directions-notice-v2.docx");
-        welshEventTypeDocs.put(EventType.DECISION_ISSUED, "TB-SCS-GNO-ENG-draft-decision-notice.docx");
+        welshEventTypeDocs.put(EventType.DECISION_ISSUED, "TB-SCS-GNO-ENG-draft-decision-notice-v2.docx");
         final Map<LanguagePreference, Map<EventType, String>> documents =  new HashMap<>();
         documents.put(LanguagePreference.ENGLISH, englishEventTypeDocs);
         documents.put(LanguagePreference.WELSH, welshEventTypeDocs);

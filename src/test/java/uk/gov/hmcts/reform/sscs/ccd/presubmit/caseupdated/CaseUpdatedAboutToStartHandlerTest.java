@@ -4,15 +4,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
@@ -30,10 +32,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
+import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
 import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class CaseUpdatedAboutToStartHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
@@ -51,12 +56,14 @@ class CaseUpdatedAboutToStartHandlerTest {
     @Mock
     private VerbalLanguagesService verbalLanguagesService;
 
-    @InjectMocks
+    @Mock
+    private SignLanguagesService signLanguagesService;
+
     private CaseUpdatedAboutToStartHandler handler;
 
     @BeforeEach
     public void setUp() {
-        openMocks(this);
+        handler = new CaseUpdatedAboutToStartHandler(dynamicListLanguageUtil, verbalLanguagesService, signLanguagesService, false);
 
         when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -213,6 +220,28 @@ class CaseUpdatedAboutToStartHandlerTest {
     }
 
     @Test
+    void givenThatOriginalLanguageFieldIsSignLanguage_thenSetDynamicListInitialValue() {
+        sscsCaseData = CaseDataUtils.buildCaseData();
+        sscsCaseData.getAppeal().getHearingOptions().setLanguages("British Sign Language (BSL)");
+
+        DynamicListItem item = new DynamicListItem("bfi", "British Sign Language (BSL)");
+        DynamicList list = new DynamicList(null, List.of(item));
+
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+        given(dynamicListLanguageUtil.generateInterpreterLanguageFields(any())).willReturn(list);
+        given(dynamicListLanguageUtil.getLanguageDynamicListItem(any())).willReturn(item);
+        given(verbalLanguagesService.getVerbalLanguage(any())).willReturn(null);
+        given(signLanguagesService.getSignLanguage(any())).willReturn(new Language("bfi", "British Sign Language (BSL)"));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(hearingOptions.getLanguagesList()).isNotNull();
+        assertThat(hearingOptions.getLanguagesList().getValue().getLabel()).isEqualTo("British Sign Language (BSL)");
+    }
+
+    @Test
     void givenThatOriginalLanguageFieldIsNonEmptyandInvalid_thenSetDynamicListInitialValue() {
         sscsCaseData = CaseDataUtils.buildCaseData();
         sscsCaseData.getAppeal().getHearingOptions().setLanguages("Wales");
@@ -224,6 +253,7 @@ class CaseUpdatedAboutToStartHandlerTest {
         given(dynamicListLanguageUtil.generateInterpreterLanguageFields(any())).willReturn(list);
         given(dynamicListLanguageUtil.getLanguageDynamicListItem(any())).willReturn(item);
         given(verbalLanguagesService.getVerbalLanguage(any())).willReturn(null);
+        given(signLanguagesService.getSignLanguage(any())).willReturn(null);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();

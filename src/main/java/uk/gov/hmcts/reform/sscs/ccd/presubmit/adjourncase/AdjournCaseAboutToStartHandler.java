@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getHmcHearingType;
 
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InternalCaseDocumentData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
@@ -29,8 +30,8 @@ public class AdjournCaseAboutToStartHandler implements PreSubmitCallbackHandler<
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType == CallbackType.ABOUT_TO_START
             && callback.getEvent() == EventType.ADJOURN_CASE
-            && Objects.nonNull(callback.getCaseDetails())
-            && Objects.nonNull(callback.getCaseDetails().getCaseData());
+            && nonNull(callback.getCaseDetails())
+            && nonNull(callback.getCaseDetails().getCaseData());
     }
 
     @Override
@@ -47,13 +48,7 @@ public class AdjournCaseAboutToStartHandler implements PreSubmitCallbackHandler<
             return preSubmitCallbackResponse;
         }
         DynamicList languageList = utils.generateInterpreterLanguageFields(sscsCaseData.getAdjournment().getInterpreterLanguage());
-        if (sscsCaseData.getSscsDocument() != null) {
-            boolean draftAdjournmentDoc = sscsCaseData.getSscsDocument().stream()
-                .anyMatch(sscsDocument -> sscsDocument.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()));
-            if (!draftAdjournmentDoc) {
-                sscsCaseData.setAdjournment(Adjournment.builder().build());
-            }
-        } else {
+        if (!draftDocInInternalDocuments(sscsCaseData) && !draftDocInSscsDocuments(sscsCaseData)) {
             sscsCaseData.setAdjournment(Adjournment.builder().build());
         }
         sscsCaseData.getAdjournment().setInterpreterLanguage(languageList);
@@ -63,6 +58,23 @@ public class AdjournCaseAboutToStartHandler implements PreSubmitCallbackHandler<
 
     private boolean isDirectionHearing(SscsCaseData sscsCaseData) {
         return HmcHearingType.DIRECTION_HEARINGS.equals(getHmcHearingType(sscsCaseData));
+    }
+
+    private boolean draftDocInSscsDocuments(SscsCaseData sscsCaseData) {
+        if (nonNull(sscsCaseData.getSscsDocument())) {
+            return sscsCaseData.getSscsDocument().stream()
+                    .anyMatch(sscsDocument -> sscsDocument.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()));
+        }
+        return false;
+    }
+
+    private boolean draftDocInInternalDocuments(SscsCaseData sscsCaseData) {
+        InternalCaseDocumentData internalCaseDocumentData = sscsCaseData.getInternalCaseDocumentData();
+        if ((nonNull(internalCaseDocumentData) && nonNull(internalCaseDocumentData.getSscsInternalDocument()))) {
+            return internalCaseDocumentData.getSscsInternalDocument().stream()
+                    .anyMatch(sscsDocument -> sscsDocument.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()));
+        }
+        return false;
     }
 }
 

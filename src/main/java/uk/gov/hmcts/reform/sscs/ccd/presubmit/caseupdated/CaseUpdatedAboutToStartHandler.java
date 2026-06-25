@@ -3,11 +3,15 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPresent;
 
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -21,18 +25,31 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
+import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
 import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
 import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-
     private final DynamicListLanguageUtil utils;
 
     private final VerbalLanguagesService verbalLanguagesService;
+    private final SignLanguagesService signLanguagesService;
+
+    private final boolean cmOtherPartyConfidentialityEnabled;
+
+    CaseUpdatedAboutToStartHandler(DynamicListLanguageUtil utils,
+                                   VerbalLanguagesService verbalLanguagesService,
+                                   SignLanguagesService signLanguagesService,
+                                   @Value("${feature.cm-other-party-confidentiality.enabled}")
+                                   boolean cmOtherPartyConfidentialityEnabled) {
+        this.utils = utils;
+        this.verbalLanguagesService = verbalLanguagesService;
+        this.signLanguagesService = signLanguagesService;
+        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -60,7 +77,7 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
 
             if (!StringUtils.isEmpty(existingLanguage)) {
                 Language language = verbalLanguagesService.getVerbalLanguage(existingLanguage);
-
+                language = isNull(language) ? signLanguagesService.getSignLanguage(existingLanguage) : language;
                 if (null != language) {
                     DynamicListItem dynamicListItem = utils.getLanguageDynamicListItem(language);
                     interpreterLanguages.setValue(dynamicListItem);
@@ -72,6 +89,11 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
         setupBenefitSelection(sscsCaseData);
         if (sscsCaseData.isIbcCase()) {
             setupUkPortsOfEntry(sscsCaseData);
+        }
+
+        if (cmOtherPartyConfidentialityEnabled && sscsCaseData.isBenefitType(UC)) {
+            sscsCaseData.getAppeal()
+                .setIsOtherPartyAddedForChildMaintUCCase(isOtherPartyPresent(sscsCaseData) ? YES : NO);
         }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);

@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "urlPattern": "/refdata/location/court-venues\\?epimms_id=.*"
+    "urlPattern": "/refdata/location/court-venues\\?service_code=BBA3&epimms_id=.*"
   },
   "response": {
     "status": 200,

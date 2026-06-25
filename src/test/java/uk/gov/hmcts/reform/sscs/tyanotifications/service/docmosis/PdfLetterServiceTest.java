@@ -146,6 +146,43 @@ public class PdfLetterServiceTest {
     }
 
     @Test
+    @Parameters({"Yes, true", "Yes, false", "No, true", "No, false"})
+    public void willCreateAPdfToTheCorrectIbcAddress(String isScottish, boolean isScottishPoBoxFeatureEnabled) {
+        NotificationWrapper wrapper = NotificationServiceTest.buildBaseWrapper(
+            APPEAL_RECEIVED,
+            appellant,
+            representative,
+            null
+        );
+
+        EVIDENCE_ADDRESS.setScottishPoBoxFeatureEnabled(isScottishPoBoxFeatureEnabled);
+        wrapper.getNewSscsCaseData().setIsScottishCase(isScottish);
+        wrapper.getNewSscsCaseData().setBenefitCode("093");
+
+        pdfLetterService.buildCoversheet(wrapper, new SubscriptionWithType(EMPTY_SUBSCRIPTION, SubscriptionType.APPELLANT,
+            appellant, appellant));
+
+        Address address = appellant.getAddress();
+        String expectedLine3 = "Yes".equalsIgnoreCase(isScottish) && isScottishPoBoxFeatureEnabled ? EVIDENCE_ADDRESS.getScottishLine3() : EVIDENCE_ADDRESS.getIbcAddressLine3();
+        String expectedPostcode = "Yes".equalsIgnoreCase(isScottish) && isScottishPoBoxFeatureEnabled ? EVIDENCE_ADDRESS.getScottishPostcode() : EVIDENCE_ADDRESS.getIbcAddressPostcode();
+
+        PdfCoverSheet pdfCoverSheet = new PdfCoverSheet(wrapper.getCaseId(),
+            appellant.getName().getFullNameNoTitle(),
+            address.getLine1(),
+            address.getTown(),
+            address.getCounty(),
+            address.getPostcode(),
+            "",
+            EVIDENCE_ADDRESS.getIbcAddressLine2(),
+            expectedLine3,
+            EVIDENCE_ADDRESS.getTown(),
+            expectedPostcode,
+            DOCMOSIS_TEMPLATES_CONFIG.getHmctsImgVal(),
+            DOCMOSIS_TEMPLATES_CONFIG.getHmctsWelshImgVal());
+        verify(docmosisPdfService).createPdf(eq(pdfCoverSheet), eq("my01.doc"));
+    }
+
+    @Test
     public void willGenerateALetter() throws IOException {
         PDDocument doc = new PDDocument();
         doc.addPage(new PDPage());

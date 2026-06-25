@@ -20,7 +20,6 @@ public final class HearingsAdjustmentMapping {
     public static final String CCD_DISABLED_ACCESS = "disabledAccess";
 
     private HearingsAdjustmentMapping() {
-
     }
 
     public static List<Adjustment> getIndividualsAdjustments(HearingOptions hearingOptions) throws InvalidMappingException {

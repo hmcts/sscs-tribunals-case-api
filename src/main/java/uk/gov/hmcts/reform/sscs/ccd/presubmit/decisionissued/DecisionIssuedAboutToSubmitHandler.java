@@ -112,6 +112,7 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
                 }
                 caseData.setInterlocReviewState(null);
             }
+            SscsUtil.setHearingRouteIfNotSet(caseData);
             caseData.setState(State.DORMANT_APPEAL_STATE);
         } else {
             log.info("Case is a Welsh case so Decsion Notice requires translation for case id : {}", caseData.getCcdCaseId());

@@ -20,6 +20,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getA
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,12 +36,25 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType;
 public class SorPlaceholderService {
     private final PlaceholderService placeholderService;
 
-    @Value("${helpline.telephone}")
-    private String helplineTelephone;
+    private final String helplineTelephone;
+
+    private final String helplineTelephoneIbc;
+
+    private final String helplineTelephoneScotland;
 
     @Autowired
-    public SorPlaceholderService(PlaceholderService placeholderService) {
+    public SorPlaceholderService(
+        PlaceholderService placeholderService,
+        @Value("${helpline.telephone}")
+        String helplineTelephone,
+        @Value("${helpline.telephoneIbc}")
+        String helplineTelephoneIbc,
+        @Value("${helpline.telephoneScotland}")
+        String helplineTelephoneScotland) {
         this.placeholderService = placeholderService;
+        this.helplineTelephone = helplineTelephone;
+        this.helplineTelephoneIbc = helplineTelephoneIbc;
+        this.helplineTelephoneScotland = helplineTelephoneScotland;
     }
 
     public Map<String, Object> populatePlaceholders(SscsCaseData caseData, FurtherEvidenceLetterType letterType,
@@ -70,7 +84,14 @@ public class SorPlaceholderService {
         }
 
         RegionalProcessingCenter rpc = caseData.getRegionalProcessingCenter();
-        if (!isNull(rpc)) {
+        if (caseData.isIbcCase()) {
+            placeholders.put(
+                PHONE_NUMBER,
+                Objects.equals(caseData.getIsScottishCase(), "Yes")
+                    ? helplineTelephoneScotland
+                    : helplineTelephoneIbc
+            );
+        } else {
             placeholders.put(PHONE_NUMBER, determinePhoneNumber(rpc));
         }
 

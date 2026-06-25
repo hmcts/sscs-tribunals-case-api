@@ -30,14 +30,15 @@ export class Hearings {
   }
 
   async verifyHearingStatusSummary(isDirectionHearing: boolean) {
-    await webActions.verifyTextVisibility('WAITING TO BE LISTED');
-    await webActions.verifyTextVisibility(isDirectionHearing ? 'Direction Hearings' : 'Substantive');
-    await webActions.verifyTextVisibility('View or edit');
-    await webActions.isLinkClickable('Cancel');
+    await webActions.verifyTextVisibility('Current and upcoming');
+    await webActions.verifyTextVisibilityFastFail('WAITING TO BE LISTED');
+    await webActions.verifyTextVisibilityFastFail(isDirectionHearing ? 'Direction Hearings' : 'Substantive');
+    await webActions.verifyTextVisibilityFastFail('View or edit');
+    await webActions.isButtonClickable('Cancel');
   }
 
   async clickHearingDetails() {
-    await webActions.clickLink('View or edit');
+    await webActions.clickButtonByRole('View or edit');
   }
 
   async clickBackLink() {
@@ -56,7 +57,7 @@ export class Hearings {
 
   async clickCancelLink() {
     await webActions.verifyTextVisibility('Cancel');
-    await webActions.clickLink('Cancel');
+    await webActions.clickButtonByRole('Cancel');
   }
 
   async submitCancellationReason() {
@@ -71,7 +72,7 @@ export class Hearings {
   }
 
   async verifyCancellationDetails(cancelReason: string) {
-    await webActions.clickLink('View details');
+    await webActions.clickButtonByRole('View details');
     await webActions.verifyTextVisibility('Cancellation requested');
     await webActions.verifyTextVisibility(cancelReason);
   }
@@ -103,9 +104,10 @@ export class Hearings {
   }
 
   async verifyUpdateStatusSummary() {
-    await webActions.verifyTextVisibility('UPDATE REQUESTED');
-    await webActions.verifyTextVisibility('Substantive');
-    await webActions.verifyTextVisibility('View or edit');
-    await webActions.isLinkClickable('Cancel');
+    await webActions.verifyTextVisibility('Current and upcoming');
+    await webActions.verifyTextVisibilityFastFail('UPDATE REQUESTED');
+    await webActions.verifyTextVisibilityFastFail('Substantive');
+    await webActions.verifyTextVisibilityFastFail('View or edit');
+    await webActions.isButtonClickable('Cancel');
   }
 }

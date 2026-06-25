@@ -1,0 +1,61 @@
+{
+  "case_details": {
+    "after_submit_callback_response": null,
+    "callback_response_status": null,
+    "callback_response_status_code": null,
+    "case_data": {
+      "appeal": {
+        "appealReasons": {},
+        "appellant": {
+          "contact": {
+            "email": "mail@email.com",
+            "phone": "01234567890"
+          },
+          "identity": {
+            "dob": "2148-03-10",
+            "nino": "AB 22 55 66 B"
+          },
+          "role": {
+            "name": "Paying parent"
+          }
+        },
+        "rep": {
+          "hasRepresentative": "No"
+        },
+        "benefitType": {
+          "code": null
+        },
+        "hearingOptions": {
+          "languageInterpreter": "Yes",
+          "other": "No",
+          "wantsSupport": "Yes",
+          "wantsToAttend": "Yes",
+          "excludeDates" : [{
+            "value" : {
+              "start" : "2018-12-01",
+              "end" : null
+            }
+          }]
+        },
+        "mrnDetails": {
+          "mrnDate": null
+        },
+        "signer": null
+      },
+      "caseReference": "SC022/14/12423"
+    },
+    "case_type_id": "Benefit",
+    "created_date": [
+      2018,
+      7,
+      25,
+      15,
+      49,
+      48,
+      23000000
+    ],
+    "state": "incompleteApplication",
+    "id": "1234567"
+  },
+  "event_id": "validAppeal"
+}

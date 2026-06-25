@@ -1,8 +1,12 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
+import static java.util.Objects.nonNull;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -27,24 +31,22 @@ public class AssociatedCaseLinkHelper {
     }
 
     public SscsCaseData linkCaseByNino(SscsCaseData sscsCaseData, Optional<CaseDetails<SscsCaseData>> previousSscsCaseDataCaseDetails) {
-        SscsCaseData updatedSscsCaseData = sscsCaseData;
         String previousNino = null;
         if (previousSscsCaseDataCaseDetails.isPresent()) {
             SscsCaseData sscsCaseDataBefore = previousSscsCaseDataCaseDetails.get().getCaseData();
             Identity identityPrevious = sscsCaseDataBefore.getAppeal().getAppellant().getIdentity();
-            previousNino = (identityPrevious != null) ? identityPrevious.getNino() : null;
+            previousNino = nonNull(identityPrevious) ? identityPrevious.getNino() : null;
         }
         Identity identity = sscsCaseData.getAppeal().getAppellant().getIdentity();
-        final String nino = (identity != null) ? identity.getNino() : null;
-        if (!StringUtils.isEmpty(nino) && StringUtils.isEmpty(previousNino)) {
+        final String nino = nonNull(identity) ? identity.getNino() : null;
+        if (isNotEmpty(nino) && isEmpty(previousNino)) {
             List<SscsCaseDetails> matchedByNinoCases = getMatchedCases(nino, idamService.getIdamTokens());
             if (!matchedByNinoCases.isEmpty()) {
                 log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino " + nino);
-                updatedSscsCaseData = addAssociatedCases(sscsCaseData, matchedByNinoCases);
+                return addAssociatedCases(sscsCaseData, matchedByNinoCases);
             }
         }
-
-        return updatedSscsCaseData;
+        return sscsCaseData;
     }
 
     protected List<SscsCaseDetails> getMatchedCases(String nino, IdamTokens idamTokens) {
@@ -75,7 +77,7 @@ public class AssociatedCaseLinkHelper {
 
     public void addLinkToOtherAssociatedCasesV2Enabled(List<SscsCaseDetails> matchedByNinoCases, String caseId) {
         log.info("Adding link to other associated cases V2");
-        if (!matchedByNinoCases.isEmpty() && !StringUtils.isEmpty(caseId)) {
+        if (isNotEmpty(matchedByNinoCases) && isNotEmpty(caseId)) {
             for (SscsCaseDetails sscsCaseDetails: matchedByNinoCases) {
                 Long currentCaseId = Long.parseLong(sscsCaseDetails.getData().getCcdCaseId());
                 log.info("Linking case {} to case {} using V2", currentCaseId, caseId);

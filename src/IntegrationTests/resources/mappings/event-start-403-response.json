@@ -1,0 +1,7 @@
+{
+  "timestamp": "2018-10-19T09:32:06.430+0000",
+  "status": 403,
+  "error": "Forbidden",
+  "message": "Access Denied",
+  "path": "/caseworkers/1234/jurisdictions/SSCS/case-types/Benefit/event-triggers/appealCreated/token"
+}
