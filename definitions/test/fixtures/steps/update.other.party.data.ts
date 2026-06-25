@@ -286,7 +286,6 @@ export class UpdateOtherPartyData extends BaseStep {
   }
 
   async performUpdateOtherPartyDataIBC(caseId: string) {
-    // await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
     await this.homePage.chooseEvent('Update other party data');
     await this.updateOtherPartyDataPage.applyOtherPartyData('IBC');
     await this.eventNameAndDescriptionPage.inputData(
@@ -390,7 +389,7 @@ export class UpdateOtherPartyData extends BaseStep {
 
     await this.homePage.signOut();
 
-    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
+    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
     await this.reloginIfRedirectedToSignIn(credentials.amCaseWorker, caseId);
     await this.summaryTab.waitForSummaryState(
       'Await Confidentiality Requirements'
@@ -568,7 +567,7 @@ export class UpdateOtherPartyData extends BaseStep {
   }
 
   private async goToUpdateOtherPartyData(caseId: string) {
-    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
+    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
     await this.chooseEventWithRetry('Update other party data');
   }
 }
