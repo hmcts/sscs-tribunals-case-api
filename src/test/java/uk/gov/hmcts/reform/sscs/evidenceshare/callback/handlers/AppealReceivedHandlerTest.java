@@ -125,12 +125,23 @@ class AppealReceivedHandlerTest {
 
     @ParameterizedTest
     @EnumSource(value = EventType.class, names = {"VALID_APPEAL_CREATED", "DRAFT_TO_VALID_APPEAL_CREATED", "VALID_APPEAL", "INTERLOC_VALID_APPEAL"})
-    void givenUcCaseAndFlagEnabled_canHandleReturnsFalse(final EventType eventType) {
+    void givenUcCaseAndFlagEnabled_canHandleReturnsTrue(final EventType eventType) {
         final AppealReceivedHandler handlerWithFlagOn = new AppealReceivedHandler(updateCcdCaseService, idamService,
             true);
         assertThat(handlerWithFlagOn.canHandle(SUBMITTED,
             HandlerHelper.buildTestCallbackForGivenData(createCaseData("UC"), INTERLOCUTORY_REVIEW_STATE,
-                eventType))).isFalse();
+                eventType))).isTrue();
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = EventType.class, names = {"VALID_APPEAL_CREATED", "DRAFT_TO_VALID_APPEAL_CREATED", "VALID_APPEAL", "INTERLOC_VALID_APPEAL"})
+    void givenUcCaseAndFlagEnabled_handleTriggersAppealReceived(final EventType eventType) {
+        final AppealReceivedHandler handlerWithFlagOn = new AppealReceivedHandler(updateCcdCaseService, idamService,
+            true);
+        handlerWithFlagOn.handle(SUBMITTED,
+            HandlerHelper.buildTestCallbackForGivenData(createCaseData("UC"), INTERLOCUTORY_REVIEW_STATE, eventType));
+        verify(updateCcdCaseService).triggerCaseEventV2(eq(1L), eq(EventType.APPEAL_RECEIVED.getCcdType()),
+            eq("Appeal received"), eq("Appeal received event has been triggered from Tribunals API for digital case"), any());
     }
 
     @ParameterizedTest
@@ -198,6 +209,16 @@ class AppealReceivedHandlerTest {
         final CallbackType callbackType = CallbackType.valueOf(callbackTypeName);
         assertThat(handlerWithFlagOn.canHandle(callbackType,
             HandlerHelper.buildTestCallbackForGivenData(createCaseData("childSupport"), INTERLOCUTORY_REVIEW_STATE,
+                EventType.CONFIDENTIALITY_CONFIRMED))).isFalse();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"ABOUT_TO_START", "MID_EVENT", "ABOUT_TO_SUBMIT"})
+    void givenUcCaseAndFlagEnabledAndNotSubmitted_canHandleReturnsFalse(final String callbackTypeName) {
+        final AppealReceivedHandler handlerWithFlagOn = new AppealReceivedHandler(updateCcdCaseService, idamService, true);
+        final CallbackType callbackType = CallbackType.valueOf(callbackTypeName);
+        assertThat(handlerWithFlagOn.canHandle(callbackType,
+            HandlerHelper.buildTestCallbackForGivenData(createCaseData("UC"), INTERLOCUTORY_REVIEW_STATE,
                 EventType.CONFIDENTIALITY_CONFIRMED))).isFalse();
     }
 
