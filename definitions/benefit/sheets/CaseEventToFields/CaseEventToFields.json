@@ -2196,6 +2196,18 @@
   },
   {
     "CaseEventID": "directionIssued",
+    "CaseFieldID": "sendDirectionNoticeToOtherPartyAllowed",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "23/06/2026",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 100,
+    "PageID": "1.0",
+    "FieldShowCondition": "confidentialityType=\"DUMMY_VALUE_TO_HIDE_FIELD\"",
+    "PageLabel": "Issue direction"
+  },
+  {
+    "CaseEventID": "directionIssued",
     "CaseFieldID": "hasJointParty",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
