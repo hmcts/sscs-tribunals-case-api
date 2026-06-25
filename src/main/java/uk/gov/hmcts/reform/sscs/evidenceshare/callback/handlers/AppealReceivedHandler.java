@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isBenefitTypeChildSupportOrUc;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,10 +47,8 @@ public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
             .getId()
             .equals(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom());
 
-        if (cmOtherPartyConfidentialityEnabled && submittedAndReadToList && callback
-            .getCaseDetails()
-            .getCaseData()
-            .isBenefitType(CHILD_SUPPORT)) {
+        if (cmOtherPartyConfidentialityEnabled && submittedAndReadToList && isBenefitTypeChildSupportOrUc(
+            callback.getCaseDetails().getCaseData())) {
             return callback.getEvent() == EventType.CONFIDENTIALITY_CONFIRMED;
         }
 
