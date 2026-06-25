@@ -54,7 +54,7 @@ export class UpdateSubscription extends BaseStep {
 
   // Event created to trigger Update subscription event from next steps dropdown menu:
   private async goToUpdateSubscriptionPage(page: Page, caseId: string) {
-    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
+    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
     await this.homePage.chooseEvent('Update subscription');
   }
 }
