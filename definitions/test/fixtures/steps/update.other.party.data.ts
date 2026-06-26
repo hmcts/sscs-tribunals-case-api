@@ -342,7 +342,7 @@ export class UpdateOtherPartyData extends BaseStep {
     const appellantName = 'Tester John';
     const otherPartyName = 'Test1 Test1';
 
-    await this.loginUserWithCaseId(credentials.dwpResponseWriter, true, caseId);
+    await this.loginUserWithCaseId(credentials.dwpResponseWriter, false, caseId);
     await this.summaryTab.waitForSummaryState('Await Other Party Data');
     await this.homePage.navigateToTab('Confidentiality');
     await this.confidentialityTab.verifyConfidentialityRows([
