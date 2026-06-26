@@ -11,7 +11,7 @@ SHUTTERED=${7:-false}
 RUN_DIR=$(pwd)
 
 if [ -z "$TYPE" ] || [ -z "$VERSION" ] || [ -z "$ENV" ]; then
-    echo "Usage: create-xlsx.sh [type] [version] [env] [use_identity] [wa_enabled] [like_prod] [shuttered] [use_identity]"
+    echo "Usage: create-xlsx.sh [type] [version] [env] [use_identity] [wa_enabled] [like_prod] [shuttered]"
     exit 1
 fi
 
