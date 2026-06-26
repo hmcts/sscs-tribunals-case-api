@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.transform.deserialize;
 
 import static junit.framework.TestCase.assertNull;
-import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;

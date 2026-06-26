@@ -19,3 +19,4 @@
   {"LiveFrom": "10/06/2022", "CaseTypeID": "Benefit", "ID": "postHearing", "Name": "Post Hearing", "Description": "Issue with List assist Hearing", "DisplayOrder": 18, "TitleDisplay": "# ${[CASE_REFERENCE]}: ${appeal.appellant.name.lastName}"},
   {"LiveFrom": "07/07/2023", "CaseTypeID": "Benefit", "ID": "withUT", "Name": "With Upper Tribunal", "Description": "Cases with Upper Tribunal decision", "DisplayOrder": 19, "TitleDisplay": "# ${[CASE_REFERENCE]}: ${appeal.appellant.name.lastName}"}
 ]
+

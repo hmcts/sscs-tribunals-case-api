@@ -2,10 +2,11 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +14,15 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InternalCaseDocumentData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsEsaCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFinalDecisionCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsPipCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsUcCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.idam.UserRole;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
@@ -26,6 +35,8 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
     private final UserDetailsService userDetailsService;
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
+    @Value("${feature.severeConditions.enabled}")
+    private final boolean isSevereConditionsEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -58,6 +69,8 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
             }
         }
 
+        sscsCaseData.getSscsEsaCaseData().setWhichEsaRegulationsApply("2013");
+
         SscsUtil.setCorrectionInProgress(caseDetails, isPostHearingsEnabled);
         clearTransientFields(sscsCaseData);
 
@@ -65,17 +78,26 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
     }
 
     private void clearTransientFields(SscsCaseData caseData) {
-        if (isDraftDecisionNotOnCase(caseData) && !isCorrectionInProgress(caseData)) {
+        if (isDraftDecisionNotInSscsDocs(caseData) && isDraftDecisionNotInInternalDocs(caseData) && !isCorrectionInProgress(caseData)) {
             clearFinalDecisionTransientFields(caseData);
         } else if (isCorrectionInProgress(caseData)) {
             caseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(null);
         }
     }
 
-    private boolean isDraftDecisionNotOnCase(SscsCaseData caseData) {
+    private boolean isDraftDecisionNotInSscsDocs(SscsCaseData caseData) {
         return isNull(caseData.getSscsDocument())
                 || caseData.getSscsDocument().stream()
                 .noneMatch(doc -> doc.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue()));
+    }
+
+    private boolean isDraftDecisionNotInInternalDocs(SscsCaseData caseData) {
+        InternalCaseDocumentData internalCaseDocumentData = caseData.getInternalCaseDocumentData();
+        if ((nonNull(internalCaseDocumentData) && nonNull(internalCaseDocumentData.getSscsInternalDocument()))) {
+            return internalCaseDocumentData.getSscsInternalDocument().stream()
+                    .noneMatch(sscsDocument -> sscsDocument.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue()));
+        }
+        return true;
     }
 
     private boolean isCorrectionInProgress(SscsCaseData caseData) {
@@ -97,6 +119,12 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
         finalDecisionCaseData.setWriteFinalDecisionDateOfDecision(null);
 
         sscsCaseData.setWcaAppeal(null);
+        if (isSevereConditionsEnabled) {
+            sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(null);
+            sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereCriteriaApply(null);
+            sscsCaseData.getExtendedSscsCaseData().setEsaWriteFinalDecisionSevereCriteriaApply(null);
+            sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecisionIsAfterSvDate(null);
+        }
         finalDecisionCaseData.setOtherPartyAttendedQuestions(new ArrayList<>());
 
         //PIP
@@ -190,5 +218,8 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
         sscsCaseData.setSupportGroupOnlyAppeal(null);
         sscsUcCaseData.setDoesSchedule8Paragraph4Apply(null);
         sscsUcCaseData.setDoesSchedule9Paragraph4Apply(null);
+        if (isSevereConditionsEnabled) {
+            sscsUcCaseData.setUcWriteFinalDecisionHasSVIssueCode(null);
+        }
     }
 }

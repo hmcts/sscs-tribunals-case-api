@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -228,8 +229,9 @@ public class CreateCaseMidEventHandlerTest {
         assertThat(response.getWarnings()).contains(IBCA_REFERENCE_EMPTY_ERROR);
     }
 
-    @Test
-    void shouldReturnWarningsOnMidEventForInvalidIbcaReference() {
+    @ParameterizedTest
+    @ValueSource(strings = {"A1211", "A11A12AA", "A12b-2", "A 2012", "ABC/EF", "12345!"})
+    void shouldReturnWarningsOnMidEventForInvalidIbcaReference(String ibcaReference) {
         SscsCaseData caseData = SscsCaseData.builder()
                 .appeal(Appeal.builder()
                         .appellant(Appellant.builder()
@@ -245,7 +247,7 @@ public class CreateCaseMidEventHandlerTest {
                                         .inMainlandUk(NO)
                                         .build()
                                 )
-                                .identity(Identity.builder().ibcaReference("IBCA1234").build())
+                                .identity(Identity.builder().ibcaReference(ibcaReference).build())
                                 .build()
                         )
                         .rep(Representative.builder().build())
@@ -264,8 +266,9 @@ public class CreateCaseMidEventHandlerTest {
         assertThat(response.getWarnings()).contains(IBCA_REFERENCE_VALIDATION_ERROR);
     }
 
-    @Test
-    void shouldNotReturnErrorsOnMidEventForIbcaCase() {
+    @ParameterizedTest
+    @ValueSource(strings = {"A12112", "A11A12", "A12b12", "A12012", "ABCDEF", "123456"})
+    void shouldNotReturnErrorsOnMidEventForIbcaCase(String ibcaReference) {
         SscsCaseData caseData = SscsCaseData.builder()
                 .appeal(Appeal.builder()
                         .appellant(Appellant.builder()
@@ -281,7 +284,7 @@ public class CreateCaseMidEventHandlerTest {
                                         .inMainlandUk(NO)
                                         .build()
                                 )
-                                .identity(Identity.builder().ibcaReference("E24A45").build())
+                                .identity(Identity.builder().ibcaReference(ibcaReference).build())
                                 .build()
                         )
                         .rep(Representative.builder().build())

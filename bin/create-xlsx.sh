@@ -3,13 +3,14 @@
 TYPE=$1
 VERSION=$2
 ENV=$3
-LIKE_PROD=${4:-$ENV}
-SHUTTERED=${5:-false}
+WA_ENABLED=${4:-false}
+LIKE_PROD=${5:-$ENV}
+SHUTTERED=${6:-false}
 
 RUN_DIR=$(pwd)
 
 if [ -z "$TYPE" ] || [ -z "$VERSION" ] || [ -z "$ENV" ]; then
-    echo "Usage: create-xlsx.sh [type] [version] [env] [like_prod] [shuttered]"
+    echo "Usage: create-xlsx.sh [type] [version] [env] [wa_enabled] [like_prod] [shuttered]"
     exit 1
 fi
 
@@ -54,17 +55,14 @@ echo "Tag version: $TAG_VERSION, CCD Definitions Version: $CCD_DEF_VERSION, File
 if [ "$ENV" = "local" ]; then
     EM_CCD_ORCHESTRATOR_URL="http://localhost:4623"
     TRIBUNALS_API_URL="http://localhost:8008"
-    BULK_SCAN_API_URL="http://localhost:8090"
     BULK_SCAN_ORCHESTRATOR_URL="http://localhost:8099"
 elif [ "$ENV" = "pr" ]; then
     EM_CCD_ORCHESTRATOR_URL=${EM_CCD_ORCHESTRATOR_URL:="https://em-ccdorc-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"}
     TRIBUNALS_API_URL=${TRIBUNALS_API_URL:="https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"}
-    BULK_SCAN_API_URL="http://sscs-bulk-scan-aat.service.core-compute-aat.internal"
     BULK_SCAN_ORCHESTRATOR_URL="http://bulk-scan-orchestrator-aat.service.core-compute-aat.internal"
 elif [ "$ENV" = "aat" ] || [ "$ENV" = "demo" ] || [ "$ENV" = "prod" ] || [ "$ENV" = "perftest" ] || [ "$ENV" = "ithc" ]; then
     EM_CCD_ORCHESTRATOR_URL="http://em-ccd-orchestrator-${ENV}.service.core-compute-${ENV}.internal"
     TRIBUNALS_API_URL="http://sscs-tribunals-api-${ENV}.service.core-compute-${ENV}.internal"
-    BULK_SCAN_API_URL="http://sscs-bulk-scan-${ENV}.service.core-compute-${ENV}.internal"
     BULK_SCAN_ORCHESTRATOR_URL="http://bulk-scan-orchestrator-${ENV}.service.core-compute-${ENV}.internal"
 else
     echo "${ENV} not recognised"
@@ -127,20 +125,37 @@ case ${ENV} in
     exit 1 ;;
 esac
 
-if [ "$ENV" = "prod" ] || [ "$LIKE_PROD" = "prod" ]; then
-  excludedFilenamePatterns="-e *-nonprod.json,${shutteredExclusion}"
+if [ "$WA_ENABLED" = "true" ]; then
+    echo "Work Allocation is enabled"
+    CCD_DEF_PUBLISH="Y"
+    waExclusion="*-nonWA*"
 else
-  excludedFilenamePatterns="-e *-prod.json,${shutteredExclusion}"
+    echo "Work Allocation is disabled"
+    CCD_DEF_PUBLISH="N"
+    waExclusion="*-WA-*"
+fi
+
+if [ "$ENV" = "prod" ] || { [ "$LIKE_PROD" = "prod" ] && [ "$ENV" != "pr" ]; }; then
+  excludedFilenamePatterns="-e *-nonprod.json,${shutteredExclusion},*-nonprod-*,*-WA-*,*preview.json"
+  CCD_DEF_PUBLISH="N"
+elif [ "$ENV" = "pr" ] && [ "$LIKE_PROD" = "prod" ]; then
+  excludedFilenamePatterns="-e *-nonprod.json,${shutteredExclusion},*-nonprod-*,*-WA-*"
+  CCD_DEF_PUBLISH="N"
+else
+  excludedFilenamePatterns="-e *-prod.json,${shutteredExclusion},${waExclusion}"
 fi
 
 echo "$excludedFilenamePatterns"
+
+az login --identity
+
+az acr login --name hmctsprod --subscription 8999dec3-0104-4a27-94ee-6588559729d1
 
 docker run --rm --name json2xlsx \
   -v "${RUN_DIR}/definitions/${TYPE}:/tmp/json" \
   -v "${RUN_DIR}/definitions/${TYPE}:/tmp/output" \
   -e "CCD_DEF_EM_CCD_ORCHESTRATOR_URL=${EM_CCD_ORCHESTRATOR_URL}" \
   -e "CCD_DEF_TRIBUNALS_API_URL=${TRIBUNALS_API_URL}" \
-  -e "CCD_DEF_BULK_SCAN_API_URL=${BULK_SCAN_API_URL}" \
   -e "CCD_DEF_BULK_SCAN_ORCHESTRATOR_URL=${BULK_SCAN_ORCHESTRATOR_URL}" \
   -e "CCD_DEF_TYA_LINK=${TYA_LINK}" \
   -e "CCD_DEF_TYA_APPOINTEE_LINK=${TYA_APPOINTEE_LINK}" \
@@ -149,5 +164,6 @@ docker run --rm --name json2xlsx \
   -e "CCD_DEF_MYA_APPOINTEE_LINK=${MYA_APPOINTEE_LINK}" \
   -e "CCD_DEF_ENV=${UPPERCASE_ENV}" \
   -e "CCD_DEF_VERSION=${CCD_DEF_VERSION}" \
-  hmctspublic.azurecr.io/ccd/definition-processor:latest \
+  -e "CCD_DEF_PUBLISH=${CCD_DEF_PUBLISH}" \
+  hmctsprod.azurecr.io/ccd/definition-processor:latest \
   json2xlsx -D /tmp/json/sheets "$excludedFilenamePatterns" -o "/tmp/output/${ccdDefinitionFile}"

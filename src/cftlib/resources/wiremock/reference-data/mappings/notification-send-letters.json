@@ -1,0 +1,16 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/letters?isAsync=true"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "letter_id": "{{randomValue type='UUID'}}"
+    },
+    "transformers": ["response-template"]
+  }
+}

@@ -48,6 +48,18 @@ import { ReferredByJudge } from '../fixtures/steps/referred.by.judge';
 import { AccessibilitySteps } from '../fixtures/steps/accessibilitySteps';
 import { CreateUpdateToCaseDataSteps } from '../fixtures/steps/update.to.case.data';
 import { GenerateAppealPdfSteps } from '../fixtures/steps/generate.appeal.pdf';
+import { ManageDocuments } from '../fixtures/steps/manage.documents';
+import { UpdateListingRequirement } from '../fixtures/steps/update.listing.requirements';
+import { CommunicateWithFta } from '../fixtures/steps/communicate-with-fta';
+import { Adjournment } from '../fixtures/steps/adjournment';
+import { AmendElements } from '../fixtures/steps/amend.elements';
+import { ValidateAppeal } from '../fixtures/steps/validate.appeal';
+import { CtscReviewIncompleteAppeal } from '../fixtures/steps/work-allocation/ctsc.review.incomplete.appeal';
+import { CtscActionUnprocessedCorrespondence } from '../fixtures/steps/work-allocation/ctsc.action.unprocessed.correspondence';
+import { CtscReviewFtaResponse } from '../fixtures/steps/work-allocation/ctsc.review.fta.response';
+import { CtscReviewListingError } from '../fixtures/steps/work-allocation/ctsc.review.listing.error'
+import { CtscReviewAdminAction } from '../fixtures/steps/work-allocation/ctsc.review.admin.action';
+import { UcConfidentiality } from '../fixtures/steps/uc.confidentiality';
 
 type MyStepsFixtures = {
   addNoteSteps: Note;
@@ -86,6 +98,7 @@ type MyStepsFixtures = {
   updateOtherPartyDataSteps: UpdateOtherPartyData;
   issueFinalDecisionSteps: WriteFinalDecision;
   updateNotListableSteps: UpdateNotListable;
+  manageDocumentsSteps: ManageDocuments;
   searchFilterSteps: SearchFilter;
   hearingSteps: Hearing;
   reissueFurtherEvidenceSteps: ReissueFurtherEvidence;
@@ -99,6 +112,17 @@ type MyStepsFixtures = {
   accessibilitySteps: AccessibilitySteps;
   createUpdateToCaseDataSteps: CreateUpdateToCaseDataSteps;
   generateAppealPdfSteps: GenerateAppealPdfSteps;
+  updateListingRequirementSteps: UpdateListingRequirement;
+  communicateWithFtaSteps: CommunicateWithFta;
+  adjournmentSteps: Adjournment;
+  amendElementSteps: AmendElements;
+  validateAppealSteps: ValidateAppeal;
+  reviewIncompleteAppealSteps: CtscReviewIncompleteAppeal;
+  ctscActionUnprocessedCorrespondenceSteps: CtscActionUnprocessedCorrespondence;
+  ctscReviewFtaResponseSteps: CtscReviewFtaResponse;
+  ctscReviewListingErrorSteps: CtscReviewListingError;
+  ctscReviewAdminActionSteps: CtscReviewAdminAction;
+  ucConfidentialitySteps: UcConfidentiality;
 };
 
 export const test = stepsFactory.extend<MyStepsFixtures>({
@@ -319,6 +343,12 @@ export const test = stepsFactory.extend<MyStepsFixtures>({
     await use(updateNotListableSteps);
     console.log(`${testInfo.title} ${testInfo.status}`);
   },
+  manageDocumentsSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
+    const manageDocumentsSteps = new ManageDocuments(page);
+    await use(manageDocumentsSteps);
+    console.log(`${testInfo.title} ${testInfo.status}`);
+  },
   searchFilterSteps: async ({ page }, use, testInfo) => {
     console.log(`Test started: ${testInfo.title}`);
     const searchFilterSteps = new SearchFilter(page);
@@ -393,4 +423,50 @@ export const test = stepsFactory.extend<MyStepsFixtures>({
     const generateAppealPdfSteps = new GenerateAppealPdfSteps(page);
     await use(generateAppealPdfSteps);
   },
+  updateListingRequirementSteps: async ({ page }, use) => {
+    const updateListingRequirementSteps = new UpdateListingRequirement(page);
+    await use(updateListingRequirementSteps);
+  },
+  communicateWithFtaSteps: async ({ page }, use, testInfo) => {
+    console.log(`Test started: ${testInfo.title}`);
+    const communicateWithFtaSteps = new CommunicateWithFta(page);
+    await use(communicateWithFtaSteps);
+    console.log(`${testInfo.title} ${testInfo.status}`);
+  },
+  adjournmentSteps: async ({ page }, use) => {
+    const adjournmentSteps = new Adjournment(page);
+    await use(adjournmentSteps);
+  },
+  amendElementSteps: async ({ page }, use) => {
+    const amendElementSteps = new AmendElements(page);
+    await use(amendElementSteps);
+  },
+  validateAppealSteps: async ({ page }, use) => {
+    const validateAppealSteps = new ValidateAppeal(page);
+    await use(validateAppealSteps);
+  },
+  reviewIncompleteAppealSteps: async ({ page }, use) => {
+    const reviewIncompleteAppealSteps = new CtscReviewIncompleteAppeal(page);
+    await use(reviewIncompleteAppealSteps);
+  },
+  ctscActionUnprocessedCorrespondenceSteps: async ({ page }, use) => {
+    const ctscActionUnprocessedCorrespondenceSteps = new CtscActionUnprocessedCorrespondence(page);
+    await use(ctscActionUnprocessedCorrespondenceSteps);
+  },
+  ctscReviewFtaResponseSteps: async ({ page }, use) => {
+    const ctscReviewFtaResponseSteps = new CtscReviewFtaResponse(page);
+    await use(ctscReviewFtaResponseSteps);
+  },
+  ctscReviewListingErrorSteps: async ({ page }, use) => {
+    const ctscReviewListingErrorSteps = new CtscReviewListingError(page);
+    await use(ctscReviewListingErrorSteps);
+  },
+  ctscReviewAdminActionSteps: async ({ page }, use) => {
+    const ctscReviewAdminActionSteps = new CtscReviewAdminAction(page);
+    await use(ctscReviewAdminActionSteps);
+  },
+  ucConfidentialitySteps: async ({ page }, use) => {
+    const ucConfidentialitySteps = new UcConfidentiality(page);
+    await use(ucConfidentialitySteps);
+  }
 });

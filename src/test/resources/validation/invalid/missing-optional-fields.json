@@ -1,0 +1,13 @@
+{
+  "_comment": "Missing optional fields address_line_1, address_line_2, address_line_3, post_town, county, country, contact_number, post_code, email, date_of_birth",
+  "ocr_data_fields": [
+    {
+      "name": "first_name",
+      "value": "John"
+    },
+    {
+      "name": "last_name",
+      "value": "Smith"
+    }
+  ]
+}

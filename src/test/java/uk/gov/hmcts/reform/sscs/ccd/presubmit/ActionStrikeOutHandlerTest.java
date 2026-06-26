@@ -1,28 +1,30 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
+import static java.time.LocalDateTime.now;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ACTION_STRIKE_OUT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CASE_UPDATED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.WITH_DWP;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
+import java.util.Optional;
 import junitparams.converters.Nullable;
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.platform.commons.util.StringUtils;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -30,89 +32,80 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.model.PoDetails;
 
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ActionStrikeOutHandlerTest {
+
     private static final String USER_AUTHORISATION = "Bearer token";
+
+    private SscsCaseData sscsCaseData;
+    private CaseDetails<SscsCaseData> caseDetails;
+    private Callback<SscsCaseData> callback;
 
     private ActionStrikeOutHandler actionStrikeOutHandler;
 
-    private SscsCaseData sscsCaseData;
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
-
-    @Mock
-    private CaseDetails<SscsCaseData> caseDetails;
-
-    @Mock
-    private Callback<SscsCaseData> callback;
-
-    @Before
+    @BeforeEach
     public void setUp() {
-        actionStrikeOutHandler = new ActionStrikeOutHandler();
-
         sscsCaseData = SscsCaseData.builder().build();
+        caseDetails = new CaseDetails<>(123L, "SSCS", WITH_DWP, sscsCaseData, now(), "Benefit");
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), READY_TO_LIST, false);
 
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        actionStrikeOutHandler = new ActionStrikeOutHandler();
     }
 
 
-    @Test
-    @Parameters({
+    @ParameterizedTest
+    @CsvSource({
         "ACTION_STRIKE_OUT, ABOUT_TO_SUBMIT, true"
     })
     public void givenEvent_thenCanHandle(EventType eventType, CallbackType callbackType, boolean expected) {
-        when(callback.getEvent()).thenReturn(eventType);
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), eventType, false);
+
         assertEquals(expected, actionStrikeOutHandler.canHandle(callbackType, callback));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void givenNullCallback_shouldThrowException() {
-        actionStrikeOutHandler.canHandle(ABOUT_TO_SUBMIT, null);
+        assertThrows(NullPointerException.class, () -> actionStrikeOutHandler.canHandle(ABOUT_TO_SUBMIT, null));
     }
 
-    @Test
-    @Parameters({
+    @ParameterizedTest
+    @CsvSource({
         "ACTION_STRIKE_OUT, strikeOut, STRIKE_OUT_ACTIONED",
         "ACTION_STRIKE_OUT, ,null",
         "ACTION_STRIKE_OUT, null,null",
     })
     public void givenEvent_thenSetDwpStateToExpected(EventType eventType, @Nullable String decisionType,
-                                                     @Nullable DwpState expectedDwpState) {
-        when(callback.getEvent()).thenReturn(eventType);
+                                                     @Nullable String expectedDwpStateStr) {
+        DwpState expectedDwpState = "null".equals(expectedDwpStateStr) ? null : DwpState.valueOf(expectedDwpStateStr);
         sscsCaseData.setDecisionType(decisionType);
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), eventType, false);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = actionStrikeOutHandler.handle(ABOUT_TO_SUBMIT, callback,
-            USER_AUTHORISATION);
+        var response = actionStrikeOutHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getDwpState(), is(expectedDwpState));
         if (StringUtils.isBlank(decisionType)) {
-            String error = response.getErrors().stream()
-                .findFirst()
-                .orElse("");
+            String error = response.getErrors().stream().findFirst().orElse("");
             assertEquals("The decision type is not \"strike out\". We cannot proceed.", error);
         }
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwExceptionIfCannotHandleEventType() {
-        when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
-
         sscsCaseData = SscsCaseData.builder().dwpState(DwpState.IN_PROGRESS).build();
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        caseDetails = new CaseDetails<>(123L, "SSCS", WITH_DWP, sscsCaseData, now(), "Benefit");
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), CASE_UPDATED, false);
 
-        actionStrikeOutHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThrows(IllegalStateException.class,
+                () -> actionStrikeOutHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION));
     }
 
     @Test
     public void givenActionStrikeOut_thenClearPoFields() {
-        when(callback.getEvent()).thenReturn(EventType.ACTION_STRIKE_OUT);
         sscsCaseData.setDecisionType("strikeOut");
-
         sscsCaseData.setPoAttendanceConfirmed(YES);
         sscsCaseData.setPresentingOfficersDetails(PoDetails.builder().name(Name.builder().build()).build());
         sscsCaseData.setPresentingOfficersHearingLink("link");
+        callback = new Callback<>(caseDetails, Optional.of(caseDetails), ACTION_STRIKE_OUT, false);
 
         actionStrikeOutHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 

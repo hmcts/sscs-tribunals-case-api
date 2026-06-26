@@ -12,18 +12,18 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.service.event.EventPublisher;
+import uk.gov.hmcts.reform.sscs.service.servicebus.SendCallbackHandler;
 
 
 @RestController
 @Slf4j
 public class CcdCallbackOrchestratorController {
-    private final EventPublisher eventPublisher;
+    private final SendCallbackHandler sendCallbackHandler;
     private final SscsCaseCallbackDeserializer mapper;
 
-    public CcdCallbackOrchestratorController(final EventPublisher eventPublisher,
+    public CcdCallbackOrchestratorController(final SendCallbackHandler sendCallbackHandler,
                                              final SscsCaseCallbackDeserializer mapper) {
-        this.eventPublisher = eventPublisher;
+        this.sendCallbackHandler = sendCallbackHandler;
         this.mapper = mapper;
     }
 
@@ -32,7 +32,7 @@ public class CcdCallbackOrchestratorController {
 
         Callback<SscsCaseData> callback = mapper.deserialize(body);
         log.info("Sending message for event: {} for case id: {}", callback.getEvent(), callback.getCaseDetails().getId());
-        eventPublisher.publishEvent(callback);
+        sendCallbackHandler.handle(callback);
         return new ResponseEntity<>("{}", HttpStatus.OK);
     }
 

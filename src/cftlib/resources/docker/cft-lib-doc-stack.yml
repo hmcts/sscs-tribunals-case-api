@@ -5,14 +5,14 @@ name: cft-lib-doc-stack
 
 services:
   dm-store:
-    image: "${DM_STORE_USE_LOCAL-hmctspublic.azurecr.io/}dm/store:${DM_STORE_TAG:-latest}"
+    image: "${DM_STORE_USE_LOCAL-hmctsprod.azurecr.io/}dm/store:${DM_STORE_TAG:-latest}"
     healthcheck:
       disable: true
     environment:
       SERVER_PORT: 5005
       IDAM_SUPERUSER_EMAIL:
       GOV_NOTIFY_API_KEY:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://shared-database-pg12:5432/evidence
+      SPRING_DATASOURCE_URL: jdbc:postgresql://shared-database-pg:5432/evidence
       SPRING_DATASOURCE_USERNAME: "postgres"
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       ENABLE_AZURE_STORAGE_CONTAINER: "false"
@@ -44,7 +44,7 @@ services:
       - "host.docker.internal:host-gateway"
 
   pdf-service-api:
-    image: hmctspublic.azurecr.io/cmc/pdf-service:latest
+    image: hmctsprod.azurecr.io/cmc/pdf-service:latest
     environment:
       - JAVA_OPTS=-Xms8m -Xmx256m -Djava.security.egd=file:/dev/./urandom -XX:MaxMetaspaceSize=128m
       - S2S_URL=http://host.docker.internal:4502

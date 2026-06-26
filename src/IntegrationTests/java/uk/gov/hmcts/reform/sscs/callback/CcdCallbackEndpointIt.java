@@ -33,6 +33,7 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.hamcrest.core.StringEndsWith;
@@ -389,7 +390,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
         assertNull(result.getData().getScannedDocuments());
         assertEquals(1, result.getData().getSscsDocument().size());
         byte[] newBytes = captor.getValue().get(0).getBytes();
-        PDDocument newPdf = PDDocument.load(newBytes);
+        PDDocument newPdf = Loader.loadPDF(newBytes);
         String text = new PDFTextStripper().getText(newPdf);
         assertThat(text, StringEndsWith.endsWith(String.format("Appellant evidence Addition A | Page 1%n")));
     }

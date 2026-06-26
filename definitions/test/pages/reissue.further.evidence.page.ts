@@ -17,7 +17,7 @@ export class ReissueFurtherEvidencePage {
       '.govuk-caption-l',
       reissueFurtherEvidenceData.reissueFurtherEvidenceHeadingReissue
     ); //Above heading Text
-    await webAction.isLinkClickable('Cancel');
+    await webAction.isButtonClickable('Cancel');
   }
 
   async verifyPageContentActionEvent() {
@@ -25,7 +25,7 @@ export class ReissueFurtherEvidencePage {
       '.govuk-caption-l',
       reissueFurtherEvidenceData.reissueFurtherEvidenceHeadingAction
     ); //Above heading Text
-    await webAction.isLinkClickable('Cancel');
+    await webAction.isButtonClickable('Cancel');
   }
 
   async applyActionFurtherEvidence() {

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
+import static java.util.Objects.nonNull;
 import static java.util.Optional.empty;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase;
@@ -10,9 +11,11 @@ import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
@@ -22,7 +25,11 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody.WriteFinalDecisionTemplateBodyBuilder;
-import uk.gov.hmcts.reform.sscs.service.*;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
+import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeOutcomeService;
+import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeQuestionService;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
+import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 
 @Slf4j
 @Component
@@ -30,24 +37,22 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
 
     private EsaDecisionNoticeQuestionService esaDecisionNoticeQuestionService;
     private VenueDataLoader venueDataLoader;
+    private final boolean isSevereConditionsEnabled;
 
     @Autowired
     public EsaWriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, UserDetailsService userDetailsService,
-        EsaDecisionNoticeQuestionService decisionNoticeQuestionService, EsaDecisionNoticeOutcomeService outcomeService, DocumentConfiguration documentConfiguration, VenueDataLoader venueDataLoader) {
+                                                       EsaDecisionNoticeQuestionService decisionNoticeQuestionService, EsaDecisionNoticeOutcomeService outcomeService,
+                                                       DocumentConfiguration documentConfiguration, VenueDataLoader venueDataLoader, @Value("${feature.severeConditions.enabled}") boolean isSevereConditionsEnabled) {
         super(generateFile, userDetailsService, decisionNoticeQuestionService, outcomeService, documentConfiguration, venueDataLoader);
         this.esaDecisionNoticeQuestionService = decisionNoticeQuestionService;
         this.venueDataLoader = venueDataLoader;
-    }
-
-    @Override
-    public String getBenefitType() {
-        return "ESA";
+        this.isSevereConditionsEnabled = isSevereConditionsEnabled;
     }
 
     @Override
     protected void setTemplateContent(DecisionNoticeOutcomeService outcomeService, PreSubmitCallbackResponse<SscsCaseData> response,
-        NoticeIssuedTemplateBodyBuilder builder, SscsCaseData caseData,
-        WriteFinalDecisionTemplateBody payload) {
+                                      NoticeIssuedTemplateBodyBuilder builder, SscsCaseData caseData,
+                                      WriteFinalDecisionTemplateBody payload) {
 
         if (isYes(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
 
@@ -151,10 +156,18 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
         if (caseData.getSscsEsaCaseData().getSchedule3Selections() != null && !caseData.getSscsEsaCaseData().getSchedule3Selections().isEmpty()) {
             builder.esaSchedule3Descriptors(getEsaSchedule3DescriptorsFromQuestionKeys(caseData, caseData.getSscsEsaCaseData().getSchedule3Selections()));
         }
-        builder.regulation29Applicable(caseData.getSscsEsaCaseData().getDoesRegulation29Apply() == null ? null :  caseData.getSscsEsaCaseData().getDoesRegulation29Apply().toBoolean());
-        builder.regulation35Applicable(caseData.getSscsEsaCaseData().getDoesRegulation35Apply() == null ? null :  caseData.getSscsEsaCaseData().getDoesRegulation35Apply().toBoolean());
+        builder.regulation29Applicable(caseData.getSscsEsaCaseData().getDoesRegulation29Apply() == null ? null : caseData.getSscsEsaCaseData().getDoesRegulation29Apply().toBoolean());
+        builder.regulation35Applicable(caseData.getSscsEsaCaseData().getDoesRegulation35Apply() == null ? null : caseData.getSscsEsaCaseData().getDoesRegulation35Apply().toBoolean());
         builder.supportGroupOnly(caseData.isSupportGroupOnlyAppeal());
+        if (isSevereConditionsEnabled) {
+            builder.severeCriteriaApplies(caseData.getExtendedSscsCaseData().getEsaWriteFinalDecisionSevereCriteriaApply() == null ? null : YesNo.isYes(caseData.getExtendedSscsCaseData().getEsaWriteFinalDecisionSevereCriteriaApply()));
+        }
+        builder.esaRegulationsYear(nonNull(caseData.getSscsEsaCaseData().getWhichEsaRegulationsApply()) ? caseData.getSscsEsaCaseData().getWhichEsaRegulationsApply() : null);
     }
 
+    @Override
+    public String getBenefitType() {
+        return "ESA";
+    }
 
 }

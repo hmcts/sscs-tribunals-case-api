@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ComparatorUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
 import org.springframework.stereotype.Component;
@@ -128,7 +129,7 @@ public abstract class AbstractFooterService<D extends AbstractDocument> {
     }
 
     public PdfState isReadablePdf(String documentUrl) {
-        try (PDDocument document = PDDocument.load(toBytes(documentUrl))) {
+        try (PDDocument document = Loader.loadPDF(toBytes(documentUrl))) {
 
             PdfACompliance p1a = new PdfACompliance();
             p1a.makeCompliant(document);

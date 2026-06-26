@@ -1,8 +1,13 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc;
 
+import static org.apache.commons.lang3.BooleanUtils.isTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcPointsRegulationsAndSchedule7ActivitiesCondition.HIGH_POINTS_SCHEDULE_9_PARAGRAPH_4_UNSPECIFIED;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcPointsRegulationsAndSchedule7ActivitiesCondition.LOW_POINTS_SCHEDULE6_AND_REG_29_SKIPPED_SCHEDULE_9_PARAGRAPH_4_UNSPECIFIED_SUPPORT_GROUP_ONLY;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcPointsRegulationsAndSchedule7ActivitiesCondition.SEVERE_CONDITIONS_WITH_SV_ISSUE_CODE;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,6 +21,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ExtendedSscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFinalDecisionCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsUcCaseData;
@@ -32,71 +38,88 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
     @Mock
     private DecisionNoticeQuestionService questionService;
 
+    private SscsCaseData caseData;
+
     @Before
     public void setUp() {
         openMocks(this);
+        caseData = SscsCaseData.builder()
+                .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
+                        .writeFinalDecisionGenerateNotice(YES)
+                        .writeFinalDecisionAllowedOrRefused("allowed")
+                        .build())
+                .supportGroupOnlyAppeal("no")
+                .extendedSscsCaseData(ExtendedSscsCaseData.builder()
+                        .writeFinalDecisionSevereCriteriaApply(YES).build())
+                .dwpReassessTheAward(null)
+                .wcaAppeal(YES)
+                .sscsUcCaseData(
+                        SscsUcCaseData.builder().ucWriteFinalDecisionSchedule7ActivitiesApply("Yes")
+                                .ucWriteFinalDecisionMobilisingUnaidedQuestion("someAnswer")
+                                .ucWriteFinalDecisionSchedule7ActivitiesQuestion(List.of("someActivity"))
+                                .build()).build();
     }
 
     @NamedParameters("wcaAppealAndScheduleAndRegulationQuestionCombinations")
     @SuppressWarnings("unused")
     private Object[] wcaAppealAndScheduleAndRegulationQuestionCombinations() {
         return new Object[] {
-            new Boolean[] {false, null, null, null},
-            new Boolean[] {false, null, null, false},
-            new Boolean[] {false, null, null, true},
-            new Boolean[] {false, null, false, null},
-            new Boolean[] {false, null, false, false},
-            new Boolean[] {false, null, false, true},
-            new Boolean[] {false, null, true, null},
-            new Boolean[] {false, null, true, false},
-            new Boolean[] {false, null, true, true},
-            new Boolean[] {false, false, null, null},
-            new Boolean[] {false, false, null, false},
-            new Boolean[] {false, false, null, true},
-            new Boolean[] {false, false, false, null},
-            new Boolean[] {false, false, false, false},
-            new Boolean[] {false, false, false, true},
-            new Boolean[] {false, false, true, null},
-            new Boolean[] {false, false, true, false},
-            new Boolean[] {false, false, true, true},
-            new Boolean[] {false, true, null, null},
-            new Boolean[] {false, true, null, false},
-            new Boolean[] {false, true, null, true},
-            new Boolean[] {false, true, false, null},
-            new Boolean[] {false, true, false, false},
-            new Boolean[] {false, true, false, true},
-            new Boolean[] {false, true, true, null},
-            new Boolean[] {false, true, true, false},
-            new Boolean[] {false, true, true, true},
+            new Boolean[] {false, null, null, null, false},
+            new Boolean[] {false, null, null, false, false},
+            new Boolean[] {false, null, null, true, false},
+            new Boolean[] {false, null, false, null, false},
+            new Boolean[] {false, null, false, false, false},
+            new Boolean[] {false, null, false, true, false},
+            new Boolean[] {false, null, true, null, false},
+            new Boolean[] {false, null, true, false, false},
+            new Boolean[] {false, null, true, true, false},
+            new Boolean[] {false, false, null, null, false},
+            new Boolean[] {false, false, null, false, false},
+            new Boolean[] {false, false, null, true, false},
+            new Boolean[] {false, false, false, null, false},
+            new Boolean[] {false, false, false, false, false},
+            new Boolean[] {false, false, false, true, false},
+            new Boolean[] {false, false, true, null, false},
+            new Boolean[] {false, false, true, false, false},
+            new Boolean[] {false, false, true, true, false},
+            new Boolean[] {false, true, null, null, false},
+            new Boolean[] {false, true, null, false, false},
+            new Boolean[] {false, true, null, true, false},
+            new Boolean[] {false, true, false, null, false},
+            new Boolean[] {false, true, false, false, false},
+            new Boolean[] {false, true, false, true, false},
+            new Boolean[] {false, true, true, null, false},
+            new Boolean[] {false, true, true, false, false},
+            new Boolean[] {false, true, true, true, false},
 
-            new Boolean[] {true, null, null, null},
-            new Boolean[] {true, null, null, false},
-            new Boolean[] {true, null, null, true},
-            new Boolean[] {true, null, false, null},
-            new Boolean[] {true, null, false, false},
-            new Boolean[] {true, null, false, true},
-            new Boolean[] {true, null, true, null},
-            new Boolean[] {true, null, true, false},
-            new Boolean[] {true, null, true, true},
-            new Boolean[] {true, false, null, null},
-            new Boolean[] {true, false, null, false},
-            new Boolean[] {true, false, null, true},
-            new Boolean[] {true, false, false, null},
-            new Boolean[] {true, false, false, false},
-            new Boolean[] {true, false, false, true},
-            new Boolean[] {true, false, true, null},
-            new Boolean[] {true, false, true, false},
-            new Boolean[] {true, false, true, true},
-            new Boolean[] {true, true, null, null},
-            new Boolean[] {true, true, null, false},
-            new Boolean[] {true, true, null, true},
-            new Boolean[] {true, true, false, null},
-            new Boolean[] {true, true, false, false},
-            new Boolean[] {true, true, false, true},
-            new Boolean[] {true, true, true, null},
-            new Boolean[] {true, true, true, false},
-            new Boolean[] {true, true, true, true},
-
+            new Boolean[] {true, null, null, null, false},
+            new Boolean[] {true, null, null, false, false},
+            new Boolean[] {true, null, null, true, false},
+            new Boolean[] {true, null, false, null, false},
+            new Boolean[] {true, null, false, false, false},
+            new Boolean[] {true, null, false, true, false},
+            new Boolean[] {true, null, true, null, false},
+            new Boolean[] {true, null, true, false, false},
+            new Boolean[] {true, null, true, true, false},
+            new Boolean[] {true, false, null, null, false},
+            new Boolean[] {true, false, null, false, false},
+            new Boolean[] {true, false, null, true, false},
+            new Boolean[] {true, false, false, null, false},
+            new Boolean[] {true, false, false, false, false},
+            new Boolean[] {true, false, false, true, false},
+            new Boolean[] {true, false, true, null, false},
+            new Boolean[] {true, false, true, false, false},
+            new Boolean[] {true, false, true, true, false},
+            new Boolean[] {true, true, null, null, false},
+            new Boolean[] {true, true, null, false, false},
+            new Boolean[] {true, true, null, true, false},
+            new Boolean[] {true, true, false, null, false},
+            new Boolean[] {true, true, false, false, false},
+            new Boolean[] {true, true, false, true, false},
+            new Boolean[] {true, true, true, null, false},
+            new Boolean[] {true, true, true, false, false},
+            new Boolean[] {true, true, true, true, false},
+            new Boolean[] {true, null, null, null, true}
         };
     }
 
@@ -118,13 +141,16 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
      * If refused no sch 3 activity and Reg 35 doesn’t apply.
      *
      */
-    private boolean isValidAllowedOrRefusedCombinationExpected(int points, Boolean wcaAppeal, Boolean doesSchedule8Paragraph4Apply, Boolean schedule7ActivitiesSelected,
+    private boolean isValidAllowedOrRefusedCombinationExpected(int points, Boolean wcaAppeal, Boolean isSevereCondition, Boolean doesSchedule8Paragraph4Apply, Boolean schedule7ActivitiesSelected,
         Boolean doesSchedule9Paragraph4Apply, boolean allowed, Boolean supportGroupOnly) {
         if (!wcaAppeal.booleanValue()) {
             return true;
         }
         if (supportGroupOnly == null) {
             return false;
+        }
+        if (isSevereCondition && !isTrue(supportGroupOnly)) {
+            return true;
         }
         if (allowed && !supportGroupOnly) {
             if (points >= 15) {
@@ -150,11 +176,15 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
         return false;
     }
 
-    private boolean isValidPointsBasedCombinationExpected(int points, Boolean wcaAppeal, Boolean doesSchedule8Paragraph4Apply, Boolean schedule7ActivitiesSelected,
+    private boolean isValidPointsBasedCombinationExpected(int points, Boolean wcaAppeal, Boolean isSevereCondition, Boolean doesSchedule8Paragraph4Apply, Boolean schedule7ActivitiesSelected,
         Boolean doesSchedule9Paragraph4, Boolean supportGroupOnly) {
 
         // If it's not a wca appeal we don't do any points-based validation - always valid
         if (!wcaAppeal.booleanValue()) {
+            return true;
+        }
+        // For WCA appeals, if severe condition only appeal, then valid regardless of points or schedule/regulation answers
+        if (wcaAppeal.booleanValue() && isSevereCondition.booleanValue() && !isTrue(supportGroupOnly)) {
             return true;
         }
         // For WCA appeals, if points < 15
@@ -194,7 +224,7 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
     }
 
     private YesNo getYesNoFieldValue(Boolean value) {
-        return value == null ? null : (value.booleanValue() ? YesNo.YES : NO);
+        return value == null ? null : (value.booleanValue() ? YES : NO);
     }
 
     /**
@@ -203,14 +233,13 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
     @Test
     @Parameters(named = "wcaAppealAndScheduleAndRegulationQuestionCombinations")
     public void testThatAtExactlyOneConditionIsApplicableForAllPointsAndActivityCombinations(
-        Boolean wcaAppeal,
-        Boolean doesSchedule8Paragraph4Apply, Boolean schedule7ActivitiesSelected,
-        Boolean doesSchedule9Paragraph4Apply) {
+        Boolean wcaAppeal, Boolean doesSchedule8Paragraph4Apply, Boolean schedule7ActivitiesSelected,
+        Boolean doesSchedule9Paragraph4Apply, Boolean isSevereCondition) {
 
         int minPointsValue = 0;
         int maxPointsValue = 0;
 
-        if (wcaAppeal != null && wcaAppeal.booleanValue()) {
+        if (wcaAppeal != null && wcaAppeal && !isTrue(isSevereCondition)) {
             minPointsValue = 14;
             maxPointsValue = 15;
         }
@@ -219,12 +248,17 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
 
             for (boolean allowed : Arrays.asList(false, true)) {
 
+                if (isTrue(isSevereCondition) && isTrue(supportGroupOnly)) {
+                    minPointsValue = 14;
+                    maxPointsValue = 15;
+                }
+
                 for (int points = minPointsValue; points <= maxPointsValue; points++) {
 
                     int conditionApplicableCount = 0;
 
                     final boolean isValidCombinationExpected =
-                        isValidPointsBasedCombinationExpected(points, wcaAppeal, doesSchedule8Paragraph4Apply, schedule7ActivitiesSelected,
+                        isValidPointsBasedCombinationExpected(points, wcaAppeal, isSevereCondition, doesSchedule8Paragraph4Apply, schedule7ActivitiesSelected,
                             doesSchedule9Paragraph4Apply, supportGroupOnly);
 
                     List<String> schedule7Activities = null;
@@ -246,6 +280,7 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
                                 .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
                                 .build())
                             .supportGroupOnlyAppeal(supportGroupOnly == null ? null : supportGroupOnly ? "Yes" : "No")
+                            .extendedSscsCaseData(ExtendedSscsCaseData.builder().writeFinalDecisionSevereCriteriaApply(isSevereCondition ? YES : null).build())
                             .dwpReassessTheAward(null)
                             .wcaAppeal(YES)
                             .sscsUcCaseData(
@@ -284,7 +319,6 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
                         1, conditionApplicableCount);
 
                     if (isValidCombinationExpected) {
-
                         Assert.assertTrue("Unexpected error for:" + points + ":" + wcaAppeal + ":" + doesSchedule8Paragraph4Apply
                             + ":" + schedule7ActivitiesSelected + ":" + doesSchedule9Paragraph4Apply + ":" + supportGroupOnly, matchingCondition
                             .getOptionalErrorMessage(questionService, caseData).isEmpty());
@@ -300,7 +334,7 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
                         int allowedOrRefusedConditionApplicableCount = 0;
 
                         final boolean isValidAllowedOrRefusedCombinationExpected =
-                            isValidAllowedOrRefusedCombinationExpected(points, wcaAppeal, doesSchedule8Paragraph4Apply, schedule7ActivitiesSelected,
+                            isValidAllowedOrRefusedCombinationExpected(points, wcaAppeal, isSevereCondition, doesSchedule8Paragraph4Apply, schedule7ActivitiesSelected,
                                 doesSchedule9Paragraph4Apply, allowed, supportGroupOnly);
 
                         UcAllowedOrRefusedCondition matchingAllowedOrRefusedCondition = null;
@@ -354,5 +388,110 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
             Assert.assertEquals(UcPointsRegulationsAndSchedule7ActivitiesCondition.class, ucPointsCondition.getEnumClass());
             Assert.assertNotNull(ucPointsCondition.getPointsRequirementCondition());
         }
+    }
+
+    @Test
+    public void testThatWcaAppealSevereConditionsOnlyCasePassesWithoutError() {
+
+        caseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(YES);
+        caseData.setSscsUcCaseData(SscsUcCaseData.builder().build());
+
+        Mockito.when(questionService.getTotalPoints(Mockito.eq(caseData), Mockito.any())).thenReturn(0);
+
+        List<UcPointsRegulationsAndSchedule7ActivitiesCondition> applicableConditions = getAllApplicableRegulationsAndSchedule7ActivitiesConditionsForCaseData(caseData);
+
+        assertThat(1).isEqualTo(applicableConditions.size());
+        assertThat(SEVERE_CONDITIONS_WITH_SV_ISSUE_CODE).isEqualTo(applicableConditions.getFirst());
+        assertThat(applicableConditions.getFirst().getOptionalErrorMessage(questionService, caseData)).isEmpty();
+
+        List<UcAllowedOrRefusedCondition> applicableAllowedOrRefusedConditions = getAllApplicableUcAllowedOrRefusedConditionsForCaseData(caseData);
+
+        assertThat(1).isEqualTo(applicableAllowedOrRefusedConditions.size());
+        assertThat(UcAllowedOrRefusedCondition.SEVERE_CONDITIONS_ALLOWED_SV_ISSUE_CODE_CASE).isEqualTo(applicableAllowedOrRefusedConditions.getFirst());
+        assertThat(applicableAllowedOrRefusedConditions.getFirst().getOptionalErrorMessage(questionService, caseData)).isEmpty();
+    }
+
+
+    @Test
+    public void testThatWcaAppealWithHighPointsSchedule7AndSevereCriteriaApplyPassesWithoutError() {
+
+        Mockito.when(questionService.getTotalPoints(Mockito.eq(caseData), Mockito.any())).thenReturn(15);
+
+        List<UcPointsRegulationsAndSchedule7ActivitiesCondition> applicableConditions = getAllApplicableRegulationsAndSchedule7ActivitiesConditionsForCaseData(caseData);
+
+        assertThat(1).isEqualTo(applicableConditions.size());
+        assertThat(HIGH_POINTS_SCHEDULE_9_PARAGRAPH_4_UNSPECIFIED).isEqualTo(applicableConditions.getFirst());
+        assertThat(applicableConditions.getFirst().getOptionalErrorMessage(questionService, caseData)).isEmpty();
+
+        List<UcAllowedOrRefusedCondition> applicableAllowedOrRefusedConditions = getAllApplicableUcAllowedOrRefusedConditionsForCaseData(caseData);
+
+        assertThat(1).isEqualTo(applicableAllowedOrRefusedConditions.size());
+        assertThat(UcAllowedOrRefusedCondition.SEVERE_CONDITIONS_ALLOWED_HIGH_POINTS_SEVERE_CONDITIONS_CASE).isEqualTo(applicableAllowedOrRefusedConditions.getFirst());
+        assertThat(applicableAllowedOrRefusedConditions.getFirst().getOptionalErrorMessage(questionService, caseData)).isEmpty();
+    }
+
+
+    @Test
+    public void testThatWcaAppealSupportGroupOnlySchedule7AndSevereCriteriaApplyPassesWithoutError() {
+
+        caseData.setSupportGroupOnlyAppeal("yes");
+
+        Mockito.when(questionService.getTotalPoints(Mockito.eq(caseData), Mockito.any())).thenReturn(0);
+
+        List<UcPointsRegulationsAndSchedule7ActivitiesCondition> applicableConditions = getAllApplicableRegulationsAndSchedule7ActivitiesConditionsForCaseData(caseData);
+
+        assertThat(1).isEqualTo(applicableConditions.size());
+        assertThat(LOW_POINTS_SCHEDULE6_AND_REG_29_SKIPPED_SCHEDULE_9_PARAGRAPH_4_UNSPECIFIED_SUPPORT_GROUP_ONLY).isEqualTo(applicableConditions.getFirst());
+        assertThat(applicableConditions.getFirst().getOptionalErrorMessage(questionService, caseData)).isEmpty();
+
+        List<UcAllowedOrRefusedCondition> applicableAllowedOrRefusedConditions = getAllApplicableUcAllowedOrRefusedConditionsForCaseData(caseData);
+
+        assertThat(1).isEqualTo(applicableAllowedOrRefusedConditions.size());
+        assertThat(UcAllowedOrRefusedCondition.ALLOWED_SUPPORT_GROUP_ONLY_SEVERE_CONDITIONS_CASE).isEqualTo(applicableAllowedOrRefusedConditions.getFirst());
+        assertThat(applicableAllowedOrRefusedConditions.getFirst().getOptionalErrorMessage(questionService, caseData)).isEmpty();
+    }
+
+    @Test
+    public void testThatWcaAppealLowPointsSchedule8Paragraph4Schedule7AndSevereCriteriaApplyPassesWithoutError() {
+
+        caseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
+
+        Mockito.when(questionService.getTotalPoints(Mockito.eq(caseData), Mockito.any())).thenReturn(10);
+
+        List<UcPointsRegulationsAndSchedule7ActivitiesCondition> applicableConditions = getAllApplicableRegulationsAndSchedule7ActivitiesConditionsForCaseData(caseData);
+
+        assertThat(1).isEqualTo(applicableConditions.size());
+        assertThat(UcPointsRegulationsAndSchedule7ActivitiesCondition.LOW_POINTS_SCHEDULE_8_PARAGRAPH_4_DOES_APPLY_SCHEDULE_9_PARAGRAPH_4_UNSPECIFIED_NON_SUPPORT_GROUP_ONLY).isEqualTo(applicableConditions.getFirst());
+        assertThat(applicableConditions.getFirst().getOptionalErrorMessage(questionService, caseData)).isEmpty();
+
+        List<UcAllowedOrRefusedCondition> applicableAllowedOrRefusedConditions = getAllApplicableUcAllowedOrRefusedConditionsForCaseData(caseData);
+
+        assertThat(1).isEqualTo(applicableAllowedOrRefusedConditions.size());
+        assertThat(UcAllowedOrRefusedCondition.ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS_SEVERE_CONDITIONS_CASE).isEqualTo(applicableAllowedOrRefusedConditions.getFirst());
+        assertThat(applicableAllowedOrRefusedConditions.getFirst().getOptionalErrorMessage(questionService, caseData)).isEmpty();
+    }
+
+    private List<UcPointsRegulationsAndSchedule7ActivitiesCondition> getAllApplicableRegulationsAndSchedule7ActivitiesConditionsForCaseData(SscsCaseData caseData) {
+        List<UcPointsRegulationsAndSchedule7ActivitiesCondition> applicablePointsConditions = new ArrayList<>();
+
+        for (UcPointsRegulationsAndSchedule7ActivitiesCondition ucPointsCondition : UcPointsRegulationsAndSchedule7ActivitiesCondition.values()) {
+
+            if (ucPointsCondition.isApplicable(questionService, caseData)) {
+                applicablePointsConditions.add(ucPointsCondition);
+            }
+        }
+        return applicablePointsConditions;
+    }
+
+    private List<UcAllowedOrRefusedCondition> getAllApplicableUcAllowedOrRefusedConditionsForCaseData(SscsCaseData caseData) {
+        List<UcAllowedOrRefusedCondition> applicableUcConditions = new ArrayList<>();
+
+        for (UcAllowedOrRefusedCondition ucPointsCondition : UcAllowedOrRefusedCondition.values()) {
+
+            if (ucPointsCondition.isApplicable(questionService, caseData)) {
+                applicableUcConditions.add(ucPointsCondition);
+            }
+        }
+        return applicableUcConditions;
     }
 }

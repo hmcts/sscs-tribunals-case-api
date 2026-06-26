@@ -1,12 +1,5 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static uk.gov.hmcts.reform.sscs.model.LetterType.APPELLANT;
-import static uk.gov.hmcts.reform.sscs.model.LetterType.APPOINTEE;
-import static uk.gov.hmcts.reform.sscs.model.LetterType.JOINT_PARTY;
-import static uk.gov.hmcts.reform.sscs.model.LetterType.OTHER_PARTY;
-import static uk.gov.hmcts.reform.sscs.model.LetterType.REPRESENTATIVE;
-
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,6 +11,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.apache.pdfbox.io.RandomAccessReadBuffer;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -167,7 +161,7 @@ public class CcdNotificationsPdfService {
     public SscsCaseData mergeReasonableAdjustmentsCorrespondenceIntoCcd(List<Pdf> pdfs, Long ccdCaseId, Correspondence correspondence, LetterType letterType) {
         PDFMergerUtility merger = new PDFMergerUtility();
         for (Pdf pdf : pdfs) {
-            merger.addSource(new ByteArrayInputStream(pdf.getContent()));
+            merger.addSource(new RandomAccessReadBuffer(pdf.getContent()));
         }
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         merger.setDestinationStream(baos);
@@ -320,7 +314,7 @@ public class CcdNotificationsPdfService {
     private byte[] getMergedDocument(List<Pdf> pdfs, Long ccdCaseId) {
         PDFMergerUtility merger = new PDFMergerUtility();
         for (Pdf pdf : pdfs) {
-            merger.addSource(new ByteArrayInputStream(pdf.getContent()));
+            merger.addSource(new RandomAccessReadBuffer(pdf.getContent()));
         }
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         merger.setDestinationStream(baos);

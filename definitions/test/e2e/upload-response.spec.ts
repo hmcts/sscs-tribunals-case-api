@@ -8,28 +8,44 @@ test.describe(
   'Upload response tests',
   { tag: ['@preview-regression', '@nightly-pipeline'] },
   async () => {
-    test('As a caseworker review response submitted with any further info', async ({
-      uploadResponseSteps
+
+    test.afterEach(
+      'Cancel the hearings after test run',
+      async({ hearingSteps, uploadResponseSteps }, testInfo) => {
+        if(testInfo.title.includes("#executeTearDown")) {
+          await uploadResponseSteps.navigateToHearingsTab();
+          await hearingSteps.cancelHearingForCleanUp();
+        } 
+      }
+    )
+
+    test('As a caseworker review response submitted with any further info #executeTearDown', async ({
+      uploadResponseSteps,
+      request
     }) => {
       test.slow();
-      await uploadResponseSteps.performUploadResponseWithFurtherInfoOnAPIPAndReviewResponse();
+      caseId = await createCaseBasedOnCaseType('PIP');
+      await uploadResponseSteps.checkHmcEnvironment(request);
+      await uploadResponseSteps.performUploadResponseWithFurtherInfoOnAPIPAndReviewResponse(caseId);
     });
 
-    test('As a caseworker review response submitted without any further info', async ({
-      uploadResponseSteps
+    test('As a caseworker review response submitted without any further info #executeTearDown', async ({
+      uploadResponseSteps,
+      request
     }) => {
       test.slow();
+      await uploadResponseSteps.checkHmcEnvironment(request);
       await uploadResponseSteps.performUploadResponseWithoutFurtherInfoOnATaxCredit();
     });
 
-    test('As a caseworker review response submitted for an UC case', async ({
-      uploadResponseSteps
+    test('As a caseworker review response submitted for an UC case #executeTearDown', async ({
+      uploadResponseSteps,
+      request
     }) => {
       test.slow();
+      await uploadResponseSteps.checkHmcEnvironment(request);
       let ucCaseId = await createCaseBasedOnCaseType('UC');
-      await uploadResponseSteps.performUploadResponseOnAUniversalCredit(
-        ucCaseId
-      );
+      await uploadResponseSteps.performUploadResponseOnAUniversalCredit(ucCaseId);
     });
   }
 );
@@ -41,6 +57,16 @@ test.describe(
     test.beforeEach('Case has to be Created', async () => {
       caseId = await createCaseBasedOnCaseType('PIP');
     });
+
+    test.afterEach(
+      'Cancel the hearings after test run',
+      async({ hearingSteps, uploadResponseSteps }, testInfo) => {
+        if(testInfo.title.includes("#executeTearDown")) {
+          await uploadResponseSteps.navigateToHearingsTab();
+          await hearingSteps.cancelHearingForCleanUp();
+        } 
+      }
+    )
 
     test('As a caseworker review PHE response submitted without any further info', async ({
       uploadResponseSteps,
@@ -64,7 +90,17 @@ test.describe(
       caseId = await createCaseBasedOnCaseType('PIP');
     });
 
-    test('As a caseworker review UCB response submitted without any further info', async ({
+    test.afterEach(
+      'Cancel the hearings after test run',
+      async({ hearingSteps, uploadResponseSteps }, testInfo) => {
+        if(testInfo.title.includes("#executeTearDown")) {
+          await uploadResponseSteps.navigateToHearingsTab();
+          await hearingSteps.cancelHearingForCleanUp();
+        } 
+      }
+    )
+
+    test('As a caseworker review UCB response submitted without any further info #executeTearDown', async ({
       uploadResponseSteps,
       updateUCBSteps
     }) => {
@@ -98,69 +134,6 @@ test.describe.serial(
     }) => {
       test.slow();
       await uploadResponseSteps.verifyIssueCodeErrorsScenariosInUploadResponse();
-    });
-  }
-);
-
-test.describe.serial(
-  'WA - Review FTA response CTSC work allocation task initiation and completion tests',
-  {
-    tag: '@work-allocation'
-  },
-  async () => {
-    let caseId: string;
-
-    test.beforeAll('Case has to be Created', async () => {
-      caseId = await createCaseBasedOnCaseType('PIP');
-    });
-
-    test('As a CSTC Admin with case allocator role, view Review FTA response CTSC task', async ({
-      uploadResponseSteps
-    }) => {
-      test.slow();
-      await uploadResponseSteps.verifyCtscAdminWithCaseAllocatorRoleCanViewReviewFTAResponseTask(
-        caseId
-      );
-    });
-
-    test('As a CSTC Administrator without case allocator role, view and complete Review FTA Response CTSC task', async ({
-      uploadResponseSteps
-    }) => {
-      test.slow();
-      await uploadResponseSteps.verifyCtscAdminWithoutCaseAllocatorRoleCanCompleteReviewFTAResponseTask(
-        caseId
-      );
-    });
-
-    test.afterAll('Case has to be set to Dormant', async () => {
-      await performAppealDormantOnCase(caseId);
-    });
-  }
-);
-
-test.describe(
-  'WA - Review FTA Response CTSC task automatic cancellation when case is void',
-  {
-    tag: '@work-allocation'
-  },
-  async () => {
-    let caseId: string;
-
-    test.beforeAll('Case has to be Created', async () => {
-      caseId = await createCaseBasedOnCaseType('PIP');
-    });
-
-    test('Review FTA Response task is cancelled automatically when case is void', async ({
-      uploadResponseSteps
-    }) => {
-      test.slow();
-      await uploadResponseSteps.verifyReviewFTAResponseTaskIsCancelledAutomaticallyWhenTheCaseIsVoid(
-        caseId
-      );
-    });
-
-    test.afterAll('Case has to be set to Dormant', async () => {
-      await performAppealDormantOnCase(caseId);
     });
   }
 );

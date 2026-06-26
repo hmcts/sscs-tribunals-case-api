@@ -1,0 +1,49 @@
+{
+  "_comment": "Missing mandatory field last_name",
+  "ocr_data_fields": [
+    {
+      "name": "first_name",
+      "value": "John"
+    },
+    {
+      "name": "date_of_birth",
+      "value": "1990-01-31"
+    },
+    {
+      "name": "address_line_1",
+      "value": "1 Street"
+    },
+    {
+      "name": "address_line_2",
+      "value": "Victoria Street"
+    },
+    {
+      "name": "address_line_3",
+      "value": "London"
+    },
+    {
+      "name": "post_code",
+      "value": "1SW1 1ER"
+    },
+    {
+      "name": "post_town",
+      "value": "London"
+    },
+    {
+      "name": "county",
+      "value": "county"
+    },
+    {
+      "name": "country",
+      "value": "UK"
+    },
+    {
+      "name": "email",
+      "value": "xyz@something.com"
+    },
+    {
+      "name": "contact_number",
+      "value": "0123456789"
+    }
+  ]
+}

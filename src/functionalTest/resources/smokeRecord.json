@@ -1,0 +1,16 @@
+{
+  "ocr_data_fields": [
+    {
+      "name": "is_hearing_type_oral",
+      "value": "TRUE"
+    },
+    {
+      "name": "is_hearing_type_paper",
+      "value": "false"
+    },
+    {
+      "name": "mrn_date",
+      "value": "an invalid date"
+    }
+  ]
+}
