@@ -199,7 +199,7 @@ curl http://localhost:8008/health
 ### CCD config generation
 You can generate a CCD configuration with `create-xlsx.sh`.
 
-Usage: `create-xlsx.sh [type] [version] [env] [wa_enabled] [like_prod] [shuttered]`. The parameters `type`, `version` and 
+Usage: `create-xlsx.sh [type] [version] [env] [use_identity] [wa_enabled] [like_prod] [shuttered]`. The parameters `type`, `version` and 
 `env` are always required. If not specified `wa_enabled` and `shuttered` will default to false and `like_prod` will 
 default to the value of `env`.
 

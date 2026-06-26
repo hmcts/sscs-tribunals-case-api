@@ -3,14 +3,15 @@
 TYPE=$1
 VERSION=$2
 ENV=$3
-WA_ENABLED=${4:-false}
-LIKE_PROD=${5:-$ENV}
-SHUTTERED=${6:-false}
+USE_IDENTITY=${4:-false}
+WA_ENABLED=${5:-false}
+LIKE_PROD=${6:-$ENV}
+SHUTTERED=${7:-false}
 
 RUN_DIR=$(pwd)
 
 if [ -z "$TYPE" ] || [ -z "$VERSION" ] || [ -z "$ENV" ]; then
-    echo "Usage: create-xlsx.sh [type] [version] [env] [wa_enabled] [like_prod] [shuttered]"
+    echo "Usage: create-xlsx.sh [type] [version] [env] [use_identity] [wa_enabled] [like_prod] [shuttered] [use_identity]"
     exit 1
 fi
 
@@ -147,7 +148,9 @@ fi
 
 echo "$excludedFilenamePatterns"
 
-az login --identity
+if [ "$USE_IDENTITY" = "true" ]; then
+    az login --identity
+fi
 
 az acr login --name hmctsprod --subscription 8999dec3-0104-4a27-94ee-6588559729d1
 
