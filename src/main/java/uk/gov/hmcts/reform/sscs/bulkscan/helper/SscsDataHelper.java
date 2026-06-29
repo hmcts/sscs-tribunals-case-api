@@ -38,7 +38,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
 import uk.gov.hmcts.reform.sscs.domain.CaseResponse;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
@@ -169,7 +169,7 @@ public class SscsDataHelper {
 
     private void checkConfidentiality(FormType formType, Map<String, Object> appealData, Appeal appeal) {
         if ((FormType.SSCS2.equals(formType) || FormType.SSCS5.equals(formType)) && appeal.getAppellant() != null && isYes(appeal.getAppellant().getConfidentialityRequirement())) {
-            appealData.put("isConfidentialCase", YesNo.YES.getValue());
+            appealData.put("confidentialCaseStatus", YesNoUndetermined.YES.getValue());
         }
     }
 
