@@ -26,6 +26,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -70,6 +71,8 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     private final PanelCompositionService panelCompositionService;
     private final HearingsService hearingsService;
     private final AddedDocumentsUtil addedDocumentsUtil;
+    @Value("${feature.cm-other-party-confidentiality.enabled}") 
+    private final boolean cmOtherPartyConfidentialityEnabled;
     private static final Enum<EventType> EVENT_TYPE = EventType.DWP_UPLOAD_RESPONSE;
 
     @Override
@@ -169,7 +172,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     }
 
     private void checkSscs2AndSscs5Confidentiality(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, SscsCaseData sscsCaseData) {
-        if (isValidBenefitTypeForConfidentiality(sscsCaseData.getAppeal().getBenefitType())) {
+        if (isValidBenefitTypeForConfidentiality(sscsCaseData.getAppeal().getBenefitType(), cmOtherPartyConfidentialityEnabled)) {
             if (sscsCaseData.getDwpEditedEvidenceReason() == null) {
                 if (otherPartyHasConfidentiality(sscsCaseData)) {
                     preSubmitCallbackResponse.addError("Other Party requires confidentiality, upload edited and unedited responses");
