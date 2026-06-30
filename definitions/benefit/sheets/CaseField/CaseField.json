@@ -487,7 +487,6 @@
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "sendDirectionNoticeToOtherPartyRep", "Label": "Other Party Rep", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "sendDirectionNoticeToOtherPartyAppointee", "Label": "Other Party Appointee", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "sendDirectionNoticeToOtherParty", "Label": "Other Party", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "23/06/2026", "CaseTypeID": "Benefit", "ID": "sendDirectionNoticeToOtherPartyAllowed", "Label": "Send direction notice to other party allowed", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "sendDirectionNoticeToJointParty", "Label": "Joint Party", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "sendDirectionNoticeToAppellantOrAppointee", "Label": "Appellant or Appointee", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/02/2023", "CaseTypeID": "Benefit", "ID": "panelMemberExclusions", "Label": "Panel member exclusions/reserve to", "FieldType": "panelMemberExclusions", "SecurityClassification": "PUBLIC"},

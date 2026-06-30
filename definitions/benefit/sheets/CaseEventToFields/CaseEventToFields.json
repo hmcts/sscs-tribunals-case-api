@@ -2196,14 +2196,14 @@
   },
   {
     "CaseEventID": "directionIssued",
-    "CaseFieldID": "sendDirectionNoticeToOtherPartyAllowed",
+    "CaseFieldID": "appeal",
     "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
+    "DisplayContext": "OPTIONAL",
     "LiveFrom": "23/06/2026",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 100,
     "PageID": "1.0",
-    "FieldShowCondition": "confidentialityType=\"DUMMY_VALUE_TO_HIDE_FIELD\"",
+    "FieldShowCondition": "[STATE]=\"doNotUse\"",
     "PageLabel": "Issue direction"
   },
   {
@@ -2287,7 +2287,7 @@
     "CaseFieldID": "sendDirectionNoticeToOtherParty",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "FieldShowCondition": "sendDirectionNoticeToOtherPartyAllowed = \"Yes\"",
+    "FieldShowCondition": "hasOtherParties = \"Yes\" AND (appeal.benefitType.code=\"childSupport\" OR appeal.benefitType.code=\"UC\")",
     "LiveFrom": "23/06/2026",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 8,

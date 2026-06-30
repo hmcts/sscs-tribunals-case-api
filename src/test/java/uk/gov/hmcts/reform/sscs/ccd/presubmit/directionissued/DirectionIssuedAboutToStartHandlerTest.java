@@ -507,7 +507,6 @@ class DirectionIssuedAboutToStartHandlerTest {
         assertThat(sscsCaseData.getOtherPartySelection().get(0).getValue().getOtherPartiesList().getListItems())
                 .extracting(DynamicListItem::getCode)
                 .containsExactlyInAnyOrder("otherParty1", "otherParty2");
-        assertThat(sscsCaseData.getExtendedSscsCaseData().getSendDirectionNoticeToOtherPartyAllowed()).isEqualTo(YES);
     }
 
     @Test
@@ -521,7 +520,6 @@ class DirectionIssuedAboutToStartHandlerTest {
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertThat(sscsCaseData.getOtherPartySelection()).isNull();
-        assertThat(sscsCaseData.getExtendedSscsCaseData().getSendDirectionNoticeToOtherPartyAllowed()).isEqualTo(NO);
     }
 
     @Test
