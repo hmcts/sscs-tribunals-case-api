@@ -185,7 +185,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             }
         }
 
-        sscsCaseData.setConfidentialCaseStatus(isConfidential(sscsCaseData, cmOtherPartyConfidentialityEnabled));
+        sscsCaseData.setIsConfidentialCase(isConfidential(sscsCaseData, cmOtherPartyConfidentialityEnabled));
         updateCaseName(callback, sscsCaseData);
         updateCaseCategoriesIfBenefitTypeUpdated(callback, sscsCaseData, preSubmitCallbackResponse);
         updateLanguage(sscsCaseData);

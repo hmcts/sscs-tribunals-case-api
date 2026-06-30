@@ -10,7 +10,6 @@ import static uk.gov.hmcts.reform.sscs.bulkscan.domain.validation.ValidationStat
 import static uk.gov.hmcts.reform.sscs.bulkscan.domain.validation.ValidationStatus.SUCCESS;
 import static uk.gov.hmcts.reform.sscs.bulkscan.domain.validation.ValidationStatus.WARNINGS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined.isYes;
 import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.generateBenefitCode;
 import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.generateCaseCode;
 import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.generateIssueCode;
@@ -168,7 +167,7 @@ public class SscsDataHelper {
     }
 
     private void checkConfidentiality(FormType formType, Map<String, Object> appealData, Appeal appeal) {
-        if ((FormType.SSCS2.equals(formType) || FormType.SSCS5.equals(formType)) && appeal.getAppellant() != null && isYes(appeal.getAppellant().getConfidentialityRequirement())) {
+        if ((FormType.SSCS2.equals(formType) || FormType.SSCS5.equals(formType)) && appeal.getAppellant() != null && YesNo.isYes(appeal.getAppellant().getConfidentialityRequired())) {
             appealData.put("isConfidentialCase", YesNo.YES.getValue());
         }
     }

@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.confidentialityrequest;
 
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined.YES;
-
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -64,7 +62,7 @@ public class ReviewConfidentialityRequestAboutToSubmitHandler implements PreSubm
                         ? InterlocReviewState.AWAITING_ADMIN_ACTION : null;
 
                     sscsCaseData.setInterlocReviewState(interlocReviewState);
-                    sscsCaseData.setConfidentialCaseStatus(YES);
+                    sscsCaseData.setIsConfidentialCase(YesNo.YES);
 
                     if (!enhancedConfidentialityFeature) {
                         sscsCaseData.setIsProgressingViaGaps(YesNo.YES.getValue());

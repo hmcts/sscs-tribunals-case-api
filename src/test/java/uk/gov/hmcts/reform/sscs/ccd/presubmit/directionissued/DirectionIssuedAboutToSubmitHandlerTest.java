@@ -88,6 +88,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsInterlocDirectionDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
@@ -1423,11 +1424,11 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
             var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-            assertThat(response.getData().getConfidentialCaseStatus()).isEqualTo(YesNoUndetermined.YES);
+            assertThat(response.getData().getIsConfidentialCase()).isEqualTo(YES);
         }
 
         @Test
-        void givenConfidentialityRefused_andNoOtherPartyHasConfidentiality_thenIsConfidentialCaseFlagIsRemoved() {
+        void givenConfidentialityRefused_andNoOtherPartyHasConfidentiality_thenIsConfidentialCaseFlagIsNo() {
             when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
             handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, idamService, 35, 42, false,
                 cmOtherPartyConfidentialityFeatureFlag);
@@ -1435,9 +1436,8 @@ class DirectionIssuedAboutToSubmitHandlerTest {
             callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList("confidentialityRefusedSendToAdmin"));
             callback.getCaseDetails().getCaseData().getAppeal()
                 .setBenefitType(BenefitType.builder().code(CHILD_SUPPORT.getShortName()).build());
-            callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(
-                YesNoUndetermined.YES);
-            callback.getCaseDetails().getCaseData().setConfidentialCaseStatus(YesNoUndetermined.YES);
+            callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(YesNoUndetermined.YES);
+            callback.getCaseDetails().getCaseData().setIsConfidentialCase(YES);
             var selectedConfidentialityParty = new DynamicList(new DynamicListItem("appellant", "Appellant (or Appointee)"), null);
             callback.getCaseDetails().getCaseData()
                 .setExtendedSscsCaseData(ExtendedSscsCaseData.builder().selectedConfidentialityParty(selectedConfidentialityParty).build());
@@ -1446,7 +1446,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
             var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-            assertThat(response.getData().getConfidentialCaseStatus()).isEqualTo(YesNoUndetermined.NO);
+            assertThat(response.getData().getIsConfidentialCase()).isEqualTo(YesNo.NO);
         }
 
         @Test
@@ -1460,7 +1460,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
                 .setBenefitType(BenefitType.builder().code(CHILD_SUPPORT.getShortName()).build());
             callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(
                 YesNoUndetermined.YES);
-            callback.getCaseDetails().getCaseData().setConfidentialCaseStatus(YesNoUndetermined.YES);
+            callback.getCaseDetails().getCaseData().setIsConfidentialCase(YesNo.YES);
             callback.getCaseDetails().getCaseData().setOtherParties(
                 List.of(buildOtherParty("111-111-111", "Other", "Party", YesNoUndetermined.YES)));
             var selectedConfidentialityParty = new DynamicList(new DynamicListItem("appellant", "Appellant (or Appointee)"), null);
@@ -1471,7 +1471,7 @@ class DirectionIssuedAboutToSubmitHandlerTest {
 
             var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-            assertThat(response.getData().getConfidentialCaseStatus()).isEqualTo(YesNoUndetermined.YES);
+            assertThat(response.getData().getIsConfidentialCase()).isEqualTo(YES);
         }
 
     }

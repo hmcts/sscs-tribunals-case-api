@@ -1,16 +1,8 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.JOINT_PARTY_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.OTHER_PARTY_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.OTHER_PARTY_REPRESENTATIVE_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.DWP_LETTER;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.JOINT_PARTY_LETTER;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.OTHER_PARTY_LETTER;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.REPRESENTATIVE_LETTER;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.*;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
@@ -22,18 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
-import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.evidenceshare.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType;
@@ -66,7 +47,7 @@ public class FurtherEvidenceService {
 
     public void issue(List<? extends AbstractDocument> sscsDocuments, SscsCaseData caseData, DocumentType documentType,
                       List<FurtherEvidenceLetterType> allowedLetterTypes, String otherPartyOriginalSenderId) {
-        List<PdfDocument> pdfDocument = sscsDocumentService.getPdfsForGivenDocTypeNotIssued(sscsDocuments, documentType, YesNoUndetermined.isYes(caseData.getConfidentialCaseStatus()), otherPartyOriginalSenderId);
+        List<PdfDocument> pdfDocument = sscsDocumentService.getPdfsForGivenDocTypeNotIssued(sscsDocuments, documentType, isYes(caseData.getIsConfidentialCase()), otherPartyOriginalSenderId);
         List<PdfDocument> sizeNormalisedPdfDocuments = sscsDocumentService.sizeNormalisePdfs(pdfDocument);
         updateCaseDocuments(sizeNormalisedPdfDocuments.stream().map(PdfDocument::getDocument).collect(Collectors.toList()), caseData, documentType);
         List<Pdf> pdfs = sizeNormalisedPdfDocuments.stream().map(PdfDocument::getPdf).collect(Collectors.toList());

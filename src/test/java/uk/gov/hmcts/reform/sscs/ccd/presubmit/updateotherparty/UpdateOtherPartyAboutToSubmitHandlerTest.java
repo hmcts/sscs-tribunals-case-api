@@ -286,19 +286,19 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertThat(response.getData().getConfidentialCaseStatus()).isEqualTo(YesNoUndetermined.YES);
+        assertThat(response.getData().getIsConfidentialCase()).isEqualTo(YES);
         assertThat(response.getErrors()).isEmpty();
     }
 
     @Test
-    void givenNoOtherPartyWantsConfidentiality_thenCaseIsUndetermined() {
+    void givenNoOtherPartyWantsConfidentiality_thenCaseIsNotConfidential() {
         final SscsCaseData caseData = SscsCaseData.builder()
                 .appeal(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build()).build())
                 .otherParties(Arrays.asList(buildConfidentialOtherParty(ID_2, YesNoUndetermined.NO), buildConfidentialOtherParty(ID_1, YesNoUndetermined.NO))).build();
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertThat(response.getData().getConfidentialCaseStatus()).isEqualTo(YesNoUndetermined.UNDETERMINED);
+        assertThat(response.getData().getIsConfidentialCase()).isNull();
         assertThat(response.getErrors()).isEmpty();
     }
 
@@ -613,11 +613,11 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response =
             handlerWithFlag.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getConfidentialCaseStatus()).isEqualTo(YesNoUndetermined.YES);
+        assertThat(response.getData().getIsConfidentialCase()).isEqualTo(YES);
     }
 
     @Test
-    void givenUcCaseWithAllNonConfidentialPartiesAndCmFlagOn_thenIsConfidentialCaseUndetermined() {
+    void givenUcCaseWithAllNonConfidentialPartiesAndCmFlagOn_thenIsConfidentialCaseNotSet() {
         final UpdateOtherPartyAboutToSubmitHandler handlerWithFlag = new UpdateOtherPartyAboutToSubmitHandler(idamService, true);
         final SscsCaseData caseData = SscsCaseData.builder()
                                                   .appeal(Appeal.builder().benefitType(BenefitType.builder().code(Benefit.UC.getShortName()).build()).build())
@@ -628,7 +628,7 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response =
             handlerWithFlag.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getConfidentialCaseStatus()).isEqualTo(YesNoUndetermined.UNDETERMINED);
+        assertThat(response.getData().getIsConfidentialCase()).isNull();
     }
 
     @ParameterizedTest
@@ -853,7 +853,7 @@ class UpdateOtherPartyAboutToSubmitHandlerTest {
 
     private CcdValue<OtherParty> buildOtherParty(final String wantsToAttend, final YesNoUndetermined confidentiality) {
         return CcdValue.<OtherParty>builder().value(OtherParty.builder()
-            .confidentialityRequirement(confidentiality)
+            .confidentialityRequirement(confidentiality != null ? confidentiality : YesNoUndetermined.NO)
             .hearingOptions(HearingOptions.builder().wantsToAttend(wantsToAttend).build())
             .build()).build();
     }

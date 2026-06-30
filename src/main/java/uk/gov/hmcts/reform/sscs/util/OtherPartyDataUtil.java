@@ -103,11 +103,11 @@ public class OtherPartyDataUtil {
             .collect(toSet());
     }
 
-    public static YesNoUndetermined isConfidential(final SscsCaseData sscsCaseData) {
+    public static YesNo isConfidential(final SscsCaseData sscsCaseData) {
         return isConfidential(sscsCaseData, false);
     }
 
-    public static YesNoUndetermined isConfidential(final SscsCaseData sscsCaseData,
+    public static YesNo isConfidential(final SscsCaseData sscsCaseData,
         final boolean cmOtherPartyConfidentialityEnabled) {
         if (sscsCaseData == null || sscsCaseData.getAppeal() == null) {
             return null;
@@ -118,18 +118,20 @@ public class OtherPartyDataUtil {
         }
         final YesNoUndetermined appellantConfidentiality = sscsCaseData.getAppellantConfidentiality().orElse(null);
         if (appellantConfidentiality == YesNoUndetermined.YES || otherPartyHasConfidentiality(sscsCaseData)) {
-            return YesNoUndetermined.YES;
+            return YesNo.YES;
         }
         if (appellantConfidentiality == YesNoUndetermined.NO && allOtherPartiesDoNotWantConfidentiality(sscsCaseData)) {
-            return YesNoUndetermined.NO;
+            return YesNo.NO;
         }
-        return YesNoUndetermined.UNDETERMINED;
+        return null;
     }
 
+    // TODO Why is the FF hard-coded as false? Can we remove this and use the method below, and if we do that we can use the predicate in sscs-common
     public static boolean isValidBenefitTypeForConfidentiality(final BenefitType benefitType) {
         return isValidBenefitTypeForConfidentiality(benefitType, false);
     }
 
+    // TODO Can replace this with the predicate defined in sscs-common once cmOtherPartyConfidentialityEnabled is removed
     public static boolean isValidBenefitTypeForConfidentiality(
         final BenefitType benefitType,
         final boolean cmOtherPartyConfidentialityEnabled) {

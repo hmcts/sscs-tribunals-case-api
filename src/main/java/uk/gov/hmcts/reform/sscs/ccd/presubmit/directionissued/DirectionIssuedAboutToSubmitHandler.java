@@ -273,7 +273,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             && isConfidentialityDirection(caseData.getDirectionTypeDl().getValue().getCode())
             && isBenefitTypeWithConfidentialityTab(caseData)) {
             applyConfidentialityDecisionFromDirection(caseData);
-            caseData.setConfidentialCaseStatus(isConfidential(caseData, cmOtherPartyConfidentialityEnabled));
+            caseData.setIsConfidentialCase(isConfidential(caseData, cmOtherPartyConfidentialityEnabled));
             caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION);
         } else {
             caseData.setInterlocReviewState(null);

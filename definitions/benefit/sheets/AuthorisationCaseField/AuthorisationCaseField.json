@@ -1173,7 +1173,6 @@
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "reinstatementRegistered", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "reinstatementOutcome", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "10/06/2020", "CaseTypeID": "Benefit", "CaseFieldID": "isConfidentialCase", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
-  {"LiveFrom": "19/06/2026", "CaseTypeID": "Benefit", "CaseFieldID": "confidentialCaseStatus", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "isConfidentialCaseLabel", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "isConfidentialityRequestUnderReviewLabel", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "confidentialityRequestOutcomeAppellant", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},

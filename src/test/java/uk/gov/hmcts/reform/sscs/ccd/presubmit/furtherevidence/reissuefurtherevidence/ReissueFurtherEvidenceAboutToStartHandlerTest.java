@@ -37,7 +37,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.reissueartifact.ReissueArtifactHandlerTest;
 
 @RunWith(JUnitParamsRunner.class)
@@ -252,7 +252,7 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest extends ReissueArtifa
             .build()).build();
 
         sscsCaseData.setSscsDocument(Arrays.asList(documentWithEditedDoc, document));
-        sscsCaseData.setConfidentialCaseStatus(YesNoUndetermined.YES);
+        sscsCaseData.setIsConfidentialCase(YesNo.YES);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 

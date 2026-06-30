@@ -47,7 +47,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 import uk.gov.hmcts.reform.sscs.service.bundle.BundleAudioVideoPdfService;
@@ -149,7 +148,7 @@ public class BundlingHandlerTest {
     public void givenCaseWithEditedDwpDocsAndPheNotGranted_thenReturnErrorMessageAndDoNotSendRequestToBundleService(String languagePreference, String expectedConfigFile) {
         addMandatoryDwpDocuments();
         addNonEditedSscsDocuments();
-        sscsCaseData.setConfidentialCaseStatus(YesNoUndetermined.NO);
+        sscsCaseData.setIsConfidentialCase(NO);
 
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(languagePreference);
         callback.getCaseDetails().getCaseData().setDwpPhme(YES.getValue());
@@ -313,7 +312,7 @@ public class BundlingHandlerTest {
         addMandatoryNonEditedDwpDocuments();
         addEditedSscsDocuments();
 
-        callback.getCaseDetails().getCaseData().setConfidentialCaseStatus(YesNoUndetermined.YES);
+        callback.getCaseDetails().getCaseData().setIsConfidentialCase(YES);
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(langPreference);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
 
@@ -331,7 +330,7 @@ public class BundlingHandlerTest {
         addEditedSscsDocuments();
         sscsCaseData.setBenefitCode("022");
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
-        callback.getCaseDetails().getCaseData().setConfidentialCaseStatus(YesNoUndetermined.YES);
+        callback.getCaseDetails().getCaseData().setIsConfidentialCase(YES);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
 
@@ -350,7 +349,7 @@ public class BundlingHandlerTest {
         addMandatoryDwpEvidenceDocuments();
         sscsCaseData.setBenefitCode("022");
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
-        callback.getCaseDetails().getCaseData().setConfidentialCaseStatus(YesNoUndetermined.YES);
+        callback.getCaseDetails().getCaseData().setIsConfidentialCase(YES);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
 
@@ -371,7 +370,7 @@ public class BundlingHandlerTest {
         addNonEditedSscsDocuments();
         sscsCaseData.setBenefitCode("022");
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
-        callback.getCaseDetails().getCaseData().setConfidentialCaseStatus(YesNoUndetermined.YES);
+        callback.getCaseDetails().getCaseData().setIsConfidentialCase(YES);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
 
@@ -389,7 +388,7 @@ public class BundlingHandlerTest {
         addMandatoryDwpDocuments();
         sscsCaseData.setBenefitCode("022");
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
-        callback.getCaseDetails().getCaseData().setConfidentialCaseStatus(YesNoUndetermined.YES);
+        callback.getCaseDetails().getCaseData().setIsConfidentialCase(YES);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
 
@@ -410,7 +409,7 @@ public class BundlingHandlerTest {
         addEditedSscsDocuments();
         sscsCaseData.setDwpPhme(YES.getValue());
         sscsCaseData.setPhmeGranted(YES);
-        callback.getCaseDetails().getCaseData().setConfidentialCaseStatus(YesNoUndetermined.YES);
+        callback.getCaseDetails().getCaseData().setIsConfidentialCase(YES);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
 
@@ -450,7 +449,7 @@ public class BundlingHandlerTest {
     public void givenEnhancedConfidentialityCaseWithNoEditedDocs_thenPopulateUneditedConfigFileName(String langPreference, String expectedBundleName) {
         addMandatoryNonEditedDwpDocuments();
 
-        callback.getCaseDetails().getCaseData().setConfidentialCaseStatus(YesNoUndetermined.YES);
+        callback.getCaseDetails().getCaseData().setIsConfidentialCase(YES);
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(langPreference);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
 
@@ -468,7 +467,7 @@ public class BundlingHandlerTest {
         addMandatoryNonEditedDwpDocuments();
         addNonEditedSscsDocuments();
         callback.getCaseDetails().getCaseData().setPhmeGranted(YES);
-        callback.getCaseDetails().getCaseData().setConfidentialCaseStatus(YesNoUndetermined.YES);
+        callback.getCaseDetails().getCaseData().setIsConfidentialCase(YES);
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(langPreference);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
 

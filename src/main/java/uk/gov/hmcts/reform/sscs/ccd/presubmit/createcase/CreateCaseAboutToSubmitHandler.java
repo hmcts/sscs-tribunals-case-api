@@ -107,7 +107,7 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
                     caseData.getIsScottishCase(), callback.getCaseDetails().getId());
         }
 
-        caseData.setConfidentialCaseStatus(isConfidential(caseData, cmOtherPartyConfidentialityEnabled));
+        caseData.setIsConfidentialCase(isConfidential(caseData, cmOtherPartyConfidentialityEnabled));
 
         return preSubmitCallbackResponse;
     }

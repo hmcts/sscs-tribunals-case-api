@@ -580,7 +580,7 @@
   },
   {
     "CaseEventID": "superUserFullEdit",
-    "CaseFieldID": "confidentialCaseStatus",
+    "CaseFieldID": "isConfidentialCase",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "16/03/2026",

@@ -90,7 +90,7 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
 
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         sscsCaseData.setOtherPartyUcb(getOtherPartyUcb(sscsCaseData.getOtherParties()));
-        sscsCaseData.setConfidentialCaseStatus(isConfidential(sscsCaseData, cmOtherPartyConfidentialityEnabled));
+        sscsCaseData.setIsConfidentialCase(isConfidential(sscsCaseData, cmOtherPartyConfidentialityEnabled));
         sscsCaseData.getOtherParties().forEach(otherPartyCcdValue -> otherPartyCcdValue.getValue()
                 .setSendNewOtherPartyNotification(sendNewOtherPartyNotification(otherPartyCcdValue)));
         sscsCaseData.setOtherParties(clearOtherPartiesIfEmpty(sscsCaseData));

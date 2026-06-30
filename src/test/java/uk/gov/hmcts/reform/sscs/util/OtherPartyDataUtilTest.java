@@ -298,7 +298,7 @@ public class OtherPartyDataUtilTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("isConfidentialScenarios")
     void isConfidential_returnsExpectedResult(final String scenario, final SscsCaseData caseData,
-        final boolean cmOtherPartyConfidentialityEnabled, final YesNoUndetermined expected) {
+        final boolean cmOtherPartyConfidentialityEnabled, final YesNo expected) {
         assertThat(isConfidential(caseData, cmOtherPartyConfidentialityEnabled)).isEqualTo(expected);
     }
 
@@ -309,23 +309,23 @@ public class OtherPartyDataUtilTest {
             Arguments.of("null benefit type returns null", buildSscsCaseData(null), false, null),
             Arguments.of("universal credit without confidentiality flag returns null", buildSscsCaseData(Benefit.UC), false, null),
             Arguments.of("appellant confidentiality yes returns yes",
-                buildSscsCaseData(Benefit.CHILD_SUPPORT, YesNoUndetermined.YES), false, YesNoUndetermined.YES),
+                buildSscsCaseData(Benefit.CHILD_SUPPORT, YesNoUndetermined.YES), false, YesNo.YES),
             Arguments.of("other party confidentiality yes with appellant not yes returns yes",
                 withOtherParties(buildSscsCaseData(Benefit.CHILD_SUPPORT),
-                    buildOtherParty("otherparty-1", true, YesNoUndetermined.YES)), false, YesNoUndetermined.YES),
+                    buildOtherParty("otherparty-1", true, YesNoUndetermined.YES)), false, YesNo.YES),
             Arguments.of("appellant no and no other parties returns no",
-                buildSscsCaseData(Benefit.CHILD_SUPPORT, YesNoUndetermined.NO), false, YesNoUndetermined.NO),
+                buildSscsCaseData(Benefit.CHILD_SUPPORT, YesNoUndetermined.NO), false, YesNo.NO),
             Arguments.of("appellant no but other party undetermined returns undetermined",
                 withOtherParties(buildSscsCaseData(Benefit.CHILD_SUPPORT, YesNoUndetermined.NO),
-                    buildOtherParty("otherparty-1", true, YesNoUndetermined.UNDETERMINED)), false, YesNoUndetermined.UNDETERMINED),
+                    buildOtherParty("otherparty-1", true, YesNoUndetermined.UNDETERMINED)), false, null),
             Arguments.of("appellant undetermined and no other party confidentiality returns undetermined",
-                buildSscsCaseData(Benefit.CHILD_SUPPORT), false, YesNoUndetermined.UNDETERMINED),
+                buildSscsCaseData(Benefit.CHILD_SUPPORT), false, null),
             Arguments.of("universal credit with confidentiality flag enabled and appellant yes returns yes",
-                buildSscsCaseData(Benefit.UC, YesNoUndetermined.YES), true, YesNoUndetermined.YES),
+                buildSscsCaseData(Benefit.UC, YesNoUndetermined.YES), true, YesNo.YES),
             Arguments.of("universal credit with confidentiality flag enabled and appellant no returns no",
-                buildSscsCaseData(Benefit.UC, YesNoUndetermined.NO), true, YesNoUndetermined.NO),
+                buildSscsCaseData(Benefit.UC, YesNoUndetermined.NO), true, YesNo.NO),
             Arguments.of("universal credit with confidentiality flag enabled and no confidentiality returns undetermined",
-                buildSscsCaseData(Benefit.UC), true, YesNoUndetermined.UNDETERMINED)
+                buildSscsCaseData(Benefit.UC), true, null)
         );
     }
 

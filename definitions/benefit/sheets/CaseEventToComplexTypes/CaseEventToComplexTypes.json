@@ -466,7 +466,7 @@
     "ListElementCode": "editedUrl",
     "ID": "scannedDocumentEditedUrl",
     "DisplayContext": "OPTIONAL",
-    "FieldShowCondition": "confidentialCaseStatus = \"Yes\"",
+    "FieldShowCondition": "isConfidentialCase = \"Yes\"",
     "LiveFrom": "19/11/2019",
     "FieldDisplayOrder": 3
   },
