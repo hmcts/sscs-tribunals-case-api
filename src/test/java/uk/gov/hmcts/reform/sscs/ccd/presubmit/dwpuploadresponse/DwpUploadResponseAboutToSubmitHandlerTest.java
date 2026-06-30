@@ -1573,7 +1573,7 @@ class DwpUploadResponseAboutToSubmitHandlerTest {
         when(panelCompositionService.resetPanelCompositionIfStale(eq(sscsCaseData), eq(Optional.of(caseDetailsBefore))))
             .thenReturn(panelComposition);
         handler = new DwpUploadResponseAboutToSubmitHandler(
-            dwpDocumentService, addNoteService, panelCompositionService, hearingsService, addedDocumentsUtil);
+            dwpDocumentService, addNoteService, panelCompositionService, hearingsService, addedDocumentsUtil, true);
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
