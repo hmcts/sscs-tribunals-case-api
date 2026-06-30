@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.bulkscan.helper;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.times;
@@ -195,7 +194,7 @@ public class SscsDataHelperTest {
 
         sscsDataHelper.addSscsDataToMap(transformedCase, appeal, null, null, FormType.SSCS2, "", null);
 
-        assertThat(transformedCase.get("confidentialCaseStatus")).isEqualTo("Yes");
+        assertEquals("Yes", transformedCase.get("isConfidentialCase"));
     }
 
     @Test
@@ -205,7 +204,7 @@ public class SscsDataHelperTest {
 
         sscsDataHelper.addSscsDataToMap(transformedCase, appeal, null, null, FormType.SSCS5, "", null);
 
-        assertThat(transformedCase.get("confidentialCaseStatus")).isEqualTo("Yes");
+        assertEquals("Yes", transformedCase.get("isConfidentialCase"));
     }
 
     @Test
@@ -215,7 +214,7 @@ public class SscsDataHelperTest {
 
         sscsDataHelper.addSscsDataToMap(transformedCase, appeal, null, null, FormType.SSCS2, "", null);
 
-        assertThat(transformedCase.get("confidentialCaseStatus")).isNull();
+        assertNull(transformedCase.get("isConfidentialCase"));
     }
 
     @Test
@@ -225,7 +224,7 @@ public class SscsDataHelperTest {
 
         sscsDataHelper.addSscsDataToMap(transformedCase, appeal, null, null, FormType.SSCS1PEU, "", null);
 
-        assertThat(transformedCase.get("confidentialCaseStatus")).isNull();
+        assertNull(transformedCase.get("isConfidentialCase"));
     }
 
     @Test
