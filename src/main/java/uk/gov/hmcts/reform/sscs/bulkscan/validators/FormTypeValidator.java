@@ -6,7 +6,6 @@ import static uk.gov.hmcts.reform.sscs.bulkscan.helper.OcrDataBuilder.build;
 import static uk.gov.hmcts.reform.sscs.bulkscan.helper.SscsDataHelper.getValidationStatus;
 import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.getField;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.networknt.schema.JsonSchema;
@@ -30,15 +29,14 @@ import uk.gov.hmcts.reform.sscs.domain.CaseResponse;
 public class FormTypeValidator {
 
     private final SscsJsonExtractor sscsJsonExtractor;
-    private final ObjectMapper mapper = new ObjectMapper()
-        .findAndRegisterModules()
-        .setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    private final ObjectMapper objectMapper;
     private final JsonSchema sscs1Schema = tryLoadSscsSchema("/config/schema/sscs-bulk-scan-schema.json");
     private final JsonSchema sscs2Schema = tryLoadSscsSchema("/config/schema/sscs2-bulk-scan-schema.json");
     private final JsonSchema sscs5Schema = tryLoadSscsSchema("/config/schema/sscs5-bulk-scan-schema.json");
 
-    public FormTypeValidator(SscsJsonExtractor sscsJsonExtractor) {
+    public FormTypeValidator(SscsJsonExtractor sscsJsonExtractor, ObjectMapper objectMapper) {
         this.sscsJsonExtractor = sscsJsonExtractor;
+        this.objectMapper = objectMapper;
     }
 
     public CaseResponse validate(String caseId, ExceptionRecord exceptionRecord) {
@@ -60,7 +58,7 @@ public class FormTypeValidator {
 
         log.info("Validating against formType {}", formType);
 
-        JsonNode jsonNode = mapper.valueToTree(build(exceptionRecord.getOcrDataFields()));
+        JsonNode jsonNode = objectMapper.valueToTree(build(exceptionRecord.getOcrDataFields()));
         Set<ValidationMessage> validationErrors = null;
 
         if (formType != null) {

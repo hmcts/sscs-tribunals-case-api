@@ -101,6 +101,7 @@ class BulkPrintServiceTest {
     static Stream<Arguments> benefitParameters() {
         return Stream.of(Arguments.of(INFECTED_BLOOD_COMPENSATION, "true"), Arguments.of(PIP, "false"));
     }
+
     @Mock
     private BusinessEventLogger businessEventLogger;
 
@@ -364,7 +365,7 @@ class BulkPrintServiceTest {
     @Test
     void sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification_whenSendLetterDisabled_returnsEmpty() {
         BulkPrintService notEnabledBulkPrint = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper, false, 1,
-                ccdNotificationService);
+                ccdNotificationService, businessEventLogger);
         Optional<UUID> id = notEnabledBulkPrint.sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(234, SSCS_CASE_DATA, PDF_LIST, EventType.ISSUE_GENERIC_LETTER, "appellant");
         assertThat(id).isEqualTo(Optional.empty());
         verifyNoInteractions(ccdNotificationService);

@@ -47,8 +47,7 @@ class HmcHearingsEventTopicListenerCorrelationIdTest {
 
     @BeforeEach
     void setUp() throws JMSException {
-        listener = new HmcHearingsEventTopicListener(processHmcMessageServiceV2);
-        ReflectionTestUtils.setField(listener, "objectMapper", mockObjectMapper);
+        listener = new HmcHearingsEventTopicListener(processHmcMessageServiceV2, mockObjectMapper);
         ReflectionTestUtils.setField(listener, "hmctsDeploymentId", "test");
         given(bytesMessage.getStringProperty("hmctsDeploymentId")).willReturn("test");
     }

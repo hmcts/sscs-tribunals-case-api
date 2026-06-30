@@ -15,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
@@ -45,10 +46,12 @@ public class SubscriptionsControllerTest {
 
     private SubscriptionsController controller;
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @Before
     public void setUp() {
         openMocks(this);
-        controller = new SubscriptionsController(macService, tribunalsService);
+        controller = new SubscriptionsController(macService, tribunalsService, objectMapper);
         mockMvc = standaloneSetup(controller).build();
     }
 

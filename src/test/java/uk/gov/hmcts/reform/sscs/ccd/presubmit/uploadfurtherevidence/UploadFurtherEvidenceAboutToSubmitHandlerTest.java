@@ -78,7 +78,7 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
 
     @Before
     public void setUp() {
-        addedDocumentsUtil = new AddedDocumentsUtil(false);
+        addedDocumentsUtil = new AddedDocumentsUtil(false, new ObjectMapper());
 
         MockitoAnnotations.openMocks(this);
         handler = new UploadFurtherEvidenceAboutToSubmitHandler(true, addedDocumentsUtil);
@@ -188,7 +188,7 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
     public void givenAMixtureOfAudioVideoAndDocumentEvidence_onlyAudioVideoShouldBeInsertedIntoAddedDocuments()
         throws JsonProcessingException {
         handler = new UploadFurtherEvidenceAboutToSubmitHandler(true,
-            new AddedDocumentsUtil(true));
+            new AddedDocumentsUtil(true, new ObjectMapper()));
 
         List<DraftSscsDocument> draftDocuments = new ArrayList<>();
         draftDocuments.add(DraftSscsDocument.builder()
@@ -238,7 +238,7 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
     public void givenASupplementaryResponseWithAudioVideoEvidenceSentMultipleTimes_shouldInsertMostRecentIntoAddedDocuments()
         throws JsonProcessingException {
         handler = new UploadFurtherEvidenceAboutToSubmitHandler(true,
-            new AddedDocumentsUtil(true));
+            new AddedDocumentsUtil(true, new ObjectMapper()));
 
         List<DraftSscsDocument> draftDocuments = new ArrayList<>();
         draftDocuments.add(DraftSscsDocument.builder()
@@ -279,7 +279,7 @@ public class UploadFurtherEvidenceAboutToSubmitHandlerTest {
     @Test
     public void givenASupplementaryResponseWitNoAudioVideoEvidence_shouldClearAddedDocuments() {
         handler = new UploadFurtherEvidenceAboutToSubmitHandler(true,
-            new AddedDocumentsUtil(true));
+            new AddedDocumentsUtil(true, new ObjectMapper()));
 
         sscsCaseData.setDraftFurtherEvidenceDocuments(new ArrayList<>());
         sscsCaseData.setWorkAllocationFields(WorkAllocationFields.builder()

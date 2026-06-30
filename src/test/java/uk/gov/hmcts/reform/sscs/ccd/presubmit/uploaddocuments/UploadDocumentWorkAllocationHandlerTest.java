@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +31,7 @@ public class UploadDocumentWorkAllocationHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
     private UploadDocumentWorkAllocationHandler handler = new UploadDocumentWorkAllocationHandler(
-            new AddedDocumentsUtil(true), true);
+            new AddedDocumentsUtil(true, new ObjectMapper()), true);
 
     @Before
     public void setUp() {

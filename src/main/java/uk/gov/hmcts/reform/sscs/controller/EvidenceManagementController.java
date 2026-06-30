@@ -35,18 +35,21 @@ public class EvidenceManagementController {
     private final FileToPdfConversionService fileToPdfConversionService;
     private final boolean secureDocStoreEnabled;
     private final IdamService idamService;
+    private final ObjectMapper objectMapper;
 
     @Autowired
     public EvidenceManagementController(EvidenceManagementService evidenceManagementService,
                                         EvidenceManagementSecureDocStoreService evidenceManagementSecureDocStoreService,
                                         FileToPdfConversionService fileToPdfConversionService,
                                         @Value("${feature.secure-doc-store.enabled:false}") boolean secureDocStoreEnabled,
-                                        IdamService idamService) {
+                                        IdamService idamService,
+                                        ObjectMapper objectMapper) {
         this.evidenceManagementService = evidenceManagementService;
         this.evidenceManagementSecureDocStoreService = evidenceManagementSecureDocStoreService;
         this.fileToPdfConversionService = fileToPdfConversionService;
         this.secureDocStoreEnabled = secureDocStoreEnabled;
         this.idamService = idamService;
+        this.objectMapper = objectMapper;
     }
 
     @Operation(summary = "Upload additional evidence converted to PDF",
@@ -75,8 +78,6 @@ public class EvidenceManagementController {
             if (secureDocStoreEnabled) {
                 List<Document> documents = evidenceManagementSecureDocStoreService
                         .upload(convertedFiles, idamService.getIdamTokens()).getDocuments();
-                ObjectMapper objectMapper = new ObjectMapper();
-
 
                 String jsonText =  "{\"documents\": " + objectMapper.writeValueAsString(documents) + "}";
                 return ResponseEntity.ok(jsonText);
@@ -85,7 +86,6 @@ public class EvidenceManagementController {
                         .upload(convertedFiles, DM_STORE_USER_ID)
                         .getEmbedded();
                 List<uk.gov.hmcts.reform.document.domain.Document> documents = embedded.getDocuments();
-                ObjectMapper objectMapper = new ObjectMapper();
 
                 String jsonText =  "{\"documents\": " + objectMapper.writeValueAsString(documents) + "}";
                 return ResponseEntity.ok(jsonText);

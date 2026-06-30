@@ -21,9 +21,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 public class AddedDocumentsUtil {
 
     private final boolean workAllocationFeature;
+    private final ObjectMapper objectMapper;
 
-    public AddedDocumentsUtil(@Value("${feature.work-allocation.enabled}") boolean workAllocationFeature) {
+    public AddedDocumentsUtil(@Value("${feature.work-allocation.enabled}") boolean workAllocationFeature,
+                              ObjectMapper objectMapper) {
         this.workAllocationFeature = workAllocationFeature;
+        this.objectMapper = objectMapper;
     }
 
     public void clearAddedDocumentsBeforeEventSubmit(SscsCaseData sscsCaseData) {
@@ -49,7 +52,7 @@ public class AddedDocumentsUtil {
 
             if (!documentsAddedThisEvent.isEmpty()) {
                 try {
-                    sscsCaseData.getWorkAllocationFields().setAddedDocuments(new ObjectMapper()
+                    sscsCaseData.getWorkAllocationFields().setAddedDocuments(objectMapper
                         .writeValueAsString(documentsAddedThisEventCounts));
                 } catch (JsonProcessingException e) {
                     throw new IllegalStateException(e);

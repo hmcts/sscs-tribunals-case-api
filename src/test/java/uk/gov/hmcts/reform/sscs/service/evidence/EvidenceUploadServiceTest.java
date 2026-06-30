@@ -159,7 +159,7 @@ public class EvidenceUploadServiceTest {
         pdfStoreService = mock(PdfStoreService.class);
         documentStoreService = mock(DocumentStoreService.class);
 
-        evidenceUploadService(new AddedDocumentsUtil(false));
+        evidenceUploadService(new AddedDocumentsUtil(false, new ObjectMapper()));
 
         fileName = "someFileName.txt";
         existingFileName = "oldFileName.txt";
@@ -451,7 +451,7 @@ public class EvidenceUploadServiceTest {
                 evidenceManagementService,
                 pdfStoreService,
                 updateCcdCaseService,
-                new AddedDocumentsUtil(false)
+                new AddedDocumentsUtil(false, new ObjectMapper())
         );
 
         StartEventResponse startEventResponse = StartEventResponse.builder().build();
@@ -492,7 +492,7 @@ public class EvidenceUploadServiceTest {
                 evidenceManagementService,
                 pdfStoreService,
                 updateCcdCaseService,
-                new AddedDocumentsUtil(false)
+                new AddedDocumentsUtil(false, new ObjectMapper())
         );
 
         StartEventResponse startEventResponse = StartEventResponse.builder().build();
@@ -623,7 +623,7 @@ public class EvidenceUploadServiceTest {
     @Test
     @Parameters({".mp3, audioDocument", ".mp4, videoDocument"})
     public void givenUploadWithAvEvidence_shouldInsertIntoAddedDocumentsMap(String fileExtension, String documentType) throws IOException {
-        evidenceUploadService(new AddedDocumentsUtil(true));
+        evidenceUploadService(new AddedDocumentsUtil(true, new ObjectMapper()));
 
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithoutCcdDocuments();
         sscsCaseDetails.getData().setSscsDocument(buildSscsDocumentList());
@@ -681,7 +681,7 @@ public class EvidenceUploadServiceTest {
 
     @Test
     public void givenUploadWithNoAvEvidence_shouldClearDocumentsMap() throws IOException {
-        evidenceUploadService(new AddedDocumentsUtil(true));
+        evidenceUploadService(new AddedDocumentsUtil(true, new ObjectMapper()));
 
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithoutCcdDocuments();
         sscsCaseDetails.getData().setSscsDocument(buildSscsDocumentList());

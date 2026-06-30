@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -38,7 +37,7 @@ public class ServiceHearingsService {
 
     private final ReferenceDataServiceHolder refData;
 
-    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    private final ObjectMapper objectMapper;
 
     private final UpdateCcdCaseService updateCcdCaseService;
 

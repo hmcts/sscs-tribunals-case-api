@@ -16,7 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.Collections;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,18 +29,13 @@ import uk.gov.hmcts.reform.sscs.service.TribunalsService;
 
 
 @RestController
+@RequiredArgsConstructor
 public class SubscriptionsController {
 
     public static final String BENEFIT_TYPE_FORMAT = "{\"benefitType\":\"%s\"}";
     private final MessageAuthenticationService macService;
-    private TribunalsService tribunalsService;
-
-
-    @Autowired
-    public SubscriptionsController(MessageAuthenticationService macService, TribunalsService tribunalsService) {
-        this.macService = macService;
-        this.tribunalsService = tribunalsService;
-    }
+    private final TribunalsService tribunalsService;
+    private final ObjectMapper objectMapper;
 
     @Operation(summary = "validateMacToken",
         description = "Validates given mac token and returns Mac token details like subscription id, "
@@ -50,7 +45,7 @@ public class SubscriptionsController {
     @RequestMapping(value = "/tokens/{token}", method = GET, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> validateMacToken(@PathVariable(value = "token") String macToken) throws JsonProcessingException {
         Map<String,Object> tokenDetails = macService.decryptMacToken(macToken);
-        String json = new ObjectMapper().writeValueAsString(Collections.singletonMap("token", tokenDetails));
+        String json = objectMapper.writeValueAsString(Collections.singletonMap("token", tokenDetails));
         return ok(json);
     }
 

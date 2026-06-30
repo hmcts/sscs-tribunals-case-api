@@ -11,15 +11,15 @@ import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
 @Service
 public class DocmosisPdfService implements PdfService {
     private final DocmosisPdfGenerationService docmosisPdfGenerationService;
+    private final ObjectMapper objectMapper;
 
-    public DocmosisPdfService(DocmosisPdfGenerationService docmosisPdfGenerationService) {
+    public DocmosisPdfService(DocmosisPdfGenerationService docmosisPdfGenerationService, ObjectMapper objectMapper) {
         this.docmosisPdfGenerationService = docmosisPdfGenerationService;
+        this.objectMapper = objectMapper;
     }
 
     @Override
     public byte[] createPdf(Object pdfSummary, String templatePath) {
-        ObjectMapper objectMapper = new ObjectMapper();
-
         Map<String, Object> placeholders = objectMapper.convertValue(
             pdfSummary,
             new TypeReference<>() {
