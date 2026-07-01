@@ -306,7 +306,6 @@ dependencyManagement {
         // CVE-2023-36415, CVE-2024-35255
         dependency group: 'com.azure', name: 'azure-identity', version: '1.18.3'
         dependency group: 'com.microsoft.azure', name: 'msal4j', version: '1.24.1'
-        dependency group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.22.0'
     }
 }
 
@@ -323,7 +322,7 @@ ext {
 def versions = [
         springboot     : springBoot.class.package.implementationVersion,
         springsecurity : '6.5.11',
-        jackson        : '2.19.0',
+        jackson        : '2.21.4',
         lombok         : '1.18.38',
         commonsio      : '2.19.0',
         openfeign      : '13.6'
