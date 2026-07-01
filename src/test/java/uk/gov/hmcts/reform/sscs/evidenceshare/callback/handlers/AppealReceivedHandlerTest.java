@@ -119,15 +119,43 @@ class AppealReceivedHandlerTest {
         final AppealReceivedHandler handlerWithFlagOn = new AppealReceivedHandler(updateCcdCaseService, idamService,
             true);
         assertThat(handlerWithFlagOn.canHandle(SUBMITTED,
-            HandlerHelper.buildTestCallbackForGivenData(childSupportCaseData(), INTERLOCUTORY_REVIEW_STATE,
+            HandlerHelper.buildTestCallbackForGivenData(createCaseData("childSupport"), INTERLOCUTORY_REVIEW_STATE,
                 eventType))).isFalse();
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = EventType.class, names = {"VALID_APPEAL_CREATED", "DRAFT_TO_VALID_APPEAL_CREATED", "VALID_APPEAL", "INTERLOC_VALID_APPEAL"})
+    void givenUcCaseAndFlagEnabled_canHandleReturnsTrue(final EventType eventType) {
+        final AppealReceivedHandler handlerWithFlagOn = new AppealReceivedHandler(updateCcdCaseService, idamService,
+            true);
+        assertThat(handlerWithFlagOn.canHandle(SUBMITTED,
+            HandlerHelper.buildTestCallbackForGivenData(createCaseData("UC"), INTERLOCUTORY_REVIEW_STATE,
+                eventType))).isTrue();
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = EventType.class, names = {"VALID_APPEAL_CREATED", "DRAFT_TO_VALID_APPEAL_CREATED", "VALID_APPEAL", "INTERLOC_VALID_APPEAL"})
+    void givenUcCaseAndFlagEnabled_handleTriggersAppealReceived(final EventType eventType) {
+        final AppealReceivedHandler handlerWithFlagOn = new AppealReceivedHandler(updateCcdCaseService, idamService,
+            true);
+        handlerWithFlagOn.handle(SUBMITTED,
+            HandlerHelper.buildTestCallbackForGivenData(createCaseData("UC"), INTERLOCUTORY_REVIEW_STATE, eventType));
+        verify(updateCcdCaseService).triggerCaseEventV2(eq(1L), eq(EventType.APPEAL_RECEIVED.getCcdType()),
+            eq("Appeal received"), eq("Appeal received event has been triggered from Tribunals API for digital case"), any());
     }
 
     @ParameterizedTest
     @EnumSource(value = EventType.class, names = {"VALID_APPEAL_CREATED", "DRAFT_TO_VALID_APPEAL_CREATED", "VALID_APPEAL", "INTERLOC_VALID_APPEAL"})
     void givenChildSupportCaseAndFlagDisabled_canHandleReturnsTrue(final EventType eventType) {
         assertThat(handler.canHandle(SUBMITTED,
-            HandlerHelper.buildTestCallbackForGivenData(childSupportCaseData(), INTERLOCUTORY_REVIEW_STATE, eventType))).isTrue();
+            HandlerHelper.buildTestCallbackForGivenData(createCaseData("childSupport"), INTERLOCUTORY_REVIEW_STATE, eventType))).isTrue();
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = EventType.class, names = {"VALID_APPEAL_CREATED", "DRAFT_TO_VALID_APPEAL_CREATED", "VALID_APPEAL", "INTERLOC_VALID_APPEAL"})
+    void givenUcCaseAndFlagDisabled_canHandleReturnsTrue(final EventType eventType) {
+        assertThat(handler.canHandle(SUBMITTED,
+            HandlerHelper.buildTestCallbackForGivenData(createCaseData("UC"), INTERLOCUTORY_REVIEW_STATE, eventType))).isTrue();
     }
 
     @ParameterizedTest
@@ -144,28 +172,31 @@ class AppealReceivedHandlerTest {
     void givenChildSupportCaseAndFlagEnabled_handleThrowsIllegalStateException() {
         final AppealReceivedHandler handlerWithFlagOn = new AppealReceivedHandler(updateCcdCaseService, idamService,
             true);
-        final var callback = HandlerHelper.buildTestCallbackForGivenData(childSupportCaseData(), INTERLOCUTORY_REVIEW_STATE,
+        final var callback = HandlerHelper.buildTestCallbackForGivenData(createCaseData("childSupport"), INTERLOCUTORY_REVIEW_STATE,
             EventType.VALID_APPEAL_CREATED);
         assertThatThrownBy(() -> handlerWithFlagOn.handle(SUBMITTED, callback)).isInstanceOf(IllegalStateException.class);
 
         verifyNoInteractions(updateCcdCaseService);
     }
 
-    @Test
-    void givenChildSupportCaseAndConfidentialityConfirmedEventAndFlagEnabled_canHandleReturnsTrue() {
+    @ParameterizedTest
+    @ValueSource(strings = {"childSupport", "UC"})
+    void givenChildSupportOrUcCaseAndConfidentialityConfirmedEventAndFlagEnabled_canHandleReturnsTrue(String benefitType) {
         final AppealReceivedHandler handlerWithFlagOn = new AppealReceivedHandler(updateCcdCaseService, idamService,
             true);
         assertThat(handlerWithFlagOn.canHandle(SUBMITTED,
-            HandlerHelper.buildTestCallbackForGivenData(childSupportCaseData(), INTERLOCUTORY_REVIEW_STATE,
+            HandlerHelper.buildTestCallbackForGivenData(createCaseData(benefitType), INTERLOCUTORY_REVIEW_STATE,
                 EventType.CONFIDENTIALITY_CONFIRMED))).isTrue();
     }
 
-    @Test
-    void givenChildSupportCaseAndConfidentialityConfirmedEventAndFlagEnabled_handleTriggersAppealReceived() {
+    @ParameterizedTest
+    @ValueSource(strings = {"childSupport", "UC"})
+    void givenChildSupportOrUcCaseAndConfidentialityConfirmedEventAndFlagEnabled_handleTriggersAppealReceived(
+        String benefitType) {
         final AppealReceivedHandler handlerWithFlagOn = new AppealReceivedHandler(updateCcdCaseService, idamService,
             true);
         handlerWithFlagOn.handle(SUBMITTED,
-            HandlerHelper.buildTestCallbackForGivenData(childSupportCaseData(), INTERLOCUTORY_REVIEW_STATE,
+            HandlerHelper.buildTestCallbackForGivenData(createCaseData(benefitType), INTERLOCUTORY_REVIEW_STATE,
                 EventType.CONFIDENTIALITY_CONFIRMED));
         verify(updateCcdCaseService).triggerCaseEventV2(eq(1L), eq(EventType.APPEAL_RECEIVED.getCcdType()),
             eq("Appeal received"), eq("Appeal received event has been triggered from Tribunals API for digital case"), any());
@@ -177,19 +208,31 @@ class AppealReceivedHandlerTest {
         final AppealReceivedHandler handlerWithFlagOn = new AppealReceivedHandler(updateCcdCaseService, idamService, true);
         final CallbackType callbackType = CallbackType.valueOf(callbackTypeName);
         assertThat(handlerWithFlagOn.canHandle(callbackType,
-            HandlerHelper.buildTestCallbackForGivenData(childSupportCaseData(), INTERLOCUTORY_REVIEW_STATE,
+            HandlerHelper.buildTestCallbackForGivenData(createCaseData("childSupport"), INTERLOCUTORY_REVIEW_STATE,
                 EventType.CONFIDENTIALITY_CONFIRMED))).isFalse();
     }
 
-    @Test
-    void givenChildSupportCaseAndFlagEnabledAndNonDigitalCase_canHandleReturnsFalse() {
+    @ParameterizedTest
+    @ValueSource(strings = {"ABOUT_TO_START", "MID_EVENT", "ABOUT_TO_SUBMIT"})
+    void givenUcCaseAndFlagEnabledAndNotSubmitted_canHandleReturnsFalse(final String callbackTypeName) {
         final AppealReceivedHandler handlerWithFlagOn = new AppealReceivedHandler(updateCcdCaseService, idamService, true);
-        final SscsCaseData nonDigitalChildSupportCase = SscsCaseData.builder()
+        final CallbackType callbackType = CallbackType.valueOf(callbackTypeName);
+        assertThat(handlerWithFlagOn.canHandle(callbackType,
+            HandlerHelper.buildTestCallbackForGivenData(createCaseData("UC"), INTERLOCUTORY_REVIEW_STATE,
+                EventType.CONFIDENTIALITY_CONFIRMED))).isFalse();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"childSupport", "UC"})
+    void givenChildSupportOrUcCaseAndFlagEnabledAndNonDigitalCase_canHandleReturnsFalse(String benefitType) {
+        final AppealReceivedHandler handlerWithFlagOn = new AppealReceivedHandler(updateCcdCaseService, idamService, true);
+        final SscsCaseData nonDigitalCase = SscsCaseData
+            .builder()
             .createdInGapsFrom(VALID_APPEAL.getId())
-            .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build()).build())
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefitType).build()).build())
             .build();
         assertThat(handlerWithFlagOn.canHandle(SUBMITTED,
-            HandlerHelper.buildTestCallbackForGivenData(nonDigitalChildSupportCase, INTERLOCUTORY_REVIEW_STATE,
+            HandlerHelper.buildTestCallbackForGivenData(nonDigitalCase, INTERLOCUTORY_REVIEW_STATE,
                 EventType.CONFIDENTIALITY_CONFIRMED))).isFalse();
     }
 
@@ -201,18 +244,20 @@ class AppealReceivedHandlerTest {
                 INTERLOCUTORY_REVIEW_STATE, EventType.CONFIDENTIALITY_CONFIRMED))).isFalse();
     }
 
-    @Test
-    void givenChildSupportCaseAndFlagDisabled_confidentialityConfirmedEvent_canHandleReturnsFalse() {
+    @ParameterizedTest
+    @ValueSource(strings = {"childSupport", "UC"})
+    void givenChildSupportOrUcCaseAndFlagDisabled_confidentialityConfirmedEvent_canHandleReturnsFalse(String benefitType) {
         assertThat(handler.canHandle(SUBMITTED,
-            HandlerHelper.buildTestCallbackForGivenData(childSupportCaseData(), INTERLOCUTORY_REVIEW_STATE,
+            HandlerHelper.buildTestCallbackForGivenData(createCaseData(benefitType), INTERLOCUTORY_REVIEW_STATE,
                 EventType.CONFIDENTIALITY_CONFIRMED))).isFalse();
     }
 
-    private static SscsCaseData childSupportCaseData() {
+    private static SscsCaseData createCaseData(String benefitType) {
         return SscsCaseData
             .builder()
             .createdInGapsFrom(READY_TO_LIST.getId())
-            .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build()).build())
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefitType).build()).build())
             .build();
     }
+
 }
