@@ -322,7 +322,7 @@ ext {
 def versions = [
         springboot     : springBoot.class.package.implementationVersion,
         springsecurity : '6.5.11',
-        jackson        : '2.21.5',
+        jackson        : '2.19.0',
         lombok         : '1.18.38',
         commonsio      : '2.19.0',
         openfeign      : '13.6'
@@ -357,7 +357,7 @@ dependencies {
 
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: versions.jackson
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: versions.jackson
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.21.5'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: versions.jackson
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
 
