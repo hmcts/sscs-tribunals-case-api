@@ -145,11 +145,11 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
 
     private boolean isChildSupportOrUcAdditionalOtherPartyAdded(SscsCaseData sscsCaseData, SscsCaseData caseDataBefore) {
         return isBenefitTypeChildSupportOrUc(sscsCaseData)
-            && appellantConfidentialityNotRequiredOrUnknown(sscsCaseData)
+            && appellantConfidentialityNotRequiredOrUndetermined(sscsCaseData)
             && additionalOtherPartyAddedPredicate.test(sscsCaseData, caseDataBefore);
     }
 
-    private static boolean appellantConfidentialityNotRequiredOrUnknown(SscsCaseData sscsCaseData) {
+    private static boolean appellantConfidentialityNotRequiredOrUndetermined(SscsCaseData sscsCaseData) {
         return isNull(sscsCaseData.getAppeal().getAppellant()) || isNoOrNullOrUndetermined(
             sscsCaseData.getAppeal().getAppellant().getConfidentialityRequirement());
     }
