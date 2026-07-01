@@ -508,11 +508,6 @@ dependencies {
         implementation('com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.4') {
             because 'Ensure jackson datatype jsr310 matches selected jackson version'
         }
-
-        // Constrain Kotlin stdlib in case it's pulled in transitively
-        implementation('org.jetbrains.kotlin:kotlin-stdlib:2.4.20') {
-            because 'Upgrade Kotlin stdlib to fix CVE-2026-53914'
-        }
     }
 
 }
