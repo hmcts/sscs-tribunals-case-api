@@ -320,13 +320,12 @@ ext {
 }
 
 def versions = [
-        springboot           : springBoot.class.package.implementationVersion,
-        springsecurity       : '6.5.11',
-        jackson              : '2.22.0',
-        jacksonannotations  :  '2.22',
-        lombok               : '1.18.38',
-        commonsio            : '2.19.0',
-        openfeign            : '13.6'
+        springboot     : springBoot.class.package.implementationVersion,
+        springsecurity : '6.5.11',
+        jackson        : '2.19.0',
+        lombok         : '1.18.38',
+        commonsio      : '2.19.0',
+        openfeign      : '13.6'
 ]
 
 dependencies {
@@ -356,9 +355,9 @@ dependencies {
     implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: versions.openfeign
     implementation group: 'io.github.openfeign', name: 'feign-jackson', version: versions.openfeign
 
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: versions.jacksonannotations
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: versions.jackson
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: versions.jackson
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
+    implementation group: 'tools.jackson.core', name: 'jackson-databind', version: '3.2.0'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: versions.jackson
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
 
