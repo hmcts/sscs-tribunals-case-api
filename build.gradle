@@ -307,6 +307,13 @@ dependencyManagement {
         dependency group: 'com.azure', name: 'azure-identity', version: '1.18.3'
         dependency group: 'com.microsoft.azure', name: 'msal4j', version: '1.24.1'
     }
+    dependencies {
+        constraints {
+            implementation('com.fasterxml.jackson.core:jackson-databind:2.22.0') {
+                because 'Fixes CVE-2026-54515, CVE-2026-54513, CVE-2026-54514, CVE-2026-53914, CVE-2026-54512'
+            }
+        }
+    }
 }
 
 ext {
@@ -357,7 +364,7 @@ dependencies {
 
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: versions.jackson
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: versions.jackson
-    implementation group: 'tools.jackson.core', name: 'jackson-databind', version: '3.2.0'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: versions.jackson
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
 
