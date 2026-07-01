@@ -322,7 +322,7 @@ ext {
 def versions = [
         springboot     : springBoot.class.package.implementationVersion,
         springsecurity : '6.5.11',
-        jackson        : '3.2.0',
+        jackson        : '2.21.4',
         lombok         : '1.18.38',
         commonsio      : '2.19.0',
         openfeign      : '13.6'
@@ -356,10 +356,10 @@ dependencies {
     implementation group: 'io.github.openfeign', name: 'feign-jackson', version: versions.openfeign
 
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.22'
-    implementation group: 'tools.jackson.core', name: 'jackson-core', version: versions.jackson
-    implementation group: 'tools.jackson.core', name: 'jackson-databind', version: versions.jackson
-    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: "2.22.0"
-    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: "2.22.0"
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: versions.jackson
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: versions.jackson
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
 
     implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.7'
     implementation group: 'org.json', name: 'json', version: '20250517'
