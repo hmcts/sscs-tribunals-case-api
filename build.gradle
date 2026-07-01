@@ -384,7 +384,6 @@ dependencies {
         exclude group: 'org.codehaus.groovy', module: 'groovy-xml'
         exclude group: 'io.cucumber', module: 'cucumber-core'
         exclude group: 'io.cucumber', module: 'cucumber-java'
-        exclude group: 'io.cucumber', module: 'cucumber-junit'
     }
     implementation platform(group: 'io.cucumber', name: 'cucumber-bom', version: '7.34.4')
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.59.2'
