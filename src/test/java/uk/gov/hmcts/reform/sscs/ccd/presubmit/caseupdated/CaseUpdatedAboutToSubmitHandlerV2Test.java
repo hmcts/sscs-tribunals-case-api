@@ -1393,12 +1393,12 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         "childBenefit,Child Benefit","thirtyHoursFreeChildcare,30 Hours Free Childcare",
         "guaranteedMinimumPension,Guaranteed Minimum Pension (COEG)","nationalInsuranceCredits,National Insurance Credits"})
     void givenACaseAppellantConfidentialityNo_thenCaseConfidentialNull(String shortName, String benefitDescription) {
-        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(NO);
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(YesNoUndetermined.NO);
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefitDescription);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertNull(response.getData().getIsConfidentialCase());
+        assertEquals(NO, response.getData().getIsConfidentialCase());
     }
 
     @ParameterizedTest
@@ -1407,7 +1407,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         "childBenefit,Child Benefit","thirtyHoursFreeChildcare,30 Hours Free Childcare",
         "guaranteedMinimumPension,Guaranteed Minimum Pension","nationalInsuranceCredits,National Insurance Credits"})
     void givenACaseAppellantConfidentialityNoOtherPartyYes_thenCaseConfidentialYes(String shortName, String benefitDescription) {
-        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(NO);
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(YesNoUndetermined.NO);
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefitDescription);
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
