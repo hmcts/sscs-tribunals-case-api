@@ -21,8 +21,6 @@ services:
       - REFORM_SERVICE_NAME=rpa-em-ccd-orchestrator
       - REFORM_TEAM=em-ccd-orchestrator
       - REFORM_ENVIRONMENT=docker
-      - NOTIFICATION_API_KEY=${NOTIFICATION_API_KEY}
-      - S2S_KEY=${S2S_KEY}
     ports:
       - 4623:8080
     networks:
