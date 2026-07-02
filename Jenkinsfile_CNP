@@ -172,14 +172,17 @@ withPipeline(type, product, component) {
     onDemo {
         env.ENVIRONMENT = "demo"
         env.WORK_ALLOCATION_FEATURE_ENABLED = 'false'
+        env.USE_IDENTITY = 'true'
     }
     onPerftest {
         env.ENVIRONMENT = "perftest"
         env.WORK_ALLOCATION_FEATURE_ENABLED = 'false'
+        env.USE_IDENTITY = 'true'
     }
     onIthc {
         env.ENVIRONMENT = "ithc"
         env.WORK_ALLOCATION_FEATURE_ENABLED = 'false'
+        env.USE_IDENTITY = 'true'
     }
     afterAlways('functionalTest:aat') {
         env.ENVIRONMENT = "prod"
@@ -231,15 +234,15 @@ def runNotificationTests() {
 
 def generateDefinitions() {
     if (env.CCD_DEF_PROD_LIKE == 'true') {
-        sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT} ${env.WORK_ALLOCATION_FEATURE_ENABLED} prod"
+        sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT} ${env.USE_IDENTITY} ${env.WORK_ALLOCATION_FEATURE_ENABLED} prod"
         echo "Generate prod-like CCD definition"
     } else {
-        sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT} ${env.WORK_ALLOCATION_FEATURE_ENABLED}"
+        sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT} ${env.USE_IDENTITY} ${env.WORK_ALLOCATION_FEATURE_ENABLED}"
     }
 
     steps.archiveArtifacts artifacts: "definitions/benefit/*.xlsx"
 
-    sh "./bin/create-xlsx.sh bulkscan tag ${env.ENVIRONMENT}"
+    sh "./bin/create-xlsx.sh bulkscan tag ${env.ENVIRONMENT} ${env.USE_IDENTITY}"
     steps.archiveArtifacts artifacts: "definitions/bulkscan/*.xlsx"
 }
 
@@ -255,6 +258,7 @@ def setAatEnvVars() {
     env.ENVIRONMENT = "aat"
     env.WORK_ALLOCATION_FEATURE_ENABLED = 'false'
     env.CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED = true
+    env.USE_IDENTITY = 'true'
 }
 
 def setPreviewEnvVars() {
@@ -269,6 +273,7 @@ def setPreviewEnvVars() {
     env.EM_STITCHING_API_URL = "https://em-stitching-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.ENVIRONMENT = "pr"
     env.CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED = true
+    env.USE_IDENTITY = 'true'
 }
 
 def runE2eTests() {
