@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 class ConfidentialityConfirmedMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final boolean cmOtherPartyConfidentialityEnabled;
-    private static final String MISSING_CONFIDENTIALITY_MSG = "Confidentiality for all parties must be determined to either Yes or No.";
+    private static final String MISSING_CONFIDENTIALITY_MSG = "Confidentiality for all parties is required.";
 
     public ConfidentialityConfirmedMidEventHandler(@Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
         this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
@@ -56,12 +56,12 @@ class ConfidentialityConfirmedMidEventHandler implements PreSubmitCallbackHandle
                 .filter(Objects::nonNull)
                 .map(CcdValue::getValue)
                 .filter(Objects::nonNull)
-                .anyMatch(value -> value.getConfidentialityRequired() == null))
+                .anyMatch(value -> value.getConfidentialityRequirement() == null))
                 .orElse(false);
 
         boolean appellantConfidentialityMissing = Optional.ofNullable(caseData.getAppeal())
             .map(Appeal::getAppellant)
-            .map(appellant -> appellant.getConfidentialityRequired() == null)
+            .map(appellant -> appellant.getConfidentialityRequirement() == null)
             .orElse(false);
 
         if (otherPartyConfidentialityMissing || appellantConfidentialityMissing) {

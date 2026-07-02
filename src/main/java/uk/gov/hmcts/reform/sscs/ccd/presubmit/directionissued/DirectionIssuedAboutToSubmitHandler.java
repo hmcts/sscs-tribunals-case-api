@@ -16,6 +16,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined.YES;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.JUDGE;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
@@ -62,6 +64,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -443,27 +446,27 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                        .orElse(null);
     }
 
-    private static void updateAppellantConfidentiality(SscsCaseData caseData, YesNo confidentialityRequired) {
+    private static void updateAppellantConfidentiality(SscsCaseData caseData, YesNoUndetermined confidentialityRequired) {
         caseData.getAppellant().ifPresent(appellant -> {
             setConfidentialityFields(confidentialityRequired, appellant);
             log.info("Updated appellant confidentiality to {} for case id {}", confidentialityRequired, caseData.getCcdCaseId());
         });
     }
 
-    private static void setConfidentialityFields(YesNo confidentialityRequired, Party party) {
-        if (confidentialityRequired == party.getConfidentialityRequired()) {
+    private static void setConfidentialityFields(YesNoUndetermined confidentialityRequired, Party party) {
+        if (confidentialityRequired == party.getConfidentialityRequirement()) {
             log.info("Users confidentiality status is not changed so not updating confidentiality required fields.");
             return;
         }
-        party.setConfidentialityRequired(confidentialityRequired);
+        party.setConfidentialityRequirement(confidentialityRequired);
         party.setConfidentialityRequiredChangedDate(getLocalDateTime());
     }
 
     private void applyConfidentialityDecisionFromDirection(SscsCaseData caseData) {
         final String directionTypeCode = getDirectionTypeCode(caseData);
-        final YesNo confidentialityRequired = CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN
+        final YesNoUndetermined confidentialityRequired = CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN
             .toString()
-            .equals(directionTypeCode) ? YesNo.YES : YesNo.NO;
+            .equals(directionTypeCode) ? YES : NO;
         final String selectedConfidentialityPartyCode = getSelectedConfidentialityPartyCode(caseData);
         log.info("Applying confidentiality decision for case id {} with direction type {} and selected party {}", caseData.getCcdCaseId(), directionTypeCode, selectedConfidentialityPartyCode);
         if (isNotBlank(selectedConfidentialityPartyCode)) {
@@ -488,7 +491,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         return APPELLANT.getCode().equals(selectedConfidentialityPartyCode);
     }
 
-    private void updateReferredOtherPartyConfidentiality(SscsCaseData caseData, YesNo confidentialityRequired,
+    private void updateReferredOtherPartyConfidentiality(SscsCaseData caseData, YesNoUndetermined confidentialityRequired,
         String selectedConfidentialityPartyCode) {
         final String otherPartyId = selectedConfidentialityPartyCode.substring(OTHER_PARTY_PREFIX.length());
         if (isEmpty(caseData.getOtherParties())) {
