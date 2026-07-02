@@ -57,7 +57,7 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
 
     @Before
     public void setUp() {
-        addedDocumentsUtil = new AddedDocumentsUtil(false);
+        addedDocumentsUtil = new AddedDocumentsUtil(false, new ObjectMapper());
         openMocks(this);
         handler = new SupplementaryResponseAboutToSubmitHandler(addedDocumentsUtil);
 
@@ -208,7 +208,7 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
     public void givenASupplementaryResponseWithAudioVideoEvidence_shouldInsertIntoAddedDocuments(String documentFileName,
                                                                                                  String documentTypeValue)
         throws JsonProcessingException {
-        handler = new SupplementaryResponseAboutToSubmitHandler(new AddedDocumentsUtil(true));
+        handler = new SupplementaryResponseAboutToSubmitHandler(new AddedDocumentsUtil(true, new ObjectMapper()));
         sscsCaseData.setDwpOtherDoc(DwpResponseDocument.builder()
             .documentLink(DocumentLink.builder()
                 .documentFilename(documentFileName)
@@ -228,7 +228,7 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
 
     @Test
     public void givenASupplementaryResponseEvent_shouldClearAddedDocuments() {
-        handler = new SupplementaryResponseAboutToSubmitHandler(new AddedDocumentsUtil(true));
+        handler = new SupplementaryResponseAboutToSubmitHandler(new AddedDocumentsUtil(true, new ObjectMapper()));
         sscsCaseData.setDwpOtherDoc(DwpResponseDocument.builder()
             .documentLink(DocumentLink.builder()
                 .documentFilename("test.docx")
@@ -250,7 +250,7 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
     @Test
     public void givenASupplementaryResponseWithAudioVideoEvidenceSentMultipleTimes_shouldInsertMostRecentIntoAddedDocuments()
         throws JsonProcessingException {
-        handler = new SupplementaryResponseAboutToSubmitHandler(new AddedDocumentsUtil(true));
+        handler = new SupplementaryResponseAboutToSubmitHandler(new AddedDocumentsUtil(true, new ObjectMapper()));
         sscsCaseData.setDwpOtherDoc(DwpResponseDocument.builder()
             .documentLink(DocumentLink.builder()
                 .documentFilename("test.mp4")
@@ -279,7 +279,7 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
 
     @Test
     public void givenASupplementaryResponseWitOnlyDocuments_shouldNotBeInsertedIntoAddedDocuments() {
-        handler = new SupplementaryResponseAboutToSubmitHandler(new AddedDocumentsUtil(true));
+        handler = new SupplementaryResponseAboutToSubmitHandler(new AddedDocumentsUtil(true, new ObjectMapper()));
 
         sscsCaseData.setDwpSupplementaryResponseDoc(DwpResponseDocument.builder()
             .documentLink(DocumentLink.builder()

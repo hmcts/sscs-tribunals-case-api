@@ -43,11 +43,12 @@ public class EvidenceManagementControllerTest {
     private FileToPdfConversionService fileToPdfConversionService;
 
     private EvidenceManagementController controller;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     public void setUp() {
         controller = new EvidenceManagementController(evidenceManagementService,
-                evidenceManagementSecureDocStoreService, fileToPdfConversionService, false, null);
+                evidenceManagementSecureDocStoreService, fileToPdfConversionService, false, null, objectMapper);
     }
 
     @Test
@@ -100,7 +101,7 @@ public class EvidenceManagementControllerTest {
     public void shouldUploadEvidenceDocumentListSecureDocStore() throws Exception {
         controller =
                 new EvidenceManagementController(evidenceManagementService, evidenceManagementSecureDocStoreService,
-                        fileToPdfConversionService, true, idamService);
+                        fileToPdfConversionService, true, idamService, objectMapper);
         final String json = """
                   { "documents":
                     [

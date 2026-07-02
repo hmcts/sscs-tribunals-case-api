@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 public class AddedDocumentsUtilTest {
 
     private AddedDocumentsUtil addedDocumentsUtil;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private static final String CASE_ID = "123456";
 
@@ -25,14 +26,14 @@ public class AddedDocumentsUtilTest {
 
     @Before
     public void setup() {
-        addedDocumentsUtil = new AddedDocumentsUtil(true);
+        addedDocumentsUtil = new AddedDocumentsUtil(true, objectMapper);
         sscsCaseData = new SscsCaseData();
         sscsCaseData.setCcdCaseId(CASE_ID);
     }
 
     @Test
     public void givenWorkAllocationFeatureFlagIsOff_shouldNotAddDocuments() {
-        addedDocumentsUtil = new AddedDocumentsUtil(false);
+        addedDocumentsUtil = new AddedDocumentsUtil(false, objectMapper);
         List<String> documentsAddedThisEvent = Collections.singletonList("reinstatementRequest");
 
         addedDocumentsUtil.computeDocumentsAddedThisEvent(sscsCaseData, documentsAddedThisEvent,

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.jobscheduler.model.Job;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobScheduler;
+import uk.gov.hmcts.reform.sscs.service.BusinessEventLogger;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationClientRuntimeException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
@@ -21,12 +22,15 @@ public class NotificationHandler {
     private final OutOfHoursCalculator outOfHoursCalculator;
     private final JobScheduler jobScheduler;
     private final JobGroupGenerator jobGroupGenerator;
+    private final BusinessEventLogger businessEventLogger;
 
     @Autowired
-    public NotificationHandler(OutOfHoursCalculator outOfHoursCalculator, JobScheduler jobScheduler, JobGroupGenerator jobGroupGenerator) {
+    public NotificationHandler(OutOfHoursCalculator outOfHoursCalculator, JobScheduler jobScheduler,
+                               JobGroupGenerator jobGroupGenerator, BusinessEventLogger businessEventLogger) {
         this.outOfHoursCalculator = outOfHoursCalculator;
         this.jobScheduler = jobScheduler;
         this.jobGroupGenerator = jobGroupGenerator;
+        this.businessEventLogger = businessEventLogger;
     }
 
     public boolean sendNotification(NotificationWrapper wrapper, String notificationTemplate, final String notificationType, SendNotification sendNotification) {
@@ -35,9 +39,13 @@ public class NotificationHandler {
             log.info("Sending {} template {} for case id: {}", notificationType, notificationTemplate, caseId);
             sendNotification.send();
             log.info("{} template {} sent for case id: {}", notificationType, notificationTemplate, caseId);
+            businessEventLogger.logNotificationEvent("sendNotification", caseId,
+                    notificationType, notificationTemplate, "success");
             return true;
         } catch (Exception ex) {
             log.error("Could not send {} notification for case id: {}", notificationType, wrapper.getCaseId());
+            businessEventLogger.logNotificationEvent("sendNotification", caseId,
+                    notificationType, notificationTemplate, "failure");
             wrapAndThrowNotificationExceptionIfRequired(wrapper, notificationTemplate, ex);
         }
 

@@ -71,7 +71,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
 
     @Before
     public void setUp() {
-        addedDocumentsUtil = new AddedDocumentsUtil(false);
+        addedDocumentsUtil = new AddedDocumentsUtil(false, new ObjectMapper());
 
         MockitoAnnotations.openMocks(this);
         handler = new UploadDocumentFurtherEvidenceAboutToSubmitHandler(addedDocumentsUtil);
@@ -203,7 +203,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
     @Test
     public void givenAMixtureOfAudioVideoAndDocumentEvidence_onlyAudioVideoShouldBeInsertedIntoAddedDocuments()
         throws JsonProcessingException {
-        handler = new UploadDocumentFurtherEvidenceAboutToSubmitHandler(new AddedDocumentsUtil(true));
+        handler = new UploadDocumentFurtherEvidenceAboutToSubmitHandler(new AddedDocumentsUtil(true, new ObjectMapper()));
 
         List<SscsFurtherEvidenceDoc> furtherEvidenceDocs = new ArrayList<>();
         furtherEvidenceDocs.add(SscsFurtherEvidenceDoc.builder()
@@ -251,7 +251,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
     @Test
     public void givenAudioVideoAndDocumentEvidenceWithoutDocumentFileName_shouldResolveFromDocumentLink()
         throws JsonProcessingException {
-        handler = new UploadDocumentFurtherEvidenceAboutToSubmitHandler(new AddedDocumentsUtil(true));
+        handler = new UploadDocumentFurtherEvidenceAboutToSubmitHandler(new AddedDocumentsUtil(true, new ObjectMapper()));
 
         List<SscsFurtherEvidenceDoc> furtherEvidenceDocs = new ArrayList<>();
         furtherEvidenceDocs.add(SscsFurtherEvidenceDoc.builder()
@@ -277,7 +277,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
     @Test
     public void givenAudioVideoEvidenceHandledMultipleTimes_shouldInsertMostRecentIntoAddedDocuments()
         throws JsonProcessingException {
-        handler = new UploadDocumentFurtherEvidenceAboutToSubmitHandler(new AddedDocumentsUtil(true));
+        handler = new UploadDocumentFurtherEvidenceAboutToSubmitHandler(new AddedDocumentsUtil(true, new ObjectMapper()));
 
         List<SscsFurtherEvidenceDoc> furtherEvidenceDocs = new ArrayList<>();
         furtherEvidenceDocs.add(SscsFurtherEvidenceDoc.builder()
@@ -318,7 +318,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
 
     @Test
     public void givenNoAudioVideoEvidenceAdded_shouldStillClearAddedDocuments() {
-        handler = new UploadDocumentFurtherEvidenceAboutToSubmitHandler(new AddedDocumentsUtil(true));
+        handler = new UploadDocumentFurtherEvidenceAboutToSubmitHandler(new AddedDocumentsUtil(true, new ObjectMapper()));
 
         sscsCaseData.setDraftSscsFurtherEvidenceDocument(new ArrayList<>());
         sscsCaseData.setWorkAllocationFields(WorkAllocationFields.builder()

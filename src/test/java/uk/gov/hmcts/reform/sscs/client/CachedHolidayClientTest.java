@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.client;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Set;
@@ -32,6 +33,8 @@ class CachedHolidayClientTest {
 
     private CachedHolidayClient cachedHolidayClient;
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @BeforeEach
     void setUp() throws IOException {
         MockitoAnnotations.openMocks(this);
@@ -41,7 +44,7 @@ class CachedHolidayClientTest {
         when(response.body()).thenReturn(responseBody);
         when(responseBody.string()).thenReturn("{\"england-and-wales\":{\"events\":[{\"date\":\"2024-12-25\"},{\"date\":\"2024-12-26\"}]}}");
 
-        cachedHolidayClient = new CachedHolidayClient(httpClient);
+        cachedHolidayClient = new CachedHolidayClient(httpClient, objectMapper);
     }
 
     @Test

@@ -70,7 +70,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     private final PanelCompositionService panelCompositionService;
     private final HearingsService hearingsService;
     private final AddedDocumentsUtil addedDocumentsUtil;
-    @Value("${feature.cm-other-party-confidentiality.enabled}") 
+    @Value("${feature.cm-other-party-confidentiality.enabled}")
     private final boolean cmOtherPartyConfidentialityEnabled;
     private static final Enum<EventType> EVENT_TYPE = EventType.DWP_UPLOAD_RESPONSE;
 

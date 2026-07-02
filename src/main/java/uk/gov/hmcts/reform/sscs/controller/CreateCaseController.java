@@ -60,15 +60,18 @@ public class CreateCaseController {
     private final SubmitAppealServiceBase submitAppealServiceBase;
     private final CcdService ccdService;
     private final IdamService idamService;
+    private final ObjectMapper objectMapper;
 
     public CreateCaseController(
         @Autowired SubmitAppealServiceBase submitAppealServiceBase,
         @Autowired CcdService ccdService,
-        @Autowired IdamService idamService
+        @Autowired IdamService idamService,
+        @Autowired ObjectMapper objectMapper
     ) {
         this.submitAppealServiceBase = submitAppealServiceBase;
         this.ccdService = ccdService;
         this.idamService = idamService;
+        this.objectMapper = objectMapper;
     }
 
     @Operation(summary = "Create a case",
@@ -113,7 +116,7 @@ public class CreateCaseController {
         SscsCaseData sscsCaseData;
         try (InputStream caseStream = getClass().getClassLoader().getResourceAsStream("json/ccd_case.json")) {
             String caseAsString = new BufferedReader(new InputStreamReader(caseStream)).lines().collect(joining("\n"));
-            sscsCaseData = new ObjectMapper().readValue(caseAsString, SscsCaseData.class);
+            sscsCaseData = objectMapper.readValue(caseAsString, SscsCaseData.class);
 
             Event events = Event.builder()
                 .value(EventDetails.builder()

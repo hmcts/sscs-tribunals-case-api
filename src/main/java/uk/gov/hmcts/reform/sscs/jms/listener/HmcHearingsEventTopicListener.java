@@ -1,14 +1,16 @@
 package uk.gov.hmcts.reform.sscs.jms.listener;
 
+import static uk.gov.hmcts.reform.sscs.config.CorrelationIdFilter.CORRELATION_ID_MDC_KEY;
 import static uk.gov.hmcts.reform.sscs.service.HmcHearingApi.HMCTS_DEPLOYMENT_ID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.jms.JMSException;
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.qpid.jms.message.JmsBytesMessage;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jms.annotation.JmsListener;
@@ -32,10 +34,9 @@ public class HmcHearingsEventTopicListener {
     @Value("${hmc.deployment-id}")
     private String hmctsDeploymentId;
 
-    public HmcHearingsEventTopicListener(ProcessHmcMessageServiceV2 processHmcMessageServiceV2) {
+    public HmcHearingsEventTopicListener(ProcessHmcMessageServiceV2 processHmcMessageServiceV2, ObjectMapper objectMapper) {
         this.processHmcMessageServiceV2 = processHmcMessageServiceV2;
-        this.objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
+        this.objectMapper = objectMapper;
     }
 
     @JmsListener(
@@ -44,33 +45,43 @@ public class HmcHearingsEventTopicListener {
         containerFactory = "hmcHearingsEventTopicContainerFactory"
     )
     public void onMessage(JmsBytesMessage message) throws JMSException, HmcEventProcessingException {
-        log.info("message deploymentId , {}", message.getStringProperty(HMCTS_DEPLOYMENT_ID));
-        log.info("application deploymentId , {}", hmctsDeploymentId);
-
-        byte[] messageBytes = new byte[(int) message.getBodyLength()];
-        message.readBytes(messageBytes);
-        String convertedMessage = new String(messageBytes, StandardCharsets.UTF_8);
-
         try {
-            HmcMessage hmcMessage = objectMapper.readValue(convertedMessage, HmcMessage.class);
-            Long caseId = hmcMessage.getCaseId();
-            String hearingId = hmcMessage.getHearingId();
+            String correlationId = message.getJMSCorrelationID();
+            if (correlationId == null || correlationId.isBlank()) {
+                correlationId = UUID.randomUUID().toString();
+            }
+            MDC.put(CORRELATION_ID_MDC_KEY, correlationId);
 
-            log.info(
-                "Attempting to process message from HMC hearings topic for event {}, Case ID {}, and Hearing ID {}.",
-                hmcMessage.getHearingUpdate().getHmcStatus(),
-                caseId,
-                hearingId
-            );
+            log.info("message deploymentId , {}", message.getStringProperty(HMCTS_DEPLOYMENT_ID));
+            log.info("application deploymentId , {}", hmctsDeploymentId);
 
-            processHmcMessageServiceV2.processEventMessage(hmcMessage);
-        } catch (JsonProcessingException | MessageProcessingException
-                 | HearingUpdateException | ExhaustedRetryException ex) {
-            log.error("Unable to successfully deliver HMC message: {}", convertedMessage, ex);
-            throw new HmcEventProcessingException(String.format(
-                "Unable to successfully deliver HMC message: %s",
-                convertedMessage
-            ), ex);
+            byte[] messageBytes = new byte[(int) message.getBodyLength()];
+            message.readBytes(messageBytes);
+            String convertedMessage = new String(messageBytes, StandardCharsets.UTF_8);
+
+            try {
+                HmcMessage hmcMessage = objectMapper.readValue(convertedMessage, HmcMessage.class);
+                Long caseId = hmcMessage.getCaseId();
+                String hearingId = hmcMessage.getHearingId();
+
+                log.info(
+                    "Attempting to process message from HMC hearings topic for event {}, Case ID {}, and Hearing ID {}.",
+                    hmcMessage.getHearingUpdate().getHmcStatus(),
+                    caseId,
+                    hearingId
+                );
+
+                processHmcMessageServiceV2.processEventMessage(hmcMessage);
+            } catch (JsonProcessingException | MessageProcessingException
+                     | HearingUpdateException | ExhaustedRetryException ex) {
+                log.error("Unable to successfully deliver HMC message: {}", convertedMessage, ex);
+                throw new HmcEventProcessingException(String.format(
+                    "Unable to successfully deliver HMC message: %s",
+                    convertedMessage
+                ), ex);
+            }
+        } finally {
+            MDC.remove(CORRELATION_ID_MDC_KEY);
         }
     }
 
