@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.ccd.util.SelectionValidator.otherPartySelectionContainsDuplicates;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.isDateInTheFuture;
 
 import java.util.Objects;
@@ -46,6 +47,16 @@ public class DirectionIssuedMidEventHandler extends IssueDocumentHandler impleme
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
+
+        if (isYes(caseData.getHasOtherParties()) && caseData.getSendDirectionNoticeToOtherParty() == null) {
+            errorResponse.addError("Select whether to send the direction notice to the other party");
+            return errorResponse;
+        }
+
+        if (otherPartySelectionContainsDuplicates(caseData.getOtherPartySelection())) {
+            errorResponse.addError("Other parties cannot be selected more than once");
+            return errorResponse;
+        }
 
         if (caseData.getDirectionTypeDl() == null) {
             errorResponse.addError("Direction Type cannot be empty");

@@ -49,6 +49,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRecordingRequestDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartySelectionDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -390,6 +391,182 @@ public class CcdNotificationWrapperTest {
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
         Assert.assertEquals(requiredMembers.size(), subsWithTypeList.size());
         subsWithTypeList.forEach(o -> Assert.assertTrue(requiredMembers.contains(o.getSubscriptionType())));
+    }
+
+    // SSCSCI-2659: on Issue Direction Notice, only the selected other party(ies) should be notified.
+    @Test
+    public void givenDirectionIssuedWithMultipleOtherParties_thenOnlySelectedOtherPartyIsNotified() {
+        assertOnlySelectedOtherPartyNotified(DIRECTION_ISSUED);
+    }
+
+    @Test
+    public void givenDirectionIssuedWelshWithMultipleOtherParties_thenOnlySelectedOtherPartyIsNotified() {
+        assertOnlySelectedOtherPartyNotified(DIRECTION_ISSUED_WELSH);
+    }
+
+    private void assertOnlySelectedOtherPartyNotified(NotificationEventType eventType) {
+        ccdNotificationWrapper = buildNotificationWrapperWithOtherParty(eventType, buildMultipleOtherParties());
+        SscsCaseData caseData = ccdNotificationWrapper.getNewSscsCaseData();
+        caseData.setConfidentialityType(ConfidentialityType.CONFIDENTIAL.getCode());
+        caseData.setSendDirectionNoticeToOtherParty(YES);
+        caseData.setOtherPartySelection(otherPartySelection(PartyItemList.OTHER_PARTY.getCode() + "1"));
+
+        List<SubscriptionWithType> subs = ccdNotificationWrapper.getOtherPartySubscriptions(caseData, eventType);
+
+        Assertions.assertThat(subs)
+            .extracting(SubscriptionWithType::getPartyId)
+            .containsExactly("1");
+    }
+
+    @Test
+    public void givenDirectionIssuedWithBothOtherPartiesSelected_thenBothAreNotified() {
+        ccdNotificationWrapper = buildNotificationWrapperWithOtherParty(DIRECTION_ISSUED, buildMultipleOtherParties());
+        SscsCaseData caseData = ccdNotificationWrapper.getNewSscsCaseData();
+        caseData.setConfidentialityType(ConfidentialityType.CONFIDENTIAL.getCode());
+        caseData.setSendDirectionNoticeToOtherParty(YES);
+        caseData.setOtherPartySelection(otherPartySelection(
+            PartyItemList.OTHER_PARTY.getCode() + "1", PartyItemList.OTHER_PARTY.getCode() + "2"));
+
+        List<SubscriptionWithType> subs = ccdNotificationWrapper.getOtherPartySubscriptions(caseData, DIRECTION_ISSUED);
+
+        Assertions.assertThat(subs)
+            .extracting(SubscriptionWithType::getPartyId)
+            .containsExactlyInAnyOrder("1", "2");
+    }
+
+    @Test
+    public void givenDirectionIssuedWithNoOtherPartySelection_thenAllEligibleOtherPartiesNotified() {
+        ccdNotificationWrapper = buildNotificationWrapperWithOtherParty(DIRECTION_ISSUED, buildMultipleOtherParties());
+        SscsCaseData caseData = ccdNotificationWrapper.getNewSscsCaseData();
+        caseData.setConfidentialityType(ConfidentialityType.CONFIDENTIAL.getCode());
+        caseData.setSendDirectionNoticeToOtherParty(YES);
+
+        List<SubscriptionWithType> subs = ccdNotificationWrapper.getOtherPartySubscriptions(caseData, DIRECTION_ISSUED);
+
+        Assertions.assertThat(subs)
+            .extracting(SubscriptionWithType::getPartyId)
+            .containsExactlyInAnyOrder("1", "2");
+    }
+
+    @Test
+    public void givenNonDirectionEventWithOtherPartySelection_thenSelectionIsIgnored() {
+        ccdNotificationWrapper = buildNotificationWrapperWithOtherParty(UPDATE_OTHER_PARTY_DATA, buildOtherPartyData(true, false, false));
+        SscsCaseData caseData = ccdNotificationWrapper.getNewSscsCaseData();
+        caseData.setOtherPartySelection(otherPartySelection(PartyItemList.OTHER_PARTY.getCode() + "999"));
+
+        List<SubscriptionWithType> subs = ccdNotificationWrapper.getOtherPartySubscriptions(caseData, UPDATE_OTHER_PARTY_DATA);
+
+        Assertions.assertThat(subs)
+            .extracting(SubscriptionWithType::getPartyId)
+            .contains("1");
+    }
+
+    @Test
+    public void givenDirectionIssuedWithSelectionRowButNothingChosen_thenAllEligibleOtherPartiesNotified() {
+        ccdNotificationWrapper = buildNotificationWrapperWithOtherParty(DIRECTION_ISSUED, buildMultipleOtherParties());
+        SscsCaseData caseData = ccdNotificationWrapper.getNewSscsCaseData();
+        caseData.setConfidentialityType(ConfidentialityType.CONFIDENTIAL.getCode());
+        caseData.setSendDirectionNoticeToOtherParty(YES);
+        caseData.setOtherPartySelection(List.of(new CcdValue<>(new OtherPartySelectionDetails(new DynamicList(null, List.of())))));
+
+        List<SubscriptionWithType> subs = ccdNotificationWrapper.getOtherPartySubscriptions(caseData, DIRECTION_ISSUED);
+
+        Assertions.assertThat(subs)
+            .extracting(SubscriptionWithType::getPartyId)
+            .containsExactlyInAnyOrder("1", "2");
+    }
+
+    @Test
+    public void givenDirectionIssuedWithOneOfTwoOtherPartyAppointeesSelected_thenOnlyThatAppointeeNotified() {
+        ccdNotificationWrapper = buildNotificationWrapperWithOtherParty(DIRECTION_ISSUED,
+            List.of(buildOtherParty("1", "2", null), buildOtherParty("10", "20", null)));
+        SscsCaseData caseData = ccdNotificationWrapper.getNewSscsCaseData();
+        caseData.setConfidentialityType(ConfidentialityType.CONFIDENTIAL.getCode());
+        caseData.setSendDirectionNoticeToOtherPartyAppointee(YES);
+        caseData.setOtherPartySelection(otherPartySelection(PartyItemList.OTHER_PARTY.getCode() + "2"));
+
+        List<SubscriptionWithType> subs = ccdNotificationWrapper.getOtherPartySubscriptions(caseData, DIRECTION_ISSUED);
+
+        Assertions.assertThat(subs)
+            .extracting(SubscriptionWithType::getPartyId)
+            .containsExactly("2");
+    }
+
+    @Test
+    public void givenDirectionIssuedWithOneOfTwoOtherPartyRepsSelected_thenOnlyThatRepNotified() {
+        ccdNotificationWrapper = buildNotificationWrapperWithOtherParty(DIRECTION_ISSUED,
+            List.of(buildOtherParty("1", null, "3"), buildOtherParty("10", null, "30")));
+        SscsCaseData caseData = ccdNotificationWrapper.getNewSscsCaseData();
+        caseData.setConfidentialityType(ConfidentialityType.CONFIDENTIAL.getCode());
+        caseData.setSendDirectionNoticeToOtherParty(NO);
+        caseData.setSendDirectionNoticeToOtherPartyRep(YES);
+        caseData.setOtherPartySelection(otherPartySelection(PartyItemList.OTHER_PARTY_REPRESENTATIVE.getCode() + "3"));
+
+        List<SubscriptionWithType> subs = ccdNotificationWrapper.getOtherPartySubscriptions(caseData, DIRECTION_ISSUED);
+
+        Assertions.assertThat(subs)
+            .extracting(SubscriptionWithType::getPartyId)
+            .containsExactly("3");
+    }
+
+    @Test
+    public void givenSelectionKeyedOnOtherPartyIdButFilterTreatsAsAppointee_thenStillNotified() {
+        // malformed appointee data: appointee object + name present but isAppointee not "Yes", so the picker keys
+        // the option on the other party id while the notification filter routes to the appointee branch.
+        CcdValue<OtherParty> op = CcdValue.<OtherParty>builder().value(OtherParty.builder()
+            .id("1")
+            .otherPartySubscription(Subscription.builder().email("op@party").subscribeEmail("Yes").build())
+            .appointee(Appointee.builder().id("2").name(Name.builder().firstName("Ap").lastName("Pointee").build()).build())
+            .build()).build();
+        ccdNotificationWrapper = buildNotificationWrapperWithOtherParty(DIRECTION_ISSUED, List.of(op));
+        SscsCaseData caseData = ccdNotificationWrapper.getNewSscsCaseData();
+        caseData.setConfidentialityType(ConfidentialityType.GENERAL.getCode());
+        caseData.setOtherPartySelection(otherPartySelection(PartyItemList.OTHER_PARTY.getCode() + "1"));
+
+        List<SubscriptionWithType> subs = ccdNotificationWrapper.getOtherPartySubscriptions(caseData, DIRECTION_ISSUED);
+
+        Assertions.assertThat(subs)
+            .extracting(SubscriptionWithType::getPartyId)
+            .contains("2");
+    }
+
+    private CcdValue<OtherParty> buildOtherParty(String id, String appointeeId, String repId) {
+        var builder = OtherParty.builder()
+            .id(id)
+            .isAppointee(appointeeId != null ? YES.getValue() : NO.getValue())
+            .otherPartySubscription(Subscription.builder().email("op" + id + "@party").subscribeEmail("Yes").build());
+        if (appointeeId != null) {
+            builder.appointee(Appointee.builder().id(appointeeId)
+                .name(Name.builder().firstName("Ap").lastName("Pointee").build()).build());
+        }
+        if (repId != null) {
+            builder.rep(Representative.builder().id(repId).hasRepresentative(YES.getValue())
+                .name(Name.builder().firstName("Re").lastName("Presentative").build()).build());
+        }
+        return CcdValue.<OtherParty>builder().value(builder.build()).build();
+    }
+
+    private List<CcdValue<OtherParty>> buildMultipleOtherParties() {
+        return List.of(
+            CcdValue.<OtherParty>builder().value(OtherParty.builder()
+                .id("1")
+                .otherPartySubscription(Subscription.builder().email("op1@party").subscribeEmail("Yes").build())
+                .isAppointee(NO.getValue())
+                .build()).build(),
+            CcdValue.<OtherParty>builder().value(OtherParty.builder()
+                .id("2")
+                .otherPartySubscription(Subscription.builder().email("op2@party").subscribeEmail("Yes").build())
+                .isAppointee(NO.getValue())
+                .build()).build());
+    }
+
+    private List<CcdValue<OtherPartySelectionDetails>> otherPartySelection(String... codes) {
+        List<CcdValue<OtherPartySelectionDetails>> selection = new ArrayList<>();
+        for (String code : codes) {
+            DynamicListItem item = new DynamicListItem(code, code);
+            selection.add(new CcdValue<>(new OtherPartySelectionDetails(new DynamicList(item, List.of(item)))));
+        }
+        return selection;
     }
 
     private void createPartiesOnTheCase(SscsCaseData sscsCaseData, String partyMember) {
