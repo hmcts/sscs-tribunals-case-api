@@ -1,8 +1,11 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
-import static org.junit.Assert.assertThrows;
+import static java.util.Objects.requireNonNull;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
@@ -24,21 +27,27 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.OTHER_PARTY;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.OTHER_PARTY_REPRESENTATIVE;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
-import org.junit.jupiter.api.Assertions;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
@@ -49,15 +58,21 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartySelectionDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.evidenceshare.config.DocmosisTemplateConfig;
-import uk.gov.hmcts.reform.sscs.evidenceshare.service.BulkPrintService;
-import uk.gov.hmcts.reform.sscs.evidenceshare.service.CcdNotificationService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.CoverLetterService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.GenericLetterPlaceholderService;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationSender;
+import uk.gov.hmcts.reform.sscs.util.LogCaptureExtension;
 
 @ExtendWith(MockitoExtension.class)
 @Slf4j
 class IssueGenericLetterHandlerTest {
+
+    @RegisterExtension
+    private final LogCaptureExtension logCapture =
+        new LogCaptureExtension(IssueGenericLetterHandler.class);
+
     @Mock
     private GenericLetterPlaceholderService genericLetterPlaceholderService;
 
@@ -65,23 +80,20 @@ class IssueGenericLetterHandlerTest {
     private IssueGenericLetterHandler handler;
 
     @Mock
-    private BulkPrintService bulkPrintService;
+    private CoverLetterService coverLetterService;
 
     @Mock
-    CoverLetterService coverLetterService;
-
-    @Mock
-    CcdNotificationService ccdNotificationService;
+    private NotificationSender notificationSender;
 
     @Captor
     ArgumentCaptor<String> argumentCaptor;
 
-    private Map<LanguagePreference, Map<String, Map<String, String>>> template = new HashMap<>();
+    private final Map<LanguagePreference, Map<String, Map<String, String>>> template = new EnumMap<>(LanguagePreference.class);
 
-    private byte[] letter = new byte[1];
+    private final byte[] letter = createPdfBytes(1);
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         Map<String, String> nameMap = new HashMap<>();
         nameMap.put("name", "TB-SCS-LET-ENG-Issue-Generic-Letter.docx");
         nameMap.put("cover", "TB-SCS-LET-ENG-Cover-Sheet.docx");
@@ -92,8 +104,8 @@ class IssueGenericLetterHandlerTest {
         DocmosisTemplateConfig docmosisTemplateConfig = new DocmosisTemplateConfig();
         docmosisTemplateConfig.setTemplate(template);
 
-        handler = new IssueGenericLetterHandler(bulkPrintService, genericLetterPlaceholderService, coverLetterService,
-            docmosisTemplateConfig);
+        handler = new IssueGenericLetterHandler(genericLetterPlaceholderService, coverLetterService,
+            docmosisTemplateConfig, notificationSender);
     }
 
     @Test
@@ -104,7 +116,7 @@ class IssueGenericLetterHandlerTest {
 
         boolean result = handler.canHandle(ABOUT_TO_SUBMIT, callback);
 
-        Assertions.assertFalse(result);
+        assertThat(result).isFalse();
     }
 
     @Test
@@ -115,28 +127,22 @@ class IssueGenericLetterHandlerTest {
 
         boolean result = handler.canHandle(SUBMITTED, callback);
 
-        Assertions.assertFalse(result);
-    }
-
-    @Test
-    void shouldThrowException_givenCallbackIsNull() {
-        assertThrows(NullPointerException.class, () ->
-            handler.canHandle(SUBMITTED, null)
-        );
+        assertThat(result).isFalse();
     }
 
     @Test
     void shouldThrowExceptionInHandler_givenCallbackIsNull() {
         SscsCaseData caseData = buildCaseData();
-        Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_ADJOURNMENT_NOTICE);
+        Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
+            ISSUE_ADJOURNMENT_NOTICE);
 
-        assertThrows(IllegalStateException.class, () ->
+        assertThatThrownBy(() ->
             handler.handle(MID_EVENT, callback)
-        );
+        ).isInstanceOf(IllegalStateException.class);
 
-        assertThrows(IllegalStateException.class, () ->
+        assertThatThrownBy(() ->
             handler.handle(SUBMITTED, callback)
-        );
+        ).isInstanceOf(IllegalStateException.class);
     }
 
     @Test
@@ -151,26 +157,31 @@ class IssueGenericLetterHandlerTest {
 
         var otherPartyWithRep = buildOtherParty();
         Representative representative = Representative.builder()
-            .hasRepresentative("YES")
-            .name(Name.builder().firstName("OPRepFirstName").lastName("OPRepLastName").build())
-            .build();
+                                                      .hasRepresentative("YES")
+                                                      .name(Name
+                                                          .builder()
+                                                          .firstName("OPRepFirstName")
+                                                          .lastName("OPRepLastName")
+                                                          .build())
+                                                      .build();
         otherPartyWithRep.setRep(representative);
 
         caseData.setOtherParties(List.of(otherParty, new CcdValue<>(otherPartyWithRep)));
         caseData.setOtherPartySelection(buildOtherPartiesSelection(otherParty, representative));
 
-        when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
+        when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(
+            Map.of());
         when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
         when(coverLetterService.generateCoverSheet(anyString(), eq("coversheet"), eq(Map.of()))).thenReturn(letter);
 
-        Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_GENERIC_LETTER);
+        Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
+            ISSUE_GENERIC_LETTER);
 
         handler.handle(SUBMITTED, callback);
 
-        verify(bulkPrintService, times(5)).sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(eq(callback.getCaseDetails().getId()),
-            eq(caseData), any(), eq(ISSUE_GENERIC_LETTER),
-            argumentCaptor.capture());
-        Assertions.assertEquals(argumentCaptor.getAllValues(), List.of("User Test", "Wendy Giles", "Joint Party", "Other Party", "OPRepFirstName OPRepLastName"));
+        verify(notificationSender, times(5)).sendBundledLetter(eq(ISSUE_GENERIC_LETTER), eq(caseData), anyList(), argumentCaptor.capture());
+        assertThat(argumentCaptor.getAllValues()).isEqualTo(
+            List.of("User Test", "Wendy Giles", "Joint Party", "Other Party", "OPRepFirstName OPRepLastName"));
     }
 
     @Test
@@ -188,75 +199,50 @@ class IssueGenericLetterHandlerTest {
 
         var otherPartyWithRep = buildOtherParty();
         Representative representative = Representative.builder()
-            .hasRepresentative("YES")
-            .name(Name.builder().firstName("OPRepFirstName").lastName("OPRepLastName").build())
-            .build();
+                                                      .hasRepresentative("YES")
+                                                      .name(Name
+                                                          .builder()
+                                                          .firstName("OPRepFirstName")
+                                                          .lastName("OPRepLastName")
+                                                          .build())
+                                                      .build();
         otherPartyWithRep.setRep(representative);
 
         caseData.setOtherParties(List.of(otherParty, new CcdValue<>(otherPartyWithRep)));
         caseData.setOtherPartySelection(buildOtherPartiesSelection(otherParty, representative));
 
-        when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
+        when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(
+            Map.of());
         when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
+        when(coverLetterService.generateCoverSheet(anyString(), eq("coversheet"), eq(Map.of()))).thenReturn(letter);
 
-        Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_GENERIC_LETTER);
-
-        handler.handle(SUBMITTED, callback);
-
-        verify(bulkPrintService, times(5)).sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(eq(callback.getCaseDetails().getId()),
-            eq(caseData), any(), eq(ISSUE_GENERIC_LETTER),
-            argumentCaptor.capture());
-        Assertions.assertEquals(argumentCaptor.getAllValues(), List.of("User Test", "Wendy Giles", "Joint Party", "Other Party", "OPRepFirstName OPRepLastName"));
-    }
-
-    @Test
-    void shouldNotSendLettersWhenNoPartiesSelected() {
-        SscsCaseData caseData = buildCaseData();
-        caseData.setSendToApellant(YesNo.NO);
-        caseData.setSendToJointParty(YesNo.NO);
-        caseData.setSendToOtherParties(YesNo.NO);
-        caseData.setSendToRepresentative(YesNo.NO);
-
-        var jointParty = buildJointParty();
-        caseData.setJointParty(jointParty);
-
-        var otherParty = new CcdValue<>(buildOtherParty());
-
-        var otherPartyWithRep = buildOtherParty();
-        Representative representative = Representative.builder()
-            .hasRepresentative("YES")
-            .name(Name.builder().firstName("OPRepFirstName").lastName("OPRepLastName").build())
-            .build();
-        otherPartyWithRep.setRep(representative);
-
-        caseData.setOtherParties(List.of(otherParty, new CcdValue<>(otherPartyWithRep)));
-        caseData.setOtherPartySelection(buildOtherPartiesSelection(otherParty, representative));
-
-        Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_GENERIC_LETTER);
+        Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
+            ISSUE_GENERIC_LETTER);
 
         handler.handle(SUBMITTED, callback);
 
-        verifyNoInteractions(ccdNotificationService);
-        verifyNoInteractions(bulkPrintService);
+        verify(notificationSender, times(5)).sendBundledLetter(eq(ISSUE_GENERIC_LETTER), eq(caseData), anyList(), argumentCaptor.capture());
+        assertThat(argumentCaptor.getAllValues()).isEqualTo(
+            List.of("User Test", "Wendy Giles", "Joint Party", "Other Party", "OPRepFirstName OPRepLastName"));
     }
-
 
     @Test
     void shouldLogErrorWhenIdIsEmpty() {
         SscsCaseData caseData = buildCaseData();
         caseData.setSendToAllParties(YesNo.YES);
 
-        when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
+        when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(
+            Map.of());
+        when(coverLetterService.generateCoverSheet(anyString(), eq("coversheet"), eq(Map.of()))).thenReturn(letter);
+        when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
 
-        Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_GENERIC_LETTER);
+        Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
+            ISSUE_GENERIC_LETTER);
 
         handler.handle(SUBMITTED, callback);
 
-        verify(ccdNotificationService, times(0)).storeNotificationLetterIntoCcd(any(), any(), any(), any());
-        verify(bulkPrintService, times(2)).sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(eq(callback.getCaseDetails().getId()),
-            eq(caseData), any(), eq(ISSUE_GENERIC_LETTER),
-            argumentCaptor.capture());
-        Assertions.assertEquals(argumentCaptor.getAllValues(), List.of("User Test", "Wendy Giles"));
+        verify(notificationSender, times(2)).sendBundledLetter(eq(ISSUE_GENERIC_LETTER), eq(caseData), anyList(), argumentCaptor.capture());
+        assertThat(argumentCaptor.getAllValues()).isEqualTo(List.of("User Test", "Wendy Giles"));
     }
 
     @Test
@@ -267,21 +253,96 @@ class IssueGenericLetterHandlerTest {
         caseData.setSendToOtherParties(YesNo.NO);
         caseData.setSendToRepresentative(YesNo.NO);
 
-        byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("myPdf.pdf"));
+        byte[] pdfBytes = IOUtils.toByteArray(
+            requireNonNull(getClass().getClassLoader().getResourceAsStream("myPdf.pdf")));
         when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(pdfBytes);
         when(coverLetterService.generateCoverSheet(anyString(), anyString(), any())).thenReturn(pdfBytes);
 
-        Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_GENERIC_LETTER);
+        Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
+            ISSUE_GENERIC_LETTER);
 
         handler.handle(SUBMITTED, callback);
 
-        verify(bulkPrintService, times(1)).sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(eq(callback.getCaseDetails().getId()),
-            eq(caseData), any(), eq(ISSUE_GENERIC_LETTER),
-            argumentCaptor.capture());
-        Assertions.assertEquals(argumentCaptor.getAllValues(), List.of("User Test"));
+        verify(notificationSender).sendBundledLetter(eq(ISSUE_GENERIC_LETTER), eq(caseData), anyList(), eq("User Test"));
+
     }
 
-    static List<CcdValue<OtherPartySelectionDetails>> buildOtherPartiesSelection(CcdValue<OtherParty> otherParty, Representative representative) {
+    @Test
+    void shouldReturnDispatchPriorityLatest() {
+        assertThat(handler.getPriority()).isEqualTo(DispatchPriority.LATEST);
+    }
+
+    @Test
+    void shouldReturnTrue_givenSubmittedCallbackTypeAndIssueGenericLetterEvent() {
+        final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder().build(),
+            READY_TO_LIST, ISSUE_GENERIC_LETTER);
+
+        assertThat(handler.canHandle(SUBMITTED, callback)).isTrue();
+    }
+
+    @Test
+    void shouldThrowException_givenCallbackTypeIsNull() {
+        final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder().build(),
+            READY_TO_LIST, ISSUE_GENERIC_LETTER);
+
+        assertThatThrownBy(() -> handler.canHandle(null, callback))
+            .isInstanceOf(NullPointerException.class);
+    }
+
+    @Test
+    void shouldIncludeSelectedDocumentsWhenAddDocumentsIsYes() throws IOException {
+        final SscsCaseData caseData = buildCaseData();
+        caseData.setSendToApellant(YesNo.YES);
+        caseData.setAddDocuments(YesNo.YES);
+
+        when(coverLetterService.getSelectedDocuments(caseData)).thenReturn(List.of(createPdfWithPages(3)));
+        when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
+        when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
+        when(coverLetterService.generateCoverSheet(anyString(), eq("coversheet"), eq(Map.of()))).thenReturn(letter);
+
+        final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
+            ISSUE_GENERIC_LETTER);
+
+        handler.handle(SUBMITTED, callback);
+
+        verify(coverLetterService).getSelectedDocuments(caseData);
+        verify(notificationSender).sendBundledLetter(eq(ISSUE_GENERIC_LETTER), eq(caseData), anyList(), eq("User Test"));
+    }
+
+    @Test
+    void shouldNotSendToOtherParties_whenOtherPartySelectionIsNull() {
+        final SscsCaseData caseData = buildCaseData();
+        caseData.setSendToOtherParties(YesNo.YES);
+        caseData.setOtherPartySelection(null);
+
+        final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
+            ISSUE_GENERIC_LETTER);
+
+        handler.handle(SUBMITTED, callback);
+
+        verifyNoInteractions(notificationSender);
+    }
+
+    @Test
+    void shouldSendOnlyToAppellant_inSendToAllPartiesFlow_whenNoRepresentative() {
+        final SscsCaseData caseData = buildCaseData();
+        caseData.setSendToAllParties(YesNo.YES);
+        caseData.getAppeal().getRep().setHasRepresentative("No");
+
+        when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
+        when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
+        when(coverLetterService.generateCoverSheet(anyString(), eq("coversheet"), eq(Map.of()))).thenReturn(letter);
+
+        final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(caseData, READY_TO_LIST,
+            ISSUE_GENERIC_LETTER);
+
+        handler.handle(SUBMITTED, callback);
+
+        verify(notificationSender, times(1)).sendBundledLetter(eq(ISSUE_GENERIC_LETTER), eq(caseData), anyList(), eq("User Test"));
+    }
+
+    static List<CcdValue<OtherPartySelectionDetails>> buildOtherPartiesSelection(CcdValue<OtherParty> otherParty,
+        Representative representative) {
         var item1 = new DynamicListItem(OTHER_PARTY.getCode() + otherParty.getValue().getId(), "test");
         var item2 = new DynamicListItem(OTHER_PARTY_REPRESENTATIVE.getCode() + representative.getId(), "test");
 
@@ -293,4 +354,27 @@ class IssueGenericLetterHandlerTest {
 
         return List.of(otherParties1, otherParties2);
     }
+
+    private Pdf createPdfWithPages(final int numberOfPages) throws IOException {
+        try (PDDocument document = new PDDocument(); ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            for (int i = 0; i < numberOfPages; i++) {
+                document.addPage(new PDPage(PDRectangle.A4));
+            }
+            document.save(outputStream);
+            return new Pdf(outputStream.toByteArray(), "letter.pdf");
+        }
+    }
+
+    private byte[] createPdfBytes(final int numberOfPages)  {
+        try (PDDocument document = new PDDocument(); ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            for (int i = 0; i < numberOfPages; i++) {
+                document.addPage(new PDPage(PDRectangle.A4));
+            }
+            document.save(outputStream);
+            return outputStream.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

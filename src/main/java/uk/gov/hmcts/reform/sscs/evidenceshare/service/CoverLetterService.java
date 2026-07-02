@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
+import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
@@ -13,7 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentSelectionDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
@@ -119,9 +124,13 @@ public class CoverLetterService {
     public List<Pdf> getSelectedDocuments(SscsCaseData sscsCaseData) {
         List<Pdf> documents = new ArrayList<>();
 
+        if (sscsCaseData.getDocumentSelection() == null) {
+            return emptyList();
+        }
+
         for (CcdValue<DocumentSelectionDetails> d : sscsCaseData.getDocumentSelection()) {
             var documentLink = findDocumentByFileName(d.getValue().getDocumentsList().getValue().getCode(), sscsCaseData);
-            byte[] document = null;
+            byte[] document;
 
             if (documentLink != null) {
                 document = pdfStoreService.download(documentLink.getDocumentUrl());

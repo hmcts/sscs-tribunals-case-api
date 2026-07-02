@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_HEARING_ENQUIR
 import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.OTHER_PARTY_LETTER;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.ADDRESS_NAME;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_NAME;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.buildBundledLetter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,10 +24,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.evidenceshare.config.DocmosisTemplateConfig;
-import uk.gov.hmcts.reform.sscs.evidenceshare.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.CoverLetterService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.HearingEnquiryFormPlaceholderService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationSender;
 
 @Slf4j
 @Service
@@ -34,21 +35,22 @@ public class IssueHearingEnquiryFormHandler implements CallbackHandler<SscsCaseD
 
     private static final String HEARING_ENQUIRY_FORM = "hearing-enquiry-form";
     private final HearingEnquiryFormPlaceholderService hearingEnquiryFormPlaceholderService;
-    private final BulkPrintService bulkPrintService;
     private final CoverLetterService coverLetterService;
     private final boolean cmOtherPartyConfidentialityEnabled;
     private final DocmosisTemplateConfig docmosisTemplateConfig;
+    private final NotificationSender notificationSender;
 
 
-    public IssueHearingEnquiryFormHandler(BulkPrintService bulkPrintService,
+    public IssueHearingEnquiryFormHandler(
         HearingEnquiryFormPlaceholderService hearingEnquiryFormPlaceholderService, CoverLetterService coverLetterService,
         DocmosisTemplateConfig docmosisTemplateConfig,
+        NotificationSender notificationSender,
         @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
-        this.bulkPrintService = bulkPrintService;
         this.coverLetterService = coverLetterService;
         this.docmosisTemplateConfig = docmosisTemplateConfig;
         this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
         this.hearingEnquiryFormPlaceholderService = hearingEnquiryFormPlaceholderService;
+        this.notificationSender = notificationSender;
     }
 
     @Override
@@ -101,7 +103,7 @@ public class IssueHearingEnquiryFormHandler implements CallbackHandler<SscsCaseD
             .get("cover");
     }
 
-    private void sendToOtherParties(long caseId, SscsCaseData caseData, List<Pdf> documents) {
+    private void sendToOtherParties(Long caseId, SscsCaseData caseData, List<Pdf> documents) {
         log.info("Sending HEF letter to other parties for case id: {}", caseId);
         final var selectedOtherParties = caseData.getOtherPartySelection();
 
@@ -117,7 +119,7 @@ public class IssueHearingEnquiryFormHandler implements CallbackHandler<SscsCaseD
                 final String recipient = PlaceholderUtility.getName(caseData, OTHER_PARTY_LETTER,
                     entityId);
                 final List<Pdf> letter = getLetterPdfs(caseData, documents, entityId);
-                bulkPrintService.sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(caseId, caseData, letter, ISSUE_HEARING_ENQUIRY_FORM, recipient);
+                notificationSender.sendBundledLetter(ISSUE_HEARING_ENQUIRY_FORM, caseData, letter, recipient);
             }
         }
     }
@@ -136,7 +138,7 @@ public class IssueHearingEnquiryFormHandler implements CallbackHandler<SscsCaseD
 
         var coverSheet = coverLetterService.generateCoverSheet(getCoverSheetTemplateName(caseData), "coversheet", placeholders);
 
-        final byte[] bundledLetter = bulkPrintService.buildBundledLetter(List.of(coverLetter, hefForm, coverSheet));
+        final byte[] bundledLetter = buildBundledLetter(List.of(coverLetter, hefForm, coverSheet));
 
         final Pdf pdf = new Pdf(bundledLetter, letterName);
         final List<Pdf> letter = new ArrayList<>();

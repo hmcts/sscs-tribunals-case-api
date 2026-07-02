@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -16,6 +15,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FURTHER_EVIDEN
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.buildBundledLetter;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.buildBundledLetterFromPdfs;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -51,7 +52,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
@@ -344,7 +344,7 @@ class BulkPrintServiceTest {
         final byte[] firstDocument = createPdf(2);
         final byte[] secondDocument = createPdf(2);
         final byte[] thirdDocument = createPdf(1);
-        final byte[] result = bulkPrintService.buildBundledLetterFromPdfs(List.of(new Pdf(firstDocument, "file.pdf"),
+        final byte[] result = buildBundledLetterFromPdfs(List.of(new Pdf(firstDocument, "file.pdf"),
                 new Pdf(secondDocument, "file2.pdf"), new Pdf(thirdDocument, "file3.pdf")));
         assertThat(result).isNotNull();
         try (PDDocument merged = Loader.loadPDF(result)) {
@@ -352,34 +352,17 @@ class BulkPrintServiceTest {
         }
     }
 
-    @Test
-    void sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification_returnsIdAndStoresNotificationLetter() throws IOException {
-        when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), captor.capture())).thenReturn(new SendLetterResponse(LETTER_ID));
-        Optional<UUID> id = bulkPrintService.sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(234, SSCS_CASE_DATA, PDF_LIST, EventType.ISSUE_GENERIC_LETTER, "appellant");
-        assertThat(id).isEqualTo(Optional.of(LETTER_ID));
-        verify(ccdNotificationService, times(1)).storeNotificationLetterIntoCcd(any(), any(), any(), any());
-    }
-
-    @Test
-    void sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification_whenSendLetterDisabled_returnsEmpty() {
-        BulkPrintService notEnabledBulkPrint = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper, false, 1,
-                ccdNotificationService);
-        Optional<UUID> id = notEnabledBulkPrint.sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(234, SSCS_CASE_DATA, PDF_LIST, EventType.ISSUE_GENERIC_LETTER, "appellant");
-        assertThat(id).isEqualTo(Optional.empty());
-        verifyNoInteractions(ccdNotificationService);
-    }
-
     @ParameterizedTest
     @NullAndEmptySource
     void buildBundledLetter_nullList_throwsBulkPrintException(List<byte[]> documents) {
-        assertThatThrownBy(() -> bulkPrintService.buildBundledLetter(documents)).isInstanceOf(BulkPrintException.class);
+        assertThatThrownBy(() -> buildBundledLetter(documents)).isInstanceOf(BulkPrintException.class);
     }
 
     @Test
     void buildBundledLetter_singleDocument_returnsSameDocument() throws IOException {
         final byte[] singleDocument = createPdf(1);
 
-        final byte[] result = bulkPrintService.buildBundledLetter(List.of(singleDocument));
+        final byte[] result = buildBundledLetter(List.of(singleDocument));
 
         assertThat(result).isEqualTo(singleDocument);
     }
@@ -389,7 +372,7 @@ class BulkPrintServiceTest {
         final byte[] firstDocument = createPdf(1);
         final byte[] secondDocument = createPdf(1);
 
-        final byte[] result = bulkPrintService.buildBundledLetter(List.of(firstDocument, secondDocument));
+        final byte[] result = buildBundledLetter(List.of(firstDocument, secondDocument));
 
         assertThat(result).isNotNull();
         try (PDDocument merged = Loader.loadPDF(result)) {
@@ -402,7 +385,7 @@ class BulkPrintServiceTest {
         final byte[] firstDocument = createPdf(2);
         final byte[] secondDocument = createPdf(1);
 
-        final byte[] result = bulkPrintService.buildBundledLetter(List.of(firstDocument, secondDocument));
+        final byte[] result = buildBundledLetter(List.of(firstDocument, secondDocument));
 
         assertThat(result).isNotNull();
         try (PDDocument merged = Loader.loadPDF(result)) {
@@ -419,7 +402,7 @@ class BulkPrintServiceTest {
         documents.add(null);
         documents.add(thirdDocument);
 
-        final byte[] result = bulkPrintService.buildBundledLetter(documents);
+        final byte[] result = buildBundledLetter(documents);
 
         assertThat(result).isNotNull();
         try (PDDocument merged = Loader.loadPDF(result)) {
@@ -431,8 +414,9 @@ class BulkPrintServiceTest {
     void buildBundledLetter_invalidFirstDocument_throwsBulkPrintException() {
         final byte[] firstDocument = "not a pdf".getBytes();
         final byte[] secondDocument = "also not a pdf".getBytes();
+        List<byte[]> documents = List.of(firstDocument, secondDocument);
 
-        assertThatThrownBy(() -> bulkPrintService.buildBundledLetter(List.of(firstDocument, secondDocument))).isInstanceOf(
+        assertThatThrownBy(() -> buildBundledLetter(documents)).isInstanceOf(
             BulkPrintException.class);
     }
 
@@ -440,8 +424,9 @@ class BulkPrintServiceTest {
     void buildBundledLetter_validFirstDocumentWithInvalidSubsequentDocument_throwsBulkPrintException() throws IOException {
         final byte[] validFirst = createPdf(1);
         final byte[] invalidSecond = "not a pdf".getBytes();
+        List<byte[]> documents = List.of(validFirst, invalidSecond);
 
-        assertThatThrownBy(() -> bulkPrintService.buildBundledLetter(List.of(validFirst, invalidSecond))).isInstanceOf(
+        assertThatThrownBy(() -> buildBundledLetter(documents)).isInstanceOf(
             BulkPrintException.class);
     }
 

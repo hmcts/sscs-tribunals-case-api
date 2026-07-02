@@ -5,10 +5,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -19,6 +19,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_HEARING_ENQUIRY_FORM;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.HandlerHelper.buildTestCallbackForGivenData;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.buildBundledLetter;
 
 import ch.qos.logback.classic.Level;
 import java.util.EnumMap;
@@ -26,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Named;
 import org.junit.jupiter.api.Test;
@@ -38,6 +40,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -56,10 +59,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.evidenceshare.config.DocmosisTemplateConfig;
-import uk.gov.hmcts.reform.sscs.evidenceshare.exception.BulkPrintException;
-import uk.gov.hmcts.reform.sscs.evidenceshare.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.CoverLetterService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.HearingEnquiryFormPlaceholderService;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationSender;
 import uk.gov.hmcts.reform.sscs.util.LogCaptureExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -74,7 +77,7 @@ class IssueHearingEnquiryFormHandlerTest {
     @Mock
     private HearingEnquiryFormPlaceholderService hearingEnquiryFormPlaceholderService;
     @Mock
-    private BulkPrintService bulkPrintService;
+    private NotificationSender notificationSender;
     @Mock
     private CoverLetterService coverLetterService;
     @Captor
@@ -84,20 +87,27 @@ class IssueHearingEnquiryFormHandlerTest {
     @Captor
     private ArgumentCaptor<String> letterNameCaptor;
     private IssueHearingEnquiryFormHandler handler;
+    private MockedStatic<LetterUtils> pdfHelperMock;
 
     @BeforeEach
     void setUp() {
-        handler = new IssueHearingEnquiryFormHandler(bulkPrintService, hearingEnquiryFormPlaceholderService, coverLetterService,
-            buildTemplateConfig(), true);
+        pdfHelperMock = mockStatic(LetterUtils.class);
+        pdfHelperMock.when(() -> buildBundledLetter(anyList())).thenReturn(BUNDLED_LETTER);
+        handler = new IssueHearingEnquiryFormHandler(hearingEnquiryFormPlaceholderService, coverLetterService,
+            buildTemplateConfig(), notificationSender, true);
+    }
 
+    @AfterEach
+    void tearDown() {
+        pdfHelperMock.close();
     }
 
     @ParameterizedTest
     @MethodSource("canHandleScenarios")
     void shouldReturnExpectedCanHandleResult(CallbackType callbackType, EventType eventType, boolean featureEnabled,
         boolean expected) {
-        final IssueHearingEnquiryFormHandler testHandler = new IssueHearingEnquiryFormHandler(bulkPrintService,
-            hearingEnquiryFormPlaceholderService, coverLetterService, buildTemplateConfig(), featureEnabled);
+        final IssueHearingEnquiryFormHandler testHandler = new IssueHearingEnquiryFormHandler(
+            hearingEnquiryFormPlaceholderService, coverLetterService, buildTemplateConfig(), notificationSender, featureEnabled);
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(SscsCaseData.builder().build(), READY_TO_LIST,
             eventType);
 
@@ -150,7 +160,7 @@ class IssueHearingEnquiryFormHandlerTest {
         when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(
             COVER_LETTER);
         when(coverLetterService.generateCoverSheet(anyString(), anyString(), any())).thenReturn(COVER_SHEET);
-        when(bulkPrintService.buildBundledLetter(anyList())).thenReturn(BUNDLED_LETTER);
+
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(caseData, READY_TO_LIST,
             ISSUE_HEARING_ENQUIRY_FORM);
 
@@ -160,8 +170,7 @@ class IssueHearingEnquiryFormHandlerTest {
         verify(coverLetterService, times(2)).generateCoverLetterRetry(any(), templateNameCaptor.capture(),
             letterNameCaptor.capture(), eq(placeholders), eq(1));
         verify(coverLetterService).generateCoverSheet("hearing-enquiry-form-cover.docx", "coversheet", placeholders);
-        verify(bulkPrintService).sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(anyLong(), eq(caseData), sentPdfsCaptor.capture(),
-            eq(ISSUE_HEARING_ENQUIRY_FORM), eq("Other Person"));
+        verify(notificationSender).sendBundledLetter(eq(ISSUE_HEARING_ENQUIRY_FORM), eq(caseData), sentPdfsCaptor.capture(), eq("Other Person"));
 
         assertThat(templateNameCaptor.getAllValues()).containsExactlyInAnyOrder("hearing-enquiry-form-letter.docx",
             "hearing-enquiry-form.docx");
@@ -189,14 +198,12 @@ class IssueHearingEnquiryFormHandlerTest {
         when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(
             COVER_LETTER);
         when(coverLetterService.generateCoverSheet(anyString(), anyString(), any())).thenReturn(COVER_SHEET);
-        when(bulkPrintService.buildBundledLetter(anyList())).thenReturn(BUNDLED_LETTER);
 
         Callback<SscsCaseData> callback = buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_HEARING_ENQUIRY_FORM);
         handler.handle(SUBMITTED, callback);
 
         verify(coverLetterService).getSelectedDocuments(caseData);
-        verify(bulkPrintService).sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(anyLong(), eq(caseData), sentPdfsCaptor.capture(),
-            eq(ISSUE_HEARING_ENQUIRY_FORM), eq("Other Person"));
+        verify(notificationSender).sendBundledLetter(eq(ISSUE_HEARING_ENQUIRY_FORM), eq(caseData), sentPdfsCaptor.capture(), eq("Other Person"));
 
         List<Pdf> sentPdfs = sentPdfsCaptor.getValue();
         assertThat(sentPdfs).hasSize(2);
@@ -217,7 +224,7 @@ class IssueHearingEnquiryFormHandlerTest {
 
         handler.handle(SUBMITTED, callback);
 
-        verify(bulkPrintService, never()).sendToBulkPrint(anyLong(), any(), any(), any(), anyString());
+        verify(notificationSender, never()).sendBundledLetter(any(EventType.class), any(), any(), anyString());
     }
 
     @ParameterizedTest
@@ -230,26 +237,9 @@ class IssueHearingEnquiryFormHandlerTest {
 
         handler.handle(SUBMITTED, callback);
 
-        verify(bulkPrintService, never()).sendToBulkPrint(anyLong(), any(), any(), any(), anyString());
+        verify(notificationSender, never()).sendBundledLetter(any(EventType.class), any(), any(), anyString());
         logCapture.assertLogContains("Sending HEF letter to other parties for case id: 1", Level.INFO);
         logCapture.assertLogContains("Skipping party with incomplete selection data for case id: 1", Level.WARN);
-    }
-
-    @Test
-    void shouldThrowExceptionWhenBundlingFails() {
-        SscsCaseData caseData = baseCaseData();
-        caseData.setAddDocuments(YesNo.NO);
-        Map<String, Object> placeholders = Map.of("address_name", "Other Party");
-
-        when(hearingEnquiryFormPlaceholderService.populatePlaceholders(any(), any(), anyString())).thenReturn(placeholders);
-        when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(
-            COVER_LETTER);
-        when(coverLetterService.generateCoverSheet(anyString(), anyString(), any())).thenReturn(COVER_SHEET);
-        when(bulkPrintService.buildBundledLetter(anyList())).thenThrow(new BulkPrintException("Failed to merge documents"));
-
-        Callback<SscsCaseData> callback = buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_HEARING_ENQUIRY_FORM);
-
-        assertThatThrownBy(() -> handler.handle(SUBMITTED, callback)).isInstanceOf(BulkPrintException.class);
     }
 
     @SuppressWarnings("unchecked")

@@ -2,8 +2,10 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+import static org.apache.pdfbox.Loader.loadPDF;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_1;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_2;
@@ -17,9 +19,15 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_5_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.defaultToEmptyStringIfNull;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.truncateAddressLine;
-import static uk.gov.hmcts.reform.sscs.model.PartyItemList.*;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.APPELLANT;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.DWP;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.HMCTS;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists.EVENTS_FOR_ACTION_FURTHER_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ADDRESS_LINE_2;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ADDRESS_LINE_3;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ADDRESS_LINE_4;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ADDRESS_LINE_5;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.POSTCODE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.hasAppointee;
 
 import java.io.ByteArrayOutputStream;
@@ -32,6 +40,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.pdfbox.Loader;
@@ -48,6 +57,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.ReasonableAdjustments;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
+import uk.gov.hmcts.reform.sscs.evidenceshare.exception.BulkPrintException;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
@@ -55,6 +66,7 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationClientRuntimeException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 
+@Slf4j
 public class LetterUtils {
 
     private LetterUtils() {
@@ -146,6 +158,45 @@ public class LetterUtils {
             }
         }
         return letter;
+    }
+
+    public static byte[] buildBundledLetterFromPdfs(List<Pdf> pdfs) {
+        List<byte[]> pdfDocuments = new ArrayList<>();
+        for (Pdf pdf : pdfs) {
+            pdfDocuments.add(pdf.getContent());
+        }
+        return buildBundledLetter(pdfDocuments);
+    }
+
+    public static byte[] buildBundledLetter(List<byte[]> documents) {
+        if (isEmpty(documents)) {
+            log.error("Failed to merge documents: document list is empty");
+            throw new BulkPrintException("Failed to merge documents: document list is empty");
+        }
+
+        if (documents.size() == 1) {
+            return documents.getFirst();
+        }
+
+        try (PDDocument bundledLetter = loadPDF(documents.getFirst())) {
+            final PDFMergerUtility merger = new PDFMergerUtility();
+            for (int i = 1; i < documents.size(); i++) {
+                if (documents.get(i) != null) {
+                    if (bundledLetter.getNumberOfPages() % 2 != 0) {
+                        bundledLetter.addPage(new PDPage(PDRectangle.A4));
+                    }
+                    try (PDDocument loadDoc = loadPDF(documents.get(i))) {
+                        merger.appendDocument(bundledLetter, loadDoc);
+                    }
+                }
+            }
+            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bundledLetter.save(baos);
+            return baos.toByteArray();
+        } catch (IOException e) {
+            log.error("Failed to merge documents with exception {}", e.getMessage());
+            throw new BulkPrintException("Failed to merge documents with exception " + e.getMessage(), e);
+        }
     }
 
     public static byte[] buildBundledLetter(byte[] coveringLetter, byte[] directionText) throws IOException {
