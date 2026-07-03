@@ -158,7 +158,7 @@ export class CreateUpdateToCaseDataPage {
   async setConfidentialityAppellant(isConfidentialityRequired: boolean) {
     await this.page
       .locator(
-        `input[id=appeal_appellant_confidentialityRequired_${isConfidentialityRequired ? 'Yes' : 'No'}]`
+        `input[id=appeal_appellant_confidentialityRequirement-${isConfidentialityRequired ? 'Yes' : 'No'}]`
       )
       .click();
     await webAction.clickSubmitButton();
