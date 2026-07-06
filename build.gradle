@@ -320,7 +320,7 @@ dependencyManagement {
 }
 
 ext {
-    set('activemq.version', '6.2.6')
+    set('activemq.version', '6.2.7')
     set('netty.version', '4.2.15.Final')
     set('log4j2.version', '2.26.0')
     set('commons-lang3.version', '3.20.0')
