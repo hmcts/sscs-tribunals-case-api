@@ -281,16 +281,6 @@ configurations {
     contractTestRuntimeOnly.extendsFrom(testRuntimeOnly)
 }
 
-configurations.configureEach {
-    resolutionStrategy {
-        force(
-                "com.fasterxml.jackson.core:jackson-annotations:2.22",
-                "com.fasterxml.jackson.core:jackson-core:2.22.0",
-                "com.fasterxml.jackson.core:jackson-databind:2.22.0",
-        )
-    }
-}
-
 tasks.register('installLocalGitHook', Copy) {
     from new File(rootProject.rootDir, 'config/git/pre-commit')
     into { new File(rootProject.rootDir, '.git/hooks') }
