@@ -297,6 +297,15 @@ tasks.register('runGitPreCommitTasks') {
     dependsOn 'checkstyleTest'
 }
 
+configurations.all {
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        if (details.requested.group == 'org.apache.httpcomponents.core5' && details.requested.name == 'httpcore5') {
+            details.useVersion '5.4.3'
+            details.because 'Fixes CVE-2026-54399 and CVE-2026-54428 memory exhaustion vulnerabilities'
+        }
+    }
+}
+
 dependencyManagement {
     dependencies {
         imports {
