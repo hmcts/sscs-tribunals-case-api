@@ -306,6 +306,13 @@ dependencyManagement {
         // CVE-2023-36415, CVE-2024-35255
         dependency group: 'com.azure', name: 'azure-identity', version: '1.18.3'
         dependency group: 'com.microsoft.azure', name: 'msal4j', version: '1.24.1'
+
+        // CVE-2026-54399, CVE-2026-54428
+        dependencySet(group: 'org.apache.httpcomponents.core5', version: '5.4.3') {
+            entry 'httpcore5'
+            entry 'httpcore5-h2'
+        }
+        dependency group: '', name: '', version: ''
     }
 }
 
