@@ -437,7 +437,7 @@ export class UpdateOtherPartyData extends BaseStep {
       .click();
     await expect(
       this.page.getByText(
-        'Confidentiality for all parties is required.'
+        'Confidentiality for all parties must be determined to either Yes or No.'
       )
     ).toBeVisible();
     await this.page

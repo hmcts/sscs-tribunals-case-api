@@ -144,7 +144,7 @@ class ConfidentialityConfirmedMidEventHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getErrors()).contains("Confidentiality for all parties is required.");
+        assertThat(response.getErrors()).contains("Confidentiality for all parties must be determined to either Yes or No.");
     }
 
     @ParameterizedTest
@@ -159,7 +159,7 @@ class ConfidentialityConfirmedMidEventHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getErrors()).contains("Confidentiality for all parties is required.");
+        assertThat(response.getErrors()).contains("Confidentiality for all parties must be determined to either Yes or No.");
     }
 
     @Test

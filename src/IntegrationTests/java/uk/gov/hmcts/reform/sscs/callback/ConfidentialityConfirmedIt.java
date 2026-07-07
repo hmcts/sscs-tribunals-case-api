@@ -26,6 +26,6 @@ public class ConfidentialityConfirmedIt extends AbstractEventIt {
     public void callToMidEventHandler_returnsErrorWhenConfidentialityMissing() throws Exception {
         PreSubmitCallbackResponse<SscsCaseData> result = assertResponseOkAndGetResult(CallbackType.MID_EVENT);
 
-        assertThat(result.getErrors()).contains("Confidentiality for all parties is required.");
+        assertThat(result.getErrors()).contains("Confidentiality for all parties must be determined to either Yes or No.");
     }
 }
