@@ -5255,7 +5255,7 @@ class NotificationsIt extends NotificationsItBase {
 
         getResponse(getRequestWithAuthHeader(updatedJson));
 
-        verify(notificationClient, atLeastOnce()).sendPrecompiledLetterWithInputStream(any(), any());
+        verifyNoMoreInteractions(notificationClient);
     }
 
     @Test
