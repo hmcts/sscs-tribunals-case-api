@@ -29,24 +29,7 @@ import org.mockito.Spy;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
-import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
-import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartySelectionDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsInterlocDirectionDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
@@ -55,7 +38,6 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 @RunWith(JUnitParamsRunner.class)
 public class DirectionIssuedMidEventHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
-    //private static final String TEMPLATE_ID = "nuts.docx";
     private static final String URL = "http://dm-store/documents/123";
     public static final String APPELLANT_LAST_NAME = "APPELLANT Last'NamE";
 
@@ -165,13 +147,28 @@ public class DirectionIssuedMidEventHandlerTest {
     }
 
     @Test
-    public void givenOtherPartiesButSendDirectionNoticeToOtherPartyNotAnswered_thenReturnsError() {
+    @Parameters({"UC", "CHILD_SUPPORT"})
+    public void givenOtherPartiesButSendDirectionNoticeToOtherPartyNotAnswered_thenReturnsError(Benefit benefit) {
         sscsCaseData.setHasOtherParties(YES);
         sscsCaseData.setSendDirectionNoticeToOtherParty(null);
+        BenefitType benefitType = BenefitType.builder().code(benefit.getShortName().toUpperCase()).build();
+        sscsCaseData.getAppeal().setBenefitType(benefitType);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertTrue(response.getErrors().contains("Select whether to send the direction notice to the other party"));
+    }
+
+    @Test
+    public void givenSendDirectionNoticeToOtherPartyNotUCOrChildSupport_thenNoError() {
+        sscsCaseData.setHasOtherParties(YES);
+        sscsCaseData.setSendDirectionNoticeToOtherParty(null);
+        BenefitType benefitType = BenefitType.builder().code(Benefit.ATTENDANCE_ALLOWANCE.getShortName().toUpperCase()).build();
+        sscsCaseData.getAppeal().setBenefitType(benefitType);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertFalse(response.getErrors().contains("Select whether to send the direction notice to the other party"));
     }
 
     @Test
