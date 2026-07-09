@@ -281,8 +281,6 @@ feature:
         enabled: ${HEARINGS_CASE_UPDATE_V2_ENABLED:false}
     cm-other-party-confidentiality:
         enabled: ${CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED:false}
-    severeConditions:
-        enabled: ${SEVERE_CONDITIONS_FEATURE:false}
 
 idam:
     api:
@@ -705,8 +703,6 @@ notification:
             docmosisId: TB-SCS-LET-ENG-Set-Aside-Grant-Refused-v2.docx
         setAsideRefused:
             docmosisId: TB-SCS-LET-ENG-Set-Aside-Grant-Refused-v2.docx
-        adminSendToValidAppeal:
-            docmosisId: TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx
         interlocValidAppeal:
             docmosisId: TB-SCS-GNO-ENG-Acknowledgment-of-Appeal.docx
         validAppeal:
@@ -1938,7 +1934,6 @@ pdf-service:
             libertyToApplyGranted: 'TB-SCS-GNO-ENG-00012.docx'
             libertyToApplyRefused: 'TB-SCS-GNO-ENG-00012.docx'
             otherPartyAddedToAppeal: 'TB-SCS-GNO-ENG-00012.docx'
-            adminSendToValidAppeal: 'TB-SCS-GNO-ENG-00012.docx'
             interlocValidAppeal: 'TB-SCS-GNO-ENG-00012.docx'
             validAppeal: 'TB-SCS-GNO-ENG-00012.docx'
             appealToProceedNotifyValidAppeal: 'TB-SCS-GNO-ENG-00012.docx'
