@@ -410,7 +410,7 @@ dependencies {
     implementation group: 'com.mchange', name: 'c3p0', version: '0.13.0'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '11.8.2'
     implementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '11.8.2'
-    implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.11'
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.12'
     implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.5.0'
 
     implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.7.6'
