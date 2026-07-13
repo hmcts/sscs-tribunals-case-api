@@ -160,7 +160,7 @@ public class DirectionIssuedMidEventHandlerTest {
     }
 
     @Test
-    public void givenSendDirectionNoticeToOtherPartyNotUCOrChildSupport_thenNoError() {
+    public void givenSendDirectionNoticeToOtherPartyNotUcOrChildSupport_thenNoError() {
         sscsCaseData.setHasOtherParties(YES);
         sscsCaseData.setSendDirectionNoticeToOtherParty(null);
         BenefitType benefitType = BenefitType.builder().code(Benefit.ATTENDANCE_ALLOWANCE.getShortName().toUpperCase()).build();
