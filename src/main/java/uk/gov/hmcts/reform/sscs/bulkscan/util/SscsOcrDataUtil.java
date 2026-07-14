@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.sscs.bulkscan.util;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined.YES;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -11,7 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
 
 public final class SscsOcrDataUtil {
 
@@ -130,8 +133,8 @@ public final class SscsOcrDataUtil {
         return convertBooleanToYesNo(value).getValue();
     }
 
-    public static YesNo convertBooleanToYesNo(boolean value) {
-        return value ? YesNo.YES : YesNo.NO;
+    public static YesNoUndetermined convertBooleanToYesNo(boolean value) {
+        return value ? YES : NO;
     }
 
     public static String generateDateForCcd(Map<String, Object> pairs, Set<String> errors, String fieldName) {
