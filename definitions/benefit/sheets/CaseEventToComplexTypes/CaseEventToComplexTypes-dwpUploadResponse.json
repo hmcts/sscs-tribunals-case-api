@@ -455,7 +455,7 @@
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "otherParties",
-    "ListElementCode": "confidentialityRequired",
+    "ListElementCode": "confidentialityRequirement",
     "ID": "otherPartyConfidentialityRequired",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "19/11/2020",
