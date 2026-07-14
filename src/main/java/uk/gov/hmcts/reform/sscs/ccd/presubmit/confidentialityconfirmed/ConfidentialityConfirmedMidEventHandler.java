@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
@@ -57,14 +56,12 @@ class ConfidentialityConfirmedMidEventHandler implements PreSubmitCallbackHandle
                 .filter(Objects::nonNull)
                 .map(CcdValue::getValue)
                 .filter(Objects::nonNull)
-                .anyMatch(value -> value.getConfidentialityRequirement() == null
-                        || value.getConfidentialityRequirement() == YesNoUndetermined.UNDETERMINED))
+                .anyMatch(value -> value.getConfidentialityRequired() == null))
                 .orElse(false);
 
         boolean appellantConfidentialityMissing = Optional.ofNullable(caseData.getAppeal())
             .map(Appeal::getAppellant)
-            .map(appellant -> appellant.getConfidentialityRequirement() == null
-                    || appellant.getConfidentialityRequirement() == YesNoUndetermined.UNDETERMINED)
+            .map(appellant -> appellant.getConfidentialityRequired() == null)
             .orElse(false);
 
         if (otherPartyConfidentialityMissing || appellantConfidentialityMissing) {

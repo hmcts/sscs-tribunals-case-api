@@ -12,6 +12,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FE_ACTIONED_NR;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -48,7 +49,7 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
     private SscsCaseData sscsCaseData;
 
     @Before
-    public void setUp() {
+    public void setUp() throws IOException {
         openMocks(this);
         handler = new ReviewConfidentialityRequestAboutToSubmitHandler(false);
 

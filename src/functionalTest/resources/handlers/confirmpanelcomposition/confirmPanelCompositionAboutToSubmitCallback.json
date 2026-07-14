@@ -182,6 +182,7 @@
             }
           },
           "isAppointee": "No",
+          "confidentialityRequired": null,
           "isAddressSameAsAppointee": "No"
         },
         "mrnDetails": {
@@ -543,7 +544,7 @@
                 }
               },
               "isAppointee": "PUBLIC",
-              "confidentialityRequirement": "PUBLIC",
+              "confidentialityRequired": "PUBLIC",
               "isAddressSameAsAppointee": "PUBLIC"
             }
           },
@@ -927,7 +928,7 @@
                 }
               },
               "isAppointee": "PUBLIC",
-              "confidentialityRequirement": "PUBLIC",
+              "confidentialityRequired": "PUBLIC",
               "isAddressSameAsAppointee": "PUBLIC"
             }
           },
@@ -1273,6 +1274,7 @@
             }
           },
           "isAppointee": "No",
+          "confidentialityRequired": null,
           "isAddressSameAsAppointee": "No"
         },
         "mrnDetails": {
@@ -1632,7 +1634,7 @@
                 "classification": "PUBLIC"
               },
               "isAppointee": "PUBLIC",
-              "confidentialityRequirement": "PUBLIC",
+              "confidentialityRequired": "PUBLIC",
               "isAddressSameAsAppointee": "PUBLIC"
             },
             "classification": "PUBLIC"
@@ -2016,7 +2018,7 @@
                 "classification": "PUBLIC"
               },
               "isAppointee": "PUBLIC",
-              "confidentialityRequirement": "PUBLIC",
+              "confidentialityRequired": "PUBLIC",
               "isAddressSameAsAppointee": "PUBLIC"
             },
             "classification": "PUBLIC"
