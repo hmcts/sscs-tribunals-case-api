@@ -54,7 +54,7 @@ import uk.gov.hmcts.reform.sscs.util.SyaServiceHelper;
 @SpringBootTest
 @Slf4j
 
-@org.junit.Ignore
+@Ignore
 public class SubmitDraftTest {
 
     private static final String LOCATION_HEADER_NAME = "Location";
