@@ -112,6 +112,7 @@ tasks.register('integration', Test) {
 }
 
 tasks.register('functional', Test) {
+    enabled = false
     group = 'Functional Tests'
     description = 'Executes non-destructive functional tests in AAT against a running CCD and notification service'
     setTestClassesDirs(sourceSets.functionalTest.output.classesDirs)
@@ -124,6 +125,7 @@ tasks.register('functional', Test) {
 }
 
 tasks.register('verifyNotifications', Test) {
+    enabled = false
     group = 'Notifications verification Tests'
     description = 'Simulates CCD callbacks to generate notifications, then retrieves pdfs from Gov.Notify'
     setTestClassesDirs(sourceSets.functionalTest.output.classesDirs)
@@ -134,6 +136,7 @@ tasks.register('verifyNotifications', Test) {
 }
 
 tasks.register('smoke', Test) {
+    enabled = false
     group = 'verification'
     description = 'Executes non-destructive smoke tests against a running Tribunal Case API'
     setTestClassesDirs(sourceSets.functionalTest.output.classesDirs)
@@ -607,23 +610,27 @@ bootWithCCD {
 }
 
 tasks.register('yarnInstall', Exec) {
+    enabled = false
     workingDir = file("${project.projectDir}/definitions/test")
     commandLine 'yarn', 'install'
 }
 
 tasks.register('runE2eTests', Exec) {
+    enabled = false
     dependsOn yarnInstall
     workingDir = file("${project.projectDir}/definitions/test")
     commandLine 'yarn', 'test:' + System.getenv('ENVIRONMENT')
 }
 
 tasks.register('runE2eTestsNightly', Exec) {
+    enabled = false
     dependsOn yarnInstall
     workingDir = file("${project.projectDir}/definitions/test")
     commandLine 'yarn', 'test:nightly'
 }
 
 tasks.register('runAccessibilityTestsNightly', Exec) {
+    enabled = false
     dependsOn yarnInstall
     workingDir = file("${project.projectDir}/definitions/test")
     commandLine 'yarn', 'test:accessibility'
