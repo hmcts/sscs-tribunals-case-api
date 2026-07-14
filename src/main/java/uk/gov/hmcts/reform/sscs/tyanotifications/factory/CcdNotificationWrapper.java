@@ -191,7 +191,7 @@ public class CcdNotificationWrapper implements NotificationWrapper {
             .filter(Objects::nonNull)
             .toList();
         if (selectedCodes.isEmpty()) {
-            return true;
+            return false;
         }
         if (partyIds == null) {
             return false;
