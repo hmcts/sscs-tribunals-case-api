@@ -74,6 +74,7 @@
       },
       "isAppointee": "No",
       "role": {},
+      "confidentialityRequired": null,
       "isAddressSameAsAppointee": "No",
       "appointee": {
         "name": {
@@ -279,5 +280,5 @@
   "poAttendanceConfirmed": "No",
   "tribunalDirectPoToAttend": "No",
   "hearingRoute": "gaps",
-  "linkedCasesBoolean": "No"
+  "linkedCasesBoolean":"No"
 }

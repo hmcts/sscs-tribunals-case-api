@@ -373,6 +373,7 @@
             "organisation": null
           },
           "role": {},
+          "confidentialityRequired": null,
           "isAddressSameAsAppointee": "No"
         },
         "benefitType": {
@@ -505,7 +506,7 @@
               "lastLoggedIntoMya": null,
               "wantSmsNotifications": null
             },
-            "confidentialityRequirement": "No",
+            "confidentialityRequired": "No",
             "repReasonableAdjustment": {
               "wantsReasonableAdjustment": null,
               "reasonableAdjustmentRequirements": null
@@ -569,7 +570,7 @@
               "lastLoggedIntoMya": null,
               "wantSmsNotifications": null
             },
-            "confidentialityRequirement": "No",
+            "confidentialityRequired": "No",
             "repReasonableAdjustment": {
               "wantsReasonableAdjustment": null,
               "reasonableAdjustmentRequirements": null
@@ -633,7 +634,7 @@
               "lastLoggedIntoMya": null,
               "wantSmsNotifications": null
             },
-            "confidentialityRequirement": "No",
+            "confidentialityRequired": "No",
             "repReasonableAdjustment": {
               "wantsReasonableAdjustment": null,
               "reasonableAdjustmentRequirements": null
@@ -696,7 +697,7 @@
               "lastLoggedIntoMya": null,
               "wantSmsNotifications": null
             },
-            "confidentialityRequirement": "No",
+            "confidentialityRequired": "No",
             "repReasonableAdjustment": {
               "wantsReasonableAdjustment": null,
               "reasonableAdjustmentRequirements": null
@@ -760,7 +761,7 @@
               "lastLoggedIntoMya": null,
               "wantSmsNotifications": null
             },
-            "confidentialityRequirement": "No",
+            "confidentialityRequired": "No",
             "repReasonableAdjustment": {
               "wantsReasonableAdjustment": null,
               "reasonableAdjustmentRequirements": null
@@ -823,7 +824,7 @@
               "lastLoggedIntoMya": null,
               "wantSmsNotifications": null
             },
-            "confidentialityRequirement": "No",
+            "confidentialityRequired": "No",
             "repReasonableAdjustment": {
               "wantsReasonableAdjustment": null,
               "reasonableAdjustmentRequirements": null
@@ -889,7 +890,7 @@
               "lastLoggedIntoMya": null,
               "wantSmsNotifications": null
             },
-            "confidentialityRequirement": "No",
+            "confidentialityRequired": "No",
             "repReasonableAdjustment": {
               "wantsReasonableAdjustment": null,
               "reasonableAdjustmentRequirements": null
@@ -952,7 +953,7 @@
               "lastLoggedIntoMya": null,
               "wantSmsNotifications": null
             },
-            "confidentialityRequirement": "No",
+            "confidentialityRequired": "No",
             "repReasonableAdjustment": {
               "wantsReasonableAdjustment": null,
               "reasonableAdjustmentRequirements": null
@@ -1015,7 +1016,7 @@
               "lastLoggedIntoMya": null,
               "wantSmsNotifications": null
             },
-            "confidentialityRequirement": "No",
+            "confidentialityRequired": "No",
             "repReasonableAdjustment": {
               "wantsReasonableAdjustment": null,
               "reasonableAdjustmentRequirements": null
@@ -1079,7 +1080,7 @@
               "lastLoggedIntoMya": null,
               "wantSmsNotifications": null
             },
-            "confidentialityRequirement": "No",
+            "confidentialityRequired": "No",
             "repReasonableAdjustment": {
               "wantsReasonableAdjustment": null,
               "reasonableAdjustmentRequirements": null
@@ -1555,7 +1556,7 @@
               },
               "isAppointee": "PUBLIC",
               "organisation": "PUBLIC",
-              "confidentialityRequirement": "PUBLIC",
+              "confidentialityRequired": "PUBLIC",
               "isAddressSameAsAppointee": "PUBLIC"
             },
             "classification": "PUBLIC"
@@ -1705,7 +1706,7 @@
                 },
                 "classification": "PUBLIC"
               },
-              "confidentialityRequirement": "PUBLIC",
+              "confidentialityRequired": "PUBLIC",
               "repReasonableAdjustment": {
                 "value": {
                   "wantsReasonableAdjustment": "PUBLIC",
@@ -1796,7 +1797,7 @@
                 },
                 "classification": "PUBLIC"
               },
-              "confidentialityRequirement": "PUBLIC",
+              "confidentialityRequired": "PUBLIC",
               "repReasonableAdjustment": {
                 "value": {
                   "wantsReasonableAdjustment": "PUBLIC",
@@ -1887,7 +1888,7 @@
                 },
                 "classification": "PUBLIC"
               },
-              "confidentialityRequirement": "PUBLIC",
+              "confidentialityRequired": "PUBLIC",
               "repReasonableAdjustment": {
                 "value": {
                   "wantsReasonableAdjustment": "PUBLIC",
@@ -1977,7 +1978,7 @@
                 },
                 "classification": "PUBLIC"
               },
-              "confidentialityRequirement": "PUBLIC",
+              "confidentialityRequired": "PUBLIC",
               "repReasonableAdjustment": {
                 "value": {
                   "wantsReasonableAdjustment": "PUBLIC",
@@ -2068,7 +2069,7 @@
                 },
                 "classification": "PUBLIC"
               },
-              "confidentialityRequirement": "PUBLIC",
+              "confidentialityRequired": "PUBLIC",
               "repReasonableAdjustment": {
                 "value": {
                   "wantsReasonableAdjustment": "PUBLIC",
@@ -2158,7 +2159,7 @@
                 },
                 "classification": "PUBLIC"
               },
-              "confidentialityRequirement": "PUBLIC",
+              "confidentialityRequired": "PUBLIC",
               "repReasonableAdjustment": {
                 "value": {
                   "wantsReasonableAdjustment": "PUBLIC",
@@ -2254,7 +2255,7 @@
                 },
                 "classification": "PUBLIC"
               },
-              "confidentialityRequirement": "PUBLIC",
+              "confidentialityRequired": "PUBLIC",
               "repReasonableAdjustment": {
                 "value": {
                   "wantsReasonableAdjustment": "PUBLIC",
@@ -2344,7 +2345,7 @@
                 },
                 "classification": "PUBLIC"
               },
-              "confidentialityRequirement": "PUBLIC",
+              "confidentialityRequired": "PUBLIC",
               "repReasonableAdjustment": {
                 "value": {
                   "wantsReasonableAdjustment": "PUBLIC",
@@ -2434,7 +2435,7 @@
                 },
                 "classification": "PUBLIC"
               },
-              "confidentialityRequirement": "PUBLIC",
+              "confidentialityRequired": "PUBLIC",
               "repReasonableAdjustment": {
                 "value": {
                   "wantsReasonableAdjustment": "PUBLIC",
@@ -2525,7 +2526,7 @@
                 },
                 "classification": "PUBLIC"
               },
-              "confidentialityRequirement": "PUBLIC",
+              "confidentialityRequired": "PUBLIC",
               "repReasonableAdjustment": {
                 "value": {
                   "wantsReasonableAdjustment": "PUBLIC",
@@ -3006,6 +3007,7 @@
           },
           "isAppointee": "No",
           "organisation": null,
+          "confidentialityRequired": null,
           "isAddressSameAsAppointee": "No"
         },
         "mrnDetails": {
@@ -3117,7 +3119,7 @@
               "lastLoggedIntoMya": null,
               "wantSmsNotifications": null
             },
-            "confidentialityRequirement": "No",
+            "confidentialityRequired": "No",
             "repReasonableAdjustment": {
               "wantsReasonableAdjustment": null,
               "reasonableAdjustmentRequirements": null
@@ -3181,7 +3183,7 @@
               "lastLoggedIntoMya": null,
               "wantSmsNotifications": null
             },
-            "confidentialityRequirement": "No",
+            "confidentialityRequired": "No",
             "repReasonableAdjustment": {
               "wantsReasonableAdjustment": null,
               "reasonableAdjustmentRequirements": null
@@ -3245,7 +3247,7 @@
               "lastLoggedIntoMya": null,
               "wantSmsNotifications": null
             },
-            "confidentialityRequirement": "No",
+            "confidentialityRequired": "No",
             "repReasonableAdjustment": {
               "wantsReasonableAdjustment": null,
               "reasonableAdjustmentRequirements": null
@@ -3308,7 +3310,7 @@
               "lastLoggedIntoMya": null,
               "wantSmsNotifications": null
             },
-            "confidentialityRequirement": "No",
+            "confidentialityRequired": "No",
             "repReasonableAdjustment": {
               "wantsReasonableAdjustment": null,
               "reasonableAdjustmentRequirements": null
@@ -3372,7 +3374,7 @@
               "lastLoggedIntoMya": null,
               "wantSmsNotifications": null
             },
-            "confidentialityRequirement": "No",
+            "confidentialityRequired": "No",
             "repReasonableAdjustment": {
               "wantsReasonableAdjustment": null,
               "reasonableAdjustmentRequirements": null
@@ -3435,7 +3437,7 @@
               "lastLoggedIntoMya": null,
               "wantSmsNotifications": null
             },
-            "confidentialityRequirement": "No",
+            "confidentialityRequired": "No",
             "repReasonableAdjustment": {
               "wantsReasonableAdjustment": null,
               "reasonableAdjustmentRequirements": null
@@ -3501,7 +3503,7 @@
               "lastLoggedIntoMya": null,
               "wantSmsNotifications": null
             },
-            "confidentialityRequirement": "No",
+            "confidentialityRequired": "No",
             "repReasonableAdjustment": {
               "wantsReasonableAdjustment": null,
               "reasonableAdjustmentRequirements": null
@@ -3564,7 +3566,7 @@
               "lastLoggedIntoMya": null,
               "wantSmsNotifications": null
             },
-            "confidentialityRequirement": "No",
+            "confidentialityRequired": "No",
             "repReasonableAdjustment": {
               "wantsReasonableAdjustment": null,
               "reasonableAdjustmentRequirements": null
@@ -3627,7 +3629,7 @@
               "lastLoggedIntoMya": null,
               "wantSmsNotifications": null
             },
-            "confidentialityRequirement": "No",
+            "confidentialityRequired": "No",
             "repReasonableAdjustment": {
               "wantsReasonableAdjustment": null,
               "reasonableAdjustmentRequirements": null
@@ -3691,7 +3693,7 @@
               "lastLoggedIntoMya": null,
               "wantSmsNotifications": null
             },
-            "confidentialityRequirement": "No",
+            "confidentialityRequired": "No",
             "repReasonableAdjustment": {
               "wantsReasonableAdjustment": null,
               "reasonableAdjustmentRequirements": null
@@ -4166,7 +4168,7 @@
               },
               "isAppointee": "PUBLIC",
               "organisation": "PUBLIC",
-              "confidentialityRequirement": "PUBLIC",
+              "confidentialityRequired": "PUBLIC",
               "isAddressSameAsAppointee": "PUBLIC"
             },
             "classification": "PUBLIC"
@@ -4316,7 +4318,7 @@
                 },
                 "classification": "PUBLIC"
               },
-              "confidentialityRequirement": "PUBLIC",
+              "confidentialityRequired": "PUBLIC",
               "repReasonableAdjustment": {
                 "value": {
                   "wantsReasonableAdjustment": "PUBLIC",
@@ -4407,7 +4409,7 @@
                 },
                 "classification": "PUBLIC"
               },
-              "confidentialityRequirement": "PUBLIC",
+              "confidentialityRequired": "PUBLIC",
               "repReasonableAdjustment": {
                 "value": {
                   "wantsReasonableAdjustment": "PUBLIC",
@@ -4498,7 +4500,7 @@
                 },
                 "classification": "PUBLIC"
               },
-              "confidentialityRequirement": "PUBLIC",
+              "confidentialityRequired": "PUBLIC",
               "repReasonableAdjustment": {
                 "value": {
                   "wantsReasonableAdjustment": "PUBLIC",
@@ -4588,7 +4590,7 @@
                 },
                 "classification": "PUBLIC"
               },
-              "confidentialityRequirement": "PUBLIC",
+              "confidentialityRequired": "PUBLIC",
               "repReasonableAdjustment": {
                 "value": {
                   "wantsReasonableAdjustment": "PUBLIC",
@@ -4679,7 +4681,7 @@
                 },
                 "classification": "PUBLIC"
               },
-              "confidentialityRequirement": "PUBLIC",
+              "confidentialityRequired": "PUBLIC",
               "repReasonableAdjustment": {
                 "value": {
                   "wantsReasonableAdjustment": "PUBLIC",
@@ -4769,7 +4771,7 @@
                 },
                 "classification": "PUBLIC"
               },
-              "confidentialityRequirement": "PUBLIC",
+              "confidentialityRequired": "PUBLIC",
               "repReasonableAdjustment": {
                 "value": {
                   "wantsReasonableAdjustment": "PUBLIC",
@@ -4865,7 +4867,7 @@
                 },
                 "classification": "PUBLIC"
               },
-              "confidentialityRequirement": "PUBLIC",
+              "confidentialityRequired": "PUBLIC",
               "repReasonableAdjustment": {
                 "value": {
                   "wantsReasonableAdjustment": "PUBLIC",
@@ -4955,7 +4957,7 @@
                 },
                 "classification": "PUBLIC"
               },
-              "confidentialityRequirement": "PUBLIC",
+              "confidentialityRequired": "PUBLIC",
               "repReasonableAdjustment": {
                 "value": {
                   "wantsReasonableAdjustment": "PUBLIC",
@@ -5045,7 +5047,7 @@
                 },
                 "classification": "PUBLIC"
               },
-              "confidentialityRequirement": "PUBLIC",
+              "confidentialityRequired": "PUBLIC",
               "repReasonableAdjustment": {
                 "value": {
                   "wantsReasonableAdjustment": "PUBLIC",
@@ -5136,7 +5138,7 @@
                 },
                 "classification": "PUBLIC"
               },
-              "confidentialityRequirement": "PUBLIC",
+              "confidentialityRequired": "PUBLIC",
               "repReasonableAdjustment": {
                 "value": {
                   "wantsReasonableAdjustment": "PUBLIC",

@@ -127,6 +127,7 @@
             "nino": "AB877533C"
           },
           "isAddressSameAsAppointee": "No",
+          "confidentialityRequired": null,
           "isAppointee": "No",
           "name": {
             "firstName": "Joe",
@@ -286,8 +287,8 @@
         "postcode": "LS1 2ED"
       },
       "reservedToJudgeInterloc": {
-        "idamId": "736238ce-5565-49b2-8d35-48d96ab438bf",
-        "personalCode": "49933315"
+        "idamId" : "736238ce-5565-49b2-8d35-48d96ab438bf",
+        "personalCode" : "49933315"
       },
       "sscsDocument": [
         {
@@ -1452,8 +1453,8 @@
         "postcode": "LS1 2ED"
       },
       "reservedToJudgeInterloc": {
-        "idamId": "736238ce-5565-49b2-8d35-48d96ab438bf",
-        "personalCode": "49933315"
+        "idamId" : "736238ce-5565-49b2-8d35-48d96ab438bf",
+        "personalCode" : "49933315"
       },
       "sscsDocument": [
         {

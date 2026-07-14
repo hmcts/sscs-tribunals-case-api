@@ -97,6 +97,7 @@
           },
           "isAppointee": "No",
           "organisation": null,
+          "confidentialityRequired": null,
           "isAddressSameAsAppointee": null
         },
         "mrnDetails": {
@@ -672,7 +673,7 @@
               },
               "isAppointee": "PUBLIC",
               "organisation": "PUBLIC",
-              "confidentialityRequirement": "PUBLIC",
+              "confidentialityRequired": "PUBLIC",
               "isAddressSameAsAppointee": "PUBLIC"
             },
             "classification": "PUBLIC"
@@ -1607,6 +1608,7 @@
           },
           "isAppointee": "No",
           "organisation": null,
+          "confidentialityRequired": null,
           "isAddressSameAsAppointee": null
         },
         "mrnDetails": {
@@ -2251,7 +2253,7 @@
               },
               "isAppointee": "PUBLIC",
               "organisation": "PUBLIC",
-              "confidentialityRequirement": "PUBLIC",
+              "confidentialityRequired": "PUBLIC",
               "isAddressSameAsAppointee": "PUBLIC"
             },
             "classification": "PUBLIC"

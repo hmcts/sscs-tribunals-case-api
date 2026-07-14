@@ -66,10 +66,10 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
     private ListAssistHearingMessageHelper hearingMessageHelper;
 
     protected static Validator validator = Validation.byDefaultProvider()
-                                                     .configure()
-                                                     .messageInterpolator(new ParameterMessageInterpolator())
-                                                     .buildValidatorFactory()
-                                                     .getValidator();
+            .configure()
+            .messageInterpolator(new ParameterMessageInterpolator())
+            .buildValidatorFactory()
+            .getValidator();
 
     private SscsCaseData sscsCaseData;
     private SscsCaseData sscsCaseDataBefore;
@@ -82,22 +82,22 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
 
         when(callback.getEvent()).thenReturn(EventType.DEATH_OF_APPELLANT);
         sscsCaseData = SscsCaseData.builder()
-                                   .ccdCaseId("ccdId")
-                                   .appeal(Appeal.builder().appellant(Appellant.builder().build()).build())
-                                   .dwpUcb("yes")
-                                   .schedulingAndListingFields(SchedulingAndListingFields.builder()
-                                                                                         .hearingRoute(HearingRoute.LIST_ASSIST)
-                                                                                         .build())
-                                   .build();
+                .ccdCaseId("ccdId")
+                .appeal(Appeal.builder().appellant(Appellant.builder().build()).build())
+                .dwpUcb("yes")
+                .schedulingAndListingFields(SchedulingAndListingFields.builder()
+                        .hearingRoute(HearingRoute.LIST_ASSIST)
+                        .build())
+                .build();
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
         sscsCaseDataBefore = SscsCaseData.builder()
-                                         .ccdCaseId("ccdId")
-                                         .appeal(Appeal.builder().appellant(Appellant.builder().build()).build())
-                                         .dwpUcb("yes")
-                                         .build();
+                .ccdCaseId("ccdId")
+                .appeal(Appeal.builder().appellant(Appellant.builder().build()).build())
+                .dwpUcb("yes")
+                .build();
         when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
         when(caseDetailsBefore.getState()).thenReturn(State.HEARING);
     }
@@ -128,7 +128,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
         assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION, response.getData().getInterlocReviewState());
         assertNull(response.getData().getDwpUcb());
         verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()),
-            eq(CancellationReason.PARTY_UNABLE_TO_ATTEND));
+                eq(CancellationReason.PARTY_UNABLE_TO_ATTEND));
         verifyNoMoreInteractions(hearingMessageHelper);
     }
 
@@ -197,7 +197,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenADeathOfAppellantEventThatHasNoAppointeeBeforeAndNoAppointeeAfter_thenSetInterlocReviewStateAndDwpState() {
+        public void givenADeathOfAppellantEventThatHasNoAppointeeBeforeAndNoAppointeeAfter_thenSetInterlocReviewStateAndDwpState() {
 
         caseDetailsBefore.getCaseData().getAppeal().getAppellant().setAppointee(null);
         caseDetails.getCaseData().getAppeal().getAppellant().setAppointee(null);
@@ -271,7 +271,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
     public void givenADeathOfAppellantWithNoJointPartyOnCase_thenClearConfidentialFlags() {
         callback.getCaseDetails().getCaseData().setIsConfidentialCase(YesNo.YES);
         callback.getCaseDetails().getCaseData().setConfidentialityRequestOutcomeAppellant(
-            DatedRequestOutcome.builder().date(LocalDate.now()).requestOutcome(RequestOutcome.GRANTED).build());
+                DatedRequestOutcome.builder().date(LocalDate.now()).requestOutcome(RequestOutcome.GRANTED).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -284,9 +284,9 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
     public void givenADeathOfAppellantWithJointPartyConfidentialRequestNotGranted_thenClearConfidentialFlagsForAppellant() {
         callback.getCaseDetails().getCaseData().setIsConfidentialCase(YesNo.YES);
         callback.getCaseDetails().getCaseData().setConfidentialityRequestOutcomeAppellant(
-            DatedRequestOutcome.builder().date(LocalDate.now()).requestOutcome(RequestOutcome.GRANTED).build());
+                DatedRequestOutcome.builder().date(LocalDate.now()).requestOutcome(RequestOutcome.GRANTED).build());
         callback.getCaseDetails().getCaseData().setConfidentialityRequestOutcomeJointParty(
-            DatedRequestOutcome.builder().date(LocalDate.now()).requestOutcome(RequestOutcome.IN_PROGRESS).build());
+                DatedRequestOutcome.builder().date(LocalDate.now()).requestOutcome(RequestOutcome.IN_PROGRESS).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -300,9 +300,9 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
     public void givenADeathOfAppellantWithJointPartyOnCaseAndConfidentialRequestGranted_thenClearConfidentialFlagForAppellantAndDoNotClearConfidentialFlagOnCase() {
         callback.getCaseDetails().getCaseData().setIsConfidentialCase(YesNo.YES);
         callback.getCaseDetails().getCaseData().setConfidentialityRequestOutcomeAppellant(
-            DatedRequestOutcome.builder().date(LocalDate.now()).requestOutcome(RequestOutcome.GRANTED).build());
+                DatedRequestOutcome.builder().date(LocalDate.now()).requestOutcome(RequestOutcome.GRANTED).build());
         callback.getCaseDetails().getCaseData().setConfidentialityRequestOutcomeJointParty(
-            DatedRequestOutcome.builder().date(LocalDate.now()).requestOutcome(RequestOutcome.GRANTED).build());
+                DatedRequestOutcome.builder().date(LocalDate.now()).requestOutcome(RequestOutcome.GRANTED).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 

@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartySelectionDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Role;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
 class IssueHearingEnquiryFormHandlerFunctionalTest extends AbstractFunctionalTest {
 
@@ -73,11 +73,11 @@ class IssueHearingEnquiryFormHandlerFunctionalTest extends AbstractFunctionalTes
             OtherParty.builder().role(Role.builder().name("Paying parent").build())
                       .name(Name.builder().firstName("Johnny").lastName("Cash").build())
                       .address(Address.builder().line1("1 Old Street").town("Hendersonville").postcode("DD11 4WR").build())
-                      .confidentialityRequirement(YesNoUndetermined.YES).build()).build(), CcdValue.<OtherParty>builder().value(
+                      .confidentialityRequired(YesNo.YES).build()).build(), CcdValue.<OtherParty>builder().value(
             OtherParty.builder().role(Role.builder().name("Other").build())
                       .name(Name.builder().firstName("June").lastName("Carter-Cash").build())
                       .address(Address.builder().line1("2 Old Street").town("Hendersonville").postcode("DD12 4WR").build())
-                      .confidentialityRequirement(YesNoUndetermined.YES).build()).build()));
+                      .confidentialityRequired(YesNo.YES).build()).build()));
         updateCaseEvent(EventType.UPDATE_OTHER_PARTY_DATA, caseDetails);
     }
 

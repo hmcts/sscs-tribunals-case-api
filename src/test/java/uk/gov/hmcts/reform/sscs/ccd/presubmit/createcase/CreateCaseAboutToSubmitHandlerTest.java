@@ -85,7 +85,7 @@ public class CreateCaseAboutToSubmitHandlerTest {
         callback = new Callback<>(caseDetails, empty(), CREATE_APPEAL_PDF, false);
 
         createCaseAboutToSubmitHandler =
-                new CreateCaseAboutToSubmitHandler(sscsPdfService, emailHelper, false, true);
+                new CreateCaseAboutToSubmitHandler(sscsPdfService, emailHelper, false);
     }
 
     @ParameterizedTest
