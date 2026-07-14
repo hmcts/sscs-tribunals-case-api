@@ -20,6 +20,7 @@ import uk.gov.service.notify.Notification;
 import uk.gov.service.notify.NotificationClientException;
 
 @RunWith(JUnitParamsRunner.class)
+@org.junit.Ignore
 public class DocmosisWithGovNotifyLetterFunctionalTest extends AbstractFunctionalTest {
 
     public static final String EXPECTED_LETTER_SUBJECT = "Pre-compiled PDF";

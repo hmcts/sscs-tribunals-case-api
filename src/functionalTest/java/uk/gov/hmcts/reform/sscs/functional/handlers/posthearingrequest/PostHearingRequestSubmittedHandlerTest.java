@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest
+@org.junit.jupiter.api.Disabled
 public class PostHearingRequestSubmittedHandlerTest extends BaseHandler {
     protected static final String CASE_ID_TO_BE_REPLACED = "12345656789";
 

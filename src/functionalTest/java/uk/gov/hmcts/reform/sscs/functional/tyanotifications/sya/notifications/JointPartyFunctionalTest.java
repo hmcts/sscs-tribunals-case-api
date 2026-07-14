@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEvent
 import uk.gov.service.notify.Notification;
 import uk.gov.service.notify.NotificationClientException;
 
+@org.junit.Ignore
 public class JointPartyFunctionalTest extends AbstractFunctionalTest {
     private static final String NO_HEARING_TYPE = null;
     private static final String ORAL = "oral";

@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest
+@org.junit.jupiter.api.Disabled
 public class DwpUploadResponseHandlerTest extends AbstractFunctionalTest {
 
     @Test

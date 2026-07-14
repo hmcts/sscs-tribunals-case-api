@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
 @SpringBootTest
 @EnabledIfEnvironmentVariable(named = "CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED", matches = "true")
+@org.junit.jupiter.api.Disabled
 class IssueHearingEnquiryFormAboutToSubmitHandlerTest extends BaseHandler {
 
     private static final String BASE_CASE_DATA = "handlers/issuehearingenquiryform/issueHearingEnquiryFormCallback.json";

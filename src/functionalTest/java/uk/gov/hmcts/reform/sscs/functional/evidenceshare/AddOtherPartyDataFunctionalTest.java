@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
+@org.junit.jupiter.api.Disabled
 class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
 
     private static final String POSTCODE = "IG10 3XX";

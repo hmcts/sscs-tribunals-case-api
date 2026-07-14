@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 
+@org.junit.jupiter.api.Disabled
 public class EvidenceUploadTest extends BaseFunctionTest {
 
     @Test

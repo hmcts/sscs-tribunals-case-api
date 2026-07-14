@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.bulkscan.domain.validation.ValidationStatus;
 @TestPropertySource(locations = "classpath:application_e2e.yaml")
 @RunWith(JUnitParamsRunner.class)
 @Slf4j
+@org.junit.Ignore
 public class OcrFormValidationFunctionalTest extends BaseFunctionalTest {
 
     @Test

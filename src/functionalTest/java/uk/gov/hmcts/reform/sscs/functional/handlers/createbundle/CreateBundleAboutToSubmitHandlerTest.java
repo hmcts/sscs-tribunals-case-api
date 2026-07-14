@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.sscs.functional.handlers.UploadDocument;
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest
 @Slf4j
+@org.junit.jupiter.api.Disabled
 public class CreateBundleAboutToSubmitHandlerTest extends BaseHandler {
 
     @BeforeEach

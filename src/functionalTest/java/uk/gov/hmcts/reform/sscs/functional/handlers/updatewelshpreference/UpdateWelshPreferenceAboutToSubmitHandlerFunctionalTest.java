@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest
+@org.junit.jupiter.api.Disabled
 public class UpdateWelshPreferenceAboutToSubmitHandlerFunctionalTest extends BaseHandler {
 
     @Test

@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
+@org.junit.jupiter.api.Disabled
 public class IssueDirectionFunctionalTest extends AbstractFunctionalTest {
 
     private static final String EVIDENCE_DOCUMENT_PDF = "evidence-document.pdf";

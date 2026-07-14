@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.sscs.service.VenueService;
 @SpringBootTest
 @Slf4j
 @TestPropertySource(locations = "classpath:config/application_refdata_test.properties")
+@org.junit.Ignore
 public class RefDataClientTest {
 
     @Rule

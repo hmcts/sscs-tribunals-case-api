@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Role;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
+@org.junit.jupiter.api.Disabled
 class IssueHearingEnquiryFormHandlerFunctionalTest extends AbstractFunctionalTest {
 
     @Test

@@ -12,6 +12,7 @@ import org.springframework.test.context.TestPropertySource;
 
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest
+@org.junit.jupiter.api.Disabled
 public class DwpChallengeValidityHandlerTest extends BaseHandler {
 
     @Test

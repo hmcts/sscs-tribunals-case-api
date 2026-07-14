@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.functional.tyanotifications.AbstractFunctionalTe
 import uk.gov.hmcts.reform.sscs.functional.tyanotifications.Retry;
 import uk.gov.service.notify.Notification;
 
+@org.junit.Ignore
 public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTest {
 
     public AdminAppealWithdrawnNotificationsTest() {

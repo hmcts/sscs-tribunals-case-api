@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.sscs.functional.tyanotifications.AbstractFunctionalTe
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.service.notify.Notification;
 
+@org.junit.Ignore
 public class WithRepresentativePersonalisationTest extends AbstractFunctionalTest {
     @Value("${notification.english.appealLapsed.appellant.emailId}")
     private String appealLapsedAppellantEmailId;

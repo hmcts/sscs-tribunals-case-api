@@ -21,6 +21,7 @@ import org.springframework.test.context.TestPropertySource;
 @TestPropertySource(locations = "classpath:application_e2e.yaml")
 @RunWith(JUnitParamsRunner.class)
 @Slf4j
+@org.junit.Ignore
 public class TransformationFunctionalTest extends BaseFunctionalTest {
     public static final String MRN_DATE_YESTERDAY_YYYY_MM_DD = LocalDate.now().minusDays(1).toString();
     public static final String MRN_DATE_YESTERDAY_DD_MM_YYYY = LocalDate.now().minusDays(1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));

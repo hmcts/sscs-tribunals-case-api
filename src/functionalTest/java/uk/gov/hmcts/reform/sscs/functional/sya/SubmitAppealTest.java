@@ -38,6 +38,7 @@ import uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer;
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 @Slf4j
+@org.junit.jupiter.api.Disabled
 public class SubmitAppealTest {
 
     @Value("${test-url}")

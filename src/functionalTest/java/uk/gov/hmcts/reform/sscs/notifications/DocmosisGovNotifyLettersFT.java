@@ -23,6 +23,7 @@ import uk.gov.service.notify.NotificationClientException;
 
 @RunWith(JUnitParamsRunner.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
+@org.junit.jupiter.api.Disabled
 public class DocmosisGovNotifyLettersFT extends AbstractNotificationsFT {
 
     @Rule

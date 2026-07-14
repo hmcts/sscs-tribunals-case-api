@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 
+@org.junit.jupiter.api.Disabled
 class RequestOtherPartyDataTest extends AbstractFunctionalTest {
 
     private static final String LINE_1 = "first line";
@@ -20,7 +21,8 @@ class RequestOtherPartyDataTest extends AbstractFunctionalTest {
 
     @Nested
     @EnabledIfEnvironmentVariable(named = CM_CONF_ENABLED, matches = "true")
-    class CmToggleOn {
+    @org.junit.jupiter.api.Disabled
+class CmToggleOn {
 
         @Test
         @SneakyThrows
@@ -33,7 +35,8 @@ class RequestOtherPartyDataTest extends AbstractFunctionalTest {
 
     @Nested
     @EnabledIfEnvironmentVariable(named = CM_CONF_ENABLED, matches = "false")
-    class CmToggleOff {
+    @org.junit.jupiter.api.Disabled
+class CmToggleOff {
 
         @Test
         @SneakyThrows

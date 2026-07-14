@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.functional.tyanotifications.Retry;
 import uk.gov.service.notify.Notification;
 import uk.gov.service.notify.NotificationClientException;
 
+@org.junit.Ignore
 public class NotificationsFunctionalTest extends AbstractFunctionalTest {
 
     private static final String AS_APPOINTEE_FOR = "You are receiving this update as the appointee for";

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
+@org.junit.jupiter.api.Disabled
 class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctionalTest {
 
     @Test

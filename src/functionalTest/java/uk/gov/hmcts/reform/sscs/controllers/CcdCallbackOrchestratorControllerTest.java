@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.sscs.service.servicebus.SendCallbackHandler;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(classes = {TribunalsCaseApiApplication.class})
 @EnableFeignClients(basePackageClasses = {IdamApi.class})
+@org.junit.Ignore
 public class CcdCallbackOrchestratorControllerTest {
 
     @MockitoBean

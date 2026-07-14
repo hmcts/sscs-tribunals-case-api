@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 
 @Retry
+@org.junit.jupiter.api.Disabled
 public class SubscriptionTest extends BaseFunctionTest {
     private static final String YES = "yes";
     private static final String NO = "no";

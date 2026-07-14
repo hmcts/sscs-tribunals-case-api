@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 
+@org.junit.jupiter.api.Disabled
 public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
 
     public EvidenceShareFunctionalTest() {

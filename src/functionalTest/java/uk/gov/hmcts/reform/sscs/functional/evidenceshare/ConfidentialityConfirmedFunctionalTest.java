@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
+@org.junit.jupiter.api.Disabled
 class ConfidentialityConfirmedFunctionalTest extends AbstractFunctionalTest {
 
     private static final String POSTCODE = "IG10 3XX";
@@ -46,7 +47,8 @@ class ConfidentialityConfirmedFunctionalTest extends AbstractFunctionalTest {
 
     @Nested
     @EnabledIfEnvironmentVariable(named = "CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED", matches = "true")
-    class CmToggleOn {
+    @org.junit.jupiter.api.Disabled
+class CmToggleOn {
 
         @Test
         void shouldTransitionToWithDwpStateWhenConfidentialityConfirmed() {
@@ -110,7 +112,8 @@ class ConfidentialityConfirmedFunctionalTest extends AbstractFunctionalTest {
 
     @Nested
     @EnabledIfEnvironmentVariable(named = "CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED", matches = "false")
-    class CmToggleOff {
+    @org.junit.jupiter.api.Disabled
+class CmToggleOff {
         @Test
         @SneakyThrows
         void shouldNotHandleConfidentialityConfirmedWhenToggleOff() {

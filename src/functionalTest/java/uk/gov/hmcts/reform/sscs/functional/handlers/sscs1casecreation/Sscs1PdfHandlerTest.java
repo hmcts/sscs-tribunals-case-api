@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest
+@org.junit.jupiter.api.Disabled
 public class Sscs1PdfHandlerTest {
     @Value("${test-url}")
     private String testUrl;

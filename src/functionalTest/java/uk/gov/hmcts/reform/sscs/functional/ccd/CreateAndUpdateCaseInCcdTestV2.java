@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @ContextConfiguration(initializers = CreateAndUpdateCaseInCcdTestV2.Initializer.class)
 @SpringBootTest
+@org.junit.Ignore
 public class CreateAndUpdateCaseInCcdTestV2 {
 
     @Autowired

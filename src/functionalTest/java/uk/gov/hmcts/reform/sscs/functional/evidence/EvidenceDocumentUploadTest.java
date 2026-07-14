@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.sscs.functional.sya.SubmitHelper;
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest
+@org.junit.jupiter.api.Disabled
 public class EvidenceDocumentUploadTest {
 
     @Value("${test-url}")

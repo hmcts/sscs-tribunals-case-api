@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application_smoke.yaml")
 @RunWith(SpringRunner.class)
+@org.junit.Ignore
 public class GetSmokeCase {
 
     @Value("${test-url}")

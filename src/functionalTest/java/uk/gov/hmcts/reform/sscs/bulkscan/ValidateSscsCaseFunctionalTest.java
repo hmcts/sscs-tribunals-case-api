@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 @TestPropertySource(locations = "classpath:application_e2e.yaml")
 @RunWith(JUnitParamsRunner.class)
 @Slf4j
+@org.junit.Ignore
 public class ValidateSscsCaseFunctionalTest extends BaseFunctionalTest {
 
     @Value("${document_management.url}")

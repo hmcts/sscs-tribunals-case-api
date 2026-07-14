@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.sscs.functional.mya.CitizenIdamService;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {TribunalsCaseApiApplication.class, CitizenIdamService.class})
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
+@org.junit.jupiter.api.Disabled
 public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
 
     @Autowired

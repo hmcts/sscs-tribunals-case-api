@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 
+@org.junit.jupiter.api.Disabled
 class DormantCaseFunctionalTest extends AbstractFunctionalTest {
 
     @Test

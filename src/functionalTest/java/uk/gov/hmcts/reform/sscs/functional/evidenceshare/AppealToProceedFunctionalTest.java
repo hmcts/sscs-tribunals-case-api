@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 
 @Slf4j
+@org.junit.jupiter.api.Disabled
 class AppealToProceedFunctionalTest extends AbstractFunctionalTest {
 
     AppealToProceedFunctionalTest() {

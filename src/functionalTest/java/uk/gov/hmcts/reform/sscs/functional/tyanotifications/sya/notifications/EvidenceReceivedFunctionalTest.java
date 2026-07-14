@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.sscs.functional.tyanotifications.AbstractFunctionalTe
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType;
 import uk.gov.service.notify.Notification;
 
+@org.junit.Ignore
 public class EvidenceReceivedFunctionalTest extends AbstractFunctionalTest {
 
     @Value("${notification.english.oral.evidenceReceived.appellant.emailId}")

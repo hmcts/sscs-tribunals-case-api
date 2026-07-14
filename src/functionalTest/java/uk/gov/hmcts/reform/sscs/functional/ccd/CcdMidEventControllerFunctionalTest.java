@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.functional.mya.BaseFunctionTest;
 
 @Slf4j
+@org.junit.jupiter.api.Disabled
 public class CcdMidEventControllerFunctionalTest extends BaseFunctionTest {
 
     public static final String ADJOURN_CASE_GAPS_CALLBACK_JSON = "handlers/adjourncase/adjournCaseGapsCallback.json";

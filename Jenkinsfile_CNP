@@ -206,16 +206,16 @@ withPipeline(type, product, component) {
         sh './bin/setup-role-assignments.sh'
         sh './bin/add-hearing-role-assignments-system-user.sh preview'
 
-//        if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "run-notification-tests").size() > 0) {
-//            runNotificationTests()
-//        }
-//        runE2eTests()
+        if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "run-notification-tests").size() > 0) {
+            runNotificationTests()
+        }
+        runE2eTests()
     }
 
     afterSuccess('smoketest:aat') {
         sh './bin/add-hearing-role-assignments-system-user.sh aat'
 
-//        runE2eTests()
+        runE2eTests()
     }
 }
 
