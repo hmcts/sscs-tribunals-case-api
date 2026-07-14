@@ -4,7 +4,7 @@ import java.nio.charset.StandardCharsets
 plugins {
     id 'application'
     id 'pmd'
-    id 'org.sonarqube' version '6.2.0.5505'
+    id 'org.sonarqube' version '7.3.1.8318'
     id 'jacoco'
     id 'org.springframework.boot' version '3.5.14'
     id 'uk.gov.hmcts.java' version '0.12.70'
@@ -392,7 +392,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'pdf-service-client', version: '8.0.2'
     implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '5.1.1'
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.3'
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '6.3.55'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '6.3.57'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '8.0.0'
 
     implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.2.1-RELEASE'
@@ -410,7 +410,7 @@ dependencies {
     implementation group: 'com.mchange', name: 'c3p0', version: '0.13.0'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '11.8.2'
     implementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: '11.8.2'
-    implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.11'
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.12'
     implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.5.0'
 
     implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.7.6'
