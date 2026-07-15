@@ -60,8 +60,8 @@ export class updateOtherPartyDataPage {
       .locator(
         confidentialityRequired ===
           addUpdateOtherPartyData.updateOtherPartyDataConfidentialityYes
-          ? '#otherParties_0_confidentialityRequirement-Yes'
-          : '#otherParties_0_confidentialityRequirement-No'
+          ? '#otherParties_0_confidentialityRequired_Yes'
+          : '#otherParties_0_confidentialityRequired_No'
       )
       .click();
     await this.page
@@ -104,7 +104,7 @@ export class updateOtherPartyDataPage {
       .locator('#otherParties_0_address_postcode')
       .fill(addUpdateOtherPartyData.updateOtherPartyDataAddressPostCode);
     await this.page
-      .locator('#otherParties_0_confidentialityRequirement-Yes')
+      .locator('#otherParties_0_confidentialityRequired_Yes')
       .click();
     await this.page
       .locator('#otherParties_0_unacceptableCustomerBehaviour_No')
@@ -197,7 +197,7 @@ export class updateOtherPartyDataPage {
       .locator('#otherParties_0_address_postcode')
       .fill(addUpdateOtherPartyData.updateOtherPartyDataAddressPostCode);
     await this.page
-      .locator('#otherParties_0_confidentialityRequirement-No')
+      .locator('#otherParties_0_confidentialityRequired_No')
       .click();
     await this.page
       .locator('#otherParties_0_unacceptableCustomerBehaviour_No')
@@ -244,7 +244,7 @@ export class updateOtherPartyDataPage {
   async setConfidentialityForOtherParty(isConfidentialityRequired: boolean) {
     await this.page
       .locator(
-        `#otherParties_0_confidentialityRequirement-${isConfidentialityRequired ? 'Yes' : 'No'}`
+        `#otherParties_0_confidentialityRequired_${isConfidentialityRequired ? 'Yes' : 'No'}`
       )
       .click();
     await webAction.clickSubmitButton();

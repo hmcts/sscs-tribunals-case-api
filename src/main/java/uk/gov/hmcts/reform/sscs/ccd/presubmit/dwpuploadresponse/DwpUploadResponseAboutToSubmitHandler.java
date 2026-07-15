@@ -48,7 +48,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
@@ -178,7 +177,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                     preSubmitCallbackResponse.addError("Other Party requires confidentiality, upload edited and unedited responses");
                     sscsCaseData.setIsConfidentialCase(YesNo.YES);
                 }
-                if (sscsCaseData.getAppeal().getAppellant() != null && YesNoUndetermined.isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequirement())) {
+                if (sscsCaseData.getAppeal().getAppellant() != null && YesNo.isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired())) {
                     preSubmitCallbackResponse.addError("Appellant requires confidentiality, upload edited and unedited responses");
                     sscsCaseData.setIsConfidentialCase(YesNo.YES);
                 }
@@ -186,7 +185,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                 if (otherPartyHasConfidentiality(sscsCaseData)) {
                     sscsCaseData.setIsConfidentialCase(YesNo.YES);
                 }
-                if (sscsCaseData.getAppeal().getAppellant() != null && YesNoUndetermined.isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequirement())) {
+                if (sscsCaseData.getAppeal().getAppellant() != null && YesNo.isYes(sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired())) {
                     sscsCaseData.setIsConfidentialCase(YesNo.YES);
                 }
             }
@@ -195,7 +194,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
     private boolean otherPartyHasConfidentiality(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getOtherParties() != null) {
-            Optional<CcdValue<OtherParty>> otherParty = sscsCaseData.getOtherParties().stream().filter(op -> YesNoUndetermined.isYes(op.getValue().getConfidentialityRequirement())).findAny();
+            Optional<CcdValue<OtherParty>> otherParty = sscsCaseData.getOtherParties().stream().filter(op -> YesNo.isYes(op.getValue().getConfidentialityRequired())).findAny();
             return otherParty.isPresent();
         }
         return false;

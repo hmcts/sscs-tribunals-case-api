@@ -272,7 +272,7 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
                                              .title("Mr")
                                              .build())
                                    .address(Address.builder().build())
-                                   .confidentialityRequirement(YesNoUndetermined.NO)
+                                   .confidentialityRequired(NO)
                                    .unacceptableCustomerBehaviour(YES)
                                    .hearingSubtype(HearingSubtype.builder()
                                                        .hearingTelephoneNumber("0999733735")

@@ -89,7 +89,7 @@ export class ValidateAppeal extends BaseStep {
       .getByLabel('Year')
       .fill('2026');
     await this.page
-      .locator('#appeal_appellant_confidentialityRequirement-No')
+      .locator('#appeal_appellant_confidentialityRequired_No')
       .evaluate((element: HTMLInputElement) => {
         element.click();
         element.checked = true;

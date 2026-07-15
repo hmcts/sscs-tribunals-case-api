@@ -66,6 +66,7 @@
           },
           "isAddressSameAsAppointee": null,
           "isAppointee": "Yes",
+          "confidentialityRequired": null,
           "name": {
             "firstName": "Sarah",
             "lastName": "Smith",
@@ -114,7 +115,7 @@
         "receivedVia": "Paper",
         "rep": {
           "id": null,
-          "identity": null,
+          "identity":null,
           "address": {
             "county": "Surrey",
             "line1": "63 Grove Hill Road",
@@ -140,8 +141,8 @@
       "benefitCode": "051",
       "bulkScanCaseReference": "id",
       "caseManagementLocation": {
-        "region": "8",
-        "baseLocation": "372653"
+        "region":"8",
+        "baseLocation":"372653"
       },
       "caseCode": "051DD",
       "caseCreated": "2019-08-02",
@@ -213,7 +214,7 @@
   },
   "warnings": [],
   "supplementary_data": {
-    "$set": {
+    "$set" : {
       "HMCTSServiceId": "BBA3"
     }
   }
