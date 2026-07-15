@@ -319,10 +319,10 @@ dependencyManagement {
 ext {
     set('activemq.version', '6.2.7')
     set('netty.version', '4.2.15.Final')
-    set('log4j2.version', '2.26.0')
+    set('log4j2.version', '2.26.1')
     set('commons-lang3.version', '3.20.0')
     set('kotlin.version', '2.2.21')
-    set('tomcat.version', '10.1.56')
+    set('tomcat.version', '11.0.24')
     set('spring-framework.version', '6.2.19')
 }
 
@@ -392,7 +392,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'pdf-service-client', version: '8.0.2'
     implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '5.1.1'
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.3'
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '6.3.58'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '6.3.57'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '8.0.0'
 
     implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.2.1-RELEASE'
@@ -440,7 +440,7 @@ dependencies {
     implementation group: 'org.apache.pdfbox', name: 'xmpbox', version: '3.0.7'
     implementation group: 'org.apache.tika', name: 'tika-core', version: '3.2.3'
     implementation group: 'org.apache.tika', name: 'tika-parsers', version: '3.2.3'
-    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '10.1.56'
+    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '11.0.24'
 
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok

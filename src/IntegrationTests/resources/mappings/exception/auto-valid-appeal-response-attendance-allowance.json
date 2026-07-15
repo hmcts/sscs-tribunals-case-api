@@ -49,6 +49,7 @@
             "dob": "1976-11-11",
             "nino": "BB000000B"
           },
+          "confidentialityRequired": null,
           "appointee": null,
           "isAppointee": "No",
           "isAddressSameAsAppointee": null,

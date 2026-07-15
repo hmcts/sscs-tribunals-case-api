@@ -186,7 +186,7 @@
   {
     "CaseEventID": "updateOtherPartyData",
     "CaseFieldID": "otherParties",
-    "ListElementCode": "confidentialityRequirement",
+    "ListElementCode": "confidentialityRequired",
     "ID": "otherPartyConfidentialityRequired",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "19/11/2020",

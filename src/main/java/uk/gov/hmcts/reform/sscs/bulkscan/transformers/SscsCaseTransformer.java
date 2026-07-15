@@ -92,7 +92,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.CaseResponse;
 import uk.gov.hmcts.reform.sscs.exception.UnknownFileTypeException;
@@ -533,14 +532,14 @@ public class SscsCaseTransformer implements CaseTransformer {
             .address(buildPersonAddress(pairs, personType, isSscs8))
             .identity(buildPersonIdentity(pairs, personType))
             .contact(contact)
-            .confidentialityRequirement(getConfidentialityRequired(pairs, errors))
+            .confidentialityRequired(getConfidentialityRequired(pairs, errors))
             .appointee(appointee)
             .role(buildAppellantRole(pairs, formType, ignoreWarnings))
             .ibcRole(buildIbcRole(pairs, personType, isSscs8))
             .build();
     }
 
-    private YesNoUndetermined getConfidentialityRequired(Map<String, Object> pairs, Set<String> errors) {
+    private YesNo getConfidentialityRequired(Map<String, Object> pairs, Set<String> errors) {
         String keepHomeAddressConfidential = (String) pairs.get(KEEP_HOME_ADDRESS_CONFIDENTIAL);
         return isNotBlank(keepHomeAddressConfidential)
             ? convertBooleanToYesNo(getBoolean(pairs, errors, KEEP_HOME_ADDRESS_CONFIDENTIAL)) : null;
