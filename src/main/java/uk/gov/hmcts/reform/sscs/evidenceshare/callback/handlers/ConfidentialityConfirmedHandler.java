@@ -1,33 +1,38 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.confidentialityconfirmed;
+package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SENT_TO_DWP;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.State.WITH_DWP;
 
 import java.time.LocalDate;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
-
 @Slf4j
 @Service
-@AllArgsConstructor
-class ConfidentialityConfirmedSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class ConfidentialityConfirmedHandler implements CallbackHandler<SscsCaseData> {
 
     private final UpdateCcdCaseService updateCcdCaseService;
     private final IdamService idamService;
+    private final DispatchPriority dispatchPriority;
+
+    @Autowired
+    public ConfidentialityConfirmedHandler(UpdateCcdCaseService updateCcdCaseService,
+                                           IdamService idamService) {
+        this.updateCcdCaseService = updateCcdCaseService;
+        this.idamService = idamService;
+        this.dispatchPriority = DispatchPriority.LATEST;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -44,12 +49,11 @@ class ConfidentialityConfirmedSubmittedHandler implements PreSubmitCallbackHandl
     }
 
     @Override
-    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
-        String userAuthorisation) {
+    public void handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
-        SscsCaseDetails caseDetails = updateCcdCaseService.updateCaseV2(
+        updateCcdCaseService.updateCaseV2(
                 callback.getCaseDetails().getId(),
                 SENT_TO_DWP.getCcdType(),
                 "Case sent to FTA",
@@ -59,8 +63,11 @@ class ConfidentialityConfirmedSubmittedHandler implements PreSubmitCallbackHandl
                     SscsCaseData sscsCaseData = sscsCaseDetails.getData();
                     sscsCaseData.setDateSentToDwp(LocalDate.now().toString());
                     sscsCaseData.setHmctsDwpState("sentToDwp");
-                    sscsCaseData.setState(WITH_DWP);
                 });
-        return new PreSubmitCallbackResponse<>(caseDetails.getData());
+    }
+
+    @Override
+    public DispatchPriority getPriority() {
+        return this.dispatchPriority;
     }
 }

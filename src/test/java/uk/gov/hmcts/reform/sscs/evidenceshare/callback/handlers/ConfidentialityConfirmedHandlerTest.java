@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.confidentialityconfirmed;
+package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -10,7 +10,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CONFIDENTIALITY_CONFIRMED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SENT_TO_DWP;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.State.WITH_DWP;
 
 import java.time.LocalDate;
 import java.util.function.Consumer;
@@ -25,7 +24,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
@@ -38,11 +37,9 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @ExtendWith(MockitoExtension.class)
-class ConfidentialityConfirmedSubmittedHandlerTest {
+class ConfidentialityConfirmedHandlerTest {
 
-    private static final String USER_AUTHORISATION = "Bearer token";
-
-    private ConfidentialityConfirmedSubmittedHandler handler;
+    private ConfidentialityConfirmedHandler handler;
 
     @Mock
     private UpdateCcdCaseService updateCcdCaseService;
@@ -64,7 +61,7 @@ class ConfidentialityConfirmedSubmittedHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new ConfidentialityConfirmedSubmittedHandler(updateCcdCaseService, idamService);
+        handler = new ConfidentialityConfirmedHandler(updateCcdCaseService, idamService);
     }
 
     @Test
@@ -114,11 +111,8 @@ class ConfidentialityConfirmedSubmittedHandlerTest {
         when(updateCcdCaseService.updateCaseV2(eq(1234L), eq(SENT_TO_DWP.getCcdType()),
                 eq("Case sent to FTA"), eq("Case sent to FTA"), eq(idamTokens), any()))
                 .thenReturn(sscsCaseDetails);
-        when(sscsCaseDetails.getData()).thenReturn(sscsCaseData);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData()).isEqualTo(sscsCaseData);
+        handler.handle(SUBMITTED, callback);
 
         verify(updateCcdCaseService).updateCaseV2(eq(1234L), eq(SENT_TO_DWP.getCcdType()),
                 eq("Case sent to FTA"), eq("Case sent to FTA"), eq(idamTokens), sscsCaseDataCaptor.capture());
@@ -131,15 +125,19 @@ class ConfidentialityConfirmedSubmittedHandlerTest {
 
         assertThat(dataToUpdate.getDateSentToDwp()).isEqualTo(LocalDate.now().toString());
         assertThat(dataToUpdate.getHmctsDwpState()).isEqualTo("sentToDwp");
-        assertThat(dataToUpdate.getState()).isEqualTo(WITH_DWP);
     }
 
     @Test
     void throwsExceptionIfItCannotHandleTheAppeal() {
         when(callback.getEvent()).thenReturn(EventType.ADD_OTHER_PARTY_DATA);
 
-        assertThatThrownBy(() -> handler.handle(SUBMITTED, callback, USER_AUTHORISATION))
+        assertThatThrownBy(() -> handler.handle(SUBMITTED, callback))
                 .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void shouldReturnCorrectPriority() {
+        assertThat(handler.getPriority()).isEqualTo(DispatchPriority.LATEST);
     }
 
     private SscsCaseData caseDataWithBenefit(String benefitCode) {
