@@ -617,8 +617,8 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTestV2 {
 
         final SscsCaseData caseData = callConvertSyaToCcdCaseDataRelevantVersion(syaCaseWrapper, false);
         assertEquals(1, caseData.getAppeal().getAppealReasons().getReasons().size());
-        assertEquals(reason.getReasonForAppealing(), caseData.getAppeal().getAppealReasons().getReasons().getFirst().getValue().getDescription());
-        assertEquals(reason.getWhatYouDisagreeWith(), caseData.getAppeal().getAppealReasons().getReasons().getFirst().getValue().getReason());
+        assertEquals(reason.getReasonForAppealing(), caseData.getAppeal().getAppealReasons().getReasons().get(0).getValue().getDescription());
+        assertEquals(reason.getWhatYouDisagreeWith(), caseData.getAppeal().getAppealReasons().getReasons().get(0).getValue().getReason());
     }
 
     @Test

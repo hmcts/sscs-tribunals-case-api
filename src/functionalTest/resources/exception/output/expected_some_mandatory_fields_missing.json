@@ -50,6 +50,7 @@
           },
           "isAddressSameAsAppointee": null,
           "isAppointee": "No",
+          "confidentialityRequired": null,
           "name": {
             "firstName": "Frederick",
             "lastName": "Falafel",
@@ -98,7 +99,7 @@
         "receivedVia": "Paper",
         "rep": {
           "id": null,
-          "identity": null,
+          "identity":null,
           "address": {
             "county": "Surrey",
             "postcode": "RH1 5BT",
@@ -122,8 +123,8 @@
       "benefitCode": "051",
       "bulkScanCaseReference": "id",
       "caseManagementLocation": {
-        "region": "8",
-        "baseLocation": "372653"
+        "region":"8",
+        "baseLocation":"372653"
       },
       "caseCode": "051DD",
       "caseCreated": "2019-08-02",
@@ -144,7 +145,7 @@
         "name": "CARDIFF",
         "phoneNumber": "0300 123 1142",
         "postcode": "CF24 0AB",
-        "hearingRoute": "gaps"
+        "hearingRoute":  "gaps"
       },
       "processingVenue": "Cardiff",
       "isScottishCase": "No",
@@ -162,7 +163,7 @@
           }
         }
       ],
-      "dwpRegionalCentre": "Sheffield DRT",
+      "dwpRegionalCentre":"Sheffield DRT",
       "subscriptions": {
         "appellantSubscription": {
           "email": null,
@@ -199,7 +200,7 @@
     "office is empty"
   ],
   "supplementary_data": {
-    "$set": {
+    "$set" : {
       "HMCTSServiceId": "BBA3"
     }
   }

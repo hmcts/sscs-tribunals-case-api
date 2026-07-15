@@ -35,6 +35,7 @@
         "nino": "JT 12 34 56 D"
       },
       "isAppointee": null,
+      "confidentialityRequired": null,
       "role": null,
       "appointee": {
         "id": null,
@@ -90,7 +91,7 @@
       }
     },
     "signer": null,
-    "hearingSubtype": null,
+    "hearingSubtype":null,
     "hearingType": "paper",
     "receivedVia": "Paper"
   },
@@ -164,7 +165,7 @@
       "wantSmsNotifications": null,
       "tya": null,
       "email": null,
-      "lastLoggedIntoMya": null,
+      "lastLoggedIntoMya":null,
       "mobile": null,
       "subscribeEmail": null,
       "subscribeSms": null,
@@ -174,7 +175,7 @@
       "wantSmsNotifications": null,
       "tya": "",
       "email": "",
-      "lastLoggedIntoMya": null,
+      "lastLoggedIntoMya":null,
       "mobile": "",
       "subscribeEmail": "No",
       "subscribeSms": "No",
@@ -184,7 +185,7 @@
       "wantSmsNotifications": null,
       "tya": null,
       "email": null,
-      "lastLoggedIntoMya": null,
+      "lastLoggedIntoMya":null,
       "mobile": null,
       "subscribeEmail": null,
       "subscribeSms": null,

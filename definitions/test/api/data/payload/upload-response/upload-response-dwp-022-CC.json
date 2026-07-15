@@ -51,6 +51,7 @@
         "organisation": null
       },
       "role": {},
+      "confidentialityRequired": null,
       "isAddressSameAsAppointee": null
     },
     "benefitType": {
@@ -63,9 +64,7 @@
       "languageInterpreter": "No",
       "languages": null,
       "signLanguageType": null,
-      "arrangements": [
-        "hearingLoop"
-      ],
+      "arrangements": ["hearingLoop"],
       "scheduleHearing": "Yes",
       "excludeDates": [
         {
@@ -325,7 +324,7 @@
   "otherParties": [
     {
       "value": {
-        "confidentialityRequirement": "No",
+        "confidentialityRequired": "No",
         "unacceptableCustomerBehaviour": "No",
         "isAppointee": null,
         "id": "13e1b3d7-c593-4e6a-b51a-99f35cac69e9",

@@ -186,7 +186,7 @@
       "otherParties": [
         {
           "value": {
-            "confidentialityRequirement": "No",
+            "confidentialityRequired": "No",
             "isAppointee": "No",
             "id": "1",
             "name": {

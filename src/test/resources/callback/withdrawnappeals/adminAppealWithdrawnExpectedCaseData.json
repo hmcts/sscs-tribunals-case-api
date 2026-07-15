@@ -35,9 +35,10 @@
         "nino": "JT 12 34 56 D"
       },
       "isAppointee": null,
+      "confidentialityRequired": null,
       "role": null,
       "appointee": {
-        "id": null,
+        "id":null,
         "name": null,
         "address": null,
         "contact": null,
@@ -57,7 +58,7 @@
     "appealReasons": {},
     "rep": {
       "hasRepresentative": "Yes",
-      "id": null,
+      "id":null,
       "identity": null,
       "organisation": "HP Ltd",
       "name": {
@@ -79,71 +80,64 @@
       }
     },
     "signer": null,
-    "hearingSubtype": null,
+    "hearingSubtype":null,
     "hearingType": "paper",
     "receivedVia": "Paper"
   },
-  "hearings": [
-    {
-      "value": {
-        "venue": {
-          "name": "Prudential House",
-          "address": {
-            "line1": "2-10 Topping Street",
-            "line2": "",
-            "town": "Blackpool",
-            "county": "",
-            "postcode": "FY1 3AB"
-          },
-          "googleMapLink": "https://www.google.com/maps/place/2-10+Topping+Street+Blackpool+FY1+3AB/@53.820175,-3.050717"
+  "hearings": [{
+    "value": {
+      "venue": {
+        "name": "Prudential House",
+        "address": {
+          "line1": "2-10 Topping Street",
+          "line2": "",
+          "town": "Blackpool",
+          "county": "",
+          "postcode": "FY1 3AB"
         },
-        "hearingDate": "2018-06-01",
-        "time": "11:40:00",
-        "adjourned": "No",
-        "hearingId": "3698764"
-      }
+        "googleMapLink": "https://www.google.com/maps/place/2-10+Topping+Street+Blackpool+FY1+3AB/@53.820175,-3.050717"
+      },
+      "hearingDate": "2018-06-01",
+      "time": "11:40:00",
+      "adjourned": "No",
+      "hearingId": "3698764"
     }
-  ],
+  }],
   "evidence": {
     "documents": []
   },
   "dwpTimeExtension": [],
-  "events": [
-    {
-      "value": {
-        "date": "2018-07-05T14:38:26.443",
-        "type": "appealDormant",
-        "description": "Appeal dormant"
-      }
-    },
-    {
-      "value": {
-        "date": "2018-05-09T11:16:01.867",
-        "type": "responseReceived",
-        "description": "Response received"
-      }
-    },
-    {
-      "value": {
-        "date": "2018-02-09T14:38:26.443",
-        "type": "hearingBooked",
-        "description": "Hearing booked"
-      }
-    },
-    {
-      "value": {
-        "date": "2017-10-06T09:38:25.190",
-        "type": "appealReceived",
-        "description": "Appeal received"
-      }
+  "events": [{
+    "value": {
+      "date": "2018-07-05T14:38:26.443",
+      "type": "appealDormant",
+      "description": "Appeal dormant"
     }
-  ],
+  }, {
+    "value": {
+      "date": "2018-05-09T11:16:01.867",
+      "type": "responseReceived",
+      "description": "Response received"
+    }
+  }, {
+    "value": {
+      "date": "2018-02-09T14:38:26.443",
+      "type": "hearingBooked",
+      "description": "Hearing booked"
+    }
+  }, {
+    "value": {
+      "date": "2017-10-06T09:38:25.190",
+      "type": "appealReceived",
+      "description": "Appeal received"
+    }
+  }],
   "subscriptions": {
     "appellantSubscription": {
       "wantSmsNotifications": "Yes",
       "tya": "NpmhpYaFLa",
       "email": "sscstest+notify@greencroftconsulting.com",
-      "lastLoggedIntoMya": null,
+      "lastLoggedIntoMya":null,
       "mobile": "07398785050",
       "subscribeEmail": "Yes",
       "subscribeSms": "Yes",
@@ -153,7 +147,7 @@
       "wantSmsNotifications": null,
       "tya": null,
       "email": null,
-      "lastLoggedIntoMya": null,
+      "lastLoggedIntoMya":null,
       "mobile": null,
       "subscribeEmail": null,
       "subscribeSms": null,
@@ -163,7 +157,7 @@
       "wantSmsNotifications": null,
       "tya": "",
       "email": "",
-      "lastLoggedIntoMya": null,
+      "lastLoggedIntoMya":null,
       "mobile": "",
       "subscribeEmail": "No",
       "subscribeSms": "No",
@@ -173,7 +167,7 @@
       "wantSmsNotifications": null,
       "tya": null,
       "email": null,
-      "lastLoggedIntoMya": null,
+      "lastLoggedIntoMya":null,
       "mobile": null,
       "subscribeEmail": null,
       "subscribeSms": null,
@@ -195,30 +189,26 @@
     "hearingRoute": null,
     "epimsId": null
   },
-  "sscsDocument": [
-    {
-      "value": {
-        "documentLink": {
-          "document_url": "http://dm-store:8080/documents/7d80b978-51d1-49e9-9791-07f86ae83bc6",
-          "document_binary_url": "http://dm-store:8080/documents/7d80b978-51d1-49e9-9791-07f86ae83bc6/binary",
-          "document_filename": "Screenshot 2019-08-30 at 16.56.20.pdf"
-        }
+  "sscsDocument": [{
+    "value": {
+      "documentLink": {
+        "document_url": "http://dm-store:8080/documents/7d80b978-51d1-49e9-9791-07f86ae83bc6",
+        "document_binary_url": "http://dm-store:8080/documents/7d80b978-51d1-49e9-9791-07f86ae83bc6/binary",
+        "document_filename": "Screenshot 2019-08-30 at 16.56.20.pdf"
       }
     }
-  ],
+  }],
   "evidencePresent": "No",
   "dateSentToDwp": "2019-09-01",
   "hmctsDwpState": "sentToDwp",
   "dwpState": "withdrawalReceived",
   "appealNotePad": {
-    "notesCollection": [
-      {
-        "value": {
-          "noteDate": "2019-09-01",
-          "noteDetail": "this is a withdrawn note"
-        }
+    "notesCollection": [{
+      "value": {
+        "noteDate": "2019-09-01",
+        "noteDetail": "this is a withdrawn note"
       }
-    ]
+    }]
   },
   "workBasketHearingDate": null,
   "workBasketHearingDateIssued": null,

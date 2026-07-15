@@ -124,7 +124,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.CaseResponse;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -2585,7 +2584,7 @@ public class SscsCaseTransformerTest {
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
         assertNoErrorsOrWarnings(result);
 
-        YesNoUndetermined appellantConfidentialityRequired = ((Appeal) result.getTransformedCase().get("appeal")).getAppellant().getConfidentialityRequirement();
+        YesNo appellantConfidentialityRequired = ((Appeal) result.getTransformedCase().get("appeal")).getAppellant().getConfidentialityRequired();
         assertEquals(expected, appellantConfidentialityRequired.toString());
     }
 
@@ -2614,7 +2613,7 @@ public class SscsCaseTransformerTest {
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
         assertNoErrorsOrWarnings(result);
 
-        YesNoUndetermined appellantConfidentialityRequired = ((Appeal) result.getTransformedCase().get("appeal")).getAppellant().getConfidentialityRequirement();
+        YesNo appellantConfidentialityRequired = ((Appeal) result.getTransformedCase().get("appeal")).getAppellant().getConfidentialityRequired();
         assertNull(appellantConfidentialityRequired);
     }
 
@@ -2642,7 +2641,7 @@ public class SscsCaseTransformerTest {
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
         assertNoErrorsOrWarnings(result);
 
-        YesNoUndetermined appellantConfidentialityRequired = ((Appeal) result.getTransformedCase().get("appeal")).getAppellant().getConfidentialityRequirement();
+        YesNo appellantConfidentialityRequired = ((Appeal) result.getTransformedCase().get("appeal")).getAppellant().getConfidentialityRequired();
         assertNull(appellantConfidentialityRequired);
     }
 
