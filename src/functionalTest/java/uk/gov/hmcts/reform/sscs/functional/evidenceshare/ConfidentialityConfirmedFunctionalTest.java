@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
@@ -76,7 +77,7 @@ class ConfidentialityConfirmedFunctionalTest extends AbstractFunctionalTest {
 
             updateCcdCaseService.updateCaseV2(caseWithState.getId(), CONFIDENTIALITY_CONFIRMED.getCcdType(),
                 idamService.getIdamTokens(), cd -> {
-                    cd.getData().getOtherParties().getFirst().getValue().setConfidentialityRequired(YesNo.YES);
+                    cd.getData().getOtherParties().getFirst().getValue().setConfidentialityRequirement(YesNoUndetermined.YES);
                     return new UpdateCcdCaseService.UpdateResult(CONFIRMED, CONFIRMED);
                 });
 
