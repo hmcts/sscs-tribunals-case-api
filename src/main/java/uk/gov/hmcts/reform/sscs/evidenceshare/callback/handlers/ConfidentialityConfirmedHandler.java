@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SENT_TO_DWP;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isBenefitTypeChildSupportOrUc;
 
