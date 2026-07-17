@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SENT_TO_DWP;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isBenefitTypeChildSupportOrUc;
 
 import java.time.LocalDate;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +46,7 @@ public class ConfidentialityConfirmedHandler implements CallbackHandler<SscsCase
         }
 
         final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        return caseData.isBenefitType(CHILD_SUPPORT) || caseData.isBenefitType(UC);
+        return isBenefitTypeChildSupportOrUc(caseData);
     }
 
     @Override
