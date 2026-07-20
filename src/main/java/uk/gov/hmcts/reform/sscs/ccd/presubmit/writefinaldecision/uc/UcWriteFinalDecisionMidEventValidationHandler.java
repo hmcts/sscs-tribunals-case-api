@@ -17,10 +17,15 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 @Component
 public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDecisionMidEventValidationHandlerBase {
 
+    @Value("${feature.severeConditions.enabled}")
+    private final boolean isSevereConditionsEnabled;
+
     public UcWriteFinalDecisionMidEventValidationHandler(Validator validator,
                                                          DecisionNoticeService decisionNoticeService,
-                                                         @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled) {
+                                                         @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled,
+                                                         @Value("${feature.severeConditions.enabled}") boolean isSevereConditionsEnabled) {
         super(validator, decisionNoticeService, isPostHearingsEnabled);
+        this.isSevereConditionsEnabled = isSevereConditionsEnabled;
     }
 
     @Override
@@ -33,11 +38,13 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
         if (sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionSchedule7ActivitiesApply() == null) {
             sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
         }
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionHasSVIssueCode(hasUcSvIssueCode(sscsCaseData));
-        if (!YES.equals(sscsCaseData.getSscsUcCaseData().getShowSchedule7ActivitiesPage()) || ("No").equals(sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionSchedule7ActivitiesApply())) {
-            sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(null);
+        if (isSevereConditionsEnabled) {
+            sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionHasSVIssueCode(hasUcSvIssueCode(sscsCaseData));
+            if (!YES.equals(sscsCaseData.getSscsUcCaseData().getShowSchedule7ActivitiesPage()) || ("No").equals(sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionSchedule7ActivitiesApply())) {
+                sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(null);
+            }
+            sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecisionIsAfterSvDate(isFinalDecisionDateOfDecisionBlankOrAfterSvStartDate(sscsCaseData) ? YES : NO);
         }
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecisionIsAfterSvDate(isFinalDecisionDateOfDecisionBlankOrAfterSvStartDate(sscsCaseData) ? YES : NO);
     }
 
     @Override
@@ -63,21 +70,24 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
 
     @Override
     protected void validateAwardTypes(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if (isYes(sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionHasSVIssueCode()) && NO.equals(sscsCaseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo())) {
-            preSubmitCallbackResponse.addError("This is a severe conditions criteria only appeal. Please select yes to this question.");
-        }
-        if (hasSvIssueCode(sscsCaseData) && !isFinalDecisionDateOfDecisionBlankOrAfterSvStartDate(sscsCaseData)) {
-            preSubmitCallbackResponse.addError("You cannot write decision notice until resolved. Please ask admin to amend issue code to WC or SG and then proceed.");
-        }
-        YesNo ucSevereCriteriaApplies = sscsCaseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply();
-        if (hasSvIssueCode(sscsCaseData) && nonNull(ucSevereCriteriaApplies)) {
-            String decision = sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAllowedOrRefused();
-            if ("allowed".equals(decision) && !YesNo.isYes(ucSevereCriteriaApplies)) {
-                preSubmitCallbackResponse.addError(SV_ALLOWED_APPEAL_ERROR_MESSAGE);
+        if (isSevereConditionsEnabled) {
+            if (isYes(sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionHasSVIssueCode()) && NO.equals(sscsCaseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo())) {
+                preSubmitCallbackResponse.addError("This is a severe conditions criteria only appeal. Please select yes to this question.");
             }
-            if ("refused".equals(decision) && YesNo.isYes(ucSevereCriteriaApplies)) {
-                preSubmitCallbackResponse.addError(SV_REFUSED_APPEAL_ERROR_MESSAGE);
+            if (hasSvIssueCode(sscsCaseData) && !isFinalDecisionDateOfDecisionBlankOrAfterSvStartDate(sscsCaseData)) {
+                preSubmitCallbackResponse.addError("You cannot write decision notice until resolved. Please ask admin to amend issue code to WC or SG and then proceed.");
             }
+            YesNo ucSevereCriteriaApplies = sscsCaseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply();
+            if (hasSvIssueCode(sscsCaseData) && nonNull(ucSevereCriteriaApplies)) {
+                String decision = sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAllowedOrRefused();
+                if ("allowed".equals(decision) && !YesNo.isYes(ucSevereCriteriaApplies)) {
+                    preSubmitCallbackResponse.addError(SV_ALLOWED_APPEAL_ERROR_MESSAGE);
+                }
+                if ("refused".equals(decision) && YesNo.isYes(ucSevereCriteriaApplies)) {
+                    preSubmitCallbackResponse.addError(SV_REFUSED_APPEAL_ERROR_MESSAGE);
+                }
+            }
+
         }
 
         if ("Yes".equalsIgnoreCase(sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionSchedule7ActivitiesApply())) {
@@ -111,8 +121,9 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
 
     @Override
     protected void setDwpReassessAwardPage(SscsCaseData sscsCaseData, String pageId) {
-        if (YesNo.isYes(sscsCaseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply())
-                || YesNo.isYes(hasUcSvIssueCode(sscsCaseData))) {
+        if (isSevereConditionsEnabled
+                && (YesNo.isYes(sscsCaseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply())
+                || YesNo.isYes(hasUcSvIssueCode(sscsCaseData)))) {
             sscsCaseData.setShowDwpReassessAwardPage(YesNo.NO);
             return;
         }
