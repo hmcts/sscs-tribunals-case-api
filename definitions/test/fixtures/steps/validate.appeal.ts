@@ -70,7 +70,7 @@ export class ValidateAppeal extends BaseStep {
     caseId: string,
     role: 'caseworker' | 'superuser'
   ) {
-    await this.loginUserWithCaseId(this.getUser(role), false, caseId);
+    await this.loginUserWithCaseId(this.getUser(role), true, caseId);
 
     await this.homePage.chooseEvent('Update to case data');
     await this.page

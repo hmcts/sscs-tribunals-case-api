@@ -148,7 +148,7 @@ class DwpUploadResponseAboutToSubmitHandlerTest {
         dwpDocumentService = new DwpDocumentService();
         addNoteService = new AddNoteService(userDetailsService);
         handler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
-                addNoteService, panelCompositionService, hearingsService, addedDocumentsUtil, true);
+                addNoteService, panelCompositionService, hearingsService, addedDocumentsUtil);
     }
 
     @Test
@@ -787,7 +787,7 @@ class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     void givenAudioVideoDocuments_shouldComputeCorrectAudioVideoTotals() throws JsonProcessingException {
         handler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
-            new AddNoteService(userDetailsService), panelCompositionService, hearingsService, new AddedDocumentsUtil(true), true);
+            new AddNoteService(userDetailsService), panelCompositionService, hearingsService, new AddedDocumentsUtil(true));
 
         List<AudioVideoEvidence> audioVideoEvidence = new ArrayList<>();
 
@@ -837,7 +837,7 @@ class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     void givenPreExistingAudioVideoDocuments_shouldComputeCorrectAudioVideoTotalsForAvAddedThisEvent() throws JsonProcessingException {
         handler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
-            new AddNoteService(userDetailsService), panelCompositionService, hearingsService, new AddedDocumentsUtil(true), true);
+            new AddNoteService(userDetailsService), panelCompositionService, hearingsService, new AddedDocumentsUtil(true));
 
         List<AudioVideoEvidence> newAudioVideoEvidence = new ArrayList<>();
 
@@ -889,7 +889,7 @@ class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     void givenNoNewAudioVideoDocuments_shouldStillClearAddedDocuments() {
         handler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
-            new AddNoteService(userDetailsService), panelCompositionService, hearingsService, new AddedDocumentsUtil(true), true);
+            new AddNoteService(userDetailsService), panelCompositionService, hearingsService, new AddedDocumentsUtil(true));
 
         sscsCaseData.setDwpUploadAudioVideoEvidence(new ArrayList<>());
         sscsCaseData.setWorkAllocationFields(WorkAllocationFields.builder()
@@ -1105,7 +1105,7 @@ class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenADwpUploadResponseEventChildSupConfNonChildSupporOrUctThenNoErrorAdded() {
+    void givenADwpUploadResponseEventChildSupConfNonChildSupportThenNoErrorAdded() {
         callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder()
                 .code(Benefit.PENSION_CREDIT.getShortName())
                 .description(Benefit.PENSION_CREDIT.getDescription()).build());
@@ -1134,14 +1134,13 @@ class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals(0, response.getErrors().size());
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"UC", "CHILD_SUPPORT"})
-    void givenADwpUploadResponseEventChildSupConfChildSupportOrUcThenNoErrorAdded(Benefit benefit) {
+    @Test
+    void givenADwpUploadResponseEventChildSupConfChildSupportThenNoErrorAdded() {
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(benefit.getShortName())
-                .description(benefit.getDescription()).build());
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName())
+                .description(Benefit.CHILD_SUPPORT.getDescription()).build());
         sscsCaseData.setDwpEditedResponseDocument(getPdfDocument());
         sscsCaseData.setDwpEditedEvidenceBundleDocument(getPdfDocument());
         sscsCaseData.setDwpEditedEvidenceReason("childSupportConfidentiality");
@@ -1449,7 +1448,7 @@ class DwpUploadResponseAboutToSubmitHandlerTest {
 
     @ParameterizedTest
     @CsvSource({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
-        "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits", "UC"})
+        "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
     void givenChildSupportCaseOtherPartyWantsConfidentialNoEditedDocs_thenShowError(String shortName) {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(shortName).build());
         sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequired(NO).build());
@@ -1471,7 +1470,7 @@ class DwpUploadResponseAboutToSubmitHandlerTest {
 
     @ParameterizedTest
     @CsvSource({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
-        "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits", "UC"})
+        "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
     void givenChildSupportCaseAppellantAndOtherPartyWantsConfidentialNoEditedDocs_thenShow2Error(String shortName) {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(shortName).build());
         sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequired(YES).build());
@@ -1572,7 +1571,7 @@ class DwpUploadResponseAboutToSubmitHandlerTest {
         when(panelCompositionService.resetPanelCompositionIfStale(eq(sscsCaseData), eq(Optional.of(caseDetailsBefore))))
                 .thenReturn(panelComposition);
         handler = new DwpUploadResponseAboutToSubmitHandler(
-                dwpDocumentService, addNoteService, panelCompositionService, hearingsService, addedDocumentsUtil, true);
+                dwpDocumentService, addNoteService, panelCompositionService, hearingsService, addedDocumentsUtil);
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 

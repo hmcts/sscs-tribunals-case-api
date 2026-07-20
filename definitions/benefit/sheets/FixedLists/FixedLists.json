@@ -948,13 +948,5 @@
   {"LiveFrom": "13/03/2025", "ID": "FL_commRequestTopic", "ListElementCode": "jointPartyPersonalInfo", "ListElement": "Joint party personal information"},
   {"LiveFrom": "13/03/2025", "ID": "FL_commRequestTopic", "ListElementCode": "mrnDetails", "ListElement": "MRN/Review Decision Notice Details"},
   {"LiveFrom": "13/03/2025", "ID": "FL_commRequestTopic", "ListElementCode": "otherPartyPersonalInfo", "ListElement": "Other party personal information"},
-  {"LiveFrom": "13/03/2025", "ID": "FL_replyNoActionRequired", "ListElementCode": "noActionRequired", "ListElement": "No reply required"},
-  {"LiveFrom": "13/03/2026", "ID": "FL_yesNoUnknown", "ListElementCode": "Yes", "ListElement": "Yes"},
-  {"LiveFrom": "13/03/2026", "ID": "FL_yesNoUnknown", "ListElementCode": "No", "ListElement": "No"},
-  {"LiveFrom": "13/03/2026", "ID": "FL_yesNoUnknown", "ListElementCode": "Unknown", "ListElement": "Unknown"},
-  {"LiveFrom": "01/01/2018", "ID": "FL_interlocWorkflow", "ListElementCode": "hefIssued", "ListElement": "HEF Issued"},
-  {"LiveFrom": "11/12/2025", "ID": "FL_interlocReferralReason", "ListElementCode": "confidentiality", "ListElement": "Confidentiality"},
-  {"LiveFrom": "24/06/2026", "ID": "FL_yesNoUndetermined","ListElementCode": "Yes","ListElement": "Yes"},
-  {"LiveFrom": "24/06/2026", "ID": "FL_yesNoUndetermined","ListElementCode": "No","ListElement": "No"},
-  {"LiveFrom": "24/06/2026", "ID": "FL_yesNoUndetermined","ListElementCode": "Undetermined","ListElement": "Undetermined" }
+  {"LiveFrom": "13/03/2025", "ID": "FL_replyNoActionRequired", "ListElementCode": "noActionRequired", "ListElement": "No reply required"}
 ]
