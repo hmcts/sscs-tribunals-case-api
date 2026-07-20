@@ -103,6 +103,7 @@ public class CitizenLoginService {
         List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
                 .map(sscsCcdConvertService::getCaseDetails)
                 .filter(AppealNumberGenerator::filterActiveCasesForCitizen)
+                .filter(f -> hasMatchingSubscriptionEmail(f, idamTokens.getEmail()))
                 .toList();
 
         log.info(format("Searching for active case without for user [%s]", idamTokens.getUserId()));
@@ -212,6 +213,20 @@ public class CitizenLoginService {
         Subscriptions subscriptions = sscsCaseDetails.getData().getSubscriptions();
 
         return of(subscriptions.getAppellantSubscription(), subscriptions.getAppointeeSubscription(), subscriptions.getRepresentativeSubscription())
+                .anyMatch(subscription -> subscription != null && email.equalsIgnoreCase(subscription.getEmail()));
+    }
+
+    private boolean hasMatchingSubscriptionEmail(SscsCaseDetails sscsCaseDetails, String email) {
+        Subscriptions subscriptions = sscsCaseDetails.getData().getSubscriptions();
+        final Stream<Subscription> otherPartySubscriptionStream = emptyIfNull(sscsCaseDetails.getData().getOtherParties()).stream()
+                .map(CcdValue::getValue)
+                .flatMap(op -> of(op.getOtherPartySubscription(), op.getOtherPartyAppointeeSubscription(), op.getOtherPartyRepresentativeSubscription()));
+
+        return concat(of(
+                subscriptions.getAppellantSubscription(),
+                subscriptions.getAppointeeSubscription(),
+                subscriptions.getRepresentativeSubscription()),
+                otherPartySubscriptionStream)
                 .anyMatch(subscription -> subscription != null && email.equalsIgnoreCase(subscription.getEmail()));
     }
 
