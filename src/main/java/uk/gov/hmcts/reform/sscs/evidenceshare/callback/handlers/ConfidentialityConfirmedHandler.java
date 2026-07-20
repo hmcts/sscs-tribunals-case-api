@@ -43,8 +43,7 @@ public class ConfidentialityConfirmedHandler implements CallbackHandler<SscsCase
             return false;
         }
 
-        final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        return isBenefitTypeChildSupportOrUc(caseData);
+        return isBenefitTypeChildSupportOrUc(callback.getCaseDetails().getCaseData());
     }
 
     @Override
