@@ -1784,5 +1784,7 @@
   {"LiveFrom": "02/02/2026", "CaseTypeID": "Benefit", "CaseFieldID": "showConfidentialityTab", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "24/02/2026", "CaseTypeID": "Benefit", "CaseFieldID": "confidentialityConfirmedLabel", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
   {"LiveFrom": "24/02/2026", "CaseTypeID": "Benefit", "CaseFieldID": "confidentialityConfirmedLabel", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
-  {"LiveFrom": "24/02/2026", "CaseTypeID": "Benefit", "CaseFieldID": "confidentialityConfirmedLabel", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"}
+  {"LiveFrom": "24/02/2026", "CaseTypeID": "Benefit", "CaseFieldID": "confidentialityConfirmedLabel", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "01/07/2026", "CaseTypeID": "Benefit", "CaseFieldID": "hasUndeterminedPartyConfidentiality", "AccessProfile": "citizen", "CRUD": "R"},
+  {"LiveFrom": "01/07/2026", "CaseTypeID": "Benefit", "CaseFieldID": "hasUndeterminedPartyConfidentiality", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"}
 ]
