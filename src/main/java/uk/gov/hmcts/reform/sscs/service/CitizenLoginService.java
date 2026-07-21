@@ -67,6 +67,7 @@ public class CitizenLoginService {
         List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
                 .map(sscsCcdConvertService::getCaseDetails)
                 .filter(AppealNumberGenerator::filterCaseNotDraftOrArchivedDraft)
+                .filter(f -> hasMatchingSubscriptionEmail(f, idamTokens.getEmail()))
                 .peek(this::attachOtherPartyDetails)
                 .toList();
         if (!isBlank(tya)) {
@@ -118,6 +119,7 @@ public class CitizenLoginService {
         List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
                 .map(sscsCcdConvertService::getCaseDetails)
                 .filter(AppealNumberGenerator::filterDormantCasesForCitizen)
+                .filter(f -> hasMatchingSubscriptionEmail(f, idamTokens.getEmail()))
                 .toList();
 
         log.info(format("Searching for dormant case without for user [%s]", idamTokens.getUserId()));
