@@ -60,7 +60,7 @@ public class ConfidentialityConfirmedHandler implements CallbackHandler<SscsCase
                 sscsCaseDetails -> {
                     SscsCaseData sscsCaseData = sscsCaseDetails.getData();
                     sscsCaseData.setDateSentToDwp(LocalDate.now().toString());
-                    sscsCaseData.setHmctsDwpState("sentToDwp");
+                    sscsCaseData.setHmctsDwpState(SENT_TO_DWP.getCcdType());
                 });
     }
 
