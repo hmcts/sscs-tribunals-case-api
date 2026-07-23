@@ -10,11 +10,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -27,22 +29,7 @@ import org.mockito.Spy;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
-import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsInterlocDirectionDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
@@ -51,7 +38,6 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 @RunWith(JUnitParamsRunner.class)
 public class DirectionIssuedMidEventHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
-    //private static final String TEMPLATE_ID = "nuts.docx";
     private static final String URL = "http://dm-store/documents/123";
     public static final String APPELLANT_LAST_NAME = "APPELLANT Last'NamE";
 
@@ -133,6 +119,76 @@ public class DirectionIssuedMidEventHandlerTest {
     @Test
     public void givenGenerateNoticeIsYes_thenReturnTrue() {
         assertTrue(handler.canHandle(MID_EVENT, callback));
+    }
+
+    @Test
+    public void givenDuplicateOtherPartySelection_thenReturnsError() {
+        DynamicListItem item = new DynamicListItem("otherParty1", "Other party 1");
+        CcdValue<OtherPartySelectionDetails> row =
+            new CcdValue<>(new OtherPartySelectionDetails(new DynamicList(item, List.of(item))));
+        sscsCaseData.setOtherPartySelection(List.of(row, row));
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getErrors().contains("Other parties cannot be selected more than once"));
+    }
+
+    @Test
+    public void givenDistinctOtherPartySelection_thenNoDuplicateError() {
+        DynamicListItem item1 = new DynamicListItem("otherParty1", "Other party 1");
+        DynamicListItem item2 = new DynamicListItem("otherParty2", "Other party 2");
+        sscsCaseData.setOtherPartySelection(List.of(
+            new CcdValue<>(new OtherPartySelectionDetails(new DynamicList(item1, List.of(item1, item2)))),
+            new CcdValue<>(new OtherPartySelectionDetails(new DynamicList(item2, List.of(item1, item2))))));
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertFalse(response.getErrors().contains("Other parties cannot be selected more than once"));
+    }
+
+    @Test
+    @Parameters({"UC", "CHILD_SUPPORT"})
+    public void givenOtherPartiesButSendDirectionNoticeToOtherPartyNotAnswered_thenReturnsError(Benefit benefit) {
+        sscsCaseData.setHasOtherParties(YES);
+        sscsCaseData.setSendDirectionNoticeToOtherParty(null);
+        BenefitType benefitType = BenefitType.builder().code(benefit.getShortName().toUpperCase()).build();
+        sscsCaseData.getAppeal().setBenefitType(benefitType);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getErrors().contains("Select whether to send the direction notice to the other party"));
+    }
+
+    @Test
+    public void givenSendDirectionNoticeToOtherPartyNotUcOrChildSupport_thenNoError() {
+        sscsCaseData.setHasOtherParties(YES);
+        sscsCaseData.setSendDirectionNoticeToOtherParty(null);
+        BenefitType benefitType = BenefitType.builder().code(Benefit.ATTENDANCE_ALLOWANCE.getShortName().toUpperCase()).build();
+        sscsCaseData.getAppeal().setBenefitType(benefitType);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertFalse(response.getErrors().contains("Select whether to send the direction notice to the other party"));
+    }
+
+    @Test
+    public void givenSendDirectionNoticeToOtherPartyAnswered_thenNoError() {
+        sscsCaseData.setHasOtherParties(YES);
+        sscsCaseData.setSendDirectionNoticeToOtherParty(NO);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertFalse(response.getErrors().contains("Select whether to send the direction notice to the other party"));
+    }
+
+    @Test
+    public void givenNoOtherParties_thenSendDirectionNoticeToOtherPartyNotRequired() {
+        sscsCaseData.setHasOtherParties(NO);
+        sscsCaseData.setSendDirectionNoticeToOtherParty(null);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertFalse(response.getErrors().contains("Select whether to send the direction notice to the other party"));
     }
 
     @Test
