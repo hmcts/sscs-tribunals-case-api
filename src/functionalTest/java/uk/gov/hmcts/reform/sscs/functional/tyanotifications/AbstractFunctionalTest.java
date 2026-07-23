@@ -1,10 +1,8 @@
 package uk.gov.hmcts.reform.sscs.functional.tyanotifications;
 
 import static java.util.Arrays.asList;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -35,7 +33,6 @@ import junitparams.JUnitParamsRunner;
 import lombok.Getter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.awaitility.core.ConditionFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -224,9 +221,9 @@ public abstract class AbstractFunctionalTest {
                 }
             } else {
 
-                secondsLeft -= 1;
+                secondsLeft -= 5;
 
-                delayInSeconds(1);
+                delayInSeconds(5);
 
                 allNotifications = client.getNotifications("", "", caseReference, "").getNotifications();
                 String allNotifTemplateIds = allNotifications.stream().map(notif ->
@@ -261,30 +258,11 @@ public abstract class AbstractFunctionalTest {
         int secondsLeft = maxSecondsToWaitForNotification;
 
         while (allNotifications.size() == 0 && secondsLeft > 0) {
-            delayInSeconds(1);
-            secondsLeft -= 1;
+            delayInSeconds(5);
+            secondsLeft -= 5;
             allNotifications = client.getNotifications("", "letter", caseId.toString(), "").getNotifications();
         }
         return allNotifications;
-    }
-
-    public List<Notification> fetchLetters(int expectedCount) throws NotificationClientException {
-        if (expectedCount == 0) {
-            return client.getNotifications("", "letter", caseId.toString(), "").getNotifications();
-        }
-        return defaultAwait().until(
-            () -> client.getNotifications("", "letter", caseId.toString(), "").getNotifications(),
-            letters -> letters.size() >= expectedCount
-        );
-    }
-
-    public void assertNoNotificationSentForTestCase(String... unexpectedTemplateIds) throws NotificationClientException {
-        delayInSeconds(5);
-        final List<Notification> allNotifications = client.getNotifications("", "", caseReference, "").getNotifications();
-        final List<Notification> matching = allNotifications.stream()
-            .filter(n -> asList(unexpectedTemplateIds).contains(n.getTemplateId().toString()))
-            .toList();
-        assertThat(matching).isEmpty();
     }
 
     protected void simulateWelshCcdCallback(NotificationEventType eventType) throws IOException {
@@ -394,12 +372,6 @@ public abstract class AbstractFunctionalTest {
                     .anySatisfy(body -> assertThat(body).contains(match))
             );
         }
-    }
-
-    public ConditionFactory defaultAwait() {
-        return await()
-            .atMost(30, SECONDS)
-            .pollInterval(2, SECONDS);
     }
 
     protected void delayInSeconds(int seconds) {

@@ -3,8 +3,6 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -21,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,12 +33,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -49,37 +50,38 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.service.ListingStateProcessingServ
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @ExtendWith(MockitoExtension.class)
-class UpdateOtherPartyHandlerTest {
+public class UpdateOtherPartyHandlerTest {
 
-    private UpdateOtherPartyHandler handler;
     @Mock
     private UpdateCcdCaseService updateCcdCaseService;
     @Mock
     private IdamService idamService;
+
+    UpdateOtherPartyHandler handler;
+
     @Captor
     private ArgumentCaptor<Consumer<SscsCaseDetails>> consumerArgumentCaptor;
 
     @BeforeEach
-    void setUp() {
-        handler = new UpdateOtherPartyHandler(new ListingStateProcessingService(updateCcdCaseService, idamService), false);
+    public void setUp() {
+        handler = new UpdateOtherPartyHandler(new ListingStateProcessingService(updateCcdCaseService, idamService));
     }
 
     @Test
-    void givenAValidSubmittedEvent_thenReturnTrue() {
-        assertTrue(handler.canHandle(SUBMITTED, HandlerHelper.buildTestCallbackForGivenData(
-            buildAValidEvent(), INTERLOCUTORY_REVIEW_STATE, UPDATE_OTHER_PARTY_DATA)));
-    }
-
-    @Test
-    void givenTheOtherPartyConfidentialityFlagIsEnabled_thenReturnFalse() {
-        handler = new UpdateOtherPartyHandler(new ListingStateProcessingService(updateCcdCaseService, idamService), true);
-        assertFalse(handler.canHandle(SUBMITTED, HandlerHelper.buildTestCallbackForGivenData(
-            buildAValidEvent(), INTERLOCUTORY_REVIEW_STATE, UPDATE_OTHER_PARTY_DATA)));
+    public void givenAValidSubmittedEvent_thenReturnTrue() {
+        Assertions.assertTrue(handler.canHandle(SUBMITTED, HandlerHelper.buildTestCallbackForGivenData(
+            SscsCaseData.builder()
+                .ccdCaseId("1")
+                .isFqpmRequired(YES)
+                .directionDueDate(LocalDate.now().toString())
+                .otherParties(List.of(buildOtherParty("2", HearingOptions.builder().build())))
+                .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build())
+                    .build()).build(), INTERLOCUTORY_REVIEW_STATE, UPDATE_OTHER_PARTY_DATA)));
     }
 
     @ParameterizedTest
     @MethodSource(value = "generateAllPossibleOtherPartyWithHearingOptions")
-    void givenFqpmSetAndDueDateSetAndAllOtherPartyHearingOptionsSet_thenCaseStateIsReadyToList(HearingOptions hearingOptions) {
+    public void givenFqpmSetAndDueDateSetAndAllOtherPartyHearingOptionsSet_thenCaseStateIsReadyToList(HearingOptions hearingOptions) {
 
         final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(
             SscsCaseData.builder()
@@ -102,7 +104,7 @@ class UpdateOtherPartyHandlerTest {
 
     @ParameterizedTest
     @MethodSource(value = "generateAllPossibleOtherPartyWithHearingOptions")
-    void givenFqpmSetAndNoDueDateSetAndAllOtherPartyHearingOptionsSet_thenCaseStateIsReadyToList(HearingOptions hearingOptions) {
+    public void givenFqpmSetAndNoDueDateSetAndAllOtherPartyHearingOptionsSet_thenCaseStateIsReadyToList(HearingOptions hearingOptions) {
 
         final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(
             SscsCaseData.builder()
@@ -121,7 +123,7 @@ class UpdateOtherPartyHandlerTest {
 
     @ParameterizedTest
     @CsvSource({"YES", "NO"})
-    void givenFqpmSetAndNoDueDateSetAndNotAllOtherPartyHearingOptionsSet_thenCaseStateIsReadyToList(String isFqpmRequired) {
+    public void givenFqpmSetAndNoDueDateSetAndNotAllOtherPartyHearingOptionsSet_thenCaseStateIsReadyToList(String isFqpmRequired) {
 
         final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(
             SscsCaseData.builder()
@@ -142,7 +144,7 @@ class UpdateOtherPartyHandlerTest {
 
     @ParameterizedTest
     @CsvSource({"YES", "NO"})
-    void givenFqpmSetAndDueDateSetAndNotAllOtherPartyHearingOptionsSet_thenCaseStateIsNotListable(String isFqpmRequired) {
+    public void givenFqpmSetAndDueDateSetAndNotAllOtherPartyHearingOptionsSet_thenCaseStateIsNotListable(String isFqpmRequired) {
 
         final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(
             SscsCaseData.builder()
@@ -161,7 +163,7 @@ class UpdateOtherPartyHandlerTest {
     }
 
     @Test
-    void givenNoFqpmSetAndNoDueDateSetAndNotAllOtherPartyHearingOptionsSet_thenCaseStateIsNotListable() {
+    public void givenNoFqpmSetAndNoDueDateSetAndNotAllOtherPartyHearingOptionsSet_thenCaseStateIsNotListable() {
 
         final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(
             SscsCaseData.builder()
@@ -179,7 +181,7 @@ class UpdateOtherPartyHandlerTest {
     }
 
     @Test
-    void givenNoFqpmSetAndDueDateSetAndNotAllOtherPartyHearingOptionsSet_thenCaseStateIsNotListable() {
+    public void givenNoFqpmSetAndDueDateSetAndNotAllOtherPartyHearingOptionsSet_thenCaseStateIsNotListable() {
 
         final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(
             SscsCaseData.builder()
@@ -198,8 +200,7 @@ class UpdateOtherPartyHandlerTest {
 
     @ParameterizedTest
     @MethodSource(value = "generateAllPossibleOtherPartyWithHearingOptions")
-    void givenNoFqpmSetAndNoDueDateSetAndAllOtherPartyHearingOptionsSet_thenCaseStateIsNotListable(
-        HearingOptions hearingOptions) {
+    public void givenNoFqpmSetAndNoDueDateSetAndAllOtherPartyHearingOptionsSet_thenCaseStateIsNotListable(HearingOptions hearingOptions) {
 
         final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(
             SscsCaseData.builder()
@@ -221,7 +222,7 @@ class UpdateOtherPartyHandlerTest {
         "HEARING, 1", "INCOMPLETE_APPLICATION, 1", "INCOMPLETE_APPLICATION_INFORMATION_REQUESTED, 1",
         "INTERLOCUTORY_REVIEW_STATE, 1", "POST_HEARING, 1", "READY_TO_LIST, 1", "RESPONSE_RECEIVED, 0",
         "VALID_APPEAL, 1", "WITH_DWP, 0"})
-    void givenAnInitialStateThenTriggerNonListableEventType(State currentState, int wantedNumberOfInvocations) {
+    public void givenAnInitialStateThenTriggerNonListableEventType(State currentState, int wantedNumberOfInvocations) {
         final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(
             SscsCaseData.builder()
                 .ccdCaseId("1")
@@ -233,8 +234,7 @@ class UpdateOtherPartyHandlerTest {
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
-        verify(updateCcdCaseService, times(wantedNumberOfInvocations)).triggerCaseEventV2(
-            eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+        verify(updateCcdCaseService, times(wantedNumberOfInvocations)).triggerCaseEventV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
             eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any());
     }
 
@@ -273,16 +273,6 @@ class UpdateOtherPartyHandlerTest {
         };
     }
 
-    private SscsCaseData buildAValidEvent() {
-        return SscsCaseData.builder()
-            .ccdCaseId("1")
-            .isFqpmRequired(YES)
-            .directionDueDate(LocalDate.now().toString())
-            .otherParties(List.of(buildOtherParty("2", HearingOptions.builder().build())))
-            .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build())
-                .build()).build();
-    }
-
     private CcdValue<OtherParty> buildOtherParty(String id, HearingOptions hearingOptions) {
         return CcdValue.<OtherParty>builder()
             .value(OtherParty.builder()
@@ -293,4 +283,14 @@ class UpdateOtherPartyHandlerTest {
             .build();
     }
 
+    private CcdValue<OtherParty> buildOtherPartyWithAppointeeAndRep(String id, String appointeeId, String repId) {
+        return CcdValue.<OtherParty>builder()
+            .value(OtherParty.builder()
+                .id(id)
+                .isAppointee(YES.getValue())
+                .appointee(Appointee.builder().id(appointeeId).build())
+                .rep(Representative.builder().id(repId).hasRepresentative(YES.getValue()).build())
+                .build())
+            .build();
+    }
 }

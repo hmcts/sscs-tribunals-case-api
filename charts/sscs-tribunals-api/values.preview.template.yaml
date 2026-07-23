@@ -42,12 +42,12 @@ java:
     ELINKS_V2_FEATURE_ENABLED: true
     DELETED_REDACTED_DOC_ENABLED: true
     TESTING_SUPPORT_ENABLED: true
-    POSTPONEMENTS_FEATURE: true
     EXUI_API_URL: "https://${SERVICE_NAME}-xui"
     ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
     ROBOTICS_EMAIL_TO: "fake"
     ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
     ROBOTICS_EMAIL_PIP_AE_TO: "fake3"
+    ISSUE_GENERIC_LETTER: true
     COH_URL: "http://coh-cor-aat.service.core-compute-aat.internal"
     ONLINE_HEARING_LINK: "https://sscs-cor-frontend-aat.service.core-compute-aat.internal"
     JOB_SCHEDULER_DB_NAME: "{{ tpl .Values.global.databaseNamePrefix $}}sscs-job-scheduler"
@@ -65,7 +65,7 @@ java:
     SCOTTISH_PO_BOX_ENABLED: true
     TRIBUNAL_INTERNAL_DOCUMENTS_ENABLED: true
     IBC_NI_POSTCODES_FEATURE: true
-    CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED: true
+    CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED: false
   secrets:
     JOB_SCHEDULER_DB_PASSWORD:
       secretRef: postgres
@@ -80,8 +80,9 @@ am-org-role-mapping-service:
     ingressHost: orm-${SERVICE_FQDN}
     releaseNameOverride: ${SERVICE_NAME}-am-org-role-mapping-service
     devmemoryRequests: 1024Mi
+    devcpuRequests: 250m
     devmemoryLimits: 2048Mi
-    devcpuRequests: 50m
+    devcpuLimits: 1500m
     secrets:
       SB_ACCESS_KEY:
         secretRef: sscs-sb-preview
@@ -144,8 +145,6 @@ aac-manage-case-assignment:
     releaseNameOverride: ${SERVICE_NAME}-aac-manage-case-assignment
     image: hmctsprod.azurecr.io/aac/manage-case-assignment:latest
     ingressHost: aac-${SERVICE_FQDN}
-    devcpuRequests: 50m
-    devcpuLimits: 250m
     environment:
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
@@ -187,10 +186,8 @@ em-ccdorc:
     image: hmctsprod.azurecr.io/em/ccdorc:latest
     releaseNameOverride: ${SERVICE_NAME}-em-ccdorc
     ingressHost: em-ccdorc-${SERVICE_FQDN}
-    devcpuRequests: 50m
-    devcpuLimits: 250m
     environment:
-      IDAM_WEB_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
+      IDAM_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
       OPEN_ID_API_BASE_URI: https://idam-web-public.aat.platform.hmcts.net/o
       S2S_BASE_URI: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
       EM_STITCHING_API_URL: ${EM_STITCHING_API_URL}
@@ -199,9 +196,6 @@ em-ccdorc:
       CALLBACK_HTTP_SCHEME: https
       CALLBACK_DOMAIN: em-ccdorc-${SERVICE_FQDN}
       LOGGING_LEVEL_UK_GOV_HMCTS_REFORM_EM: DEBUG
-      IDAM_SECURITY_ALLOWED_ISSUERS_0: https://idam-web-public.aat.platform.hmcts.net/o
-      IDAM_SECURITY_ALLOWED_ISSUERS_1: https://hmcts-access.aat.platform.hmcts.net/o
-      IDAM_SECURITY_ALLOWED_ISSUERS_2: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts
     keyVaults:
       em-ccdorc:
         resourceGroup: em-ccdorc
@@ -217,15 +211,13 @@ em-stitching:
     image: hmctsprod.azurecr.io/em/stitching:latest
     releaseNameOverride: ${SERVICE_NAME}-em-stitching
     ingressHost: em-stitching-${SERVICE_FQDN}
-    devcpuRequests: 50m
-    devcpuLimits: 250m
     environment:
       SPRING_DATASOURCE_HOST: '{{ tpl .Values.global.postgresHostname $}}'
       SPRING_DATASOURCE_NAME: "{{ tpl .Values.global.databaseNamePrefix $}}emstitch"
       SPRING_DATASOURCE_OPTIONS: "?ssl=disable"
       SPRING_DATASOURCE_PORT: 5432
       SPRING_DATASOURCE_USERNAME: "{{ tpl .Values.global.postgresUsername $}}"
-      IDAM_WEB_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
+      IDAM_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
       OPEN_ID_API_BASE_URI: https://idam-web-public.aat.platform.hmcts.net/o
       S2S_BASE_URI: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
       DM_STORE_APP_URL: http://dm-store-aat.service.core-compute-aat.internal
@@ -234,9 +226,6 @@ em-stitching:
       RUN_DB_MIGRATION_ON_STARTUP: true
       FLYWAY_POSTGRESQL_TRANSACTIONAL_LOCK: false
       LOGGING_LEVEL_UK_GOV_HMCTS_REFORM_EM: DEBUG
-      IDAM_SECURITY_ALLOWED_ISSUERS_0: https://idam-web-public.aat.platform.hmcts.net/o
-      IDAM_SECURITY_ALLOWED_ISSUERS_1: https://hmcts-access.aat.platform.hmcts.net/o
-      IDAM_SECURITY_ALLOWED_ISSUERS_2: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts
     secrets:
       SPRING_DATASOURCE_PASSWORD:
         secretRef: postgres
@@ -253,8 +242,6 @@ em-stitching:
 
 ccd-case-document-am-api:
   enabled: ${PREVIEW_BRANCH_WITH_LOCAL_CCD}
-  devcpuRequests: 50m
-  devcpuLimits: 250m
   java:
     image: hmctsprod.azurecr.io/ccd/case-document-am-api:latest
     releaseNameOverride: ${SERVICE_NAME}-ccd-case-document-am-api
@@ -272,8 +259,8 @@ xui-webapp:
   nodejs:
     devmemoryRequests: "512Mi"
     devmemoryLimits: "1Gi"
-    devcpuRequests: 50m
-    devcpuLimits: 250m
+    devcpuRequests: "200m"
+    devcpuLimits: "1000m"
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
     image: hmctsprod.azurecr.io/xui/webapp:latest
@@ -365,6 +352,10 @@ ccd:
   am-role-assignment-service:
     java:
       ingressHost: am-role-assignment-service-${SERVICE_FQDN}
+      autoscaling:
+        enabled: false
+        minReplicas: 1
+        maxReplicas: 1
       environment:
         ROLE_ASSIGNMENT_DB_USERNAME: hmcts
         ROLE_ASSIGNMENT_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
@@ -394,33 +385,13 @@ ccd:
           disabled: false
 
   elasticsearch:
-    image: hmctsprod.azurecr.io/imported/elastic/elasticsearch
-    imageTag: 9.2.3
     nameOverride: ${SERVICE_NAME}-es
     clusterName: "es"
-    createCert: false
-    protocol: http
     replicas: 1
-    minimumMasterNodes: 1
-    antiAffinity: "soft"
-    esJavaOpts: "-Xmx512m -Xms512m"
-    # Their tests delete the pod after succeeding, we pass --logs to the test command which fail if the pod has already been deleted
-    # The tests do pass, at least as of 2023-01-19
-    tests:
-      enabled: false
-    esConfig:
-      elasticsearch.yml: |
-        action.auto_create_index: .security*,.watches,.triggered_watches,.watcher-history-*,.logstash_dead_letter,.ml*,ccd-logstash-dead-letter
-        xpack.security.enabled: false
-    persistence:
-      enabled: false
-    ingress:
-      enabled: false
-      className: traefik
 
   logstash:
-    image: hmctsprod.azurecr.io/imported/elastic/logstash
-    imageTag: "9.2.4"
+    image: hmctsprod.azurecr.io/imported/logstash/logstash
+    imageTag: "7.16.1"
     imagePullPolicy: "IfNotPresent"
     logstashJavaOpts: -Xmx1g -Xms512M
     persistence:
@@ -431,7 +402,7 @@ ccd:
     extraInitContainers: |
       - name: download-postgres-jdbc
         image: hmctsprod.azurecr.io/curl:7.70.0
-        command: ['curl', '-L', 'https://jdbc.postgresql.org/download/postgresql-42.7.9.jar', '-o', '/logstash-lib/postgresql.jar']
+        command: ['curl', '-L', 'https://jdbc.postgresql.org/download/postgresql-42.3.3.jar', '-o', '/logstash-lib/postgresql.jar']
         volumeMounts:
         - name: logstash-lib
           mountPath: /logstash-lib
@@ -449,11 +420,10 @@ ccd:
         readOnly: true
     logstashConfig:
       logstash.yml: |
-        api.http.host: 0.0.0.0
+        http.host: 0.0.0.0
         xpack.monitoring.enabled: false
         queue.type: persisted
         dead_letter_queue.enable: true
-        pipeline.ecs_compatibility: disabled
       pipelines.yml: |
         - pipeline.id: main
           path.config: "/usr/share/logstash/pipeline/{01_input,02_filter,03_output}.conf"
@@ -623,11 +593,10 @@ ccd:
 
   ccd-definition-store-api:
     java:
-      image: hmctsprod.azurecr.io/ccd/definition-store-api:latest
       disableKeyVaults: true
       devmemoryRequests: '1024Mi'
       devmemoryLimits: '2048Mi'
-      devcpuRequests: 50m
+      devcpuRequests: '500m'
       autoscaling:
         enabled: false
         minReplicas: 1
@@ -640,7 +609,6 @@ ccd:
         DEFINITION_STORE_TX_TIMEOUT_DEFAULT: 360
         ELASTIC_SEARCH_ENABLED: true
         ELASTIC_SEARCH_HOST: ${SERVICE_NAME}-es-master
-        ELASTIC_SEARCH_SCHEME: http
         WELSH_TRANSLATION_ENABLED: false
         DEFINITION_STORE_DB_USERNAME: hmcts
       secrets:
@@ -656,8 +624,7 @@ ccd:
       imagePullPolicy: Always
       devmemoryRequests: '1524Mi'
       devmemoryLimits: '2048Mi'
-      devcpuRequests: 50m
-      devcpuLimits: 500m
+      devcpuRequests: '500m'
       environment:
         DATA_STORE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
         DATA_STORE_DB_USERNAME: hmcts
@@ -668,7 +635,6 @@ ccd:
         IDAM_API_BASE_URL: https://idam-api.aat.platform.hmcts.net
         IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
         DATA_STORE_CROSS_JURISDICTIONAL_ROLES: caseworker-caa,caseworker-approver
-        ELASTIC_SEARCH_SCHEME: http
         ELASTIC_SEARCH_ENABLED: true
         ELASTIC_SEARCH_HOSTS: ${SERVICE_NAME}-es-master:9200
         ELASTIC_SEARCH_DATA_NODES_HOSTS:  http://${SERVICE_NAME}-es-master:9200
@@ -729,7 +695,7 @@ sscs-tribunals-frontend:
       prefix: iba
       primaryIngressHost: sya-${SERVICE_FQDN}
     environment:
-      REDIS_URL: redis://${SERVICE_NAME}-hmcts-redis-master
+      REDIS_URL: redis://${SERVICE_NAME}-redis-master
       APPINSIGHTS_ROLE_NAME: ${SERVICE_NAME}
       PCQ_URL: "https://pcq.aat.platform.hmcts.net"
       FT_ANTENNA_WEBCHAT: false
@@ -741,7 +707,6 @@ sscs-tribunals-frontend:
       UPLOAD_EVIDENCE_URL: http://${SERVICE_NAME}-java/evidence/upload
       SERVICES_IDAM_LOGIN_URL: https://idam-web-public.aat.platform.hmcts.net/login
       SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
-      S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
       UV_THREADPOOL_SIZE: 64
       IBC_NI_POSTCODES_FEATURE: true
     keyVaults:
@@ -753,22 +718,22 @@ sscs-tribunals-frontend:
           - pcq-token-key
           - sscs-redis-access-key
           - sscs-redis-connection-string
-          - sscs-s2s-secret
 
-hmcts-redis:
+redis:
   enabled: true
-  architecture: standalone
-  auth:
+  serviceAccount:
+    create: false
+    name: "sscs"
+    automountServiceAccountToken: true
+  replica:
+    replicaCount: 0
+  cluster:
     enabled: false
-    sentinel: false
-  image:
-    registry: hmctsprod.azurecr.io
-    repository: imported/redis
-    tag: 8.2.1
-  sentinel:
-    enabled: false
-  metrics:
-    enabled: false
+    slaveCount: 0
+  usePassword: false
+  master:
+    persistence:
+      enabled: false
 
 
 #Enable for queues/topics

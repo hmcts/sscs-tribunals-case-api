@@ -70,9 +70,7 @@ public class WriteFinalDecisionTemplateBody {
     @JsonProperty("appointee_on_case")
     private boolean appointeeOnCase;
     @JsonProperty("other_party_names_attended_hearing")
-    private List<String> otherPartyNamesAttendedHearing;
-    @JsonProperty("other_party_names_did_not_attend_hearing")
-    private List<String> otherPartyNamesDidNotAttendHearing;
+    private String otherPartyNamesAttendedHearing;
     @JsonProperty("presenting_officer_attended")
     private boolean presentingOfficerAttended;
     @JsonProperty("is_descriptor_flow")
@@ -127,6 +125,4 @@ public class WriteFinalDecisionTemplateBody {
     private LocalDate ucCapabilityAssessmentStartDate;
     @JsonProperty("esa_regulations_year")
     private String esaRegulationsYear;
-    @JsonProperty("severe_criteria_applies")
-    private Boolean severeCriteriaApplies;
 }

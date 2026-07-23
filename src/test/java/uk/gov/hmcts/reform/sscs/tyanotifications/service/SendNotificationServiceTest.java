@@ -207,6 +207,7 @@ public class SendNotificationServiceTest {
     @Captor
     private ArgumentCaptor captorLoggingEvent;
 
+
     @Captor
     private ArgumentCaptor<String> smsTemplateIdCaptor;
 

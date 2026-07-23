@@ -21,9 +21,4 @@ export class OtherPartyDetails {
       )
     ).toBeVisible();
   }
-    async verifyPageContentByRoleWithLocator(fieldLabel: string, fieldValue: string) {
-      await this.page
-        .getByRole('row', { name: `${fieldLabel} ${fieldValue}`, exact: true })
-        .locator(`//tr[.='${fieldLabel}${fieldValue}']`);
-    }
 }

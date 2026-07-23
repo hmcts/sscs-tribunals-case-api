@@ -28,12 +28,6 @@ export default defineConfig({
         port: 9223,
         printSteps: true
       }
-    ],
-    [
-      'json',
-      {
-        outputFile: 'playwright-report/test-results.json'
-      }
     ]
   ],
   use: {

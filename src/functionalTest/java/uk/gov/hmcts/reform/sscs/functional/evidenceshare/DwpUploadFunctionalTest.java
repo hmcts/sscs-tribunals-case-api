@@ -1,11 +1,9 @@
 package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
 import static java.util.Collections.singletonList;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_TEST_CASE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DWP_UPLOAD_RESPONSE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SEND_TO_DWP_OFFLINE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 
 import java.io.File;
@@ -37,7 +35,7 @@ class DwpUploadFunctionalTest extends AbstractFunctionalTest {
     void dwpUploadResponseEventSendsToReadyToList() throws IOException {
 
         SscsCaseDetails createdCase = createCaseWithState(CREATE_TEST_CASE, "UC", "Universal Credit",
-            READY_TO_LIST.getId(), null);
+            READY_TO_LIST.getId());
 
         //Get case into correct state without triggering any callbacks that cause race conditions
         updateCaseEvent(SEND_TO_DWP_OFFLINE, createdCase);
@@ -59,8 +57,7 @@ class DwpUploadFunctionalTest extends AbstractFunctionalTest {
 
         defaultAwait().untilAsserted(() -> {
             SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
-            assertThat(caseDetails).isNotNull();
-            assertThat(caseDetails.getState()).isNotNull().isEqualTo("readyToList");
+            assertEquals("readyToList", caseDetails.getState());
         });
     }
 

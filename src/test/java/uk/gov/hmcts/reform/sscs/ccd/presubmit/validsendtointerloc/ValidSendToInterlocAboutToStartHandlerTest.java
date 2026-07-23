@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_SEND_TO_INTERLOC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW;
@@ -15,14 +15,11 @@ import static uk.gov.hmcts.reform.sscs.model.PartyItemList.REPRESENTATIVE;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -30,8 +27,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
@@ -41,7 +36,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @ExtendWith(MockitoExtension.class)
-class ValidSendToInterlocAboutToStartHandlerTest {
+public class ValidSendToInterlocAboutToStartHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
@@ -56,8 +51,8 @@ class ValidSendToInterlocAboutToStartHandlerTest {
     private SscsCaseData sscsCaseData;
 
     @BeforeEach
-    void setUp() {
-        handler = new ValidSendToInterlocAboutToStartHandler(false, false, false);
+    public void setUp() {
+        handler = new ValidSendToInterlocAboutToStartHandler(false, false);
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
     }
 
@@ -71,13 +66,13 @@ class ValidSendToInterlocAboutToStartHandlerTest {
     @EnumSource(value = EventType.class, names = {"APPEAL_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
     void givenANonHandleEvidenceEvent_thenReturnFalse(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
-        assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
+        assertFalse(handler.canHandle(ABOUT_TO_START, callback));
     }
 
     @ParameterizedTest
     @EnumSource(value = CallbackType.class, names = {"ABOUT_TO_SUBMIT", "MID_EVENT", "SUBMITTED"})
     void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
-        assertThat(handler.canHandle(callbackType, callback)).isFalse();
+        assertFalse(handler.canHandle(callbackType, callback));
     }
 
     @ParameterizedTest
@@ -86,132 +81,90 @@ class ValidSendToInterlocAboutToStartHandlerTest {
         when(callback.getEvent()).thenReturn(eventType);
         setupCallback();
 
-        final List<DynamicListItem> listOptions = new ArrayList<>();
+        List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()));
         listOptions.add(new DynamicListItem(REVIEW_BY_JUDGE.getId(), REVIEW_BY_JUDGE.getLabel()));
-        final DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
+        DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getSelectWhoReviewsCase()).isEqualTo(expected);
+        assertEquals(expected, response.getData().getSelectWhoReviewsCase());
     }
 
     @ParameterizedTest
     @EnumSource(value = EventType.class, names = {"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
-    void givenPostponementsFeatureOn_populatesSelectWhoReviewsCaseDropDown(EventType eventType) {
+    public void givenPostponementsFeatureOn_populatesSelectWhoReviewsCaseDropDown(EventType eventType) {
         ReflectionTestUtils.setField(handler, "postponementsFeature", true);
 
         when(callback.getEvent()).thenReturn(eventType);
         setupCallback();
 
-        final List<DynamicListItem> listOptions = new ArrayList<>();
+        List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()));
         listOptions.add(new DynamicListItem(REVIEW_BY_JUDGE.getId(), REVIEW_BY_JUDGE.getLabel()));
         listOptions.add(new DynamicListItem(POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId(), POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getLabel()));
-        final DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
+        DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getSelectWhoReviewsCase()).isEqualTo(expected);
+        assertEquals(expected, response.getData().getSelectWhoReviewsCase());
     }
 
     @Test
-    void givenAValidSendToInterlocRequestWithRep_thenPopulateDropdownWithPartiesOnCase() {
+    public void givenAValidSendToInterlocRequestWithRep_thenPopulateDropdownWithPartiesOnCase() {
         setupCallback();
         sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative("Yes").build());
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        final DynamicList result = response.getData().getOriginalSender();
-        assertThat(result.getListItems()).hasSize(2);
+        DynamicList result = response.getData().getOriginalSender();
+        assertEquals(2, result.getListItems().size());
 
-        final DynamicListItem expectedListItem1 = new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel());
-        final DynamicListItem expectedListItem2 = new DynamicListItem(REPRESENTATIVE.getCode(), REPRESENTATIVE.getLabel());
-        final List<DynamicListItem> expectedList = new ArrayList<>();
+        DynamicListItem expectedListItem1 = new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel());
+        DynamicListItem expectedListItem2 = new DynamicListItem(REPRESENTATIVE.getCode(), REPRESENTATIVE.getLabel());
+        List<DynamicListItem> expectedList = new ArrayList<>();
         expectedList.add(expectedListItem1);
         expectedList.add(expectedListItem2);
 
-        assertThat(response.getData().getOriginalSender()).isEqualTo(new DynamicList(expectedListItem1, expectedList));
+        assertEquals(new DynamicList(expectedListItem1, expectedList), response.getData().getOriginalSender());
     }
 
     @Test
-    void givenAValidSendToInterlocRequestWithJointParty_thenPopulateDropdownWithPartiesOnCase() {
+    public void givenAValidSendToInterlocRequestWithJointParty_thenPopulateDropdownWithPartiesOnCase() {
         setupCallback();
         sscsCaseData.getJointParty().setHasJointParty(YES);
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        final DynamicList result = response.getData().getOriginalSender();
-        assertThat(result.getListItems()).hasSize(2);
+        DynamicList result = response.getData().getOriginalSender();
+        assertEquals(2, result.getListItems().size());
 
-        final DynamicListItem expectedListItem1 = new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel());
-        final DynamicListItem expectedListItem2 = new DynamicListItem(JOINT_PARTY.getCode(), JOINT_PARTY.getLabel());
-        final List<DynamicListItem> expectedList = new ArrayList<>();
+        DynamicListItem expectedListItem1 = new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel());
+        DynamicListItem expectedListItem2 = new DynamicListItem(JOINT_PARTY.getCode(), JOINT_PARTY.getLabel());
+        List<DynamicListItem> expectedList = new ArrayList<>();
         expectedList.add(expectedListItem1);
         expectedList.add(expectedListItem2);
 
-        assertThat(response.getData().getOriginalSender()).isEqualTo(new DynamicList(expectedListItem1, expectedList));
+        assertEquals(new DynamicList(expectedListItem1, expectedList), response.getData().getOriginalSender());
     }
 
     @Test
-    void givenAValidSendToInterlocRequestWithJointPartyAndRep_thenPopulateDropdownWithPartiesOnCase() {
+    public void givenAValidSendToInterlocRequestWithJointPartyAndRep_thenPopulateDropdownWithPartiesOnCase() {
         setupCallback();
         sscsCaseData.getJointParty().setHasJointParty(YES);
         sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative("Yes").build());
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        final DynamicList result = response.getData().getOriginalSender();
-        assertThat(result.getListItems()).hasSize(3);
+        DynamicList result = response.getData().getOriginalSender();
+        assertEquals(3, result.getListItems().size());
 
-        final DynamicListItem expectedListItem1 = new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel());
-        final DynamicListItem expectedListItem2 = new DynamicListItem(JOINT_PARTY.getCode(), JOINT_PARTY.getLabel());
-        final DynamicListItem expectedListItem3 = new DynamicListItem(REPRESENTATIVE.getCode(), REPRESENTATIVE.getLabel());
-        final List<DynamicListItem> expectedList = new ArrayList<>();
+        DynamicListItem expectedListItem1 = new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel());
+        DynamicListItem expectedListItem2 = new DynamicListItem(JOINT_PARTY.getCode(), JOINT_PARTY.getLabel());
+        DynamicListItem expectedListItem3 = new DynamicListItem(REPRESENTATIVE.getCode(), REPRESENTATIVE.getLabel());
+        List<DynamicListItem> expectedList = new ArrayList<>();
         expectedList.add(expectedListItem1);
         expectedList.add(expectedListItem2);
         expectedList.add(expectedListItem3);
 
-        assertThat(response.getData().getOriginalSender()).isEqualTo(new DynamicList(expectedListItem1, expectedList));
-    }
-
-    private static Stream<Arguments> benefitStates() {
-        return Stream.of(Arguments.of(VALID_SEND_TO_INTERLOC, Benefit.CHILD_SUPPORT),
-                Arguments.of(ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE, Benefit.CHILD_SUPPORT),
-                Arguments.of(VALID_SEND_TO_INTERLOC, Benefit.UC),
-                Arguments.of(ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE, Benefit.UC)
-                );
-    }
-
-    @ParameterizedTest
-    @MethodSource("benefitStates")
-    void givenFlagEnabledAndBenefit_thenSelectedConfidentialityPartyHasNoDefaultSelection(EventType eventType, Benefit benefit) {
-        handler = new ValidSendToInterlocAboutToStartHandler(false, false, true);
-        when(callback.getEvent()).thenReturn(eventType);
-        setupCallback();
-        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(benefit.getShortName()).build());
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode()).isEmpty();
-    }
-
-    @Test
-    void givenFlagEnabledAndNonChildSupport_thenSelectedConfidentialityPartyIsNotSet() {
-        handler = new ValidSendToInterlocAboutToStartHandler(false, false, true);
-        setupCallback();
-        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("PIP").build());
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty()).isNull();
-    }
-
-    @Test
-    void givenFlagDisabledAndNonChildSupport_thenSelectedConfidentialityPartyIsNotSet() {
-        setupCallback();
-        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("PIP").build());
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty()).isNull();
+        assertEquals(new DynamicList(expectedListItem1, expectedList), response.getData().getOriginalSender());
     }
 }

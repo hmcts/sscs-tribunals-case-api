@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.DORMANT_APPEAL_STATE;
 
@@ -14,7 +14,7 @@ class DormantCaseFunctionalTest extends AbstractFunctionalTest {
     @Test
     void otherDetailsChangedTest() throws Exception {
         SscsCaseDetails createdCase = createCaseWithState(CREATE_TEST_CASE, "Child Support",
-            "Child Support", State.VALID_APPEAL.getId(), null);
+            "Child Support", State.VALID_APPEAL.getId());
         updateCaseEvent(DORMANT, createdCase);
 
         String json = getJson(UPDATE_OTHER_PARTY_DATA.getCcdType());
@@ -25,6 +25,6 @@ class DormantCaseFunctionalTest extends AbstractFunctionalTest {
 
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
 
-        assertThat(caseDetails.getState()).isEqualTo(DORMANT_APPEAL_STATE.toString());
+        assertEquals(DORMANT_APPEAL_STATE.toString(), caseDetails.getState());
     }
 }

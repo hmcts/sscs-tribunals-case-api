@@ -1,16 +1,15 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen.scenarios;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.util.Arrays;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen.GenTemplateContent;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
-class GenScenarioNonDescriptorAllowedTest {
+public class GenScenarioNonDescriptorAllowedTest {
 
     @Test
-    void testScenario() {
+    public void testScenario() {
 
         WriteFinalDecisionTemplateBody body =
             WriteFinalDecisionTemplateBody.builder()
@@ -29,26 +28,24 @@ class GenScenarioNonDescriptorAllowedTest {
 
         GenTemplateContent content = GenScenario.SCENARIO_NON_DESCRIPTOR.getContent(body);
 
-        String expectedContent = """
-            The appeal is allowed.
+        String expectedContent = "The appeal is allowed.\n"
+                + "\n"
+                + "The decision made by the Secretary of State on 20/09/2020 is set aside.\n"
+                + "\n"
+                + "My summary\n"
+                + "\n"
+                + "My first reasons\n"
+                + "\n"
+                + "My second reasons\n"
+                + "\n"
+                + "Something else\n"
+                + "\n"
+                + "This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative did not attend.\n"
+                + "\n";
 
-            The decision made by the Secretary of State on 20/09/2020 is set aside.
+        Assert.assertEquals(7, content.getComponents().size());
 
-            My summary
-
-            My first reasons
-
-            My second reasons
-
-            Something else
-
-            This has been an oral (face to face) hearing. The following people attended: Felix Sydney the appellant. A representative from the First Tier Agency did not attend. The Tribunal considered the appeal bundle to page A1.
-
-            """;
-
-        assertEquals(7, content.getComponents().size());
-
-        assertEquals(expectedContent, content.toString());
+        Assert.assertEquals(expectedContent, content.toString());
 
     }
 

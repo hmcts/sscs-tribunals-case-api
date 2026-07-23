@@ -118,10 +118,6 @@ public class SscsUtil {
             .orElse(null);
     }
 
-    public static boolean isBenefitTypeChildSupportOrUc(SscsCaseData sscsCaseData) {
-        return sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT) || sscsCaseData.isBenefitType(Benefit.UC);
-    }
-
     public static boolean isValidCaseState(State state, List<State> allowedStates) {
         return allowedStates.contains(state);
     }
@@ -778,5 +774,6 @@ public class SscsUtil {
             return sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode();
         }
     }
+
 }
 

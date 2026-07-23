@@ -101,7 +101,7 @@ export class UploadDocumentFurtherEvidence extends BaseStep {
     caseId: string
   ) {
     // Verify CTSC Admin as allocated caseworker can see the assigned Action Unprocessed Correspondence task
-    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
+    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
     await this.homePage.navigateToTab('Tasks');
     await this.tasksTab.verifyTaskIsDisplayed(aucTask.name);
 
@@ -150,7 +150,7 @@ export class UploadDocumentFurtherEvidence extends BaseStep {
     caseId: string
   ) {
     // Verify CTSC Admin as allocated caseworker can see the assigned Review Bi-Lingual Document - CTSC task
-    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
+    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
     await this.homePage.navigateToTab('Tasks');
     await this.tasksTab.verifyTaskIsDisplayed(rbdTask.name);
 
@@ -211,7 +211,7 @@ export class UploadDocumentFurtherEvidence extends BaseStep {
     caseId: string
   ) {
     // Verify CTSC Admin can view the unassigned Review Bi-Lingual Document task
-    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
+    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
     await this.homePage.navigateToTab('Tasks');
     await this.tasksTab.verifyTaskIsDisplayed(rbdTask.name);
     await this.tasksTab.verifyPageContentByKeyValue(
@@ -233,7 +233,7 @@ export class UploadDocumentFurtherEvidence extends BaseStep {
     caseId: string
   ) {
     // CTSC Admin verifies task is removed from the tasks list within Tasks tab
-    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
+    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
     await this.homePage.navigateToTab('Tasks');
     await this.tasksTab.verifyTaskIsHidden(rbdTask.name);
   }

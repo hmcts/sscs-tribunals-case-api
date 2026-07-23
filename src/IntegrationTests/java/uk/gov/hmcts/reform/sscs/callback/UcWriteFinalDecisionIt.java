@@ -1,10 +1,8 @@
 package uk.gov.hmcts.reform.sscs.callback;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -78,50 +76,48 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Tribunal Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
-        assertTrue(payload.isAllowed());
-        assertTrue(payload.isSetAside());
+        assertEquals(true, payload.isAllowed());
+        assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
         assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
-        assertFalse(payload.isIndefinite());
-        assertTrue(payload.isUcIsEntited());
+        assertEquals(false, payload.isIndefinite());
+        assertEquals(true, payload.isUcIsEntited());
         assertEquals("lower rate", payload.getUcAwardRate());
         Assert.assertNotNull(payload.getUcSchedule6Descriptors());
         assertEquals(1, payload.getUcSchedule6Descriptors().size());
-        assertEquals(15, payload.getUcSchedule6Descriptors().getFirst().getActivityAnswerPoints());
-        assertEquals("a", payload.getUcSchedule6Descriptors().getFirst().getActivityAnswerLetter());
-        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.", payload.getUcSchedule6Descriptors().getFirst().getActivityAnswerValue());
-        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", payload.getUcSchedule6Descriptors().getFirst().getActivityQuestionValue());
-        assertEquals("1", payload.getUcSchedule6Descriptors().getFirst().getActivityQuestionNumber());
+        assertEquals(15, payload.getUcSchedule6Descriptors().get(0).getActivityAnswerPoints());
+        assertEquals("a", payload.getUcSchedule6Descriptors().get(0).getActivityAnswerLetter());
+        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.", payload.getUcSchedule6Descriptors().get(0).getActivityAnswerValue());
+        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", payload.getUcSchedule6Descriptors().get(0).getActivityQuestionValue());
+        assertEquals("1", payload.getUcSchedule6Descriptors().get(0).getActivityQuestionNumber());
         Assert.assertNotNull(payload.getUcNumberOfPoints());
         assertEquals(15, payload.getUcNumberOfPoints().intValue());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().getFirst());
+        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
-        assertEquals("""
-            The appeal is allowed.
-
-            The decision made by the Secretary of State on 01/09/2018 is set aside.
-
-            AN Test has limited capability for work.
-
-            In applying the Work Capability Assessment 15 points were scored from the activities and descriptors in Schedule 6 of the Universal Credit (UC) Regulations 2013 made up as follows:
-
-            1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.\ta.Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.\t15
-
-
-            AN Test does not have limited capability for work-related activity because no descriptor from Schedule 7 of the UC Regulations applied. Schedule 9, paragraph 4 did not apply.
-
-            My reasons for decision
-
-            Something else.
-
-            This has been an oral (face to face) hearing. The following people attended: AN Test the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page A1.
-
-            """, parentPayload.getWriteFinalDecisionTemplateContent().toString());
+        assertEquals("The appeal is allowed.\n"
+            + "\n"
+            + "The decision made by the Secretary of State on 01/09/2018 is set aside.\n"
+            + "\n"
+            + "AN Test has limited capability for work.\n"
+            + "\n"
+            + "In applying the Work Capability Assessment 15 points were scored from the activities and descriptors in Schedule 6 of the Universal Credit (UC) Regulations 2013 made up as follows:\n"
+            + "\n"
+            + "1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.\ta.Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.\t15\n"
+            + "\n"
+            + "\n"
+            + "AN Test does not have limited capability for work-related activity because no descriptor from Schedule 7 of the UC Regulations applied. Schedule 9, paragraph 4 did not apply.\n"
+            + "\n"
+            + "My reasons for decision\n"
+            + "\n"
+            + "Something else.\n"
+            + "\n"
+            + "This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
+                + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
     }
 
     @Test
@@ -158,36 +154,34 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Tribunal Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
-        assertTrue(payload.isAllowed());
-        assertTrue(payload.isSetAside());
+        assertEquals(true, payload.isAllowed());
+        assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
         assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
-        assertFalse(payload.isIndefinite());
-        assertFalse(payload.isUcIsEntited());
+        assertEquals(false, payload.isIndefinite());
+        assertEquals(false, payload.isUcIsEntited());
         assertNull(payload.getUcAwardRate());
         Assert.assertNull(payload.getUcSchedule6Descriptors());
         Assert.assertNull(payload.getUcNumberOfPoints());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().getFirst());
+        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
-        assertEquals("""
-            The appeal is allowed.
-
-            The decision made by the Secretary of State on 01/09/2018 is set aside.
-
-            This is my summary.
-
-            My reasons for decision
-
-            Something else.
-
-            This has been an oral (face to face) hearing. The following people attended: AN Test the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page A1.
-
-            """, parentPayload.getWriteFinalDecisionTemplateContent().toString());
+        assertEquals("The appeal is allowed.\n"
+            + "\n"
+            + "The decision made by the Secretary of State on 01/09/2018 is set aside.\n"
+            + "\n"
+            + "This is my summary.\n"
+            + "\n"
+            + "My reasons for decision\n"
+            + "\n"
+            + "Something else.\n"
+            + "\n"
+            + "This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
+                + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
     }
 
     @Override
@@ -231,49 +225,47 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Tribunal Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
-        assertFalse(payload.isAllowed());
-        assertFalse(payload.isSetAside());
+        assertEquals(false, payload.isAllowed());
+        assertEquals(false, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
         assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
-        assertFalse(payload.isIndefinite());
-        assertFalse(payload.isUcIsEntited());
+        assertEquals(false, payload.isIndefinite());
+        assertEquals(false, payload.isUcIsEntited());
         assertEquals("no award", payload.getUcAwardRate());
         Assert.assertNotNull(payload.getUcSchedule6Descriptors());
         assertEquals(1, payload.getUcSchedule6Descriptors().size());
-        assertEquals(9, payload.getUcSchedule6Descriptors().getFirst().getActivityAnswerPoints());
-        assertEquals("c", payload.getUcSchedule6Descriptors().getFirst().getActivityAnswerLetter());
-        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 100 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 100 metres within a reasonable timescale because of significant discomfort or exhaustion.", payload.getUcSchedule6Descriptors().getFirst().getActivityAnswerValue());
-        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", payload.getUcSchedule6Descriptors().getFirst().getActivityQuestionValue());
-        assertEquals("1", payload.getUcSchedule6Descriptors().getFirst().getActivityQuestionNumber());
+        assertEquals(9, payload.getUcSchedule6Descriptors().get(0).getActivityAnswerPoints());
+        assertEquals("c", payload.getUcSchedule6Descriptors().get(0).getActivityAnswerLetter());
+        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 100 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 100 metres within a reasonable timescale because of significant discomfort or exhaustion.", payload.getUcSchedule6Descriptors().get(0).getActivityAnswerValue());
+        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", payload.getUcSchedule6Descriptors().get(0).getActivityQuestionValue());
+        assertEquals("1", payload.getUcSchedule6Descriptors().get(0).getActivityQuestionNumber());
         Assert.assertNotNull(payload.getUcNumberOfPoints());
         assertEquals(9, payload.getUcNumberOfPoints().intValue());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().getFirst());
+        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
-        assertEquals("""
-            The appeal is refused.
-
-            The decision made by the Secretary of State on 01/09/2018 is confirmed.
-
-            AN Test does not have limited capability for work and cannot be treated as having limited capability for work.
-
-            In applying the Work Capability Assessment 9 points were scored from the activities and descriptors in Schedule 6 of the Universal Credit (UC) Regulations 2013. This is insufficient to meet the threshold for the test. Schedule 8, paragraph 4 of the UC Regulations did not apply.
-
-            1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.\tc.Cannot, unaided by another person, either: (i) mobilise more than 100 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 100 metres within a reasonable timescale because of significant discomfort or exhaustion.\t9
-
-
-            My reasons for decision
-
-            Something else.
-
-            This has been an oral (face to face) hearing. The following people attended: AN Test the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page A1.
-
-            """, parentPayload.getWriteFinalDecisionTemplateContent().toString());
+        assertEquals("The appeal is refused.\n"
+            + "\n"
+            + "The decision made by the Secretary of State on 01/09/2018 is confirmed.\n"
+            + "\n"
+            + "AN Test does not have limited capability for work and cannot be treated as having limited capability for work.\n"
+            + "\n"
+            + "In applying the Work Capability Assessment 9 points were scored from the activities and descriptors in Schedule 6 of the Universal Credit (UC) Regulations 2013. This is insufficient to meet the threshold for the test. Schedule 8, paragraph 4 of the UC Regulations did not apply.\n"
+            + "\n"
+            + "1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.\tc.Cannot, unaided by another person, either: (i) mobilise more than 100 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 100 metres within a reasonable timescale because of significant discomfort or exhaustion.\t9\n"
+            + "\n"
+            + "\n"
+            + "My reasons for decision\n"
+            + "\n"
+            + "Something else.\n"
+            + "\n"
+            + "This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
+                + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
     }
 
     @Test
@@ -312,25 +304,25 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Tribunal Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
-        assertFalse(payload.isAllowed());
-        assertFalse(payload.isSetAside());
+        assertEquals(false, payload.isAllowed());
+        assertEquals(false, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
         assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
-        assertFalse(payload.isIndefinite());
-        assertFalse(payload.isUcIsEntited());
+        assertEquals(false, payload.isIndefinite());
+        assertEquals(false, payload.isUcIsEntited());
         assertEquals("no award", payload.getUcAwardRate());
-        assertNotNull(payload.getUcSchedule6Descriptors());
+        Assert.assertNotNull(payload.getUcSchedule6Descriptors());
         assertEquals(0, payload.getUcSchedule6Descriptors().size());
         assertEquals(0, payload.getUcNumberOfPoints().intValue());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        assertEquals("My reasons for decision", payload.getReasonsForDecision().getFirst());
+        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         UcTemplateContent ucTemplateContent = (UcTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();
-        assertEquals(UcScenario.SCENARIO_1, ucTemplateContent.getScenario());
+        Assert.assertEquals(UcScenario.SCENARIO_1, ucTemplateContent.getScenario());
     }
 
     @Test
@@ -367,27 +359,27 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Tribunal Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
-        assertFalse(payload.isAllowed());
-        assertFalse(payload.isSetAside());
+        assertEquals(false, payload.isAllowed());
+        assertEquals(false, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
         assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
-        assertFalse(payload.isIndefinite());
-        assertFalse(payload.isUcIsEntited());
+        assertEquals(false, payload.isIndefinite());
+        assertEquals(false, payload.isUcIsEntited());
         assertEquals("no award", payload.getUcAwardRate());
         Assert.assertNotNull(payload.getUcSchedule6Descriptors());
         assertEquals(1, payload.getUcSchedule6Descriptors().size());
-        assertEquals(9, payload.getUcSchedule6Descriptors().getFirst().getActivityAnswerPoints());
-        assertEquals("c", payload.getUcSchedule6Descriptors().getFirst().getActivityAnswerLetter());
-        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 100 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 100 metres within a reasonable timescale because of significant discomfort or exhaustion.", payload.getUcSchedule6Descriptors().getFirst().getActivityAnswerValue());
-        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", payload.getUcSchedule6Descriptors().getFirst().getActivityQuestionValue());
-        assertEquals("1", payload.getUcSchedule6Descriptors().getFirst().getActivityQuestionNumber());
+        assertEquals(9, payload.getUcSchedule6Descriptors().get(0).getActivityAnswerPoints());
+        assertEquals("c", payload.getUcSchedule6Descriptors().get(0).getActivityAnswerLetter());
+        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 100 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 100 metres within a reasonable timescale because of significant discomfort or exhaustion.", payload.getUcSchedule6Descriptors().get(0).getActivityAnswerValue());
+        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", payload.getUcSchedule6Descriptors().get(0).getActivityQuestionValue());
+        assertEquals("1", payload.getUcSchedule6Descriptors().get(0).getActivityQuestionNumber());
         Assert.assertNotNull(payload.getUcNumberOfPoints());
         assertEquals(9, payload.getUcNumberOfPoints().intValue());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().getFirst());
+        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         UcTemplateContent ucTemplateContent = (UcTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();
@@ -573,20 +565,20 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Tribunal Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
-        assertFalse(payload.isAllowed());
-        assertFalse(payload.isSetAside());
+        assertEquals(false, payload.isAllowed());
+        assertEquals(false, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
         assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
-        assertFalse(payload.isIndefinite());
-        assertTrue(payload.isUcIsEntited());
+        assertEquals(false, payload.isIndefinite());
+        assertEquals(true, payload.isUcIsEntited());
         assertEquals("lower rate", payload.getUcAwardRate());
         Assert.assertNull(payload.getUcSchedule6Descriptors());
         assertNull(payload.getUcNumberOfPoints());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().getFirst());
+        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         UcTemplateContent ucTemplateContent = (UcTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();
@@ -700,20 +692,20 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Tribunal Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
-        assertTrue(payload.isAllowed());
-        assertTrue(payload.isSetAside());
+        assertEquals(true, payload.isAllowed());
+        assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
         assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
-        assertFalse(payload.isIndefinite());
-        assertTrue(payload.isUcIsEntited());
+        assertEquals(false, payload.isIndefinite());
+        assertEquals(true, payload.isUcIsEntited());
         assertEquals("higher rate", payload.getUcAwardRate());
         Assert.assertNull(payload.getUcSchedule6Descriptors());
         assertNull(payload.getUcNumberOfPoints());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().getFirst());
+        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         UcTemplateContent ucTemplateContent = (UcTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();
@@ -826,20 +818,20 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Tribunal Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
-        assertTrue(payload.isAllowed());
-        assertTrue(payload.isSetAside());
+        assertEquals(true, payload.isAllowed());
+        assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
         assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
-        assertFalse(payload.isIndefinite());
-        assertTrue(payload.isUcIsEntited());
+        assertEquals(false, payload.isIndefinite());
+        assertEquals(true, payload.isUcIsEntited());
         assertEquals("higher rate", payload.getUcAwardRate());
         Assert.assertNull(payload.getUcSchedule6Descriptors());
         assertNull(payload.getUcNumberOfPoints());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().getFirst());
+        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         UcTemplateContent ucTemplateContent = (UcTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();
@@ -929,27 +921,27 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Tribunal Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
-        assertTrue(payload.isAllowed());
-        assertTrue(payload.isSetAside());
+        assertEquals(true, payload.isAllowed());
+        assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
         assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
-        assertFalse(payload.isIndefinite());
-        assertTrue(payload.isUcIsEntited());
+        assertEquals(false, payload.isIndefinite());
+        assertEquals(true, payload.isUcIsEntited());
         assertEquals("lower rate", payload.getUcAwardRate());
         Assert.assertNotNull(payload.getUcSchedule6Descriptors());
         assertEquals(1, payload.getUcSchedule6Descriptors().size());
-        assertEquals(15, payload.getUcSchedule6Descriptors().getFirst().getActivityAnswerPoints());
-        assertEquals("a", payload.getUcSchedule6Descriptors().getFirst().getActivityAnswerLetter());
-        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.", payload.getUcSchedule6Descriptors().getFirst().getActivityAnswerValue());
-        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", payload.getUcSchedule6Descriptors().getFirst().getActivityQuestionValue());
-        assertEquals("1", payload.getUcSchedule6Descriptors().getFirst().getActivityQuestionNumber());
+        assertEquals(15, payload.getUcSchedule6Descriptors().get(0).getActivityAnswerPoints());
+        assertEquals("a", payload.getUcSchedule6Descriptors().get(0).getActivityAnswerLetter());
+        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.", payload.getUcSchedule6Descriptors().get(0).getActivityAnswerValue());
+        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", payload.getUcSchedule6Descriptors().get(0).getActivityQuestionValue());
+        assertEquals("1", payload.getUcSchedule6Descriptors().get(0).getActivityQuestionNumber());
         Assert.assertNotNull(payload.getUcNumberOfPoints());
         assertEquals(15, payload.getUcNumberOfPoints().intValue());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().getFirst());
+        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         UcTemplateContent ucTemplateContent = (UcTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();
@@ -1064,27 +1056,27 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Tribunal Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
-        assertTrue(payload.isAllowed());
-        assertTrue(payload.isSetAside());
+        assertEquals(true, payload.isAllowed());
+        assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
         assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
-        assertFalse(payload.isIndefinite());
-        assertTrue(payload.isUcIsEntited());
+        assertEquals(false, payload.isIndefinite());
+        assertEquals(true, payload.isUcIsEntited());
         assertEquals("higher rate", payload.getUcAwardRate());
         Assert.assertNotNull(payload.getUcSchedule6Descriptors());
         assertEquals(1, payload.getUcSchedule6Descriptors().size());
-        assertEquals(15, payload.getUcSchedule6Descriptors().getFirst().getActivityAnswerPoints());
-        assertEquals("a", payload.getUcSchedule6Descriptors().getFirst().getActivityAnswerLetter());
-        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.", payload.getUcSchedule6Descriptors().getFirst().getActivityAnswerValue());
-        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", payload.getUcSchedule6Descriptors().getFirst().getActivityQuestionValue());
-        assertEquals("1", payload.getUcSchedule6Descriptors().getFirst().getActivityQuestionNumber());
+        assertEquals(15, payload.getUcSchedule6Descriptors().get(0).getActivityAnswerPoints());
+        assertEquals("a", payload.getUcSchedule6Descriptors().get(0).getActivityAnswerLetter());
+        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.", payload.getUcSchedule6Descriptors().get(0).getActivityAnswerValue());
+        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", payload.getUcSchedule6Descriptors().get(0).getActivityQuestionValue());
+        assertEquals("1", payload.getUcSchedule6Descriptors().get(0).getActivityQuestionNumber());
         Assert.assertNotNull(payload.getUcNumberOfPoints());
         assertEquals(15, payload.getUcNumberOfPoints().intValue());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().getFirst());
+        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         UcTemplateContent ucTemplateContent = (UcTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();
@@ -1227,27 +1219,27 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Tribunal Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
-        assertTrue(payload.isAllowed());
-        assertTrue(payload.isSetAside());
+        assertEquals(true, payload.isAllowed());
+        assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
         assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
-        assertFalse(payload.isIndefinite());
-        assertTrue(payload.isUcIsEntited());
+        assertEquals(false, payload.isIndefinite());
+        assertEquals(true, payload.isUcIsEntited());
         assertEquals("lower rate", payload.getUcAwardRate());
         Assert.assertNotNull(payload.getUcSchedule6Descriptors());
         assertEquals(1, payload.getUcSchedule6Descriptors().size());
-        assertEquals(9, payload.getUcSchedule6Descriptors().getFirst().getActivityAnswerPoints());
-        assertEquals("c", payload.getUcSchedule6Descriptors().getFirst().getActivityAnswerLetter());
-        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 100 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 100 metres within a reasonable timescale because of significant discomfort or exhaustion.", payload.getUcSchedule6Descriptors().getFirst().getActivityAnswerValue());
-        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", payload.getUcSchedule6Descriptors().getFirst().getActivityQuestionValue());
-        assertEquals("1", payload.getUcSchedule6Descriptors().getFirst().getActivityQuestionNumber());
+        assertEquals(9, payload.getUcSchedule6Descriptors().get(0).getActivityAnswerPoints());
+        assertEquals("c", payload.getUcSchedule6Descriptors().get(0).getActivityAnswerLetter());
+        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 100 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 100 metres within a reasonable timescale because of significant discomfort or exhaustion.", payload.getUcSchedule6Descriptors().get(0).getActivityAnswerValue());
+        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", payload.getUcSchedule6Descriptors().get(0).getActivityQuestionValue());
+        assertEquals("1", payload.getUcSchedule6Descriptors().get(0).getActivityQuestionNumber());
         Assert.assertNotNull(payload.getUcNumberOfPoints());
         assertEquals(9, payload.getUcNumberOfPoints().intValue());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().getFirst());
+        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         UcTemplateContent ucTemplateContent = (UcTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();
@@ -1392,27 +1384,27 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Tribunal Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
-        assertTrue(payload.isAllowed());
-        assertTrue(payload.isSetAside());
+        assertEquals(true, payload.isAllowed());
+        assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
         assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
-        assertFalse(payload.isIndefinite());
-        assertTrue(payload.isUcIsEntited());
+        assertEquals(false, payload.isIndefinite());
+        assertEquals(true, payload.isUcIsEntited());
         assertEquals("higher rate", payload.getUcAwardRate());
         Assert.assertNotNull(payload.getUcSchedule6Descriptors());
         assertEquals(1, payload.getUcSchedule6Descriptors().size());
-        assertEquals(9, payload.getUcSchedule6Descriptors().getFirst().getActivityAnswerPoints());
-        assertEquals("c", payload.getUcSchedule6Descriptors().getFirst().getActivityAnswerLetter());
-        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 100 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 100 metres within a reasonable timescale because of significant discomfort or exhaustion.", payload.getUcSchedule6Descriptors().getFirst().getActivityAnswerValue());
-        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", payload.getUcSchedule6Descriptors().getFirst().getActivityQuestionValue());
-        assertEquals("1", payload.getUcSchedule6Descriptors().getFirst().getActivityQuestionNumber());
+        assertEquals(9, payload.getUcSchedule6Descriptors().get(0).getActivityAnswerPoints());
+        assertEquals("c", payload.getUcSchedule6Descriptors().get(0).getActivityAnswerLetter());
+        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 100 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 100 metres within a reasonable timescale because of significant discomfort or exhaustion.", payload.getUcSchedule6Descriptors().get(0).getActivityAnswerValue());
+        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", payload.getUcSchedule6Descriptors().get(0).getActivityQuestionValue());
+        assertEquals("1", payload.getUcSchedule6Descriptors().get(0).getActivityQuestionNumber());
         Assert.assertNotNull(payload.getUcNumberOfPoints());
         assertEquals(9, payload.getUcNumberOfPoints().intValue());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().getFirst());
+        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         UcTemplateContent ucTemplateContent = (UcTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();
@@ -1477,27 +1469,27 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Tribunal Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
-        assertTrue(payload.isAllowed());
-        assertTrue(payload.isSetAside());
+        assertEquals(true, payload.isAllowed());
+        assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
         assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
-        assertFalse(payload.isIndefinite());
-        assertTrue(payload.isUcIsEntited());
+        assertEquals(false, payload.isIndefinite());
+        assertEquals(true, payload.isUcIsEntited());
         assertEquals("higher rate", payload.getUcAwardRate());
         Assert.assertNotNull(payload.getUcSchedule6Descriptors());
         assertEquals(1, payload.getUcSchedule6Descriptors().size());
-        assertEquals(9, payload.getUcSchedule6Descriptors().getFirst().getActivityAnswerPoints());
-        assertEquals("c", payload.getUcSchedule6Descriptors().getFirst().getActivityAnswerLetter());
-        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 100 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 100 metres within a reasonable timescale because of significant discomfort or exhaustion.", payload.getUcSchedule6Descriptors().getFirst().getActivityAnswerValue());
-        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", payload.getUcSchedule6Descriptors().getFirst().getActivityQuestionValue());
-        assertEquals("1", payload.getUcSchedule6Descriptors().getFirst().getActivityQuestionNumber());
+        assertEquals(9, payload.getUcSchedule6Descriptors().get(0).getActivityAnswerPoints());
+        assertEquals("c", payload.getUcSchedule6Descriptors().get(0).getActivityAnswerLetter());
+        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 100 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 100 metres within a reasonable timescale because of significant discomfort or exhaustion.", payload.getUcSchedule6Descriptors().get(0).getActivityAnswerValue());
+        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", payload.getUcSchedule6Descriptors().get(0).getActivityQuestionValue());
+        assertEquals("1", payload.getUcSchedule6Descriptors().get(0).getActivityQuestionNumber());
         Assert.assertNotNull(payload.getUcNumberOfPoints());
         assertEquals(9, payload.getUcNumberOfPoints().intValue());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().getFirst());
+        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         UcTemplateContent ucTemplateContent = (UcTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();
@@ -1562,37 +1554,35 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Tribunal Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
-        assertFalse(payload.isAllowed());
-        assertFalse(payload.isSetAside());
+        assertEquals(false, payload.isAllowed());
+        assertEquals(false, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
         assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
-        assertFalse(payload.isIndefinite());
-        assertFalse(payload.isUcIsEntited());
+        assertEquals(false, payload.isIndefinite());
+        assertEquals(false, payload.isUcIsEntited());
         assertNull(payload.getUcAwardRate());
         Assert.assertNull(payload.getUcSchedule6Descriptors());
         Assert.assertNull(payload.getUcNumberOfPoints());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().getFirst());
+        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
-        assertEquals("""
-            The appeal is refused.
-
-            The decision made by the Secretary of State on 01/09/2018 is confirmed.
-
-            This is my summary.
-
-            My reasons for decision
-
-            Something else.
-
-            This has been an oral (face to face) hearing. The following people attended: AN Test the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page A1.
-
-            """, parentPayload.getWriteFinalDecisionTemplateContent().toString());
+        assertEquals("The appeal is refused.\n"
+            + "\n"
+            + "The decision made by the Secretary of State on 01/09/2018 is confirmed.\n"
+            + "\n"
+            + "This is my summary.\n"
+            + "\n"
+            + "My reasons for decision\n"
+            + "\n"
+            + "Something else.\n"
+            + "\n"
+            + "This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
+                + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
         UcTemplateContent ucTemplateContent = (UcTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();
         Assert.assertEquals(UcScenario.SCENARIO_10, ucTemplateContent.getScenario());
     }
@@ -1631,37 +1621,35 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Tribunal Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
-        assertTrue(payload.isAllowed());
-        assertTrue(payload.isSetAside());
+        assertEquals(true, payload.isAllowed());
+        assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
         assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
-        assertFalse(payload.isIndefinite());
-        assertFalse(payload.isUcIsEntited());
+        assertEquals(false, payload.isIndefinite());
+        assertEquals(false, payload.isUcIsEntited());
         assertNull(payload.getUcAwardRate());
         Assert.assertNull(payload.getUcSchedule6Descriptors());
         Assert.assertNull(payload.getUcNumberOfPoints());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().getFirst());
+        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
-        assertEquals("""
-            The appeal is allowed.
-
-            The decision made by the Secretary of State on 01/09/2018 is set aside.
-
-            This is my summary.
-
-            My reasons for decision
-
-            Something else.
-
-            This has been an oral (face to face) hearing. The following people attended: AN Test the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page A1.
-
-            """, parentPayload.getWriteFinalDecisionTemplateContent().toString());
+        assertEquals("The appeal is allowed.\n"
+            + "\n"
+            + "The decision made by the Secretary of State on 01/09/2018 is set aside.\n"
+            + "\n"
+            + "This is my summary.\n"
+            + "\n"
+            + "My reasons for decision\n"
+            + "\n"
+            + "Something else.\n"
+            + "\n"
+            + "This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
+                + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
         UcTemplateContent ucTemplateContent = (UcTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();
         Assert.assertEquals(UcScenario.SCENARIO_10, ucTemplateContent.getScenario());
     }
@@ -1701,37 +1689,35 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Tribunal Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
-        assertTrue(payload.isAllowed());
-        assertTrue(payload.isSetAside());
+        assertEquals(true, payload.isAllowed());
+        assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
         assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
-        assertFalse(payload.isIndefinite());
-        assertFalse(payload.isUcIsEntited());
+        assertEquals(false, payload.isIndefinite());
+        assertEquals(false, payload.isUcIsEntited());
         assertNull(payload.getUcAwardRate());
         Assert.assertNull(payload.getUcSchedule6Descriptors());
         Assert.assertNull(payload.getUcNumberOfPoints());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().getFirst());
+        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
-        assertEquals("""
-            The appeal is allowed.
-
-            The decision made by the Secretary of State on 01/09/2018 is set aside.
-
-            This is my summary.
-
-            My reasons for decision
-
-            Something else.
-
-            This has been an oral (face to face) hearing. The following people attended: AN Test the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page A1.
-
-            """, parentPayload.getWriteFinalDecisionTemplateContent().toString());
+        assertEquals("The appeal is allowed.\n"
+            + "\n"
+            + "The decision made by the Secretary of State on 01/09/2018 is set aside.\n"
+            + "\n"
+            + "This is my summary.\n"
+            + "\n"
+            + "My reasons for decision\n"
+            + "\n"
+            + "Something else.\n"
+            + "\n"
+            + "This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
+                + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
     }
 
     @Test
@@ -1768,27 +1754,27 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Tribunal Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
-        assertTrue(payload.isAllowed());
-        assertTrue(payload.isSetAside());
+        assertEquals(true, payload.isAllowed());
+        assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
         assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
-        assertFalse(payload.isIndefinite());
-        assertTrue(payload.isUcIsEntited());
+        assertEquals(false, payload.isIndefinite());
+        assertEquals(true, payload.isUcIsEntited());
         assertEquals("higher rate", payload.getUcAwardRate());
         Assert.assertNotNull(payload.getUcSchedule6Descriptors());
         assertEquals(1, payload.getUcSchedule6Descriptors().size());
-        assertEquals(15, payload.getUcSchedule6Descriptors().getFirst().getActivityAnswerPoints());
-        assertEquals("a", payload.getUcSchedule6Descriptors().getFirst().getActivityAnswerLetter());
-        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.", payload.getUcSchedule6Descriptors().getFirst().getActivityAnswerValue());
-        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", payload.getUcSchedule6Descriptors().getFirst().getActivityQuestionValue());
-        assertEquals("1", payload.getUcSchedule6Descriptors().getFirst().getActivityQuestionNumber());
+        assertEquals(15, payload.getUcSchedule6Descriptors().get(0).getActivityAnswerPoints());
+        assertEquals("a", payload.getUcSchedule6Descriptors().get(0).getActivityAnswerLetter());
+        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.", payload.getUcSchedule6Descriptors().get(0).getActivityAnswerValue());
+        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", payload.getUcSchedule6Descriptors().get(0).getActivityQuestionValue());
+        assertEquals("1", payload.getUcSchedule6Descriptors().get(0).getActivityQuestionNumber());
         Assert.assertNotNull(payload.getUcNumberOfPoints());
         assertEquals(15, payload.getUcNumberOfPoints().intValue());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().getFirst());
+        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         UcTemplateContent ucTemplateContent = (UcTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();

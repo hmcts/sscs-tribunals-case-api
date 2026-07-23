@@ -1,39 +1,40 @@
 package uk.gov.hmcts.reform.sscs.functional.ccd;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.not;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.hamcrest.Matchers.*;
 import static uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler.getJsonCallbackForTest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.apache.http.HttpResponse;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication;
+import org.springframework.test.context.junit4.rules.SpringClassRule;
+import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.functional.mya.BaseFunctionTest;
-import uk.gov.hmcts.reform.sscs.functional.mya.CitizenIdamService;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {TribunalsCaseApiApplication.class, CitizenIdamService.class})
+@RunWith(JUnitParamsRunner.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
 
+    @ClassRule
+    public static final SpringClassRule scr = new SpringClassRule();
+
+    @Rule
+    public final SpringMethodRule smr = new SpringMethodRule();
 
     @Autowired
     protected ObjectMapper objectMapper;
@@ -95,7 +96,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("6. The tribunal applied regulation 35 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work-related activity."));
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else"));
-            assertThat(pdfTextWithoutNewLines, containsString("9. This has been an oral (face to face) hearing. The following people attended: Joe Bloggs the appellant. A representative from the First Tier Agency did not attend. The Tribunal considered the appeal bundle to page B7."));
+            assertThat(pdfTextWithoutNewLines, containsString("9. This has been an oral (face to face) hearing. Joe Bloggs the appellant attended the hearing today and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative did not attend."));
             assertThat(pdfTextWithoutNewLines, containsString("10. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal recommends that the Department does not reassess Joe Bloggs within 3 months from today's date."));
             assertThat(pdfTextWithoutNewLines, not(containsString("11.")));
         }
@@ -139,7 +140,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("15 points"));
             assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision"));
             assertThat(pdfTextWithoutNewLines, containsString("7. Anything else"));
-            assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a telephone hearing. The following people attended: Joe Bloggs the appellant. A representative from the First Tier Agency did not attend. The Tribunal considered the appeal bundle to page B7."));
+            assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative did not attend."));
             assertThat(pdfTextWithoutNewLines, containsString("9. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal makes no recommendation as to when the Department should reassess Joe Bloggs."));
             assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
         }
@@ -169,7 +170,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("2. Transferring from one seated position to another. Cannot move between one seated position and another seated position located next to one another without receiving physical assistance from another person."));
             assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision"));
             assertThat(pdfTextWithoutNewLines, containsString("7. Anything else"));
-            assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a telephone hearing. The following people attended: A representative from the First Tier Agency. Joe Bloggs the appellant did not attend."));
+            assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs the appellant did not attend the hearing today. First Tier Agency representative attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, containsString("9. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today."));
             assertThat(pdfTextWithoutNewLines, containsString("10. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal makes no recommendation as to when the Department should reassess Joe Bloggs. Tribunal Judge: Account Date: " + date + " Issued to the parties on: "));
             assertThat(pdfTextWithoutNewLines, not(containsString("11.")));
@@ -193,7 +194,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("6. Joe Bloggs does not have limited capability for work-related activity because no descriptor from Schedule 3 of the ESA Regulations applied. Regulation 35 did not apply."));
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else"));
-            assertThat(pdfTextWithoutNewLines, containsString("9. This has been a remote hearing in the form of a telephone hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7."));
+            assertThat(pdfTextWithoutNewLines, containsString("9. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, containsString("10. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal makes no recommendation as to when the Department should reassess Joe Bloggs."));
             assertThat(pdfTextWithoutNewLines, not(containsString("11.")));
         }
@@ -222,14 +223,14 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
         }
     }
 
-    @ParameterizedTest
-    @CsvSource({
-        "noRecommendation, 'The Tribunal makes no recommendation as to when the Department should reassess Joe Bloggs.'",
-        "doNotReassess, 'In view of the degree of disability found by the Tribunal, and unless the regulations change, the Tribunal would recommend that the appellant is not re-assessed.'",
-        "reassess12, 'The Tribunal recommends that the Department reassesses Joe Bloggs within 12 months from today''s date.'",
-        "reassess3, 'The Tribunal recommends that the Department reassesses Joe Bloggs within 3 months from today''s date.'",
-        "doNotReassess3, 'The Tribunal recommends that the Department does not reassess Joe Bloggs within 3 months from today''s date.'",
-        "doNotReassess18, 'The Tribunal recommends that the Department does not reassess Joe Bloggs within 18 months from today''s date.'"
+    @Test
+    @Parameters({
+        "noRecommendation, The Tribunal makes no recommendation as to when the Department should reassess Joe Bloggs.",
+        "doNotReassess, In view of the degree of disability found by the Tribunal\\, and unless the regulations change\\, the Tribunal would recommend that the appellant is not re-assessed.",
+        "reassess12, The Tribunal recommends that the Department reassesses Joe Bloggs within 12 months from today's date.",
+        "reassess3, The Tribunal recommends that the Department reassesses Joe Bloggs within 3 months from today's date.",
+        "doNotReassess3, The Tribunal recommends that the Department does not reassess Joe Bloggs within 3 months from today's date.",
+        "doNotReassess18, The Tribunal recommends that the Department does not reassess Joe Bloggs within 18 months from today's date.",
     })
     public void scenario8_allowed_notSupportGroup_LessThan15PointsSch2_Reg29Applies_Reg35Applies_shouldHaveExpectedText(String code, String expectedText) throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/esaDwpReassessTheAwardCallback.json");
@@ -254,14 +255,14 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
         }
     }
 
-    @ParameterizedTest
-    @CsvSource({
-        "noRecommendation, 'The Tribunal makes no recommendation as to when the Department should reassess Joe Bloggs.'",
-        "doNotReassess, 'In view of the degree of disability found by the Tribunal, and unless the regulations change, the Tribunal would recommend that the appellant is not re-assessed.'",
-        "reassess12, 'The Tribunal recommends that the Department reassesses Joe Bloggs within 12 months from today''s date.'",
-        "reassess3, 'The Tribunal recommends that the Department reassesses Joe Bloggs within 3 months from today''s date.'",
-        "doNotReassess3, 'The Tribunal recommends that the Department does not reassess Joe Bloggs within 3 months from today''s date.'",
-        "doNotReassess18, 'The Tribunal recommends that the Department does not reassess Joe Bloggs within 18 months from today''s date.'"
+    @Test
+    @Parameters({
+        "noRecommendation, The Tribunal makes no recommendation as to when the Department should reassess Joe Bloggs.",
+        "doNotReassess, In view of the degree of disability found by the Tribunal\\, and unless the regulations change\\, the Tribunal would recommend that the appellant is not re-assessed.",
+        "reassess12, The Tribunal recommends that the Department reassesses Joe Bloggs within 12 months from today's date.",
+        "reassess3, The Tribunal recommends that the Department reassesses Joe Bloggs within 3 months from today's date.",
+        "doNotReassess3, The Tribunal recommends that the Department does not reassess Joe Bloggs within 3 months from today's date.",
+        "doNotReassess18, The Tribunal recommends that the Department does not reassess Joe Bloggs within 18 months from today's date.",
     })
     public void scenario8_allowed_notSupportGroup_LessThan15PointsSch2_Reg29Applies_Reg35Applies_shouldHaveExpectedText_When_ZeroPoints(String code, String expectedText) throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/esaDwpReassessTheAwardCallbackZeroPoints.json");
@@ -302,7 +303,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("2. Transferring from one seated position to another. Cannot move between one seated position and another seated position located next to one another without receiving physical assistance from another person."));
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else"));
-            assertThat(pdfTextWithoutNewLines, containsString("9. This has been a remote hearing in the form of a telephone hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7."));
+            assertThat(pdfTextWithoutNewLines, containsString("9. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, containsString("10. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal makes no recommendation as to when the Department should reassess Joe Bloggs."));
             assertThat(pdfTextWithoutNewLines, not(containsString("11.")));
         }
@@ -322,7 +323,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("4. Reasons for decision 1"));
             assertThat(pdfTextWithoutNewLines, containsString("5. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("6. Anything else."));
-            assertThat(pdfTextWithoutNewLines, containsString("7. This has been a remote hearing in the form of a telephone hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7."));
+            assertThat(pdfTextWithoutNewLines, containsString("7. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("8.")));
         }
     }
@@ -340,7 +341,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("4. Reasons for decision 1"));
             assertThat(pdfTextWithoutNewLines, containsString("5. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("6. Anything else."));
-            assertThat(pdfTextWithoutNewLines, containsString("7. This has been a remote hearing in the form of a telephone hearing. The following people attended: Joe Bloggs the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page B7."));
+            assertThat(pdfTextWithoutNewLines, containsString("7. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("8.")));
         }
     }
@@ -363,7 +364,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("15 points"));
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else"));
-            assertThat(pdfTextWithoutNewLines, containsString("9. This has been a remote hearing in the form of a telephone hearing. The following people attended: Joe Bloggs the appellant. A representative from the First Tier Agency did not attend. The Tribunal considered the appeal bundle to page B7."));
+            assertThat(pdfTextWithoutNewLines, containsString("9. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative did not attend."));
             assertThat(pdfTextWithoutNewLines, containsString("10. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal makes no recommendation as to when the Department should reassess Joe Bloggs."));
             assertThat(pdfTextWithoutNewLines, not(containsString("11.")));
         }
@@ -376,8 +377,8 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
     private byte[] callPreviewFinalDecision(String json) throws IOException {
         HttpResponse httpResponse = sscsMyaBackendRequests.midEvent(new StringEntity(json), "PreviewFinalDecision");
         CcdEventResponse ccdEventResponse = getCcdEventResponse(httpResponse);
-        assertEquals(200, httpResponse.getStatusLine().getStatusCode());
-        assertNotNull(ccdEventResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
+        assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
+        assertThat(ccdEventResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument(), is(not(nullValue())));
         return sscsMyaBackendRequests.toBytes(ccdEventResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
     }
 

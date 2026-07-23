@@ -71,11 +71,6 @@ import { WriteAdjournmentPages } from '../../pages/write.adjournment.page';
 import { AmendElementPage } from '../../pages/amend.element.page';
 import { ElementsAndIssues } from '../../pages/tabs/elementsAndIssues';
 import { MyWorkPage } from '../../pages/my.work.page';
-import { AddOtherPartyDataPage } from '../../pages/add.other.party.data.page';
-import { Confidentiality } from '../../pages/tabs/confidentiality';
-import { IssueHearingEnquiryFormPage } from '../../pages/issue.hearing.enquiry.form.page';
-import { ConfidentialityConfirmed } from '../../pages/confidentiality.confirmed';
-import { SendToInterlocPage } from '../../pages/send.to.interloc.page';
 
 export abstract class BaseStep {
   readonly page: Page;
@@ -130,7 +125,6 @@ export abstract class BaseStep {
   protected processAVPage: ProcessAVPage;
   protected updateOtherPartyDataPage: updateOtherPartyDataPage;
   protected otherPartyDetailsTab: OtherPartyDetails;
-  protected confidentialityTab: Confidentiality;
   protected sendCaseToTcwPage: SendCaseToTcwPage;
   protected writeFinalDecisionPage: WriteFinalDecisionPages;
   protected sendToInterlocPrevalidPage: SendToInterlocPrevalidPage;
@@ -152,10 +146,6 @@ export abstract class BaseStep {
   protected amendElementPage: AmendElementPage;
   protected elementsAndIssuesTab: ElementsAndIssues;
   protected myWorkPage: MyWorkPage;
-  protected addOtherPartyDataPage: AddOtherPartyDataPage;
-  protected issueHefPage: IssueHearingEnquiryFormPage;
-  protected confidentialityConfirmedPage: ConfidentialityConfirmed;
-  protected sendToInterlocPage: SendToInterlocPage
 
   protected constructor(page: Page) {
     this.page = page;
@@ -223,11 +213,9 @@ export abstract class BaseStep {
     this.processAVPage = new ProcessAVPage(this.page);
     this.updateOtherPartyDataPage = new updateOtherPartyDataPage(this.page);
     this.otherPartyDetailsTab = new OtherPartyDetails(this.page);
-    this.confidentialityTab = new Confidentiality(this.page);
     this.sendCaseToTcwPage = new SendCaseToTcwPage(this.page);
-    this.confidentialityConfirmedPage = new ConfidentialityConfirmed(this.page);
-    this.writeFinalDecisionPage = new WriteFinalDecisionPages(this.page);
-    this.sendToInterlocPrevalidPage = new SendToInterlocPrevalidPage(this.page);
+    this.writeFinalDecisionPage = new WriteFinalDecisionPages(page);
+    this.sendToInterlocPrevalidPage = new SendToInterlocPrevalidPage(page);
     this.sendToJudgePage = new SendToJudgePage(this.page);
     this.notListablePage = new NotListablePage(this.page);
     this.updateNotListablePage = new UpdateNotListablePage(this.page);
@@ -240,20 +228,12 @@ export abstract class BaseStep {
     this.reviewConfidentialityPage = new ReviewConfidentialityPage(this.page);
     this.createUpdateToCaseDataPage = new CreateUpdateToCaseDataPage(this.page);
     this.communicateWithFtaPage = new CommunicateWithFtaPage(this.page);
-    this.tribunalFtaCommunicationsTab = new TribunalFtaCommunications(
-      this.page
-    );
-    this.communicateWithTribunalPage = new CommunicateWithTribunalPage(
-      this.page
-    );
+    this.tribunalFtaCommunicationsTab = new TribunalFtaCommunications(this.page);
+    this.communicateWithTribunalPage = new CommunicateWithTribunalPage(this.page);
     this.writeAdjournmentPage = new WriteAdjournmentPages(this.page);
     this.amendElementPage = new AmendElementPage(this.page);
     this.elementsAndIssuesTab = new ElementsAndIssues(this.page);
     this.myWorkPage = new MyWorkPage(this.page);
-    this.addOtherPartyDataPage = new AddOtherPartyDataPage(this.page);
-    this.confidentialityTab = new Confidentiality(this.page);
-    this.issueHefPage = new IssueHearingEnquiryFormPage(this.page);
-    this.sendToInterlocPage = new SendToInterlocPage(this.page)
   }
 
   async loginUserWithCaseIdViaCaseList(
@@ -273,7 +253,6 @@ export abstract class BaseStep {
   ) {
     await this.loginPage.goToLoginPage();
     await this.loginPage.verifySuccessfulLoginForUser(user, clearCacheFlag);
-    await this.homePage.selectToViewTasksAndCasesIfRequired();
     await this.loginPage.goToCase(caseId);
   }
 
@@ -298,8 +277,7 @@ export abstract class BaseStep {
   }
 
   async verifyEndStateInHistoryTab(state: string) {
-    if (state)
-      await this.historyTab.verifyPageContentByKeyValue('End state', state);
+    if (state) await this.historyTab.verifyPageContentByKeyValue('End state', state);
   }
 
   async verifyHistoryTabLink(linkLabel: string) {

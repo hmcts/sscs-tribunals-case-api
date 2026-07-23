@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -290,27 +289,6 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         assertNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
-    }
-
-    @Test
-    public void givenSevereConditionsFieldsAreSet_thenClearSevereConditionsFields() {
-        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true);
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionHasSVIssueCode(YES);
-        sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereCriteriaApply(YES);
-        sscsCaseData.getExtendedSscsCaseData().setEsaWriteFinalDecisionSevereCriteriaApply(YES);
-        sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(YES);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecisionIsAfterSvDate(YES);
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getSscsUcCaseData().getUcWriteFinalDecisionHasSVIssueCode()).isNull();
-        assertThat(response.getData().getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply()).isNull();
-        assertThat(response.getData().getExtendedSscsCaseData().getEsaWriteFinalDecisionSevereCriteriaApply()).isNull();
-        assertThat(response.getData().getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo()).isNull();
-        assertThat(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecisionIsAfterSvDate()).isNull();
     }
 
     private void assertDataRetained(PreSubmitCallbackResponse<SscsCaseData> response) {

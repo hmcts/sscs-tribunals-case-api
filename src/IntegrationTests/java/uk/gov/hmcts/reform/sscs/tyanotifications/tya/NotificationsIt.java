@@ -1,10 +1,9 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.tya;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.atMost;
 import static org.mockito.Mockito.atMostOnce;
 import static org.mockito.Mockito.eq;
@@ -19,6 +18,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADMIN_APPEAL_WITHDRAWN;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_DORMANT;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_LAPSED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_WITHDRAWN;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.CASE_UPDATED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DECISION_ISSUED;
@@ -61,38 +61,30 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
+import junitparams.NamedParameters;
+import junitparams.Parameters;
 import org.apache.commons.io.FileUtils;
 import org.apache.pdfbox.io.IOUtils;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.quartz.SchedulerException;
 import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DatedRequestOutcome;
-import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.helper.IntegrationTestHelper;
 
-class NotificationsIt extends NotificationsItBase {
+public class NotificationsIt extends NotificationsItBase {
 
     private static final String HEARING_ROUTE_FIELD = "hearingRouteReplace";
     private static final String GAPS_ROUTE = "gaps";
     private static final String LIST_ASSIST_ROUTE = "listAssist";
-    private static final String JSON_CCD_RESPONSE_TEST_JSON = "json/ccdResponseTest.json";
-    private static final String APPEAL_RECEIVED = "appealReceived";
 
     @Test
-    void shouldSendNotificationForAnAdjournedRequestForAnOralHearing() throws Exception {
-        json = json.replace(APPEAL_RECEIVED, "hearingAdjourned");
+    public void shouldSendNotificationForAnAdjournedRequestForAnOralHearing() throws Exception {
+        json = json.replace("appealReceived", "hearingAdjourned");
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json));
 
@@ -102,9 +94,9 @@ class NotificationsIt extends NotificationsItBase {
     }
 
     @Test
-    void shouldNotSendNotificationForAnAdjournedRequestForAPaperHearing() throws Exception {
+    public void shouldNotSendNotificationForAnAdjournedRequestForAPaperHearing() throws Exception {
         updateJsonForPaperHearing();
-        json = json.replace(APPEAL_RECEIVED, "hearingAdjourned");
+        json = json.replace("appealReceived", "hearingAdjourned");
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json));
 
@@ -114,8 +106,8 @@ class NotificationsIt extends NotificationsItBase {
     }
 
     @Test
-    void shouldSendNotificationForAnEvidenceReceivedRequestForAnOralHearing() throws Exception {
-        json = json.replace(APPEAL_RECEIVED, "evidenceReceived");
+    public void shouldSendNotificationForAnEvidenceReceivedRequestForAnOralHearing() throws Exception {
+        json = json.replace("appealReceived", "evidenceReceived");
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json));
 
@@ -125,9 +117,9 @@ class NotificationsIt extends NotificationsItBase {
     }
 
     @Test
-    void shouldSendEmailNotificationOnlyForAnEvidenceReceivedRequestToAnAppellantForAPaperHearing() throws Exception {
+    public void shouldSendEmailNotificationOnlyForAnEvidenceReceivedRequestToAnAppellantForAPaperHearing() throws Exception {
         updateJsonForPaperHearing();
-        json = json.replace(APPEAL_RECEIVED, "evidenceReceived");
+        json = json.replace("appealReceived", "evidenceReceived");
         json = updateEmbeddedJson(json, "No", "case_details", "case_data", "subscriptions", "representativeSubscription", "subscribeSms");
         json = updateEmbeddedJson(json, "No", "case_details", "case_data", "subscriptions", "representativeSubscription", "subscribeEmail");
 
@@ -139,8 +131,8 @@ class NotificationsIt extends NotificationsItBase {
     }
 
     @Test
-    void shouldSendNotificationForAHearingPostponedRequestForAnOralHearingForListAssist() throws Exception {
-        json = json.replace(APPEAL_RECEIVED, "hearingPostponed");
+    public void shouldSendNotificationForAHearingPostponedRequestForAnOralHearingForListAssist() throws Exception {
+        json = json.replace("appealReceived", "hearingPostponed");
         json = json.replace(HEARING_ROUTE_FIELD, LIST_ASSIST_ROUTE);
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json));
 
@@ -155,9 +147,9 @@ class NotificationsIt extends NotificationsItBase {
     }
 
     @Test
-    void shouldNotSendNotificationForAHearingPostponedRequestForAPaperHearing() throws Exception {
+    public void shouldNotSendNotificationForAHearingPostponedRequestForAPaperHearing() throws Exception {
         updateJsonForPaperHearing();
-        json = json.replace(APPEAL_RECEIVED, "hearingPostponed");
+        json = json.replace("appealReceived", "hearingPostponed");
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json));
 
@@ -166,9 +158,9 @@ class NotificationsIt extends NotificationsItBase {
         verify(notificationClient, never()).sendSms(any(), any(), any(), any(), any());
     }
 
-    @ParameterizedTest
-    @MethodSource("generateDelayedNotificationScenarios")
-    void shouldScheduleDelayedNotificationsForAnEvent(
+    @Test
+    @Parameters(method = "generateDelayedNotificationScenarios")
+    public void shouldScheduleDelayedNotificationsForAnEvent(
         NotificationEventType notificationEventType, String message, int expectedValue) throws Exception {
 
         try {
@@ -186,9 +178,9 @@ class NotificationsIt extends NotificationsItBase {
         IntegrationTestHelper.assertScheduledJobCount(quartzScheduler, message, notificationEventType.getId(), expectedValue);
     }
 
-    @ParameterizedTest
-    @MethodSource("generateRepsNotificationScenarios")
-    void shouldSendRepsNotificationsForAnEventForAnOralOrPaperHearingAndForEachSubscription(
+    @Test
+    @Parameters(method = "generateRepsNotificationScenarios")
+    public void shouldSendRepsNotificationsForAnEventForAnOralOrPaperHearingAndForEachSubscription(
         NotificationEventType notificationEventType, String hearingType, String hearingRoute, List<String> expectedEmailTemplateIds,
         List<String> expectedSmsTemplateIds, List<String> expectedLetterTemplateIds, String appellantEmailSubs, String appellantSmsSubs, String repsEmailSubs,
         String repsSmsSubs, int wantedNumberOfSendEmailInvocations, int wantedNumberOfSendSmsInvocations, int wantedNumberOfSendLetterInvocations) throws Exception {
@@ -219,8 +211,8 @@ class NotificationsIt extends NotificationsItBase {
     }
 
     @Test
-    void shouldSetCarersAllowanceDescriptionInAcronymField() throws Exception {
-        String path = getClass().getClassLoader().getResource(JSON_CCD_RESPONSE_TEST_JSON).getFile();
+    public void shouldSetCarersAllowanceDescriptionInAcronymField() throws Exception {
+        String path = getClass().getClassLoader().getResource("json/ccdResponseTest.json").getFile();
         json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         json = updateEmbeddedJson(json, "carersAllowance", "case_details", "case_data", "appeal", "benefitType", "code");
@@ -232,14 +224,14 @@ class NotificationsIt extends NotificationsItBase {
         ArgumentCaptor<Map<String, ?>> emailPersonalisationCaptor = ArgumentCaptor.forClass(Map.class);
         verify(notificationClient, times(1))
             .sendEmail(emailTemplateIdCaptor.capture(), any(), emailPersonalisationCaptor.capture(), any());
-        final Map<String, ?> personalisation = emailPersonalisationCaptor.getValue();
-        assertThat(personalisation.get(BENEFIT_NAME_ACRONYM_LITERAL)).isEqualTo("Carer's Allowance");
-        assertThat(personalisation.get(BENEFIT_NAME_ACRONYM_LITERAL_WELSH)).isEqualTo("Lwfans Gofalwr");
+        Map<String, ?> personalisation = emailPersonalisationCaptor.getValue();
+        assertEquals("Carer's Allowance", personalisation.get(BENEFIT_NAME_ACRONYM_LITERAL));
+        assertEquals("Lwfans Gofalwr", personalisation.get(BENEFIT_NAME_ACRONYM_LITERAL_WELSH));
     }
 
     @Test
-    void shouldSetInfectedBloodCompensationDescriptionInAcronymField() throws Exception {
-        String path = getClass().getClassLoader().getResource(JSON_CCD_RESPONSE_TEST_JSON).getFile();
+    public void shouldSetInfectedBloodCompensationDescriptionInAcronymField() throws Exception {
+        String path = getClass().getClassLoader().getResource("json/ccdResponseTest.json").getFile();
         json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         json = updateEmbeddedJson(json, "infectedBloodCompensation", "case_details", "case_data", "appeal", "benefitType", "code");
@@ -251,14 +243,14 @@ class NotificationsIt extends NotificationsItBase {
         ArgumentCaptor<Map<String, ?>> emailPersonalisationCaptor = ArgumentCaptor.forClass(Map.class);
         verify(notificationClient, times(1))
                 .sendEmail(emailTemplateIdCaptor.capture(), any(), emailPersonalisationCaptor.capture(), any());
-        final Map<String, ?> personalisation = emailPersonalisationCaptor.getValue();
-        assertThat(personalisation.get(BENEFIT_NAME_ACRONYM_LITERAL)).isEqualTo("IBC");
-        assertThat(personalisation.get(BENEFIT_NAME_ACRONYM_LITERAL_WELSH)).isEqualTo("IGH");
+        Map<String, ?> personalisation = emailPersonalisationCaptor.getValue();
+        assertEquals("IBC", personalisation.get(BENEFIT_NAME_ACRONYM_LITERAL));
+        assertEquals("IGH", personalisation.get(BENEFIT_NAME_ACRONYM_LITERAL_WELSH));
     }
 
     @Test
-    void shouldSetBereavementBenefitDescriptionInAcronymField() throws Exception {
-        String path = getClass().getClassLoader().getResource(JSON_CCD_RESPONSE_TEST_JSON).getFile();
+    public void shouldSetBereavementBenefitDescriptionInAcronymField() throws Exception {
+        String path = getClass().getClassLoader().getResource("json/ccdResponseTest.json").getFile();
         json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         json = updateEmbeddedJson(json, "bereavementBenefit", "case_details", "case_data", "appeal", "benefitType", "code");
@@ -270,14 +262,14 @@ class NotificationsIt extends NotificationsItBase {
         ArgumentCaptor<Map<String, ?>> emailPersonalisationCaptor = ArgumentCaptor.forClass(Map.class);
         verify(notificationClient, times(1))
             .sendEmail(emailTemplateIdCaptor.capture(), any(), emailPersonalisationCaptor.capture(), any());
-        final Map<String, ?> personalisation = emailPersonalisationCaptor.getValue();
-        assertThat(personalisation.get(BENEFIT_NAME_ACRONYM_LITERAL)).isEqualTo("Bereavement Benefit");
-        assertThat(personalisation.get(BENEFIT_NAME_ACRONYM_LITERAL_WELSH)).isEqualTo("Budd-dal Profedigaeth");
+        Map<String, ?> personalisation = emailPersonalisationCaptor.getValue();
+        assertEquals("Bereavement Benefit", personalisation.get(BENEFIT_NAME_ACRONYM_LITERAL));
+        assertEquals("Budd-dal Profedigaeth", personalisation.get(BENEFIT_NAME_ACRONYM_LITERAL_WELSH));
     }
 
-    @ParameterizedTest
-    @MethodSource("generateBundledLetterNotificationScenarios")
-    void shouldSendRepsBundledLetterNotificationsForAnEventForAnOralOrPaperHearingAndForEachSubscription(
+    @Test
+    @Parameters(method = "generateBundledLetterNotificationScenarios")
+    public void shouldSendRepsBundledLetterNotificationsForAnEventForAnOralOrPaperHearingAndForEachSubscription(
         NotificationEventType notificationEventType, String hearingType, String hearingRoute, boolean hasRep, boolean hasAppointee, int wantedNumberOfSendLetterInvocations) throws Exception {
 
         byte[] sampleDirectionNotice = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/direction-text.pdf"));
@@ -300,12 +292,12 @@ class NotificationsIt extends NotificationsItBase {
         verify(notificationClient, times(wantedNumberOfSendLetterInvocations)).sendPrecompiledLetterWithInputStream(any(), any());
     }
 
-    @ParameterizedTest
-    @MethodSource("generateAppointeeNotificationScenarios")
-    @Disabled
+    @Test
+    @Parameters(method = "generateAppointeeNotificationScenarios")
+    @Ignore
     // SSCS-11586
     @SuppressWarnings("unchecked")
-    void shouldSendAppointeeNotificationsForAnEventForAnOralOrPaperHearingAndForEachSubscription(
+    public void shouldSendAppointeeNotificationsForAnEventForAnOralOrPaperHearingAndForEachSubscription(
         NotificationEventType notificationEventType, String hearingType, String hearingRoute, List<String> expectedEmailTemplateIds,
         List<String> expectedSmsTemplateIds, List<String> expectedLetterTemplateIds, String appointeeEmailSubs,
         String appointeeSmsSubs, int wantedNumberOfSendEmailInvocations, int wantedNumberOfSendSmsInvocations,
@@ -322,7 +314,7 @@ class NotificationsIt extends NotificationsItBase {
             "appointeeSubscription", "subscribeSms");
 
         if (notificationEventType.equals(HEARING_BOOKED)) {
-            jsonAppointee = jsonAppointee.replace(APPEAL_RECEIVED, "hearingBooked");
+            jsonAppointee = jsonAppointee.replace("appealReceived", "hearingBooked");
             jsonAppointee = jsonAppointee.replace("2018-01-12", LocalDate.now().plusDays(2).toString());
         }
 
@@ -364,11 +356,11 @@ class NotificationsIt extends NotificationsItBase {
         return json;
     }
 
-    @ParameterizedTest
-    @MethodSource("generateJointPartyNotificationScenarios")
-    @Disabled
+    @Test
+    @Parameters(method = "generateJointPartyNotificationScenarios")
+    @Ignore
     // SSCS-11586
-    void shouldSendJointPartyNotificationsForAnEventForAnOralOrPaperHearingAndForEachSubscription(
+    public void shouldSendJointPartyNotificationsForAnEventForAnOralOrPaperHearingAndForEachSubscription(
         NotificationEventType notificationEventType, String hearingType, String hearingRoute, List<String> expectedEmailTemplateIds,
         List<String> expectedSmsTemplateIds, List<String> expectedLetterTemplateIds, String jointPartyEmailSubs,
         String jointPartySmsSubs, int wantedNumberOfSendEmailInvocations, int wantedNumberOfSendSmsInvocations, int wantedNumberOfSendLetterInvocations) throws Exception {
@@ -403,7 +395,7 @@ class NotificationsIt extends NotificationsItBase {
 
 
     @SuppressWarnings({"Indentation", "unused"})
-    private static Object[] generateJointPartyNotificationScenarios() {
+    private Object[] generateJointPartyNotificationScenarios() {
         return new Object[]{
             // GAPS
             new Object[]{
@@ -1217,7 +1209,7 @@ class NotificationsIt extends NotificationsItBase {
     }
 
     @SuppressWarnings({"Indentation", "unused"})
-    private static Object[] generateRepsNotificationScenarios() {
+    private Object[] generateRepsNotificationScenarios() {
         return new Object[]{
             // GAPS
             new Object[]{
@@ -2904,10 +2896,10 @@ class NotificationsIt extends NotificationsItBase {
         };
     }
 
-    private static Object[] generateDelayedNotificationScenarios() {
+    private Object[] generateDelayedNotificationScenarios() {
         return new Object[]{
             new Object[]{
-                NotificationEventType.APPEAL_RECEIVED,
+                APPEAL_RECEIVED,
                 "Appeal received scheduled",
                 1
             },
@@ -2925,7 +2917,7 @@ class NotificationsIt extends NotificationsItBase {
     }
 
     @SuppressWarnings({"Indentation", "unused"})
-    private static Object[] generateBundledLetterNotificationScenarios() {
+    private Object[] generateBundledLetterNotificationScenarios() {
         return new Object[]{
             // GAPS
             new Object[]{
@@ -3733,7 +3725,7 @@ class NotificationsIt extends NotificationsItBase {
     }
 
     @SuppressWarnings({"Indentation", "unused"})
-    private static Object[] generateAppointeeNotificationScenarios() {
+    private Object[] generateAppointeeNotificationScenarios() {
         return new Object[]{
             // GAPS
             new Object[]{
@@ -4833,10 +4825,10 @@ class NotificationsIt extends NotificationsItBase {
     }
 
     @Test
-    @Disabled
+    @Ignore
     // SSCS-11586
-    void shouldSendNotificationForHearingBookedRequestForAnOralHearing() throws Exception {
-        json = json.replace(APPEAL_RECEIVED, "hearingBooked");
+    public void shouldSendNotificationForHearingBookedRequestForAnOralHearing() throws Exception {
+        json = json.replace("appealReceived", "hearingBooked");
         json = json.replace(HEARING_ROUTE_FIELD, LIST_ASSIST_ROUTE);
         json = json.replace("2018-01-12", LocalDate.now().plusDays(2).toString());
 
@@ -4848,9 +4840,9 @@ class NotificationsIt extends NotificationsItBase {
     }
 
     @Test
-    void shouldNotSendNotificationForHearingBookedRequestForAPaperHearing() throws Exception {
+    public void shouldNotSendNotificationForHearingBookedRequestForAPaperHearing() throws Exception {
         updateJsonForPaperHearing();
-        json = json.replace(APPEAL_RECEIVED, "hearingBooked");
+        json = json.replace("appealReceived", "hearingBooked");
         json = json.replace(HEARING_ROUTE_FIELD, LIST_ASSIST_ROUTE);
         json = json.replace("2018-01-12", LocalDate.now().plusDays(2).toString());
 
@@ -4862,8 +4854,8 @@ class NotificationsIt extends NotificationsItBase {
     }
 
     @Test
-    void shouldNotSendNotificationForHearingBookedRequestForHearingInThePastForAnOralHearing() throws Exception {
-        json = json.replace(APPEAL_RECEIVED, "hearingBooked");
+    public void shouldNotSendNotificationForHearingBookedRequestForHearingInThePastForAnOralHearing() throws Exception {
+        json = json.replace("appealReceived", "hearingBooked");
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json));
 
@@ -4873,8 +4865,8 @@ class NotificationsIt extends NotificationsItBase {
     }
 
     @Test
-    void shouldSendAppellantNotificationForEvidenceReminderForAnOralHearing() throws Exception {
-        json = json.replace(APPEAL_RECEIVED, "evidenceReminder");
+    public void shouldSendAppellantNotificationForEvidenceReminderForAnOralHearing() throws Exception {
+        json = json.replace("appealReceived", "evidenceReminder");
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json));
 
@@ -4884,9 +4876,9 @@ class NotificationsIt extends NotificationsItBase {
     }
 
     @Test
-    void shouldSendAppellantNotificationForEvidenceReminderForAPaperHearing() throws Exception {
+    public void shouldSendAppellantNotificationForEvidenceReminderForAPaperHearing() throws Exception {
         updateJsonForPaperHearing();
-        json = json.replace(APPEAL_RECEIVED, "evidenceReminder");
+        json = json.replace("appealReceived", "evidenceReminder");
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json));
 
@@ -4896,10 +4888,10 @@ class NotificationsIt extends NotificationsItBase {
     }
 
     @Test
-    @Disabled
+    @Ignore
     // SSCS-11586
-    void shouldSendNotificationForHearingReminderForAnOralHearing() throws Exception {
-        json = json.replace(APPEAL_RECEIVED, "hearingReminder");
+    public void shouldSendNotificationForHearingReminderForAnOralHearing() throws Exception {
+        json = json.replace("appealReceived", "hearingReminder");
         json = json.replace(HEARING_ROUTE_FIELD, LIST_ASSIST_ROUTE);
         json = json.replace("2018-01-12", LocalDate.now().plusDays(2).toString());
 
@@ -4911,9 +4903,9 @@ class NotificationsIt extends NotificationsItBase {
     }
 
     @Test
-    void shouldNotSendNotificationForHearingReminderForAPaperHearing() throws Exception {
+    public void shouldNotSendNotificationForHearingReminderForAPaperHearing() throws Exception {
         updateJsonForPaperHearing();
-        json = json.replace(APPEAL_RECEIVED, "hearingReminder");
+        json = json.replace("appealReceived", "hearingReminder");
         json = json.replace(HEARING_ROUTE_FIELD, LIST_ASSIST_ROUTE);
         json = json.replace("2018-01-12", LocalDate.now().plusDays(2).toString());
 
@@ -4925,8 +4917,8 @@ class NotificationsIt extends NotificationsItBase {
     }
 
     @Test
-    void shouldSendNotificationForSyaAppealCreatedRequestForAnOralHearing() throws Exception {
-        json = json.replace(APPEAL_RECEIVED, "appealCreated");
+    public void shouldSendNotificationForSyaAppealCreatedRequestForAnOralHearing() throws Exception {
+        json = json.replace("appealReceived", "appealCreated");
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json));
 
@@ -4936,9 +4928,9 @@ class NotificationsIt extends NotificationsItBase {
     }
 
     @Test
-    void shouldSendNotificationForSyaAppealCreatedRequestForAPaperHearing() throws Exception {
+    public void shouldSendNotificationForSyaAppealCreatedRequestForAPaperHearing() throws Exception {
         updateJsonForPaperHearing();
-        json = json.replace(APPEAL_RECEIVED, "appealCreated");
+        json = json.replace("appealReceived", "appealCreated");
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json));
 
         assertHttpStatus(response, HttpStatus.OK);
@@ -4947,8 +4939,8 @@ class NotificationsIt extends NotificationsItBase {
     }
 
     @Test
-    void shouldSendSubscriptionCreatedNotificationForSubscriptionUpdatedRequestWithNewSubscribeSmsRequestForAnOralHearing() throws Exception {
-        json = json.replace(APPEAL_RECEIVED, "subscriptionUpdated");
+    public void shouldSendSubscriptionCreatedNotificationForSubscriptionUpdatedRequestWithNewSubscribeSmsRequestForAnOralHearing() throws Exception {
+        json = json.replace("appealReceived", "subscriptionUpdated");
         json = updateEmbeddedJson(json, "No", "case_details", "case_data", "subscriptions", "appellantSubscription", "subscribeEmail");
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json));
@@ -4959,7 +4951,7 @@ class NotificationsIt extends NotificationsItBase {
     }
 
     /*@Test
-    void shouldSendSubscriptionCreatedNotificationForSubscriptionUpdatedRequestWithNewSubscribeSmsRequestForAPaperHearingWithRepSubscribedToSms() throws Exception {
+    public void shouldSendSubscriptionCreatedNotificationForSubscriptionUpdatedRequestWithNewSubscribeSmsRequestForAPaperHearingWithRepSubscribedToSms() throws Exception {
         updateJsonForPaperHearing();
         json = json.replace("appealReceived", "subscriptionUpdated");
         json = updateEmbeddedJson(json, "No", "case_details", "case_data", "subscriptions", "appellantSubscription", "subscribeEmail");
@@ -4973,7 +4965,7 @@ class NotificationsIt extends NotificationsItBase {
     }
 
     @Test
-    void shouldSendSubscriptionUpdatedNotificationForSubscriptionUpdatedRequestWithNewEmailAddressForAnOralHearingWhenAlreadySubscribedToSms() throws Exception {
+    public void shouldSendSubscriptionUpdatedNotificationForSubscriptionUpdatedRequestWithNewEmailAddressForAnOralHearingWhenAlreadySubscribedToSms() throws Exception {
         json = updateEmbeddedJson(json, "subscriptionUpdated", "event_id");
         json = updateEmbeddedJson(json, "oral",
                         GAPS_ROUTE, "case_details", "case_data", "appeal", "hearingType");
@@ -4989,7 +4981,7 @@ class NotificationsIt extends NotificationsItBase {
     }
 
     @Test
-    void shouldSendSubscriptionUpdatedNotificationForSubscriptionUpdatedRequestWithNewEmailAddressForAPaperHearingWhenRepAlreadySubscriptedToSms() throws Exception {
+    public void shouldSendSubscriptionUpdatedNotificationForSubscriptionUpdatedRequestWithNewEmailAddressForAPaperHearingWhenRepAlreadySubscriptedToSms() throws Exception {
         updateJsonForPaperHearing();
         json = updateEmbeddedJson(json, "subscriptionUpdated", "event_id");
         json = updateEmbeddedJson(json, "No", "case_details", "case_data", "subscriptions",
@@ -5004,8 +4996,8 @@ class NotificationsIt extends NotificationsItBase {
     }*/
 
     @Test
-    void shouldNotSendSubscriptionUpdatedNotificationForSubscriptionUpdatedRequestWithSameEmailAddress() throws Exception {
-        json = json.replace(APPEAL_RECEIVED, "subscriptionUpdated");
+    public void shouldNotSendSubscriptionUpdatedNotificationForSubscriptionUpdatedRequestWithSameEmailAddress() throws Exception {
+        json = json.replace("appealReceived", "subscriptionUpdated");
         json = json.replace("sscstest@greencroftconsulting.com", "tester@hmcts.net");
 
         json = updateEmbeddedJson(json, "Yes", "case_details_before", "case_data", "subscriptions", "appellantSubscription", "subscribeEmail");
@@ -5019,11 +5011,11 @@ class NotificationsIt extends NotificationsItBase {
     }
 
     @Test
-    void givenAnUnknownRpcCase_thenDoNotProcessNotifications() throws Exception {
+    public void givenAnUnknownRpcCase_thenDoNotProcessNotifications() throws Exception {
         String path = getClass().getClassLoader().getResource("json/ccdResponseWithNoOldCaseRef.json").getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
-        json = json.replace(APPEAL_RECEIVED, "appealCreated");
+        json = json.replace("appealReceived", "appealCreated");
         json = json.replace("SC022", "SC948");
 
         json = updateEmbeddedJson(json, "No", "case_details", "case_data", "subscriptions", "appellantSubscription", "subscribeEmail");
@@ -5040,7 +5032,7 @@ class NotificationsIt extends NotificationsItBase {
     }
 
     @Test
-    void shouldReturn400WhenAuthHeaderIsMissing() throws Exception {
+    public void shouldReturn400WhenAuthHeaderIsMissing() throws Exception {
         HttpServletResponse response = getResponse(getRequestWithoutAuthHeader(json));
 
         assertHttpStatus(response, HttpStatus.BAD_REQUEST);
@@ -5048,11 +5040,11 @@ class NotificationsIt extends NotificationsItBase {
         verify(notificationClient, never()).sendEmail(any(), any(), any(), any(), any());
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"subscriptionUpdated", APPEAL_RECEIVED, "directionIssued", "nonCompliant"})
-    void shouldNotSendNotificationWhenAppealDormantAndNotificationType(final String notificationEventType) throws Exception {
+    @Test
+    @Parameters({"subscriptionUpdated", "appealReceived", "directionIssued", "nonCompliant"})
+    public void shouldNotSendNotificationWhenAppealDormantAndNotificationType(String notificationEventType) throws Exception {
         json = json.replace("appealCreated", State.DORMANT_APPEAL_STATE.toString());
-        json = json.replace(APPEAL_RECEIVED, notificationEventType);
+        json = json.replace("appealReceived", notificationEventType);
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json));
 
@@ -5061,11 +5053,11 @@ class NotificationsIt extends NotificationsItBase {
         verify(notificationClient, never()).sendSms(any(), any(), any(), any(), any());
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"appealLapsed", "appealDormant"})
-    void shouldSendNotificationWhenAppealDormantAndNotificationType(final String notificationEventType) throws Exception {
+    @Test
+    @Parameters({"appealLapsed", "appealDormant"})
+    public void shouldSendNotificationWhenAppealDormantAndNotificationType(String notificationEventType) throws Exception {
         json = json.replace("appealCreated", State.DORMANT_APPEAL_STATE.toString());
-        json = json.replace(APPEAL_RECEIVED, notificationEventType);
+        json = json.replace("appealReceived", notificationEventType);
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json));
 
@@ -5081,11 +5073,11 @@ class NotificationsIt extends NotificationsItBase {
         verifyNoMoreInteractions(notificationClient);
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"appealWithdrawn", "directionIssued"})
-    void shouldSendNotificationLetterWhenAppealDormantAndNotificationType(final String notificationEventType) throws Exception {
+    @Test
+    @Parameters({"appealWithdrawn", "directionIssued"})
+    public void shouldSendNotificationLetterWhenAppealDormantAndNotificationType(String notificationEventType) throws Exception {
         json = json.replace("appealCreated", State.DORMANT_APPEAL_STATE.toString());
-        json = json.replace(APPEAL_RECEIVED, notificationEventType);
+        json = json.replace("appealReceived", notificationEventType);
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json));
 
@@ -5097,7 +5089,7 @@ class NotificationsIt extends NotificationsItBase {
     }
 
     @Test
-    void givenAStruckOutEvent_shouldStillSendStruckOutNotificationWhenAppealDormant() throws Exception {
+    public void givenAStruckOutEvent_shouldStillSendStruckOutNotificationWhenAppealDormant() throws Exception {
 
         String filename = "json/ccdResponse_struckOut.json";
         String path = getClass().getClassLoader().getResource(filename).getFile();
@@ -5117,9 +5109,9 @@ class NotificationsIt extends NotificationsItBase {
         verifyNoMoreInteractions(notificationClient);
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"adjournCase", "issueFinalDecision", "decisionIssued", "directionIssued"})
-    void givenAReissueEvent_shouldStillSendDirectionIssued(final String furtherEvidenceType) throws Exception {
+    @Test
+    @Parameters({"adjournCase", "issueFinalDecision", "decisionIssued", "directionIssued"})
+    public void givenAReissueEvent_shouldStillSendDirectionIssued(String furtherEvidenceType) throws Exception {
 
         String filename = "json/ccdResponse_reissueDocument.json";
         String path = getClass().getClassLoader().getResource(filename).getFile();
@@ -5140,19 +5132,20 @@ class NotificationsIt extends NotificationsItBase {
         verifyNoMoreInteractions(notificationClient);
     }
 
+    @NamedParameters("grantedOrRefused")
     @SuppressWarnings("unused")
-    private static Stream<Arguments> grantedOrRefused() {
-        return Stream.of(
-            Arguments.of(DatedRequestOutcome.builder()
-                .requestOutcome(RequestOutcome.GRANTED).date(LocalDate.now()).build()),
-            Arguments.of(DatedRequestOutcome.builder()
-                .requestOutcome(RequestOutcome.REFUSED).date(LocalDate.now()).build())
-        );
+    private Object[] grantedOrRefused() {
+        return new Object[]{
+            new DatedRequestOutcome[] {DatedRequestOutcome.builder()
+                .requestOutcome(RequestOutcome.GRANTED).date(LocalDate.now()).build()},
+            new DatedRequestOutcome[] {DatedRequestOutcome.builder()
+                .requestOutcome(RequestOutcome.REFUSED).date(LocalDate.now()).build()},
+        };
     }
 
-    @ParameterizedTest
-    @MethodSource("grantedOrRefused")
-    void givenAppellantConfidentialityRequest_shouldSendConfidentialityLetter(final DatedRequestOutcome requestOutcome) throws Exception {
+    @Test
+    @Parameters(named = "grantedOrRefused")
+    public void givenAppellantConfidentialityRequest_shouldSendConfidentialityLetter(DatedRequestOutcome requestOutcome) throws Exception {
         String path = getClass().getClassLoader().getResource("json/ccdResponseWithJointParty.json").getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = updateEmbeddedJson(json, "reviewConfidentialityRequest", "event_id");
@@ -5165,9 +5158,9 @@ class NotificationsIt extends NotificationsItBase {
         verify(notificationClient, times(1)).sendPrecompiledLetterWithInputStream(any(), any());
     }
 
-    @ParameterizedTest
-    @MethodSource("grantedOrRefused")
-    void givenJointPartyConfidentialityRequest_shouldSendConfidentialityLetter(final DatedRequestOutcome requestOutcome) throws Exception {
+    @Test
+    @Parameters(named = "grantedOrRefused")
+    public void givenJointPartyConfidentialityRequest_shouldSendConfidentialityLetter(DatedRequestOutcome requestOutcome) throws Exception {
         String path = getClass().getClassLoader().getResource("json/ccdResponseWithJointParty.json").getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = updateEmbeddedJson(json, "reviewConfidentialityRequest", "event_id");
@@ -5180,9 +5173,9 @@ class NotificationsIt extends NotificationsItBase {
         verify(notificationClient, times(1)).sendPrecompiledLetterWithInputStream(any(), any());
     }
 
-    @ParameterizedTest
-    @MethodSource("grantedOrRefused")
-    void givenJointPartyAndAppellantConfidentialityRequest_shouldSendBothConfidentialityLetters(final DatedRequestOutcome requestOutcome) throws Exception {
+    @Test
+    @Parameters(named = "grantedOrRefused")
+    public void givenJointPartyAndAppellantConfidentialityRequest_shouldSendBothConfidentialityLetters(DatedRequestOutcome requestOutcome) throws Exception {
         String path = getClass().getClassLoader().getResource("json/ccdResponseWithJointParty.json").getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = updateEmbeddedJson(json, "reviewConfidentialityRequest", "event_id");
@@ -5196,14 +5189,14 @@ class NotificationsIt extends NotificationsItBase {
         verify(notificationClient, times(2)).sendPrecompiledLetterWithInputStream(any(), any());
     }
 
-    @ParameterizedTest
-    @CsvSource({
+    @Test
+    @Parameters({
         "appellant, Dexter Vasquez, true",
         "appellant, Appointee Appointee, false",
         "jointParty, Joint Party, false",
         "representative, Harry Potter, false"
     })
-    void givenRequestForInformationEvent_shouldSendNotificationToSelectedParty(final String partySelected, final String letterRecipient, final boolean sendToAppellant) throws Exception {
+    public void givenRequestForInformationEvent_shouldSendNotificationToSelectedParty(String partySelected, String letterRecipient, boolean sendToAppellant) throws Exception {
         String jsonPath = sendToAppellant ? "json/ccdResponse_requestForInformationAppellant.json" : "json/ccdResponse_requestForInformation.json";
         String path = getClass().getClassLoader().getResource(jsonPath).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
@@ -5220,62 +5213,6 @@ class NotificationsIt extends NotificationsItBase {
     private void updateJsonForPaperHearing() throws IOException {
         json = updateEmbeddedJson(json, "No", "case_details", "case_data", "appeal", "hearingOptions", "wantsToAttend");
         json = updateEmbeddedJson(json, "paper", "case_details", "case_data", "appeal", "hearingType");
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"childSupport", "UC"})
-    public void givenUpdateOtherPartyDataEvent_whenMoreThanOneOtherParty_thenLetterNotificationSent(String benefitType) throws Exception {
-        String updatedJson = updateEmbeddedJson(json, "updateOtherPartyData", "event_id");
-        updatedJson = updateEmbeddedJson(updatedJson, benefitType, "case_details", "case_data", "appeal", "benefitType",
-            "code");
-        updatedJson = updateEmbeddedJson(updatedJson,
-            List.of(CcdValue.<OtherParty>builder().value(OtherParty.builder().build()).build(),
-                CcdValue.<OtherParty>builder().value(OtherParty.builder().build()).build()), "case_details", "case_data",
-            "otherParties");
-
-        getResponse(getRequestWithAuthHeader(updatedJson));
-
-        verify(notificationClient, atLeastOnce()).sendPrecompiledLetterWithInputStream(any(), any());
-    }
-
-    @Test
-    void givenValidAppealEvent_whenBenefitIsChildSupport_thenLetterNotificationSent() throws Exception {
-        String updatedJson = updateEmbeddedJson(json, "validAppeal", "event_id");
-        updatedJson = updateEmbeddedJson(updatedJson, "childSupport", "case_details", "case_data", "appeal", "benefitType", "code");
-
-        getResponse(getRequestWithAuthHeader(updatedJson));
-
-        verify(notificationClient, atLeastOnce()).sendPrecompiledLetterWithInputStream(any(), any());
-    }
-
-    @Test
-    void givenAdminSendToValidAppealEvent_whenBenefitIsChildSupport_thenLetterNotificationSent() throws Exception {
-        String updatedJson = updateEmbeddedJson(json, "adminSendToValidAppeal", "event_id");
-        updatedJson = updateEmbeddedJson(updatedJson, "childSupport", "case_details", "case_data", "appeal", "benefitType", "code");
-
-        getResponse(getRequestWithAuthHeader(updatedJson));
-
-        verifyNoMoreInteractions(notificationClient);
-    }
-
-    @Test
-    void givenInterlocValidAppealEvent_whenBenefitIsChildSupport_thenLetterNotificationSent() throws Exception {
-        String updatedJson = updateEmbeddedJson(json, "interlocValidAppeal", "event_id");
-        updatedJson = updateEmbeddedJson(updatedJson, "childSupport", "case_details", "case_data", "appeal", "benefitType", "code");
-
-        getResponse(getRequestWithAuthHeader(updatedJson));
-
-        verify(notificationClient, atLeastOnce()).sendPrecompiledLetterWithInputStream(any(), any());
-    }
-
-    @Test
-    void givenAppealToProceedNotifyValidAppealEvent_whenBenefitIsChildSupport_thenLetterNotificationSent() throws Exception {
-        String updatedJson = updateEmbeddedJson(json, "directionIssued", "event_id");
-        updatedJson = updateEmbeddedJson(updatedJson, "childSupport", "case_details", "case_data", "appeal", "benefitType", "code");
-
-        getResponse(getRequestWithAuthHeader(updatedJson));
-
-        verify(notificationClient, atLeastOnce()).sendPrecompiledLetterWithInputStream(any(), any());
     }
 
 }

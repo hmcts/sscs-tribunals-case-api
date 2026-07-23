@@ -60,7 +60,11 @@ public class CcdBulkScanCallbackController {
 
         log.info("Request received for to validate SSCS exception record id {}", callback.getCaseDetails().getId());
 
-        authorisationService.assertIsAllowedToHandleCallback(serviceAuthToken);
+        String serviceName = authorisationService.authenticate(serviceAuthToken);
+
+        log.info("Asserting that service {} is allowed to request validation of exception record {}", serviceName, callback.getCaseDetails().getId());
+
+        authorisationService.assertIsAllowedToHandleCallback(serviceName);
 
         IdamTokens token = IdamTokens.builder().serviceAuthorization(serviceAuthToken).idamOauth2Token(userAuthToken).userId(userId).build();
 

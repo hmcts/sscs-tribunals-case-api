@@ -220,17 +220,6 @@ Examples:
 # Generate shuttered, prod like CCD config for AAT with WA turned off
 ./bin/create-xlsx.sh benefit dev aat false prod true
 ```
-```bash
-# Generate prod like CCD config for preview with WA turned off
-export CHANGE_ID=[pr_number]
-./bin/create-xlsx.sh benefit dev pr false prod
-
-# Note: verify that the generated file has the correct pr number in the 'CaseEvent' Tab. The callback urls should look 
-# something like: https://sscs-tribunals-api-pr-5218.preview.platform.hmcts.net/ccdAboutToSubmit
-```
-
-For more information on how to upload the generated definition files to the relevant environment see the deployment sections 
-[here](https://tools.hmcts.net/confluence/spaces/SSCS/pages/1545339359/CCD+Definitions+Info)
 
 ## Work allocation
 Work allocation can be enabled in lower environments. To generate the correct CCD configuration for this feature, 
@@ -264,11 +253,3 @@ This avoids re-triggering the pipeline build and saves time.
 ### Local DM Store Not Healthy (DOWN or UNKNOWN)
 If this is the first time that the container has been created then it may need to be restarted multiple times in order for it to come up successfully!
 
-### AAT Idam users
-To test work allocation you will need to create users in IDAM with the correct roles. To do this run the following two commands:
-```bash
-chmod +x bin/create-idam-users.sh
-```
-```bash
-bin/create-idam-users.sh
-```

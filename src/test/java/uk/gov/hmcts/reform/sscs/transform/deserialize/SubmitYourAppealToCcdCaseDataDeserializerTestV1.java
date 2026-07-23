@@ -81,7 +81,7 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 public class SubmitYourAppealToCcdCaseDataDeserializerTestV1 {
 
     private static final String NO = "No";
-    private static final String[] IGNORED_PATHS = {
+    public static final String[] IGNORED_PATHS = {
         "jointPartyId",
         "appeal.appellant.appointee.id",
         "appeal.appellant.id",

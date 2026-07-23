@@ -82,7 +82,7 @@ public class OtherPartyFunctionalTest extends AbstractFunctionalTest {
         simulateCcdCallback(notificationEventType,
             "tyanotifications/otherparty/oral-eventTypeCallback.json");
 
-        final List<Notification> notifications = fetchLetters(expectedNumberOfLetters);
+        List<Notification> notifications = fetchLetters();
 
         assertEquals(expectedNumberOfLetters, notifications.size());
         notifications.forEach(n -> assertEquals("Pre-compiled PDF", n.getSubject().orElse("Unknown Subject")));

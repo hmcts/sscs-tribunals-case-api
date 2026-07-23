@@ -160,7 +160,6 @@
         }
       ],
       "processingVenue": "Cardiff",
-      "isScottishCase": "No",
       "caseManagementCategory": {
         "value": {
           "code": "maternityAllowance",

@@ -13,11 +13,10 @@ export class ReadyToList extends BaseStep {
 
   async performReadyToListEvent(
     caseId: string,
-    loginRequired: boolean = true,
-    user = credentials.amCtscAdminNwLiverpool
+    loginRequired: boolean = true
   ): Promise<void> {
     if (loginRequired) {
-      await this.loginUserWithCaseId(user, false, caseId);
+      await this.loginUserWithCaseId(credentials.amCtscAdminNwLiverpool, false, caseId);
     }
     await this.homePage.chooseEvent('Ready to list');
     await this.completeReadyToListEvent();
@@ -30,7 +29,6 @@ export class ReadyToList extends BaseStep {
       eventTestData.eventDescriptionInput
     );
     await this.eventNameAndDescriptionPage.confirmSubmission();
-    await this.ignoreWarningsIfPresent();
 
     await expect(this.homePage.summaryTab).toBeVisible();
     await this.homePage.delay(3000);
@@ -39,41 +37,5 @@ export class ReadyToList extends BaseStep {
       'Ready to list',
       eventTestData.eventDescriptionInput
     );
-    await this.waitForReadyToListState();
-  }
-
-  private async waitForReadyToListState(): Promise<void> {
-    let lastError;
-
-    for (let attempt = 1; attempt <= 10; attempt++) {
-      try {
-        await this.homePage.navigateToTab('Summary');
-        await expect(
-          this.page.locator(
-            `//p[./strong[normalize-space()="Appeal status"] and contains(normalize-space(), "Ready to list")]`
-          )
-        ).toBeVisible();
-        return;
-      } catch (error) {
-        lastError = error;
-        if (attempt === 10) {
-          throw lastError;
-        }
-        await this.homePage.delay(3000);
-        await this.homePage.reloadPage();
-        await expect(this.homePage.summaryTab).toBeVisible();
-      }
-    }
-  }
-
-  private async ignoreWarningsIfPresent(): Promise<void> {
-    const ignoreWarningButton = this.page.getByRole('button', {
-      name: 'Ignore Warning and Continue',
-      exact: true
-    });
-
-    if (await ignoreWarningButton.isVisible().catch(() => false)) {
-      await ignoreWarningButton.click();
-    }
   }
 }

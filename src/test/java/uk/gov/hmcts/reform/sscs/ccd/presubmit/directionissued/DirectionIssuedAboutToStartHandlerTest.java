@@ -1,23 +1,13 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
 import static java.time.LocalDateTime.now;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.PIP;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.APPEAL_TO_PROCEED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.GRANT_EXTENSION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.GRANT_REINSTATEMENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.GRANT_URGENT_HEARING;
@@ -35,21 +25,16 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.NO_FURTHER_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.SEND_TO_LISTING;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.SEND_TO_VALID_APPEAL;
-import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -57,13 +42,11 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HmcHearingType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
@@ -72,20 +55,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.idam.UserDetails;
-import uk.gov.hmcts.reform.sscs.idam.UserRole;
 import uk.gov.hmcts.reform.sscs.reference.data.model.ConfidentialityType;
 
 @ExtendWith(MockitoExtension.class)
-class DirectionIssuedAboutToStartHandlerTest {
+public class DirectionIssuedAboutToStartHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
-
-    @Mock
-    private IdamService idamService;
-    @Mock
-    private UserDetails userDetails;
 
     private Callback<SscsCaseData> callback;
     private CaseDetails<SscsCaseData> caseDetails;
@@ -94,9 +69,8 @@ class DirectionIssuedAboutToStartHandlerTest {
     private DirectionIssuedAboutToStartHandler handler;
 
     @BeforeEach
-    void setUp() {
-        handler = new DirectionIssuedAboutToStartHandler(false, false, idamService);
-        lenient().when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
+    public void setUp() {
+        handler = new DirectionIssuedAboutToStartHandler(false);
         sscsCaseData = SscsCaseData.builder()
                 .appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build())
                 .build();
@@ -105,7 +79,7 @@ class DirectionIssuedAboutToStartHandlerTest {
     }
 
     @Test
-    void givenANonHandleEvidenceEvent_thenReturnFalse() {
+    public void givenANonHandleEvidenceEvent_thenReturnFalse() {
         callback = new Callback<>(caseDetails, Optional.of(caseDetails), APPEAL_RECEIVED, false);
 
         assertFalse(handler.canHandle(ABOUT_TO_START, callback));
@@ -113,18 +87,18 @@ class DirectionIssuedAboutToStartHandlerTest {
 
     @ParameterizedTest
     @CsvSource({"ABOUT_TO_SUBMIT", "SUBMITTED"})
-    void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
+    public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
     }
 
     @ParameterizedTest
     @CsvSource({"ABOUT_TO_START", "MID_EVENT"})
-    void givenAValidCallbackType_thenReturnTrue(CallbackType callbackType) {
+    public void givenAValidCallbackType_thenReturnTrue(CallbackType callbackType) {
         assertTrue(handler.canHandle(callbackType, callback));
     }
 
     @Test
-    void givenValidAppeal_populateExtensionNextEventDropdown() {
+    public void givenValidAppeal_populateExtensionNextEventDropdown() {
         callback = new Callback<>(caseDetails, Optional.of(caseDetails), DIRECTION_ISSUED, false);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -140,7 +114,7 @@ class DirectionIssuedAboutToStartHandlerTest {
     }
 
     @Test
-    void givenValidAppealWithExtensionNextEventAlreadyPopulated_thenAutoSelectExtensionNextEventValue() {
+    public void givenValidAppealWithExtensionNextEventAlreadyPopulated_thenAutoSelectExtensionNextEventValue() {
         sscsCaseData = SscsCaseData.builder().extensionNextEventDl(new DynamicList(NO_FURTHER_ACTION.getCode()))
                 .appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build())
                 .build();
@@ -160,7 +134,7 @@ class DirectionIssuedAboutToStartHandlerTest {
 
     @ParameterizedTest
     @CsvSource({"INCOMPLETE_APPLICATION", "INCOMPLETE_APPLICATION_INFORMATION_REQUESTED", "INTERLOCUTORY_REVIEW_STATE"})
-    void givenNonValidAppeal_populateExtensionNextEventDropdown(State state) {
+    public void givenNonValidAppeal_populateExtensionNextEventDropdown(State state) {
         caseDetails = new CaseDetails<>(1234L, "SSCS", state, sscsCaseData, now(), "Benefit");
         callback = new Callback<>(caseDetails, Optional.of(caseDetails), DIRECTION_ISSUED, false);
         List<DynamicListItem> listOptions = new ArrayList<>();
@@ -176,7 +150,7 @@ class DirectionIssuedAboutToStartHandlerTest {
     }
 
     @Test
-    void givenAppealWithTimeExtension_populateDirectionTypeDropdown() {
+    public void givenAppealWithTimeExtension_populateDirectionTypeDropdown() {
         sscsCaseData.setTimeExtensionRequested("Yes");
 
         List<DynamicListItem> listOptions = new ArrayList<>();
@@ -188,96 +162,13 @@ class DirectionIssuedAboutToStartHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getDirectionTypeDl().getListItems()).containsExactlyElementsOf(listOptions);
+        DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
+        assertEquals(expected, response.getData().getDirectionTypeDl());
+        assertEquals(5, response.getData().getDirectionTypeDl().getListItems().size());
     }
 
     @Test
-    void givenAppealWithConfidentialityReferralAndFeatureFlagEnabled_populateDirectionTypeDropdown() {
-        handler = new DirectionIssuedAboutToStartHandler(false, true, idamService);
-        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
-
-        List<DynamicListItem> listOptions = new ArrayList<>();
-        listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
-        listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
-        listOptions.add(new DynamicListItem(ISSUE_AND_SEND_TO_ADMIN.toString(), ISSUE_AND_SEND_TO_ADMIN.getLabel()));
-        listOptions.add(new DynamicListItem(CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString(),
-            CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.getLabel()));
-        listOptions.add(new DynamicListItem(CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN.toString(),
-            CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN.getLabel()));
-
-        when(idamService.getUserDetails(anyString())).thenReturn(userDetails);
-        when(userDetails.hasRole(SUPER_USER)).thenReturn(true);
-        callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(CHILD_SUPPORT.getShortName()).build());
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getDirectionTypeDl().getListItems()).containsExactlyElementsOf(listOptions);
-    }
-
-    @Test
-    void givenUcAppealWithConfidentialityReferralAndFeatureFlagEnabled_populateDirectionTypeDropdown() {
-        handler = new DirectionIssuedAboutToStartHandler(false, true, idamService);
-        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
-
-        List<DynamicListItem> listOptions = new ArrayList<>();
-        listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
-        listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
-        listOptions.add(new DynamicListItem(ISSUE_AND_SEND_TO_ADMIN.toString(), ISSUE_AND_SEND_TO_ADMIN.getLabel()));
-        listOptions.add(new DynamicListItem(CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString(),
-            CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.getLabel()));
-        listOptions.add(new DynamicListItem(CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN.toString(),
-            CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN.getLabel()));
-
-        when(idamService.getUserDetails(anyString())).thenReturn(userDetails);
-        when(userDetails.hasRole(SUPER_USER)).thenReturn(true);
-        callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(UC.getShortName()).build());
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getDirectionTypeDl().getListItems()).containsExactlyElementsOf(listOptions);
-    }
-
-    @ParameterizedTest(name = "{0}")
-    @MethodSource("provideConfidentialityReferralTestCases")
-    void givenAppealWithConfidentialityReferral_doNotPopulateDirectionTypeDropdown(
-        String scenario, boolean featureFlagEnabled, InterlocReferralReason referralReason,
-        String benefitCode, boolean hasSuperUser) {
-        handler = new DirectionIssuedAboutToStartHandler(false, featureFlagEnabled, idamService);
-        sscsCaseData.setInterlocReferralReason(referralReason);
-
-        List<DynamicListItem> listOptions = new ArrayList<>();
-        listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
-        listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
-        listOptions.add(new DynamicListItem(ISSUE_AND_SEND_TO_ADMIN.toString(), ISSUE_AND_SEND_TO_ADMIN.getLabel()));
-
-        if (hasSuperUser) {
-            when(idamService.getUserDetails(anyString())).thenReturn(userDetails);
-            when(userDetails.hasRole(SUPER_USER)).thenReturn(true);
-        }
-
-        if (benefitCode != null) {
-            callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(
-                BenefitType.builder().code(benefitCode).build());
-        }
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getDirectionTypeDl().getListItems()).containsExactlyElementsOf(listOptions);
-    }
-
-    private static Stream<Arguments> provideConfidentialityReferralTestCases() {
-        return Stream.of(
-            Arguments.of("confidentiality referral with feature flag enabled and not supported benefit",
-                true, InterlocReferralReason.CONFIDENTIALITY, PIP.getShortName(), true),
-            Arguments.of("confidentiality referral with feature flag disabled",
-                false, InterlocReferralReason.CONFIDENTIALITY, null, false),
-            Arguments.of("no confidentiality referral with feature flag enabled",
-                true, null, CHILD_SUPPORT.getShortName(), true)
-        );
-    }
-
-    @Test
-    void givenAnyBenefitCodeAppeal_populateDirectionTypeDropdown() {
+    public void givenAnyBenefitCodeAppeal_populateDirectionTypeDropdown() {
         for (BenefitCode benefitCode : BenefitCode.values()) {
             sscsCaseData.setBenefitCode(String.valueOf(benefitCode.getCcdReference()));
 
@@ -295,7 +186,7 @@ class DirectionIssuedAboutToStartHandlerTest {
     }
 
     @Test
-    void givenNonSpecificBenefitCodeAppeal_doNotPopulateIssueAndSendToAdmin() {
+    public void givenNonSpecificBenefitCodeAppeal_doNotPopulateIssueAndSendToAdmin() {
         sscsCaseData.setBenefitCode("001");
 
         List<DynamicListItem> listOptions = new ArrayList<>();
@@ -311,8 +202,8 @@ class DirectionIssuedAboutToStartHandlerTest {
     }
 
     @Test
-    void givenAppealWithReinstatementRequest_populateDirectionTypeDropdown() {
-        handler = new DirectionIssuedAboutToStartHandler(false, false, idamService);
+    public void givenAppealWithReinstatementRequest_populateDirectionTypeDropdown() {
+        handler = new DirectionIssuedAboutToStartHandler(false);
         sscsCaseData.setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
@@ -330,7 +221,7 @@ class DirectionIssuedAboutToStartHandlerTest {
     }
 
     @Test
-    void givenAppealWithUrgentHearingEnabledAndUrgentCaseYes_populateDirectionTypeDropdown() {
+    public void givenAppealWithUrgentHearingEnabledAndUrgentCaseYes_populateDirectionTypeDropdown() {
         callback.getCaseDetails().getCaseData().setUrgentCase("Yes");
 
         List<DynamicListItem> listOptions = new ArrayList<>();
@@ -348,7 +239,7 @@ class DirectionIssuedAboutToStartHandlerTest {
     }
 
     @Test
-    void givenAppealWithUrgentHearingEnabledAndUrgentCaseNo_populateDirectionTypeDropdown() {
+    public void givenAppealWithUrgentHearingEnabledAndUrgentCaseNo_populateDirectionTypeDropdown() {
         callback.getCaseDetails().getCaseData().setUrgentCase("No");
 
         List<DynamicListItem> listOptions = new ArrayList<>();
@@ -364,7 +255,7 @@ class DirectionIssuedAboutToStartHandlerTest {
     }
 
     @Test
-    void givenValidAppealWithTimeExtensionAndDirectionTypeAlreadyPopulated_thenAutoSelectDirectionTypeValue() {
+    public void givenValidAppealWithTimeExtensionAndDirectionTypeAlreadyPopulated_thenAutoSelectDirectionTypeValue() {
         sscsCaseData = SscsCaseData.builder().timeExtensionRequested("Yes")
                 .directionTypeDl(new DynamicList(GRANT_EXTENSION.toString()))
                 .appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build())
@@ -388,7 +279,7 @@ class DirectionIssuedAboutToStartHandlerTest {
     }
 
     @Test
-    void givenAppealWithNoTimeExtension_populateDirectionTypeDropdown() {
+    public void givenAppealWithNoTimeExtension_populateDirectionTypeDropdown() {
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
         listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
@@ -402,8 +293,8 @@ class DirectionIssuedAboutToStartHandlerTest {
     }
 
     @Test
-    void givenAppealWithHearingRecordingRequestOutstanding_populateDirectionTypeDropdownWithRefuseHearingRecordingRequest() {
-        handler = new DirectionIssuedAboutToStartHandler(false, false, idamService);
+    public void givenAppealWithHearingRecordingRequestOutstanding_populateDirectionTypeDropdownWithRefuseHearingRecordingRequest() {
+        handler = new DirectionIssuedAboutToStartHandler(false);
         sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(YES);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
@@ -421,8 +312,8 @@ class DirectionIssuedAboutToStartHandlerTest {
     }
 
     @Test
-    void givenAppealWithNoHearingRecordingRequestOutstanding_doNotPopulateDirectionTypeDropdownWithRefuseHearingRecordingRequest() {
-        handler = new DirectionIssuedAboutToStartHandler(false, false, idamService);
+    public void givenAppealWithNoHearingRecordingRequestOutstanding_doNotPopulateDirectionTypeDropdownWithRefuseHearingRecordingRequest() {
+        handler = new DirectionIssuedAboutToStartHandler(false);
         sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(NO);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
@@ -438,8 +329,8 @@ class DirectionIssuedAboutToStartHandlerTest {
     }
 
     @Test
-    void givenAValidCallbackType_thenClearTheConfidentialityFields() {
-        handler = new DirectionIssuedAboutToStartHandler(false, false, idamService);
+    public void givenAValidCallbackType_thenClearTheConfidentialityFields() {
+        handler = new DirectionIssuedAboutToStartHandler(false);
         sscsCaseData.setConfidentialityType(ConfidentialityType.CONFIDENTIAL.getCode());
         sscsCaseData.setSendDirectionNoticeToFTA(YES);
         sscsCaseData.setSendDirectionNoticeToRepresentative(YES);
@@ -462,8 +353,8 @@ class DirectionIssuedAboutToStartHandlerTest {
     }
 
     @Test
-    void givenAValidCallbackType_thenVerifyAllPartiesOnTheCase() {
-        handler = new DirectionIssuedAboutToStartHandler(false, false, idamService);
+    public void givenAValidCallbackType_thenVerifyAllPartiesOnTheCase() {
+        handler = new DirectionIssuedAboutToStartHandler(false);
 
         Appointee otherPartyAppointee = Appointee.builder()
                 .id("2").name(Name.builder().firstName("Henry").lastName("Smith").build()).build();
@@ -492,8 +383,8 @@ class DirectionIssuedAboutToStartHandlerTest {
     }
 
     @Test
-    void givenAValidCallbackType_NoAdditionalPartiesForOtherParty() {
-        handler = new DirectionIssuedAboutToStartHandler(false, false, idamService);
+    public void givenAValidCallbackType_NoAdditionalPartiesForOtherParty() {
+        handler = new DirectionIssuedAboutToStartHandler(false);
 
         CcdValue<OtherParty> otherParty = CcdValue.<OtherParty>builder()
                 .value(OtherParty.builder()
@@ -511,7 +402,7 @@ class DirectionIssuedAboutToStartHandlerTest {
     }
 
     @Test
-    void givenNonDefaultSelectHmcHearingTypeNo_whenValueAboutToStart() {
+    public void givenNonDefaultSelectHmcHearingTypeNo_whenValueAboutToStart() {
         sscsCaseData.getExtendedSscsCaseData().setSelectNextHmcHearingType(YES);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -527,7 +418,7 @@ class DirectionIssuedAboutToStartHandlerTest {
     }
 
     @Test
-    void givenNullSelectHmcHearingTypeNo_whenNullAboutToStart() {
+    public void givenNullSelectHmcHearingTypeNo_whenNullAboutToStart() {
         sscsCaseData.getExtendedSscsCaseData().setSelectNextHmcHearingType(null);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -542,75 +433,8 @@ class DirectionIssuedAboutToStartHandlerTest {
         assertNull(response.getData().getHmcHearingType());
     }
 
-    @ParameterizedTest(name = "{0} - {1}")
-    @MethodSource("provideRoleAndBenefitTestCases")
-    void givenConfidentialityFlagAndAuthorisedRole_populateConfidentialityDirections(UserRole roleName, String benefitShortName) {
-        handler = new DirectionIssuedAboutToStartHandler(false, true, idamService);
-        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
-        when(idamService.getUserDetails(anyString())).thenReturn(userDetails);
-        lenient().when(userDetails.hasRole(roleName)).thenReturn(true);
-        callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(benefitShortName).build());
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getDirectionTypeDl().getListItems())
-                .anyMatch(item -> item.getCode().equals(CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString()));
-        assertThat(response.getData().getDirectionTypeDl().getListItems())
-                .anyMatch(item -> item.getCode().equals(CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN.toString()));
-    }
-
-    private static Stream<Arguments> provideRoleAndBenefitTestCases() {
-        return Stream.of(
-            Arguments.of(UserRole.SUPER_USER, CHILD_SUPPORT.getShortName()),
-            Arguments.of(UserRole.TCW, CHILD_SUPPORT.getShortName()),
-            Arguments.of(UserRole.JUDGE, CHILD_SUPPORT.getShortName()),
-            Arguments.of(UserRole.SUPER_USER, UC.getShortName()),
-            Arguments.of(UserRole.TCW, UC.getShortName()),
-            Arguments.of(UserRole.JUDGE, UC.getShortName())
-        );
-    }
-
-    @ParameterizedTest(name = "{0}")
-    @MethodSource("provideConfidentialityTestCases")
-    void givenConfidentialityFlagAndVariousConditions_doNotPopulateConfidentialityDirections(String scenario,
-        boolean hasUserDetails, InterlocReferralReason referralReason, boolean hasQualifyingRole, boolean hasRoleCheck) {
-        handler = new DirectionIssuedAboutToStartHandler(false, true, idamService);
-        sscsCaseData.setInterlocReferralReason(referralReason);
-
-        if (hasUserDetails) {
-            when(idamService.getUserDetails(anyString())).thenReturn(userDetails);
-            if (hasRoleCheck) {
-                if (hasQualifyingRole) {
-                    lenient().when(userDetails.hasRole(SUPER_USER)).thenReturn(true);
-                } else {
-                    when(userDetails.hasRole(any(UserRole.class))).thenReturn(false);
-                }
-            }
-        } else {
-            when(idamService.getUserDetails(anyString())).thenReturn(null);
-        }
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getDirectionTypeDl().getListItems()).noneMatch(
-            item -> item.getCode().equals(CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString()));
-        assertThat(response.getData().getDirectionTypeDl().getListItems()).noneMatch(
-            item -> item.getCode().equals(CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN.toString()));
-    }
-
-    private static Stream<Arguments> provideConfidentialityTestCases() {
-        return Stream.of(
-            Arguments.of("user has confidentiality referral but no qualifying role", true, InterlocReferralReason.CONFIDENTIALITY,
-                false, true),
-            Arguments.of("user has qualifying role but non-confidentiality referral reason", true,
-                InterlocReferralReason.COMPLEX_CASE, true, true),
-            Arguments.of("no user details with confidentiality referral", false, InterlocReferralReason.CONFIDENTIALITY, false,
-                false)
-        );
-    }
-
     @Test
-    void givenMidEvent_ThenDoesNotWipeHmcHearingTypeOrSelect() {
+    public void givenMidEvent_ThenDoesNotWipeHmcHearingTypeOrSelect() {
         sscsCaseData.getExtendedSscsCaseData().setSelectNextHmcHearingType(YES);
         sscsCaseData.setHmcHearingType(HmcHearingType.DIRECTION_HEARINGS);
 

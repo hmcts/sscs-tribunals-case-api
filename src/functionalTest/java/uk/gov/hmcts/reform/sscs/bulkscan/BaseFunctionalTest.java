@@ -176,7 +176,7 @@ public class BaseFunctionalTest {
         return simulateCcdCallbackNoUserIdOrAuthorization(json,"/transform-exception-record", statusCode);
     }
 
-    public static String generateRandomNino() {
+    protected String generateRandomNino() {
         String firstChar = generateRandomCharacterFromRange("ABCEHJKLMNOPRSTWXYZ");
         String secondChar = generateRandomCharacterFromRange("ABCEHJLMPRSWXY");
         String lastChar = generateRandomCharacterFromRange("ABCD");
@@ -184,7 +184,7 @@ public class BaseFunctionalTest {
         return firstChar + secondChar + RandomStringUtils.secure().next(6, false, true) + lastChar;
     }
 
-    private static String generateRandomCharacterFromRange(final String range) {
+    private String generateRandomCharacterFromRange(String range) {
         Random r = new Random();
         return String.valueOf(range.charAt(r.nextInt(range.length())));
     }

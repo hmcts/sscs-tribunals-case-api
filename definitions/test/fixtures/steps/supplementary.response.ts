@@ -85,7 +85,7 @@ export class SupplementaryResponse extends BaseStep {
     caseId: string
   ) {
     // Verify CTSC Admin as allocated caseworker can see the assigned Action Unprocessed Correspondence task
-    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
+    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
     await this.homePage.navigateToTab('Tasks');
     await this.tasksTab.verifyTaskIsDisplayed(task.name);
 
@@ -135,7 +135,7 @@ export class SupplementaryResponse extends BaseStep {
     caseId: string
   ) {
     // Verify CTSC Admin as allocated caseworker can view the automatically assigned Action Unprocessed Correspondence task
-    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
+    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
     await this.homePage.navigateToTab('Tasks');
     await this.tasksTab.verifyTaskIsDisplayed(task.name);
     await this.tasksTab.verifyManageOptions(

@@ -1,6 +1,5 @@
 import { BaseStep } from "./base";
 import { Page } from "@playwright/test";
-import { credentials } from '../../config/config';
 
 export class CreateUpdateToCaseDataSteps extends BaseStep {
 
@@ -28,14 +27,6 @@ export class CreateUpdateToCaseDataSteps extends BaseStep {
     await this.eventNameAndDescriptionPage.confirmSubmission();
   }
 
-   async updateToNonIBCCaseDataEvent(caseId, updateData) {
-    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
-    await this.homePage.chooseEvent("Update to case data");
-    await this.createUpdateToCaseDataPage.updateAppellantDetails(updateData);
-    await this.eventNameAndDescriptionPage.inputData('test reason', 'test description');
-    await this.eventNameAndDescriptionPage.confirmSubmission();
-  }
-
   async verifySummaryTab(updateData) {
     await this.homePage.delay(3000);
     await this.homePage.navigateToTab("Summary");
@@ -47,12 +38,6 @@ export class CreateUpdateToCaseDataSteps extends BaseStep {
     // await this.summaryTab.verifyPageContentByKeyValue("Regional Centre", updateData.regionalCentre);
     await this.summaryTab.verifyPageContentByKeyValue("Is a Scottish Case?", updateData.isScottishCase);
     //await this.notListablePage.verifyPageContent(); //Verifying Heading and Caption for event
-  }
-
-  async verifyNonIBCAppealDetailsTab(updateData) {
-    await this.homePage.navigateToTab("Appeal Details");
-    await this.appealDetailsTab.verifyAppealDetailsPageContentByKeyValue("First Name", updateData.appellantDetails.nameDetails.firstName);
-    await this.appealDetailsTab.verifyAppealDetailsPageContentByKeyValue("Last Name", updateData.appellantDetails.nameDetails.lastName);
   }
 
   async verifyAppealDetailsTab(updateData) {

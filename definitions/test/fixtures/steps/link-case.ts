@@ -122,7 +122,7 @@ export class LinkCase extends BaseStep {
 
   // Event created to trigger Link a case event from next steps dropdown menu:
   private async goToLinkACasePage(page: Page, caseId: string) {
-    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
+    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
     await this.homePage.chooseEvent('Link a case');
   }
 }
