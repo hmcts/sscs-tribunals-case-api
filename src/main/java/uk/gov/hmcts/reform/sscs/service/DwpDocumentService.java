@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isBenefitTypeChildSupportOrUc;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,9 +33,7 @@ public class DwpDocumentService {
                     .addError("Potential harmful evidence is not a valid selection for child support cases");
         }
 
-        if (!isBenefitTypeChildSupportOrUc(sscsCaseData)
-                && !isBenefitTypeSscs5(sscsCaseData.getBenefitType())
-                && editedEvidenceReason != null
+        if (!sscsCaseData.isBenefitType(CHILD_SUPPORT) && !isBenefitTypeSscs5(sscsCaseData.getBenefitType()) && editedEvidenceReason != null
                 && editedEvidenceReason.equals("childSupportConfidentiality")) {
             preSubmitCallbackResponse
                     .addError("Child support - Confidentiality is not a valid selection for this case");

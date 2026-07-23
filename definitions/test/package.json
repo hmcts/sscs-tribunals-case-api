@@ -7,7 +7,7 @@
   },
   "scripts": {
     "start": "node index.js",
-    "test:e2e": "npx playwright install chromium && npx playwright test --config ./playwright.config.ts --project chromium",
+    "test:e2e": "npx playwright install chromium && npx playwright test --config ./playwright.config.ts --project chromium --reporter=html",
     "test:pr": "yarn test:e2e --grep-invert @work-allocation --grep $TEST_SUITE",
     "test:aat": "yarn test:e2e --grep-invert @work-allocation --grep @master-pipeline",
     "test:nightly": "yarn test:e2e --grep-invert @work-allocation --grep @nightly-pipeline",
@@ -31,7 +31,7 @@
   "devDependencies": {
     "@faker-js/faker": "7.6.0",
     "@hmcts/eslint-config": "^1.4.0",
-    "@playwright/test": "^1.60.0",
+    "@playwright/test": "^1.50.1",
     "@types/node": "^20.17.17",
     "chai": "^4.5.0",
     "eslint": "^8.57.1",
@@ -40,7 +40,7 @@
     "lodash": "^4.17.21",
     "mocha": "^10.8.2",
     "otp": "^1.1.2",
-    "playwright-core": "^1.60.0",
+    "playwright-core": "^1.50.1",
     "pre-commit": "^1.2.2",
     "prettier": "^3.4.2",
     "pretty-quick": "^4.0.0",
@@ -50,7 +50,7 @@
     "typescript": "^5.7.3"
   },
   "resolutions": {
-    "axios": "1.13.5",
+    "axios": "^1.7.4",
     "braces": "^3.0.3",
     "phin": "^3.7.1",
     "semver": "^7.5.4",

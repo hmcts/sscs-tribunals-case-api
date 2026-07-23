@@ -49,7 +49,7 @@ export class UrgentHearing extends BaseStep {
     );
     await this.homePage.signOut();
 
-    await this.loginUserWithCaseId(credentials.judge, false, caseId);
+    await this.loginUserWithCaseId(credentials.judge, true, caseId);
     await this.homePage.chooseEvent(issueDirectionTestdata.eventNameCaptor);
 
     await this.issueDirectionPage.submitIssueDirection(
@@ -105,7 +105,7 @@ export class UrgentHearing extends BaseStep {
     );
     await this.homePage.signOut();
 
-    await this.loginUserWithCaseId(credentials.judge, false, caseId);
+    await this.loginUserWithCaseId(credentials.judge, true, caseId);
     await this.homePage.chooseEvent(issueDirectionTestdata.eventNameCaptor);
 
     await this.issueDirectionPage.submitIssueDirection(
@@ -259,7 +259,7 @@ export class UrgentHearing extends BaseStep {
   }
 
   async requestAnUrgentHearing(caseId: string): Promise<void> {
-    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
+    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
     await this.homePage.chooseEvent(actionFurtherEvidenceTestdata.eventName);
     await this.actionFurtherEvidencePage.submitActionFurtherEvidence(
       actionFurtherEvidenceTestdata.sender,

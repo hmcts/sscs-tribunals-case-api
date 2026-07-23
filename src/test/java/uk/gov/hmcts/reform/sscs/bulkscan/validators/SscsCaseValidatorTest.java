@@ -66,7 +66,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.ExceptionRecord;
@@ -1179,22 +1178,6 @@ public class SscsCaseValidatorTest {
         assertTrue(actualError.contains("person1_for_person_under_18"));
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"A12112", "A11A12", "A12b12", "A12012", "123456", "ABCDEF"})
-    public void givenSscs8ContainValidIbcaReferenceWithSixAlphanumericCharacters_thenDoNotAddAWarningOrError(String ibcaReference) {
-        Appellant appellant = buildAppellant(false);
-        appellant.getIdentity().setIbcaReference(ibcaReference);
-        ocrCaseData.put(IBC_ROLE_FOR_SELF, true);
-        AppealReasons appealReasons = AppealReasons.builder().reasons(List.of(AppealReason.builder().value(AppealReasonDetails.builder().reason("some reason").description("some description").build()).build())).build();
-
-        CaseResponse response = validator
-                .validateExceptionRecord(transformResponse, exceptionRecord,
-                        buildMinimumAppealDataWithBenefitTypeWithAppealReasons(INFECTED_BLOOD_COMPENSATION.getShortName(), appellant, true, FormType.SSCS8, appealReasons),
-                        false);
-
-        assertThat(response.getWarnings()).isEmpty();
-    }
-
     @Test
     public void givenSscs8HasOneAppellantIbcRole_thenDoNotError() {
         Appellant appellant = buildAppellant(false);
@@ -1516,19 +1499,6 @@ public class SscsCaseValidatorTest {
         assertEquals("Address 1",
             ((RegionalProcessingCenter) response.getTransformedCase().get("regionalProcessingCenter")).getAddress1());
         assertEquals("Liverpool", (response.getTransformedCase().get("region")));
-        assertEquals("No", response.getTransformedCase().get("isScottishCase"));
-    }
-
-    @Test
-    public void givenAGlasgowPostcode_thenSetIsScottishCaseToYes() {
-        given(regionalProcessingCenterService.getByPostcode(anyString(), anyBoolean()))
-            .willReturn(RegionalProcessingCenter.builder().address1("Address 1").name("GLASGOW").build());
-
-        CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord,
-            buildMinimumAppealDataWithBenefitType(PIP.name(), buildAppellant(false), true, FormType.SSCS1PE), false);
-
-        assertEquals("GLASGOW", response.getTransformedCase().get("region"));
-        assertEquals("Yes", response.getTransformedCase().get("isScottishCase"));
     }
 
     @Test

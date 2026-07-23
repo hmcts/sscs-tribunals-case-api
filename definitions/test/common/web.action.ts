@@ -86,12 +86,14 @@ export class WebAction {
 
   async clickButton(elementLocator: string): Promise<void> {
     await this.page.waitForLoadState('domcontentloaded');
-    const button = this.page
+    await expect(this.page.getByRole('button', { name: elementLocator, exact: true }).first())
+      .toBeVisible();
+    await expect(this.page.getByRole('button', { name: elementLocator, exact: true }).first())
+      .toBeEnabled();
+    await this.page
       .getByRole('button', { name: elementLocator, exact: true })
-      .first();
-    await expect(button).toBeVisible();
-    await expect(button).toBeEnabled();
-    await button.click();
+      .first()
+      .click();
   }
 
   async clickGoButton(elementLocator: string): Promise<void> {
@@ -192,9 +194,5 @@ export class WebAction {
 
   async pause() {
     await this.page.pause();
-  }
-
-  async waitForSpinnerToDisappear() {
-    await this.page.waitForSelector('.spinner', { state: 'hidden' });
   }
 }

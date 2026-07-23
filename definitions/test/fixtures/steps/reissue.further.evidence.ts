@@ -123,13 +123,13 @@ export class ReissueFurtherEvidence extends BaseStep {
 
   // Event created to trigger Reissue Further Evidence event from next steps dropdown menu:
   private async goToReissueFurtherEvidence(page: Page, caseId: string) {
-    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
+    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
     await this.homePage.chooseEvent('Reissue further evidence');
   }
 
   // Event created to trigger Action further evidence event from next steps dropdown menu:
   private async goToActionFurtherEvidence(page: Page, caseId: string) {
-    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
+    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
     await this.homePage.chooseEvent('Action further evidence');
   }
 }

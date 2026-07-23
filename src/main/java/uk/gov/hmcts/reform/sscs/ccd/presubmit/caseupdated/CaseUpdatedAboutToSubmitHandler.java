@@ -28,7 +28,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -99,7 +98,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private static final String LAST_NAME = "Last Name";
 
-    private final boolean cmOtherPartyConfidentialityEnabled;
 
     @SuppressWarnings("squid:S107")
     CaseUpdatedAboutToSubmitHandler(RegionalProcessingCenterService regionalProcessingCenterService,
@@ -110,8 +108,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                                     RefDataService refDataService,
                                     VenueService venueService,
                                     HearingDurationsService hearingDurationsService,
-                                    PanelCompositionService panelCompositionService,
-                                    @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
+                                    PanelCompositionService panelCompositionService) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.associatedCaseLinkHelper = associatedCaseLinkHelper;
         this.airLookupService = airLookupService;
@@ -121,7 +118,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         this.hearingDurationsService = hearingDurationsService;
         this.panelCompositionService = panelCompositionService;
         this.venueService = venueService;
-        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
 
     @Override
@@ -185,7 +181,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             }
         }
 
-        sscsCaseData.setIsConfidentialCase(isConfidential(sscsCaseData, cmOtherPartyConfidentialityEnabled));
+        sscsCaseData.setIsConfidentialCase(isConfidential(sscsCaseData));
         updateCaseName(callback, sscsCaseData);
         updateCaseCategoriesIfBenefitTypeUpdated(callback, sscsCaseData, preSubmitCallbackResponse);
         updateLanguage(sscsCaseData);
@@ -430,10 +426,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     public void maybeChangeIsScottish(RegionalProcessingCenter oldRpc, RegionalProcessingCenter newRpc, SscsCaseData caseData) {
-        boolean rpcChanged = oldRpc != newRpc;
-        boolean isScottishCaseNotSet = isEmpty(caseData.getIsScottishCase());
-        if (rpcChanged || isScottishCaseNotSet) {
-            caseData.setIsScottishCase(isScottishCase(newRpc));
+        if (oldRpc != newRpc) {
+            String isScottishCase = isScottishCase(newRpc);
+            caseData.setIsScottishCase(isScottishCase);
         }
     }
 
@@ -452,24 +447,29 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                     log.info("Processing venue requires updating for case {}: setting venue name to {} from {}",
                             caseDetails.getId(), venue, sscsCaseData.getProcessingVenue());
                     sscsCaseData.setProcessingVenue(venue);
-                    if (isNotEmpty(venue)) {
-                        CourtVenue courtVenue = refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId);
-
-                        sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
-                                .baseLocation(rpcEpimsId)
-                                .region(courtVenue.getRegionId()).build());
-
-                        log.info("Successfully updated case management location details for case {}. Processing venue {}, epimsId {}",
-                                caseDetails.getId(), venue, venueEpimsId);
-                    }
                 } else {
+                    venue = sscsCaseData.getProcessingVenue();
+                    venueEpimsId = venueService.getEpimsIdForVenue(venue);
                     log.info("Legacy venue {} has not been updated for case {}",
-                            sscsCaseData.getProcessingVenue(), caseDetails.getId());
+                            venue, caseDetails.getId());
                 }
+
+            }
+
+            if (isNotEmpty(venue)) {
+                CourtVenue courtVenue = refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId);
+
+                sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
+                    .baseLocation(rpcEpimsId)
+                    .region(courtVenue.getRegionId()).build());
+
+                log.info("Successfully updated case management location details for case {}. Processing venue {}, epimsId {}",
+                    caseDetails.getId(), venue, venueEpimsId);
+
             }
         } else {
             log.info("Processing venue has not changed or is null, skipping update for case {}, venue: {}",
-                    caseDetails.getId(), venue);
+                caseDetails.getId(), venue);
         }
     }
 

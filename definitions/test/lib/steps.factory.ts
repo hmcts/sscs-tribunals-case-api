@@ -53,13 +53,11 @@ import { UpdateListingRequirement } from '../fixtures/steps/update.listing.requi
 import { CommunicateWithFta } from '../fixtures/steps/communicate-with-fta';
 import { Adjournment } from '../fixtures/steps/adjournment';
 import { AmendElements } from '../fixtures/steps/amend.elements';
-import { ValidateAppeal } from '../fixtures/steps/validate.appeal';
 import { CtscReviewIncompleteAppeal } from '../fixtures/steps/work-allocation/ctsc.review.incomplete.appeal';
 import { CtscActionUnprocessedCorrespondence } from '../fixtures/steps/work-allocation/ctsc.action.unprocessed.correspondence';
 import { CtscReviewFtaResponse } from '../fixtures/steps/work-allocation/ctsc.review.fta.response';
 import { CtscReviewListingError } from '../fixtures/steps/work-allocation/ctsc.review.listing.error'
 import { CtscReviewAdminAction } from '../fixtures/steps/work-allocation/ctsc.review.admin.action';
-import { UcConfidentiality } from '../fixtures/steps/uc.confidentiality';
 
 type MyStepsFixtures = {
   addNoteSteps: Note;
@@ -116,13 +114,11 @@ type MyStepsFixtures = {
   communicateWithFtaSteps: CommunicateWithFta;
   adjournmentSteps: Adjournment;
   amendElementSteps: AmendElements;
-  validateAppealSteps: ValidateAppeal;
   reviewIncompleteAppealSteps: CtscReviewIncompleteAppeal;
   ctscActionUnprocessedCorrespondenceSteps: CtscActionUnprocessedCorrespondence;
   ctscReviewFtaResponseSteps: CtscReviewFtaResponse;
   ctscReviewListingErrorSteps: CtscReviewListingError;
   ctscReviewAdminActionSteps: CtscReviewAdminAction;
-  ucConfidentialitySteps: UcConfidentiality;
 };
 
 export const test = stepsFactory.extend<MyStepsFixtures>({
@@ -441,10 +437,6 @@ export const test = stepsFactory.extend<MyStepsFixtures>({
     const amendElementSteps = new AmendElements(page);
     await use(amendElementSteps);
   },
-  validateAppealSteps: async ({ page }, use) => {
-    const validateAppealSteps = new ValidateAppeal(page);
-    await use(validateAppealSteps);
-  },
   reviewIncompleteAppealSteps: async ({ page }, use) => {
     const reviewIncompleteAppealSteps = new CtscReviewIncompleteAppeal(page);
     await use(reviewIncompleteAppealSteps);
@@ -464,9 +456,5 @@ export const test = stepsFactory.extend<MyStepsFixtures>({
   ctscReviewAdminActionSteps: async ({ page }, use) => {
     const ctscReviewAdminActionSteps = new CtscReviewAdminAction(page);
     await use(ctscReviewAdminActionSteps);
-  },
-  ucConfidentialitySteps: async ({ page }, use) => {
-    const ucConfidentialitySteps = new UcConfidentiality(page);
-    await use(ucConfidentialitySteps);
   }
 });

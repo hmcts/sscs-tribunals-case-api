@@ -19,9 +19,6 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -59,7 +56,6 @@ public class ManageDwpDocumentsAboutToSubmitHandlerTest {
     private DwpDocumentService dwpDocumentService;
 
     @Before
-    @BeforeEach
     public void setUp() {
         openMocks(this);
 
@@ -196,23 +192,8 @@ public class ManageDwpDocumentsAboutToSubmitHandlerTest {
                 is("Potential harmful evidence is not a valid selection for child support cases"));
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"UC", "CHILD_SUPPORT"})
-    public void shouldHaveNoErrorsWhenChildSupportOrUcCaseHasChildSupportConfidentiality(Benefit benefit) {
-        addMandatoryDwpDocuments();
-        sscsCaseData.setDwpEditedEvidenceReason("childSupportConfidentiality");
-        addEditedDwpDocuments();
-        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder()
-                .code(benefit.getShortName())
-                .description(benefit.getDescription()).build());
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertThat(response.getErrors().isEmpty(), is(true));
-        verify(dwpDocumentService).removeOldDwpDocuments(eq(sscsCaseData));
-    }
-
     @Test
-    public void givenADwpDocumentChildSupConfEditedReasonInNonChildSupportOrUcCaseThenErrorAdded() {
+    public void givenADwpDocumentChildSupConfEditedReasonInNonChildSupportCaseThenErrorAdded() {
         addMandatoryDwpDocuments();
         addEditedDwpDocuments();
 

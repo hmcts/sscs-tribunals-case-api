@@ -5,7 +5,6 @@ tags:
 java:
   devmemoryRequests: 1Gi
   devmemoryLimits: 2Gi
-  devcpuRequests: 50m
   image: ${IMAGE_NAME}
   readinessDelay: 45
   environment:
@@ -48,7 +47,7 @@ java:
 am-org-role-mapping-service:
   enabled: true
   java:
-    image: 'hmctsprod.azurecr.io/am/org-role-mapping-service:latest'
+    image: 'hmctspublic.azurecr.io/am/org-role-mapping-service:latest'
     ingressHost: orm-${SERVICE_FQDN}
     releaseNameOverride: ${SERVICE_NAME}-am-org-role-mapping-service
     devmemoryRequests: 1024Mi
@@ -117,9 +116,8 @@ aac-manage-case-assignment:
     disableKeyVaults: true
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-aac-manage-case-assignment
-    image: hmctsprod.azurecr.io/aac/manage-case-assignment:latest
+    image: hmctspublic.azurecr.io/aac/manage-case-assignment:latest
     ingressHost: aac-${SERVICE_FQDN}
-    devcpuRequests: 50m
     environment:
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
@@ -148,11 +146,9 @@ aac-manage-case-assignment:
 em-ccdorc:
   enabled: true
   java:
-    image: hmctsprod.azurecr.io/em/ccdorc:latest
+    image: hmctspublic.azurecr.io/em/ccdorc:latest
     releaseNameOverride: ${SERVICE_NAME}-em-ccdorc
     ingressHost: em-ccdorc-${SERVICE_FQDN}
-    devcpuRequests: 50m
-    devcpuLimits: 250m
     environment:
       IDAM_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
       OPEN_ID_API_BASE_URI: https://idam-web-public.aat.platform.hmcts.net/o
@@ -174,9 +170,7 @@ em-ccdorc:
 em-stitching:
   enabled: ${PREVIEW_BRANCH_WITH_LOCAL_CCD}
   java:
-    devcpuRequests: 50m
-    devcpuLimits: 250m
-    image: hmctsprod.azurecr.io/em/stitching:latest
+    image: hmctspublic.azurecr.io/em/stitching:latest
     releaseNameOverride: ${SERVICE_NAME}-em-stitching
     ingressHost: em-stitching-${SERVICE_FQDN}
     environment:
@@ -211,10 +205,8 @@ em-stitching:
 ccd-case-document-am-api:
   enabled: true
   java:
-    image: hmctsprod.azurecr.io/ccd/case-document-am-api:latest
+    image: hmctspublic.azurecr.io/ccd/case-document-am-api:latest
     releaseNameOverride: ${SERVICE_NAME}-ccd-case-document-am-api
-    devcpuRequests: 50m
-    devcpuLimits: 250m
     environment:
       CCD_DATA_STORE_API_BASE_URL: http://${SERVICE_NAME}-ccd-data-store-api
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
@@ -228,11 +220,11 @@ xui-webapp:
   nodejs:
     devmemoryRequests: "512Mi"
     devmemoryLimits: "1Gi"
-    devcpuRequests: 50m
-    devcpuLimits: 250m
+    devcpuRequests: "200m"
+    devcpuLimits: "1000m"
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
-    image: hmctsprod.azurecr.io/xui/webapp:latest
+    image: hmctspublic.azurecr.io/xui/webapp:latest
     ingressHost: xui-${SERVICE_FQDN}
     environment:
       HEALTH_CCD_COMPONENT_API: ${CCD_GW_API}/health
@@ -335,7 +327,7 @@ ccd:
         CCD_DATA_STORE_URL: http://${SERVICE_NAME}-ccd-data-store-api
         RAS_ENV: pr
       devmemoryRequests: 1024Mi
-      devcpuRequests: 50m
+      devcpuRequests: 250m
       devmemoryLimits: 2048Mi
       devcpuLimits: 1500m
       keyVaults:
@@ -362,8 +354,8 @@ ccd:
     replicas: 1
 
   logstash:
-    image: hmctsprod.azurecr.io/imported/elastic/logstash
-    imageTag: "9.2.4"
+    image: hmctspublic.azurecr.io/imported/logstash/logstash
+    imageTag: "7.16.1"
     imagePullPolicy: "IfNotPresent"
     logstashJavaOpts: -Xmx1g -Xms512M
     persistence:
@@ -373,8 +365,8 @@ ccd:
         value: "${SERVICE_NAME}-es-master"
     extraInitContainers: |
       - name: download-postgres-jdbc
-        image: hmctsprod.azurecr.io/curl:7.70.0
-        command: ['curl', '-L', 'https://jdbc.postgresql.org/download/postgresql-42.7.9.jar', '-o', '/logstash-lib/postgresql.jar']
+        image: hmctspublic.azurecr.io/curl:7.70.0
+        command: ['curl', '-L', 'https://jdbc.postgresql.org/download/postgresql-42.3.3.jar', '-o', '/logstash-lib/postgresql.jar']
         volumeMounts:
         - name: logstash-lib
           mountPath: /logstash-lib
@@ -392,11 +384,10 @@ ccd:
         readOnly: true
     logstashConfig:
       logstash.yml: |
-        api.http.host: 0.0.0.0
+        http.host: 0.0.0.0
         xpack.monitoring.enabled: false
         queue.type: persisted
         dead_letter_queue.enable: true
-        pipeline.ecs_compatibility: disabled
       pipelines.yml: |
         - pipeline.id: main
           path.config: "/usr/share/logstash/pipeline/{01_input,02_filter,03_output}.conf"
@@ -540,7 +531,7 @@ ccd:
 
   ccd-admin-web:
     nodejs:
-      image: hmctsprod.azurecr.io/ccd/admin-web:latest
+      image: hmctspublic.azurecr.io/ccd/admin-web:latest
       ingressHost: admin-web-${SERVICE_FQDN}
       environment:
         ADMINWEB_GLOBAL_SEARCH_INDEX_URL: http://${SERVICE_NAME}-ccd-definition-store/elastic-support/global-search/index
@@ -566,11 +557,10 @@ ccd:
 
   ccd-definition-store-api:
     java:
-      image: hmctsprod.azurecr.io/ccd/definition-store-api:latest
       disableKeyVaults: true
       devmemoryRequests: '1024Mi'
       devmemoryLimits: '2048Mi'
-      devcpuRequests: '50m'
+      devcpuRequests: '500m'
       autoscaling:
         enabled: false
         minReplicas: 1
@@ -598,7 +588,7 @@ ccd:
       imagePullPolicy: Always
       devmemoryRequests: '1524Mi'
       devmemoryLimits: '2048Mi'
-      devcpuRequests: '50m'
+      devcpuRequests: '500m'
       environment:
         DATA_STORE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
         DATA_STORE_DB_USERNAME: hmcts
@@ -646,7 +636,7 @@ ccd:
       disableKeyVaults: true
 
   ccd-user-profile-importer:
-    image: hmctsprod.azurecr.io/ccd/user-profile-importer:db2r9a
+    image: hmctspublic.azurecr.io/ccd/user-profile-importer:db2r9a
     environment:
       AUTH_PROVIDER_BASE_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
       CCD_USER_PROFILE_URL: http://${SERVICE_NAME}-ccd-user-profile-api
@@ -662,14 +652,14 @@ elastic:
 sscs-tribunals-frontend:
   enabled: true
   nodejs:
-    image: hmctsprod.azurecr.io/sscs/tribunals-frontend:latest
+    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:latest
     ingressHost: sya-${SERVICE_FQDN}
     registerAdditionalDns:
       enabled: true
       prefix: iba
       primaryIngressHost: sya-${SERVICE_FQDN}
     environment:
-      REDIS_URL: redis://${SERVICE_NAME}-hmcts-redis-master
+      REDIS_URL: redis://${SERVICE_NAME}-redis-master
       APPINSIGHTS_ROLE_NAME: ${SERVICE_NAME}
       PCQ_URL: "https://pcq.aat.platform.hmcts.net"
       FT_ANTENNA_WEBCHAT: false
@@ -681,7 +671,6 @@ sscs-tribunals-frontend:
       UPLOAD_EVIDENCE_URL: http://${SERVICE_NAME}-java/evidence/upload
       SERVICES_IDAM_LOGIN_URL: https://idam-web-public.aat.platform.hmcts.net/login
       SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
-      S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
       UV_THREADPOOL_SIZE: 64
       IBC_NI_POSTCODES_FEATURE: true
     keyVaults:
@@ -693,7 +682,6 @@ sscs-tribunals-frontend:
           - pcq-token-key
           - sscs-redis-access-key
           - sscs-redis-connection-string
-          - sscs-s2s-secret
 
 #Enable for queues/topics
 #If you need a subscription for a topic, topic name should be not longer than 10 characters
@@ -768,7 +756,7 @@ camunda-bpm:
     disableKeyVaults: true
     ingressHost: camunda-${SERVICE_FQDN}
     releaseNameOverride: ${SERVICE_NAME}-camunda
-    devcpuRequests: 50m
+    devcpuRequests: 500m
     devmemoryRequests: 512Mi
     devcpuLimits: 1
     devmemoryLimits: 1Gi
@@ -794,7 +782,6 @@ wa-task-management-api:
     releaseNameOverride: ${SERVICE_NAME}-wa-task-management-api
     ingressHost: wa-task-management-api-${SERVICE_FQDN}
     readinessDelay: 90
-    devcpuRequests: 50m
     secrets:
       POSTGRES_PASSWORD:
         secretRef: postgres
@@ -823,7 +810,6 @@ wa-task-monitor:
     ingressHost: wa-task-monitor-${SERVICE_FQDN}
     releaseNameOverride: ${SERVICE_NAME}-wa-task-monitor
     readinessDelay: 90
-    devcpuRequests: 50m
     environment:
       CAMUNDA_URL: https://camunda-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net/engine-rest
       WA_TASK_MANAGEMENT_API_URL: http://{{ .Release.Name }}-wa-task-management-api
@@ -874,7 +860,6 @@ wa-workflow-api:
     ingressHost: wa-workflow-api-${SERVICE_FQDN}
     releaseNameOverride: ${SERVICE_NAME}-wa-workflow-api
     readinessDelay: 90
-    devcpuRequests: 50m
     secrets:
       POSTGRES_PASSWORD:
         secretRef: postgres
@@ -987,7 +972,7 @@ ccd-message-publisher:
 sscs-cron-trigger:
   job:
     kind: CronJob
-    image: 'hmctsprod.azurecr.io/sscs/cron-trigger:pr-5'
+    image: 'hmctspublic.azurecr.io/sscs/cron-trigger:pr-5'
     releaseNameOverride: ${SERVICE_NAME}-sscs-cron-trigger
     name: ${SERVICE_NAME}-sscs-cron-trigger
     schedule: "0 10-17 * * *"

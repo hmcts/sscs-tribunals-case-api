@@ -6,11 +6,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SEND_TO_ROBOTICS_ERROR;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.RESPONSE_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
@@ -18,7 +15,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -54,7 +50,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.robotics.RoboticsJsonMapper;
-import uk.gov.hmcts.reform.sscs.robotics.RoboticsJsonValidator;
 import uk.gov.hmcts.reform.sscs.robotics.RoboticsWrapper;
 
 @RunWith(SpringRunner.class)
@@ -91,11 +86,6 @@ public class RoboticsServiceIt {
 
     @Mock
     private SscsCaseDetails sscsCaseDetails;
-
-    @MockitoBean
-    private RoboticsJsonValidator roboticsJsonValidator;
-
-    private static final String ROBOTICS_ERROR_MESSAGE = "Flag error to Send to robotics";
 
 
     @Before
@@ -389,13 +379,5 @@ public class RoboticsServiceIt {
         assertThat(result.get("dwpIssuingOffice"), is("Attendance Allowance & DLA65 DRT"));
 
         verifyNoMoreInteractions(ccdService);
-    }
-
-    @Test
-    public void givenRoboticsError_ThenUpdateCaseWithRoboticsFailEvent() {
-        when(roboticsJsonValidator.validate(any(), any())).thenReturn(Set.of("error"));
-        roboticsService.sendCaseToRobotics(caseDetails);
-
-        verify(ccdService).updateCase(any(), any(), eq(SEND_TO_ROBOTICS_ERROR.getCcdType()), eq(ROBOTICS_ERROR_MESSAGE), any(), any());
     }
 }

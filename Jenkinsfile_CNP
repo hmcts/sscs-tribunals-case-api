@@ -76,9 +76,7 @@ def secrets = [
                 secret('test-e2e-ctsc-team-leader-nw-liverpool-username', 'TEST_CTSC_TEAM_LEADER_NW_LIVERPOOL_USERNAME'),
                 secret('test-e2e-ctsc-team-leader-nw-liverpool-password', 'TEST_CTSC_TEAM_LEADER_NW_LIVERPOOL_PASSWORD'),
                 secret('test-e2e-ctsc-admin-nw-liverpool-username', 'TEST_CTSC_ADMIN_NW_LIVERPOOL_USERNAME'),
-                secret('test-e2e-ctsc-admin-nw-liverpool-password', 'TEST_CTSC_ADMIN_NW_LIVERPOOL_PASSWORD'),
-                secret('test-e2e-legal-officer-username', 'TEST_LEGAL_OFFICER_USERNAME'),
-                secret('test-e2e-legal-officer-password', 'TEST_LEGAL_OFFICER_PASSWORD')
+                secret('test-e2e-ctsc-admin-nw-liverpool-password', 'TEST_CTSC_ADMIN_NW_LIVERPOOL_PASSWORD')
         ],
         's2s-${env}' : [
                 secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
@@ -134,12 +132,11 @@ withPipeline(type, product, component) {
     enableHighLevelDataSetup()
     loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')
-    syncBranchesWithMaster(['ithc', 'perftest'])
+    syncBranchesWithMaster(['demo', 'ithc', 'perftest'])
 
     env.DOCUMENT_MANAGEMENT_URL = "http://dm-store-aat.service.core-compute-aat.internal"
     env.TEST_DOCUMENT_MANAGEMENT_URL = "http://dm-store-aat.service.core-compute-aat.internal"
     env.PACT_BROKER_FULL_URL = "https://pact-broker.platform.hmcts.net"
-    env.CCD_DEF_PROD_LIKE = 'false'
 
     onMaster() {
         setAatEnvVars();
@@ -159,10 +156,6 @@ withPipeline(type, product, component) {
         } else {
             env.WORK_ALLOCATION_FEATURE_ENABLED = 'false'
             echo "Disabling Work Allocation"
-        }
-
-        if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:ccd_def_like_prod").size() > 0) {
-            env.CCD_DEF_PROD_LIKE = 'true'
         }
 
         def tests = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "test-suite")
@@ -214,8 +207,6 @@ withPipeline(type, product, component) {
 
     afterSuccess('smoketest:aat') {
         sh './bin/add-hearing-role-assignments-system-user.sh aat'
-
-        runE2eTests()
     }
 }
 
@@ -230,13 +221,7 @@ def runNotificationTests() {
 }
 
 def generateDefinitions() {
-    if (env.CCD_DEF_PROD_LIKE == 'true') {
-        sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT} ${env.WORK_ALLOCATION_FEATURE_ENABLED} prod"
-        echo "Generate prod-like CCD definition"
-    } else {
-        sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT} ${env.WORK_ALLOCATION_FEATURE_ENABLED}"
-    }
-
+    sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT} ${env.WORK_ALLOCATION_FEATURE_ENABLED}"
     steps.archiveArtifacts artifacts: "definitions/benefit/*.xlsx"
 
     sh "./bin/create-xlsx.sh bulkscan tag ${env.ENVIRONMENT}"
@@ -254,7 +239,6 @@ def setAatEnvVars() {
     env.EM_STITCHING_API_URL = "http://em-stitching-aat.service.core-compute-aat.internal"
     env.ENVIRONMENT = "aat"
     env.WORK_ALLOCATION_FEATURE_ENABLED = 'false'
-    env.CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED = true
 }
 
 def setPreviewEnvVars() {
@@ -268,7 +252,6 @@ def setPreviewEnvVars() {
     env.CASE_DOCUMENT_AM_URL = "https://ccd-case-document-am-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.EM_STITCHING_API_URL = "https://em-stitching-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.ENVIRONMENT = "pr"
-    env.CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED = true
 }
 
 def runE2eTests() {

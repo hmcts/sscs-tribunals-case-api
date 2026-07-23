@@ -27,9 +27,6 @@ public final class DateTimeUtils {
 
     }
 
-    public static LocalDateTime getLocalDateTime() {
-        return LocalDateTime.now(ZoneId.of(EUROPE_LONDON));
-    }
 
     public static LocalDateTime getLocalDateTime(String localDateStr, String localTimeStr) {
         LocalDate localDate = LocalDate.parse(localDateStr);

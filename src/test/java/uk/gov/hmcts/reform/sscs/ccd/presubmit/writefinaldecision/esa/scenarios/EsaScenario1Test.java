@@ -1,22 +1,20 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaTemplateContent;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
-class EsaScenario1Test {
+public class EsaScenario1Test {
 
     @Test
-    void testScenario1() {
+    public void testScenario1() {
 
         List<Descriptor> schedule2Descriptors =
-            Collections.singletonList(Descriptor.builder()
+            Arrays.asList(Descriptor.builder()
                 .activityQuestionValue("Mobilising Unaided")
                 .activityAnswerValue("1")
                 .activityAnswerLetter("c").activityAnswerPoints(9).build());
@@ -36,39 +34,37 @@ class EsaScenario1Test {
 
         EsaTemplateContent content = EsaScenario.SCENARIO_1.getContent(body);
 
-        String expectedContent = """
-            The appeal is refused.
+        String expectedContent = "The appeal is refused.\n"
+            + "\n"
+            + "The decision made by the Secretary of State on 20/09/2020 is confirmed.\n"
+            + "\n"
+            + "Felix Sydney does not have limited capability for work and cannot be treated as having limited capability for work.\n"
+            + "\n"
+            + "In applying the Work Capability Assessment 9 points were scored from the activities and descriptors in Schedule 2 of the Employment and Support Allowance (ESA) Regulations 2008. This is insufficient to meet the threshold for the test. Regulation 29 of the ESA Regulations did not apply.\n"
+            + "\n"
+            + "Mobilising Unaided\tc.1\t9\n"
+            + "\n"
+            + "\n"
+            + "My first reasons\n"
+            + "\n"
+            + "My second reasons\n"
+            + "\n"
+            + "Something else\n"
+            + "\n"
+            + "This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
+            + "\n";
 
-            The decision made by the Secretary of State on 20/09/2020 is confirmed.
+        Assert.assertEquals(9, content.getComponents().size());
 
-            Felix Sydney does not have limited capability for work and cannot be treated as having limited capability for work.
-
-            In applying the Work Capability Assessment 9 points were scored from the activities and descriptors in Schedule 2 of the Employment and Support Allowance (ESA) Regulations 2008. This is insufficient to meet the threshold for the test. Regulation 29 of the ESA Regulations did not apply.
-
-            Mobilising Unaided\tc.1\t9
-
-
-            My first reasons
-
-            My second reasons
-
-            Something else
-
-            This has been an oral (face to face) hearing. The following people attended: Felix Sydney the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page A1.
-
-            """;
-
-        assertEquals(9, content.getComponents().size());
-
-        assertEquals(expectedContent, content.toString());
+        Assert.assertEquals(expectedContent, content.toString());
 
     }
 
     @Test
-    void testScenario1WhenAnythingElseBlank() {
+    public void testScenario1WhenAnythingElseBlank() {
 
         List<Descriptor> schedule2Descriptors =
-            Collections.singletonList(Descriptor.builder()
+            Arrays.asList(Descriptor.builder()
                 .activityQuestionValue("Mobilising Unaided")
                 .activityAnswerValue("1")
                 .activityAnswerLetter("c").activityAnswerPoints(9).build());
@@ -88,36 +84,35 @@ class EsaScenario1Test {
 
         EsaTemplateContent content = EsaScenario.SCENARIO_1.getContent(body);
 
-        String expectedContent = """
-            The appeal is refused.
+        String expectedContent = "The appeal is refused.\n"
+            + "\n"
+            + "The decision made by the Secretary of State on 20/09/2020 is confirmed.\n"
+            + "\n"
+            + "Felix Sydney does not have limited capability for work and cannot be treated as having limited capability for work.\n"
+            + "\n"
+            + "In applying the Work Capability Assessment 9 points were scored from the activities and descriptors in Schedule 2 of the Employment and Support Allowance (ESA) Regulations 2008. This is insufficient to meet the threshold for the test. Regulation 29 of the ESA Regulations did not apply.\n"
+            + "\n"
+            + "Mobilising Unaided\tc.1\t9\n"
+            + "\n"
+            + "\n"
+            + "My first reasons\n"
+            + "\n"
+            + "My second reasons\n"
+            + "\n"
+            + "This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
+            + "\n";
 
-            The decision made by the Secretary of State on 20/09/2020 is confirmed.
+        Assert.assertEquals(8, content.getComponents().size());
 
-            Felix Sydney does not have limited capability for work and cannot be treated as having limited capability for work.
-
-            In applying the Work Capability Assessment 9 points were scored from the activities and descriptors in Schedule 2 of the Employment and Support Allowance (ESA) Regulations 2008. This is insufficient to meet the threshold for the test. Regulation 29 of the ESA Regulations did not apply.
-
-            Mobilising Unaided\tc.1\t9
-
-
-            My first reasons
-
-            My second reasons
-
-            This has been an oral (face to face) hearing. The following people attended: Felix Sydney the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page A1.
-
-            """;
-
-        assertEquals(8, content.getComponents().size());
-
-        assertEquals(expectedContent, content.toString());
+        Assert.assertEquals(expectedContent, content.toString());
 
     }
 
     @Test
-    void testScenario1NoSchedule2() {
+    public void testScenario1NoSchedule2() {
 
-        List<Descriptor> schedule2Descriptors = List.of();
+        List<Descriptor> schedule2Descriptors =
+            Arrays.asList();
 
         WriteFinalDecisionTemplateBody body =
             WriteFinalDecisionTemplateBody.builder()
@@ -134,28 +129,26 @@ class EsaScenario1Test {
 
         EsaTemplateContent content = EsaScenario.SCENARIO_1.getContent(body);
 
-        String expectedContent = """
-            The appeal is refused.
+        String expectedContent = "The appeal is refused.\n"
+            + "\n"
+            + "The decision made by the Secretary of State on 20/09/2020 is confirmed.\n"
+            + "\n"
+            + "Felix Sydney does not have limited capability for work and cannot be treated as having limited capability for work.\n"
+            + "\n"
+            + "In applying the Work Capability Assessment 0 points were scored from the activities and descriptors in Schedule 2 of the Employment and Support Allowance (ESA) Regulations 2008. This is insufficient to meet the threshold for the test. Regulation 29 of the ESA Regulations did not apply.\n"
+            + "\n"
+            + "My first reasons\n"
+            + "\n"
+            + "My second reasons\n"
+            + "\n"
+            + "Something else\n"
+            + "\n"
+            + "This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
+            + "\n";
 
-            The decision made by the Secretary of State on 20/09/2020 is confirmed.
+        Assert.assertEquals(8, content.getComponents().size());
 
-            Felix Sydney does not have limited capability for work and cannot be treated as having limited capability for work.
-
-            In applying the Work Capability Assessment 0 points were scored from the activities and descriptors in Schedule 2 of the Employment and Support Allowance (ESA) Regulations 2008. This is insufficient to meet the threshold for the test. Regulation 29 of the ESA Regulations did not apply.
-
-            My first reasons
-
-            My second reasons
-
-            Something else
-
-            This has been an oral (face to face) hearing. The following people attended: Felix Sydney the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page A1.
-
-            """;
-
-        assertEquals(8, content.getComponents().size());
-
-        assertEquals(expectedContent, content.toString());
+        Assert.assertEquals(expectedContent, content.toString());
 
     }
 }

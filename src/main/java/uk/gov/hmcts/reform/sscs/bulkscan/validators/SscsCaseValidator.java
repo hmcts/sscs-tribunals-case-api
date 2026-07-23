@@ -10,7 +10,6 @@ import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.findBoolean
 import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.getBoolean;
 import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.getField;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL;
-import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.isScottishCase;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -626,7 +625,6 @@ public class SscsCaseValidator implements CaseValidator {
                     }
                     caseData.put("region", rpc.getName());
                     caseData.put("regionalProcessingCenter", rpc);
-                    caseData.put("isScottishCase", isScottishCase(rpc));
                 } else if (!isPort) {
                     warnings.add(getMessageByCallbackType(callbackType, personType,
                         getWarningMessageName(personType, appellant) + ADDRESS_POSTCODE,
@@ -759,7 +757,7 @@ public class SscsCaseValidator implements CaseValidator {
     private void checkAppellantIbcaReference(Appellant appellant, String personType) {
         if (appellant != null && appellant.getIdentity() != null && appellant.getIdentity().getIbcaReference() != null) {
             if (!String.join("", appellant.getIdentity().getIbcaReference().split(" ")).matches(
-                "^[A-Za-z0-9]{6}$")) {
+                "^[A-z]\\d{2}[A-z]\\d{2}$")) {
                 warnings.add(getMessageByCallbackType(callbackType, personType,
                     getWarningMessageName(personType, appellant) + IBCA_REFERENCE, IS_INVALID));
             }

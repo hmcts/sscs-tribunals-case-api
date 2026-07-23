@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.functional.mya;
 
 import static java.lang.Long.valueOf;
+import static org.apache.http.conn.ssl.SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
 
 import java.io.IOException;
 import java.security.KeyManagementException;
@@ -10,25 +11,24 @@ import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
 import org.apache.http.client.HttpClient;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.ssl.SSLContextBuilder;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.Before;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
-@ExtendWith(SpringExtension.class)
+@RunWith(SpringRunner.class)
 @SpringBootTest(classes = {TribunalsCaseApiApplication.class, CitizenIdamService.class})
 @Slf4j
 public abstract class BaseFunctionTest {
@@ -52,7 +52,7 @@ public abstract class BaseFunctionTest {
     private String idamApiUrl;
     protected IdamTestApiRequests idamTestApiRequests;
 
-    @BeforeEach
+    @Before
     public void setUp() throws Exception {
         myaClient = buildClient("USE_MYA_PROXY");
         client = buildClient("USE_BACKEND_PROXY");
@@ -70,7 +70,8 @@ public abstract class BaseFunctionTest {
     protected CreatedCcdCase createCase() throws IOException {
         String emailAddress = createRandomEmail();
 
-        CreatedCcdCase createdCcdCase = sscsMyaBackendRequests.createOralCase(emailAddress);
+        CreatedCcdCase createdCcdCase = null;
+        createdCcdCase = sscsMyaBackendRequests.createOralCase(emailAddress);
 
         return createdCcdCase;
     }
@@ -85,12 +86,12 @@ public abstract class BaseFunctionTest {
         SSLContextBuilder builder = new SSLContextBuilder();
         builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
         SSLConnectionSocketFactory sslsf =
-                new SSLConnectionSocketFactory(builder.build(), NoopHostnameVerifier.INSTANCE);
+                new SSLConnectionSocketFactory(builder.build(), ALLOW_ALL_HOSTNAME_VERIFIER);
 
         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create()
                 .setSSLSocketFactory(sslsf);
         if (System.getenv(proxySystemProperty) != null) {
-            httpClientBuilder.setProxy(new HttpHost("proxyout.reform.hmcts.net", 8080));
+            httpClientBuilder = httpClientBuilder.setProxy(new HttpHost("proxyout.reform.hmcts.net", 8080));
         }
         return httpClientBuilder.build();
     }

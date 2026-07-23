@@ -34,19 +34,14 @@ import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
 @Slf4j
 public class SscsMyaBackendRequests {
-
-    private static final String COH_URL = "/api/continuous-online-hearings/";
-    private static final String CITIZEN_API_URL = "/api/citizen/";
-
     private final IdamTokens idamTokens;
     private final CitizenIdamService citizenIdamService;
-    private final String baseUrl;
-    private final CloseableHttpClient client;
-    private final EvidenceManagementService evidenceManagementService;
+    private String baseUrl;
+    private CloseableHttpClient client;
+    private EvidenceManagementService evidenceManagementService;
 
 
-    public SscsMyaBackendRequests(IdamService idamService, CitizenIdamService citizenIdamService, String baseUrl,
-                                  CloseableHttpClient client, EvidenceManagementService evidenceManagementService) {
+    public SscsMyaBackendRequests(IdamService idamService, CitizenIdamService citizenIdamService, String baseUrl, CloseableHttpClient client, EvidenceManagementService evidenceManagementService) {
         this.idamTokens = idamService.getIdamTokens();
         this.citizenIdamService = citizenIdamService;
         this.baseUrl = baseUrl;
@@ -55,7 +50,7 @@ public class SscsMyaBackendRequests {
     }
 
     public JSONArray getOnlineHearingForCitizen(String tya, String email) throws IOException {
-        String uri = (StringUtils.isNotBlank(tya)) ? CITIZEN_API_URL + tya : CITIZEN_API_URL;
+        String uri = (StringUtils.isNotBlank(tya)) ? "/api/citizen/" + tya : "/api/citizen";
         HttpResponse getOnlineHearingResponse = getRequest(uri, email);
 
         // Retry if failed first time
@@ -71,10 +66,9 @@ public class SscsMyaBackendRequests {
     }
 
     public JSONObject assignCaseToUser(String tya, String email, String postcode) throws IOException {
-        StringEntity entity =
-                new StringEntity("{\"email\":\"" + email + "\", \"postcode\":\"" + postcode + "\"}", APPLICATION_JSON);
+        StringEntity entity = new StringEntity("{\"email\":\"" + email + "\", \"postcode\":\"" + postcode + "\"}", APPLICATION_JSON);
 
-        HttpResponse response = postRequest(CITIZEN_API_URL + tya, entity, email);
+        HttpResponse response = postRequest("/api/citizen/" + tya, entity, email);
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
 
         String responseBody = EntityUtils.toString(response.getEntity());
@@ -85,7 +79,7 @@ public class SscsMyaBackendRequests {
     public void logUserWithCase(Long caseId) throws IOException {
         StringEntity entity = new StringEntity(EMPTY, APPLICATION_JSON);
 
-        HttpResponse response = putRequest(CITIZEN_API_URL + "cases/" + caseId + "/log", entity);
+        HttpResponse response = putRequest("/api/citizen/cases/" + caseId + "/log", entity);
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
     }
 
@@ -116,12 +110,11 @@ public class SscsMyaBackendRequests {
                         fileName)
                 .build();
 
-        HttpResponse response = putRequest(COH_URL + hearingId + "/evidence", data);
+        HttpResponse response = putRequest("/api/continuous-online-hearings/" + hearingId + "/evidence", data);
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
     }
 
-    public void uploadSingleHearingEvidence(String hearingId, String fileName, String body, String idamEmail)
-            throws IOException {
+    public void uploadSingleHearingEvidence(String hearingId, String fileName, String body, String idamEmail) throws IOException {
         HttpEntity data = MultipartEntityBuilder.create()
                 .setContentType(ContentType.MULTIPART_FORM_DATA)
                 .addBinaryBody("file",
@@ -130,18 +123,17 @@ public class SscsMyaBackendRequests {
                         fileName)
                 .build();
 
-        HttpResponse response =
-                postRequest(COH_URL + hearingId + "/singleevidence?body=" + body + "&idamEmail=" + idamEmail, data);
+        HttpResponse response = postRequest("/api/continuous-online-hearings/" + hearingId + "/singleevidence?body=" + body + "&idamEmail=" + idamEmail, data);
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
     }
 
     public void deleteUploadEvidence(Long caseId, String evidenceId) throws IOException {
-        HttpResponse response = client.execute(addHeaders(delete(baseUrl + COH_URL + caseId + "/evidence/" + evidenceId)).build());
+        HttpResponse response = client.execute(addHeaders(delete(baseUrl + "/api/continuous-online-hearings/" + caseId + "/evidence/" + evidenceId)).build());
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
     }
 
     public void submitHearingEvidence(String hearingId, String description) throws IOException {
-        HttpResponse response = postRequest(COH_URL + hearingId + "/evidence",
+        HttpResponse response = postRequest("/api/continuous-online-hearings/" + hearingId + "/evidence",
                 new StringEntity("{\n"
                         + "  \"body\": \"" + description + "\",\n"
                         + "  \"idamEmail\": \"mya-sscs-6920@mailinator.com\"\n"
@@ -151,7 +143,7 @@ public class SscsMyaBackendRequests {
     }
 
     public JSONArray getDraftHearingEvidence(String hearingId) throws IOException {
-        HttpResponse response = getRequest(COH_URL + hearingId + "/evidence");
+        HttpResponse response = getRequest("/api/continuous-online-hearings/" + hearingId + "/evidence");
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
 
         String responseBody = EntityUtils.toString(response.getEntity());
@@ -160,7 +152,7 @@ public class SscsMyaBackendRequests {
     }
 
     public void uploadAppellantStatement(String hearingId, String statement) throws IOException {
-        String uri = COH_URL + hearingId + "/statement";
+        String uri = "/api/continuous-online-hearings/" + hearingId + "/statement";
         String stringEntity = "{\n"
                 + "  \"body\": \"statement\",\n"
                 + "  \"tya\": \"Q9jE2FQuRR\"\n"
@@ -171,7 +163,7 @@ public class SscsMyaBackendRequests {
     }
 
     public String getCoversheet(String caseId) throws IOException {
-        CloseableHttpResponse getCoverSheetResponse = getRequest(COH_URL + caseId + "/evidence/coversheet");
+        CloseableHttpResponse getCoverSheetResponse = getRequest("/api/continuous-online-hearings/" + caseId + "/evidence/coversheet");
 
         assertThat(getCoverSheetResponse.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
         Header fileNameHeader = getCoverSheetResponse.getFirstHeader("Content-Disposition");

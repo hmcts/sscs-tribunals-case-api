@@ -35,7 +35,6 @@ export class HomePage {
   readonly searchResultsField: string;
   readonly elementsAndIssuesTab: Locator;
   readonly unprocessedCorrespondenceTab: Locator;
-  readonly confidentialityTab: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -66,7 +65,6 @@ export class HomePage {
     this.elementsAndIssuesTab = page.getByRole('tab').filter({ hasText: /^Elements and issues$/ });
     this.tribunalFtaCommunicationsTab = page.getByRole('tab').filter({ hasText: /^Tribunal\/FTA Communications$/ });
     this.unprocessedCorrespondenceTab = page.getByRole('tab').filter({ hasText: /^Unprocessed Correspondence$/ });
-    this.confidentialityTab = page.getByRole('tab').filter({ hasText: /^Confidentiality$/ });
     this.afterTabBtn = page.locator(
       '//html/body/exui-root/exui-case-home/div/exui-case-details-home/exui-case-viewer-container/ccd-case-viewer/div/ccd-case-full-access-view/div[2]/div/mat-tab-group/mat-tab-header/button[2]/div'
     );
@@ -327,11 +325,6 @@ export class HomePage {
       case 'Tribunal/FTA Communications': {
         await expect(this.tribunalFtaCommunicationsTab).toBeVisible();
         await this.tribunalFtaCommunicationsTab.click();
-        break;
-      }
-      case 'Confidentiality': {
-        await expect(this.confidentialityTab).toBeVisible();
-        await this.confidentialityTab.click();
         break;
       }
       default: {

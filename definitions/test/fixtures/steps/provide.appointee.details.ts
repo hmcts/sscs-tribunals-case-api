@@ -45,7 +45,7 @@ export class ProvideAppointeeDetails extends BaseStep {
     );
     await this.eventNameAndDescriptionPage.confirmAndSignOut();
 
-    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
+    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
     await this.verifyHistoryTabDetails(
       appointeeDetailsData.endState,
       appointeeDetailsData.eventName

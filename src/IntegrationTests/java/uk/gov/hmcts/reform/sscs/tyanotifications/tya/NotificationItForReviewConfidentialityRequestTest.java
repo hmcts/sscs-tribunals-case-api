@@ -9,29 +9,29 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.helper.IntegrationTestHe
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.stream.Stream;
+import junitparams.NamedParameters;
+import junitparams.Parameters;
 import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DatedRequestOutcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome;
 
-class NotificationItForReviewConfidentialityRequestTest extends NotificationsItBase {
+public class NotificationItForReviewConfidentialityRequestTest extends NotificationsItBase {
 
+    @NamedParameters("grantedOrRefused")
     @SuppressWarnings("unused")
-    private static Stream<Arguments> grantedOrRefused() {
-        return Stream.of(
-            Arguments.of(DatedRequestOutcome.builder()
-                .requestOutcome(RequestOutcome.GRANTED).date(LocalDate.now()).build()),
-            Arguments.of(DatedRequestOutcome.builder()
-                .requestOutcome(RequestOutcome.REFUSED).date(LocalDate.now()).build())
-        );
+    private Object[] grantedOrRefused() {
+        return new Object[]{
+            new DatedRequestOutcome[]{DatedRequestOutcome.builder()
+                .requestOutcome(RequestOutcome.GRANTED).date(LocalDate.now()).build()},
+            new DatedRequestOutcome[]{DatedRequestOutcome.builder()
+                .requestOutcome(RequestOutcome.REFUSED).date(LocalDate.now()).build()},
+        };
     }
 
-    @ParameterizedTest
-    @MethodSource("grantedOrRefused")
-    void givenAppellantConfidentialityRequest_shouldSendConfidentialityLetter(final DatedRequestOutcome requestOutcome) throws Exception {
+    @Test
+    @Parameters(named = "grantedOrRefused")
+    public void givenAppellantConfidentialityRequest_shouldSendConfidentialityLetter(DatedRequestOutcome requestOutcome) throws Exception {
         String path = getClass().getClassLoader().getResource("json/ccdResponseWithJointParty.json").getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = updateEmbeddedJson(json, "reviewConfidentialityRequest", "event_id");
@@ -44,9 +44,9 @@ class NotificationItForReviewConfidentialityRequestTest extends NotificationsItB
         verify(notificationClient, times(1)).sendPrecompiledLetterWithInputStream(any(), any());
     }
 
-    @ParameterizedTest
-    @MethodSource("grantedOrRefused")
-    void givenJointPartyConfidentialityRequest_shouldSendConfidentialityLetter(final DatedRequestOutcome requestOutcome) throws Exception {
+    @Test
+    @Parameters(named = "grantedOrRefused")
+    public void givenJointPartyConfidentialityRequest_shouldSendConfidentialityLetter(DatedRequestOutcome requestOutcome) throws Exception {
         String path = getClass().getClassLoader().getResource("json/ccdResponseWithJointParty.json").getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = updateEmbeddedJson(json, "reviewConfidentialityRequest", "event_id");
@@ -59,9 +59,9 @@ class NotificationItForReviewConfidentialityRequestTest extends NotificationsItB
         verify(notificationClient, times(1)).sendPrecompiledLetterWithInputStream(any(), any());
     }
 
-    @ParameterizedTest
-    @MethodSource("grantedOrRefused")
-    void givenJointPartyAndAppellantConfidentialityRequest_shouldSendBothConfidentialityLetters(final DatedRequestOutcome requestOutcome) throws Exception {
+    @Test
+    @Parameters(named = "grantedOrRefused")
+    public void givenJointPartyAndAppellantConfidentialityRequest_shouldSendBothConfidentialityLetters(DatedRequestOutcome requestOutcome) throws Exception {
         String path = getClass().getClassLoader().getResource("json/ccdResponseWithJointParty.json").getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = updateEmbeddedJson(json, "reviewConfidentialityRequest", "event_id");

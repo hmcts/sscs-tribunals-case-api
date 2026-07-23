@@ -11,16 +11,16 @@ import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -30,9 +30,8 @@ import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.document.domain.Classification;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
-import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 
-@ExtendWith(SpringExtension.class)
+@RunWith(SpringRunner.class)
 @SpringBootTest
 @TestPropertySource(locations = "classpath:config/application_it.properties")
 @AutoConfigureMockMvc
@@ -53,16 +52,13 @@ public class EvidenceDocumentUploadEndpointIt {
     @MockitoBean
     private DocumentUploadClientApi documentUploadClientApi;
 
-    @MockitoBean
-    AuthorisationService authorisationService;
-
     @Mock
     private UploadResponse uploadResponse;
 
     @Mock
     private Embedded value;
 
-    @BeforeEach
+    @Before
     public void setUp() throws Exception {
         given(authTokenGenerator.generate()).willReturn(AUTH_TOKEN);
     }
@@ -83,8 +79,7 @@ public class EvidenceDocumentUploadEndpointIt {
             MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
             mockMvc.perform(MockMvcRequestBuilders.multipart("/evidence/upload")
                     .file("file", bytes)
-                    .characterEncoding("UTF-8")
-                    .header("ServiceAuthorization", AUTH_TOKEN))
+                    .characterEncoding("UTF-8"))
                     .andExpect(status().is(200));
 
         }
