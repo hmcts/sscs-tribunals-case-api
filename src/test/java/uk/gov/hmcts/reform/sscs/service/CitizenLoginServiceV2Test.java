@@ -19,10 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
@@ -66,7 +66,6 @@ public class CitizenLoginServiceV2Test {
     private CaseAssignmentVerifier caseAssignmentVerifier;
     private OnlineHearingService onlineHearingService;
 
-    @Before
     @BeforeEach
     public void setUp() {
         citizenIdamTokens = IdamTokens.builder()
@@ -548,6 +547,19 @@ public class CitizenLoginServiceV2Test {
         assertThat(sscsCaseDetails.isPresent(), is(false));
     }
 
+    @ParameterizedTest
+    @CsvSource({
+        "test@example.com, tes***@example.com",
+        "t@example.com, t***@example.com",
+        "te@example.com, te***@example.com",
+        "tes@example.com, tes***@example.com",
+        "testing@example.com, tes***@example.com",
+        ","
+    })
+    public void maskEmail(String email, String maskedEmail) {
+        assertThat(invokeMaskEmail(email), is(maskedEmail));
+    }
+
     private static Object[] createValidCaseDataSubscriptions() {
         return new Object[]{
             new Object[]{SscsCaseData.builder().subscriptions(Subscriptions.builder()
@@ -658,6 +670,16 @@ public class CitizenLoginServiceV2Test {
     void verifyFindAndUpdateCaseLastLoggedIntoMya(CcdService ccdService, UpdateCcdCaseService updateCcdCaseService, SscsCaseDetails expectedCase, long expectedCaseId, IdamTokens serviceIdamTokens) {
         verify(updateCcdCaseService).updateCaseV2(eq(expectedCaseId), eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
                 anyString(), anyString(), eq(serviceIdamTokens), any(Consumer.class));
+    }
+
+    private String invokeMaskEmail(String email) {
+        try {
+            java.lang.reflect.Method m = CitizenLoginService.class.getDeclaredMethod("maskEmail", String.class);
+            m.setAccessible(true);
+            return (String) m.invoke(underTest, email);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
