@@ -144,7 +144,7 @@ class ConfidentialityConfirmedMidEventHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getErrors()).contains("Confidentiality for all parties is required.");
+        assertThat(response.getErrors()).contains("Confidentiality for all parties must be determined to either Yes or No.");
     }
 
     @ParameterizedTest
@@ -159,7 +159,37 @@ class ConfidentialityConfirmedMidEventHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getErrors()).contains("Confidentiality for all parties is required.");
+        assertThat(response.getErrors()).contains("Confidentiality for all parties must be determined to either Yes or No.");
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = Benefit.class, names = {"CHILD_SUPPORT", "UC"})
+    void givenConfidentialityConfirmedEventWithOtherPartyConfidentialityUndetermined_thenReturnError(Benefit benefit) {
+        var sscsCaseData = caseDataWithBenefit(benefit.getShortName());
+        sscsCaseData.setOtherParties(Collections.singletonList(buildOtherParty("1", YesNoUndetermined.UNDETERMINED)));
+
+        when(callback.getEvent()).thenReturn(CONFIDENTIALITY_CONFIRMED);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).contains("Confidentiality for all parties must be determined to either Yes or No.");
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = Benefit.class, names = {"CHILD_SUPPORT", "UC"})
+    void givenConfidentialityConfirmedEventWithAppellantConfidentialityUndetermined_thenReturnError(Benefit benefit) {
+        var sscsCaseData = caseDataWithBenefit(benefit.getShortName());
+        sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequirement(YesNoUndetermined.UNDETERMINED).build());
+
+        when(callback.getEvent()).thenReturn(CONFIDENTIALITY_CONFIRMED);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).contains("Confidentiality for all parties must be determined to either Yes or No.");
     }
 
     @Test
