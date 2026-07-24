@@ -657,15 +657,4 @@ public class CitizenLoginServiceV2Test {
         verify(updateCcdCaseService).updateCaseV2(eq(expectedCaseId), eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
                 anyString(), anyString(), eq(serviceIdamTokens), any(Consumer.class));
     }
-
-    private String invokeMaskEmail(String email) {
-        try {
-            java.lang.reflect.Method m = CitizenLoginService.class.getDeclaredMethod("maskEmail", String.class);
-            m.setAccessible(true);
-            return (String) m.invoke(underTest, email);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
 }
