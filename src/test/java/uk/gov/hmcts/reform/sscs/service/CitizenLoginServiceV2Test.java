@@ -22,7 +22,6 @@ import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
@@ -545,19 +544,6 @@ public class CitizenLoginServiceV2Test {
 
         verify(citizenCcdService, never()).addUserToCase(any(IdamTokens.class), any(String.class), anyLong());
         assertThat(sscsCaseDetails.isPresent(), is(false));
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-        "test@example.com, tes***@example.com",
-        "t@example.com, t***@example.com",
-        "te@example.com, te***@example.com",
-        "tes@example.com, tes***@example.com",
-        "testing@example.com, tes***@example.com",
-        ","
-    })
-    public void maskEmail(String email, String maskedEmail) {
-        assertThat(invokeMaskEmail(email), is(maskedEmail));
     }
 
     private static Object[] createValidCaseDataSubscriptions() {

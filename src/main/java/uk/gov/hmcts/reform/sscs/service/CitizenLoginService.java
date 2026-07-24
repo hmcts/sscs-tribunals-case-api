@@ -186,16 +186,8 @@ public class CitizenLoginService {
     }
 
     private Predicate<SscsCaseDetails> casesWithSubscriptionMatchingTya(String tya) {
-        return sscsCaseDetails -> {
-            Subscriptions subscriptions = sscsCaseDetails.getData().getSubscriptions();
-            final Stream<Subscription> otherPartySubscriptionStream = emptyIfNull(sscsCaseDetails.getData().getOtherParties()).stream()
-                    .map(CcdValue::getValue)
-                    .flatMap(op -> of(op.getOtherPartySubscription(), op.getOtherPartyAppointeeSubscription(), op.getOtherPartyRepresentativeSubscription()));
-
-
-            return concat(of(subscriptions.getAppellantSubscription(), subscriptions.getAppointeeSubscription(), subscriptions.getRepresentativeSubscription()), otherPartySubscriptionStream)
+        return sscsCaseDetails -> getAllSubscriptionsOnCase(sscsCaseDetails)
                     .anyMatch(subscription -> subscription != null && tya.equals(subscription.getTya()));
-        };
     }
 
     private boolean caseHasSubscriptionWithTyaAndEmail(SscsCaseDetails sscsCaseDetails, String tya, String email) {
@@ -211,29 +203,42 @@ public class CitizenLoginService {
     }
 
     private boolean caseHasSubscriptionWithMatchingEmail(SscsCaseDetails sscsCaseDetails, IdamTokens idamTokens) {
-        Subscriptions subscriptions = sscsCaseDetails.getData().getSubscriptions();
-        final Stream<Subscription> otherPartySubscriptionStream = emptyIfNull(sscsCaseDetails.getData().getOtherParties()).stream()
-                .map(CcdValue::getValue)
-                .flatMap(op -> of(op.getOtherPartySubscription(), op.getOtherPartyAppointeeSubscription(), op.getOtherPartyRepresentativeSubscription()));
-
-        boolean hasMatchingSubscriptionEmail = concat(of(
-                        subscriptions.getAppellantSubscription(),
-                        subscriptions.getAppointeeSubscription(),
-                        subscriptions.getRepresentativeSubscription()),
-                otherPartySubscriptionStream)
+        boolean hasMatchingSubscriptionEmail = getAllSubscriptionsOnCase(sscsCaseDetails)
                 .anyMatch(subscription -> subscription != null && idamTokens.getEmail().equalsIgnoreCase(subscription.getEmail()));
 
         if (isFalse(hasMatchingSubscriptionEmail)) {
-            log.info("No matching subscription email found for case id {} and user id {}", sscsCaseDetails.getId(), idamTokens.getUserId());
+            log.info("No matching subscription email found for case id {} and user id [{}]", sscsCaseDetails.getId(), idamTokens.getUserId());
         }
 
         return hasMatchingSubscriptionEmail;
     }
 
+    private Stream<Subscription> getAllSubscriptionsOnCase(SscsCaseDetails sscsCaseDetails) {
+        Subscriptions subscriptions = sscsCaseDetails.getData().getSubscriptions();
+        final Stream<Subscription> otherPartySubscriptionStream = emptyIfNull(sscsCaseDetails.getData().getOtherParties()).stream()
+                .map(CcdValue::getValue)
+                .flatMap(op -> of(op.getOtherPartySubscription(), op.getOtherPartyAppointeeSubscription(), op.getOtherPartyRepresentativeSubscription()));
+
+        return concat(of(
+                        subscriptions.getAppellantSubscription(),
+                        subscriptions.getAppointeeSubscription(),
+                        subscriptions.getRepresentativeSubscription()),
+                otherPartySubscriptionStream);
+
+    }
+
     private void updateSubscriptionWithLastLoggedIntoMya(SscsCaseDetails sscsCaseDetails, String email) {
         SscsCaseData sscsCaseData = sscsCaseDetails.getData();
         Subscriptions subscriptions = sscsCaseData.getSubscriptions();
+
+        Stream<Subscription> subs = getAllSubscriptionsOnCase(sscsCaseDetails);
+
         String lastLoggedIntoMya = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
+
+
+        subs.anyMatch(subscription -> subscription != null && email.equalsIgnoreCase(subscription.getEmail()));
+
+
         if (subscriptions != null && subscriptions.getAppellantSubscription() != null
                 && email.equalsIgnoreCase(subscriptions.getAppellantSubscription().getEmail())) {
             subscriptions.getAppellantSubscription().setLastLoggedIntoMya(lastLoggedIntoMya);
