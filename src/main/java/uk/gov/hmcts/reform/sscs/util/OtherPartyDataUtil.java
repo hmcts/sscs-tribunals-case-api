@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
 
 public class OtherPartyDataUtil {
 
@@ -106,23 +107,31 @@ public class OtherPartyDataUtil {
         return isConfidential(sscsCaseData, false);
     }
 
-    public static YesNo isConfidential(final SscsCaseData sscsCaseData, final boolean cmOtherPartyConfidentialityEnabled) {
-        var appeal = sscsCaseData.getAppeal();
-        if (isValidBenefitTypeForConfidentiality(appeal.getBenefitType(), cmOtherPartyConfidentialityEnabled)) {
-            if ((appeal.getAppellant() != null
-                && appeal.getAppellant().getConfidentialityRequired() != null
-                && isYes(appeal.getAppellant().getConfidentialityRequired()))
-                || otherPartyHasConfidentiality(sscsCaseData)) {
-                return YES;
-            }
+    public static YesNo isConfidential(final SscsCaseData sscsCaseData,
+        final boolean cmOtherPartyConfidentialityEnabled) {
+        if (sscsCaseData == null || sscsCaseData.getAppeal() == null) {
+            return null;
+        }
+        if (!isValidBenefitTypeForConfidentiality(sscsCaseData.getAppeal().getBenefitType(),
+            cmOtherPartyConfidentialityEnabled)) {
+            return null;
+        }
+        final YesNoUndetermined appellantConfidentiality = sscsCaseData.getAppellantConfidentiality().orElse(null);
+        if (appellantConfidentiality == YesNoUndetermined.YES || otherPartyHasConfidentiality(sscsCaseData)) {
+            return YesNo.YES;
+        }
+        if (appellantConfidentiality == YesNoUndetermined.NO && allOtherPartiesDoNotWantConfidentiality(sscsCaseData)) {
+            return YesNo.NO;
         }
         return null;
     }
 
+    // TODO Why is the FF hard-coded as false? Can we remove this and use the method below, and if we do that we can use the predicate in sscs-common
     public static boolean isValidBenefitTypeForConfidentiality(final BenefitType benefitType) {
         return isValidBenefitTypeForConfidentiality(benefitType, false);
     }
 
+    // TODO Can replace this with the predicate defined in sscs-common once cmOtherPartyConfidentialityEnabled is removed
     public static boolean isValidBenefitTypeForConfidentiality(
         final BenefitType benefitType,
         final boolean cmOtherPartyConfidentialityEnabled) {
@@ -142,10 +151,18 @@ public class OtherPartyDataUtil {
         return sscsCaseData.getOtherParties() != null && !sscsCaseData.getOtherParties().isEmpty();
     }
 
+    private static boolean allOtherPartiesDoNotWantConfidentiality(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getOtherParties() != null) {
+            return sscsCaseData.getOtherParties().stream()
+                               .allMatch(op -> YesNoUndetermined.isNo(op.getValue().getConfidentialityRequirement()));
+        }
+        return true;
+    }
+
     private static boolean otherPartyHasConfidentiality(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getOtherParties() != null) {
             return sscsCaseData.getOtherParties().stream()
-                    .anyMatch(op -> isYes(op.getValue().getConfidentialityRequired()));
+                    .anyMatch(op -> YesNoUndetermined.isYes(op.getValue().getConfidentialityRequirement()));
         }
         return false;
     }
@@ -293,31 +310,31 @@ public class OtherPartyDataUtil {
         if (isEmpty(currentOtherParties)) {
             return;
         }
-        final Map<String, YesNo> confidentialityBefore = buildConfidentialityMap(previousOtherParties);
+        final Map<String, YesNoUndetermined> confidentialityBefore = buildConfidentialityMap(previousOtherParties);
         currentOtherParties.stream()
             .filter(Objects::nonNull)
             .map(CcdValue::getValue)
             .filter(Objects::nonNull)
             .forEach(current -> {
-                final YesNo priorConfidentiality = confidentialityBefore.get(current.getId());
-                if (nonNull(current.getConfidentialityRequired())
+                final YesNoUndetermined priorConfidentiality = confidentialityBefore.get(current.getId());
+                if (nonNull(current.getConfidentialityRequirement())
                     && (priorConfidentiality == null
-                        || !Objects.equals(priorConfidentiality, current.getConfidentialityRequired()))) {
+                        || !Objects.equals(priorConfidentiality, current.getConfidentialityRequirement()))) {
                     current.setConfidentialityRequiredChangedDate(getLocalDateTime());
                 }
             });
     }
 
-    private static Map<String, YesNo> buildConfidentialityMap(final List<CcdValue<OtherParty>> otherParties) {
+    private static Map<String, YesNoUndetermined> buildConfidentialityMap(final List<CcdValue<OtherParty>> otherParties) {
         if (isEmpty(otherParties)) {
             return Collections.emptyMap();
         }
-        final Map<String, YesNo> byId = new HashMap<>();
+        final Map<String, YesNoUndetermined> byId = new HashMap<>();
         otherParties.stream()
             .filter(Objects::nonNull)
             .map(CcdValue::getValue)
             .filter(Objects::nonNull)
-            .forEach(prior -> byId.put(prior.getId(), prior.getConfidentialityRequired()));
+            .forEach(prior -> byId.put(prior.getId(), prior.getConfidentialityRequirement()));
         return byId;
     }
 
