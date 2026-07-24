@@ -19,13 +19,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -43,7 +47,7 @@ import uk.gov.hmcts.reform.sscs.util.CaseAssignmentVerifier;
 
 public class CitizenLoginServiceV2Test {
 
-    private static final String SUBSCRIPTION_EMAIL_ADDRESS = "someEmail@exaple.com";
+    private static final String SUBSCRIPTION_EMAIL_ADDRESS = "someEmail@example.com";
     private static final String APPEAL_POSTCODE = "CM11 1AB";
     private static final String IBCA_REFERENCE = "AB12CD34";
 
@@ -61,11 +65,11 @@ public class CitizenLoginServiceV2Test {
     private CaseAssignmentVerifier caseAssignmentVerifier;
     private OnlineHearingService onlineHearingService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         citizenIdamTokens = IdamTokens.builder()
                 .userId("someUserId")
-                .email("someEmail@exaple.com")
+                .email(SUBSCRIPTION_EMAIL_ADDRESS)
                 .build();
         citizenCcdService = mock(CitizenCcdService.class);
         ccdService = mock(CcdService.class);
@@ -80,7 +84,7 @@ public class CitizenLoginServiceV2Test {
         serviceIdamTokens = mock(IdamTokens.class);
         when(idamService.getIdamTokens()).thenReturn(serviceIdamTokens);
         caseAssignmentVerifier = mock(CaseAssignmentVerifier.class);
-        when(caseAssignmentVerifier.verifyPostcodeOrIbcaReference(any(SscsCaseDetails.class), eq(APPEAL_POSTCODE), eq(IBCA_REFERENCE), eq("someEmail@exaple.com"))).thenReturn(true);
+        when(caseAssignmentVerifier.verifyPostcodeOrIbcaReference(any(SscsCaseDetails.class), eq(APPEAL_POSTCODE), eq(IBCA_REFERENCE), eq(SUBSCRIPTION_EMAIL_ADDRESS))).thenReturn(true);
         onlineHearingService = mock(OnlineHearingService.class);
 
         underTest = new CitizenLoginService(citizenCcdService, ccdService, updateCcdCaseService, sscsCcdConvertService, idamService, caseAssignmentVerifier, onlineHearingService);
@@ -88,28 +92,23 @@ public class CitizenLoginServiceV2Test {
         tya = "123-123-123-123";
     }
 
-    @Test
-    public void findsCasesAlreadyAssociatedWithCitizen() {
+    @ParameterizedTest
+    @MethodSource("createValidCaseDataSubscriptions")
+    public void findsCasesAlreadyAssociatedWithCitizen(SscsCaseData sscsCaseData) {
         List<CaseDetails> caseDetails = new ArrayList<>();
         caseDetails.add(case1);
         caseDetails.add(case2);
-        SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().id(111L).data(SscsCaseData.builder()
-                .subscriptions(Subscriptions.builder()
-                        .appellantSubscription(Subscription.builder()
-                                .email(SUBSCRIPTION_EMAIL_ADDRESS).build()).build()).build()).build();
-        SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().id(222L).data(SscsCaseData.builder()
-                .subscriptions(Subscriptions.builder()
-                        .appellantSubscription(Subscription.builder()
-                                .email(SUBSCRIPTION_EMAIL_ADDRESS).build()).build()).build()).build();
+        SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().id(111L).data(sscsCaseData).build();
+        SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().id(222L).data(sscsCaseData).build();
         when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
         when(case1.getState()).thenReturn(State.READY_TO_LIST.getId());
         when(case2.getState()).thenReturn(State.APPEAL_CREATED.getId());
         when(sscsCcdConvertService.getCaseDetails(case1)).thenReturn(sscsCaseDetails1);
         when(sscsCcdConvertService.getCaseDetails(case2)).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing1 = someOnlineHearing(111L);
-        when(onlineHearingService.loadHearing(sscsCaseDetails1, null, "someEmail@exaple.com")).thenReturn(Optional.of(onlineHearing1));
+        when(onlineHearingService.loadHearing(sscsCaseDetails1, null, SUBSCRIPTION_EMAIL_ADDRESS)).thenReturn(Optional.of(onlineHearing1));
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
-        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, "someEmail@exaple.com")).thenReturn(Optional.of(onlineHearing2));
+        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, SUBSCRIPTION_EMAIL_ADDRESS)).thenReturn(Optional.of(onlineHearing2));
 
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, null);
 
@@ -117,20 +116,50 @@ public class CitizenLoginServiceV2Test {
         assertThat(casesForCitizen, is(asList(onlineHearing1, onlineHearing2)));
     }
 
+    @ParameterizedTest
+    @MethodSource("createInvalidCaseDataSubscriptions")
+    public void doesNotFindCasesAlreadyAssociatedWithCitizenWhenSubscriptionEmailDoesNotMatch(SscsCaseData sscsCaseData) {
+        List<CaseDetails> caseDetails = new ArrayList<>();
+        caseDetails.add(case1);
+        caseDetails.add(case2);
+        SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().id(111L).data(sscsCaseData).build();
+        SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().id(222L).data(sscsCaseData).build();
+        when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
+        when(case1.getState()).thenReturn(State.READY_TO_LIST.getId());
+        when(case2.getState()).thenReturn(State.APPEAL_CREATED.getId());
+        when(sscsCcdConvertService.getCaseDetails(case1)).thenReturn(sscsCaseDetails1);
+        when(sscsCcdConvertService.getCaseDetails(case2)).thenReturn(sscsCaseDetails2);
+        OnlineHearing onlineHearing1 = someOnlineHearing(111L);
+        when(onlineHearingService.loadHearing(sscsCaseDetails1, null, SUBSCRIPTION_EMAIL_ADDRESS)).thenReturn(Optional.of(onlineHearing1));
+        OnlineHearing onlineHearing2 = someOnlineHearing(222L);
+        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, SUBSCRIPTION_EMAIL_ADDRESS)).thenReturn(Optional.of(onlineHearing2));
+
+        List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, null);
+
+        verify(sscsCcdConvertService, times(2)).getCaseDetails(any(CaseDetails.class));
+        assertThat(casesForCitizen, is(new ArrayList<>()));
+    }
+
     @Test
     public void findsCasesAlreadyAssociatedWithCitizenWhenOneCaseStatusIsDraft() {
         List<CaseDetails> caseDetails = new ArrayList<>();
         caseDetails.add(case1);
         caseDetails.add(case2);
-        SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().data(SscsCaseData.builder().build()).id(111L).build();
-        SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().data(SscsCaseData.builder().build()).id(222L).build();
+        SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().data(SscsCaseData.builder().build()).id(111L).data(SscsCaseData.builder()
+                .subscriptions(Subscriptions.builder().appellantSubscription(
+                        Subscription.builder().email(SUBSCRIPTION_EMAIL_ADDRESS).build()
+                ).build()).build()).build();
+        SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().data(SscsCaseData.builder().build()).id(222L).data(SscsCaseData.builder()
+                .subscriptions(Subscriptions.builder().appellantSubscription(
+                        Subscription.builder().email(SUBSCRIPTION_EMAIL_ADDRESS).build()
+                ).build()).build()).build();
         when(case1.getState()).thenReturn(State.DRAFT.getId());
         when(case2.getState()).thenReturn(State.APPEAL_CREATED.getId());
         when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
         when(sscsCcdConvertService.getCaseDetails(eq(case1))).thenReturn(sscsCaseDetails1);
         when(sscsCcdConvertService.getCaseDetails(eq(case2))).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
-        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, "someEmail@exaple.com")).thenReturn(Optional.of(onlineHearing2));
+        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, SUBSCRIPTION_EMAIL_ADDRESS)).thenReturn(Optional.of(onlineHearing2));
 
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, null);
 
@@ -143,15 +172,21 @@ public class CitizenLoginServiceV2Test {
         List<CaseDetails> caseDetails = new ArrayList<>();
         caseDetails.add(case1);
         caseDetails.add(case2);
-        SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().data(SscsCaseData.builder().build()).id(111L).build();
-        SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().data(SscsCaseData.builder().build()).id(222L).build();
+        SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().data(SscsCaseData.builder()
+                .subscriptions(Subscriptions.builder().appellantSubscription(
+                        Subscription.builder().email(SUBSCRIPTION_EMAIL_ADDRESS).build()
+                ).build()).build()).id(111L).build();
+        SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().data(SscsCaseData.builder()
+                .subscriptions(Subscriptions.builder().appellantSubscription(
+                        Subscription.builder().email(SUBSCRIPTION_EMAIL_ADDRESS).build()
+                ).build()).build()).id(222L).build();
         when(case1.getState()).thenReturn(State.DRAFT_ARCHIVED.getId());
         when(case2.getState()).thenReturn(State.READY_TO_LIST.getId());
         when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
         when(sscsCcdConvertService.getCaseDetails(case1)).thenReturn(sscsCaseDetails1);
         when(sscsCcdConvertService.getCaseDetails(eq(case2))).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
-        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, "someEmail@exaple.com")).thenReturn(Optional.of(onlineHearing2));
+        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, SUBSCRIPTION_EMAIL_ADDRESS)).thenReturn(Optional.of(onlineHearing2));
 
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, null);
 
@@ -164,13 +199,21 @@ public class CitizenLoginServiceV2Test {
         List<CaseDetails> caseDetails = new ArrayList<>();
         caseDetails.add(case1);
         caseDetails.add(case2);
-        SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().id(222L).build();
+        SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().id(111L).data(SscsCaseData.builder()
+                .subscriptions(Subscriptions.builder().appellantSubscription(
+                        Subscription.builder().email(SUBSCRIPTION_EMAIL_ADDRESS).build()
+                ).build()).build()).build();
+        SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().id(222L).data(SscsCaseData.builder()
+                .subscriptions(Subscriptions.builder().appellantSubscription(
+                        Subscription.builder().email(SUBSCRIPTION_EMAIL_ADDRESS).build()
+                ).build()).build()).build();
         when(case1.getState()).thenReturn(State.DORMANT_APPEAL_STATE.getId());
         when(case2.getState()).thenReturn(State.READY_TO_LIST.getId());
         when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
+        when(sscsCcdConvertService.getCaseDetails(eq(case1))).thenReturn(sscsCaseDetails1);
         when(sscsCcdConvertService.getCaseDetails(eq(case2))).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
-        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, "someEmail@exaple.com")).thenReturn(Optional.of(onlineHearing2));
+        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, SUBSCRIPTION_EMAIL_ADDRESS)).thenReturn(Optional.of(onlineHearing2));
 
         List<OnlineHearing> casesForCitizen = underTest.findActiveCasesForCitizen(citizenIdamTokens);
 
@@ -178,20 +221,21 @@ public class CitizenLoginServiceV2Test {
         assertThat(casesForCitizen, is(singletonList(onlineHearing2)));
     }
 
-    @Test
-    public void findsActiveCasesAlreadyAssociatedWithCitizenWhenOneCaseStatusIsVoidState() {
+    @ParameterizedTest
+    @MethodSource("createValidCaseDataSubscriptions")
+    public void findsActiveCasesAlreadyAssociatedWithCitizenWhenOneCaseStatusIsVoidState(SscsCaseData sscsCaseData) {
         List<CaseDetails> caseDetails = new ArrayList<>();
         caseDetails.add(case1);
         caseDetails.add(case2);
-        SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().id(111L).build();
-        SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().id(222L).build();
+        SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().id(111L).data(sscsCaseData).build();
+        SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().id(222L).data(sscsCaseData).build();
         when(case1.getState()).thenReturn(State.VOID_STATE.getId());
         when(case2.getState()).thenReturn(State.READY_TO_LIST.getId());
         when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
         when(sscsCcdConvertService.getCaseDetails(eq(case1))).thenReturn(sscsCaseDetails1);
         when(sscsCcdConvertService.getCaseDetails(eq(case2))).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
-        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, "someEmail@exaple.com")).thenReturn(Optional.of(onlineHearing2));
+        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, SUBSCRIPTION_EMAIL_ADDRESS)).thenReturn(Optional.of(onlineHearing2));
 
         List<OnlineHearing> casesForCitizen = underTest.findActiveCasesForCitizen(citizenIdamTokens);
 
@@ -200,25 +244,62 @@ public class CitizenLoginServiceV2Test {
         assertThat(casesForCitizen, is(singletonList(onlineHearing2)));
     }
 
-    @Test
-    public void findsDormantCasesAlreadyAssociatedWithCitizenWhenOneCaseStatusIsVoidState() {
+    @ParameterizedTest
+    @MethodSource("createInvalidCaseDataSubscriptions")
+    public void doesNotFindActiveCasesWhenSubscriptionEmailDoesNotMatch(SscsCaseData sscsCaseData) {
+        List<CaseDetails> caseDetails = new ArrayList<>();
+        caseDetails.add(case1);
+        SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().id(222L).data(sscsCaseData).build();
+        when(case1.getState()).thenReturn(State.READY_TO_LIST.getId());
+        when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
+        when(sscsCcdConvertService.getCaseDetails(eq(case1))).thenReturn(sscsCaseDetails1);
+        OnlineHearing onlineHearing1 = someOnlineHearing(222L);
+        when(onlineHearingService.loadHearing(sscsCaseDetails1, null, SUBSCRIPTION_EMAIL_ADDRESS)).thenReturn(Optional.of(onlineHearing1));
+
+        List<OnlineHearing> casesForCitizen = underTest.findActiveCasesForCitizen(citizenIdamTokens);
+
+        verify(sscsCcdConvertService).getCaseDetails(eq(case1));
+        assertThat(casesForCitizen, is(new ArrayList<>()));
+    }
+
+    @ParameterizedTest
+    @MethodSource("createValidCaseDataSubscriptions")
+    public void findsDormantCasesAlreadyAssociatedWithCitizenWhenOneCaseStatusIsVoidState(SscsCaseData sscsCaseData) {
         List<CaseDetails> caseDetails = new ArrayList<>();
         CaseDetails caseDetails1 = CaseDetails.builder().id(111L).state(State.READY_TO_LIST.getId()).build();
         CaseDetails caseDetails2 = CaseDetails.builder().id(222L).state(State.DORMANT_APPEAL_STATE.getId()).build();
         caseDetails.add(caseDetails1);
         caseDetails.add(caseDetails2);
-        SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().id(222L).state(State.DORMANT_APPEAL_STATE.getId()).build();
-        SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().id(111L).state(State.READY_TO_LIST.getId()).build();
+        SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().id(222L).data(sscsCaseData).state(State.DORMANT_APPEAL_STATE.getId()).build();
+        SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().id(111L).data(sscsCaseData).state(State.READY_TO_LIST.getId()).build();
         when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
         when(sscsCcdConvertService.getCaseDetails(eq(caseDetails1))).thenReturn(sscsCaseDetails1);
         when(sscsCcdConvertService.getCaseDetails(eq(caseDetails2))).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
-        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, "someEmail@exaple.com")).thenReturn(Optional.of(onlineHearing2));
+        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, SUBSCRIPTION_EMAIL_ADDRESS)).thenReturn(Optional.of(onlineHearing2));
 
         List<OnlineHearing> casesForCitizen = underTest.findDormantCasesForCitizen(citizenIdamTokens);
 
         verify(sscsCcdConvertService).getCaseDetails(eq(caseDetails2));
         assertThat(casesForCitizen, is(singletonList(onlineHearing2)));
+    }
+
+    @ParameterizedTest
+    @MethodSource("createInvalidCaseDataSubscriptions")
+    public void doesNotFindDormantCasesAlreadyAssociatedWithCitizenWhenSubscriptionEmailDoesNotMatch(SscsCaseData sscsCaseData) {
+        List<CaseDetails> caseDetails = new ArrayList<>();
+        CaseDetails caseDetails1 = CaseDetails.builder().id(222L).state(State.DORMANT_APPEAL_STATE.getId()).build();
+        caseDetails.add(caseDetails1);
+        SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().id(222L).data(sscsCaseData).state(State.DORMANT_APPEAL_STATE.getId()).build();
+        when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
+        when(sscsCcdConvertService.getCaseDetails(eq(caseDetails1))).thenReturn(sscsCaseDetails1);
+        OnlineHearing onlineHearing1 = someOnlineHearing(222L);
+        when(onlineHearingService.loadHearing(sscsCaseDetails1, null, SUBSCRIPTION_EMAIL_ADDRESS)).thenReturn(Optional.of(onlineHearing1));
+
+        List<OnlineHearing> casesForCitizen = underTest.findDormantCasesForCitizen(citizenIdamTokens);
+
+        verify(sscsCcdConvertService).getCaseDetails(eq(caseDetails1));
+        assertThat(casesForCitizen, is(new ArrayList<>()));
     }
 
     @Test
@@ -231,7 +312,7 @@ public class CitizenLoginServiceV2Test {
         when(sscsCcdConvertService.getCaseDetails(case1)).thenReturn(sscsCaseDetailsWithDifferentTya);
         when(sscsCcdConvertService.getCaseDetails(case2)).thenReturn(sscsCaseDetailsWithTya);
         OnlineHearing onlineHearing = someOnlineHearing(111L);
-        when(onlineHearingService.loadHearing(sscsCaseDetailsWithTya, null, "someEmail@exaple.com")).thenReturn(Optional.of(onlineHearing));
+        when(onlineHearingService.loadHearing(sscsCaseDetailsWithTya, null, SUBSCRIPTION_EMAIL_ADDRESS)).thenReturn(Optional.of(onlineHearing));
         when(ccdService.getByCaseId(eq(sscsCaseDetailsWithTya.getId()), eq(serviceIdamTokens))).thenReturn(sscsCaseDetailsWithTya);
 
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, tya);
@@ -251,7 +332,7 @@ public class CitizenLoginServiceV2Test {
         when(sscsCcdConvertService.getCaseDetails(case2)).thenReturn(sscsCaseDetailsWithTya);
 
         OnlineHearing onlineHearing = someOnlineHearing(111L);
-        when(onlineHearingService.loadHearing(sscsCaseDetailsWithTya, null, "someEmail@exaple.com")).thenReturn(Optional.of(onlineHearing));
+        when(onlineHearingService.loadHearing(sscsCaseDetailsWithTya, null, SUBSCRIPTION_EMAIL_ADDRESS)).thenReturn(Optional.of(onlineHearing));
 
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, tya);
 
@@ -268,7 +349,7 @@ public class CitizenLoginServiceV2Test {
         when(sscsCcdConvertService.getCaseDetails(case1)).thenReturn(sscsCaseDetailsWithDifferentTya);
         when(sscsCcdConvertService.getCaseDetails(case2)).thenReturn(sscsCaseDetailsWithTya);
         OnlineHearing onlineHearing = someOnlineHearing(111L);
-        when(onlineHearingService.loadHearing(sscsCaseDetailsWithTya, null, "someEmail@exaple.com")).thenReturn(Optional.of(onlineHearing));
+        when(onlineHearingService.loadHearing(sscsCaseDetailsWithTya, null, SUBSCRIPTION_EMAIL_ADDRESS)).thenReturn(Optional.of(onlineHearing));
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, tya);
 
         assertThat(casesForCitizen, is(singletonList(onlineHearing)));
@@ -305,7 +386,7 @@ public class CitizenLoginServiceV2Test {
                 .thenReturn(Optional.of(expectedOnlineHearing));
         AssociateCaseDetails associateCaseDetails =
                 new AssociateCaseDetails(SUBSCRIPTION_EMAIL_ADDRESS, null, IBCA_REFERENCE);
-        when(caseAssignmentVerifier.verifyPostcodeOrIbcaReference(any(SscsCaseDetails.class), eq(null), eq(IBCA_REFERENCE), eq("someEmail@exaple.com"))).thenReturn(true);
+        when(caseAssignmentVerifier.verifyPostcodeOrIbcaReference(any(SscsCaseDetails.class), eq(null), eq(IBCA_REFERENCE), eq(SUBSCRIPTION_EMAIL_ADDRESS))).thenReturn(true);
 
 
         Optional<OnlineHearing> sscsCaseDetails =
@@ -452,7 +533,7 @@ public class CitizenLoginServiceV2Test {
     public void cannotAssociatesUserWithCaseAsCaseNotFound() {
         String someOtherPostcode = "someOtherPostcode";
         when(caseAssignmentVerifier.verifyPostcodeOrIbcaReference(any(SscsCaseDetails.class),
-                eq(someOtherPostcode), eq(IBCA_REFERENCE), eq("someEmail@exaple.com"))).thenReturn(false);
+                eq(someOtherPostcode), eq(IBCA_REFERENCE), eq(SUBSCRIPTION_EMAIL_ADDRESS))).thenReturn(false);
 
         when(ccdService.findCaseByAppealNumber(tya, serviceIdamTokens)).thenReturn(null);
         AssociateCaseDetails associateCaseDetails =
@@ -463,6 +544,60 @@ public class CitizenLoginServiceV2Test {
 
         verify(citizenCcdService, never()).addUserToCase(any(IdamTokens.class), any(String.class), anyLong());
         assertThat(sscsCaseDetails.isPresent(), is(false));
+    }
+
+    private static Object[] createValidCaseDataSubscriptions() {
+        return new Object[]{
+            new Object[]{SscsCaseData.builder().subscriptions(Subscriptions.builder()
+                    .appellantSubscription(Subscription.builder().email(SUBSCRIPTION_EMAIL_ADDRESS).build()).build())
+                    .build()},
+
+            new Object[]{SscsCaseData.builder().subscriptions(Subscriptions.builder()
+                    .appointeeSubscription(Subscription.builder().email(SUBSCRIPTION_EMAIL_ADDRESS).build()).build())
+                    .build()},
+
+            new Object[]{SscsCaseData.builder().subscriptions(Subscriptions.builder()
+                    .representativeSubscription(Subscription.builder().email(SUBSCRIPTION_EMAIL_ADDRESS).build()).build())
+                    .build()},
+
+            new Object[]{SscsCaseData.builder().otherParties(List.of(CcdValue.<OtherParty>builder().value(OtherParty.builder()
+                                    .otherPartySubscription(Subscription.builder().email(SUBSCRIPTION_EMAIL_ADDRESS).build()).build())
+                            .build())).build()},
+
+            new Object[]{SscsCaseData.builder().otherParties(List.of(CcdValue.<OtherParty>builder().value(OtherParty.builder()
+                            .otherPartyAppointeeSubscription(Subscription.builder().email(SUBSCRIPTION_EMAIL_ADDRESS).build())
+                            .build()).build())).build()},
+            new Object[]{SscsCaseData.builder().otherParties(List.of(CcdValue.<OtherParty>builder().value(OtherParty.builder()
+                            .otherPartyRepresentativeSubscription(Subscription.builder().email(SUBSCRIPTION_EMAIL_ADDRESS).build())
+                            .build()).build())).build()}
+        };
+    }
+
+    private static Object[] createInvalidCaseDataSubscriptions() {
+        return new Object[]{
+            new Object[]{SscsCaseData.builder().subscriptions(Subscriptions.builder()
+                    .appellantSubscription(Subscription.builder().email("someDifferentEmail@example.com").build()).build())
+                    .build()},
+
+            new Object[]{SscsCaseData.builder().subscriptions(Subscriptions.builder()
+                    .appointeeSubscription(Subscription.builder().email("someDifferentEmail@example.com").build()).build())
+                    .build()},
+
+            new Object[]{SscsCaseData.builder().subscriptions(Subscriptions.builder()
+                    .representativeSubscription(Subscription.builder().email("someDifferentEmail@example.com").build()).build())
+                    .build()},
+
+            new Object[]{SscsCaseData.builder().otherParties(List.of(CcdValue.<OtherParty>builder().value(OtherParty.builder()
+                                    .otherPartySubscription(Subscription.builder().email("someDifferentEmail@example.com").build()).build())
+                            .build())).build()},
+
+            new Object[]{SscsCaseData.builder().otherParties(List.of(CcdValue.<OtherParty>builder().value(OtherParty.builder()
+                            .otherPartyAppointeeSubscription(Subscription.builder().email("someDifferentEmail@example.com").build())
+                            .build()).build())).build()},
+            new Object[]{SscsCaseData.builder().otherParties(List.of(CcdValue.<OtherParty>builder().value(OtherParty.builder()
+                            .otherPartyRepresentativeSubscription(Subscription.builder().email("someDifferentEmail@example.com").build())
+                            .build()).build())).build()}
+        };
     }
 
     private SscsCaseDetails createSscsCaseDetailsWithAppellantSubscription(String tya) {
@@ -522,5 +657,4 @@ public class CitizenLoginServiceV2Test {
         verify(updateCcdCaseService).updateCaseV2(eq(expectedCaseId), eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
                 anyString(), anyString(), eq(serviceIdamTokens), any(Consumer.class));
     }
-
 }
