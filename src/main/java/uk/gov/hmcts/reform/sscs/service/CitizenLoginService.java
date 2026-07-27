@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
@@ -191,14 +190,8 @@ public class CitizenLoginService {
     }
 
     private boolean caseHasSubscriptionWithTyaAndEmail(SscsCaseDetails sscsCaseDetails, String tya, String email) {
-        Subscriptions subscriptions = sscsCaseDetails.getData().getSubscriptions();
 
-        final Stream<Subscription> otherPartySubscriptionStream = emptyIfNull(sscsCaseDetails.getData().getOtherParties()).stream()
-                .map(CcdValue::getValue)
-                .flatMap(op -> of(op.getOtherPartySubscription(), op.getOtherPartyAppointeeSubscription(), op.getOtherPartyRepresentativeSubscription()));
-
-        return concat(of(subscriptions.getAppellantSubscription(), subscriptions.getAppointeeSubscription(), subscriptions.getRepresentativeSubscription(),
-                subscriptions.getJointPartySubscription()), otherPartySubscriptionStream)
+        return getAllSubscriptionsOnCase(sscsCaseDetails)
                 .anyMatch(subscription -> subscription != null && tya.equals(subscription.getTya()) && email.equalsIgnoreCase(subscription.getEmail()));
     }
 
@@ -222,37 +215,17 @@ public class CitizenLoginService {
         return concat(of(
                         subscriptions.getAppellantSubscription(),
                         subscriptions.getAppointeeSubscription(),
-                        subscriptions.getRepresentativeSubscription()),
-                otherPartySubscriptionStream);
+                        subscriptions.getRepresentativeSubscription(),
+                        subscriptions.getJointPartySubscription(),
+                        subscriptions.getSupporterSubscription()),
+                        otherPartySubscriptionStream);
 
     }
 
     private void updateSubscriptionWithLastLoggedIntoMya(SscsCaseDetails sscsCaseDetails, String email) {
-        SscsCaseData sscsCaseData = sscsCaseDetails.getData();
-        Subscriptions subscriptions = sscsCaseData.getSubscriptions();
-
-        Stream<Subscription> subs = getAllSubscriptionsOnCase(sscsCaseDetails);
-
         String lastLoggedIntoMya = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
 
-
-        subs.anyMatch(subscription -> subscription != null && email.equalsIgnoreCase(subscription.getEmail()));
-
-
-        if (subscriptions != null && subscriptions.getAppellantSubscription() != null
-                && email.equalsIgnoreCase(subscriptions.getAppellantSubscription().getEmail())) {
-            subscriptions.getAppellantSubscription().setLastLoggedIntoMya(lastLoggedIntoMya);
-        }
-        if (subscriptions != null && subscriptions.getAppointeeSubscription() != null
-                && email.equalsIgnoreCase(subscriptions.getAppointeeSubscription().getEmail())) {
-            subscriptions.getAppointeeSubscription().setLastLoggedIntoMya(lastLoggedIntoMya);
-        }
-
-        if (subscriptions != null && subscriptions.getRepresentativeSubscription() != null
-                && email.equalsIgnoreCase(subscriptions.getRepresentativeSubscription().getEmail())) {
-            subscriptions.getRepresentativeSubscription().setLastLoggedIntoMya(lastLoggedIntoMya);
-        }
-
+        getAllSubscriptionsOnCase(sscsCaseDetails).filter(subscription -> subscription != null && email.equalsIgnoreCase(subscription.getEmail()))
+                .forEach(subscription -> subscription.setLastLoggedIntoMya(lastLoggedIntoMya));
     }
-
 }
