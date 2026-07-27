@@ -99,6 +99,108 @@
   },
   {
     "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "overrideFields",
+    "ListElementCode": "updateListingRequirementsInterpreterDurationLabel",
+    "ID": "updateListingRequirementsDurationLabel",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "29/05/2025",
+    "FieldDisplayOrder": 2,
+    "FieldShowCondition": "overrideFields.duration != \"\"",
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "overrideFields",
+    "ListElementCode": "appellantHearingChannel",
+    "ID": "updateListingRequirementsOverrideFieldsAppellantHearingChannel",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/07/2022",
+    "FieldDisplayOrder": 3,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "overrideFields",
+    "ListElementCode": "hmcHearingType",
+    "ID": "updateListingRequirementsOverrideFieldsHmcHearingType",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/07/2022",
+    "FieldDisplayOrder": 4,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "overrideFields",
+    "ListElementCode": "autoList",
+    "ID": "updateListingRequirementsOverrideFieldsAutoList",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/07/2022",
+    "FieldDisplayOrder": 5,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "overrideFields",
+    "ListElementCode": "appellantInterpreter.isInterpreterWanted",
+    "ID": "updateListingRequirementsOverrideFieldsAppellantInterpreterIsInterpreterWanted",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/07/2022",
+    "FieldDisplayOrder": 6,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "overrideFields",
+    "ListElementCode": "appellantInterpreter.interpreterLanguage",
+    "ID": "updateListingRequirementsOverrideFieldsAppellantInterpreterInterpreterLanguage",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "overrideFields.appellantInterpreter.isInterpreterWanted = \"Yes\"",
+    "LiveFrom": "01/07/2022",
+    "FieldDisplayOrder": 7,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "overrideFields",
+    "ListElementCode": "hearingWindow.firstDateTimeMustBe",
+    "ID": "updateListingRequirementsOverrideFieldsHearingWindowFirstDateTimeMustBe",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/07/2022",
+    "FieldDisplayOrder": 8,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "overrideFields",
+    "ListElementCode": "hearingWindow.dateRangeStart",
+    "ID": "updateListingRequirementsOverrideFieldsHearingWindowDateRangeStart",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/07/2022",
+    "FieldDisplayOrder": 9,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "overrideFields",
+    "ListElementCode": "hearingWindow.dateRangeEnd",
+    "ID": "updateListingRequirementsOverrideFieldsHearingWindowDateRangeEnd",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/07/2022",
+    "FieldDisplayOrder": 10,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "overrideFields",
+    "ListElementCode": "hearingVenueEpimsIds.value",
+    "ID": "updateListingRequirementsOverrideFieldsHearingVenueEpimsIdsValue",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/07/2022",
+    "FieldDisplayOrder": 11,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
     "CaseFieldID": "reserveTo",
     "ListElementCode": "reservedDistrictTribunalJudge",
     "ID": "updateListingRequirementsReserveToReservedDistrictTribunalJudge",
@@ -116,16 +218,6 @@
     "FieldShowCondition": "reserveTo.reservedDistrictTribunalJudge != \"Yes\"",
     "LiveFrom": "08/02/2023",
     "FieldDisplayOrder": 2,
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "updateListingRequirements",
-    "CaseFieldID": "overrideFields",
-    "ListElementCode": "appellantInterpreter.isInterpreterWanted",
-    "ID": "updateListingRequirementsOverrideFieldsAppellantInterpreterIsInterpreterWanted",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/07/2022",
-    "FieldDisplayOrder": 4,
     "PageID": "1.0"
   },
   {
@@ -168,87 +260,6 @@
     "FieldShowCondition": "panelMemberExclusions.arePanelMembersReserved = \"Yes\"",
     "LiveFrom": "01/05/2023",
     "FieldDisplayOrder": 4,
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "updateListingRequirements",
-    "CaseFieldID": "overrideFields",
-    "ListElementCode": "appellantInterpreter.interpreterLanguage",
-    "ID": "updateListingRequirementsOverrideFieldsAppellantInterpreterInterpreterLanguage",
-    "DisplayContext": "OPTIONAL",
-    "FieldShowCondition": "overrideFields.appellantInterpreter.isInterpreterWanted = \"Yes\"",
-    "LiveFrom": "01/07/2022",
-    "FieldDisplayOrder": 5,
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "updateListingRequirements",
-    "CaseFieldID": "overrideFields",
-    "ListElementCode": "appellantHearingChannel",
-    "ID": "updateListingRequirementsOverrideFieldsAppellantHearingChannel",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/07/2022",
-    "FieldDisplayOrder": 6,
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "updateListingRequirements",
-    "CaseFieldID": "overrideFields",
-    "ListElementCode": "hmcHearingType",
-    "ID": "updateListingRequirementsOverrideFieldsHmcHearingType",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/07/2022",
-    "FieldDisplayOrder": 7,
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "updateListingRequirements",
-    "CaseFieldID": "overrideFields",
-    "ListElementCode": "autoList",
-    "ID": "updateListingRequirementsOverrideFieldsAutoList",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/07/2022",
-    "FieldDisplayOrder": 8,
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "updateListingRequirements",
-    "CaseFieldID": "overrideFields",
-    "ListElementCode": "hearingVenueEpimsIds.value",
-    "ID": "updateListingRequirementsOverrideFieldsHearingVenueEpimsIdsValue",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/07/2022",
-    "FieldDisplayOrder": 9,
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "updateListingRequirements",
-    "CaseFieldID": "overrideFields",
-    "ListElementCode": "hearingWindow.firstDateTimeMustBe",
-    "ID": "updateListingRequirementsOverrideFieldsHearingWindowFirstDateTimeMustBe",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/07/2022",
-    "FieldDisplayOrder": 11,
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "updateListingRequirements",
-    "CaseFieldID": "overrideFields",
-    "ListElementCode": "hearingWindow.dateRangeStart",
-    "ID": "updateListingRequirementsOverrideFieldsHearingWindowDateRangeStart",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/07/2022",
-    "FieldDisplayOrder": 11,
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "updateListingRequirements",
-    "CaseFieldID": "overrideFields",
-    "ListElementCode": "hearingWindow.dateRangeEnd",
-    "ID": "updateListingRequirementsOverrideFieldsHearingWindowDateRangeEnd",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "01/07/2022",
-    "FieldDisplayOrder": 11,
     "PageID": "1.0"
   },
   {
@@ -532,6 +543,16 @@
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "19/11/2019",
     "FieldDisplayOrder": 11
+  },
+  {
+    "CaseEventID": "actionFurtherEvidence",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "documentTabChoice",
+    "ID": "scannedDocumentDocumentTabChoice",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "19/11/2019",
+    "FieldShowCondition": "documentTabChoice!=\"DONOTSHOW\"",
+    "FieldDisplayOrder": 12
   },
   {
     "CaseEventID": "attachScannedDocs",
@@ -2566,5 +2587,192 @@
     "DisplayContext": "MANDATORY",
     "LiveFrom": "28/10/2024",
     "FieldDisplayOrder": 3
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "name.title",
+    "ID": "otherPartyTitle",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "15/01/2026",
+    "FieldDisplayOrder": 1,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "name.firstName",
+    "ID": "otherPartyFirstName",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "15/01/2026",
+    "FieldDisplayOrder": 2,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "name.lastName",
+    "ID": "otherPartyLastName",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "15/01/2026",
+    "FieldDisplayOrder": 3,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "address.line1",
+    "ID": "otherPartyAddressLine1",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "15/01/2026",
+    "FieldDisplayOrder": 4,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "address.line2",
+    "ID": "otherPartyAddressLine2",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "15/01/2026",
+    "FieldDisplayOrder": 5,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "address.town",
+    "ID": "otherPartyAddressTown",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "15/01/2026",
+    "FieldDisplayOrder": 6,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "address.county",
+    "ID": "otherPartyAddressCounty",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "15/01/2026",
+    "FieldDisplayOrder": 7,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "address.postcode",
+    "ID": "otherPartyAddressPostcode",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "15/01/2026",
+    "FieldDisplayOrder": 8,
+    "PageID": "1.0",
+    "EventElementLabel": "Postcode/Zip code"
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "contact.phone",
+    "ID": "otherPartyPhone",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "15/01/2026",
+    "FieldDisplayOrder": 9,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "contact.mobile",
+    "ID": "otherPartyMobile",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "15/01/2026",
+    "FieldDisplayOrder": 10,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "contact.email",
+    "ID": "otherPartyEmail",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "15/01/2026",
+    "FieldDisplayOrder": 11,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "unacceptableCustomerBehaviour",
+    "ID": "otherPartyUnacceptableCustomerBehaviour",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "15/01/2026",
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "role.name",
+    "ID": "otherPartyRoleName",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "15/01/2026",
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "role.description",
+    "ID": "otherPartyRoleDescription",
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "otherParties.role.name=\"Other\"",
+    "LiveFrom": "15/01/2026",
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "domesticViolenceMarker",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "16/03/2026",
+    "FieldShowCondition": "appeal.benefitType.code=\"childSupport\" OR appeal.benefitType.code=\"UC\"",
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "updateOtherPartyData",
+    "CaseFieldID": "otherParties",
+    "ListElementCode": "domesticViolenceMarker",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "16/03/2026",
+    "FieldShowCondition": "appeal.benefitType.code=\"childSupport\" OR appeal.benefitType.code=\"UC\"",
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "appeal",
+    "ListElementCode": "benefitType",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "16/03/2026",
+    "PageID": "1.0",
+    "FieldShowCondition": "otherParties=\"DoNotShow\""
+  },
+  {
+    "CaseEventID": "addOtherPartyData",
+    "CaseFieldID": "appeal",
+    "ListElementCode": "benefitType.code",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "16/03/2026",
+    "PageID": "1.0",
+    "FieldShowCondition": "otherParties=\"DoNotShow\""
+  },
+  {
+    "CaseEventID": "caseUpdated",
+    "CaseFieldID": "appeal",
+    "CaseTypeID": "Benefit",
+    "ListElementCode": "appellant.confidentialityRequired",
+    "ID": "appealAppellantConfidentiality",
+    "FieldShowCondition": "appeal.isOtherPartyAddedForChildMaintUCCase=\"Yes\" OR appeal.benefitType.code=\"childSupport\" OR appeal.benefitType.code=\"taxCredit\" OR appeal.benefitType.code=\"guardiansAllowance\" OR appeal.benefitType.code=\"taxFreeChildcare\" OR appeal.benefitType.code=\"homeResponsibilitiesProtection\" OR appeal.benefitType.code=\"childBenefit\" OR appeal.benefitType.code=\"thirtyHoursFreeChildcare\" OR appeal.benefitType.code=\"guaranteedMinimumPension\" OR appeal.benefitType.code=\"nationalInsuranceCredits\"",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "05/05/2026",
+    "FieldDisplayOrder": 16,
+    "PageID": "1.0"
   }
 ]

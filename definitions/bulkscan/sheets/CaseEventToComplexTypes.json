@@ -1,6 +1,6 @@
 [
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "createException",
     "CaseFieldID": "scannedDocuments",
@@ -10,7 +10,7 @@
     "DisplayContext": "READONLY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "createException",
     "CaseFieldID": "scannedDocuments",
@@ -20,7 +20,7 @@
     "DisplayContext": "MANDATORY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "createException",
     "CaseFieldID": "scannedDocuments",
@@ -30,7 +30,7 @@
     "DisplayContext": "OPTIONAL"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "createException",
     "CaseFieldID": "scannedDocuments",
@@ -40,7 +40,7 @@
     "DisplayContext": "MANDATORY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "createException",
     "CaseFieldID": "scannedDocuments",
@@ -50,7 +50,7 @@
     "DisplayContext": "MANDATORY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "createException",
     "CaseFieldID": "scannedDocuments",
@@ -60,7 +60,7 @@
     "DisplayContext": "MANDATORY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "createException",
     "CaseFieldID": "scannedDocuments",
@@ -70,7 +70,7 @@
     "DisplayContext": "MANDATORY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "createException",
     "CaseFieldID": "scannedDocuments",
@@ -80,7 +80,7 @@
     "DisplayContext": "MANDATORY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "KeyValue",
     "CaseEventID": "createException",
     "CaseFieldID": "scanOCRData",
@@ -90,7 +90,7 @@
     "DisplayContext": "MANDATORY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "KeyValue",
     "CaseEventID": "createException",
     "CaseFieldID": "scanOCRData",
@@ -100,7 +100,7 @@
     "DisplayContext": "OPTIONAL"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "attachToExistingCase",
     "CaseFieldID": "scannedDocuments",
@@ -110,7 +110,7 @@
     "DisplayContext": "READONLY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "attachToExistingCase",
     "CaseFieldID": "scannedDocuments",
@@ -120,7 +120,7 @@
     "DisplayContext": "MANDATORY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "attachToExistingCase",
     "CaseFieldID": "scannedDocuments",
@@ -130,7 +130,7 @@
     "DisplayContext": "OPTIONAL"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "attachToExistingCase",
     "CaseFieldID": "scannedDocuments",
@@ -140,7 +140,7 @@
     "DisplayContext": "MANDATORY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "attachToExistingCase",
     "CaseFieldID": "scannedDocuments",
@@ -150,7 +150,7 @@
     "DisplayContext": "MANDATORY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "attachToExistingCase",
     "CaseFieldID": "scannedDocuments",
@@ -160,7 +160,7 @@
     "DisplayContext": "MANDATORY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "attachToExistingCase",
     "CaseFieldID": "scannedDocuments",
@@ -170,7 +170,7 @@
     "DisplayContext": "MANDATORY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "attachToExistingCase",
     "CaseFieldID": "scannedDocuments",
@@ -180,7 +180,7 @@
     "DisplayContext": "MANDATORY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "rejectRecord",
     "CaseFieldID": "scannedDocuments",
@@ -190,7 +190,7 @@
     "DisplayContext": "READONLY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "rejectRecord",
     "CaseFieldID": "scannedDocuments",
@@ -200,7 +200,7 @@
     "DisplayContext": "READONLY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "rejectRecord",
     "CaseFieldID": "scannedDocuments",
@@ -210,7 +210,7 @@
     "DisplayContext": "READONLY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "rejectRecord",
     "CaseFieldID": "scannedDocuments",
@@ -220,7 +220,7 @@
     "DisplayContext": "READONLY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "rejectRecord",
     "CaseFieldID": "scannedDocuments",
@@ -230,7 +230,7 @@
     "DisplayContext": "READONLY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "rejectRecord",
     "CaseFieldID": "scannedDocuments",
@@ -240,7 +240,7 @@
     "DisplayContext": "READONLY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "rejectRecord",
     "CaseFieldID": "scannedDocuments",
@@ -250,7 +250,7 @@
     "DisplayContext": "READONLY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "rejectRecord",
     "CaseFieldID": "scannedDocuments",
@@ -260,7 +260,7 @@
     "DisplayContext": "READONLY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "KeyValue",
     "CaseEventID": "rejectRecord",
     "CaseFieldID": "scanOCRData",
@@ -270,7 +270,7 @@
     "DisplayContext": "READONLY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "KeyValue",
     "CaseEventID": "rejectRecord",
     "CaseFieldID": "scanOCRData",
@@ -280,7 +280,7 @@
     "DisplayContext": "READONLY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "createNewCase",
     "CaseFieldID": "scannedDocuments",
@@ -290,7 +290,7 @@
     "DisplayContext": "READONLY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "createNewCase",
     "CaseFieldID": "scannedDocuments",
@@ -300,7 +300,7 @@
     "DisplayContext": "MANDATORY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "createNewCase",
     "CaseFieldID": "scannedDocuments",
@@ -310,7 +310,7 @@
     "DisplayContext": "OPTIONAL"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "createNewCase",
     "CaseFieldID": "scannedDocuments",
@@ -320,7 +320,7 @@
     "DisplayContext": "MANDATORY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "createNewCase",
     "CaseFieldID": "scannedDocuments",
@@ -330,7 +330,7 @@
     "DisplayContext": "MANDATORY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "createNewCase",
     "CaseFieldID": "scannedDocuments",
@@ -340,7 +340,7 @@
     "DisplayContext": "MANDATORY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "createNewCase",
     "CaseFieldID": "scannedDocuments",
@@ -350,7 +350,7 @@
     "DisplayContext": "MANDATORY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "createNewCase",
     "CaseFieldID": "scannedDocuments",
@@ -360,7 +360,7 @@
     "DisplayContext": "MANDATORY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "KeyValue",
     "CaseEventID": "createNewCase",
     "CaseFieldID": "scanOCRData",
@@ -370,7 +370,7 @@
     "DisplayContext": "MANDATORY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "KeyValue",
     "CaseEventID": "createNewCase",
     "CaseFieldID": "scanOCRData",
@@ -380,7 +380,7 @@
     "DisplayContext": "OPTIONAL"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "updateManually",
     "CaseFieldID": "scannedDocuments",
@@ -390,7 +390,7 @@
     "DisplayContext": "READONLY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "updateManually",
     "CaseFieldID": "scannedDocuments",
@@ -400,7 +400,7 @@
     "DisplayContext": "READONLY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "updateManually",
     "CaseFieldID": "scannedDocuments",
@@ -410,7 +410,7 @@
     "DisplayContext": "READONLY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "updateManually",
     "CaseFieldID": "scannedDocuments",
@@ -420,7 +420,7 @@
     "DisplayContext": "READONLY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "updateManually",
     "CaseFieldID": "scannedDocuments",
@@ -430,7 +430,7 @@
     "DisplayContext": "READONLY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "updateManually",
     "CaseFieldID": "scannedDocuments",
@@ -440,7 +440,7 @@
     "DisplayContext": "READONLY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "updateManually",
     "CaseFieldID": "scannedDocuments",
@@ -450,7 +450,7 @@
     "DisplayContext": "READONLY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "ScannedDocument",
     "CaseEventID": "updateManually",
     "CaseFieldID": "scannedDocuments",
@@ -460,7 +460,7 @@
     "DisplayContext": "READONLY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "KeyValue",
     "CaseEventID": "updateManually",
     "CaseFieldID": "scanOCRData",
@@ -470,7 +470,7 @@
     "DisplayContext": "READONLY"
   },
   {
-    "LiveFrom": "01/04/2023",
+    "LiveFrom": "01/01/2018",
     "ID": "KeyValue",
     "CaseEventID": "updateManually",
     "CaseFieldID": "scanOCRData",

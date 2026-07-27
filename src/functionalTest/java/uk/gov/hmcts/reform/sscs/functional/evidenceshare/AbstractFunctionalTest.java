@@ -2,42 +2,57 @@ package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
 import static io.restassured.RestAssured.baseURI;
 import static java.util.Collections.singletonList;
+import static java.util.Objects.nonNull;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.stream.Collectors.joining;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
+import static uk.gov.hmcts.reform.sscs.bulkscan.BaseFunctionalTest.generateRandomNino;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DOCUMENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.RandomStringUtils;
 import helper.EnvironmentProfileValueSource;
 import io.restassured.RestAssured;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
-import junitparams.JUnitParamsRunner;
+import java.util.function.Consumer;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.awaitility.core.ConditionFactory;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.ProfileValueSourceConfiguration;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Correspondence;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
@@ -45,59 +60,95 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
 
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @ProfileValueSourceConfiguration(EnvironmentProfileValueSource.class)
-public abstract class AbstractFunctionalTest {
+abstract class AbstractFunctionalTest {
 
     private static final Logger log = getLogger(AbstractFunctionalTest.class);
     private static final String EVIDENCE_DOCUMENT_PDF = "evidence-document.pdf";
     private static final String EVIDENCE_DOCUMENT_TYPE = "EVIDENCE_DOCUMENT";
     private static final String EXISTING_DOCUMENT_PDF = "existing-document.pdf";
     private static final String EXISTING_DOCUMENT_TYPE = "EXISTING_DOCUMENT";
-
-    // Below rules are needed to use the junitParamsRunner together with SpringRunner
-    @ClassRule
-    public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
-
-    @Rule
-    public final SpringMethodRule springMethodRule = new SpringMethodRule();
-    //end of rules needed for junitParamsRunner
-
-    @Autowired
-    private IdamService idamService;
-
-    private IdamTokens idamTokens;
-
-    @Autowired
-    private CcdService ccdService;
-
-    @Autowired
-    private EvidenceManagementSecureDocStoreService evidenceManagementSecureDocStoreService;
-
-    @Autowired
-    private ObjectMapper mapper;
+    private static final String LOCAL_INSTANCE = "http://localhost:8008";
+    private final String tcaInstance = System.getenv("TEST_URL");
 
     String ccdCaseId;
 
-    private final String tcaInstance = System.getenv("TEST_URL");
-    private final String localInstance = "http://localhost:8008";
+    @Autowired
+    private IdamService idamService;
+    private IdamTokens idamTokens;
+    @Autowired
+    private CcdService ccdService;
+    @Autowired
+    private EvidenceManagementSecureDocStoreService evidenceManagementSecureDocStoreService;
+    @Autowired
+    private DocumentDownloadClientApi documentDownloadClientApi;
+    @Autowired
+    private ObjectMapper mapper;
 
-    SscsCaseDetails createNonDigitalCaseWithEvent(EventType eventType) {
-        return createCaseWithState(eventType, "PIP", "Personal Independence Payment", State.VALID_APPEAL.getId());
+    public void simulateCcdCallback(String json) {
+
+        baseURI = StringUtils.isNotBlank(tcaInstance) ? tcaInstance : LOCAL_INSTANCE;
+
+        final String callbackUrl = baseURI + "/testing-support/send";
+
+        RestAssured.useRelaxedHTTPSValidation();
+        RestAssured
+            .given()
+            .header("ServiceAuthorization", idamTokens.getServiceAuthorization())
+            .contentType("application/json")
+            .body(json)
+            .when()
+            .post(callbackUrl)
+            .then()
+            .statusCode(HttpStatus.OK.value());
+    }
+
+    public void simulateCcdCallback(String json, IdamTokens idamTokens) {
+
+        // Again, need to pass in the correct autorization tokens so that they are fed to the Test Controller
+
+        baseURI = StringUtils.isNotBlank(tcaInstance) ? tcaInstance : LOCAL_INSTANCE;
+
+        final String callbackUrl = baseURI + "/testing-support/send";
+
+        RestAssured.useRelaxedHTTPSValidation();
+        RestAssured
+            .given()
+            .header("ServiceAuthorization", idamTokens.getServiceAuthorization())
+            .header("Authorization", idamTokens.getIdamOauth2Token())
+            .contentType("application/json")
+            .body(json)
+            .when()
+            .post(callbackUrl)
+            .then()
+            .statusCode(HttpStatus.OK.value());
+    }
+
+    void createNonDigitalCaseWithEvent() {
+        createCaseWithState(EventType.CREATE_TEST_CASE, "PIP", "Personal Independence Payment", State.VALID_APPEAL.getId(), null);
     }
 
     SscsCaseDetails createDigitalCaseWithEvent(EventType eventType) {
-        return createCaseWithState(eventType, "PIP", "Personal Independence Payment", State.READY_TO_LIST.getId());
+        return createCaseWithState(eventType, "PIP", "Personal Independence Payment", State.READY_TO_LIST.getId(), null);
     }
 
+    SscsCaseDetails createCaseFromEvent(Benefit benefit, EventType eventType) {
+        return createCaseWithState(eventType, benefit.getShortName(), benefit.getDescription(), null, null);
+    }
 
-    SscsCaseDetails createCaseWithState(EventType eventType, String benefitType, String benefitDescription, String createdInGapsFrom) {
-        idamTokens = idamService.getIdamTokens();
+    SscsCaseDetails createCaseFromEvent(Benefit benefit, EventType eventType, Consumer<SscsCaseData> consumer) {
+        return createCaseWithState(eventType, benefit.getShortName(), benefit.getDescription(), null, consumer);
+    }
 
-        SscsCaseData minimalCaseData = CaseDataUtils.buildMinimalCaseData();
+    SscsCaseDetails createCaseWithState(EventType eventType, String benefitType, String benefitDescription,
+        String createdInGapsFrom, Consumer<SscsCaseData> consumer) {
+        idamTokens = getIdamTokens();
 
-        SscsCaseData caseData = minimalCaseData.toBuilder()
+        final SscsCaseData minimalCaseData = CaseDataUtils.buildMinimalCaseData();
+        minimalCaseData.getAppeal().getAppellant().getIdentity().setNino(generateRandomNino());
+        final SscsCaseData caseData = minimalCaseData.toBuilder()
             .createdInGapsFrom(createdInGapsFrom)
             .appeal(minimalCaseData.getAppeal().toBuilder()
                 .benefitType(BenefitType.builder()
@@ -108,8 +159,11 @@ public abstract class AbstractFunctionalTest {
                 .build())
             .build();
 
+        if (consumer != null) {
+            consumer.accept(caseData);
+        }
 
-        SscsCaseDetails caseDetails = ccdService.createCase(caseData, eventType.getCcdType(),
+        final SscsCaseDetails caseDetails = ccdService.createCase(caseData, eventType.getCcdType(),
             "Evidence share service created case",
             "Evidence share service case created for functional test", idamTokens);
         ccdCaseId = String.valueOf(caseDetails.getId());
@@ -117,13 +171,12 @@ public abstract class AbstractFunctionalTest {
     }
 
     void updateCaseEvent(EventType eventType, SscsCaseDetails caseDetails) {
-        idamTokens = idamService.getIdamTokens();
+        idamTokens = getIdamTokens();
 
         ccdService.updateCase(caseDetails.getData(), caseDetails.getId(),
             eventType.getCcdType(), "Evidence share update case test",
-            "Evidence share service pushed case update for functional test", idamService.getIdamTokens());
+            "Evidence share service pushed case update for functional test", getIdamTokens());
     }
-
 
     SscsCaseDetails findCaseById(String ccdCaseId) {
         return ccdService.getByCaseId(Long.valueOf(ccdCaseId), idamTokens);
@@ -135,47 +188,105 @@ public abstract class AbstractFunctionalTest {
         return FileUtils.readFileToString(new File(file), StandardCharsets.UTF_8.name());
     }
 
-    public static String getRandomNino() {
-        return RandomStringUtils.random(9, true, true).toUpperCase();
-    }
-
-    public void simulateCcdCallback(String json) {
-
-        baseURI = StringUtils.isNotBlank(tcaInstance) ? tcaInstance : localInstance;
-
-        final String callbackUrl = baseURI + "/testing-support/send";
-
-        RestAssured.useRelaxedHTTPSValidation();
-        RestAssured
-            .given()
-            .header("ServiceAuthorization", "" + idamTokens.getServiceAuthorization())
-            .contentType("application/json")
-            .body(json)
-            .when()
-            .post(callbackUrl)
-            .then()
-            .statusCode(HttpStatus.OK.value());
-    }
-
-    protected String createTestData(String fileName) throws IOException {
+    String createTestData(String fileName) throws IOException {
         SscsCaseDetails caseDetails = createDigitalCaseWithEvent(VALID_APPEAL_CREATED);
 
-        String json = uploadCaseDocuments(fileName, caseDetails);
-
-        return json;
+        return uploadCaseDocuments(fileName, caseDetails);
     }
 
-    protected String uploadCaseDocuments(String fileName, SscsCaseDetails caseDetails) throws IOException {
+    String uploadCaseDocuments(String fileName, SscsCaseDetails caseDetails) throws IOException {
         String json = getJson(fileName);
         json = json.replace("CASE_ID_TO_BE_REPLACED", String.valueOf(caseDetails.getId()));
         json = json.replace("CREATED_IN_GAPS_FROM", State.READY_TO_LIST.getId());
-        json = json.replaceAll("NINO_TO_BE_REPLACED", getRandomNino());
+        json = json.replaceAll("NINO_TO_BE_REPLACED", generateRandomNino());
 
         json = uploadCaseDocument(EVIDENCE_DOCUMENT_PDF, EVIDENCE_DOCUMENT_TYPE, json);
         json = uploadCaseDocument(EXISTING_DOCUMENT_PDF, EXISTING_DOCUMENT_TYPE, json);
 
         updateCaseForDocuments(caseDetails, json);
         return json;
+    }
+
+    String uploadCaseDocument(String name, String type, String json) throws IOException {
+        UploadResponse upload = uploadDocToDocMgmtStore(name);
+
+        String location = upload.getDocuments().getFirst().links.self.href;
+        log.info("Document created {} for {}", location, name);
+        json = json.replace(type + "_PLACEHOLDER", location);
+        json = json.replace(type + "_BINARY_PLACEHOLDER", location + "/binary");
+
+        String hash = upload.getDocuments().getFirst().hashToken;
+        return json.replace(type + "_HASH_PLACEHOLDER", hash);
+    }
+
+    ConditionFactory defaultAwait() {
+        return await()
+            .atMost(60, SECONDS)
+            .pollInterval(2, SECONDS);
+    }
+
+    UploadResponse uploadDocToDocMgmtStore(String name) throws IOException {
+        Path evidencePath = new File(Objects.requireNonNull(
+            getClass().getClassLoader().getResource(name)).getFile()).toPath();
+
+        ByteArrayMultipartFile file = ByteArrayMultipartFile.builder()
+            .content(Files.readAllBytes(evidencePath))
+            .name(name)
+            .contentType(APPLICATION_PDF)
+            .build();
+
+        idamTokens = getIdamTokens();
+
+        return evidenceManagementSecureDocStoreService.upload(singletonList(file), idamTokens);
+    }
+
+    Resource getDocument(Long caseId, String correspondenceName) {
+        final List<Correspondence> correspondenceList = defaultAwait().until(
+            () -> findCaseById(caseId.toString()).getData().getCorrespondence(),
+            correspondences -> isNotEmpty(correspondences) && containsDocument(correspondences, correspondenceName));
+        final Correspondence correspondence = correspondenceList.stream()
+            .filter(c -> c.getValue().getDocumentLink().getDocumentFilename().contains(correspondenceName)).findFirst()
+            .orElseThrow();
+        final String documentBinaryUrl = correspondence.getValue().getDocumentLink().getDocumentBinaryUrl();
+        final ResponseEntity<Resource> resourceResponseEntity = documentDownloadClientApi.downloadBinary("oauth2Token",
+                getIdamTokens().getServiceAuthorization(),
+            "caseworker,citizen", "sscs", URI.create(documentBinaryUrl).getPath());
+        assertThat(resourceResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        return resourceResponseEntity.getBody();
+    }
+
+    IdamTokens getIdamTokens() {
+        return idamService.getIdamTokens();
+    }
+
+    void assertEventuallyInState(final long caseId, String state) {
+        defaultAwait().untilAsserted(
+            () -> assertThat(findCaseById(Long.toString(caseId)).getState()).isEqualTo(state));
+    }
+
+    void assertThatPdfTextIsCorrect(Resource documentResource, String expectedContent) {
+        try {
+            try (PDDocument document = Loader.loadPDF(documentResource.getContentAsByteArray())) {
+                final String pdfText = new PDFTextStripper().getText(document);
+                assertThat(normalizeTrailingWhitespace(pdfText)).isEqualTo(normalizeTrailingWhitespace(expectedContent));
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    private static String normalizeTrailingWhitespace(String input) {
+        return input
+            .replace("\r\n", "\n")
+            .lines()
+            .map(line -> line.replaceAll("\\s+$", ""))
+            .collect(joining("\n"));
+    }
+
+    private static boolean containsDocument(List<Correspondence> correspondences, String correspondenceName) {
+        return correspondences.stream().filter(c -> nonNull(c.getValue().getDocumentLink()))
+            .map(correspondence -> correspondence.getValue().getDocumentLink().getDocumentFilename())
+            .anyMatch(f -> f.contains(correspondenceName));
     }
 
     private void updateCaseForDocuments(SscsCaseDetails caseDetails, String json) throws IOException {
@@ -189,40 +300,5 @@ public abstract class AbstractFunctionalTest {
         );
         caseDetails.getData().setSscsDocument(sscsCaseDocs);
         updateCaseEvent(UPLOAD_DOCUMENT, caseDetails);
-    }
-
-    protected String uploadCaseDocument(String name, String type, String json) throws IOException {
-        UploadResponse upload = uploadDocToDocMgmtStore(name);
-
-        String location = upload.getDocuments().get(0).links.self.href;
-        log.info("Document created {} for {}", location, name);
-        json = json.replace(type + "_PLACEHOLDER", location);
-        json = json.replace(type + "_BINARY_PLACEHOLDER", location + "/binary");
-
-        String hash = upload.getDocuments().get(0).hashToken;
-        return json.replace(type + "_HASH_PLACEHOLDER", hash);
-    }
-
-    private UploadResponse uploadDocToDocMgmtStore(String name) throws IOException {
-        Path evidencePath = new File(Objects.requireNonNull(
-            getClass().getClassLoader().getResource(name)).getFile()).toPath();
-
-        ByteArrayMultipartFile file = ByteArrayMultipartFile.builder()
-            .content(Files.readAllBytes(evidencePath))
-            .name(name)
-            .contentType(APPLICATION_PDF)
-            .build();
-
-        idamTokens = idamService.getIdamTokens();
-
-        UploadResponse upload = evidenceManagementSecureDocStoreService.upload(singletonList(file), idamTokens);
-
-        return upload;
-    }
-
-    protected ConditionFactory defaultAwait() {
-        return await()
-            .atMost(15, SECONDS)
-            .pollInterval(2, SECONDS);
     }
 }

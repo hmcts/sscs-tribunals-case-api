@@ -15,19 +15,14 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,7 +39,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment;
 import uk.gov.hmcts.reform.sscs.domain.email.RoboticsEmailTemplate;
 import uk.gov.hmcts.reform.sscs.evidenceshare.config.EvidenceShareConfig;
@@ -60,7 +54,7 @@ import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 @RunWith(JUnitParamsRunner.class)
 public class RoboticsServiceTest {
 
-    RoboticsService roboticsService;
+    private RoboticsService roboticsService;
 
     @Mock
     PdfStoreService pdfStoreService;
@@ -68,7 +62,7 @@ public class RoboticsServiceTest {
     @Mock
     EmailService emailService;
 
-    EmailHelper emailHelper;
+    private EmailHelper emailHelper;
 
     @Mock
     RoboticsJsonMapper roboticsJsonMapper;
@@ -91,12 +85,6 @@ public class RoboticsServiceTest {
     @Mock
     IdamService idamService;
 
-    SscsCcdConvertService convertService;
-
-    LocalDate localDate;
-
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
     @Captor
     private ArgumentCaptor<List<EmailAttachment>> captor;
 
@@ -112,7 +100,6 @@ public class RoboticsServiceTest {
         openMocks(this);
 
         emailHelper = new EmailHelper();
-        convertService = new SscsCcdConvertService();
 
         roboticsService = new RoboticsService(
             pdfStoreService,
@@ -127,8 +114,6 @@ public class RoboticsServiceTest {
             idamService,
             1,
             1);
-
-        localDate = LocalDate.now();
 
         JSONObject mappedJson = mock(JSONObject.class);
         given(roboticsJsonMapper.map(any())).willReturn(mappedJson);
@@ -148,15 +133,15 @@ public class RoboticsServiceTest {
 
         given(pdfStoreService.download(any())).willReturn(null);
 
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
+        caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
         roboticsService.sendCaseToRobotics(caseData);
 
-        boolean isScottish = StringUtils.equalsAnyIgnoreCase(rpcName, "GLASGOW");
+        boolean isScottish = "GLASGOW".equalsIgnoreCase(rpcName);
         verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123 for Robot [1]"), captor.capture(), eq(isScottish), eq(false));
         List<EmailAttachment> attachmentResult = captor.getValue();
 
         assertThat(attachmentResult.size(), is(1));
-        assertThat(attachmentResult.get(0).getFilename(), is("Bloggs_123.txt"));
+        assertThat(attachmentResult.getFirst().getFilename(), is("Bloggs_123.txt"));
         verify(roboticsJsonMapper).map(any());
         verify(roboticsJsonValidator).validate(any(), any());
         verify(emailService).sendEmail(eq(1L), any());
@@ -173,17 +158,17 @@ public class RoboticsServiceTest {
 
         given(pdfStoreService.download(any())).willReturn(null);
 
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
+        caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
         caseData.getCaseData().getAppeal().getAppellant().getName().setLastName("");
         when(roboticsJsonValidator.validate(any(), any())).thenReturn(errorSet);
         roboticsService.sendCaseToRobotics(caseData);
 
-        boolean isScottish = StringUtils.equalsAnyIgnoreCase(rpcName, "GLASGOW");
+        boolean isScottish = "GLASGOW".equalsIgnoreCase(rpcName);
         verify(roboticsEmailTemplate).generateEmail(eq("_123 for Robot [1]"), captor.capture(), eq(isScottish), eq(false));
         List<EmailAttachment> attachmentResult = captor.getValue();
 
         assertThat(attachmentResult.size(), is(1));
-        assertThat(attachmentResult.get(0).getFilename(), is("_123.txt"));
+        assertThat(attachmentResult.getFirst().getFilename(), is("_123.txt"));
         assertThat(caseData.getCaseData().getHmctsDwpState(), is("failedRobotics"));
         verify(roboticsJsonMapper).map(any());
         verify(roboticsJsonValidator).validate(any(), any());
@@ -209,14 +194,14 @@ public class RoboticsServiceTest {
 
         sscsCaseData.getAppeal().setReceivedVia(receivedVia);
         sscsCaseData.setSscsDocument(documents);
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
+        caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
 
         roboticsService.sendCaseToRobotics(caseData);
 
         verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123 for Robot [1]"), captor.capture(), eq(false), eq(false));
         List<EmailAttachment> attachmentResult = captor.getValue();
 
-        assertThat(attachmentResult.get(0).getFilename(), is("Bloggs_123.txt"));
+        assertThat(attachmentResult.getFirst().getFilename(), is("Bloggs_123.txt"));
 
         if (receivedVia.equals("Paper")) {
             assertThat(attachmentResult.size(), is(1));
@@ -237,9 +222,6 @@ public class RoboticsServiceTest {
         byte[] expectedBytes = {1, 2, 3};
         given(pdfStoreService.download("www.download.com")).willReturn(expectedBytes);
 
-        Map<String, byte[]> expectedAdditionalEvidence = new HashMap<>();
-        expectedAdditionalEvidence.put("test.jpg", expectedBytes);
-
         List<SscsDocument> documents = new ArrayList<>();
         documents.add(SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
@@ -251,14 +233,14 @@ public class RoboticsServiceTest {
 
         sscsCaseData.setSscsDocument(documents);
 
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
+        caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
 
         roboticsService.sendCaseToRobotics(caseData);
 
         verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123 for Robot [1]"), captor.capture(), eq(false), eq(false));
         List<EmailAttachment> attachmentResult = captor.getValue();
 
-        assertThat(attachmentResult.get(0).getFilename(), is("Bloggs_123.txt"));
+        assertThat(attachmentResult.getFirst().getFilename(), is("Bloggs_123.txt"));
         assertThat(attachmentResult.size(), is(1));
 
         verify(roboticsJsonMapper).map(any());
@@ -273,9 +255,6 @@ public class RoboticsServiceTest {
         byte[] expectedBytes = {1, 2, 3};
         given(pdfStoreService.download("www.download.com")).willReturn(expectedBytes);
 
-        Map<String, byte[]> expectedAdditionalEvidence = new HashMap<>();
-        expectedAdditionalEvidence.put("test.jpg", expectedBytes);
-
         List<SscsDocument> documents = new ArrayList<>();
         documents.add(SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
@@ -288,14 +267,14 @@ public class RoboticsServiceTest {
         sscsCaseData.getAppeal().getMrnDetails().setDwpIssuingOffice("DWP PIP (AE)");
         sscsCaseData.setSscsDocument(documents);
 
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
+        caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
 
-        JSONObject actual = roboticsService.sendCaseToRobotics(caseData);
+        roboticsService.sendCaseToRobotics(caseData);
 
         verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123 for Robot [1]"), captor.capture(), eq(false), eq(true));
         List<EmailAttachment> attachmentResult = captor.getValue();
 
-        assertThat(attachmentResult.get(0).getFilename(), is("Bloggs_123.txt"));
+        assertThat(attachmentResult.getFirst().getFilename(), is("Bloggs_123.txt"));
         assertThat(attachmentResult.size(), is(1));
 
         verify(roboticsJsonMapper).map(any());
@@ -310,9 +289,6 @@ public class RoboticsServiceTest {
         byte[] expectedBytes = {1, 2, 3};
         given(pdfStoreService.download("www.download.com")).willReturn(expectedBytes);
 
-        Map<String, byte[]> expectedAdditionalEvidence = new HashMap<>();
-        expectedAdditionalEvidence.put("test.jpg", expectedBytes);
-
         List<SscsDocument> documents = new ArrayList<>();
         documents.add(SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
@@ -325,14 +301,14 @@ public class RoboticsServiceTest {
         sscsCaseData.getAppeal().getMrnDetails().setDwpIssuingOffice("DWP PIP (AE)");
         sscsCaseData.setSscsDocument(documents);
 
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
+        caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
 
         roboticsService.sendCaseToRobotics(caseData);
 
         verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123 for Robot [1]"), captor.capture(), eq(false), eq(true));
         List<EmailAttachment> attachmentResult = captor.getValue();
 
-        assertThat(attachmentResult.get(0).getFilename(), is("Bloggs_123.txt"));
+        assertThat(attachmentResult.getFirst().getFilename(), is("Bloggs_123.txt"));
         assertThat(attachmentResult.size(), is(1));
 
         verify(roboticsJsonMapper).map(any());
@@ -347,9 +323,6 @@ public class RoboticsServiceTest {
         byte[] expectedBytes = {1, 2, 3};
         given(pdfStoreService.download("www.download.com")).willReturn(expectedBytes);
 
-        Map<String, byte[]> expectedAdditionalEvidence = new HashMap<>();
-        expectedAdditionalEvidence.put("test.jpg", expectedBytes);
-
         List<SscsDocument> documents = new ArrayList<>();
         documents.add(SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
@@ -362,7 +335,7 @@ public class RoboticsServiceTest {
         sscsCaseData.getAppeal().getMrnDetails().setDwpIssuingOffice("DWP PIP (AE)");
         sscsCaseData.setSscsDocument(documents);
 
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
+        caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
         caseData.getCaseData().setCreatedInGapsFrom(READY_TO_LIST.getId());
 
         roboticsService.sendCaseToRobotics(caseData);
@@ -370,7 +343,7 @@ public class RoboticsServiceTest {
         verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123 for Robot [1]"), captor.capture(), eq(false), eq(true));
         List<EmailAttachment> attachmentResult = captor.getValue();
 
-        assertThat(attachmentResult.get(0).getFilename(), is("Bloggs_123.txt"));
+        assertThat(attachmentResult.getFirst().getFilename(), is("Bloggs_123.txt"));
         assertThat(attachmentResult.size(), is(1));
 
         verify(roboticsJsonMapper).map(any());
@@ -388,7 +361,7 @@ public class RoboticsServiceTest {
         sscsCaseData.getAppeal().getMrnDetails().setDwpIssuingOffice(existingOffice);
         sscsCaseData.getAppeal().getBenefitType().setCode(benefitType);
 
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
+        caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
 
         roboticsService.sendCaseToRobotics(caseData);
 
@@ -407,7 +380,7 @@ public class RoboticsServiceTest {
         DynamicListItem value = new DynamicListItem(existingOffice, existingOffice);
         sscsCaseData.setDwpOriginatingOffice(new DynamicList(value, Collections.singletonList(value)));
 
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
+        caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
 
         roboticsService.sendCaseToRobotics(caseData);
 
@@ -426,7 +399,7 @@ public class RoboticsServiceTest {
         DynamicListItem value = new DynamicListItem(existingOffice, existingOffice);
         sscsCaseData.setDwpPresentingOffice(new DynamicList(value, Collections.singletonList(value)));
 
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
+        caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
 
         roboticsService.sendCaseToRobotics(caseData);
 
@@ -447,7 +420,7 @@ public class RoboticsServiceTest {
         sscsCaseData.setDwpOriginatingOffice(new DynamicList(value, Collections.singletonList(value)));
         sscsCaseData.setDwpPresentingOffice(new DynamicList(value, Collections.singletonList(value)));
 
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
+        caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
 
         roboticsService.sendCaseToRobotics(caseData);
 

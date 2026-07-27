@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.confirmpanelcomposition;
 
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,7 +17,6 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Service
 @Slf4j
 public class ConfirmPanelCompositionAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -39,6 +40,7 @@ public class ConfirmPanelCompositionAboutToSubmitHandler implements PreSubmitCal
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
+        syncUpdateListingRequirements(sscsCaseData);
         processInterloc(sscsCaseData);
         return response;
     }
@@ -48,6 +50,30 @@ public class ConfirmPanelCompositionAboutToSubmitHandler implements PreSubmitCal
                 && sscsCaseData.getInterlocReviewState().equals(InterlocReviewState.REVIEW_BY_JUDGE)) {
             sscsCaseData.setInterlocReferralReason(null);
             sscsCaseData.setInterlocReviewState(null);
+        }
+    }
+
+    private void syncUpdateListingRequirements(SscsCaseData sscsCaseData) {
+        if (nonNull(sscsCaseData.getPanelMemberComposition()) && !sscsCaseData.getPanelMemberComposition().isEmpty()) {
+            boolean isFqpmRequired = isYes(sscsCaseData.getIsFqpmRequired());
+
+            if (isFqpmRequired) {
+                sscsCaseData.getPanelMemberComposition().addFqpm();
+            } else {
+                sscsCaseData.getPanelMemberComposition().removeFqpm();
+            }
+
+            if (sscsCaseData.isIbcCase()) {
+                if (isYes(sscsCaseData.getIsMedicalMemberRequired())
+                    && !sscsCaseData.getPanelMemberComposition().hasMedicalMember()) {
+
+                    sscsCaseData.getPanelMemberComposition()
+                        .setPanelCompositionMemberMedical1(PanelMemberType.TRIBUNAL_MEMBER_MEDICAL.toRef());
+
+                } else if (!isYes(sscsCaseData.getIsMedicalMemberRequired())) {
+                    sscsCaseData.getPanelMemberComposition().clearMedicalMembers();
+                }
+            }
         }
     }
 }

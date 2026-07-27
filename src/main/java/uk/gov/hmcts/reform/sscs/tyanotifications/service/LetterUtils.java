@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -127,7 +128,7 @@ public class LetterUtils {
 
     public static byte[] addBlankPageAtTheEndIfOddPage(byte[] letter) throws IOException {
         if (ArrayUtils.isNotEmpty(letter)) {
-            PDDocument loadDoc = PDDocument.load(letter);
+            PDDocument loadDoc = Loader.loadPDF(letter);
             if (loadDoc.getNumberOfPages() % 2 != 0) {
                 final PDPage blankPage = new PDPage(PDRectangle.A4);
                 // need to add PDPageContentStream here to pass gov notify validation!
@@ -149,9 +150,9 @@ public class LetterUtils {
 
     public static byte[] buildBundledLetter(byte[] coveringLetter, byte[] directionText) throws IOException {
         if (coveringLetter != null && directionText != null) {
-            PDDocument bundledLetter = PDDocument.load(coveringLetter);
+            PDDocument bundledLetter = Loader.loadPDF(coveringLetter);
 
-            PDDocument loadDoc = PDDocument.load(directionText);
+            PDDocument loadDoc = Loader.loadPDF(directionText);
 
             final PDFMergerUtility merger = new PDFMergerUtility();
             merger.appendDocument(bundledLetter, loadDoc);

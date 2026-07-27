@@ -1,9 +1,10 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -13,47 +14,45 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.RESPONSE_SUBMITTED_DWP;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DWP_UPLOAD_RESPONSE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_ADMIN_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.NOT_LISTABLE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.RESPONSE_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.WITH_DWP;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
+import java.util.List;
 import java.util.function.Consumer;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockito.quality.Strictness;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.WorkAllocationFields;
 import uk.gov.hmcts.reform.sscs.ccd.exception.RequiredFieldMissingException;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
-
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DwpUploadResponseHandlerTest {
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
 
     @Mock
     private IdamService idamService;
@@ -65,57 +64,58 @@ public class DwpUploadResponseHandlerTest {
     @Captor
     private ArgumentCaptor<Consumer<SscsCaseDetails>> consumerArgumentCaptor;
 
-    @Before
+    @BeforeEach
     public void setup() {
         handler = new DwpUploadResponseHandler(updateCcdCaseService, idamService);
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void givenCallbackIsNull_whenHandleIsCalled_shouldThrowException() {
-        handler.handle(CallbackType.SUBMITTED, null);
+        assertThrows(NullPointerException.class, () -> handler.handle(CallbackType.SUBMITTED, null));
     }
 
-    @Test(expected = IllegalStateException.class)
-    @Parameters({"ABOUT_TO_START", "MID_EVENT", "ABOUT_TO_SUBMIT"})
+    @ParameterizedTest
+    @EnumSource(value = CallbackType.class, names = {"ABOUT_TO_START", "MID_EVENT", "ABOUT_TO_SUBMIT"}, mode = EnumSource.Mode.INCLUDE)
     public void givenCallbackIsNotSubmitted_willThrowAnException(CallbackType callbackType) {
-        handler.handle(callbackType,
-            HandlerHelper.buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE));
+        assertThrows(IllegalStateException.class, () -> handler.handle(callbackType,
+            HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder().build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE)));
     }
 
-    @Test(expected = IllegalStateException.class)
-    @Parameters({"REISSUE_FURTHER_EVIDENCE", "EVIDENCE_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
+    @ParameterizedTest
+    @EnumSource(value = EventType.class, names = {"REISSUE_FURTHER_EVIDENCE", "EVIDENCE_RECEIVED", "ACTION_FURTHER_EVIDENCE"}, mode = EnumSource.Mode.INCLUDE)
     public void givenEventTypeIsNotIssueFurtherEvidence_willThrowAnException(EventType eventType) {
-        handler.handle(CallbackType.SUBMITTED,
-            HandlerHelper.buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, eventType));
+        assertThrows(IllegalStateException.class, () -> handler.handle(CallbackType.SUBMITTED,
+            HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder().build(), INTERLOCUTORY_REVIEW_STATE, eventType)));
     }
 
-    @Test(expected = IllegalStateException.class)
-    @Parameters({"REISSUE_FURTHER_EVIDENCE", "EVIDENCE_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
+    @SuppressWarnings("unused")
+    @ParameterizedTest
+    @EnumSource(value = EventType.class, names = {"REISSUE_FURTHER_EVIDENCE", "EVIDENCE_RECEIVED", "ACTION_FURTHER_EVIDENCE"}, mode = EnumSource.Mode.INCLUDE)
     public void givenAppealIsNullEvidence_willThrowAnException(EventType eventType) {
-        handler.handle(CallbackType.SUBMITTED, HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder().createdInGapsFrom(State.READY_TO_LIST.getId()).appeal(null).build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE));
+        assertThrows(IllegalStateException.class, () -> handler.handle(CallbackType.SUBMITTED, HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder().createdInGapsFrom(State.READY_TO_LIST.getId()).appeal(null).build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE)));
     }
 
-    @Test(expected = IllegalStateException.class)
-    @Parameters({"REISSUE_FURTHER_EVIDENCE", "EVIDENCE_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
+    @SuppressWarnings("unused")
+    @ParameterizedTest
+    @EnumSource(value = EventType.class, names = {"REISSUE_FURTHER_EVIDENCE", "EVIDENCE_RECEIVED", "ACTION_FURTHER_EVIDENCE"}, mode = EnumSource.Mode.INCLUDE)
     public void givenBenefitCodeIsNullEvidence_willThrowAnException(EventType eventType) {
         Callback<SscsCaseData> sscsCaseData = HandlerHelper.buildTestCallbackForGivenData(
             SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("No")
                 .elementsDisputedIsDecisionDisputedByOthers("No").appeal(Appeal.builder()
                     .benefitType(null)
                     .build()).build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE);
-        handler.handle(CallbackType.SUBMITTED, sscsCaseData);
+        assertThrows(IllegalStateException.class, () -> handler.handle(CallbackType.SUBMITTED, sscsCaseData));
     }
 
-    @Test(expected = RequiredFieldMissingException.class)
+    @Test
     public void givenCaseDataInCallbackIsNull_shouldThrowException() {
-        handler.handle(CallbackType.SUBMITTED,
-            HandlerHelper.buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE));
+        assertThrows(RequiredFieldMissingException.class, () -> handler.handle(CallbackType.SUBMITTED,
+            HandlerHelper.buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE)));
     }
 
-
-    @Test(expected = NullPointerException.class)
+    @Test
     public void givenCallbackIsNull_whenCanHandleIsCalled_shouldThrowException() {
-        handler.canHandle(CallbackType.SUBMITTED, null);
+        assertThrows(NullPointerException.class, () -> handler.canHandle(CallbackType.SUBMITTED, null));
     }
 
     @Test
@@ -135,6 +135,7 @@ public class DwpUploadResponseHandlerTest {
                 .elementsDisputedIsDecisionDisputedByOthers("No").appeal(Appeal.builder()
                         .benefitType(BenefitType.builder().code("PIP").build())
                         .build()).build();
+        sscsCaseData.setWorkAllocationFields(WorkAllocationFields.builder().ftaResponseReviewRequired(YES).build());
         final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(
                 sscsCaseData, INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE);
 
@@ -150,6 +151,9 @@ public class DwpUploadResponseHandlerTest {
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
         consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
         assertEquals(RESPONSE_SUBMITTED_DWP, sscsCaseData.getDwpState());
+        assertEquals(YES, sscsCaseData.getIgnoreCallbackWarnings());
+        assertNotNull(sscsCaseData.getWorkAllocationFields());
+        assertEquals(NO, sscsCaseData.getWorkAllocationFields().getFtaResponseReviewRequired());
     }
 
     @Test
@@ -171,6 +175,7 @@ public class DwpUploadResponseHandlerTest {
                 .elementsDisputedIsDecisionDisputedByOthers(null).appeal(Appeal.builder()
                         .benefitType(BenefitType.builder().code("PIP").build())
                         .build()).build();
+        sscsCaseData.setWorkAllocationFields(WorkAllocationFields.builder().ftaResponseReviewRequired(YES).build());
         final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(
                 sscsCaseData, WITH_DWP, DWP_UPLOAD_RESPONSE);
 
@@ -187,6 +192,8 @@ public class DwpUploadResponseHandlerTest {
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
         consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
         assertEquals(RESPONSE_SUBMITTED_DWP, sscsCaseData.getDwpState());
+        assertNotNull(sscsCaseData.getWorkAllocationFields());
+        assertEquals(NO, sscsCaseData.getWorkAllocationFields().getFtaResponseReviewRequired());
     }
 
     @Test
@@ -281,6 +288,81 @@ public class DwpUploadResponseHandlerTest {
         verify(idamService).getIdamTokens();
         verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
                  eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
+
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+        assertEquals(RESPONSE_SUBMITTED_DWP, sscsCaseData.getDwpState());
+    }
+
+    @Test
+    public void givenADwpUploadResponseEventUcWithDwpDocuments_runResponseReceivedEvent() {
+        SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(READY_TO_LIST.getId()).dwpFurtherInfo("No")
+            .elementsDisputedIsDecisionDisputedByOthers("No").appeal(Appeal.builder()
+                .benefitType(BenefitType.builder().code("UC").build())
+                .build()).dwpDocuments(List.of(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType("any").build()).build())).build();
+        final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(
+            sscsCaseData, WITH_DWP, DWP_UPLOAD_RESPONSE);
+
+
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+        when(updateCcdCaseService.updateCaseV2(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().id(1L)
+            .data(callback.getCaseDetails().getCaseData()).build());
+
+        handler.handle(CallbackType.SUBMITTED, callback);
+
+        verify(idamService).getIdamTokens();
+        verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+            eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
+
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+        assertEquals(RESPONSE_SUBMITTED_DWP, sscsCaseData.getDwpState());
+    }
+
+    @Test
+    public void givenADwpUploadResponseEventUcWithDwpEvidenceBundleDocuments_runResponseReceivedEvent() {
+        SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(READY_TO_LIST.getId()).dwpFurtherInfo("No")
+            .elementsDisputedIsDecisionDisputedByOthers("No").appeal(Appeal.builder()
+                .benefitType(BenefitType.builder().code("UC").build())
+                .build()).dwpDocuments(List.of(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType("dwpEvidenceBundle").build()).build())).build();
+        final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(
+            sscsCaseData, WITH_DWP, DWP_UPLOAD_RESPONSE);
+
+
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+        when(updateCcdCaseService.updateCaseV2(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().id(1L)
+            .data(callback.getCaseDetails().getCaseData()).build());
+
+        handler.handle(CallbackType.SUBMITTED, callback);
+
+        verify(idamService).getIdamTokens();
+        verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+            eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
+
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+        assertEquals(RESPONSE_SUBMITTED_DWP, sscsCaseData.getDwpState());
+    }
+
+    @Test
+    public void givenADwpUploadResponseEventUcWithDwpEvidenceBundleDocumentsAndEditedReason_runResponseReceivedEvent() {
+        SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(READY_TO_LIST.getId()).dwpFurtherInfo("No")
+            .elementsDisputedIsDecisionDisputedByOthers("No").appeal(Appeal.builder()
+                .benefitType(BenefitType.builder().code("UC").build())
+                .build()).dwpDocuments(List.of(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType("dwpEvidenceBundle").dwpEditedEvidenceReason("any").build()).build())).build();
+        final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(
+            sscsCaseData, WITH_DWP, DWP_UPLOAD_RESPONSE);
+
+
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+        when(updateCcdCaseService.updateCaseV2(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().id(1L)
+            .data(callback.getCaseDetails().getCaseData()).build());
+
+        handler.handle(CallbackType.SUBMITTED, callback);
+
+        verify(idamService).getIdamTokens();
+        verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+            eq(EventType.DWP_RESPOND.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
 
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
         consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
@@ -452,7 +534,7 @@ public class DwpUploadResponseHandlerTest {
         consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
 
         assertEquals(RESPONSE_SUBMITTED_DWP, sscsCaseData.getDwpState());
-        assertEquals(AWAITING_ADMIN_ACTION, sscsCaseData.getInterlocReviewState());
+        assertEquals(null, sscsCaseData.getInterlocReviewState());
     }
 
     @Test
@@ -465,14 +547,13 @@ public class DwpUploadResponseHandlerTest {
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
-        verify(idamService, times(0)).getIdamTokens();
-        verify(updateCcdCaseService, times(0)).updateCase(eq(callback.getCaseDetails().getCaseData()),
-            eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
-            eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any());
+        verify(idamService).getIdamTokens();
+        verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+            eq(EventType.DWP_RESPOND.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
     }
 
-    @Test
-    @Parameters({"WITH_DWP", "READY_TO_LIST",})
+    @ParameterizedTest
+    @EnumSource(value = State.class, names = {"WITH_DWP", "READY_TO_LIST"}, mode = EnumSource.Mode.INCLUDE)
     public void givenAStateForTheCaseAndWhenDwpUploadResponseForSscs2IsRunWhileContainsFurtherInformationIsNoThenDoNotUpdateState(State state) {
         final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(
             SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("No")
@@ -481,10 +562,9 @@ public class DwpUploadResponseHandlerTest {
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
-        verify(idamService, times(0)).getIdamTokens();
-        verify(updateCcdCaseService, times(0)).updateCase(eq(callback.getCaseDetails().getCaseData()),
-            eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
-            eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any());
+        verify(idamService).getIdamTokens();
+        verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+            eq(EventType.DWP_RESPOND.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
     }
 
     @Test

@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.FINAL_DECISION_
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.POSTPONEMENT_REQUEST_DIRECTION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.STATEMENT_OF_REASONS_GRANTED;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.STATEMENT_OF_REASONS_REFUSED;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.getPostponementRequestStatus;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ADDRESS_LINE_1;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPEAL_RESPOND_DATE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPELLANT_NAME;
@@ -18,6 +19,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMa
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ENTITY_TYPE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.NAME;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.PARTY_TYPE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.POSTPONEMENT_REQUEST;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.REPRESENTATIVE_NAME;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ACTION_POSTPONEMENT_REQUEST;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ACTION_POSTPONEMENT_REQUEST_WELSH;
@@ -98,13 +100,9 @@ public class SendNotificationService {
     private final PdfStoreService pdfStoreService;
 
     @Autowired
-    public SendNotificationService(
-        NotificationSender notificationSender,
-        NotificationHandler notificationHandler,
-        NotificationValidService notificationValidService,
-        PdfLetterService pdfLetterService,
-        PdfStoreService pdfStoreService
-    ) {
+    public SendNotificationService(NotificationSender notificationSender, NotificationHandler notificationHandler,
+                                   NotificationValidService notificationValidService, PdfLetterService pdfLetterService,
+                                   PdfStoreService pdfStoreService) {
         this.notificationSender = notificationSender;
         this.notificationHandler = notificationHandler;
         this.notificationValidService = notificationValidService;
@@ -112,11 +110,9 @@ public class SendNotificationService {
         this.pdfStoreService = pdfStoreService;
     }
 
-    boolean sendEmailSmsLetterNotification(
-        NotificationWrapper wrapper,
-        Notification notification,
-        SubscriptionWithType subscriptionWithType,
-        NotificationEventType eventType) {
+    boolean sendEmailSmsLetterNotification(NotificationWrapper wrapper, Notification notification,
+                                           SubscriptionWithType subscriptionWithType, NotificationEventType eventType) {
+
         boolean emailSent = sendEmailNotification(wrapper, subscriptionWithType.getSubscription(), notification);
         notificationSuccessLog(wrapper, "Email", notification, notification.getEmailTemplate(), emailSent);
 
@@ -286,6 +282,8 @@ public class SendNotificationService {
                 placeholders.put(APPEAL_RESPOND_DATE, appealReceivedDate.format(DateTimeFormatter.ofPattern(AppConstants.RESPONSE_DATE_FORMAT)));
             }
 
+            placeholders.put(POSTPONEMENT_REQUEST,  getPostponementRequestStatus(wrapper.getNewSscsCaseData()));
+
             log.info("In sendLetterNotificationToAddress method notificationSender is available {} ", notificationSender != null);
             notificationLog(notification, "GovNotify letter", address.getPostcode(), wrapper);
 
@@ -306,7 +304,10 @@ public class SendNotificationService {
             && (YesNo.NO.equals(addressToUse.getInMainlandUk()) || isNotBlank(addressToUse.getPostcode()));
     }
 
-    private boolean sendBundledAndDocmosisLetterNotification(NotificationWrapper wrapper, Notification notification, String nameToUse, SubscriptionWithType subscriptionWithType) {
+    private boolean sendBundledAndDocmosisLetterNotification(NotificationWrapper wrapper,
+                                                             Notification notification,
+                                                             String nameToUse,
+                                                             SubscriptionWithType subscriptionWithType) {
         try {
             byte[] bundledLetter;
             if (isNotBlank(notification.getDocmosisLetterTemplate())) {
@@ -329,14 +330,10 @@ public class SendNotificationService {
                     nameToUse,
                     wrapper.getCaseId(),
                     subscriptionWithType.getSubscriptionType())
-                    : () -> notificationSender.sendBundledLetter(
-                    wrapper.getNewSscsCaseData().getAppeal().getAppellant().getAddress().getPostcode(),   // Used for whitelisting only
-                    bundledLetter,
-                    wrapper.getNotificationType(),
-                    nameToUse,
-                    wrapper.getCaseId());
+                    : () -> notificationSender.sendBundledLetter(wrapper,bundledLetter, nameToUse);
 
-                log.info("In sendBundledAndDocmosisLetterNotification method notificationSender is available {} ", notificationSender != null);
+                log.info("In sendBundledAndDocmosisLetterNotification method notificationSender is available {} ",
+                        notificationSender != null);
 
                 notificationLog(notification, "Docmosis Letter", nameToUse, wrapper);
 

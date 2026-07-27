@@ -114,7 +114,7 @@ public class IssueGenericLetterAboutToStartHandler implements PreSubmitCallbackH
             sscsCaseData.setHasOtherParties(YesNo.YES);
 
             List<DynamicListItem> listOptions = new ArrayList<>();
-            addOtherPartiesToListOptions(sscsCaseData, listOptions);
+            addOtherPartiesToListOptions(sscsCaseData, listOptions, true);
 
             var list = new ArrayList<CcdValue<OtherPartySelectionDetails>>();
             list.add(new CcdValue<>(new OtherPartySelectionDetails(new DynamicList(null, listOptions))));

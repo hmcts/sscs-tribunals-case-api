@@ -1,12 +1,16 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
+import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import jakarta.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Issue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionMidEventValidationHandlerBase;
@@ -15,6 +19,8 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 @Slf4j
 @Component
 public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDecisionMidEventValidationHandlerBase {
+
+    private static final String SEVERE_CONDITIONS_ISSUE_CODE = "SV";
 
     public EsaWriteFinalDecisionMidEventValidationHandler(Validator validator,
                                                           DecisionNoticeService decisionNoticeService,
@@ -32,6 +38,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
         if (sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply() == null) {
             sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
         }
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecisionIsAfterSvDate(isFinalDecisionDateOfDecisionBlankOrAfterSvStartDate(sscsCaseData) ? YES : NO);
     }
 
     @Override
@@ -51,12 +58,25 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
         }
     }
 
-    private boolean isWcaNotSupportGroupOnly(SscsCaseData sscsCaseData) {
-        return sscsCaseData.isWcaAppeal() && !sscsCaseData.isSupportGroupOnlyAppeal();
-    }
-
     @Override
     protected void validateAwardTypes(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        if (Issue.SV.name().equals(sscsCaseData.getIssueCode()) && NO.equals(sscsCaseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo())) {
+            preSubmitCallbackResponse.addError("This is a severe conditions criteria only appeal. Please select yes to this question.");
+        }
+        if (hasSvIssueCode(sscsCaseData) && !isFinalDecisionDateOfDecisionBlankOrAfterSvStartDate(sscsCaseData)) {
+            preSubmitCallbackResponse.addError("You cannot write decision notice until resolved. Please ask admin to amend issue code to WC or SG and then proceed.");
+        }
+        YesNo esaSevereCriteriaApplies = sscsCaseData.getExtendedSscsCaseData().getEsaWriteFinalDecisionSevereCriteriaApply();
+        if (hasSvIssueCode(sscsCaseData) && nonNull(esaSevereCriteriaApplies)) {
+            String decision = sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAllowedOrRefused();
+            if ("allowed".equals(decision) && !YesNo.isYes(esaSevereCriteriaApplies)) {
+                preSubmitCallbackResponse.addError(SV_ALLOWED_APPEAL_ERROR_MESSAGE);
+            }
+            if ("refused".equals(decision) && YesNo.isYes(esaSevereCriteriaApplies)) {
+                preSubmitCallbackResponse.addError(SV_REFUSED_APPEAL_ERROR_MESSAGE);
+            }
+        }
+
         if (isYes(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply())) {
             if (sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesQuestion() == null
                 || sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesQuestion().isEmpty()) {
@@ -88,14 +108,23 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
 
     @Override
     protected void setDwpReassessAwardPage(SscsCaseData sscsCaseData, String pageId) {
+        if (YesNo.isYes(sscsCaseData.getExtendedSscsCaseData().getEsaWriteFinalDecisionSevereCriteriaApply())
+                || SEVERE_CONDITIONS_ISSUE_CODE.equals(sscsCaseData.getIssueCode())) {
+            sscsCaseData.setShowDwpReassessAwardPage(YesNo.NO);
+            return;
+        }
         if (pageId != null && pageId.equals("workCapabilityAssessment")) {
             if (isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())
-                    && sscsCaseData.isWcaAppeal()
-                    && "allowed".equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAllowedOrRefused())) {
+                && sscsCaseData.isWcaAppeal()
+                && "allowed".equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAllowedOrRefused())) {
                 sscsCaseData.setShowDwpReassessAwardPage(YesNo.YES);
                 return;
             }
             sscsCaseData.setShowDwpReassessAwardPage(YesNo.NO);
         }
+    }
+
+    private boolean isWcaNotSupportGroupOnly(SscsCaseData sscsCaseData) {
+        return sscsCaseData.isWcaAppeal() && !sscsCaseData.isSupportGroupOnlyAppeal();
     }
 }

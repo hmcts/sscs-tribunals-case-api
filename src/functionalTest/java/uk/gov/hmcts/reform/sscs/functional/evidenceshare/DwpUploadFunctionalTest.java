@@ -1,9 +1,12 @@
 package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_TEST_CASE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DWP_UPLOAD_RESPONSE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SEND_TO_DWP_OFFLINE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,28 +14,30 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.Objects;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
-public class DwpUploadFunctionalTest extends AbstractFunctionalTest {
+class DwpUploadFunctionalTest extends AbstractFunctionalTest {
+
     private static final String EVIDENCE_DOCUMENT_PDF = "evidence-document.pdf";
+
     @Autowired
     private EvidenceManagementService evidenceManagementService;
 
-    public DwpUploadFunctionalTest() {
+    DwpUploadFunctionalTest() {
         super();
     }
 
     // Need tribunals running to pass this functional test
     @Test
-    public void dwpUploadResponseEventSendsToReadyToList() throws IOException {
+    void dwpUploadResponseEventSendsToReadyToList() throws IOException {
 
-        SscsCaseDetails createdCase = createCaseWithState(CREATE_TEST_CASE, "UC", "Universal Credit", State.READY_TO_LIST.getId());
+        SscsCaseDetails createdCase = createCaseWithState(CREATE_TEST_CASE, "UC", "Universal Credit",
+            READY_TO_LIST.getId(), null);
 
         //Get case into correct state without triggering any callbacks that cause race conditions
         updateCaseEvent(SEND_TO_DWP_OFFLINE, createdCase);
@@ -54,7 +59,8 @@ public class DwpUploadFunctionalTest extends AbstractFunctionalTest {
 
         defaultAwait().untilAsserted(() -> {
             SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
-            assertEquals("readyToList", caseDetails.getState());
+            assertThat(caseDetails).isNotNull();
+            assertThat(caseDetails.getState()).isNotNull().isEqualTo("readyToList");
         });
     }
 
@@ -70,8 +76,7 @@ public class DwpUploadFunctionalTest extends AbstractFunctionalTest {
 
         UploadResponse upload = evidenceManagementService.upload(singletonList(file), "sscs");
 
-        return upload.getEmbedded().getDocuments().get(0).links.self.href;
+        return upload.getEmbedded().getDocuments().getFirst().links.self.href;
     }
-
 
 }

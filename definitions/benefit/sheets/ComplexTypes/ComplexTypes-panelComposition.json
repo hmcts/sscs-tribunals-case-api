@@ -1,0 +1,7 @@
+[
+  {"LiveFrom": "11/04/2025", "ID": "panelMemberComposition", "ListElementCode": "districtTribunalJudge", "FieldType": "FixedRadioList", "FieldTypeParameter": "FL_panelCompositionDtj", "ElementLabel": "District Tribunal Judge", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "11/04/2025", "ID": "panelMemberComposition", "ListElementCode": "panelCompositionJudge", "FieldType": "FixedRadioList", "FieldTypeParameter": "FL_panelCompositionJudge", "ElementLabel": "Tribunal or Regional Judge", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "11/04/2025", "ID": "panelMemberComposition", "ListElementCode": "panelCompositionMemberMedical1", "FieldType": "FixedRadioList", "FieldTypeParameter": "FL_panelCompositionMedical", "ElementLabel": "Tribunal or Regional Medical member", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "11/04/2025", "ID": "panelMemberComposition", "ListElementCode": "panelCompositionMemberMedical2", "FieldType": "FixedRadioList", "FieldTypeParameter": "FL_panelCompositionMedical", "ElementLabel": "Additional Tribunal or Regional Medical member", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "11/04/2025", "ID": "panelMemberComposition", "ListElementCode": "panelCompositionDisabilityAndFqMember", "FieldType": "MultiSelectList", "FieldTypeParameter": "FL_panelCompositionTribunalMember", "ElementLabel": "Tribunal member Disability or Financial", "SecurityClassification": "PUBLIC"}
+]

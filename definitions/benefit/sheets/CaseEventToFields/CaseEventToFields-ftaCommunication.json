@@ -1,0 +1,140 @@
+[
+  {
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "ftaRequestType",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "selectFtaCommunicationAction",
+    "PageLabel": "Select FTA Communication action",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=selectFtaCommunicationAction"
+  },
+  {
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "commRequestTopic",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "newFtaRequest",
+    "PageShowCondition": "ftaRequestType=\"newRequest\"",
+    "PageLabel": "Send a Communication Request to the FTA"
+  },
+  {
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "commRequestQuestion",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "newFtaRequest"
+  },
+  {
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "ftaRequestsDl",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "selectFtaRequest",
+    "PageShowCondition": "ftaRequestType=\"replyToFtaQuery\"",
+    "PageLabel": "Reply to FTA Query",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=selectFtaRequest"
+  },
+  {
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "ftaRequestNoResponseQuery",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "replyToFtaQuery",
+    "PageShowCondition": "ftaRequestType=\"replyToFtaQuery\"",
+    "PageLabel": "Write a reply to FTA Query",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=replyToFtaQuery"
+  },
+  {
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "commRequestResponseTextArea",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "replyToFtaQuery"
+  },
+  {
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "communicationNoActionLabel",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 3,
+    "PageID": "replyToFtaQuery"
+  },
+  {
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "commRequestResponseNoAction",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 4,
+    "PageID": "replyToFtaQuery"
+  },
+  {
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "tribunalRequestsToReviewDl",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "14/04/2025",
+    "PageDisplayOrder": 5,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "selectFtaReply",
+    "PageShowCondition": "ftaRequestType=\"reviewFtaReply\"",
+    "PageLabel": "Select a Tribunal communication to mark as reviewed"
+  },
+  {
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "deleteCommRequestRadioDl",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 6,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "selectRequestToDelete",
+    "PageShowCondition": "ftaRequestType=\"deleteRequestReply\"",
+    "PageLabel": "Select a request/response to delete",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=selectRequestToDelete"
+  },
+  {
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "deleteCommRequestReadOnly",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "READONLY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 7,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "deleteRequest",
+    "PageShowCondition": "ftaRequestType=\"deleteRequestReply\"",
+    "PageLabel": "Delete a request/response",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=deleteRequest"
+  },
+  {
+    "CaseEventID": "ftaCommunication",
+    "CaseFieldID": "deleteCommRequestTextArea",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "13/03/2025",
+    "PageDisplayOrder": 7,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "deleteRequest"
+  }
+]

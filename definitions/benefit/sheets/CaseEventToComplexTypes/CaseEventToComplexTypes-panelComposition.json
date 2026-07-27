@@ -1,0 +1,58 @@
+[
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "panelMemberComposition",
+    "ListElementCode": "panelCompositionJudge",
+    "ID": "updateListingRequirementsPanelCompositionJudge",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "reserveTo.reservedDistrictTribunalJudge != \"Yes\"",
+    "LiveFrom": "11/04/2025",
+    "FieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "RetainHiddenValue": "No"
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "panelMemberComposition",
+    "ListElementCode": "districtTribunalJudge",
+    "ID": "updateListingRequirementsPanelCompositionDtj",
+    "FieldShowCondition": "panelMemberComposition.districtTribunalJudge = \"DUMMY_VALUE_TO_HIDE_FIELD\"",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "11/04/2025",
+    "FieldDisplayOrder": 2,
+    "PageID": "1.0",
+    "RetainHiddenValue": "Yes"
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "panelMemberComposition",
+    "ListElementCode": "panelCompositionMemberMedical1",
+    "ID": "updateListingRequirementsPanelCompositionMemberMedical1",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "11/04/2025",
+    "FieldDisplayOrder": 3,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "panelMemberComposition",
+    "ListElementCode": "panelCompositionMemberMedical2",
+    "ID": "updateListingRequirementsPanelCompositionMemberMedical2",
+    "FieldShowCondition": "panelMemberComposition.panelCompositionMemberMedical2 = \"DUMMY_VALUE_TO_HIDE_FIELD\"",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "11/04/2025",
+    "FieldDisplayOrder": 4,
+    "PageID": "1.0",
+    "RetainHiddenValue": "Yes"
+  },
+  {
+    "CaseEventID": "updateListingRequirements",
+    "CaseFieldID": "panelMemberComposition",
+    "ListElementCode": "panelCompositionDisabilityAndFqMember",
+    "ID": "updateListingRequirementsPanelCompositionDisabilityAndFqMember",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "11/04/2025",
+    "FieldDisplayOrder": 5,
+    "PageID": "1.0"
+  }
+]

@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -38,8 +37,6 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
 
     private final DocmosisTemplateConfig docmosisTemplateConfig;
 
-    private final boolean canIssueGenericLetter;
-
     private String docmosisTemplate;
 
     private String docmosisCoverSheetTemplate;
@@ -48,14 +45,11 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
     public IssueGenericLetterHandler(BulkPrintService bulkPrintService,
                                      GenericLetterPlaceholderService genericLetterPlaceholderService,
                                      CoverLetterService coverLetterService,
-                                     DocmosisTemplateConfig docmosisTemplateConfig,
-                                     @Value("${feature.issue-generic-letter.enabled}")
-                                     boolean canIssueGenericLetter) {
+                                     DocmosisTemplateConfig docmosisTemplateConfig) {
         this.genericLetterPlaceholderService = genericLetterPlaceholderService;
         this.bulkPrintService = bulkPrintService;
         this.coverLetterService = coverLetterService;
         this.docmosisTemplateConfig = docmosisTemplateConfig;
-        this.canIssueGenericLetter = canIssueGenericLetter;
     }
 
     @Override
@@ -65,7 +59,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbackType must not be null");
 
-        return canIssueGenericLetter && callbackType.equals(CallbackType.SUBMITTED)
+        return callbackType.equals(CallbackType.SUBMITTED)
             && callback.getEvent() == EventType.ISSUE_GENERIC_LETTER;
     }
 
@@ -145,7 +139,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
                     FurtherEvidenceLetterType letterType = getLetterType(otherParty, entityId);
                     String recipient = PlaceholderUtility.getName(caseData, letterType, entityId);
                     List<Pdf> letter = getLetterPdfs(caseData, documents, letterType, entityId);
-                    bulkPrintService.sendToBulkPrint(caseId, caseData, letter, EventType.ISSUE_GENERIC_LETTER, recipient);
+                    bulkPrintService.sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(caseId, caseData, letter, EventType.ISSUE_GENERIC_LETTER, recipient);
                 }
             }
         }
@@ -160,19 +154,19 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
     private void sendToJointParty(long caseId, SscsCaseData caseData, List<Pdf> documents) {
         List<Pdf> letter = getLetterPdfs(caseData, documents, FurtherEvidenceLetterType.JOINT_PARTY_LETTER);
         String recipient = PlaceholderUtility.getName(caseData, FurtherEvidenceLetterType.JOINT_PARTY_LETTER, null);
-        bulkPrintService.sendToBulkPrint(caseId, caseData, letter, EventType.ISSUE_GENERIC_LETTER, recipient);
+        bulkPrintService.sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(caseId, caseData, letter, EventType.ISSUE_GENERIC_LETTER, recipient);
     }
 
     private void sendToRepresentative(long caseId, SscsCaseData caseData, List<Pdf> documents) {
         List<Pdf> letter = getLetterPdfs(caseData, documents, FurtherEvidenceLetterType.REPRESENTATIVE_LETTER);
         String recipient = PlaceholderUtility.getName(caseData, FurtherEvidenceLetterType.REPRESENTATIVE_LETTER, null);
-        bulkPrintService.sendToBulkPrint(caseId, caseData, letter, EventType.ISSUE_GENERIC_LETTER, recipient);
+        bulkPrintService.sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(caseId, caseData, letter, EventType.ISSUE_GENERIC_LETTER, recipient);
     }
 
     private void sendToAppellant(long caseId, SscsCaseData caseData, List<Pdf> documents) {
         List<Pdf> letter = getLetterPdfs(caseData, documents, FurtherEvidenceLetterType.APPELLANT_LETTER);
         String recipient = PlaceholderUtility.getName(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER, null);
-        bulkPrintService.sendToBulkPrint(caseId, caseData, letter, EventType.ISSUE_GENERIC_LETTER, recipient);
+        bulkPrintService.sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(caseId, caseData, letter, EventType.ISSUE_GENERIC_LETTER, recipient);
     }
 
     private static String getLetterName(Map<String, Object> placeholders) {

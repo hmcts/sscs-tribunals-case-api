@@ -1,8 +1,9 @@
 package uk.gov.hmcts.reform.sscs.functional.tyanotifications.handlers;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADMIN_APPEAL_WITHDRAWN;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.CASE_UPDATED;
 
@@ -41,8 +42,8 @@ public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTes
 
     @Test
     @Parameters({
-        "Appellant, 8620e023-f663-477e-a771-9cfad50ee30f, 446c7b23-7342-42e1-adff-b4c367e951cb, 1, 1, 1, true",
-        "Appointee, 8620e023-f663-477e-a771-9cfad50ee30f, 446c7b23-7342-42e1-adff-b4c367e951cb, 1, 1, 1, false",
+        "Appellant, 6919c7bd-96c7-4b6a-8a1d-4f8591a2ca19, 446c7b23-7342-42e1-adff-b4c367e951cb, 1, 1, 1, true",
+        "Appointee, 6919c7bd-96c7-4b6a-8a1d-4f8591a2ca19, 446c7b23-7342-42e1-adff-b4c367e951cb, 1, 1, 1, false",
         "Reps, e29a2275-553f-4e70-97f4-2994c095f281, f59440ee-19ca-4d47-a702-13e9cecaccbd, 1, 1, 2, false"
     })
     public void givenCallbackWithSubscriptions_shouldSendEmailSmsAndLetterNotifications(
@@ -56,27 +57,24 @@ public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTes
         simulateCcdCallback(ADMIN_APPEAL_WITHDRAWN, "tyanotifications/handlers/" + ADMIN_APPEAL_WITHDRAWN.getId() + subscription
             + "Callback.json");
 
-        delayInSeconds(5);
         List<Notification> notifications = tryFetchNotificationsForTestCase(emailId, smsId);
 
         assertEquals(expectedNumEmailNotifications, getNumberOfNotificationsForGivenEmailOrSmsTemplateId(notifications, emailId));
         assertEquals(expectedNumSmsNotifications, getNumberOfNotificationsForGivenEmailOrSmsTemplateId(notifications, smsId));
 
         if (checkFromCorrespondence) {
-            assertTrue(fetchLettersFromCase(expectedNumLetters, subscription));
+            fetchLettersFromCase(expectedNumLetters, subscription);
         } else {
             List<Notification> letterNotifications = fetchLetters();
             assertThat(letterNotifications).hasSize(expectedNumLetters);
         }
     }
 
-    private boolean fetchLettersFromCase(int expectedNumLetters, String subscription) {
-        do {
-            if (getNumberOfLetterCorrespondence(subscription) == expectedNumLetters) {
-                return true;
-            }
-            delayInSeconds(10);
-        } while (true);
+    private void fetchLettersFromCase(int expectedNumLetters, String subscription) {
+        await()
+            .atMost(120, SECONDS)
+            .pollInterval(10, SECONDS)
+            .untilAsserted(() -> assertThat(getNumberOfLetterCorrespondence(subscription)).isEqualTo(expectedNumLetters));
     }
 
     private void initialiseCcdCase() {

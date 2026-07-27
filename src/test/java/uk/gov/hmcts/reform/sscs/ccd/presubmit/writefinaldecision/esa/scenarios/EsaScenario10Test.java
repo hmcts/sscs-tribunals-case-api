@@ -1,29 +1,26 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios;
 
-import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaTemplateContent;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
-@RunWith(JUnitParamsRunner.class)
-public class EsaScenario10Test {
+class EsaScenario10Test {
 
-    @Test
-    @Parameters({"true, allowed, has limited capability for work", "false, refused, does not have limited capability for work and cannot be treated as having limited capability for work"})
-    public void testScenario10(boolean isAllowed, String allowedText, String capabilityText) {
+    @ParameterizedTest
+    @CsvSource({"true, allowed", "false, refused"})
+    void testScenario10(boolean isAllowed, String allowedText) {
 
         List<Descriptor> schedule2Descriptors =
-            Arrays.asList(Descriptor.builder()
+            Collections.singletonList(Descriptor.builder()
                 .activityQuestionValue("Mobilising Unaided")
                 .activityAnswerValue("1")
                 .activityAnswerLetter("c").activityAnswerPoints(9).build());
@@ -48,22 +45,24 @@ public class EsaScenario10Test {
 
         EsaTemplateContent content = EsaScenario.SCENARIO_10.getContent(body);
 
-        String expectedContent = format("The appeal is %s.\n"
-                + "\n"
-                + "The decision made by the Secretary of State on 20/09/2020 is confirmed.\n"
-                + "\n"
-                + "This is the summary of outcome decision\n"
-                + "\n"
-                + "My first reasons\n"
-                + "\n"
-                + "My second reasons\n"
-                + "\n"
-                + "Something else\n"
-                + "\n"
-                + "This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n\n",
-            allowedText, capabilityText);
+        String expectedContent = """
+                The appeal is %s.
+                
+                The decision made by the Secretary of State on 20/09/2020 is confirmed.
+                
+                This is the summary of outcome decision
+                
+                My first reasons
+                
+                My second reasons
+                
+                Something else
+                
+                This has been an oral (face to face) hearing. The following people attended: Felix Sydney the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page A1.
+                
+                """.formatted(allowedText);
 
-        assertEquals(7, content.getComponents().size());
+        Assertions.assertEquals(7, content.getComponents().size());
 
         assertThat(content.toString(), is(expectedContent));
 

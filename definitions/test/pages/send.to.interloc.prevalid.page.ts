@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 import { WebAction } from '../common/web.action';
 import sendToInterLocPreValidData from './content/send.to.interloc_en.json';
 
@@ -33,6 +33,33 @@ export class SendToInterlocPrevalidPage {
       '#interlocReferralReason',
       sendToInterLocPreValidData.sendToInterLocReferalReasonOptionValue
     );
+  }
+
+  async verifyReasonReferredOptions(options: string[]): Promise<void> {
+    await webAction.clickElementById('#interlocReferralReason');
+
+    const availableOptions = (
+      await this.page.locator('#interlocReferralReason option').allTextContents()
+    )
+      .map((option) => option.trim())
+      .filter((option) => option !== '');
+
+    options.forEach((option) => {
+      expect(availableOptions).toContain(option);
+    });
+  }
+
+  async selectReasonReferred(reasonReferred: string): Promise<void> {
+    await webAction.chooseOptionByLabel(
+      '#interlocReferralReason',
+      reasonReferred
+    );
+  }
+
+  async verifySelectedReasonReferred(reasonReferred: string): Promise<void> {
+    await expect(
+      this.page.locator('#interlocReferralReason option:checked')
+    ).toHaveText(reasonReferred);
   }
 
   async submitContinueBtn(): Promise<void> {

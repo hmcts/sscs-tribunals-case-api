@@ -47,6 +47,10 @@ export class WebAction {
     await expect(this.page.getByText(labelText).first()).toBeVisible();
   }
 
+  async verifyTextVisibilityFastFail(labelText: string) {
+    await expect(this.page.getByText(labelText).first()).toBeVisible({timeout: 5000});
+  }
+
   async verifyElementVisibility(elementlocator: string) {
     await expect(this.page.locator(elementlocator).first()).toBeVisible();
   }
@@ -82,14 +86,12 @@ export class WebAction {
 
   async clickButton(elementLocator: string): Promise<void> {
     await this.page.waitForLoadState('domcontentloaded');
-    await expect(this.page.getByRole('button', { name: elementLocator, exact: true }).first())
-      .toBeVisible();
-    await expect(this.page.getByRole('button', { name: elementLocator, exact: true }).first())
-      .toBeEnabled();
-    await this.page
+    const button = this.page
       .getByRole('button', { name: elementLocator, exact: true })
-      .first()
-      .click();
+      .first();
+    await expect(button).toBeVisible();
+    await expect(button).toBeEnabled();
+    await button.click();
   }
 
   async clickGoButton(elementLocator: string): Promise<void> {
@@ -101,6 +103,7 @@ export class WebAction {
 
   async clickSubmitButton(): Promise<void> {
     await this.verifyElementVisibility('//*[@class=\'button\']');
+    await expect(this.page.locator('//*[@class=\'button\']').first()).toBeEnabled();
     await this.page.locator('//*[@class=\'button\']').first().click();
   }
 
@@ -118,6 +121,10 @@ export class WebAction {
     await this.page.getByLabel(elementValue).first().check();
   }
 
+  async unCheckAnCheckBox(elementLocator: string): Promise<void> {
+    await this.page.locator(elementLocator).uncheck();
+  }
+
   async clickElementById(elementLocator: string): Promise<void> {
     await this.verifyElementVisibility(elementLocator);
     await this.page.locator(elementLocator).first().click();
@@ -132,12 +139,23 @@ export class WebAction {
     await this.page.getByRole('link', { name: elementLocator }).first().click();
   }
 
+  async clickButtonByRole(elementLocator: string): Promise<void> {
+    await expect(this.page.getByRole('button', { name: elementLocator , exact: true})).toBeVisible();
+    await this.page.getByRole('button', { name: elementLocator, exact: true}).click();
+  }
+
   async isLinkClickable(elementLocator: string): Promise<void> {
     await expect(this.page.getByRole('link', { name: elementLocator }).first()).toBeVisible();
     await expect(this.page
       .getByRole('link', { name: elementLocator })
       .first()
     ).toBeEnabled();
+  }
+
+  async isButtonClickable(elementLocator: string): Promise<void> {
+     await expect(this.page.getByRole('button', { name: elementLocator })
+     .first())
+     .toBeVisible();
   }
 
   async clickNextStepButton(elementId: string): Promise<void> {
@@ -174,5 +192,9 @@ export class WebAction {
 
   async pause() {
     await this.page.pause();
+  }
+
+  async waitForSpinnerToDisappear() {
+    await this.page.waitForSelector('.spinner', { state: 'hidden' });
   }
 }

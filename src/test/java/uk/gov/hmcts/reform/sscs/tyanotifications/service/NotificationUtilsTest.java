@@ -16,6 +16,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_DORMANT;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.CASE_UPDATED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DO_NOT_SEND;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DRAFT_TO_VALID_APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DWP_RESPONSE_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DWP_UPLOAD_RESPONSE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.EVIDENCE_RECEIVED;
@@ -455,13 +456,13 @@ public class NotificationUtilsTest {
 
     @Test
     public void shouldReturnFalseWhenTheSubscriptionIsNull() {
-        assertFalse(isValidSubscriptionOrIsMandatoryLetter(null, VALID_APPEAL_CREATED));
+        assertFalse(isValidSubscriptionOrIsMandatoryLetter(null, DRAFT_TO_VALID_APPEAL_CREATED));
     }
 
     @Test
     public void shouldReturnFalseWhenTheCaseHasNotSubscribed() {
         Subscription subscription = Subscription.builder().subscribeSms(YesNo.NO.getValue()).subscribeEmail(YesNo.NO.getValue()).build();
-        assertFalse(isValidSubscriptionOrIsMandatoryLetter(subscription, VALID_APPEAL_CREATED));
+        assertFalse(isValidSubscriptionOrIsMandatoryLetter(subscription, DRAFT_TO_VALID_APPEAL_CREATED));
     }
 
     @Test

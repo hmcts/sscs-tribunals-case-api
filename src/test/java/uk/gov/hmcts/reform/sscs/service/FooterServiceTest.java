@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DIRECTION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.io.IOException;
@@ -146,6 +147,32 @@ public class FooterServiceTest {
         assertEquals("Addition A", stringCaptor.getAllValues().get(1));
     }
 
+    public void givenADocumentEvidenceIssued_thenAddAFooter() throws Exception {
+        byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
+        when(pdfStoreService.download(any())).thenReturn(pdfBytes);
+
+        when(pdfStoreService.storeDocument(any(), anyString())).thenReturn(sscsDocument);
+
+        when(pdfWatermarker.shrinkAndWatermarkPdf(any(), stringCaptor.capture(), stringCaptor.capture())).thenReturn(new byte[]{});
+
+        String now = LocalDate.now().toString();
+
+        footerService.createFooterAndAddDocToCase(DocumentLink.builder().documentUrl("MyUrl").documentFilename("afilename").build(),
+            sscsCaseData, DIRECTION_NOTICE, now, null, null, null);
+
+        assertEquals(2, sscsCaseData.getSscsDocument().size());
+        SscsDocumentDetails footerDoc = sscsCaseData.getSscsDocument().get(0).getValue();
+        assertEquals(DIRECTION_NOTICE.getValue(), footerDoc.getDocumentType());
+        String expectedFilename = String.format("Addition A - %s %s on %s.pdf", DIRECTION_NOTICE.getLabel(), "issued", now);
+        assertEquals(expectedFilename, footerDoc.getDocumentFileName());
+        assertEquals(now, footerDoc.getDocumentDateAdded());
+        assertEquals(expectedDocumentUrl, footerDoc.getDocumentLink().getDocumentUrl());
+        assertEquals("Yes", footerDoc.getEvidenceIssued());
+        verify(pdfStoreService).storeDocument(any(), anyString());
+        assertEquals(DIRECTION_NOTICE.getLabel(), stringCaptor.getAllValues().get(0));
+        assertEquals("Addition A", stringCaptor.getAllValues().get(1));
+    }
+
     @Test
     public void givenADocumentWithOverriddenDateAndFileName_thenAddAFooterWithOverriddenValues() throws Exception {
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
@@ -156,11 +183,11 @@ public class FooterServiceTest {
         when(pdfWatermarker.shrinkAndWatermarkPdf(any(), stringCaptor.capture(), stringCaptor.capture())).thenReturn(new byte[]{});
 
         footerService.createFooterAndAddDocToCase(DocumentLink.builder().documentUrl("MyUrl").documentFilename("afilename").build(),
-                sscsCaseData, DocumentType.DIRECTION_NOTICE, LocalDate.now().toString(), LocalDate.now().minusDays(1), "overridden.pdf", null);
+                sscsCaseData, DIRECTION_NOTICE, LocalDate.now().toString(), LocalDate.now().minusDays(1), "overridden.pdf", null);
 
         assertEquals(2, sscsCaseData.getSscsDocument().size());
         SscsDocumentDetails footerDoc = sscsCaseData.getSscsDocument().get(0).getValue();
-        assertEquals(DocumentType.DIRECTION_NOTICE.getValue(), footerDoc.getDocumentType());
+        assertEquals(DIRECTION_NOTICE.getValue(), footerDoc.getDocumentType());
         assertEquals("overridden.pdf", footerDoc.getDocumentFileName());
         assertEquals(LocalDate.now().minusDays(1).toString(), footerDoc.getDocumentDateAdded());
         assertEquals(expectedDocumentUrl, footerDoc.getDocumentLink().getDocumentUrl());
@@ -182,11 +209,11 @@ public class FooterServiceTest {
         String now = LocalDate.now().toString();
 
         footerService.createFooterAndAddDocToCase(DocumentLink.builder().documentUrl("MyUrl").documentFilename("afilename").build(),
-                sscsCaseData, DocumentType.DIRECTION_NOTICE, now, null, null, SscsDocumentTranslationStatus.TRANSLATION_REQUIRED);
+                sscsCaseData, DIRECTION_NOTICE, now, null, null, SscsDocumentTranslationStatus.TRANSLATION_REQUIRED);
 
         assertEquals(2, sscsCaseData.getSscsDocument().size());
         SscsDocumentDetails footerDoc = sscsCaseData.getSscsDocument().get(0).getValue();
-        assertEquals(DocumentType.DIRECTION_NOTICE.getValue(), footerDoc.getDocumentType());
+        assertEquals(DIRECTION_NOTICE.getValue(), footerDoc.getDocumentType());
         assertEquals("Addition A - Directions Notice issued on " + now + ".pdf", footerDoc.getDocumentFileName());
         assertEquals(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED, footerDoc.getDocumentTranslationStatus());
         assertEquals(now, footerDoc.getDocumentDateAdded());

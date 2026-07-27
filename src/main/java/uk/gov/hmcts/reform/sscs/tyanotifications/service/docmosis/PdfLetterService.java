@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis;
 
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.IBCA_URL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.getPostponementRequestStatus;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ADDRESS_NAME;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.POSTPONEMENT_REQUEST;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.personalisation.Personalisation.translateToWelshDate;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.LetterType.DOCMOSIS;
@@ -93,7 +95,7 @@ public class PdfLetterService {
             lines.get(lineNum++),
             lines.get(lineNum++),
             lines.get(lineNum),
-            evidenceProperties.getAddress().getLine2(),
+            evidenceProperties.getAddress().getLine2(wrapper.getNewSscsCaseData()),
             evidenceProperties.getAddress().getLine3(wrapper.getNewSscsCaseData()),
             evidenceProperties.getAddress().getTown(),
             evidenceProperties.getAddress().getPostcode(wrapper.getNewSscsCaseData()),
@@ -137,6 +139,9 @@ public class PdfLetterService {
                     docmosisTemplatesConfig.getHmctsWelshImgVal());
                 placeholders.put(WELSH_GENERATED_DATE_LITERAL, LocalDateToWelshStringConverter.convert(LocalDate.now()));
             }
+
+            placeholders.put(POSTPONEMENT_REQUEST,  getPostponementRequestStatus(wrapper.getNewSscsCaseData()));
+
             return docmosisPdfService.createPdfFromMap(placeholders, notification.getDocmosisLetterTemplate());
         }
         return new byte[0];

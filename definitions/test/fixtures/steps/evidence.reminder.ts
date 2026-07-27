@@ -23,6 +23,7 @@ export class EvidenceReminder extends BaseStep {
       eventTestData.eventDescriptionInput
     );
     await this.eventNameAndDescriptionPage.confirmSubmission();
+    await this.homePage.delay(1000);
     await this.homePage.navigateToTab('History');
     await this.verifyHistoryTabLink('Evidence reminder');
 

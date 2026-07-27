@@ -29,7 +29,6 @@ import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.NOT_LIST
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
@@ -42,7 +41,6 @@ public class TrackYourAppealJsonBuilderTest {
     @Before
     public void setUp() {
         trackYourAppealJsonBuilder = new TrackYourAppealJsonBuilder();
-        ReflectionTestUtils.setField(trackYourAppealJsonBuilder, "isDirectionHearingsEnabled", true);
     }
 
     @Test
@@ -155,20 +153,11 @@ public class TrackYourAppealJsonBuilderTest {
     }
 
     @Test
-    public void shouldReturnTypeOfHearingInTheMyaResponseWithHearing() {
+    public void shouldReturnHmcHearingTypeInTheMyaResponseWithHearing() {
         SscsCaseData caseData = HMC_HEARING_TYPE_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
             populateRegionalProcessingCenter(), 1L, true, "hearing");
         assertJsonEquals(HMC_HEARING_TYPE_MYA.getSerializedMessage(), objectNode);
-    }
-
-    @Test
-    public void shouldNotReturnTypeOfHearingInTheMyaResponseWithHearingIfDirectionHearingsFlagOff() {
-        ReflectionTestUtils.setField(trackYourAppealJsonBuilder, "isDirectionHearingsEnabled", false);
-        SscsCaseData caseData = HMC_HEARING_TYPE_CCD.getDeserializeMessage();
-        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
-            populateRegionalProcessingCenter(), 1L, true, "hearing");
-        assertJsonEquals(ADJOURNED_HEARING_MYA.getSerializedMessage(), objectNode);
     }
 
     private RegionalProcessingCenter populateRegionalProcessingCenter() {

@@ -7,7 +7,7 @@ test.beforeAll('Case has to be Created', async () => {
   caseId = await createCaseBasedOnCaseType('PIP');
 });
 test(
-  'As a caseworker appeal a dormant case',
+  'As a caseworker appeal a dormant case - open case via case list',
   { tag: '@nightly-pipeline' },
   async ({ appealDormantSteps }) => {
     await appealDormantSteps.performAppealDormant(caseId);

@@ -59,7 +59,7 @@ public final class HearingsWindowMapping {
     }
 
     public static LocalDate getDateRangeStart(@Valid SscsCaseData caseData, ReferenceDataServiceHolder refData) {
-        return refData.isAdjournmentFlagEnabled() && isYes(caseData.getAdjournment().getAdjournmentInProgress())
+        return isYes(caseData.getAdjournment().getAdjournmentInProgress())
                 ? AdjournmentCalculateDateHelper.getHearingWindowStart(caseData)
                 : getHearingWindowStart(caseData);
     }

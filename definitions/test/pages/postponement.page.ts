@@ -89,7 +89,7 @@ export class PostponementPages {
         postponementData.bodyContentLabel
       );
       await webActions.verifyPageLabel(
-        '.form-label[_ngcontent-ng-c823086951]',
+        '[for="reservedToJudgeInterloc"] span',
         postponementData.reservedToInterLocLabel
       );
       await webActions.verifyPageLabel(
@@ -130,7 +130,7 @@ export class PostponementPages {
         postponementData.bodyContentLabel
       );
       await webActions.verifyPageLabel(
-        '.form-label[_ngcontent-ng-c823086951]',
+        '[for="reservedToJudgeInterloc"] span',
         postponementData.reservedToInterLocLabel
       );
       await webActions.verifyPageLabel(
@@ -163,7 +163,7 @@ export class PostponementPages {
         postponementData.postponementDetailsLabel
       );
       await webActions.verifyPageLabel(
-        '.form-label[_ngcontent-ng-c823086951]',
+        '[for="reservedToJudgeInterloc"] span',
         postponementData.reservedToInterLocLabel
       );
       await webActions.inputField(

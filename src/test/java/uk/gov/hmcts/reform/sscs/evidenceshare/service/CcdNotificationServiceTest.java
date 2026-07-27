@@ -61,7 +61,10 @@ class CcdNotificationServiceTest {
 
     @Test
     void returnRepresentativeToFieldGivenOrganisationButNoNameForSorLetter() {
-        sorPlaceholderService = new SorPlaceholderService(placeholderService);
+        sorPlaceholderService = new SorPlaceholderService(placeholderService,
+            "0300 123 1142",
+            "0300 131 2850",
+            "0300 790 6234");
         SscsCaseData caseData = buildCaseData();
         caseData.getAppeal().getRep().setName(new Name(null, null, null));
         caseData.getAppeal().getRep().setOrganisation("Test organisation");

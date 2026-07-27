@@ -25,6 +25,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.FileUtils;
@@ -40,6 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
@@ -66,7 +68,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
-import uk.gov.hmcts.reform.sscs.service.servicebus.TopicConsumer;
+import uk.gov.hmcts.reform.sscs.service.servicebus.SendCallbackHandler;
 
 
 @RunWith(JUnitParamsRunner.class)
@@ -118,10 +120,13 @@ public class ReissueFurtherEvidenceServiceIt {
     private ReissueFurtherEvidenceHandler handler;
 
     @Autowired
-    private TopicConsumer topicConsumer;
+    private SendCallbackHandler sendCallbackHandler;
 
     @Autowired
     private SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer;
+
+    @Autowired
+    private ThreadPoolTaskExecutor executor;
 
     @MockitoBean
     protected AirLookupService airLookupService;
@@ -152,7 +157,7 @@ public class ReissueFurtherEvidenceServiceIt {
         nameMap.put("name", "TB-SCS-GNO-ENG-00011.doc");
         englishDocs.put(DocumentType.DL16.getValue(), nameMap);
         nameMap = new HashMap<>();
-        nameMap.put("name", "TB-SCS-GNO-ENG-00068.doc");
+        nameMap.put("name", "TB-SCS-GNO-ENG-00068-v2.doc");
         englishDocs.put("d609-97", nameMap);
         nameMap = new HashMap<>();
         nameMap.put("name", "TB-SCS-GNO-ENG-00069.doc");
@@ -166,7 +171,7 @@ public class ReissueFurtherEvidenceServiceIt {
         nameMap.put("name", "TB-SCS-GNO-ENG-00011.doc");
         welshDocs.put(DocumentType.DL16.getValue(), nameMap);
         nameMap = new HashMap<>();
-        nameMap.put("name", "TB-SCS-GNO-WEL-00469.docx");
+        nameMap.put("name", "TB-SCS-GNO-WEL-00469-v2.docx");
         welshDocs.put("d609-97", nameMap);
         nameMap = new HashMap<>();
         nameMap.put("name", "TB-SCS-GNO-WEL-00470.docx");
@@ -184,7 +189,7 @@ public class ReissueFurtherEvidenceServiceIt {
     }
 
     @Test
-    public void appealWithAppellantAndFurtherEvidenceFromAppellant_shouldSend609_97ToAppellantAndNotSend609_98() throws IOException {
+    public void appealWithAppellantAndFurtherEvidenceFromAppellant_shouldSend609_97ToAppellantAndNotSend609_98() throws IOException, InterruptedException {
 
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
@@ -203,7 +208,9 @@ public class ReissueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(sscsCaseDataCallback);
+        sendCallbackHandler.handle(sscsCaseDataCallback);
+
+        executor.getThreadPoolExecutor().awaitTermination(3, TimeUnit.SECONDS);
 
         verify(bulkPrintService).sendToBulkPrint(any(), any(), any(), any(), any());
 
@@ -223,7 +230,7 @@ public class ReissueFurtherEvidenceServiceIt {
     }
 
     @Test
-    public void appealWithAppellantAndRepFurtherEvidenceFromAppellant_shouldSend609_97ToAppellantAnd609_98ToRep() throws IOException {
+    public void appealWithAppellantAndRepFurtherEvidenceFromAppellant_shouldSend609_97ToAppellantAnd609_98ToRep() throws IOException, InterruptedException {
 
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
@@ -240,7 +247,9 @@ public class ReissueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(sscsCaseDataCallback);
+        sendCallbackHandler.handle(sscsCaseDataCallback);
+
+        executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
         verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any(), any(), any(), any());
 
@@ -265,7 +274,7 @@ public class ReissueFurtherEvidenceServiceIt {
     }
 
     @Test
-    public void appealWithAppellantAndRepFurtherEvidenceFromRep_shouldSend609_97ToRepAnd609_98ToAppellant() throws IOException {
+    public void appealWithAppellantAndRepFurtherEvidenceFromRep_shouldSend609_97ToRepAnd609_98ToAppellant() throws IOException, InterruptedException {
 
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
@@ -282,7 +291,9 @@ public class ReissueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(sscsCaseDataCallback);
+        sendCallbackHandler.handle(sscsCaseDataCallback);
+
+        executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
         verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any(), any(), any(), any());
 
@@ -307,7 +318,7 @@ public class ReissueFurtherEvidenceServiceIt {
     }
 
     @Test
-    public void appealWithAppellantFurtherEvidenceAndRepFurtherEvidence_shouldSend609_97ToRepAndAppellantAnd609_98ToAppellantAndRep() throws IOException {
+    public void appealWithAppellantFurtherEvidenceAndRepFurtherEvidence_shouldSend609_97ToRepAndAppellantAnd609_98ToAppellantAndRep() throws IOException, InterruptedException {
 
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
@@ -324,7 +335,9 @@ public class ReissueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(sscsCaseDataCallback);
+        sendCallbackHandler.handle(sscsCaseDataCallback);
+
+        executor.getThreadPoolExecutor().awaitTermination(3, TimeUnit.SECONDS);
 
         verify(bulkPrintService, times(4)).sendToBulkPrint(any(), any(), any(), any(), any());
 
@@ -359,7 +372,7 @@ public class ReissueFurtherEvidenceServiceIt {
     }
 
     @Test
-    public void appealWithFurtherEvidenceFromDwp_shouldNotSend609_97And609_98ToAppellant() throws IOException {
+    public void appealWithFurtherEvidenceFromDwp_shouldNotSend609_97And609_98ToAppellant() throws IOException, InterruptedException {
 
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
@@ -376,7 +389,9 @@ public class ReissueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(sscsCaseDataCallback);
+        sendCallbackHandler.handle(sscsCaseDataCallback);
+
+        executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
         verify(bulkPrintService).sendToBulkPrint(any(), any(), any(), any(), any());
 
@@ -396,7 +411,7 @@ public class ReissueFurtherEvidenceServiceIt {
     }
 
     @Test
-    public void appealWithRepAndFurtherEvidenceFromDwp_shouldNotSend609_97AndSend609_98ToRepAndAppellant() throws IOException {
+    public void appealWithRepAndFurtherEvidenceFromDwp_shouldNotSend609_97AndSend609_98ToRepAndAppellant() throws IOException, InterruptedException {
 
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
@@ -413,7 +428,9 @@ public class ReissueFurtherEvidenceServiceIt {
         mockCcdCaseDataForStartEvent(json);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        topicConsumer.onMessage(sscsCaseDataCallback);
+        sendCallbackHandler.handle(sscsCaseDataCallback);
+
+        executor.getThreadPoolExecutor().awaitTermination(2, TimeUnit.SECONDS);
 
         verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any(), any(), any(), any());
 

@@ -1,0 +1,38 @@
+[
+  {
+    "LiveFrom": "14/11/2023",
+    "CaseTypeID": "Benefit",
+    "RoleName": "hmcts-admin",
+    "Authorisation": "",
+    "ReadOnly": "Y",
+    "AccessProfiles": "GS_profile",
+    "Disabled": "N"
+  },
+  {
+    "LiveFrom": "14/11/2023",
+    "CaseTypeID": "Benefit",
+    "RoleName": "hmcts-judiciary",
+    "Authorisation": "",
+    "ReadOnly": "Y",
+    "AccessProfiles": "GS_profile",
+    "Disabled": "N"
+  },
+  {
+    "LiveFrom": "14/11/2023",
+    "CaseTypeID": "Benefit",
+    "RoleName": "hmcts-legal-operations",
+    "Authorisation": "",
+    "ReadOnly": "Y",
+    "AccessProfiles": "GS_profile",
+    "Disabled": "N"
+  },
+  {
+    "LiveFrom": "14/11/2023",
+    "CaseTypeID": "Benefit",
+    "RoleName": "hmcts-ctsc",
+    "Authorisation": "",
+    "ReadOnly": "Y",
+    "AccessProfiles": "GS_profile",
+    "Disabled": "N"
+  }
+]

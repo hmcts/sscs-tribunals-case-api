@@ -1,8 +1,15 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc;
 
+import static java.util.Objects.nonNull;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcScenario;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcTemplateComponentId;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
+import uk.gov.hmcts.reform.sscs.model.docassembly.Paragraph;
+import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateContent;
 
 public abstract class UcTemplateContent extends WriteFinalDecisionTemplateContent {
@@ -23,21 +30,20 @@ public abstract class UcTemplateContent extends WriteFinalDecisionTemplateConten
     public abstract UcScenario getScenario();
 
     public String getDoesNotHaveLimitedCapabilityForWorkSentence(String appellantName) {
-        return appellantName + " does not have limited capability for work and cannot be treated as having limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to " + getUsageDependentBenefitTypeString() + ".";
+        return appellantName + " does not have limited capability for work and cannot be treated as having limited capability for work.";
     }
 
     public String getDoesNotHaveLimitedCapabilityForWorkNoSchedule7Sentence(String appellantName) {
         return appellantName + " does not have limited capability for work-related activity because no descriptor from Schedule 7 of the " + getUsageDependentBenefitTypeRegulationsString() + " applied. Schedule 9, paragraph 4 did not apply.";
     }
 
-    public String getDoesHaveLimitedCapabilityForWorkSentence(String appellantName, boolean isTreatedLimitedCapability, boolean includeWorkRelatedActivities, boolean isWorkRelatedActivitiesLimited, boolean isWorkRelatedActivitiesToBeTreatedLimitedCapability) {
-        return (appellantName + (isTreatedLimitedCapability ? " is to be treated as having" : " has") + " limited capability for work" + (includeWorkRelatedActivities ? " and " + (!isWorkRelatedActivitiesLimited ? "" : (isWorkRelatedActivitiesToBeTreatedLimitedCapability ? "is to be treated as having limited capability " : "has limited capability ")) + "for work-related activity." : "."))
-            + " The matter is now remitted to the Secretary of State to make a final decision upon entitlement to " + getUsageDependentBenefitTypeString() + ".";
+    public String getDoesHaveLimitedCapabilityForWorkSentence(String appellantName, boolean isTreatedLimitedCapability, boolean includeWorkRelatedActivities, boolean isWorkRelatedActivitiesLimited, boolean isWorkRelatedActivitiesToBeTreatedLimitedCapability, LocalDate startDate) {
+        return (appellantName + (isTreatedLimitedCapability ? " is to be treated as having" : " has") + " limited capability for work" + (includeWorkRelatedActivities ? " and " + (!isWorkRelatedActivitiesLimited ? "" : (isWorkRelatedActivitiesToBeTreatedLimitedCapability ? "is to be treated as having limited capability " : "has limited capability ")) + "for work-related activity" : ""))
+               + ((nonNull(startDate)) ? " from %s.".formatted(startDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))) : ".");
     }
 
-    public String getLimitedCapabilityForWorkRelatedSentence(String appellantName, boolean isTreatedLimitedCapability) {
-        return appellantName + (isTreatedLimitedCapability ? " is to be treated as having" : " has") + " limited capability for work-related activity."
-            + " The matter is now remitted to the Secretary of State to make a final decision upon entitlement to " + getUsageDependentBenefitTypeString() + ".";
+    public String getLimitedCapabilityForWorkRelatedSentence(String appellantName, boolean isTreatedLimitedCapability, LocalDate startDate) {
+        return appellantName + (isTreatedLimitedCapability ? " is to be treated as having" : " has") + " limited capability for work-related activity" + ((nonNull(startDate)) ? " from %s.".formatted(startDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))) : ".");
     }
 
     public String getSchedule7AppliesParagraph(List<Descriptor> descriptors) {
@@ -101,5 +107,21 @@ public abstract class UcTemplateContent extends WriteFinalDecisionTemplateConten
     public String getSecretaryOfStateAcceptsHasLimitedCapabilityForWorkSentence(String appellantName, boolean work) {
         return "The Secretary of State has accepted that " + appellantName + " has limited capability for "
                 + (work ? "work." : "work-related activity.") + " This was not in issue.";
+    }
+
+    public void addSevereCriteriaApplyIfPresent(WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody) {
+        if (nonNull(writeFinalDecisionTemplateBody.getSevereCriteriaApplies())) {
+            addComponent(new Paragraph(UcTemplateComponentId.SEVERE_CRITERIA_APPLY_PARAGRAPH.name(),
+                    getSevereCriteriaApplySentence(writeFinalDecisionTemplateBody.getSevereCriteriaApplies())));
+        }
+    }
+
+    private String getSevereCriteriaApplySentence(Boolean severeCriteriaApply) {
+        if (severeCriteriaApply) {
+            return "The appellant meets the severe conditions criteria because they will constantly meet a Schedule 7 descriptor,"
+                    + " and they have a lifelong condition with no realistic prospect of recovery of function.";
+        } else {
+            return "The appellant does not meet the severe conditions criteria.";
+        }
     }
 }

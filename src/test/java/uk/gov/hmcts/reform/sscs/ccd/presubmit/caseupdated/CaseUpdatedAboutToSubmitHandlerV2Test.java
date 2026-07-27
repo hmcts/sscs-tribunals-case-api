@@ -1,9 +1,12 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
+import static java.time.LocalDateTime.now;
+import static java.util.Optional.empty;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -15,12 +18,14 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode.PIP_NEW_CLAIM;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.Issue.AT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CASE_UPDATED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.CTSC_CLERK;
@@ -28,25 +33,27 @@ import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -57,14 +64,17 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLinkDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseManagementLocation;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DateRange;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
@@ -72,20 +82,21 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.AssociatedCaseLinkHelper;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
-import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
-import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
+import uk.gov.hmcts.reform.sscs.model.VenueDetails;
+import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.RefDataService;
@@ -96,43 +107,29 @@ import uk.gov.hmcts.reform.sscs.service.VenueService;
 @ExtendWith(MockitoExtension.class)
 public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
-    @Captor
-    private ArgumentCaptor<Consumer<SscsCaseDetails>> caseDetailsCaptor;
-
     private static final String USER_AUTHORISATION = "Bearer token";
 
-    @Mock
     private Callback<SscsCaseData> callback;
-
-    @Mock
     private CaseDetails<SscsCaseData> caseDetails;
-
-    @Mock
     private CaseDetails<SscsCaseData> caseDetailsBefore;
 
     @Mock
-    private CcdService ccdService;
-    @Mock
-    private UpdateCcdCaseService updateCcdCaseService;
-
-    @Mock
     private RegionalProcessingCenterService regionalProcessingCenterService;
-
     @Mock
     private AirLookupService airLookupService;
-
     @Mock
     private IdamService idamService;
-
     @Mock
     private RefDataService refDataService;
-
     @Mock
     private VenueService venueService;
+    @Mock
+    private PanelCompositionService panelCompositionService;
+  
+    @Mock
+    private HearingDurationsService hearingDurationsService;
 
     @Mock
-    private SessionCategoryMapService categoryMapService;
-
     private AssociatedCaseLinkHelper associatedCaseLinkHelper;
 
     private CaseUpdatedAboutToSubmitHandler handler;
@@ -145,72 +142,34 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
     @BeforeEach
     void setUp() {
-        associatedCaseLinkHelper = new AssociatedCaseLinkHelper(ccdService, idamService, updateCcdCaseService);
-
-        handler = new CaseUpdatedAboutToSubmitHandler(
-                regionalProcessingCenterService,
-                associatedCaseLinkHelper,
-                airLookupService,
-                new DwpAddressLookupService(),
-                idamService,
-                refDataService,
-                venueService,
-                categoryMapService,
-                true);
-
-        lenient().when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        handler = createNewCaseHandler(false);
 
         sscsCaseData = SscsCaseData.builder()
                 .ccdCaseId("ccdId")
                 .appeal(Appeal.builder()
-                        .benefitType(BenefitType.builder()
-                                .code("PIP")
-                                .build())
+                        .benefitType(BenefitType.builder().code("PIP").build())
                         .appellant(Appellant.builder()
                                 .name(Name.builder().firstName("First").lastName("Last").build())
                                 .address(Address.builder().line1("Line1").line2("Line2").postcode("CM120NS").build())
                                 .identity(Identity.builder().nino("AB223344B").dob("1995-12-20").build())
                                 .isAppointee("Yes")
-                                .appointee(
-                                        Appointee.builder()
-                                                .address(Address.builder()
-                                                        .line1("123 the Street")
-                                                        .postcode("CM120NS")
-                                                        .build()
-                                                )
-                                                .build()
-                                )
-                                .build())
-                        .rep(Representative.builder().address(Address.builder()
-                                                .line1("123 the Street")
-                                                .postcode("CM120NS")
-                                                .build()
-                                        )
-                                        .build()
-                        )
+                                .appointee(Appointee.builder()
+                                        .address(Address.builder().line1("123 the Street").postcode("CM120NS").build())
+                                        .build()).build())
+                        .rep(Representative.builder()
+                                .address(Address.builder().line1("123 the Street").postcode("CM120NS").build()).build())
                         .build())
-                .jointParty(JointParty.builder()
-                        .jointPartyAddressSameAsAppellant(NO)
-                        .address(Address.builder()
-                                .line1("123 the street")
-                                .postcode("CM120NS")
-                                .build()
-                        )
-                        .build()
-                )
+                .jointParty(JointParty.builder().jointPartyAddressSameAsAppellant(NO)
+                        .address(Address.builder().line1("123 the street").postcode("CM120NS").build()).build())
                 .benefitCode("002")
                 .issueCode("DD")
                 .isFqpmRequired(NO)
                 .build();
 
-
         sscsCaseDataBefore = SscsCaseData.builder()
                 .ccdCaseId("ccdId")
                 .appeal(Appeal.builder()
-                        .appellant(Appellant.builder()
-                                .address(Address.builder()
-                                        .line1("123 the Street")
+                        .appellant(Appellant.builder().address(Address.builder().line1("123 the Street")
                                         .postcode("CM120NS")
                                         .build())
                                 .appointee(
@@ -242,28 +201,30 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
                 )
                 .build();
 
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        lenient().when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
-        lenient().when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
+        caseDetails =
+                new CaseDetails<>(1234L, "SSCS", HEARING, sscsCaseData, now(), "Benefit");
+        caseDetailsBefore =
+                new CaseDetails<>(1234L, "SSCS", HEARING, sscsCaseDataBefore, now(), "Benefit");
+        callback = new Callback<>(caseDetails, Optional.of(caseDetailsBefore), CASE_UPDATED, true);
+        lenient().when(associatedCaseLinkHelper.linkCaseByNino(eq(sscsCaseData), eq(Optional.of(caseDetailsBefore))))
+                .thenReturn(sscsCaseData);
         lenient().when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
         lenient().when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                 .roles(List.of(SUPER_USER.getValue()))
                 .build());
-        lenient().when(categoryMapService.getSessionCategory(any(String.class), any(String.class), any(boolean.class),
-                any(boolean.class))).thenReturn(new SessionCategoryMap(PIP_NEW_CLAIM, AT, true, true));
+        lenient().when(panelCompositionService.isBenefitIssueCodeValid(any(), any())).thenReturn(true);
         appeal = callback.getCaseDetails().getCaseData().getAppeal();
     }
 
     @Test
     void givenANonCaseUpdatedEvent_thenReturnFalse() {
-        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+        callback = new Callback<>(caseDetails, Optional.of(caseDetailsBefore), APPEAL_RECEIVED, false);
+
         assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
     @Test
     void givenACaseUpdatedEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
         assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
@@ -671,7 +632,8 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
     @Test
     void throwsExceptionIfItCannotHandleTheAppeal() {
-        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+        callback = new Callback<>(caseDetails, Optional.of(caseDetailsBefore), APPEAL_RECEIVED, false);
+
         assertThrows(IllegalStateException.class, () ->
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION));
     }
@@ -683,47 +645,33 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
                 .address(Address.builder().line1("Line1").line2("Line2").postcode("CM120NS").build())
                 .identity(Identity.builder().nino("AB223344B").dob("1995-12-20").build())
                 .isAppointee("Yes")
-                .appointee(
-                        Appointee.builder()
-                                .address(Address.builder()
-                                        .line1("123 the Street")
-                                        .postcode("CM120NS")
-                                        .build()
-                                )
-                                .build()
-                )
+                .appointee(Appointee.builder()
+                        .address(Address.builder().line1("123 the Street").postcode("CM120NS").build()).build())
                 .build();
-        SscsCaseDetails matchingCase1 = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().ccdCaseId("12345678").appeal(Appeal.builder().appellant(appellant).build()).build()).build();
-        SscsCaseDetails matchingCase2 = SscsCaseDetails.builder().id(56765676L).data(SscsCaseData.builder().ccdCaseId("56765676").appeal(Appeal.builder().appellant(appellant).build()).build()).build();
-        List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
-        matchedByNinoCases.add(matchingCase1);
-        matchedByNinoCases.add(matchingCase2);
-
-        when(ccdService.findCaseBy(anyString(), anyString(), any())).thenReturn(matchedByNinoCases);
+        SscsCaseDetails matchingCase1 = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder()
+                .ccdCaseId("12345678").appeal(Appeal.builder().appellant(appellant).build()).build()).build();
+        SscsCaseDetails matchingCase2 = SscsCaseDetails.builder().id(56765676L).data(SscsCaseData.builder()
+                .ccdCaseId("56765676").appeal(Appeal.builder().appellant(appellant).build()).build()).build();
+        List<CaseLink> matchedByNinoCases = new ArrayList<>();
+        matchedByNinoCases.add(CaseLink.builder().value(
+                CaseLinkDetails.builder().caseReference(matchingCase1.getId().toString()).build()).build());
+        matchedByNinoCases.add(CaseLink.builder().value(
+                CaseLinkDetails.builder().caseReference(matchingCase2.getId().toString()).build()).build());
+        sscsCaseData.setAssociatedCase(matchedByNinoCases);
+        sscsCaseData.setLinkedCasesBoolean("Yes");
+        lenient().when(associatedCaseLinkHelper.linkCaseByNino(eq(sscsCaseData), eq(Optional.of(caseDetailsBefore))))
+                .thenReturn(sscsCaseData);
         callback.getCaseDetails().getCaseData().setCaseCode("002DD");
         callback.getCaseDetails().getCaseData().getAppeal().setAppellant(appellant);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verifyUpdateCcdCaseServiceIsCalledWithExpectedValues(updateCcdCaseService, matchingCase1, matchingCase2);
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(2, response.getData().getAssociatedCase().size());
         assertEquals("Yes", response.getData().getLinkedCasesBoolean());
-        assertEquals("56765676", response.getData().getAssociatedCase().get(0).getValue().getCaseReference());
-        assertEquals("12345678", response.getData().getAssociatedCase().get(1).getValue().getCaseReference());
-
-        assertEquals("Yes", matchingCase1.getData().getLinkedCasesBoolean());
-        assertEquals("ccdId", matchingCase1.getData().getAssociatedCase().get(0).getValue().getCaseReference());
-
-        assertEquals("Yes", matchingCase2.getData().getLinkedCasesBoolean());
-        assertEquals("ccdId", matchingCase2.getData().getAssociatedCase().get(0).getValue().getCaseReference());
-    }
-
-    void verifyUpdateCcdCaseServiceIsCalledWithExpectedValues(UpdateCcdCaseService updateCcdCaseService, SscsCaseDetails matchingCase1, SscsCaseDetails matchingCase2) {
-        verify(updateCcdCaseService).updateCaseV2(eq(12345678L), eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any(IdamTokens.class), caseDetailsCaptor.capture());
-        caseDetailsCaptor.getValue().accept(matchingCase1);
-
-        verify(updateCcdCaseService).updateCaseV2(eq(56765676L), eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any(IdamTokens.class), caseDetailsCaptor.capture());
-        caseDetailsCaptor.getValue().accept(matchingCase2);
+        assertEquals("12345678",
+                response.getData().getAssociatedCase().getFirst().getValue().getCaseReference());
+        assertEquals("56765676",
+                response.getData().getAssociatedCase().getLast().getValue().getCaseReference());
     }
 
     @ParameterizedTest
@@ -742,13 +690,24 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     @ParameterizedTest
     @CsvSource({"Birmingham,No", "Glasgow,Yes"})
     void givenChangeInNullRpcChangeIsScottish(String newRpcName, String expected) {
-
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         caseData.setIsScottishCase("No");
         RegionalProcessingCenter oldRpc = null;
         RegionalProcessingCenter newRpc = RegionalProcessingCenter.builder().name(newRpcName).build();
 
         handler.maybeChangeIsScottish(oldRpc, newRpc, caseData);
+
+        assertEquals(expected, caseData.getIsScottishCase());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"Glasgow,Yes", "Birmingham,No"})
+    void givenSameRpcButIsScottishCaseNotSet_shouldBackfillIsScottishCase(String rpcName, String expected) {
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        caseData.setIsScottishCase(null);
+        RegionalProcessingCenter rpc = RegionalProcessingCenter.builder().name(rpcName).build();
+
+        handler.maybeChangeIsScottish(rpc, rpc, caseData);
 
         assertEquals(expected, caseData.getIsScottishCase());
     }
@@ -777,6 +736,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         String venueB = "VenueB";
         String venueEpimsId = "12345";
         when(venueService.getEpimsIdForVenue(venueB)).thenReturn(venueEpimsId);
+        when(venueService.getVenueDetailsForActiveVenueByEpimsId(venueEpimsId)).thenReturn(VenueDetails.builder().build());
         when(airLookupService.lookupAirVenueNameByPostCode("AB12 00B", sscsCaseData.getAppeal().getBenefitType())).thenReturn(
                 venueB);
 
@@ -793,6 +753,117 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     }
 
     @Test
+    void givenAnAppealHasLegacyVenue_thenDoNotUpdateVenue() {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIsAppointee("No");
+
+        when(regionalProcessingCenterService.getByPostcode(eq("AB12 00B"), anyBoolean())).thenReturn(
+                RegionalProcessingCenter.builder()
+                        .name("rpcName")
+                        .postcode("rpcPostcode")
+                        .epimsId("rpcEpimsId")
+                        .build());
+        String venueA = "VenueA";
+        String venueB = "VenueB";
+        String venueBEpimsId = "12345";
+        callback.getCaseDetails().getCaseData().setProcessingVenue(venueA);
+        when(venueService.getEpimsIdForVenue(venueB)).thenReturn(venueBEpimsId);
+        when(venueService.getVenueDetailsForActiveVenueByEpimsId(venueBEpimsId)).thenReturn(VenueDetails.builder().venName(venueB).legacyVenue(venueA).build());
+        when(airLookupService.lookupAirVenueNameByPostCode("AB12 00B", sscsCaseData.getAppeal().getBenefitType())).thenReturn(
+                venueB);
+
+
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("AB12 00B");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(venueA, response.getData().getProcessingVenue());
+    }
+
+    @Test
+    void givenAnAppealWithNewProcessingVenue_thenUpdateIfNoLegacyVenue() {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIsAppointee("No");
+
+        when(regionalProcessingCenterService.getByPostcode(eq("AB12 00B"), anyBoolean())).thenReturn(
+                RegionalProcessingCenter.builder()
+                        .name("rpcName")
+                        .postcode("rpcPostcode")
+                        .epimsId("rpcEpimsId")
+                        .build());
+        String venueA = "VenueA";
+        String venueB = "VenueB";
+        String venueEpimsId = "12345";
+        callback.getCaseDetails().getCaseData().setProcessingVenue(venueA);
+        when(venueService.getEpimsIdForVenue(venueB)).thenReturn(venueEpimsId);
+        when(venueService.getVenueDetailsForActiveVenueByEpimsId(venueEpimsId)).thenReturn(VenueDetails.builder().venName(venueB).build());
+        when(airLookupService.lookupAirVenueNameByPostCode("AB12 00B", sscsCaseData.getAppeal().getBenefitType())).thenReturn(
+                venueB);
+
+        when(refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId)).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("regionId").build());
+
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("AB12 00B");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(venueB, response.getData().getProcessingVenue());
+        assertNotNull(response.getData().getCaseManagementLocation());
+        verify(refDataService, times(1)).getCourtVenueRefDataByEpimsId(venueEpimsId);
+
+    }
+
+    @Test
+    void givenAnAppealWithProcessingVenue_thenDoNotUpdateIfNoNewVenue() {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIsAppointee("No");
+
+        when(regionalProcessingCenterService.getByPostcode(eq("AB12 00B"), anyBoolean())).thenReturn(
+                RegionalProcessingCenter.builder()
+                        .name("rpcName")
+                        .postcode("rpcPostcode")
+                        .epimsId("rpcEpimsId")
+                        .build());
+        String venueA = "VenueA";
+        String venueB = "VenueB";
+        String venueEpimsId = "12345";
+        callback.getCaseDetails().getCaseData().setProcessingVenue(venueA);
+        when(venueService.getEpimsIdForVenue(venueB)).thenReturn(venueEpimsId);
+        when(venueService.getVenueDetailsForActiveVenueByEpimsId(venueEpimsId)).thenReturn(null);
+        when(airLookupService.lookupAirVenueNameByPostCode("AB12 00B", sscsCaseData.getAppeal().getBenefitType())).thenReturn(
+                venueB);
+
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("AB12 00B");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(venueA, response.getData().getProcessingVenue());
+        verify(refDataService, times(0)).getCourtVenueRefDataByEpimsId(venueEpimsId);
+    }
+
+
+    @ParameterizedTest
+    @NullSource
+    @EmptySource
+    void givenAnAppealWithProcessingVenue_thenDoNotUpdateIfNewVenueIsNull(String venue) {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIsAppointee("No");
+        String venueA = "VenueA";
+        callback.getCaseDetails().getCaseData().setProcessingVenue(venueA);
+        when(regionalProcessingCenterService.getByPostcode(eq("TEST"), anyBoolean())).thenReturn(
+                RegionalProcessingCenter.builder()
+                        .name("rpcName")
+                        .postcode("rpcPostcode")
+                        .epimsId("rpcEpimsId")
+                        .build());
+
+        when(airLookupService.lookupAirVenueNameByPostCode("TEST", sscsCaseData.getAppeal().getBenefitType())).thenReturn(
+                venue);
+
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("TEST");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(venueA, response.getData().getProcessingVenue());
+        verify(refDataService, times(0)).getCourtVenueRefDataByEpimsId(any());
+    }
+
+    @Test
     void givenAnAppealWithNewAppointeePostcode_thenUpdateProcessingVenueWithAppointeeVenue() {
         when(regionalProcessingCenterService.getByPostcode(eq("AB12 00B"), anyBoolean())).thenReturn(
                 RegionalProcessingCenter.builder()
@@ -805,6 +876,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         String venueEpimsId = "12345";
 
         when(venueService.getEpimsIdForVenue(venueB)).thenReturn(venueEpimsId);
+        when(venueService.getVenueDetailsForActiveVenueByEpimsId(venueEpimsId)).thenReturn(VenueDetails.builder().build());
         when(airLookupService.lookupAirVenueNameByPostCode("AB12 00B", sscsCaseData.getAppeal().getBenefitType())).thenReturn(venueB);
         when(refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId)).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("regionId").build());
 
@@ -858,6 +930,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         String venueEpimsId = "12345";
 
         when(venueService.getEpimsIdForVenue(venueB)).thenReturn(venueEpimsId);
+        when(venueService.getVenueDetailsForActiveVenueByEpimsId(venueEpimsId)).thenReturn(VenueDetails.builder().build());
         when(airLookupService.lookupAirVenueNameByPostCode("AB12 00B", sscsCaseData.getAppeal().getBenefitType()))
                 .thenReturn(venueB);
         when(refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId)).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("regionId").build());
@@ -1021,8 +1094,6 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
     @Test
     void givenChildSupportCaseAndCaseCodeIsChangedToNonChildSupportCodeAndCaseHasOtherParty_thenShowError() {
-        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
-
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         sscsCaseData.setBenefitCode("001");
         sscsCaseDataBefore.setBenefitCode("022");
@@ -1041,8 +1112,6 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
     @Test
     void givenChildSupportCaseAndCaseCodeIsChangedToNonChildSupportCodeAndCaseHasNoOtherParty_thenShowWarning() {
-        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
-
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         sscsCaseData.setBenefitCode("001");
         sscsCaseDataBefore.setBenefitCode("022");
@@ -1057,8 +1126,6 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     @ParameterizedTest
     @CsvSource({"022", "023", "024", "025", "026", "028"})
     void givenChildSupportCaseAndCaseCodeIsSetToChildSupportCode_thenNoWarningOrErrorIsShown(String childSupportBenefitCode) {
-        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
-
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         sscsCaseData.setBenefitCode(childSupportBenefitCode);
         sscsCaseDataBefore.setBenefitCode("022");
@@ -1071,8 +1138,6 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
     @Test
     void givenChildSupportCaseAndCaseCodeIsAlreadyANonChildSupportCase_thenShowErrorOrWarning() {
-        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
-
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         sscsCaseData.setBenefitCode("001");
         sscsCaseDataBefore.setBenefitCode("001");
@@ -1432,17 +1497,18 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         appeal.getAppellant().setName(new Name("", "New", "Name"));
         appeal.getAppellant().getAddress().setPostcode("Postcode");
         appeal.getAppellant().setIdentity(new Identity("1", "Nino"));
-
         sscsCaseData.setBenefitCode("001");
         sscsCaseData.setIssueCode("DD");
 
-        IdamTokens idamTokens = IdamTokens.builder().build();
-        when(idamService.getIdamTokens()).thenReturn(idamTokens);
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals("New Name", response.getData().getCaseAccessManagementFields().getCaseNameHmctsInternal());
-        assertEquals("New Name", response.getData().getCaseAccessManagementFields().getCaseNameHmctsRestricted());
-        assertEquals("New Name", response.getData().getCaseAccessManagementFields().getCaseNamePublic());
+        assertEquals("New Name",
+                response.getData().getCaseAccessManagementFields().getCaseNameHmctsInternal());
+        assertEquals("New Name",
+                response.getData().getCaseAccessManagementFields().getCaseNameHmctsRestricted());
+        assertEquals("New Name",
+                response.getData().getCaseAccessManagementFields().getCaseNamePublic());
     }
 
     @Test
@@ -1475,20 +1541,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     }
 
     @Test
-    void givenCaseAccessManagementFeatureDisabled_shouldNotSetCaseNames() {
-        ReflectionTestUtils.setField(handler, "caseAccessManagementFeature", false);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertNull(response.getData().getCaseAccessManagementFields().getCaseNameHmctsInternal());
-        assertNull(response.getData().getCaseAccessManagementFields().getCaseNameHmctsRestricted());
-        assertNull(response.getData().getCaseAccessManagementFields().getCaseNamePublic());
-    }
-
-    @Test
     void givenBenefitTypeChanged_thenSetCaseCategories() {
-        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
-
         BenefitType benefitTypeBefore = BenefitType.builder().code("ESA").description("Employment and Support Allowance").build();
         sscsCaseDataBefore.getAppeal().setBenefitType(benefitTypeBefore);
         sscsCaseDataBefore.getCaseAccessManagementFields().setCategories(Benefit.ESA);
@@ -1512,12 +1565,9 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         sscsCaseDataBefore.getCaseAccessManagementFields().setCategories(Benefit.ESA);
         sscsCaseDataBefore = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder()
                         .benefitType(BenefitType.builder().code("PIP").build())
-                        .appellant(Appellant.builder().address(Address.builder().postcode("CM120NS").line1("123 Street").build()).build()).build())
-                .build();
-
-        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
-        when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
-
+                        .appellant(Appellant.builder()
+                                .address(Address.builder().postcode("CM120NS").line1("123 Street").build()).build()
+                        ).build()).build();
         BenefitType benefitType = BenefitType.builder().code("").description("").build();
         sscsCaseData.setAppeal(Appeal.builder()
                 .benefitType(benefitType)
@@ -1528,8 +1578,15 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
                         .build())
                 .build());
         sscsCaseData.getCaseAccessManagementFields().setCategories(Benefit.ESA);
-        callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(new BenefitType("", "", null));
-        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIdentity(new Identity("1", "Nino"));
+        caseDetailsBefore =
+                new CaseDetails<>(1234L, "SSCS", HEARING, sscsCaseDataBefore, now(), "Benefit");
+        callback = new Callback<>(caseDetails, Optional.of(caseDetailsBefore), CASE_UPDATED, true);
+        callback.getCaseDetails().getCaseData().getAppeal()
+                .setBenefitType(new BenefitType("", "", null));
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant()
+                .setIdentity(new Identity("1", "Nino"));
+        lenient().when(associatedCaseLinkHelper.linkCaseByNino(eq(sscsCaseData), eq(Optional.of(caseDetailsBefore))))
+                .thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(1, response.getErrors().size());
@@ -1542,9 +1599,6 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         sscsCaseDataBefore = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder()
                         .appellant(appellant).build())
                 .build();
-
-        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
-        when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
 
         BenefitType benefitType = BenefitType.builder().code("").description("").build();
         var appeal = callback.getCaseDetails().getCaseData().getAppeal();
@@ -1562,9 +1616,6 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         sscsCaseDataBefore = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder()
                         .appellant(Appellant.builder().address(Address.builder().postcode("CM120NS").build()).build()).build())
                 .build();
-
-        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
-        when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
         callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(new BenefitType("PIP", "", null));
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIdentity(new Identity("1", "Nino"));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -1579,10 +1630,6 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         sscsCaseDataBefore = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder()
                         .appellant(Appellant.builder().address(Address.builder().line1("123 Street").postcode("CM120NS").build()).build()).build())
                 .build();
-
-        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
-        when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
-
         var appeal = callback.getCaseDetails().getCaseData().getAppeal();
         appeal.setBenefitType(new BenefitType("turnip", null, null));
         appeal.getAppellant().setName(new Name("", "New", "Name"));
@@ -1591,17 +1638,6 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
-    }
-
-    @Test
-    void givenCaseAccessManagementFeatureDisabled_shouldNotSetCaseCategories() {
-        ReflectionTestUtils.setField(handler, "caseAccessManagementFeature", false);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertTrue(response.getErrors().isEmpty());
-        assertNull(response.getData().getCaseAccessManagementFields().getCaseAccessCategory());
-        assertNull(response.getData().getCaseAccessManagementFields().getCaseManagementCategory());
     }
 
     @ParameterizedTest
@@ -1694,7 +1730,6 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     @ParameterizedTest
     @CsvSource({"015", "016", "030", "034", "050", "053", "054", "055", "057", "058"})
     void givenSscs5CaseAndCaseCodeIsSetToSscs5Code_thenNoErrorIsShown(String sscs5BenefitCode) {
-        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("taxFreeChildcare").description("Tax Credit").build());
         sscsCaseData.setBenefitCode(sscs5BenefitCode);
         sscsCaseDataBefore.setBenefitCode("022");
@@ -1710,7 +1745,6 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     @CsvSource({"015", "016", "030", "034", "050", "053", "054", "055", "057", "058"})
     void givenSscs5CaseAndCaseCodeIsChangedToNonSscs5_thenShowError(String sscs5BenefitCode) {
         when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder().roles(List.of(CTSC_CLERK.getValue())).build());
-        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
         sscsCaseData.getAppeal().setBenefitType(
                 BenefitType.builder().code("homeResponsibilitiesProtection")
                         .description("Home Responsibilities Protection").build());
@@ -1730,7 +1764,6 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     @CsvSource({"015", "016", "030", "034", "050", "053", "054", "055", "057", "058"})
     void givenSscs5CaseAndCaseCodeIsChangedToNonSscs5SuperUser_thenShowError(String sscs5BenefitCode) {
         when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder().roles(List.of(SUPER_USER.getValue())).build());
-        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
         sscsCaseData.getAppeal().setBenefitType(
                 BenefitType.builder().code("homeResponsibilitiesProtection")
                         .description("Home Responsibilities Protection").build());
@@ -1750,7 +1783,6 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     @CsvSource({"015", "016", "030", "034", "050", "053", "054", "055", "057", "058"})
     void givenNonSscs5CaseAndCaseCodeIsSetToSscs5Code_thenErrorIsShown(String sscs5BenefitCode) {
         when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder().roles(List.of(CTSC_CLERK.getValue())).build());
-        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("PIP").description("test").build());
         sscsCaseData.setBenefitCode(sscs5BenefitCode);
         sscsCaseDataBefore.setBenefitCode("002");
@@ -1768,7 +1800,6 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     @CsvSource({"015", "016", "030", "034", "050", "053", "054", "055", "057", "058"})
     void givenNonSscs5CaseAndCaseCodeIsSetToSscs5CodeSuperUser_thenErrorIsShown(String sscs5BenefitCode) {
         when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder().roles(List.of(SUPER_USER.getValue())).build());
-        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("PIP").description("test").build());
         sscsCaseData.setBenefitCode(sscs5BenefitCode);
         sscsCaseDataBefore.setBenefitCode("002");
@@ -1792,7 +1823,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     void givenSscs5CaseBenefitCodeAndDescription_thenErrorIsShownForInvalidSet(String code, String description,
                                                                                String benefitCode, int error) {
         when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder().roles(List.of(CTSC_CLERK.getValue())).build());
-        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(code).description(description).build());
         sscsCaseData.setBenefitCode(benefitCode);
         sscsCaseDataBefore.setBenefitCode(benefitCode);
@@ -1816,7 +1847,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     void givenSscs5CaseBenefitCodeAndDescriptionSuperUser_thenErrorIsShownForInvalidSet(String code, String description,
                                                                                         String benefitCode, int error, int warnings) {
         when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder().roles(List.of(SUPER_USER.getValue())).build());
-        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(code).description(description).build());
         sscsCaseData.setBenefitCode(benefitCode);
         sscsCaseDataBefore.setBenefitCode(benefitCode);
@@ -1859,20 +1890,15 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
     @Test
     public void givenInvalidIssueBenefitCode_thenThrowError() {
-        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
-        when(categoryMapService.getSessionCategory(anyString(), anyString(), anyBoolean(), anyBoolean()))
-                .thenReturn(null);
+        when(panelCompositionService.isBenefitIssueCodeValid(any(), any())).thenReturn(false);
 
-        PreSubmitCallbackResponse<SscsCaseData> response =
-                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(1));
     }
 
     @Test
     public void givenInvalidHearingVideoEmail_thenValidateAndReturnErrorMessage() {
-        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
-
         HearingSubtype hearingSubType = HearingSubtype.builder()
                 .hearingVideoEmail("12345")
                 .wantsHearingTypeVideo(YES.getValue())
@@ -1887,8 +1913,6 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
     @Test
     public void givenInterpreterLanguage_thenSetInterpreterLanguageFromLanguageList() {
-        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
-
         DynamicListItem item = new DynamicListItem("ENG", "english");
         DynamicList languagesList = new DynamicList(item, null);
 
@@ -1900,7 +1924,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         sscsCaseData.getAppeal().setHearingOptions(hearingOptions);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         String language = sscsCaseData.getAppeal().getHearingOptions().getLanguages();
 
@@ -1923,4 +1947,201 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         assertThat(response.getErrors().size(), is(0));
     }
 
+    @Test
+    void shouldUpdateOverrideInterpreterWhenInterpreterUpdated() {
+        sscsCaseDataBefore.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("No").build());
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("Yes").languages("Arabic").build());
+        sscsCaseData.getAppeal().getHearingOptions().setLanguagesList(new DynamicList(new DynamicListItem("Arabic", "Arabic"), Collections.emptyList()));
+        sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder()
+                .appellantInterpreter(HearingInterpreter.builder().isInterpreterWanted(NO).build()).build());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter().getIsInterpreterWanted(), is(YES));
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter().getInterpreterLanguage().getValue().getCode(), is("Arabic"));
+    }
+
+    @Test
+    void shouldUpdateOverrideLanguageAndKeepDuration_WhenOnlyLanguageUpdated() {
+        sscsCaseDataBefore.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("Yes").languages("Spanish").build());
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("Yes").languages("Arabic").build());
+        sscsCaseData.getAppeal().getHearingOptions().setLanguagesList(new DynamicList(new DynamicListItem("Arabic", "Arabic"), Collections.emptyList()));
+        sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder()
+                .appellantInterpreter(HearingInterpreter.builder().isInterpreterWanted(YES).build()).build());
+        DynamicList languagesList = new DynamicList(new DynamicListItem("Spanish", "Spanish"), Collections.emptyList());
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().duration(95)
+                .appellantInterpreter(HearingInterpreter.builder().isInterpreterWanted(YES).interpreterLanguage(languagesList).build()).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter().getIsInterpreterWanted(), is(YES));
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter().getInterpreterLanguage().getValue().getCode(), is("Arabic"));
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getDuration(), is(95));
+
+    }
+
+    @Test
+    void shouldNotUpdateOverrideInterpreterWhenInterpreterNotUpdated() {
+        sscsCaseDataBefore.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("No").build());
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("No").build());
+        sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder().duration(60).build());
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter(), nullValue());
+    }
+
+    @Test
+    void shouldNotUpdateOverrideWhenDefaultListingValuesIsNull() {
+        sscsCaseDataBefore.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("No").build());
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("Yes").build());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields(), nullValue());
+    }
+
+    @Test
+    void ifIbcCaseThenSetHearingRouteToListAssist() {
+        sscsCaseData.setBenefitCode(IBCA_BENEFIT_CODE);
+        sscsCaseData.getAppeal().getAppellant().getIdentity().setIbcaReference("IBCA12345");
+        sscsCaseData.getAppeal().getAppellant().getAddress().setInMainlandUk(NO);
+        sscsCaseData.getAppeal().getAppellant().getAddress().setPortOfEntry("GB000434");
+
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().build());
+        sscsCaseData.getAppeal().setMrnDetails(MrnDetails.builder().build());
+        sscsCaseData.setRegionalProcessingCenter(RegionalProcessingCenter.builder().build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
+        assertEquals(HearingRoute.LIST_ASSIST, response.getData().getRegionalProcessingCenter().getHearingRoute());
+        assertEquals(HearingRoute.LIST_ASSIST, response.getData().getSchedulingAndListingFields().getHearingRoute());
+        assertEquals(HearingRoute.LIST_ASSIST, response.getData().getAppeal().getHearingOptions().getHearingRoute());
+    }
+
+    @Test
+    void shouldNotSetPanelMemberComposition() {
+        lenient().when(associatedCaseLinkHelper.linkCaseByNino(eq(sscsCaseData), eq(empty())))
+                .thenReturn(sscsCaseData);
+        callback = new Callback<>(caseDetails, empty(), CASE_UPDATED, true);
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getPanelMemberComposition());
+        verify(panelCompositionService).isBenefitIssueCodeValid(any(), any());
+    }
+
+    @Test
+    void shouldSetPanelMemberComposition() {
+        var panelMemberComposition = new PanelMemberComposition(List.of("84"));
+        when(panelCompositionService.resetPanelCompositionIfStale(sscsCaseData, Optional.of(caseDetailsBefore)))
+                .thenReturn(panelMemberComposition);
+        when(panelCompositionService.isBenefitIssueCodeValid(any(), any())).thenReturn(true);
+        handler = createNewCaseHandler(false);
+
+        var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNotNull(response.getData().getPanelMemberComposition());
+        assertEquals(panelMemberComposition, response.getData().getPanelMemberComposition());
+    }
+
+    @Nested
+    class CmOtherPartyConfidentialityDisabled {
+        @BeforeEach
+        void beforeEach() {
+            handler = createNewCaseHandler(false);
+        }
+
+        @Test
+        void givenUniversalCreditBenefitTypeWithoutOtherParties_thenCaseConfidentialNull() {
+            callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(Benefit.UC.getShortName());
+            callback.getCaseDetails()
+                .getCaseData()
+                .getAppeal()
+                .getBenefitType()
+                .setDescription(Benefit.UC.getDescription());
+            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
+                USER_AUTHORISATION);
+
+            Assertions.assertThat(response.getData().getIsConfidentialCase()).isNull();
+        }
+
+        @Test
+        void givenUniversalCreditBenefitTypeWithOtherParties_thenCaseConfidentialNull() {
+            callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(Benefit.UC.getShortName());
+            callback.getCaseDetails()
+                .getCaseData()
+                .getAppeal()
+                .getBenefitType()
+                .setDescription(Benefit.UC.getDescription());
+            List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
+            CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder()
+                .value(OtherParty.builder().confidentialityRequired(NO).build())
+                .build();
+            otherPartyList.add(ccdValue);
+            CcdValue<OtherParty> ccdValue1 = CcdValue.<OtherParty>builder()
+                .value(OtherParty.builder().confidentialityRequired(YES).build())
+                .build();
+            otherPartyList.add(ccdValue1);
+            callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
+            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
+                USER_AUTHORISATION);
+
+            Assertions.assertThat(response.getData().getIsConfidentialCase()).isNull();
+        }
+    }
+
+    @Nested
+    class CmOtherPartyConfidentialityEnabled {
+
+        static Stream<Benefit> benefits() {
+            return Stream.of(Benefit.CHILD_SUPPORT, Benefit.TAX_CREDIT, Benefit.GUARDIANS_ALLOWANCE,
+                Benefit.TAX_FREE_CHILDCARE, Benefit.HOME_RESPONSIBILITIES_PROTECTION, Benefit.CHILD_BENEFIT,
+                Benefit.THIRTY_HOURS_FREE_CHILDCARE, Benefit.GUARANTEED_MINIMUM_PENSION,
+                Benefit.NATIONAL_INSURANCE_CREDITS, Benefit.UC);
+        }
+
+        @BeforeEach
+        void beforeEach() {
+            handler = createNewCaseHandler(true);
+        }
+
+        @ParameterizedTest
+        @MethodSource("benefits")
+        void givenACaseAppellantConfidentialityYes_thenCaseConfidentialYes(Benefit benefit) {
+            callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(YES);
+            callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(benefit.getShortName());
+            callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefit.getDescription());
+            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
+                USER_AUTHORISATION);
+
+            Assertions.assertThat(response.getData().getIsConfidentialCase()).isEqualTo(YES);
+        }
+
+        @ParameterizedTest
+        @MethodSource("benefits")
+        void givenACaseAppellantConfidentialityNoOtherPartyYes_thenCaseConfidentialYes(Benefit benefit) {
+            callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(NO);
+            callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(benefit.getShortName());
+            callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefit.getDescription());
+            List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
+            CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder()
+                .value(OtherParty.builder().confidentialityRequired(YES).build())
+                .build();
+            otherPartyList.add(ccdValue);
+            callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
+            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
+                USER_AUTHORISATION);
+
+            Assertions.assertThat(response.getData().getIsConfidentialCase()).isEqualTo(YES);
+        }
+    }
+
+    private CaseUpdatedAboutToSubmitHandler createNewCaseHandler(boolean cmOtherPartyConfidentialityEnabled) {
+        return new CaseUpdatedAboutToSubmitHandler(
+            regionalProcessingCenterService,
+            associatedCaseLinkHelper,
+            airLookupService,
+            new DwpAddressLookupService(),
+            idamService,
+            refDataService,
+            venueService,
+            hearingDurationsService,
+            panelCompositionService, cmOtherPartyConfidentialityEnabled);
+    }
 }

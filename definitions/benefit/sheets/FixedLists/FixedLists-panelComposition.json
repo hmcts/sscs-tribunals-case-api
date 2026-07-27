@@ -1,0 +1,10 @@
+[
+  {"LiveFrom": "11/04/2025", "ID": "FL_panelCompositionDtj", "ListElementCode": "90000", "ListElement": "District Tribunal Judge"},
+  {"LiveFrom": "11/04/2025", "ID": "FL_panelCompositionJudge", "ListElementCode": "84", "ListElement": "Tribunal Judge"},
+  {"LiveFrom": "11/04/2025", "ID": "FL_panelCompositionJudge", "ListElementCode": "74", "ListElement": "Regional Judge"},
+  {"LiveFrom": "11/04/2025", "ID": "FL_panelCompositionMedical", "ListElementCode": "58", "ListElement": "Tribunal Member Medical"},
+  {"LiveFrom": "11/04/2025", "ID": "FL_panelCompositionMedical", "ListElementCode": "69", "ListElement": "Regional Member Medical"},
+  {"LiveFrom": "11/04/2025", "ID": "FL_panelCompositionMedical", "ListElementCode": "NoMedicalMemberRequired", "ListElement": "No Medical Member Required"},
+  {"LiveFrom": "11/04/2025", "ID": "FL_panelCompositionTribunalMember", "ListElementCode": "44", "ListElement": "Tribunal Member Disability"},
+  {"LiveFrom": "11/04/2025", "ID": "FL_panelCompositionTribunalMember", "ListElementCode": "50", "ListElement": "Tribunal Member Financially Qualified"}
+]

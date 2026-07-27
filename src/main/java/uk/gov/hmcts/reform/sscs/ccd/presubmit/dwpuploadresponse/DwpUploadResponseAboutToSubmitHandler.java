@@ -23,9 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -42,6 +43,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
@@ -49,30 +51,28 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
+import uk.gov.hmcts.reform.sscs.service.HearingsService;
 import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
 import uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutToSubmit implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private static final DateTimeFormatter DD_MM_YYYY_FORMAT = DateTimeFormatter.ofPattern("dd-MM-yyyy");
     public static final int NEW_OTHER_PARTY_RESPONSE_DUE_DAYS = 14;
     private final DwpDocumentService dwpDocumentService;
     private final AddNoteService addNoteService;
+    private final PanelCompositionService panelCompositionService;
+    private final HearingsService hearingsService;
     private final AddedDocumentsUtil addedDocumentsUtil;
+    @Value("${feature.cm-other-party-confidentiality.enabled}") 
+    private final boolean cmOtherPartyConfidentialityEnabled;
     private static final Enum<EventType> EVENT_TYPE = EventType.DWP_UPLOAD_RESPONSE;
-
-
-    @Autowired
-    public DwpUploadResponseAboutToSubmitHandler(DwpDocumentService dwpDocumentService, AddNoteService addNoteService,
-                                                 AddedDocumentsUtil addedDocumentsUtil) {
-        this.dwpDocumentService = dwpDocumentService;
-        this.addNoteService = addNoteService;
-        this.addedDocumentsUtil = addedDocumentsUtil;
-    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -134,12 +134,21 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                 sscsCaseData.setDwpDueDate(null);
             }
         }
+
         sscsCaseData.setDirectionDueDate(getUpdatedDirectionDueDate(sscsCaseData));
         updateBenefitType(sscsCaseData);
 
+        sscsCaseData.setPanelMemberComposition(panelCompositionService
+                .resetPanelCompositionIfStale(sscsCaseData, callback.getCaseDetailsBefore()));
+
+        if (HearingRoute.LIST_ASSIST.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute())) {
+            // Setting this to yes so that the warning about hearings in exception state on ready to list does not block the RTL event
+            sscsCaseData.setIgnoreCallbackWarnings(YesNo.YES);
+            log.info("Case {} is List Assist so setting IgnoreCallbackWarnings to Yes", sscsCaseData.getCcdCaseId());
+        }
+
         return preSubmitCallbackResponse;
     }
-
 
     private void updateBenefitType(SscsCaseData caseData) {
         String benefitCode = caseData.getBenefitCode();
@@ -162,7 +171,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     }
 
     private void checkSscs2AndSscs5Confidentiality(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, SscsCaseData sscsCaseData) {
-        if (isValidBenefitTypeForConfidentiality(sscsCaseData.getAppeal().getBenefitType())) {
+        if (isValidBenefitTypeForConfidentiality(sscsCaseData.getAppeal().getBenefitType(), cmOtherPartyConfidentialityEnabled)) {
             if (sscsCaseData.getDwpEditedEvidenceReason() == null) {
                 if (otherPartyHasConfidentiality(sscsCaseData)) {
                     preSubmitCallbackResponse.addError("Other Party requires confidentiality, upload edited and unedited responses");
@@ -224,9 +233,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
         sscsCaseData.setDwpUploadAudioVideoEvidence(null);
 
-        if (StringUtils.equalsIgnoreCase(sscsCaseData.getDwpEditedEvidenceReason(), "phme")) {
-            sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE);
-        } else {
+        if (!StringUtils.equalsIgnoreCase(sscsCaseData.getDwpEditedEvidenceReason(), "phme")) {
             if (REVIEW_BY_JUDGE != sscsCaseData.getInterlocReviewState()) {
                 sscsCaseData.setInterlocReviewState(REVIEW_BY_TCW);
             }
@@ -243,6 +250,9 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         validateDwpResponseDocuments(sscsCaseData, preSubmitCallbackResponse);
 
         validateDwpAudioVideoEvidence(sscsCaseData, preSubmitCallbackResponse);
+
+        checkForListedHearings(sscsCaseData, preSubmitCallbackResponse);
+
         return preSubmitCallbackResponse;
     }
 
@@ -253,6 +263,12 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                     preSubmitCallbackResponse.addError("You must upload an audio/video document when submitting a RIP 1 document");
                 }
             }
+        }
+    }
+
+    private void checkForListedHearings(SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        if (YesNo.NO.getValue().equals(caseData.getDwpFurtherInfo())) {
+            hearingsService.validationCheckForListedOrExceptionHearings(caseData, preSubmitCallbackResponse);
         }
     }
 
@@ -328,8 +344,6 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                 && sscsCaseData.getDwpEditedResponseDocument() != null
                 && sscsCaseData.getDwpEditedResponseDocument().getDocumentLink() != null) {
 
-            sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE);
-
             if (StringUtils.equalsIgnoreCase(sscsCaseData.getDwpEditedEvidenceReason(), "phme")) {
                 sscsCaseData.setInterlocReferralReason(PHE_REQUEST);
                 sscsCaseData.setInterlocReferralDate(LocalDate.now());
@@ -377,5 +391,4 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                                 .build()
                 ).build());
     }
-
 }

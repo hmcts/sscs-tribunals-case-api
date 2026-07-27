@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
@@ -148,5 +149,26 @@ class PostHearingReviewAboutToSubmitHandlerTest {
 
         assertThat(response.getErrors()).isEmpty();
         assertThat(response.getData().getSchedulingAndListingFields().getPanelMemberExclusions().getReservedPanelMembers().contains(new CollectionItem<>("", judge))).isTrue();
+    }
+
+    @Test
+    void givenNullPostHearing_thenDoNothingToPanelList() {
+        JudicialUserBase judge = new JudicialUserBase("678", "1234");
+        caseData.setHearings(List.of(Hearing.builder()
+            .value(HearingDetails.builder()
+                .panel(JudicialUserPanel.builder()
+                    .assignedTo(judge)
+                    .build())
+                .build())
+            .build()));
+        caseData.setPostHearing(null);
+        caseData.setDocumentGeneration(null);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getSchedulingAndListingFields().getPanelMemberExclusions());
     }
 }

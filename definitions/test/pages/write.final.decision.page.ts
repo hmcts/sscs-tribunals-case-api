@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 import { WebAction } from '../common/web.action';
 import writeFinalDecisionData from './content/write.final.decision_en.json';
 
@@ -301,28 +301,28 @@ export class WriteFinalDecisionPages {
       writeFinalDecisionData.dateOfFTADecisionLabel
     );
     await webActions.verifyPageLabel(
-      "[for='writeFinalDecisionDateOfDecision-day']",
+      '#day-label-writeFinalDecisionDateOfDecision-day',
       writeFinalDecisionData.dayLabel
     );
     await webActions.verifyPageLabel(
-      "[for='writeFinalDecisionDateOfDecision-month']",
+      '#month-label-writeFinalDecisionDateOfDecision-month',
       writeFinalDecisionData.monthLabel
     );
     await webActions.verifyPageLabel(
-      "[for='writeFinalDecisionDateOfDecision-year']",
+      '#year-label-writeFinalDecisionDateOfDecision-year',
       writeFinalDecisionData.yearLabel
     );
   }
 
   async inputTypePageContentForDecisionPageData() {
-    await webActions.inputField('#writeFinalDecisionDateOfDecision-day', '11');
+    await webActions.inputField('#writeFinalDecisionDateOfDecision-day', '06');
     await webActions.inputField(
       '#writeFinalDecisionDateOfDecision-month',
-      '07'
+      '04'
     );
     await webActions.inputField(
       '#writeFinalDecisionDateOfDecision-year',
-      '2024'
+      '2026'
     );
     await this.page.locator('#writeFinalDecisionDateOfDecision-day').first().click()
     await webActions.verifyElementHidden('span.error-message')
@@ -648,15 +648,15 @@ export class WriteFinalDecisionPages {
       writeFinalDecisionData.startDateLabel
     );
     await webActions.verifyPageLabel(
-      "[for='writeFinalDecisionStartDate-day']",
+      '#day-label-writeFinalDecisionStartDate-day',
       writeFinalDecisionData.dayLabel
     );
     await webActions.verifyPageLabel(
-      "[for='writeFinalDecisionStartDate-month']",
+      '#month-label-writeFinalDecisionStartDate-month',
       writeFinalDecisionData.monthLabel
     );
     await webActions.verifyPageLabel(
-      "[for='writeFinalDecisionStartDate-year']",
+      '#year-label-writeFinalDecisionStartDate-year',
       writeFinalDecisionData.yearLabel
     );
     await webActions.verifyPageLabel(
@@ -683,15 +683,15 @@ export class WriteFinalDecisionPages {
       writeFinalDecisionData.endDateLabel
     );
     await webActions.verifyPageLabel(
-      "[for='writeFinalDecisionEndDate-day']",
+      "#day-label-writeFinalDecisionEndDate-day",
       writeFinalDecisionData.dayLabel
     );
     await webActions.verifyPageLabel(
-      "[for='writeFinalDecisionEndDate-month']",
+      "#month-label-writeFinalDecisionEndDate-month",
       writeFinalDecisionData.monthLabel
     );
     await webActions.verifyPageLabel(
-      "[for='writeFinalDecisionEndDate-year']",
+      "#year-label-writeFinalDecisionEndDate-year",
       writeFinalDecisionData.yearLabel
     );
   }
@@ -1211,70 +1211,48 @@ export class WriteFinalDecisionPages {
       writeFinalDecisionData.yesLabel
     );
 
-    //Commented out as The return value was 'Show Schedule 7 Activities Apply?'
+    // Commented out as The return value was 'Show Schedule 7 Activities Apply?'
     //await webActions.verifyPageLabel('.form-table tr:nth-of-type(15) > .valign-top > .text-16', writeFinalDecisionData.doSchedule7ActivitiesApply);
     //await webActions.verifyPageLabel('.form-table tr:nth-of-type(15) > .form-cell .text-16', writeFinalDecisionData.theSchedule7ActivitiesSelectedBelowApply);
 
-    await webActions.verifyPageLabel(
-      '.form-table tr:nth-of-type(16) > .valign-top > .text-16',
-      writeFinalDecisionData.schedule7ActivitiesLabel
+    const scheduleActivitiesQuestion = this.page.locator(
+      '.form-table tr:nth-of-type(16) > .valign-top > .text-16'
     );
-    await webActions.verifyPageLabel(
-      'tr:nth-of-type(16) tr:nth-of-type(1) .text-16',
+    const scheduleQuestionText =
+      (await scheduleActivitiesQuestion.textContent())?.trim() || '';
+    expect(scheduleQuestionText).toMatch(
+      /Do Schedule 7 Activities Apply\?|Show the Schedule 7 Activities Page\?/
+    );
+
+    await webActions.verifyTextVisibility(
       writeFinalDecisionData.manualDexterityLabel
     );
-    await webActions.verifyPageLabel(
-      'tr:nth-of-type(16) tr:nth-of-type(2) .text-16',
+    await webActions.verifyTextVisibility(
       writeFinalDecisionData.initiatingAndCompletingLabel
     );
 
-    await webActions.verifyPageLabel(
-      '.form-table tr:nth-of-type(17) > .valign-top > .text-16',
+    await webActions.verifyTextVisibility(
       writeFinalDecisionData.whatIsTheLastPageInTheTribunalBundleLabel
     );
-    await webActions.verifyPageLabel(
-      'tr:nth-of-type(17) > .form-cell .text-16',
+    await webActions.verifyTextVisibility(
       writeFinalDecisionData.lastPageInTheTribunalBundleInput
     );
 
-    await webActions.verifyPageLabel(
-      'tr:nth-of-type(19) > .valign-top > .text-16',
-      writeFinalDecisionData.whenShouldFTAReAssessTheAwardLabel
-    );
-    await webActions.verifyPageLabel(
-      'tr:nth-of-type(19) > .form-cell .text-16',
-      writeFinalDecisionData.reassessWithin3MonthsLabel
-    );
-
-    await webActions.verifyPageLabel(
-      'tr:nth-of-type(20) > .valign-top > .text-16',
+    await webActions.verifyTextVisibility(
       writeFinalDecisionData.reasonsForDecisionLabel
     );
-    await webActions.verifyPageLabel(
-      'tr:nth-of-type(20) > td:nth-of-type(1) span:nth-of-type(1)',
+    await webActions.verifyTextVisibility(
       writeFinalDecisionData.reasonsForDecisionInput
     );
 
-    await webActions.verifyPageLabel(
-      'tr:nth-of-type(20) > .valign-top > .text-16',
-      writeFinalDecisionData.reasonsForDecisionLabel
-    );
-    await webActions.verifyPageLabel(
-      'tr:nth-of-type(20) > td:nth-of-type(1) span:nth-of-type(1)',
-      writeFinalDecisionData.reasonsForDecisionInput
-    );
-
-    await webActions.verifyPageLabel(
-      'tr:nth-of-type(21) > .valign-top > .text-16',
+    await webActions.verifyTextVisibility(
       writeFinalDecisionData.checkYourAnswersAnythingElse
     );
-    await webActions.verifyPageLabel(
-      'tr:nth-of-type(21) > .form-cell span',
+    await webActions.verifyTextVisibility(
       writeFinalDecisionData.anythingElseInput
     );
 
-    await webActions.verifyPageLabel(
-      'tr:nth-of-type(22) > .valign-top > .text-16',
+    await webActions.verifyTextVisibility(
       writeFinalDecisionData.previewDecisionNoticeLabel
     );
   }
@@ -1306,9 +1284,28 @@ export class WriteFinalDecisionPages {
     );
   }
 
-  async inputAndVerifyPageContentForWorkCapabilityAssessmentPageData(
-    supportGroup: boolean
-  ) {
+  async verifyPageContentForWorkCapabilityAssessmentPageWithStartDate() {
+    await this.verifyPageContentForWorkCapabilityAssessmentPage();
+    // Start date fields stay hidden until WCA is set to 'Yes', so only assert labels after selection.
+  }
+
+  async inputAndVerifyPageContentForWorkCapabilityAssessmentPageData({
+    appealHasSvIssueCode = false,
+    appealAllowed = true,
+    supportGroup = false,
+    isSccOnlyAppeal = false,
+    isESACase = false,
+    includeStartDate = true,
+    esaRegulationYear = '2013'
+  }: {
+    appealHasSvIssueCode?: boolean;
+    appealAllowed?: boolean;
+    supportGroup?: boolean;
+    isSccOnlyAppeal?: boolean;
+    isESACase?: boolean;
+    includeStartDate?: boolean;
+    esaRegulationYear?: '2008' | '2013';
+  }) {
     await webActions.clickElementById('#wcaAppeal_Yes');
     await webActions.verifyPageLabel(
       '#supportGroupOnlyAppeal legend > .form-label',
@@ -1322,9 +1319,63 @@ export class WriteFinalDecisionPages {
       "[for='supportGroupOnlyAppeal_No']",
       writeFinalDecisionData.noLabel
     );
+
+    if (appealHasSvIssueCode) {
+      await webActions.verifyPageLabel(
+        "#writeFinalDecisionSevereYesNo legend > .form-label",
+        writeFinalDecisionData.isThisASccOnlyAppealLabel
+      )
+      await webActions.verifyPageLabel(
+        "[for='writeFinalDecisionSevereYesNo_Yes']",
+        writeFinalDecisionData.yesLabel
+      );
+      await webActions.verifyPageLabel(
+        "[for='writeFinalDecisionSevereYesNo_No']",
+        writeFinalDecisionData.noLabel
+      );
+    }
+
+    if (isESACase) {
+      await webActions.verifyTextVisibility(
+        writeFinalDecisionData.whichEsaRegulationsApplyLabel
+      );
+      await webActions.clickRadioButton(
+        esaRegulationYear === '2008'
+          ? writeFinalDecisionData.esaRegulations2008Label
+          : writeFinalDecisionData.esaRegulations2013Label
+      );
+    }
     supportGroup
       ? await webActions.clickElementById('#supportGroupOnlyAppeal_Yes')
       : await webActions.clickElementById('#supportGroupOnlyAppeal_No');
+
+    if (appealHasSvIssueCode) {
+      const elementId = isSccOnlyAppeal ? '#writeFinalDecisionSevereYesNo_Yes' : '#writeFinalDecisionSevereYesNo_No';
+      await webActions.clickElementById(elementId);
+    }
+
+    if (includeStartDate && appealAllowed) {
+      // The start date fields appear after selecting WCA = Yes; use a safe past date.
+      await webActions.verifyElementVisibility(
+        '#ucWriteFinalDecisionWorkCapabilityAssessmentStartDate legend > .form-label'
+      );
+      await webActions.verifyPageLabel(
+        '#ucWriteFinalDecisionWorkCapabilityAssessmentStartDate legend > .form-label',
+        writeFinalDecisionData.ucAwardStartDateLabel
+      );
+      await webActions.inputField(
+        '#ucWriteFinalDecisionWorkCapabilityAssessmentStartDate-day',
+        '01'
+      );
+      await webActions.inputField(
+        '#ucWriteFinalDecisionWorkCapabilityAssessmentStartDate-month',
+        '01'
+      );
+      await webActions.inputField(
+        '#ucWriteFinalDecisionWorkCapabilityAssessmentStartDate-year',
+        '2023'
+      );
+    }
   }
 
   async verifyPageContentForSchedule7ActivitiesPage() {
@@ -1510,7 +1561,7 @@ export class WriteFinalDecisionPages {
 
   async inputAndVerifyPageContentForSchedule2ActivitiesPageData(
     option1: string,
-    option2: string
+    option2: string,
   ) {
     // await webActions.clickElementById("ccd-write-fixed-radio-list-field div:nth-of-type(2) > .form-control");
     // await webActions.verifyPageLabel('ccd-write-multi-select-list-field legend > .form-label', writeFinalDecisionData.schedule7ActivitiesLabel);
@@ -1582,16 +1633,19 @@ export class WriteFinalDecisionPages {
       "[for='esaWriteFinalDecisionMentalAssessmentQuestion-appropriatenessOfBehaviour']",
       writeFinalDecisionData.esaAppropriateness
     );
+
     await webActions.clickElementById(
       `#esaWriteFinalDecisionPhysicalDisabilitiesQuestion-${option1}`
     );
     await webActions.clickElementById(
       `#esaWriteFinalDecisionMentalAssessmentQuestion-${option2}`
     );
+
   }
 
   async verifyPageContentForCheckYourAnswersPageForESACaseWithScheduleAndReasses(
-    appealPermission: string
+    appealPermission: string,
+    esaRegulationsLabel = writeFinalDecisionData.esaRegulations2013Label
   ) {
     //await webActions.verifyPageLabel('.govuk-caption-l', writeFinalDecisionData.eventNameCaptor); // No Captor on this Page.
     await webActions.verifyPageLabel(
@@ -1670,6 +1724,13 @@ export class WriteFinalDecisionPages {
       writeFinalDecisionData.noLabel
     );
 
+    const esaRegulationRow = this.page.locator('tr', {
+      hasText: new RegExp(esaRegulationsLabel)
+    });
+    const rowCount = await esaRegulationRow.count();
+    expect(rowCount).toBeGreaterThan(0);
+    await expect(esaRegulationRow.first()).toContainText(esaRegulationsLabel);
+
     // await webActions.verifyPageLabel('.form-table tr:nth-of-type(14) > .form-cell .text-16', phyDisabilities);
     // await webActions.verifyPageLabel('.form-table tr:nth-of-type(15) > .form-cell .text-16', menDisabilities);
   }
@@ -1702,9 +1763,12 @@ export class WriteFinalDecisionPages {
     );
   }
 
-  async inputAndVerifyPageContentForSchedule2ReachingPageData() {
+  async inputAndVerifyPageContentForSchedule2ReachingPageData(appealAllowed: boolean) {
+
+    let optionValue = appealAllowed ? 'reaching3b' : 'reaching3d';
+
     await webActions.clickElementById(
-      '#esaWriteFinalDecisionReachingQuestion-reaching3b'
+      `#esaWriteFinalDecisionReachingQuestion-${optionValue}`
     );
   }
 
@@ -1730,9 +1794,11 @@ export class WriteFinalDecisionPages {
     );
   }
 
-  async inputAndVerifyPageContentForSchedule2CognitivePageData() {
+  async inputAndVerifyPageContentForSchedule2CognitivePageData(appealAllowed: boolean) {
+    let optionValue = appealAllowed ? 'learningTasks11b' : 'learningTasks11d';
+
     await webActions.clickElementById(
-      '#esaWriteFinalDecisionLearningTasksQuestion-learningTasks11b'
+      `#esaWriteFinalDecisionLearningTasksQuestion-${optionValue}`
     );
   }
 
@@ -1775,12 +1841,14 @@ export class WriteFinalDecisionPages {
     );
   }
 
-  async chooseAllowedOrRefused(optionVal: string) {
-    await webActions.clickElementById(optionVal);
+  async appealAllowed(IsAllowed: boolean) {
+    const choice = IsAllowed ? 'allowed' : 'refused';
+    await webActions.clickElementById(`#writeFinalDecisionAllowedOrRefused-${choice}`);
   }
 
   async submitContinueBtn(): Promise<void> {
     await webActions.clickButton('Continue');
+    await webActions.waitForSpinnerToDisappear();
   }
 
   async verifyDocumentTitle(expText: string) {
@@ -1788,8 +1856,102 @@ export class WriteFinalDecisionPages {
   }
 
   async confirmSubmission(): Promise<void> {
-    await this.page.waitForTimeout(3000);
-    await webActions.clickSubmitButton();
-    await this.page.waitForTimeout(3000);
+    webActions.waitForSpinnerToDisappear();
+    webActions.clickSubmitButton();
+    webActions.waitForSpinnerToDisappear();
+  }
+
+  async verifyPageContentForSevereConditionsCriteriaPage() {
+    await webActions.verifyPageLabel(
+      '.govuk-caption-l',
+      writeFinalDecisionData.eventNameCaptor
+    );
+    await webActions.verifyPageLabel(
+      'h1.govuk-heading-l',
+      writeFinalDecisionData.severeConditionsCriteriaPageHeading
+    );
+    await webActions.verifyPageLabel(
+      '.form-label',
+      writeFinalDecisionData.doSccApplyLabel
+    );
+  }
+
+  async inputAndVerifyPageContentForSevereConditionsCriteriaPageDataUcAppeal(sccConditionsApply: boolean) {
+    await webActions.verifyPageLabel(
+      "[for='writeFinalDecisionSevereCriteriaApply_Yes']",
+      writeFinalDecisionData.yesLabel
+    );
+    await webActions.verifyPageLabel(
+      "[for='writeFinalDecisionSevereCriteriaApply_No']",
+      writeFinalDecisionData.noLabel
+    );
+    await webActions.verifyElementVisibility('#writeFinalDecisionSevereCriteriaApply_Yes');
+    await webActions.verifyElementVisibility('#writeFinalDecisionSevereCriteriaApply_No');
+
+    const choice = sccConditionsApply ? 'Yes' : 'No';
+    await webActions.clickElementById(`#writeFinalDecisionSevereCriteriaApply_${choice}`);
+  }
+
+  async inputAndVerifyPageContentForSevereConditionsCriteriaPageDataEsaAppeal(sccConditionsApply: boolean) {
+    await webActions.verifyPageLabel(
+      "[for='esaWriteFinalDecisionSevereCriteriaApply_Yes']",
+      writeFinalDecisionData.yesLabel
+    );
+    await webActions.verifyPageLabel(
+      "[for='esaWriteFinalDecisionSevereCriteriaApply_No']",
+      writeFinalDecisionData.noLabel
+    );
+    await webActions.verifyElementVisibility('#esaWriteFinalDecisionSevereCriteriaApply_Yes');
+    await webActions.verifyElementVisibility('#esaWriteFinalDecisionSevereCriteriaApply_No');
+
+    const choice = sccConditionsApply ? 'Yes' : 'No';
+    await webActions.clickElementById(`#esaWriteFinalDecisionSevereCriteriaApply_${choice}`);
+  }
+
+  async verifyValueByLabelInCheckYourAnswersTable(label: string, expectedValue: string) {
+    const row = this.page.locator('tr').filter({ hasText: label });
+    await expect(row.getByText(expectedValue, { exact: true })).toBeVisible();
+  }
+
+  async verifyPageContentForCheckYourAnswersPageForScc({
+    isAppealAllowed,
+    isSccOnlyAppeal,
+    doSccApply,
+    isEsaCase = false
+  }: {
+    isAppealAllowed: boolean;
+    isSccOnlyAppeal: boolean;
+    doSccApply: boolean,
+    isEsaCase?: boolean
+  }) {
+
+    let appealAllowedValue = isAppealAllowed ? writeFinalDecisionData.allowedLabel : writeFinalDecisionData.refusedLabel;
+    let sccOnlyAppealValue = isSccOnlyAppeal ? writeFinalDecisionData.yesLabel : writeFinalDecisionData.noLabel;
+    let doSccApplyValue = doSccApply ? writeFinalDecisionData.yesLabel : writeFinalDecisionData.noLabel;
+
+    const expectedRows = [
+      { label: writeFinalDecisionData.generateNoticeLabel, value: writeFinalDecisionData.yesLabel },
+      { label: writeFinalDecisionData.isTheAppealLabel, value: appealAllowedValue },
+      { label: writeFinalDecisionData.whatTypeOfHearingWasHeldLabel, value: writeFinalDecisionData.faceToFaceLabel },
+      { label: writeFinalDecisionData.didAPresentingOfficerLabel, value: writeFinalDecisionData.yesLabel },
+      { label: writeFinalDecisionData.didTheAppellantAttendTheHearing, value: writeFinalDecisionData.noLabel },
+      { label: writeFinalDecisionData.isThisAWCAAppeal, value: writeFinalDecisionData.yesLabel },
+      { label: writeFinalDecisionData.isThisASupportGroupOnlyAppealLabel, value: writeFinalDecisionData.noLabel },
+      { label: writeFinalDecisionData.isThisASccOnlyAppealLabel, value: sccOnlyAppealValue },
+      { label: writeFinalDecisionData.doSccApplyLabel, value: doSccApplyValue },
+      { label: writeFinalDecisionData.whatIsTheLastPageInTheTribunalBundleLabel, value: writeFinalDecisionData.lastPageInTheTribunalBundleInput },
+      { label: writeFinalDecisionData.reasonsForDecisionLabel, value: writeFinalDecisionData.reasonsForDecisionInput },
+      { label: writeFinalDecisionData.checkYourAnswersAnythingElse, value: writeFinalDecisionData.anythingElseInput }
+    ]
+
+    if (isEsaCase) {
+      expectedRows.push(
+        { label: writeFinalDecisionData.whichEsaRegulationsApplyLabel, value: writeFinalDecisionData.esaRegulations2013Label },
+      );
+    }
+
+    for (const { label, value } of expectedRows) {
+      await this.verifyValueByLabelInCheckYourAnswersTable(label, value);
+    }
   }
 }

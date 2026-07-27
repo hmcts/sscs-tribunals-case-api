@@ -1,0 +1,19 @@
+{
+  "token": "test_event_token",
+  "case_details": {
+    "id": null,
+    "jurisdiction": "SSCS",
+    "state": null,
+    "case_type_id": "Benefit",
+    "created_date": null,
+    "last_modified": null,
+    "security_classification": null,
+    "case_data": {},
+    "data_classification": {},
+    "after_submit_callback_response": null,
+    "callback_response_status_code": null,
+    "callback_response_status": null,
+    "security_classifications": {}
+  },
+  "event_id": "appealCreated"
+}

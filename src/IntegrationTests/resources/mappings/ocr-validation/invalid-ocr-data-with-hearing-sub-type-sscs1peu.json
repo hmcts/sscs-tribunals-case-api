@@ -1,0 +1,80 @@
+{
+  "ocr_data_fields": [
+    {
+      "name": "person1_title",
+      "value": "Mr"
+    },
+    {
+      "name": "person1_first_name",
+      "value": "John"
+    },
+    {
+      "name": "person1_last_name",
+      "value": "Smith"
+    },
+    {
+      "name": "person1_dob",
+      "value": "10/10/2000"
+    },
+    {
+      "name": "person1_address_line1",
+      "value": "1 Street"
+    },
+    {
+      "name": "person1_address_line2",
+      "value": "Victoria Street"
+    },
+    {
+      "name": "person1_address_line3",
+      "value": "London"
+    },
+    {
+      "name": "person1_postcode",
+      "value": "CF48 2HY"
+    },
+    {
+      "name": "person1_nino",
+      "value": "BB000000B"
+    },
+    {
+      "name": "person1_email",
+      "value": "xyz@something.com"
+    },
+    {
+      "name": "person1_mobile",
+      "value": "0123456789"
+    },
+    {
+      "name": "office",
+      "value": "3"
+    },
+    {
+      "name": "is_benefit_type_pip",
+      "value": "true"
+    },
+    {
+      "name": "is_hearing_type_oral",
+      "value": "true"
+    },
+    {
+      "name": "is_hearing_type_paper",
+      "value": "false"
+    },
+    {
+      "name": "hearing_type_telephone",
+      "value": ""
+    },
+    {
+      "name": "hearing_type_video",
+      "value": ""
+    },
+    {
+      "name": "hearing_type_face_to_face",
+      "value": ""
+    },
+    {
+      "name": "mrn_date",
+      "value": "23/4/2020"
+    }
+  ]
+}

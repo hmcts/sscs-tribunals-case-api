@@ -7,60 +7,61 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.CaseCategoryType.CASE_SUBTYPE;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.CaseCategoryType.CASE_TYPE;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseAccessManagementFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseManagementLocation;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Issue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SessionCategory;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.model.HearingWrapper;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.CaseCategory;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.CaseDetails;
-import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
-import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 import uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil;
 
+@ExtendWith(MockitoExtension.class)
 class HearingsCaseMappingTest extends HearingsMappingBase {
-    @Mock
-    private SessionCategoryMapService sessionCategoryMaps;
 
     @Mock
     private ReferenceDataServiceHolder refData;
+    @Mock
+    private PanelCompositionService panelCompositionService;
+    private HearingsCaseMapping hearingsCaseMapping;
+
+    @BeforeEach
+    void setUp() {
+        hearingsCaseMapping = new HearingsCaseMapping(panelCompositionService);
+    }
 
     @DisplayName("When a valid hearing wrapper is given buildHearingCaseDetails returns the correct Hearing Case Details")
     @Test
     void buildHearingCaseDetails() throws ListingException {
-        // TODO Finish Test when method done
-
-        given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE,ISSUE_CODE,false,false))
-            .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
-                    false,false,SessionCategory.CATEGORY_03,null));
-
-        given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
-
         List<CcdValue<OtherParty>> otherParties = new ArrayList<>();
         otherParties.add(new CcdValue<>(OtherParty.builder()
             .hearingOptions(HearingOptions.builder().build())
@@ -74,32 +75,21 @@ class HearingsCaseMappingTest extends HearingsMappingBase {
             .build()));
         SscsCaseData caseData = SscsCaseData.builder()
             .ccdCaseId(String.valueOf(CASE_ID))
-            .benefitCode(BENEFIT_CODE)
-            .issueCode(ISSUE_CODE)
-            .caseCreated(CASE_CREATED)
+                .benefitCode(BENEFIT_CODE).issueCode(ISSUE_CODE).caseCreated(CASE_CREATED)
             .caseAccessManagementFields(CaseAccessManagementFields.builder()
-                .caseNameHmctsInternal(CASE_NAME_INTERNAL)
-                .caseNamePublic(CASE_NAME_PUBLIC)
-                .build())
+                .caseNameHmctsInternal(CASE_NAME_INTERNAL).caseNamePublic(CASE_NAME_PUBLIC).build())
             .appeal(Appeal.builder()
                 .hearingOptions(HearingOptions.builder().build())
-                .appellant(Appellant.builder()
-                    .appointee(Appointee.builder().build())
-                    .build())
+                .appellant(Appellant.builder().appointee(Appointee.builder().build()).build())
                 .rep(Representative.builder().build())
-                .build())
+                    .build())
             .otherParties(otherParties)
-            .caseManagementLocation(CaseManagementLocation.builder()
-                .baseLocation(EPIMS_ID)
-                .region(REGION)
-                .build())
-            .build();
-        HearingWrapper wrapper = HearingWrapper.builder()
-            .caseData(caseData)
-            .caseData(caseData)
-            .build();
+            .caseManagementLocation(CaseManagementLocation.builder().baseLocation(EPIMS_ID).region(REGION).build())
+                .build();
+        HearingWrapper wrapper = HearingWrapper.builder().caseData(caseData).caseData(caseData).build();
+        when(panelCompositionService.isBenefitIssueCodeValid(eq(BENEFIT_CODE), eq(ISSUE_CODE))).thenReturn(true);
 
-        CaseDetails caseDetails = HearingsCaseMapping.buildHearingCaseDetails(wrapper, refData);
+        CaseDetails caseDetails = hearingsCaseMapping.buildHearingCaseDetails(wrapper, refData);
 
         assertNotNull(caseDetails.getCaseId());
         assertNotNull(caseDetails.getCaseDeepLink());
@@ -332,31 +322,16 @@ class HearingsCaseMappingTest extends HearingsMappingBase {
         assertEquals(expected, result);
     }
 
-
-    @DisplayName("When give a valid benefit code and issue code, buildCaseCategories returns a valid case Category and  case subcategory")
+    @DisplayName("When give a valid benefit code and issue code, and defaultPaanelCompEnabled,"
+            + "buildCaseCategories returns a valid case Category and  case subcategory")
     @Test
-    void buildCaseCategories() throws ListingException {
+    void buildCaseCategoriesDefaultPanelCompEnabled() throws ListingException {
         String parentValue = "BBA3-002";
-        String subTypeValue = "BBA3-002-DD";
+        String subTypeValue = "BBA3-002DD";
+        SscsCaseData caseData = SscsCaseData.builder().benefitCode(BENEFIT_CODE).issueCode(ISSUE_CODE).build();
+        given(panelCompositionService.isBenefitIssueCodeValid(any(), any())).willReturn(true);
 
-        SessionCategoryMap sessionCategoryMap = new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
-                false, false, SessionCategory.CATEGORY_06, null);
-
-        given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE, ISSUE_CODE,false,false))
-                .willReturn(sessionCategoryMap);
-        given(sessionCategoryMaps.getCategoryTypeValue(sessionCategoryMap))
-                .willReturn(parentValue);
-        given(sessionCategoryMaps.getCategorySubTypeValue(sessionCategoryMap))
-                .willReturn(subTypeValue);
-
-        given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
-
-        SscsCaseData caseData = SscsCaseData.builder()
-                .benefitCode(BENEFIT_CODE)
-                .issueCode(ISSUE_CODE)
-                .build();
-
-        List<CaseCategory> result = HearingsCaseMapping.buildCaseCategories(caseData, refData);
+        List<CaseCategory> result = hearingsCaseMapping.buildCaseCategories(caseData);
 
         assertThat(result)
                 .extracting("categoryType", "categoryValue", "categoryParent")
@@ -401,9 +376,7 @@ class HearingsCaseMappingTest extends HearingsMappingBase {
     @Test
     void getCaseCreated() {
         String caseCreatedDate = "2022-04-01";
-        SscsCaseData caseData = SscsCaseData.builder()
-            .caseCreated(caseCreatedDate)
-            .build();
+        SscsCaseData caseData = SscsCaseData.builder().caseCreated(caseCreatedDate).build();
 
         String result = HearingsCaseMapping.getCaseCreated(caseData);
 

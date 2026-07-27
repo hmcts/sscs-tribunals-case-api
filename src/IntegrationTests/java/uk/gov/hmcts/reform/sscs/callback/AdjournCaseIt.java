@@ -320,7 +320,7 @@ public class AdjournCaseIt extends AbstractEventIt {
 
         assertThat(result.getData().getOutcome()).isNull();
 
-        SscsDocumentDetails document = result.getData().getSscsDocument().get(0).getValue();
+        SscsDocumentDetails document = result.getData().getInternalCaseDocumentData().getSscsInternalDocument().getFirst().getValue();
         assertThat(document.getDocumentType()).isEqualTo(DocumentType.DRAFT_ADJOURNMENT_NOTICE.getValue());
         assertThat(document.getDocumentDateAdded()).isEqualTo(LocalDate.now().toString());
         assertThat(document.getDocumentFileName()).containsPattern(

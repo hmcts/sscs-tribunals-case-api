@@ -23,7 +23,7 @@ export class UpdateNotListable extends BaseStep {
     await this.notListablePage.enterValidDirectionDueDate();
     await this.notListablePage.continueEvent();
 
-    await this.notListablePage.confirmSubmission();
+    await this.eventNameAndDescriptionPage.confirmSubmission();
     // verifying that event has submitted successfully and details are showing in Summary and History Tabs
     await this.verifyHistoryTabDetails('Not listable', 'Not listable');
   }
@@ -154,7 +154,7 @@ export class UpdateNotListable extends BaseStep {
 
   async performUpdateNotListableDirectionNotFulfilledAbateTCW(caseId: string) {
     //Trigger Not listable event:
-    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
+    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
     await this.homePage.chooseEvent('Not listable');
     await this.notListablePage.verifyPageContent(); //Verifying Heading and Caption for event
 
@@ -165,7 +165,7 @@ export class UpdateNotListable extends BaseStep {
     await this.notListablePage.enterValidDirectionDueDate();
     await this.notListablePage.continueEvent();
 
-    await this.notListablePage.confirmSubmission();
+    await this.eventNameAndDescriptionPage.confirmSubmission();
 
     // verifying that event has submitted successfully and details are showing in Summary and History Tabs
     await this.verifyHistoryTabDetails('Not listable', 'Not listable');
@@ -189,7 +189,7 @@ export class UpdateNotListable extends BaseStep {
     caseId: string
   ) {
     //Trigger Not listable event:
-    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
+    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
     await this.homePage.chooseEvent('Not listable');
     await this.notListablePage.verifyPageContent(); //Verifying Heading and Caption for event
 
@@ -200,7 +200,7 @@ export class UpdateNotListable extends BaseStep {
     await this.notListablePage.enterValidDirectionDueDate();
     await this.notListablePage.continueEvent();
 
-    await this.notListablePage.confirmSubmission();
+    await this.eventNameAndDescriptionPage.confirmSubmission();
 
     // verifying that event has submitted successfully and details are showing in Summary and History Tabs
     await this.verifyHistoryTabDetails('Not listable', 'Not listable');

@@ -1,0 +1,16 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "v2/notifications/email"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "id": "{{randomValue type='UUID'}}"
+    },
+    "transformers": ["response-template"]
+  }
+}

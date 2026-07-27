@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 public abstract class EventToFieldPreSubmitCallbackHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
     private final Map<EventType, String> eventFieldMappings;
 
     EventToFieldPreSubmitCallbackHandler(Map<EventType, String> eventFieldMappings) {
@@ -28,7 +29,7 @@ public abstract class EventToFieldPreSubmitCallbackHandler implements PreSubmitC
 
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
-                                                          String userAuthorisation) {
+                                                          String userAuth) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
@@ -41,8 +42,9 @@ public abstract class EventToFieldPreSubmitCallbackHandler implements PreSubmitC
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        return new PreSubmitCallbackResponse<>(setField(sscsCaseData, eventFieldMappings.get(callback.getEvent()),
-            callback.getEvent()));
+        return new PreSubmitCallbackResponse<>(
+                updateCaseData(sscsCaseData, eventFieldMappings.get(callback.getEvent()), callback.getEvent(), userAuth)
+        );
     }
 
     private Optional<PreSubmitCallbackResponse<SscsCaseData>> responseWithErrorCheck(Callback<SscsCaseData> callback) {
@@ -58,5 +60,6 @@ public abstract class EventToFieldPreSubmitCallbackHandler implements PreSubmitC
         return Optional.empty();
     }
 
-    protected abstract SscsCaseData setField(SscsCaseData sscsCaseData, String newValue, EventType eventType);
+    protected abstract SscsCaseData updateCaseData(SscsCaseData sscsCaseData, String newValue, EventType eventType,
+                                                   String userAuth);
 }

@@ -1,0 +1,5 @@
+allowed-services-for-callback: test_service
+
+feature:
+  uc-office-feature:
+    enabled: false

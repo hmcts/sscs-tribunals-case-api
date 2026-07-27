@@ -20,13 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.sscs.service.DocumentDownloadService;
 import uk.gov.hmcts.reform.sscs.service.TribunalsService;
 
-
 @RestController
 public class TyaController {
 
-    private TribunalsService tribunalsService;
-
-    private DocumentDownloadService documentDownloadService;
+    private final TribunalsService tribunalsService;
+    private final DocumentDownloadService documentDownloadService;
 
     @Autowired
     public TyaController(TribunalsService tribunalsService, DocumentDownloadService documentDownloadService) {
@@ -38,7 +36,8 @@ public class TyaController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Appeal", content = {
         @Content(schema = @Schema(implementation = String.class))})})
     @RequestMapping(value = "/appeals", method = GET, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getAppealByCaseId(@RequestParam(value = "caseId") Long caseId,
+    public ResponseEntity<String> getAppealByCaseId(
+            @RequestParam(value = "caseId") Long caseId,
             @RequestParam(value = "mya", required = false, defaultValue = "false") boolean mya) {
         return ok(tribunalsService.findAppeal(caseId, mya).toString());
     }

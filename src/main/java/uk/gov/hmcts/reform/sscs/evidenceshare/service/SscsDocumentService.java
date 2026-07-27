@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -114,7 +115,7 @@ public class SscsDocumentService {
 
     public Optional<Pdf> resizedPdf(Pdf originalPdf) throws BulkPrintException {
 
-        try (PDDocument document = PDDocument.load(originalPdf.getContent())) {
+        try (PDDocument document = Loader.loadPDF(originalPdf.getContent())) {
             Optional<PDDocument> resizedDoc = pdfHelper.scaleToA4(document);
 
             if (resizedDoc.isPresent()) {

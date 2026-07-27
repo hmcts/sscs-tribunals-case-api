@@ -18,21 +18,23 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Objects;
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaEvidence;
 import uk.gov.hmcts.reform.sscs.functional.sya.SubmitHelper;
 
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest
 public class EvidenceDocumentUploadTest {
@@ -43,7 +45,12 @@ public class EvidenceDocumentUploadTest {
     @Autowired
     private SubmitHelper submitHelper;
 
-    @Before
+    @Autowired
+    private AuthTokenGenerator authTokenGenerator;
+
+    private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
+
+    @BeforeEach
     public void setUp() {
         baseURI = testUrl;
         useRelaxedHTTPSValidation();
@@ -54,7 +61,8 @@ public class EvidenceDocumentUploadTest {
         uploadAndVerifyEvidenceDocumentUpload();
     }
 
-    @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000L)
+    @DisplayName("Create appeal case with evidence document link into CCD")
+    @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000L, name = "{displayName} (Try #{currentRepetition})")
     public void shouldCreateAppealCaseWithEvidenceDocumentLinkIntoCcd() throws IOException {
         Response response = uploadAndVerifyEvidenceDocumentUpload();
 
@@ -66,6 +74,7 @@ public class EvidenceDocumentUploadTest {
 
         given()
             .contentType(ContentType.JSON)
+            .header(SERVICE_AUTHORIZATION, authTokenGenerator.generate())
             .body(syaJsonWithEvidence)
             .expect()
             .statusCode(201)
@@ -78,6 +87,7 @@ public class EvidenceDocumentUploadTest {
         URL resource = getClass().getClassLoader().getResource("evidence/evidence-document.pdf");
 
         return given()
+            .header(SERVICE_AUTHORIZATION, authTokenGenerator.generate())
             .multiPart("file", new File(Objects.requireNonNull(resource).getPath()), MediaType.APPLICATION_PDF_VALUE)
             .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
             .expect()
@@ -99,25 +109,25 @@ public class EvidenceDocumentUploadTest {
         ObjectMapper mapper = new ObjectMapper();
 
         return mapper.writeValueAsString(syaCaseWrapper);
-
     }
 
 
     private SyaCaseWrapper getDeserializeMessage() throws IOException {
         String syaJson;
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("evidence/appealCaseSyaDocument.json");
-        syaJson = IOUtils.toString(Objects.requireNonNull(inputStream), StandardCharsets.UTF_8);
-        // set random nino and mrnDate
-        String nino = submitHelper.getRandomNino();
-        syaJson = submitHelper.setNino(syaJson, nino);
-
-        LocalDate mrnDate = LocalDate.now().minusMonths(12);
-        syaJson = submitHelper.setLatestMrnDate(syaJson, mrnDate);
-
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
 
-        return mapper.readValue(syaJson, SyaCaseWrapper.class);
+        try (InputStream inputStream = getClass().getClassLoader()
+                .getResourceAsStream("evidence/appealCaseSyaDocument.json")) {
+            syaJson = IOUtils.toString(Objects.requireNonNull(inputStream), StandardCharsets.UTF_8);
+            // set random nino and mrnDate
+            String nino = submitHelper.getRandomNino();
+            syaJson = submitHelper.setNino(syaJson, nino);
 
+            LocalDate mrnDate = LocalDate.now().minusMonths(12);
+            syaJson = submitHelper.setLatestMrnDate(syaJson, mrnDate);
+
+            return mapper.readValue(syaJson, SyaCaseWrapper.class);
+        }
     }
 }

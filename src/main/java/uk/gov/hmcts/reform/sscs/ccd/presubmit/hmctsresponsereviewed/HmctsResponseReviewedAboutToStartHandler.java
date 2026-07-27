@@ -9,13 +9,15 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_RESPONSE
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.UCB;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_TCW;
+import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown;
+import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.isChildSupportAppeal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -25,15 +27,21 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
+import uk.gov.hmcts.reform.sscs.service.HearingsService;
 
 @Service
 public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final DwpAddressLookupService service;
+    private final HearingsService hearingsService;
+    private final boolean cmConfidentialityEnabled;
 
-    @Autowired
-    public HmctsResponseReviewedAboutToStartHandler(DwpAddressLookupService service) {
+    public HmctsResponseReviewedAboutToStartHandler(DwpAddressLookupService service,
+                                                    HearingsService hearingsService,
+        @Value("${feature.cm-other-party-confidentiality.enabled}") final boolean cmConfidentialityEnabled) {
         this.service = service;
+        this.hearingsService = hearingsService;
+        this.cmConfidentialityEnabled = cmConfidentialityEnabled;
     }
 
     @Override
@@ -58,6 +66,10 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
         setDefaultFieldValues(sscsCaseData);
         setDwpDocuments(sscsCaseData);
         setSelectWhoReviewsCase(sscsCaseData);
+        if (cmConfidentialityEnabled && (isChildSupportAppeal(sscsCaseData) || sscsCaseData.isBenefitType(Benefit.UC))) {
+            sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
+                    getSelectedConfidentialityPartyDropdown(sscsCaseData));
+        }
 
         if (sscsCaseData.isIbcCase()) {
             final String benefitCode = sscsCaseData.getBenefitCode();
@@ -71,6 +83,8 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
         if (sscsCaseData.getCreatedInGapsFrom() == null || !sscsCaseData.getCreatedInGapsFrom().equals("readyToList")) {
             preSubmitCallbackResponse.addError("This event cannot be run for cases created in GAPS at valid appeal");
         }
+
+        hearingsService.validationCheckForListedOrExceptionHearings(sscsCaseData, preSubmitCallbackResponse);
 
         return preSubmitCallbackResponse;
     }

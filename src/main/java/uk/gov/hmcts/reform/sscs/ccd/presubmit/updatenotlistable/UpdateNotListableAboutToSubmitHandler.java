@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatenotlistable;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Objects;
@@ -8,10 +10,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Component
@@ -21,9 +20,9 @@ public class UpdateNotListableAboutToSubmitHandler implements PreSubmitCallbackH
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType == CallbackType.ABOUT_TO_SUBMIT
-            && callback.getEvent() == EventType.UPDATE_NOT_LISTABLE
-            && Objects.nonNull(callback.getCaseDetails())
-            && Objects.nonNull(callback.getCaseDetails().getCaseData());
+                && callback.getEvent() == EventType.UPDATE_NOT_LISTABLE
+                && Objects.nonNull(callback.getCaseDetails())
+                && Objects.nonNull(callback.getCaseDetails().getCaseData());
     }
 
     @Override
@@ -42,9 +41,9 @@ public class UpdateNotListableAboutToSubmitHandler implements PreSubmitCallbackH
 
         if ("yes".equalsIgnoreCase(sscsCaseData.getUpdateNotListableInterlocReview())) {
             InterlocReviewState interlocState = Arrays.stream(InterlocReviewState.values())
-                .filter(x -> x.getCcdDefinition().equals(sscsCaseData.getUpdateNotListableWhoReviewsCase()))
-                .findFirst()
-                .orElse(null);
+                    .filter(x -> x.getCcdDefinition().equals(sscsCaseData.getUpdateNotListableWhoReviewsCase()))
+                    .findFirst()
+                    .orElse(null);
             sscsCaseData.setInterlocReviewState(interlocState);
             sscsCaseData.setInterlocReferralDate(LocalDate.now());
             sscsCaseData.setDirectionDueDate(null);
@@ -63,11 +62,19 @@ public class UpdateNotListableAboutToSubmitHandler implements PreSubmitCallbackH
             sscsCaseData.setNotListableProvideReasons(null);
         }
 
+        if ("yes".equalsIgnoreCase(sscsCaseData.getUpdateNotListableDirectionsFulfilled())
+                || ("no".equalsIgnoreCase(sscsCaseData.getUpdateNotListableDirectionsFulfilled())
+                && "no".equalsIgnoreCase(sscsCaseData.getUpdateNotListableInterlocReview())
+                && "no".equalsIgnoreCase(sscsCaseData.getUpdateNotListableSetNewDueDate())
+                && State.READY_TO_LIST.getId().equals(sscsCaseData.getUpdateNotListableWhereShouldCaseMoveTo()))) {
+            sscsCaseData.setShouldReadyToListBeTriggered(YES);
+        } else {
+            sscsCaseData.setShouldReadyToListBeTriggered(null);
+        }
+
         clearTransientFields(sscsCaseData);
 
-        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-
-        return preSubmitCallbackResponse;
+        return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
     private void clearTransientFields(SscsCaseData sscsCaseData) {

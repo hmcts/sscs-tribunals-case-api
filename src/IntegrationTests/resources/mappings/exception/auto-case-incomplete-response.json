@@ -1,0 +1,97 @@
+{
+  "case_creation_details": {
+    "case_data": {
+      "appeal": {
+        "mrnDetails": {
+          "dwpIssuingOffice": "Sheffield DRT",
+          "mrnDate": "2018-12-09",
+          "mrnLateReason": null,
+          "mrnMissingReason": null
+        },
+        "appellant": {
+          "name": {
+            "title": "Mr",
+            "firstName": "John",
+            "lastName": null
+          },
+          "address": {},
+          "contact": {
+            "email": null,
+            "phone": null,
+            "mobile": null
+          },
+          "organisation": null,
+          "id": null,
+          "identity": {
+            "dob": null,
+            "nino": null
+          },
+          "isAppointee": "No",
+          "appointee": null,
+          "isAddressSameAsAppointee": null
+        },
+        "benefitType": {
+          "code": "ESA",
+          "description": "Employment and Support Allowance"
+        },
+        "hearingSubtype": {},
+        "hearingOptions": {
+          "wantsToAttend": "Yes",
+          "wantsSupport": "No",
+          "languageInterpreter": "No",
+          "arrangements": [],
+          "scheduleHearing": "No"
+        },
+        "appealReasons": null,
+        "rep": {
+          "hasRepresentative": "No",
+          "organisation": null,
+          "name": null,
+          "address": {},
+          "contact": null
+        },
+        "signer": null,
+        "hearingType": "oral",
+        "receivedVia": "Paper"
+      },
+      "sscsDocument": [],
+      "subscriptions": {
+        "appellantSubscription": {
+          "wantSmsNotifications": "No",
+          "email": null,
+          "mobile": null,
+          "subscribeEmail": "No",
+          "subscribeSms": "No",
+          "reason": null,
+          "lastLoggedIntoMya": null,
+          "tya": "TYA_RANDOM_NUMBER"
+        },
+        "supporterSubscription": null,
+        "representativeSubscription": null,
+        "appointeeSubscription": null,
+        "jointPartySubscription": null
+      },
+      "evidencePresent": "No",
+      "bulkScanCaseReference": "1234567891011",
+      "benefitCode": "051",
+      "caseCode": "051DD",
+      "caseCreated": "2018-01-11",
+      "createdInGapsFrom": "readyToList",
+      "dwpRegionalCentre": "Sheffield DRT",
+      "issueCode": "DD",
+      "linkedCasesBoolean": "No",
+      "formType": "sscs1peu"
+    },
+    "case_type_id": "Benefit",
+    "event_id": "incompleteApplicationReceived"
+  },
+  "warnings": [
+    "person1_last_name is empty",
+      "person1_address_line1 is empty",
+      "person1_address_line2 is empty",
+      "person1_address_line3 is empty",
+      "person1_postcode is empty",
+      "person1_nino is empty",
+      "hearing_type_telephone, hearing_type_video and hearing_type_face_to_face are empty. At least one must be populated"
+  ]
+}

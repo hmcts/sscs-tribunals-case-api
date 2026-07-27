@@ -1,0 +1,67 @@
+{
+  "id": 1539878003972756,
+  "jurisdiction": "SSCS",
+  "state": "appealCreated",
+  "case_type_id": "Benefit",
+  "created_date": "2018-10-18T15:53:23.974",
+  "last_modified": "2018-10-18T15:53:23.978",
+  "security_classification": "PUBLIC",
+  "case_data": {
+    "caseReference": "123456789",
+
+    "appeal": {
+      "mrnDetails": {
+        "mrnDate": "2019-02-01"
+      },
+      "appellant": {
+        "name": {
+          "title": "Mr",
+          "firstName": "Joe",
+          "lastName": "Bloggs"
+        },
+        "address": {
+          "line1": "123 Hairy Lane",
+          "line2": "Off Hairy Park",
+          "town": "Hairyfield",
+          "county": "Kent",
+          "postcode": "TN32 6PL"
+        },
+        "contact": {
+          "email": "joe@bloggs.com",
+          "phone": null,
+          "mobile": "07411222222"
+        },
+        "identity": {
+          "dob": "1990-02-26",
+          "nino": "AB877533C"
+        },
+        "appointee": null
+      },
+      "benefitType": {
+        "code": "PIP",
+        "description": "Personal Independence Payment"
+      },
+      "hearingOptions": {
+        "wantsToAttend": "Yes"
+      },
+      "hearingSubtype": {
+        "wantsHearingTypeTelephone": "Yes",
+        "hearingTelephoneNumber": "01234555996",
+        "wantsHearingTypeVideo": "Yes",
+        "hearingVideoEmail": "my@email.com",
+        "wantsHearingTypeFaceToFace": "No"
+      },
+    "caseCreated" : "2018-01-11",
+    "evidencePresent" : "No"
+  },
+  "data_classification": {
+    "caseReference": "PUBLIC",
+    "caseCreated" : "PUBLIC"
+  },
+  "after_submit_callback_response": null,
+  "callback_response_status_code": 200,
+  "callback_response_status": "INCOMPLETE",
+  "security_classifications": {
+    "caseReference": "PUBLIC"
+  }
+}

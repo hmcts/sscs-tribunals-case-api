@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
@@ -53,17 +54,20 @@ public class PartiesOnCaseUtil {
         }
 
         if (isNotEmpty(sscsCaseData.getOtherParties())) {
-            addOtherPartiesToListOptions(sscsCaseData, listOptions);
+            addOtherPartiesToListOptions(sscsCaseData, listOptions, true);
         }
 
         return listOptions;
     }
 
-    public static void addOtherPartiesToListOptions(SscsCaseData sscsCaseData, List<DynamicListItem> listOptions) {
+    public static void addOtherPartiesToListOptions(SscsCaseData sscsCaseData, List<DynamicListItem> listOptions,
+        boolean includeRepresentatives) {
         for (int i = 0; i < sscsCaseData.getOtherParties().size(); i++) {
             OtherParty otherParty = sscsCaseData.getOtherParties().get(i).getValue();
             addOtherPartyOrOtherPartyAppointeeToListOptions(listOptions, i, otherParty);
-            addOtherPartyRepresentativeToListOptions(listOptions, i, otherParty);
+            if (includeRepresentatives) {
+                addOtherPartyRepresentativeToListOptions(listOptions, i, otherParty);
+            }
         }
     }
 
@@ -83,9 +87,39 @@ public class PartiesOnCaseUtil {
 
     public static boolean isChildSupportAppeal(SscsCaseData sscsCaseData) {
         return sscsCaseData.getBenefitType()
-                .filter(f -> f == Benefit.CHILD_SUPPORT)
+                .filter(benefitType -> benefitType == Benefit.CHILD_SUPPORT)
                 .isPresent();
     }
+
+    public static DynamicList getSelectedConfidentialityPartyDropdown(SscsCaseData sscsCaseData) {
+        List<DynamicListItem> listOptions = getPartiesOnCaseForConfidentiality(sscsCaseData);
+
+        DynamicList existingSelectedConfidentialityParty = sscsCaseData
+            .getExtendedSscsCaseData()
+            .getSelectedConfidentialityParty();
+        DynamicListItem existingValue = existingSelectedConfidentialityParty
+            != null ? existingSelectedConfidentialityParty.getValue() : null;
+
+        if (existingValue != null
+                && existingValue.getCode() != null
+                && listOptions.stream().anyMatch(option -> option.getCode().equals(existingValue.getCode()))) {
+            return new DynamicList(existingValue, listOptions);
+        }
+
+        return new DynamicList(new DynamicListItem("", ""), listOptions);
+    }
+
+    private static List<DynamicListItem> getPartiesOnCaseForConfidentiality(SscsCaseData sscsCaseData) {
+        List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions.add(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
+
+        if (isNotEmpty(sscsCaseData.getOtherParties())) {
+            addOtherPartiesToListOptions(sscsCaseData, listOptions, false);
+        }
+
+        return listOptions;
+    }
+
 
     public static List<String> getAllOtherPartiesOnCase(SscsCaseData sscsCaseData) {
         List<String> otherParties = new ArrayList<>();

@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.sscs.callback;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -117,7 +119,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
                 + "\n"
                 + "Something else.\n"
                 + "\n"
-                + "This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
+                + "This has been an oral (face to face) hearing. The following people attended: AN Test the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page A1.\n"
                 + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
     }
 
@@ -1411,14 +1413,14 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Tribunal Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
-        assertEquals(false, payload.isAllowed());
-        assertEquals(false, payload.isSetAside());
+        assertFalse(payload.isAllowed());
+        assertFalse(payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
         assertEquals(AN_Test, payload.getAppellantName());
         assertEquals("2018-10-10", payload.getStartDate());
         assertEquals("2018-11-10", payload.getEndDate());
-        assertEquals(false, payload.isIndefinite());
-        assertEquals(false, payload.isEsaIsEntited());
+        assertFalse(payload.isIndefinite());
+        assertFalse(payload.isEsaIsEntited());
         assertNull(payload.getEsaAwardRate());
         Assert.assertNull(payload.getEsaSchedule2Descriptors());
         Assert.assertNull(payload.getEsaNumberOfPoints());
@@ -1428,18 +1430,20 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
-        assertEquals("The appeal is refused.\n"
-                + "\n"
-                + "The decision made by the Secretary of State on 01/09/2018 is confirmed.\n"
-                + "\n"
-                + "This is my summary.\n"
-                + "\n"
-                + "My reasons for decision\n"
-                + "\n"
-                + "Something else.\n"
-                + "\n"
-                + "This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
-                + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
+        assertEquals("""
+            The appeal is refused.
+
+            The decision made by the Secretary of State on 01/09/2018 is confirmed.
+
+            This is my summary.
+
+            My reasons for decision
+
+            Something else.
+
+            This has been an oral (face to face) hearing. The following people attended: AN Test the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page A1.
+
+            """, parentPayload.getWriteFinalDecisionTemplateContent().toString());
         EsaTemplateContent esaTemplateContent = (EsaTemplateContent) parentPayload.getWriteFinalDecisionTemplateContent();
         Assert.assertEquals(EsaScenario.SCENARIO_10, esaTemplateContent.getScenario());
     }
@@ -1505,7 +1509,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
                 + "\n"
                 + "Something else.\n"
                 + "\n"
-                + "This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
+                + "This has been an oral (face to face) hearing. The following people attended: AN Test the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page A1.\n"
                 + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
         EsaTemplateContent esaTemplateContent = (EsaTemplateContent) parentPayload.getWriteFinalDecisionTemplateContent();
         Assert.assertEquals(EsaScenario.SCENARIO_10, esaTemplateContent.getScenario());
@@ -1546,35 +1550,37 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Tribunal Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
-        assertEquals(true, payload.isAllowed());
-        assertEquals(true, payload.isSetAside());
+        assertTrue(payload.isAllowed());
+        assertTrue(payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
         assertEquals(AN_Test, payload.getAppellantName());
         assertEquals("2018-10-10", payload.getStartDate());
         assertEquals("2018-11-10", payload.getEndDate());
-        assertEquals(false, payload.isIndefinite());
-        assertEquals(false, payload.isEsaIsEntited());
+        assertFalse(payload.isIndefinite());
+        assertFalse(payload.isEsaIsEntited());
         assertNull(payload.getEsaAwardRate());
         Assert.assertNull(payload.getEsaSchedule2Descriptors());
         Assert.assertNull(payload.getEsaNumberOfPoints());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
+        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().getFirst());
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
-        assertEquals("The appeal is allowed.\n"
-                + "\n"
-                + "The decision made by the Secretary of State on 01/09/2018 is set aside.\n"
-                + "\n"
-                + "This is my summary.\n"
-                + "\n"
-                + "My reasons for decision\n"
-                + "\n"
-                + "Something else.\n"
-                + "\n"
-                + "This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
-                + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
+        assertEquals("""
+            The appeal is allowed.
+
+            The decision made by the Secretary of State on 01/09/2018 is set aside.
+
+            This is my summary.
+
+            My reasons for decision
+
+            Something else.
+
+            This has been an oral (face to face) hearing. The following people attended: AN Test the appellant and a representative from the First Tier Agency. The Tribunal considered the appeal bundle to page A1.
+
+            """, parentPayload.getWriteFinalDecisionTemplateContent().toString());
     }
 
     @Test

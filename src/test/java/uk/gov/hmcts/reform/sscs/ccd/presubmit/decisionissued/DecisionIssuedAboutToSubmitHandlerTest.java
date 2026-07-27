@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DecisionType.STRIKE_OUT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.STRUCK_OUT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.WELSH_TRANSLATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
@@ -47,6 +48,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
@@ -120,7 +122,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
                             .build())
                     .build())
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
-                    .hearingRoute(HearingRoute.LIST_ASSIST)
+                    .hearingRoute(LIST_ASSIST)
                     .build())
             .build();
 
@@ -247,6 +249,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
         assertEquals("nonCompliantAppealStruckout", response.getData().getOutcome());
         assertNull(response.getData().getInterlocReviewState());
         assertEquals(response.getData().getState(), (State.DORMANT_APPEAL_STATE));
+        assertEquals(LIST_ASSIST, response.getData().getSchedulingAndListingFields().getHearingRoute());
     }
 
     @Test
@@ -388,5 +391,25 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(LocalDate.now(), response.getData().getIssueInterlocDecisionDate());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = HearingRoute.class)
+    public void givenSetToDormant_shouldSetHearingTypeFromRpcIfNull(HearingRoute hearingRoute) {
+        when(callback.getEvent()).thenReturn(EventType.DECISION_ISSUED);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+        when(caseDetailsBefore.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE).thenReturn(HEARING);
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW);
+        sscsCaseData.setSchedulingAndListingFields(null);
+        sscsCaseData.setRegionalProcessingCenter(RegionalProcessingCenter.builder().hearingRoute(hearingRoute).build());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(STRUCK_OUT, response.getData().getDwpState());
+        assertEquals("nonCompliantAppealStruckout", response.getData().getOutcome());
+        assertNull(response.getData().getInterlocReviewState());
+        assertEquals(response.getData().getState(), (State.DORMANT_APPEAL_STATE));
+        assertEquals(hearingRoute, response.getData().getSchedulingAndListingFields().getHearingRoute());
     }
 }

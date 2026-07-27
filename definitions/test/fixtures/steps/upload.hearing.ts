@@ -59,7 +59,7 @@ export class UploadHearing extends BaseStep {
     await this.homePage.chooseEvent('Action hearing recording req');
     await this.actionRecordingPage.grantRecordingRequest();
     await this.eventNameAndDescriptionPage.confirmSubmission();
-
+    await this.homePage.delay(3000);
     await this.homePage.navigateToTab('History');
     await this.verifyHistoryTabDetails('Action hearing recording req');
 
@@ -123,7 +123,7 @@ export class UploadHearing extends BaseStep {
     await this.homePage.chooseEvent('Action hearing recording req');
     await this.actionRecordingPage.refuseRecordingRequest();
     await this.eventNameAndDescriptionPage.confirmSubmission();
-
+    await this.homePage.delay(3000);
     await this.homePage.navigateToTab('History');
     await this.verifyHistoryTabDetails('Action hearing recording req');
 

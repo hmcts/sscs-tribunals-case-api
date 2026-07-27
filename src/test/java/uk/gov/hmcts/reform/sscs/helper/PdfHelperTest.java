@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Optional;
 import org.apache.commons.io.IOUtils;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
@@ -171,7 +172,7 @@ public class PdfHelperTest {
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("A3 Landscape.pdf"));
 
         PDRectangle pageSize = PDRectangle.A4;
-        try (PDDocument document = PDDocument.load(pdfBytes)) {
+        try (PDDocument document = Loader.loadPDF(pdfBytes)) {
 
             Optional<PDDocument> result = pdfHelper.scaleToPageSize(document, pageSize);
 
@@ -192,7 +193,7 @@ public class PdfHelperTest {
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("another-test.pdf"));
 
         PDRectangle pageSize = PDRectangle.A4;
-        try (PDDocument document = PDDocument.load(pdfBytes)) {
+        try (PDDocument document = Loader.loadPDF(pdfBytes)) {
 
             Optional<PDDocument> result = pdfHelper.scaleToPageSize(document, pageSize);
 
@@ -212,7 +213,7 @@ public class PdfHelperTest {
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("another-test.pdf"));
 
         PDRectangle pageSize = PDRectangle.A2;
-        try (PDDocument document = PDDocument.load(pdfBytes)) {
+        try (PDDocument document = Loader.loadPDF(pdfBytes)) {
 
             Optional<PDDocument> result = pdfHelper.scaleToPageSize(document, pageSize);
 
@@ -232,7 +233,7 @@ public class PdfHelperTest {
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("A3 Landscape.pdf"));
 
         PDRectangle pageSize = PDRectangle.A2;
-        try (PDDocument document = PDDocument.load(pdfBytes)) {
+        try (PDDocument document = Loader.loadPDF(pdfBytes)) {
 
             Optional<PDDocument> result = pdfHelper.scaleToPageSize(document, pageSize);
 
@@ -251,7 +252,7 @@ public class PdfHelperTest {
 
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("another-test.pdf"));
 
-        try (PDDocument document = PDDocument.load(pdfBytes)) {
+        try (PDDocument document = Loader.loadPDF(pdfBytes)) {
             PDRectangle pageSize = PDRectangle.A4;
             Optional<PDDocument> result = pdfHelper.scaleToPageSize(document, pageSize);
 
@@ -270,7 +271,7 @@ public class PdfHelperTest {
 
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("another-test.pdf"));
 
-        try (PDDocument document = PDDocument.load(pdfBytes)) {
+        try (PDDocument document = Loader.loadPDF(pdfBytes)) {
             PDRectangle pageSize = PDRectangle.A2;
             Optional<PDDocument> result = pdfHelper.scaleToPageSize(document, pageSize);
 
@@ -288,7 +289,7 @@ public class PdfHelperTest {
     public void doesNotResizeDocumentWhichDoesNotNeedResizing() throws Exception {
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("A3 Portrait.pdf"));
 
-        try (PDDocument document = PDDocument.load(pdfBytes)) {
+        try (PDDocument document = Loader.loadPDF(pdfBytes)) {
 
             Optional<PDDocument> result = pdfHelper.scaleToPageSize(document, PDRectangle.A3);
 
@@ -301,7 +302,7 @@ public class PdfHelperTest {
 
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("another-test.pdf"));
 
-        try (PDDocument document = PDDocument.load(pdfBytes)) {
+        try (PDDocument document = Loader.loadPDF(pdfBytes)) {
 
             Optional<PDDocument> result = pdfHelper.scaleToA4(document);
 
@@ -343,7 +344,7 @@ public class PdfHelperTest {
 
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("MultiPage.pdf"));
 
-        try (PDDocument document = PDDocument.load(pdfBytes)) {
+        try (PDDocument document = Loader.loadPDF(pdfBytes)) {
 
             Optional<PDDocument> result = pdfHelper.scaleToA4(document);
 

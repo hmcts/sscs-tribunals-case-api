@@ -43,6 +43,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -419,7 +420,7 @@ public class EvidenceUploadService {
 
     public static PDDocument getLoadSafe(byte[] statement, String docType, String caseId) {
         try {
-            return PDDocument.load(statement);
+            return Loader.loadPDF(statement);
         } catch (IOException e) {
             throw new EvidenceUploadException("Error when getting PDDocument " + docType + " for caseId " + caseId
                     + " with bytes length " + statement.length, e);

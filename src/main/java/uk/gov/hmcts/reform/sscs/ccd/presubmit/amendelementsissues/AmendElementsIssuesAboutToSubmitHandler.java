@@ -11,10 +11,18 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
+import uk.gov.hmcts.reform.sscs.reference.data.service.PanelCompositionService;
 
 @Service
 @Slf4j
-public class AmendElementsIssuesAboutToSubmitHandler extends ResponseEventsAboutToSubmit implements PreSubmitCallbackHandler<SscsCaseData> {
+public class AmendElementsIssuesAboutToSubmitHandler extends ResponseEventsAboutToSubmit
+        implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    private final PanelCompositionService panelCompositionService;
+
+    public AmendElementsIssuesAboutToSubmitHandler(PanelCompositionService panelCompositionService) {
+        this.panelCompositionService = panelCompositionService;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -26,7 +34,8 @@ public class AmendElementsIssuesAboutToSubmitHandler extends ResponseEventsAbout
     }
 
     @Override
-    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
+                                                          String userAuthorisation) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
@@ -35,9 +44,10 @@ public class AmendElementsIssuesAboutToSubmitHandler extends ResponseEventsAbout
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 
         log.info("Setting case code for case id {}", callback.getCaseDetails().getId());
-
         setCaseCode(preSubmitCallbackResponse, callback);
 
+        caseData.setPanelMemberComposition(panelCompositionService
+                .resetPanelCompIfElementsChanged(caseData, callback.getCaseDetailsBefore()));
         return preSubmitCallbackResponse;
     }
 }
