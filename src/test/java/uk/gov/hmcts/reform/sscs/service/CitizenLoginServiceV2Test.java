@@ -216,8 +216,8 @@ public class CitizenLoginServiceV2Test {
                 .subscriptions(Subscriptions.builder().appellantSubscription(
                         Subscription.builder().email(SUBSCRIPTION_EMAIL_ADDRESS).build()
                 ).build()).build()).build();
-        when(case1.getState()).thenReturn(State.DORMANT_APPEAL_STATE.getId());
-        when(case2.getState()).thenReturn(State.READY_TO_LIST.getId());
+        lenient().when(case1.getState()).thenReturn(State.DORMANT_APPEAL_STATE.getId());
+        lenient().when(case2.getState()).thenReturn(State.READY_TO_LIST.getId());
         when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
         when(sscsCcdConvertService.getCaseDetails(eq(case1))).thenReturn(sscsCaseDetails1);
         when(sscsCcdConvertService.getCaseDetails(eq(case2))).thenReturn(sscsCaseDetails2);
@@ -238,8 +238,8 @@ public class CitizenLoginServiceV2Test {
         caseDetails.add(case2);
         SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().id(111L).data(sscsCaseData).build();
         SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().id(222L).data(sscsCaseData).build();
-        when(case1.getState()).thenReturn(State.VOID_STATE.getId());
-        when(case2.getState()).thenReturn(State.READY_TO_LIST.getId());
+        lenient().when(case1.getState()).thenReturn(State.VOID_STATE.getId());
+        lenient().when(case2.getState()).thenReturn(State.READY_TO_LIST.getId());
         when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
         when(sscsCcdConvertService.getCaseDetails(eq(case1))).thenReturn(sscsCaseDetails1);
         when(sscsCcdConvertService.getCaseDetails(eq(case2))).thenReturn(sscsCaseDetails2);
@@ -259,7 +259,7 @@ public class CitizenLoginServiceV2Test {
         List<CaseDetails> caseDetails = new ArrayList<>();
         caseDetails.add(case1);
         SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().id(222L).data(sscsCaseData).build();
-        when(case1.getState()).thenReturn(State.READY_TO_LIST.getId());
+        lenient().when(case1.getState()).thenReturn(State.READY_TO_LIST.getId());
         when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
         when(sscsCcdConvertService.getCaseDetails(eq(case1))).thenReturn(sscsCaseDetails1);
         OnlineHearing onlineHearing1 = someOnlineHearing(222L);
