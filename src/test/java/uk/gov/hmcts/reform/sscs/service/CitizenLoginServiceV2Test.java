@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -16,6 +17,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.util.DataFixtures.someOnlineHearing;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -168,7 +171,7 @@ public class CitizenLoginServiceV2Test {
         when(sscsCcdConvertService.getCaseDetails(eq(case1))).thenReturn(sscsCaseDetails1);
         when(sscsCcdConvertService.getCaseDetails(eq(case2))).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
-        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, SUBSCRIPTION_EMAIL_ADDRESS)).thenReturn(Optional.of(onlineHearing2));
+        lenient().when(onlineHearingService.loadHearing(sscsCaseDetails2, null, SUBSCRIPTION_EMAIL_ADDRESS)).thenReturn(Optional.of(onlineHearing2));
 
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, null);
 
@@ -195,7 +198,7 @@ public class CitizenLoginServiceV2Test {
         when(sscsCcdConvertService.getCaseDetails(case1)).thenReturn(sscsCaseDetails1);
         when(sscsCcdConvertService.getCaseDetails(eq(case2))).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
-        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, SUBSCRIPTION_EMAIL_ADDRESS)).thenReturn(Optional.of(onlineHearing2));
+        lenient().when(onlineHearingService.loadHearing(sscsCaseDetails2, null, SUBSCRIPTION_EMAIL_ADDRESS)).thenReturn(Optional.of(onlineHearing2));
 
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, null);
 
@@ -222,7 +225,7 @@ public class CitizenLoginServiceV2Test {
         when(sscsCcdConvertService.getCaseDetails(eq(case1))).thenReturn(sscsCaseDetails1);
         when(sscsCcdConvertService.getCaseDetails(eq(case2))).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
-        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, SUBSCRIPTION_EMAIL_ADDRESS)).thenReturn(Optional.of(onlineHearing2));
+        lenient().when(onlineHearingService.loadHearing(sscsCaseDetails2, null, SUBSCRIPTION_EMAIL_ADDRESS)).thenReturn(Optional.of(onlineHearing2));
 
         List<OnlineHearing> casesForCitizen = underTest.findActiveCasesForCitizen(citizenIdamTokens);
 
@@ -244,7 +247,7 @@ public class CitizenLoginServiceV2Test {
         when(sscsCcdConvertService.getCaseDetails(eq(case1))).thenReturn(sscsCaseDetails1);
         when(sscsCcdConvertService.getCaseDetails(eq(case2))).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
-        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, SUBSCRIPTION_EMAIL_ADDRESS)).thenReturn(Optional.of(onlineHearing2));
+        lenient().when(onlineHearingService.loadHearing(sscsCaseDetails2, null, SUBSCRIPTION_EMAIL_ADDRESS)).thenReturn(Optional.of(onlineHearing2));
 
         List<OnlineHearing> casesForCitizen = underTest.findActiveCasesForCitizen(citizenIdamTokens);
 
@@ -262,8 +265,6 @@ public class CitizenLoginServiceV2Test {
         lenient().when(case1.getState()).thenReturn(State.READY_TO_LIST.getId());
         when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
         when(sscsCcdConvertService.getCaseDetails(eq(case1))).thenReturn(sscsCaseDetails1);
-        OnlineHearing onlineHearing1 = someOnlineHearing(222L);
-        when(onlineHearingService.loadHearing(sscsCaseDetails1, null, SUBSCRIPTION_EMAIL_ADDRESS)).thenReturn(Optional.of(onlineHearing1));
 
         List<OnlineHearing> casesForCitizen = underTest.findActiveCasesForCitizen(citizenIdamTokens);
 
@@ -302,8 +303,6 @@ public class CitizenLoginServiceV2Test {
         SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().id(222L).data(sscsCaseData).state(State.DORMANT_APPEAL_STATE.getId()).build();
         when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
         when(sscsCcdConvertService.getCaseDetails(eq(caseDetails1))).thenReturn(sscsCaseDetails1);
-        OnlineHearing onlineHearing1 = someOnlineHearing(222L);
-        when(onlineHearingService.loadHearing(sscsCaseDetails1, null, SUBSCRIPTION_EMAIL_ADDRESS)).thenReturn(Optional.of(onlineHearing1));
 
         List<OnlineHearing> casesForCitizen = underTest.findDormantCasesForCitizen(citizenIdamTokens);
 
@@ -468,6 +467,7 @@ public class CitizenLoginServiceV2Test {
 
     @Test
     public void findAndUpdateCaseLastLoggedIntoMya() {
+        final String beforeTimestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
         SscsCaseDetails expectedCase = createSscsCaseDetailsWithRepSubscription(tya);
         long expectedCaseId = expectedCase.getId();
         when(ccdService.getByCaseId(expectedCaseId, serviceIdamTokens)).thenReturn(expectedCase);
@@ -475,6 +475,11 @@ public class CitizenLoginServiceV2Test {
 
         verify(ccdService).getByCaseId(eq(expectedCaseId), eq(serviceIdamTokens));
         verifyFindAndUpdateCaseLastLoggedIntoMya(ccdService, updateCcdCaseService, expectedCase, expectedCaseId, serviceIdamTokens);
+        sscsCaseDataCaptor.getValue().accept(expectedCase);
+
+        String capturedTimestamp = expectedCase.getData().getSubscriptions().getRepresentativeSubscription().getLastLoggedIntoMya();
+        // Verify timestamp is formatted correctly and within a reasonable range (same second)
+        assertThat(capturedTimestamp, containsString(beforeTimestamp.substring(0, 19)));
     }
 
     @ParameterizedTest
@@ -556,8 +561,6 @@ public class CitizenLoginServiceV2Test {
     @Test
     public void cannotAssociatesUserWithCaseAsCaseNotFound() {
         String someOtherPostcode = "someOtherPostcode";
-        when(caseAssignmentVerifier.verifyPostcodeOrIbcaReference(any(SscsCaseDetails.class),
-                eq(someOtherPostcode), eq(IBCA_REFERENCE), eq(SUBSCRIPTION_EMAIL_ADDRESS))).thenReturn(false);
 
         when(ccdService.findCaseByAppealNumber(tya, serviceIdamTokens)).thenReturn(null);
         AssociateCaseDetails associateCaseDetails =
@@ -697,6 +700,6 @@ public class CitizenLoginServiceV2Test {
 
     void verifyFindAndUpdateCaseLastLoggedIntoMya(CcdService ccdService, UpdateCcdCaseService updateCcdCaseService, SscsCaseDetails expectedCase, long expectedCaseId, IdamTokens serviceIdamTokens) {
         verify(updateCcdCaseService).updateCaseV2(eq(expectedCaseId), eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
-                anyString(), anyString(), eq(serviceIdamTokens), any(Consumer.class));
+                anyString(), anyString(), eq(serviceIdamTokens), sscsCaseDataCaptor.capture());
     }
 }
