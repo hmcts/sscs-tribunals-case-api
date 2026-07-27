@@ -39,7 +39,6 @@ java:
     POST_HEARINGS_B_FEATURE: true
     GAPS_SWITCHOVER_FEATURE: true
     ELASTIC_SEARCH_FEATURE: true
-    SEVERE_CONDITIONS_FEATURE: true
     ELINKS_V2_FEATURE_ENABLED: true
     DELETED_REDACTED_DOC_ENABLED: true
     TESTING_SUPPORT_ENABLED: true
@@ -191,7 +190,7 @@ em-ccdorc:
     devcpuRequests: 50m
     devcpuLimits: 250m
     environment:
-      IDAM_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
+      IDAM_WEB_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
       OPEN_ID_API_BASE_URI: https://idam-web-public.aat.platform.hmcts.net/o
       S2S_BASE_URI: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
       EM_STITCHING_API_URL: ${EM_STITCHING_API_URL}
@@ -226,7 +225,7 @@ em-stitching:
       SPRING_DATASOURCE_OPTIONS: "?ssl=disable"
       SPRING_DATASOURCE_PORT: 5432
       SPRING_DATASOURCE_USERNAME: "{{ tpl .Values.global.postgresUsername $}}"
-      IDAM_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
+      IDAM_WEB_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
       OPEN_ID_API_BASE_URI: https://idam-web-public.aat.platform.hmcts.net/o
       S2S_BASE_URI: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
       DM_STORE_APP_URL: http://dm-store-aat.service.core-compute-aat.internal
