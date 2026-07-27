@@ -21,8 +21,12 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
@@ -45,6 +49,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.util.CaseAssignmentVerifier;
 
+@ExtendWith(MockitoExtension.class)
 public class CitizenLoginServiceV2Test {
 
     private static final String SUBSCRIPTION_EMAIL_ADDRESS = "someEmail@example.com";
@@ -64,6 +69,9 @@ public class CitizenLoginServiceV2Test {
     private String tya;
     private CaseAssignmentVerifier caseAssignmentVerifier;
     private OnlineHearingService onlineHearingService;
+
+    @Captor
+    private ArgumentCaptor<Consumer<SscsCaseDetails>> sscsCaseDataCaptor;
 
     @BeforeEach
     public void setUp() {
@@ -468,6 +476,21 @@ public class CitizenLoginServiceV2Test {
         verifyFindAndUpdateCaseLastLoggedIntoMya(ccdService, updateCcdCaseService, expectedCase, expectedCaseId, serviceIdamTokens);
     }
 
+    @ParameterizedTest
+    @MethodSource("createValidCaseDataSubscriptions")
+    public void lastloggedintoMya(SscsCaseData sscsCaseData) {
+        List<CaseDetails> caseDetails = new ArrayList<>();
+        caseDetails.add(case1);
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().id(111L).data(sscsCaseData).build();
+        when(ccdService.getByCaseId(111L, serviceIdamTokens)).thenReturn(sscsCaseDetails);
+        verify(updateCcdCaseService).updateCaseV2(eq(111L), eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
+                anyString(), anyString(), eq(serviceIdamTokens), sscsCaseDataCaptor.capture());
+        verify(ccdService).getByCaseId(eq(111L), eq(serviceIdamTokens));
+        verifyFindAndUpdateCaseLastLoggedIntoMya(ccdService, updateCcdCaseService, sscsCaseDetails, 111L, serviceIdamTokens);
+        sscsCaseDataCaptor.getValue().accept(sscsCaseDetails);
+        assertThat(sscsCaseDetails.getData().getSubscriptions().getRepresentativeSubscription().getLastLoggedIntoMya(), is("111"));
+    }
+
     @Test
     public void findAndShouldNotUpdateCaseLastLoggedIntoMyaWhenCaseDetailsIsNull() {
         SscsCaseDetails expectedCase = null;
@@ -560,16 +583,25 @@ public class CitizenLoginServiceV2Test {
                     .representativeSubscription(Subscription.builder().email(SUBSCRIPTION_EMAIL_ADDRESS).build()).build())
                     .build()},
 
-            new Object[]{SscsCaseData.builder().otherParties(List.of(CcdValue.<OtherParty>builder().value(OtherParty.builder()
-                                    .otherPartySubscription(Subscription.builder().email(SUBSCRIPTION_EMAIL_ADDRESS).build()).build())
-                            .build())).build()},
+            new Object[]{SscsCaseData.builder().subscriptions(Subscriptions.builder()
+                    .jointPartySubscription(Subscription.builder().email(SUBSCRIPTION_EMAIL_ADDRESS).build()).build())
+                    .build()},
+
+            new Object[]{SscsCaseData.builder().subscriptions(Subscriptions.builder()
+                    .supporterSubscription(Subscription.builder().email(SUBSCRIPTION_EMAIL_ADDRESS).build()).build())
+                    .build()},
 
             new Object[]{SscsCaseData.builder().otherParties(List.of(CcdValue.<OtherParty>builder().value(OtherParty.builder()
-                            .otherPartyAppointeeSubscription(Subscription.builder().email(SUBSCRIPTION_EMAIL_ADDRESS).build())
-                            .build()).build())).build()},
+                    .otherPartySubscription(Subscription.builder().email(SUBSCRIPTION_EMAIL_ADDRESS).build()).build())
+                    .build())).build()},
+
             new Object[]{SscsCaseData.builder().otherParties(List.of(CcdValue.<OtherParty>builder().value(OtherParty.builder()
-                            .otherPartyRepresentativeSubscription(Subscription.builder().email(SUBSCRIPTION_EMAIL_ADDRESS).build())
-                            .build()).build())).build()}
+                    .otherPartyAppointeeSubscription(Subscription.builder().email(SUBSCRIPTION_EMAIL_ADDRESS).build())
+                    .build()).build())).build()},
+
+            new Object[]{SscsCaseData.builder().otherParties(List.of(CcdValue.<OtherParty>builder().value(OtherParty.builder()
+                    .otherPartyRepresentativeSubscription(Subscription.builder().email(SUBSCRIPTION_EMAIL_ADDRESS).build())
+                    .build()).build())).build()}
         };
     }
 
@@ -587,16 +619,25 @@ public class CitizenLoginServiceV2Test {
                     .representativeSubscription(Subscription.builder().email("someDifferentEmail@example.com").build()).build())
                     .build()},
 
-            new Object[]{SscsCaseData.builder().otherParties(List.of(CcdValue.<OtherParty>builder().value(OtherParty.builder()
-                                    .otherPartySubscription(Subscription.builder().email("someDifferentEmail@example.com").build()).build())
-                            .build())).build()},
+            new Object[]{SscsCaseData.builder().subscriptions(Subscriptions.builder()
+                    .jointPartySubscription(Subscription.builder().email("someDifferentEmail@example.com").build()).build())
+                    .build()},
+
+            new Object[]{SscsCaseData.builder().subscriptions(Subscriptions.builder()
+                    .supporterSubscription(Subscription.builder().email("someDifferentEmail@example.com").build()).build())
+                    .build()},
 
             new Object[]{SscsCaseData.builder().otherParties(List.of(CcdValue.<OtherParty>builder().value(OtherParty.builder()
-                            .otherPartyAppointeeSubscription(Subscription.builder().email("someDifferentEmail@example.com").build())
-                            .build()).build())).build()},
+                    .otherPartySubscription(Subscription.builder().email("someDifferentEmail@example.com").build()).build())
+                    .build())).build()},
+
             new Object[]{SscsCaseData.builder().otherParties(List.of(CcdValue.<OtherParty>builder().value(OtherParty.builder()
-                            .otherPartyRepresentativeSubscription(Subscription.builder().email("someDifferentEmail@example.com").build())
-                            .build()).build())).build()}
+                    .otherPartyAppointeeSubscription(Subscription.builder().email("someDifferentEmail@example.com").build())
+                    .build()).build())).build()},
+
+            new Object[]{SscsCaseData.builder().otherParties(List.of(CcdValue.<OtherParty>builder().value(OtherParty.builder()
+                    .otherPartyRepresentativeSubscription(Subscription.builder().email("someDifferentEmail@example.com").build())
+                    .build()).build())).build()}
         };
     }
 
