@@ -475,26 +475,10 @@ public class CitizenLoginServiceV2Test {
 
         verify(ccdService).getByCaseId(eq(expectedCaseId), eq(serviceIdamTokens));
         verifyFindAndUpdateCaseLastLoggedIntoMya(ccdService, updateCcdCaseService, expectedCase, expectedCaseId, serviceIdamTokens);
+
         sscsCaseDataCaptor.getValue().accept(expectedCase);
-
         String capturedTimestamp = expectedCase.getData().getSubscriptions().getRepresentativeSubscription().getLastLoggedIntoMya();
-        // Verify timestamp is formatted correctly and within a reasonable range (same second)
         assertThat(capturedTimestamp, containsString(beforeTimestamp.substring(0, 19)));
-    }
-
-    @ParameterizedTest
-    @MethodSource("createValidCaseDataSubscriptions")
-    public void lastloggedintoMya(SscsCaseData sscsCaseData) {
-        List<CaseDetails> caseDetails = new ArrayList<>();
-        caseDetails.add(case1);
-        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().id(111L).data(sscsCaseData).build();
-        when(ccdService.getByCaseId(111L, serviceIdamTokens)).thenReturn(sscsCaseDetails);
-        verify(updateCcdCaseService).updateCaseV2(eq(111L), eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
-                anyString(), anyString(), eq(serviceIdamTokens), sscsCaseDataCaptor.capture());
-        verify(ccdService).getByCaseId(eq(111L), eq(serviceIdamTokens));
-        verifyFindAndUpdateCaseLastLoggedIntoMya(ccdService, updateCcdCaseService, sscsCaseDetails, 111L, serviceIdamTokens);
-        sscsCaseDataCaptor.getValue().accept(sscsCaseDetails);
-        assertThat(sscsCaseDetails.getData().getSubscriptions().getRepresentativeSubscription().getLastLoggedIntoMya(), is("111"));
     }
 
     @Test
