@@ -46,7 +46,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
     @Override
     protected WriteFinalDecisionMidEventValidationHandlerBase createValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService, boolean isPostHearingsEnabled) {
-        return new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, isPostHearingsEnabled, false);
+        return new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, isPostHearingsEnabled);
     }
 
     @Override
@@ -217,7 +217,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         when(callback.getPageId()).thenReturn("workCapabilityAssessment");
 
         EsaWriteFinalDecisionMidEventValidationHandler severeConditionsHandler = new EsaWriteFinalDecisionMidEventValidationHandler(
-                validator, decisionNoticeService, true, true);
+                validator, decisionNoticeService, true);
 
         PreSubmitCallbackResponse<SscsCaseData> response = severeConditionsHandler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -236,7 +236,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         when(callback.getPageId()).thenReturn("workCapabilityAssessment");
 
         EsaWriteFinalDecisionMidEventValidationHandler severeConditionsHandler = new EsaWriteFinalDecisionMidEventValidationHandler(
-                validator, decisionNoticeService, true, true);
+                validator, decisionNoticeService, true);
 
         PreSubmitCallbackResponse<SscsCaseData> response = severeConditionsHandler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -256,7 +256,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         when(callback.getPageId()).thenReturn("workCapabilityAssessment");
 
         EsaWriteFinalDecisionMidEventValidationHandler severeConditionsHandler = new EsaWriteFinalDecisionMidEventValidationHandler(
-                validator, decisionNoticeService, true, true);
+                validator, decisionNoticeService, true);
 
         PreSubmitCallbackResponse<SscsCaseData> response = severeConditionsHandler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -277,7 +277,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(callback.getPageId()).thenReturn("severeCriteria");
 
-        EsaWriteFinalDecisionMidEventValidationHandler severeConditionsHandler = new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, true);
+        EsaWriteFinalDecisionMidEventValidationHandler severeConditionsHandler = new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true);
 
         PreSubmitCallbackResponse<SscsCaseData> response = severeConditionsHandler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -298,7 +298,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         when(callback.getPageId()).thenReturn("severeCriteria");
 
         EsaWriteFinalDecisionMidEventValidationHandler severeConditionsHandler = new EsaWriteFinalDecisionMidEventValidationHandler(
-                validator, decisionNoticeService, true, true);
+                validator, decisionNoticeService, true);
 
         PreSubmitCallbackResponse<SscsCaseData> response = severeConditionsHandler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -398,7 +398,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(NO);
         sscsCaseData.setIssueCode("SV");
         EsaWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new EsaWriteFinalDecisionMidEventValidationHandler(
-                validator, decisionNoticeService, true, true);
+                validator, decisionNoticeService, true);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handlerWithSevereConditions.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -419,7 +419,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereYesNo(YesNo.valueOf(isCaseSevereCondition));
         sscsCaseData.setIssueCode(issueCode);
         EsaWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new EsaWriteFinalDecisionMidEventValidationHandler(
-                validator, decisionNoticeService, true, true);
+                validator, decisionNoticeService, true);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handlerWithSevereConditions.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -431,7 +431,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     @Parameters({"2026-04-05, NO", "2026-04-06, YES"})
     public void givenSevereConditionsEnabled_shouldSetWriteFinalDecisionDateOfDecisionIsAfterSvDate(String dateOfDecision, YesNo isDateOfDecisionAfterSvDate) {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision(dateOfDecision);
-        EsaWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, true);
+        EsaWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true);
         handlerWithSevereConditions.setDefaultFields(sscsCaseData);
         assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecisionIsAfterSvDate()).isEqualTo(isDateOfDecisionAfterSvDate);
     }
@@ -440,7 +440,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     public void givenSevereConditionsCaseBeforeSvStartDate_thenShouldThrowError() {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2026-04-05");
         sscsCaseData.setCaseCode("051SV");
-        EsaWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, true);
+        EsaWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handlerWithSevereConditions.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -452,7 +452,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     public void givenSevereConditionsCaseAfterSvStartDate_thenShouldNotThrowError() {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2026-04-06");
         sscsCaseData.setCaseCode("051SV");
-        EsaWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, true);
+        EsaWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handlerWithSevereConditions.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -463,7 +463,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     public void givenNonSevereConditionsCase_thenShouldNotThrowError() {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2026-04-05");
         sscsCaseData.setCaseCode("051SG");
-        EsaWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true, true);
+        EsaWriteFinalDecisionMidEventValidationHandler handlerWithSevereConditions = new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, true);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handlerWithSevereConditions.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
