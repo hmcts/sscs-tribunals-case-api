@@ -54,7 +54,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.util.CaseAssignmentVerifier;
 
 @ExtendWith(MockitoExtension.class)
-public class CitizenLoginServiceV2Test {
+class CitizenLoginServiceV2Test {
 
     private static final String SUBSCRIPTION_EMAIL_ADDRESS = "someEmail@example.com";
     private static final String APPEAL_POSTCODE = "CM11 1AB";
