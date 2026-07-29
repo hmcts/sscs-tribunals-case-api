@@ -280,7 +280,6 @@ public class TrackYourAppealJsonBuilder {
             addSubscription(subscriptionsNode, subscriptions.getAppellantSubscription(), "Appellant");
             addSubscription(subscriptionsNode, subscriptions.getAppointeeSubscription(), "Appointee");
             addSubscription(subscriptionsNode, subscriptions.getRepresentativeSubscription(), "Representative");
-            addSubscription(subscriptionsNode, subscriptions.getJointPartySubscription(), "JointParty");
             addSubscription(subscriptionsNode, subscriptions.getSupporterSubscription(), "Supporter");
         }
 
