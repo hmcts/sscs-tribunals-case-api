@@ -1,0 +1,174 @@
+{
+  "caseCreated": "HYWw-sy-ag",
+  "appeal": {
+    "mrnDetails": {
+      "dwpIssuingOffice": "W",
+      "mrnDate": "6QQA-6Y-kQ"
+    },
+    "appellant": {
+      "name": {
+        "title": "8Y",
+        "firstName": "84C",
+        "lastName": "4uSSIQ"
+      },
+      "address": {
+        "line1": "gKK CWSSY cY24",
+        "line2": "U04 6iuMY ssYa",
+        "town": "yK8csc0woW",
+        "county": "G8yq",
+        "postcode": "W8G2 O4w"
+      },
+      "contact": {
+        "email": "OOo@2iaQA0.A8w",
+        "mobile": "keEEG0aq0Y4"
+      },
+      "identity": {
+        "dob": "UEQ8-Mm-OS",
+        "nino": "cOew0uMic"
+      },
+      "appointee": {
+        "name": {
+          "title": "0I",
+          "lastName": "GYa8",
+          "firstName": "CueOwGSkY"
+        },
+        "address": {
+          "line1": "uy6 mmkyu GUm2",
+          "line2": "uko ymo0a wIOQ",
+          "town": "G6SSqE4CmM",
+          "county": "g6gO",
+          "postcode": "0mU aCA"
+        },
+        "contact": {
+          "email": "m6YmMCm0Y@ceoA.uWo",
+          "mobile": "aIGYaSWusMM"
+        },
+        "identity": {
+          "dob": "q44k-Mm-aK",
+          "nino": "EwaYAS0YK"
+        }
+      },
+      "isAppointee": "wUu",
+      "isAddressSameAsAppointee": null
+    },
+    "benefitType": {
+      "code": "oU4"
+    },
+    "hearingType": "yMmy",
+    "hearingOptions": {
+      "wantsToAttend": "S2A",
+      "wantsSupport": "kkG",
+      "languageInterpreter": "miU",
+      "languages": "0aIqe6",
+      "arrangements": [
+        "4WMssc2qSo4GY002wUmgW6e",
+        "ksk6iiQmsEk"
+      ],
+      "scheduleHearing": "g08",
+      "excludeDates": [
+        {
+          "value": {
+            "start": "sG6a-uQ-O0",
+            "end": "W6Ii-Mw-Ey"
+          }
+        },
+        {
+          "value": {
+            "start": "0e2g-KM-CC",
+            "end": "IYcS-2q-2M"
+          }
+        },
+        {
+          "value": {
+            "start": "OA4a-Gq-0K",
+            "end": "CGYK-GO-Ww"
+          }
+        }
+      ],
+      "other": "cAMm oec6..."
+    },
+    "appealReasons": {
+      "reasons": [
+        {
+          "value": {
+            "reason": "QsW0eGCg4a",
+            "description": "mg2c2IGi2g"
+          }
+        },
+        {
+          "value": {
+            "reason": "SASeQMsueK",
+            "description": "8AcU8Yi24I"
+          }
+        },
+        {
+          "value": {
+            "reason": "wSeUW8Mwoy",
+            "description": "MUqukOAsuO"
+          }
+        }
+      ],
+      "otherReasons": "IQUEACM smqa4o"
+    },
+    "rep": {
+      "hasRepresentative": "gy6",
+      "organisation": "KU MYc",
+      "name": {
+        "firstName": "OQMc6",
+        "lastName": "wSoSIU"
+      },
+      "address": {
+        "line1": "6K4 uAgeI KUkQ",
+        "line2": "Uao wAUYk S2Oo",
+        "town": "YGyA",
+        "county": "KyQqkO",
+        "postcode": "qaya YCY"
+      },
+      "contact": {
+        "email": "2Oq26.wougco@GUaAMKc.GGa",
+        "mobile": "yo08IUmQo64"
+      }
+    },
+    "signer": "YU8 KWaqmU"
+  },
+  "subscriptions": {
+    "appellantSubscription": {
+      "wantSmsNotifications": "OmS",
+      "tya": "YMOeuWCQa8",
+      "email": "8Oa@cIoc6g.OEE",
+      "mobile": "YI2KUUqAyYA",
+      "subscribeEmail": "kgK",
+      "subscribeSms": "Q46"
+    },
+    "appointeeSubscription": {
+      "wantSmsNotifications": "ug4",
+      "tya": "2CIYgMkc28",
+      "email": "SssMqWa0M@s4q6.uQe",
+      "mobile": "8yECscmY4qs",
+      "subscribeEmail": "4YK",
+      "subscribeSms": "ySc"
+    },
+    "representativeSubscription": {
+      "wantSmsNotifications": "Wg6",
+      "tya": "2sSUKCu48k",
+      "email": "G6A@884S.UQ8",
+      "mobile": "6oIy2qUqiAO",
+      "subscribeEmail": "K0K",
+      "subscribeSms": "qmq"
+    },
+    "jointPartySubscription": {
+      "wantSmsNotifications": "cKG",
+      "tya": "ciSC4SwYKU",
+      "email": "oSk8I@uGKaYC.EEU",
+      "mobile": "68WcWKAOCMy",
+      "subscribeEmail": "i6g",
+      "subscribeSms": "qAk"
+    }
+  },
+  "generatedNino": "6Ue0Ywyg2",
+  "generatedSurname": "GGsyKi",
+  "generatedEmail": "Yye@qow4xK.AWa",
+  "generatedMobile": "eS8Yuqcsg88",
+  "generatedDob": "gueI-C2-kc",
+  "evidencePresent": "2i"
+}
