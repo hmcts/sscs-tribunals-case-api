@@ -78,7 +78,7 @@ class CitizenLoginServiceV2Test {
     private ArgumentCaptor<Consumer<SscsCaseDetails>> sscsCaseDataCaptor;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         citizenIdamTokens = IdamTokens.builder()
                 .userId("someUserId")
                 .email(SUBSCRIPTION_EMAIL_ADDRESS)
@@ -106,7 +106,7 @@ class CitizenLoginServiceV2Test {
 
     @ParameterizedTest
     @MethodSource("createValidCaseDataSubscriptions")
-    public void findsCasesAlreadyAssociatedWithCitizen(SscsCaseData sscsCaseData) {
+    void findsCasesAlreadyAssociatedWithCitizen(SscsCaseData sscsCaseData) {
         List<CaseDetails> caseDetails = new ArrayList<>();
         caseDetails.add(case1);
         caseDetails.add(case2);
@@ -130,7 +130,7 @@ class CitizenLoginServiceV2Test {
 
     @ParameterizedTest
     @MethodSource("createInvalidCaseDataSubscriptions")
-    public void doesNotFindCasesAlreadyAssociatedWithCitizenWhenSubscriptionEmailDoesNotMatch(SscsCaseData sscsCaseData) {
+    void doesNotFindCasesAlreadyAssociatedWithCitizenWhenSubscriptionEmailDoesNotMatch(SscsCaseData sscsCaseData) {
         List<CaseDetails> caseDetails = new ArrayList<>();
         caseDetails.add(case1);
         caseDetails.add(case2);
@@ -153,7 +153,7 @@ class CitizenLoginServiceV2Test {
     }
 
     @Test
-    public void findsCasesAlreadyAssociatedWithCitizenWhenOneCaseStatusIsDraft() {
+    void findsCasesAlreadyAssociatedWithCitizenWhenOneCaseStatusIsDraft() {
         List<CaseDetails> caseDetails = new ArrayList<>();
         caseDetails.add(case1);
         caseDetails.add(case2);
@@ -180,7 +180,7 @@ class CitizenLoginServiceV2Test {
     }
 
     @Test
-    public void findsCasesAlreadyAssociatedWithCitizenWhenOneCaseStatusIsDraftArchived() {
+    void findsCasesAlreadyAssociatedWithCitizenWhenOneCaseStatusIsDraftArchived() {
         List<CaseDetails> caseDetails = new ArrayList<>();
         caseDetails.add(case1);
         caseDetails.add(case2);
@@ -207,7 +207,7 @@ class CitizenLoginServiceV2Test {
     }
 
     @Test
-    public void findsActiveCasesAlreadyAssociatedWithCitizenWhenOneCaseStatusIsDormantState() {
+    void findsActiveCasesAlreadyAssociatedWithCitizenWhenOneCaseStatusIsDormantState() {
         List<CaseDetails> caseDetails = new ArrayList<>();
         caseDetails.add(case1);
         caseDetails.add(case2);
@@ -235,7 +235,7 @@ class CitizenLoginServiceV2Test {
 
     @ParameterizedTest
     @MethodSource("createValidCaseDataSubscriptions")
-    public void findsActiveCasesAlreadyAssociatedWithCitizenWhenOneCaseStatusIsVoidState(SscsCaseData sscsCaseData) {
+    void findsActiveCasesAlreadyAssociatedWithCitizenWhenOneCaseStatusIsVoidState(SscsCaseData sscsCaseData) {
         List<CaseDetails> caseDetails = new ArrayList<>();
         caseDetails.add(case1);
         caseDetails.add(case2);
@@ -258,7 +258,7 @@ class CitizenLoginServiceV2Test {
 
     @ParameterizedTest
     @MethodSource("createInvalidCaseDataSubscriptions")
-    public void doesNotFindActiveCasesWhenSubscriptionEmailDoesNotMatch(SscsCaseData sscsCaseData) {
+    void doesNotFindActiveCasesWhenSubscriptionEmailDoesNotMatch(SscsCaseData sscsCaseData) {
         List<CaseDetails> caseDetails = new ArrayList<>();
         caseDetails.add(case1);
         SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().id(222L).data(sscsCaseData).build();
@@ -274,7 +274,7 @@ class CitizenLoginServiceV2Test {
 
     @ParameterizedTest
     @MethodSource("createValidCaseDataSubscriptions")
-    public void findsDormantCasesAlreadyAssociatedWithCitizenWhenOneCaseStatusIsVoidState(SscsCaseData sscsCaseData) {
+    void findsDormantCasesAlreadyAssociatedWithCitizenWhenOneCaseStatusIsVoidState(SscsCaseData sscsCaseData) {
         List<CaseDetails> caseDetails = new ArrayList<>();
         CaseDetails caseDetails1 = CaseDetails.builder().id(111L).state(State.READY_TO_LIST.getId()).build();
         CaseDetails caseDetails2 = CaseDetails.builder().id(222L).state(State.DORMANT_APPEAL_STATE.getId()).build();
@@ -296,7 +296,7 @@ class CitizenLoginServiceV2Test {
 
     @ParameterizedTest
     @MethodSource("createInvalidCaseDataSubscriptions")
-    public void doesNotFindDormantCasesAlreadyAssociatedWithCitizenWhenSubscriptionEmailDoesNotMatch(SscsCaseData sscsCaseData) {
+    void doesNotFindDormantCasesAlreadyAssociatedWithCitizenWhenSubscriptionEmailDoesNotMatch(SscsCaseData sscsCaseData) {
         List<CaseDetails> caseDetails = new ArrayList<>();
         CaseDetails caseDetails1 = CaseDetails.builder().id(222L).state(State.DORMANT_APPEAL_STATE.getId()).build();
         caseDetails.add(caseDetails1);
@@ -311,7 +311,7 @@ class CitizenLoginServiceV2Test {
     }
 
     @Test
-    public void findsCasesAlreadyAssociatedWithCitizenAndAppellantTyaNumber() {
+    void findsCasesAlreadyAssociatedWithCitizenAndAppellantTyaNumber() {
         List<CaseDetails> caseDetails = new ArrayList<>();
         caseDetails.add(case1);
         caseDetails.add(case2);
@@ -329,7 +329,7 @@ class CitizenLoginServiceV2Test {
     }
 
     @Test
-    public void findsCasesAlreadyAssociatedWithCitizenAndAppointeeTyaNumber() {
+    void findsCasesAlreadyAssociatedWithCitizenAndAppointeeTyaNumber() {
         List<CaseDetails> caseDetails = new ArrayList<>();
         caseDetails.add(case1);
         caseDetails.add(case2);
@@ -348,7 +348,7 @@ class CitizenLoginServiceV2Test {
     }
 
     @Test
-    public void findsCasesAlreadyAssociatedWithCitizenAndRepTyaNumber() {
+    void findsCasesAlreadyAssociatedWithCitizenAndRepTyaNumber() {
         List<CaseDetails> caseDetails = new ArrayList<>();
         caseDetails.add(case1);
         caseDetails.add(case2);
@@ -364,7 +364,7 @@ class CitizenLoginServiceV2Test {
     }
 
     @Test
-    public void associatesUserWithCaseAppellant() {
+    void associatesUserWithCaseAppellant() {
         SscsCaseDetails expectedCase = createSscsCaseDetailsWithAppellantSubscription(tya);
         when(ccdService.findCaseByAppealNumber(tya, serviceIdamTokens))
                 .thenReturn(expectedCase);
@@ -384,7 +384,7 @@ class CitizenLoginServiceV2Test {
     }
 
     @Test
-    public void associatesUserWithCaseAppellantVerifiedWithIbcaReference() {
+    void associatesUserWithCaseAppellantVerifiedWithIbcaReference() {
         SscsCaseDetails expectedCase = createSscsCaseDetailsWithAppellantSubscription(tya);
         expectedCase.getData().getAppeal().getAppellant().getAddress().setPostcode(null);
         when(ccdService.findCaseByAppealNumber(tya, serviceIdamTokens))
@@ -407,7 +407,7 @@ class CitizenLoginServiceV2Test {
     }
 
     @Test
-    public void associatesUserWithCaseAppointee() {
+    void associatesUserWithCaseAppointee() {
         SscsCaseDetails expectedCase = createSscsCaseDetailsWithAppointeeSubscription(tya);
         when(ccdService.findCaseByAppealNumber(tya, serviceIdamTokens))
                 .thenReturn(expectedCase);
@@ -427,7 +427,7 @@ class CitizenLoginServiceV2Test {
     }
 
     @Test
-    public void associatesUserWithCaseRep() {
+    void associatesUserWithCaseRep() {
         SscsCaseDetails expectedCase = createSscsCaseDetailsWithRepSubscription(tya);
         when(ccdService.findCaseByAppealNumber(tya, serviceIdamTokens))
                 .thenReturn(expectedCase);
@@ -447,7 +447,7 @@ class CitizenLoginServiceV2Test {
     }
 
     @Test
-    public void associatesUserWithCaseJointParty() {
+    void associatesUserWithCaseJointParty() {
         SscsCaseDetails expectedCase = createSscsCaseDetailsWithJointPartySubscription(tya);
         when(ccdService.findCaseByAppealNumber(tya, serviceIdamTokens))
                 .thenReturn(expectedCase);
@@ -466,7 +466,7 @@ class CitizenLoginServiceV2Test {
     }
 
     @Test
-    public void findAndUpdateCaseLastLoggedIntoMya() {
+    void findAndUpdateCaseLastLoggedIntoMya() {
         final String beforeTimestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
         SscsCaseDetails expectedCase = createSscsCaseDetailsWithRepSubscription(tya);
         long expectedCaseId = expectedCase.getId();
@@ -482,7 +482,7 @@ class CitizenLoginServiceV2Test {
     }
 
     @Test
-    public void findAndShouldNotUpdateCaseLastLoggedIntoMyaWhenCaseDetailsIsNull() {
+    void findAndShouldNotUpdateCaseLastLoggedIntoMyaWhenCaseDetailsIsNull() {
         SscsCaseDetails expectedCase = null;
         long expectedCaseId = 1234L;
         when(ccdService.getByCaseId(expectedCaseId, serviceIdamTokens)).thenReturn(expectedCase);
@@ -495,7 +495,7 @@ class CitizenLoginServiceV2Test {
     }
 
     @Test
-    public void cannotAssociatesUserWithCaseAsEmailIncorrect() {
+    void cannotAssociatesUserWithCaseAsEmailIncorrect() {
         SscsCaseDetails expectedCase = createSscsCaseDetailsWithAppellantSubscription(tya);
         when(ccdService.findCaseByAppealNumber(tya, serviceIdamTokens))
                 .thenReturn(expectedCase);
@@ -510,20 +510,20 @@ class CitizenLoginServiceV2Test {
     }
 
     @Test
-    public void cannotAssociatesUserWithCaseAsPostcodeIncorrect() {
+    void cannotAssociatesUserWithCaseAsPostcodeIncorrect() {
         SscsCaseDetails expectedCase = createSscsCaseDetailsWithAppellantSubscription(tya);
         assertThatUserIsNotAddedToCase(expectedCase);
     }
 
     @Test
-    public void cannotAssociateUserWithCaseAsCasePostcodeIsEmpty() {
+    void cannotAssociateUserWithCaseAsCasePostcodeIsEmpty() {
         SscsCaseDetails expectedCase = createSscsCaseDetailsWithAppellantSubscription(tya);
         expectedCase.getData().getAppeal().getAppellant().getAddress().setPostcode("");
         assertThatUserIsNotAddedToCase(expectedCase);
     }
 
     @Test
-    public void cannotAssociateUserWithCaseAsCasePostcodeIsNull() {
+    void cannotAssociateUserWithCaseAsCasePostcodeIsNull() {
         SscsCaseDetails expectedCase = createSscsCaseDetailsWithAppellantSubscription(tya);
         expectedCase.getData().getAppeal().getAppellant().getAddress().setPostcode(null);
         assertThatUserIsNotAddedToCase(expectedCase);
@@ -543,7 +543,7 @@ class CitizenLoginServiceV2Test {
     }
 
     @Test
-    public void cannotAssociatesUserWithCaseAsCaseNotFound() {
+    void cannotAssociatesUserWithCaseAsCaseNotFound() {
         String someOtherPostcode = "someOtherPostcode";
 
         when(ccdService.findCaseByAppealNumber(tya, serviceIdamTokens)).thenReturn(null);
