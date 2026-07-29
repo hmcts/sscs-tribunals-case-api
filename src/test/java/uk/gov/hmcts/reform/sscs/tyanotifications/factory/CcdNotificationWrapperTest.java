@@ -250,22 +250,24 @@ public class CcdNotificationWrapperTest {
             .name(Name.builder().firstName("Ap").lastName("Pointee").build())
             .address(Address.builder().line1("Appointee Line 1").town("Appointee Town").county("Appointee County").postcode("AP9 0IN").build())
             .build();
+        SscsCaseData caseData = SscsCaseData.builder().otherParties(otherParties)
+            .appeal(Appeal.builder()
+                .hearingType(ORAL)
+                .appellant(Appellant.builder().appointee(appointee).build())
+                .build())
+            .subscriptions(Subscriptions.builder()
+                .appellantSubscription(
+                    Subscription.builder()
+                        .email("appellant@test.com")
+                        .subscribeEmail("Yes")
+                        .build()
+                )
+                .build())
+            .build();
+        updateOtherPartySelection(caseData);
         return new CcdNotificationWrapper(
             NotificationSscsCaseDataWrapper.builder()
-                .newSscsCaseData(SscsCaseData.builder().otherParties(otherParties)
-                    .appeal(Appeal.builder()
-                        .hearingType(ORAL)
-                        .appellant(Appellant.builder().appointee(appointee).build())
-                        .build())
-                    .subscriptions(Subscriptions.builder()
-                        .appellantSubscription(
-                            Subscription.builder()
-                                .email("appellant@test.com")
-                                .subscribeEmail("Yes")
-                                .build()
-                        )
-                        .build())
-                    .build())
+                .newSscsCaseData(caseData)
                 .notificationEventType(notificationEventType)
                 .build());
 
@@ -367,6 +369,7 @@ public class CcdNotificationWrapperTest {
         SscsCaseData sscsCaseData = ccdNotificationWrapper.getNewSscsCaseData();
         sscsCaseData.setConfidentialityType(confidentialityType);
         chosenMembers.forEach(o -> createPartiesOnTheCase(sscsCaseData, o));
+        updateOtherPartySelection(sscsCaseData);
         assertDirectionsNoticeConfidentiality(sscsCaseData, chosenMembers, requiredMembers);
     }
 
@@ -434,19 +437,6 @@ public class CcdNotificationWrapperTest {
             .containsExactlyInAnyOrder("1", "2");
     }
 
-    @Test
-    public void givenDirectionIssuedWithNoOtherPartySelection_thenAllEligibleOtherPartiesNotified() {
-        ccdNotificationWrapper = buildNotificationWrapperWithOtherParty(DIRECTION_ISSUED, buildMultipleOtherParties());
-        SscsCaseData caseData = ccdNotificationWrapper.getNewSscsCaseData();
-        caseData.setConfidentialityType(ConfidentialityType.CONFIDENTIAL.getCode());
-        caseData.setSendDirectionNoticeToOtherParty(YES);
-
-        List<SubscriptionWithType> subs = ccdNotificationWrapper.getOtherPartySubscriptions(caseData, DIRECTION_ISSUED);
-
-        Assertions.assertThat(subs)
-            .extracting(SubscriptionWithType::getPartyId)
-            .containsExactlyInAnyOrder("1", "2");
-    }
 
     @Test
     public void givenNonDirectionEventWithOtherPartySelection_thenSelectionIsIgnored() {
@@ -462,7 +452,7 @@ public class CcdNotificationWrapperTest {
     }
 
     @Test
-    public void givenDirectionIssuedWithSelectionRowButNothingChosen_thenAllEligibleOtherPartiesNotified() {
+    public void givenDirectionIssuedWithSelectionRowButNothingChosen_thenNoOtherPartiesNotified() {
         ccdNotificationWrapper = buildNotificationWrapperWithOtherParty(DIRECTION_ISSUED, buildMultipleOtherParties());
         SscsCaseData caseData = ccdNotificationWrapper.getNewSscsCaseData();
         caseData.setConfidentialityType(ConfidentialityType.CONFIDENTIAL.getCode());
@@ -471,9 +461,7 @@ public class CcdNotificationWrapperTest {
 
         List<SubscriptionWithType> subs = ccdNotificationWrapper.getOtherPartySubscriptions(caseData, DIRECTION_ISSUED);
 
-        Assertions.assertThat(subs)
-            .extracting(SubscriptionWithType::getPartyId)
-            .containsExactlyInAnyOrder("1", "2");
+        Assertions.assertThat(subs).isEmpty();
     }
 
     @Test
@@ -569,8 +557,29 @@ public class CcdNotificationWrapperTest {
         return selection;
     }
 
+    private void updateOtherPartySelection(SscsCaseData caseData) {
+        if (caseData.getOtherParties() != null) {
+            List<String> codes = new ArrayList<>();
+            for (CcdValue<OtherParty> op : caseData.getOtherParties()) {
+                if (op.getValue().getId() != null) {
+                    codes.add(PartyItemList.OTHER_PARTY.getCode() + op.getValue().getId());
+                }
+                if (op.getValue().getAppointee() != null && op.getValue().getAppointee().getId() != null) {
+                    codes.add(PartyItemList.OTHER_PARTY.getCode() + op.getValue().getAppointee().getId());
+                }
+                if (op.getValue().getRep() != null && op.getValue().getRep().getId() != null) {
+                    codes.add(PartyItemList.OTHER_PARTY_REPRESENTATIVE.getCode() + op.getValue().getRep().getId());
+                }
+            }
+            if (!codes.isEmpty()) {
+                caseData.setOtherPartySelection(otherPartySelection(codes.toArray(new String[0])));
+            }
+        }
+    }
+
     private void createPartiesOnTheCase(SscsCaseData sscsCaseData, String partyMember) {
         CcdValue<OtherParty> otherParty = CcdValue.<OtherParty>builder().value(OtherParty.builder()
+            .id("1")
             .name(Name.builder().title("Mr").firstName("Harrison").lastName("Kane").build())
             .address(Address.builder()
                 .line1("First Floor")
@@ -581,6 +590,7 @@ public class CcdNotificationWrapperTest {
                 .build())
             .build()).build();
         Representative rep = Representative.builder()
+            .id("3")
             .name(Name.builder().firstName("Harry").lastName("Potter").build())
             .hasRepresentative("Yes").build();
 
@@ -593,6 +603,7 @@ public class CcdNotificationWrapperTest {
 
         } else if (ConfidentialityPartyMembers.OTHER_PARTY_APPOINTEE.getCode().equals(partyMember)) {
             Appointee appointee = Appointee.builder()
+                .id("2")
                 .name(Name.builder().firstName("APPOINTEE").lastName("Test").build())
                 .build();
             otherParty.getValue().setAppointee(appointee);
