@@ -112,14 +112,12 @@ public class OnlineHearingService {
                     sscsCaseDetails.getData().getAppeal().getAppellant().getAddress(),
                     Optional.ofNullable(sscsCaseDetails.getData().getAppeal().getAppellant().getContact()),
                     appellantSubscriptions);
-        }
-        else if (isSignInSubscription(jointPartySubscriptions.values(), tya, email) && isYes(sscsCaseDetails.getData().getJointParty().getHasJointParty())) {
-                return populateUserDetails(UserType.JOINT_PARTY, sscsCaseDetails.getData().getJointParty().getName(),
-                        sscsCaseDetails.getData().getJointParty().getAddress(),
-                        Optional.ofNullable(sscsCaseDetails.getData().getJointParty().getContact()),
-                        jointPartySubscriptions);
-        }
-        else {
+        } else if (isSignInSubscription(jointPartySubscriptions.values(), tya, email) && isYes(sscsCaseDetails.getData().getJointParty().getHasJointParty())) {
+            return populateUserDetails(UserType.JOINT_PARTY, sscsCaseDetails.getData().getJointParty().getName(),
+                    sscsCaseDetails.getData().getJointParty().getAddress(),
+                    Optional.ofNullable(sscsCaseDetails.getData().getJointParty().getContact()),
+                    jointPartySubscriptions);
+        } else {
             List<CcdValue<OtherParty>> otherParties = sscsCaseDetails.getData().getOtherParties();
             for (CcdValue<OtherParty> op : emptyIfNull(otherParties)) {
                 Map<UserType, Subscription> otherPartySubscriptions = getOtherPartySubscriptionMap(op);
