@@ -109,6 +109,8 @@ public class OnlineHearingService {
         boolean isSignInSubscription = isSignInSubscription(appellantSubscriptions.values(), tya, email);
         log.info("Is sign in subscription for case id {} and email {}: {}", sscsCaseDetails.getId(), email, isSignInSubscription);
         log.info(sscsCaseDetails.getData().toString());
+        log.info("Appellant address: {}", sscsCaseDetails.getData().getAppeal().getAppellant().getAddress().toString());
+        log.info("Joint Party Address: {}", sscsCaseDetails.getData().getJointParty().getAddress().toString());
         if (isSignInSubscription) {
             log.info("Populating user details for case id {} and email {} as APPELLANT", sscsCaseDetails.getId(), email);
             return populateUserDetails(UserType.APPELLANT, sscsCaseDetails.getData().getAppeal().getAppellant().getName(),
