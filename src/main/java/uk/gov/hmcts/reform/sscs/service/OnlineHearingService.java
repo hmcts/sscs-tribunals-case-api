@@ -109,8 +109,6 @@ public class OnlineHearingService {
         boolean isSignInSubscription = isSignInSubscription(appellantSubscriptions.values(), tya, email);
         log.info("Is sign in subscription for case id {} and email {}: {}", sscsCaseDetails.getId(), email, isSignInSubscription);
         log.info(sscsCaseDetails.getData().toString());
-        log.info("Appellant address: {}", sscsCaseDetails.getData().getAppeal().getAppellant().getAddress().toString());
-        log.info("Joint Party Address: {}", sscsCaseDetails.getData().getJointParty().getAddress().toString());
         if (isSignInSubscription) {
             log.info("Populating user details for case id {} and email {} as APPELLANT", sscsCaseDetails.getId(), email);
             return populateUserDetails(UserType.APPELLANT, sscsCaseDetails.getData().getAppeal().getAppellant().getName(),
@@ -127,6 +125,8 @@ public class OnlineHearingService {
             log.info("{} was not populated with user details for Appellant or Joint Party for {}", sscsCaseDetails.getId(), email);
             log.info("Case has Joint Party {}", sscsCaseDetails.getData().getJointParty().getHasJointParty());
             log.info("Joint Party Subscriptions {}", isSignInSubscription(jointPartySubscriptions.values(), tya, email));
+            log.info("Appellant address: {}", sscsCaseDetails.getData().getAppeal().getAppellant().getAddress().toString());
+            log.info("Joint Party Address: {}", sscsCaseDetails.getData().getJointParty().getAddress().toString());
             List<CcdValue<OtherParty>> otherParties = sscsCaseDetails.getData().getOtherParties();
             for (CcdValue<OtherParty> op : emptyIfNull(otherParties)) {
                 Map<UserType, Subscription> otherPartySubscriptions = getOtherPartySubscriptionMap(op);
