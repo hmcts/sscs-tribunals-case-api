@@ -23,7 +23,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Contact;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
@@ -217,23 +216,6 @@ public class OnlineHearingServiceTest {
                                         .arrangements(asList("signLanguageInterpreter", "hearingLoop", "disabledAccess"))
                                         .signLanguageType("BSL")
                                         .other("other arrangements")
-                                        .build())
-                                .build()
-                        )
-                        .jointParty(JointParty.builder()
-                                .name(Name.builder()
-                                        .firstName("joint")
-                                        .lastName("party")
-                                        .build())
-                                .address(Address.builder()
-                                        .line1("joint")
-                                        .line2("street")
-                                        .town("joint town")
-                                        .county("UK")
-                                        .postcode("joint")
-                                        .build())
-                                .contact(Contact.builder()
-                                        .email("jointparty@hmct.com")
                                         .build())
                                 .build()
                         )

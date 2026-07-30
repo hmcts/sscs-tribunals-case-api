@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Collections.emptyList;
+import static java.util.Objects.nonNull;
 import static java.util.stream.Stream.of;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 
@@ -126,7 +127,7 @@ public class OnlineHearingService {
             log.info("Case has Joint Party {}", sscsCaseDetails.getData().getJointParty().getHasJointParty());
             log.info("Joint Party Subscriptions {}", isSignInSubscription(jointPartySubscriptions.values(), tya, email));
             log.info("Appellant address: {}", sscsCaseDetails.getData().getAppeal().getAppellant().getAddress().toString());
-            log.info("Joint Party Address: {}", sscsCaseDetails.getData().getJointParty().getAddress().toString());
+            log.info("Joint Party Address: {}", nonNull(sscsCaseDetails.getData().getJointParty().getAddress()) ? sscsCaseDetails.getData().getJointParty().getAddress().toString() : null);
             List<CcdValue<OtherParty>> otherParties = sscsCaseDetails.getData().getOtherParties();
             for (CcdValue<OtherParty> op : emptyIfNull(otherParties)) {
                 Map<UserType, Subscription> otherPartySubscriptions = getOtherPartySubscriptionMap(op);
