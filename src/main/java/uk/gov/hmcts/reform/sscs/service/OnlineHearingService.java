@@ -108,13 +108,14 @@ public class OnlineHearingService {
         Map<UserType, Subscription> jointPartySubscriptions = getJointPartySubscriptionMap(sscsCaseDetails);
         boolean isSignInSubscription = isSignInSubscription(appellantSubscriptions.values(), tya, email);
         log.info("Is sign in subscription for case id {} and email {}: {}", sscsCaseDetails.getId(), email, isSignInSubscription);
+        log.info(sscsCaseDetails.getData().toString());
         if (isSignInSubscription) {
             log.info("Populating user details for case id {} and email {} as APPELLANT", sscsCaseDetails.getId(), email);
             return populateUserDetails(UserType.APPELLANT, sscsCaseDetails.getData().getAppeal().getAppellant().getName(),
                     sscsCaseDetails.getData().getAppeal().getAppellant().getAddress(),
                     Optional.ofNullable(sscsCaseDetails.getData().getAppeal().getAppellant().getContact()),
                     appellantSubscriptions);
-        } else if (isSignInSubscription(jointPartySubscriptions.values(), tya, email)) {
+        } else if (sscsCaseDetails.getData().isThereAJointParty() && isSignInSubscription(jointPartySubscriptions.values(), tya, email)) {
             log.info("Populating user details for case id {} and email {} as JOINT_PARTY", sscsCaseDetails.getId(), email);
             return populateUserDetails(UserType.JOINT_PARTY, sscsCaseDetails.getData().getJointParty().getName(),
                     sscsCaseDetails.getData().getJointParty().getAddress(),
