@@ -39,6 +39,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DatedRequestOutcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
@@ -252,6 +253,7 @@ public class CcdNotificationWrapperTest {
             .build();
         SscsCaseData caseData = SscsCaseData.builder().otherParties(otherParties)
             .appeal(Appeal.builder()
+                    .benefitType(BenefitType.builder().code("childSupport").description("Child Support").build())
                 .hearingType(ORAL)
                 .appellant(Appellant.builder().appointee(appointee).build())
                 .build())
