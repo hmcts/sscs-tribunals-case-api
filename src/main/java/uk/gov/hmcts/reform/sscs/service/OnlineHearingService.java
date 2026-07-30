@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.service;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Stream.of;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -115,7 +114,7 @@ public class OnlineHearingService {
                     sscsCaseDetails.getData().getAppeal().getAppellant().getAddress(),
                     Optional.ofNullable(sscsCaseDetails.getData().getAppeal().getAppellant().getContact()),
                     appellantSubscriptions);
-        } else if (isSignInSubscription(jointPartySubscriptions.values(), tya, email) && isYes(sscsCaseDetails.getData().getJointParty().getHasJointParty())) {
+        } else if (isSignInSubscription(jointPartySubscriptions.values(), tya, email)) {
             log.info("Populating user details for case id {} and email {} as JOINT_PARTY", sscsCaseDetails.getId(), email);
             return populateUserDetails(UserType.JOINT_PARTY, sscsCaseDetails.getData().getJointParty().getName(),
                     sscsCaseDetails.getData().getJointParty().getAddress(),
