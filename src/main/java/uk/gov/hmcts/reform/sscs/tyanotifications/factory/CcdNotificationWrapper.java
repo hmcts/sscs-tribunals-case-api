@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEvent
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.*;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.*;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isBenefitTypeChildSupportOrUc;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -179,6 +180,8 @@ public class CcdNotificationWrapper implements NotificationWrapper {
 
     private boolean isOtherPartySelectedForDirectionNotice(SscsCaseData caseData, NotificationEventType eventType, String... partyIds) {
         if (!(DIRECTION_ISSUED.equals(eventType) || DIRECTION_ISSUED_WELSH.equals(eventType))) {
+            return true;
+        } else if (!isBenefitTypeChildSupportOrUc(caseData)) {
             return true;
         }
         List<String> selectedCodes = emptyIfNull(caseData.getOtherPartySelection()).stream()
