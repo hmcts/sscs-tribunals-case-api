@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static java.lang.String.format;
+import static java.util.Objects.isNull;
 import static java.util.stream.Stream.concat;
 import static java.util.stream.Stream.of;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
@@ -128,6 +129,9 @@ public class CitizenLoginService {
     private List<OnlineHearing> convert(List<SscsCaseDetails> sscsCaseDetails, IdamTokens idamTokens) {
         return sscsCaseDetails.stream()
                 .filter(f -> caseHasSubscriptionWithMatchingEmail(f, idamTokens))
+                .peek(sscsCase -> log.info(format("Find case: Found case with id [%s] for user [%s] with joint party [%s] and address [%s] appellant address [%s] and data[%s]",
+                        sscsCase.getId(), idamTokens.getUserId(), sscsCase.getData().getJointParty(), sscsCase.getData().getJointParty().getAddress(),
+                        isNull(sscsCase.getData().getAppeal()) ? null : sscsCase.getData().getAppeal().getAppellant().getAddress(), sscsCase.getData())))
                 .map(sscsCase -> onlineHearingService.loadHearing(sscsCase, null, idamTokens.getEmail()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
