@@ -9,12 +9,12 @@ module "notification-scheduler-db-flexible" {
   providers = {
     azurerm.postgres_network = azurerm.postgres_network
   }
-  source = "git@github.com:hmcts/terraform-module-postgresql-flexible?ref=master"
-  env    = var.env
-  product       = var.product
-  component     = var.tya-component
-  name          = "${var.product}-${var.tya-component}-postgres-v15-db"
-  business_area = "CFT" # sds or cft
+  source                         = "git@github.com:hmcts/terraform-module-postgresql-flexible?ref=master"
+  env                            = var.env
+  product                        = var.product
+  component                      = var.tya-component
+  name                           = "${var.product}-${var.tya-component}-postgres-v15-db"
+  business_area                  = "CFT" # sds or cft
   force_user_permissions_trigger = "1"
   # The original subnet is full, this is required to use the new subnet for new databases
   subnet_suffix = "expanded"
@@ -28,7 +28,7 @@ module "notification-scheduler-db-flexible" {
   # On Jenkins it will be injected for you automatically as jenkins_AAD_objectId.
   # Otherwise change the below:
   admin_user_object_id = var.jenkins_AAD_objectId
-  common_tags = var.common_tags
+  common_tags          = var.common_tags
   pgsql_server_configuration = [
     {
       name  = "azure.extensions"
@@ -36,8 +36,8 @@ module "notification-scheduler-db-flexible" {
     }
   ]
   //Below attributes needs to be overridden for Perftest & Prod
-  pgsql_sku            = var.pgsql_sku
-  pgsql_storage_mb     = var.pgsql_storage_mb
+  pgsql_sku        = var.pgsql_sku
+  pgsql_storage_mb = var.pgsql_storage_mb
 }
 
 # FlexibleServer v15 creds
