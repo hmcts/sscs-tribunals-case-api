@@ -68,7 +68,7 @@ public class CitizenLoginService {
         List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
                 .map(sscsCcdConvertService::getCaseDetails)
                 .filter(AppealNumberGenerator::filterCaseNotDraftOrArchivedDraft)
-                .peek(this::attachOtherPartyDetails)
+                .peek(this::attachOtherAndJointPartyDetails)
                 .toList();
         if (!isBlank(tya)) {
             log.info(format("Find case: Filtering for case with tya [%s] for user [%s]", tya, idamTokens.getUserId()));
@@ -89,11 +89,17 @@ public class CitizenLoginService {
         return convert;
     }
 
-    private void attachOtherPartyDetails(SscsCaseDetails sscsCaseDetailsItem) {
+    private void attachOtherAndJointPartyDetails(SscsCaseDetails sscsCaseDetailsItem) {
         if (sscsCaseDetailsItem.getData().getOtherParties() == null) {
             SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(sscsCaseDetailsItem.getId(), idamService.getIdamTokens());
             if (sscsCaseDetails != null) {
                 sscsCaseDetailsItem.getData().setOtherParties(sscsCaseDetails.getData().getOtherParties());
+            }
+        }
+        if (sscsCaseDetailsItem.getData().getJointParty() == null) {
+            SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(sscsCaseDetailsItem.getId(), idamService.getIdamTokens());
+            if (sscsCaseDetails != null) {
+                sscsCaseDetailsItem.getData().setJointParty(sscsCaseDetails.getData().getJointParty());
             }
         }
     }

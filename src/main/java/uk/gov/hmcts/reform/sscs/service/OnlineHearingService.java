@@ -128,9 +128,6 @@ public class OnlineHearingService {
             log.info("Joint Party Subscriptions {}", isSignInSubscription(jointPartySubscriptions.values(), tya, email));
             log.info("Case Data for Appellant: {}", sscsCaseDetails.getData().getAppeal().getAppellant());
             log.info("Appellant address: {}", sscsCaseDetails.getData().getAppeal().getAppellant().getAddress().toString());
-            log.info("Joint Party Address: {}", nonNull(sscsCaseDetails.getData().getJointParty().getAddress()) ? sscsCaseDetails.getData().getJointParty().getAddress().toString() : null);
-            log.info("Other Party data: {}", nonNull(sscsCaseDetails.getData().getOtherParties().getFirst())
-                    ? sscsCaseDetails.getData().getOtherParties().getFirst().getValue().toString() : null);
             List<CcdValue<OtherParty>> otherParties = sscsCaseDetails.getData().getOtherParties();
             for (CcdValue<OtherParty> op : emptyIfNull(otherParties)) {
                 Map<UserType, Subscription> otherPartySubscriptions = getOtherPartySubscriptionMap(op);
