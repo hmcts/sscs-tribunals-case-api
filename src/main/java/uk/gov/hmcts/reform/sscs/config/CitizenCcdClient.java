@@ -99,6 +99,7 @@ public class CitizenCcdClient {
                     idamTokens.getServiceAuthorization(),
                     ccdRequestDetails.getCaseTypeId(),
                     searchCriteria);
+            log.info("Search result for all cases for citizen: {}", searchResult.getCases());
             return Optional.ofNullable(searchResult).isEmpty() ? new ArrayList<>() : searchResult.getCases();
         } else {
             Map<String, String> searchCriteria = new HashMap<>();
