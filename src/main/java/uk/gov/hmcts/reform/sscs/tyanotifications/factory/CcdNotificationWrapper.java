@@ -178,35 +178,43 @@ public class CcdNotificationWrapper implements NotificationWrapper {
         return otherPartySubscription;
     }
 
-    private boolean isOtherPartySelectedForDirectionNotice(SscsCaseData caseData, NotificationEventType eventType, String... partyIds) {
-        if (!(DIRECTION_ISSUED.equals(eventType) || DIRECTION_ISSUED_WELSH.equals(eventType))) {
+    private boolean isOtherPartySelectedForDirectionNotice(
+            SscsCaseData caseData,
+            NotificationEventType eventType,
+            String... partyIds) {
+
+        if (!isDirectionNotice(eventType) || !isBenefitTypeChildSupportOrUc(caseData)) {
             return true;
-        } else if (!isBenefitTypeChildSupportOrUc(caseData)) {
-            return true;
         }
-        List<String> selectedCodes = emptyIfNull(caseData.getOtherPartySelection()).stream()
-            .map(CcdValue::getValue)
-            .map(OtherPartySelectionDetails::getOtherPartiesList)
-            .filter(Objects::nonNull)
-            .map(DynamicList::getValue)
-            .filter(Objects::nonNull)
-            .map(DynamicListItem::getCode)
-            .filter(Objects::nonNull)
-            .toList();
-        if (selectedCodes.isEmpty()) {
-            return false;
-        }
-        if (partyIds == null) {
-            return false;
-        }
-        for (String partyId : partyIds) {
-            if (nonNull(partyId)
-                && (selectedCodes.contains(PartyItemList.OTHER_PARTY.getCode() + partyId)
-                    || selectedCodes.contains(PartyItemList.OTHER_PARTY_REPRESENTATIVE.getCode() + partyId))) {
-                return true;
-            }
-        }
-        return false;
+
+        List<String> selectedCodes = getSelectedOtherPartyCodes(caseData);
+
+        return partyIds != null
+                && Arrays.stream(partyIds)
+                .filter(Objects::nonNull)
+                .anyMatch(partyId -> isOtherPartySelected(selectedCodes, partyId));
+    }
+
+    private boolean isDirectionNotice(NotificationEventType eventType) {
+        return DIRECTION_ISSUED.equals(eventType)
+                || DIRECTION_ISSUED_WELSH.equals(eventType);
+    }
+
+    private List<String> getSelectedOtherPartyCodes(SscsCaseData caseData) {
+        return emptyIfNull(caseData.getOtherPartySelection()).stream()
+                .map(CcdValue::getValue)
+                .map(OtherPartySelectionDetails::getOtherPartiesList)
+                .filter(Objects::nonNull)
+                .map(DynamicList::getValue)
+                .filter(Objects::nonNull)
+                .map(DynamicListItem::getCode)
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    private boolean isOtherPartySelected(List<String> selectedCodes, String partyId) {
+        return selectedCodes.contains(PartyItemList.OTHER_PARTY.getCode() + partyId)
+                || selectedCodes.contains(PartyItemList.OTHER_PARTY_REPRESENTATIVE.getCode() + partyId);
     }
 
     private boolean isOtherPartyPresent(SscsCaseData sscsCaseData) {

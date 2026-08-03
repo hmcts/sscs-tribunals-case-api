@@ -16,6 +16,7 @@ import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isBenefitTypeChildSupportOr
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -26,6 +27,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 
+@Slf4j
 @Service
 public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private final boolean isPostHearingsEnabled;
@@ -162,6 +164,7 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
             selection.add(new CcdValue<>(new OtherPartySelectionDetails(new DynamicList(null, listOptions))));
             sscsCaseData.setOtherPartySelection(selection);
         } else {
+            log.warn("Other party selection not set for case {}", sscsCaseData.getCcdCaseId());
             sscsCaseData.setOtherPartySelection(null);
         }
     }
