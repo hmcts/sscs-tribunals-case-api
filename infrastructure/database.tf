@@ -36,8 +36,8 @@ module "notification-scheduler-db-flexible" {
     }
   ]
   //Below attributes needs to be overridden for Perftest & Prod
-  pgsql_sku = var.pgsql_sku
-  pgsql_storage_mb = var.pgsql_storage_mb
+  pgsql_sku            = var.pgsql_sku
+  pgsql_storage_mb     = var.pgsql_storage_mb
 }
 
 # FlexibleServer v15 creds
