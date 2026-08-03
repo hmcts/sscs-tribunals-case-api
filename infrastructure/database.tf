@@ -28,7 +28,7 @@ module "notification-scheduler-db-flexible" {
   # On Jenkins it will be injected for you automatically as jenkins_AAD_objectId.
   # Otherwise change the below:
   admin_user_object_id = var.jenkins_AAD_objectId
-  common_tags          = var.common_tags
+  common_tags = var.common_tags
   pgsql_server_configuration = [
     {
       name  = "azure.extensions"
@@ -36,7 +36,7 @@ module "notification-scheduler-db-flexible" {
     }
   ]
   //Below attributes needs to be overridden for Perftest & Prod
-  pgsql_sku        = var.pgsql_sku
+  pgsql_sku = var.pgsql_sku
   pgsql_storage_mb = var.pgsql_storage_mb
 }
 
