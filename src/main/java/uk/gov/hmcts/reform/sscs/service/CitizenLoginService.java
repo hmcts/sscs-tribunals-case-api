@@ -101,12 +101,10 @@ public class CitizenLoginService {
                 sscsCaseDetailsItem.getData().setOtherParties(sscsCaseDetails.getData().getOtherParties());
             }
         }
-        if (sscsCaseDetailsItem.getData().getJointParty() == null) {
-            log.info("Attaching Joint party details to case {}", sscsCaseDetailsItem.getId());
-            SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(sscsCaseDetailsItem.getId(), idamService.getIdamTokens());
-            if (sscsCaseDetails != null) {
-                sscsCaseDetailsItem.getData().setJointParty(sscsCaseDetails.getData().getJointParty());
-            }
+        log.info("Attaching Joint party details to case {}", sscsCaseDetailsItem.getId());
+        SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(sscsCaseDetailsItem.getId(), idamService.getIdamTokens());
+        if (sscsCaseDetails != null) {
+            sscsCaseDetailsItem.getData().setJointParty(sscsCaseDetails.getData().getJointParty());
         }
     }
 
