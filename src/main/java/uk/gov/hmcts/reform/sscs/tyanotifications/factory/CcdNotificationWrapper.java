@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.factory;
 
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType.ORAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType.PAPER;
