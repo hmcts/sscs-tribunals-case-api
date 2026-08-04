@@ -189,7 +189,6 @@ public class OnlineHearingService {
     private List<uk.gov.hmcts.reform.sscs.domain.wrapper.Subscription> getSubscriptions(Map<UserType, Subscription> subscriptionsMap) {
         return subscriptionsMap.entrySet().stream()
                 .filter(Objects::nonNull)
-                .filter(s -> !UserType.JOINT_PARTY.equals(s.getKey()))
                 .map(s -> new uk.gov.hmcts.reform.sscs.domain.wrapper.Subscription(s.getKey().getType(), s.getValue().getEmail(), s.getValue().getMobile()))
                 .collect(Collectors.toList());
     }
