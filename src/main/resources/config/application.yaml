@@ -1776,8 +1776,8 @@ notification:
                     emailId: 385e1c56-7b69-4af2-8b0d-50a8ab66679e
                     smsId: fdedbabe-a46e-410f-849f-345edada0a6d
                 joint_party:
-                    emailId: d798661e-611b-4ff1-86e7-4cccda64cb36
-                    smsId: ae62c0e6-d910-4802-8ce8-9cd863fe9170
+                    emailId: e6969b5d-cd8c-4ff8-ab76-faaed6f388c3
+                    smsId: ec79f3ac-f7fe-41f0-a033-f0c20cfd1c69
                 other_party:
                     emailId: 385e1c56-7b69-4af2-8b0d-50a8ab66679e
                     smsId: fdedbabe-a46e-410f-849f-345edada0a6d
