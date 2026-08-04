@@ -163,8 +163,8 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
             List<CcdValue<OtherPartySelectionDetails>> selection = new ArrayList<>();
             selection.add(new CcdValue<>(new OtherPartySelectionDetails(new DynamicList(null, listOptions))));
             sscsCaseData.setOtherPartySelection(selection);
+            log.info("Other party selection set for case {}", sscsCaseData.getCcdCaseId());
         } else {
-            log.warn("Other party selection not set for case {}", sscsCaseData.getCcdCaseId());
             sscsCaseData.setOtherPartySelection(null);
         }
     }
