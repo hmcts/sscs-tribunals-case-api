@@ -68,7 +68,7 @@ java:
     CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED: true
   secrets:
     JOB_SCHEDULER_DB_PASSWORD:
-      secretRef: postgres
+      secretRef: "{{ tpl .Values.global.postgresSecret $}}"
       key: PASSWORD
   postgresql:
     enabled: false
@@ -90,7 +90,7 @@ am-org-role-mapping-service:
         secretRef: sscs-sb-preview
         key: connectionString
       ORG_ROLE_MAPPING_DB_PASSWORD:
-        secretRef: postgres
+        secretRef: "{{ tpl .Values.global.postgresSecret $}}"
         key: PASSWORD
         disabled: false
     keyVaults:
@@ -389,7 +389,7 @@ ccd:
               alias: ROLE_ASSIGNMENT_IDAM_ADMIN_PASSWORD
       secrets:
         ROLE_ASSIGNMENT_DB_PASSWORD:
-          secretRef: postgres
+          secretRef: "{{ tpl .Values.global.postgresSecret $}}"
           key: PASSWORD
           disabled: false
 
@@ -645,7 +645,7 @@ ccd:
         DEFINITION_STORE_DB_USERNAME: hmcts
       secrets:
         DEFINITION_STORE_DB_PASSWORD:
-          secretRef: postgres
+          secretRef: "{{ tpl .Values.global.postgresSecret $}}"
           key: PASSWORD
           disabled: false
       ingressHost: ccd-definition-store-${SERVICE_FQDN}
