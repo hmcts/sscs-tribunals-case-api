@@ -338,6 +338,7 @@ global:
   idamWebUrl: https://idam-web-public.aat.platform.hmcts.net
   s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
   postgresHostname: "sscs-preview.postgres.database.azure.com"
+  postgresSecret: postgres
   databaseNamePrefix: "pr-${CHANGE_ID}-"
   postgresUsername: hmcts
   security:
