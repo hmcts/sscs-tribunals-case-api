@@ -193,7 +193,7 @@
             "role": {
               "name": "Receiving parent"
             },
-            "confidentialityRequired": "No",
+            "confidentialityRequirement": "No",
             "unacceptableCustomerBehaviour": "No",
             "hearingOptions": {
               "arrangements": [],
