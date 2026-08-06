@@ -6,6 +6,7 @@ import static java.util.Objects.nonNull;
 import static java.util.stream.Stream.concat;
 import static java.util.stream.Stream.of;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+import static org.apache.commons.lang3.BooleanUtils.isFalse;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
@@ -21,7 +22,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
@@ -77,7 +77,7 @@ public class CitizenLoginService {
                     sscsCaseDetails.stream()
                             .filter(casesWithSubscriptionMatchingTya(tya))
                             .toList(),
-                    idamTokens.getEmail()
+                    idamTokens
             );
             log.info(format("Find case: Found [%s] cases for tya [%s] for user [%s]", convert.size(), tya, idamTokens.getUserId()));
 
@@ -85,7 +85,7 @@ public class CitizenLoginService {
         }
 
         log.info(format("Searching for case without for user [%s]", idamTokens.getUserId()));
-        List<OnlineHearing> convert = convert(sscsCaseDetails, idamTokens.getEmail());
+        List<OnlineHearing> convert = convert(sscsCaseDetails, idamTokens);
         log.info(format("Found [%s] cases without tya for user [%s]", convert.size(), idamTokens.getUserId()));
         return convert;
     }
@@ -111,7 +111,7 @@ public class CitizenLoginService {
                 .toList();
 
         log.info(format("Searching for active case without for user [%s]", idamTokens.getUserId()));
-        List<OnlineHearing> convert = convert(sscsCaseDetails, idamTokens.getEmail());
+        List<OnlineHearing> convert = convert(sscsCaseDetails, idamTokens);
         log.info(format("Found [%s] active cases for user [%s]", convert.size(), idamTokens.getUserId()));
         return convert;
     }
@@ -125,14 +125,15 @@ public class CitizenLoginService {
                 .toList();
 
         log.info(format("Searching for dormant case without for user [%s]", idamTokens.getUserId()));
-        List<OnlineHearing> convert = convert(sscsCaseDetails, idamTokens.getEmail());
+        List<OnlineHearing> convert = convert(sscsCaseDetails, idamTokens);
         log.info(format("Found [%s] dormant cases for user [%s]", convert.size(), idamTokens.getUserId()));
         return convert;
     }
 
-    private List<OnlineHearing> convert(List<SscsCaseDetails> sscsCaseDetails, String email) {
+    private List<OnlineHearing> convert(List<SscsCaseDetails> sscsCaseDetails, IdamTokens idamTokens) {
         return sscsCaseDetails.stream()
-                .map(sscsCase -> onlineHearingService.loadHearing(sscsCase, null, email))
+                .filter(f -> caseHasSubscriptionWithMatchingEmail(f, idamTokens))
+                .map(sscsCase -> onlineHearingService.loadHearing(sscsCase, null, idamTokens.getEmail()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .toList();
@@ -174,7 +175,7 @@ public class CitizenLoginService {
     public void findAndUpdateCaseLastLoggedIntoMya(IdamTokens citizenIdamTokens, String caseId) {
         if (StringUtils.isNotEmpty(caseId)) {
             SscsCaseDetails caseDetails = ccdService.getByCaseId(Long.valueOf(caseId), idamService.getIdamTokens());
-            if (caseDetails != null && caseHasSubscriptionWithMatchingEmail(caseDetails, citizenIdamTokens.getEmail())) {
+            if (caseDetails != null && caseHasSubscriptionWithMatchingEmail(caseDetails, citizenIdamTokens)) {
                 log.info("MYA log time: found matching email {} for case id {}", citizenIdamTokens.getEmail(), caseId);
                 updateCaseWithLastLoggedIntoMya(citizenIdamTokens.getEmail(), caseDetails);
             }
@@ -189,55 +190,47 @@ public class CitizenLoginService {
     }
 
     private Predicate<SscsCaseDetails> casesWithSubscriptionMatchingTya(String tya) {
-        return sscsCaseDetails -> {
-            Subscriptions subscriptions = sscsCaseDetails.getData().getSubscriptions();
-            final Stream<Subscription> otherPartySubscriptionStream = emptyIfNull(sscsCaseDetails.getData().getOtherParties()).stream()
-                    .map(CcdValue::getValue)
-                    .flatMap(op -> of(op.getOtherPartySubscription(), op.getOtherPartyAppointeeSubscription(), op.getOtherPartyRepresentativeSubscription()));
-
-
-            return concat(of(subscriptions.getAppellantSubscription(), subscriptions.getAppointeeSubscription(), subscriptions.getRepresentativeSubscription()), otherPartySubscriptionStream)
+        return sscsCaseDetails -> getAllSubscriptionsOnCase(sscsCaseDetails)
                     .anyMatch(subscription -> subscription != null && tya.equals(subscription.getTya()));
-        };
     }
 
     private boolean caseHasSubscriptionWithTyaAndEmail(SscsCaseDetails sscsCaseDetails, String tya, String email) {
-        Subscriptions subscriptions = sscsCaseDetails.getData().getSubscriptions();
 
+        return getAllSubscriptionsOnCase(sscsCaseDetails)
+                .anyMatch(subscription -> subscription != null && tya.equals(subscription.getTya()) && email.equalsIgnoreCase(subscription.getEmail()));
+    }
+
+    private boolean caseHasSubscriptionWithMatchingEmail(SscsCaseDetails sscsCaseDetails, IdamTokens idamTokens) {
+        boolean hasMatchingSubscriptionEmail = getAllSubscriptionsOnCase(sscsCaseDetails)
+                .anyMatch(subscription -> subscription != null && idamTokens.getEmail().equalsIgnoreCase(subscription.getEmail()));
+
+        if (isFalse(hasMatchingSubscriptionEmail)) {
+            log.info("No matching subscription email found for case id {} and user id [{}]", sscsCaseDetails.getId(), idamTokens.getUserId());
+        }
+
+        return hasMatchingSubscriptionEmail;
+    }
+
+    private Stream<Subscription> getAllSubscriptionsOnCase(SscsCaseDetails sscsCaseDetails) {
+        Subscriptions subscriptions = sscsCaseDetails.getData().getSubscriptions();
         final Stream<Subscription> otherPartySubscriptionStream = emptyIfNull(sscsCaseDetails.getData().getOtherParties()).stream()
                 .map(CcdValue::getValue)
                 .flatMap(op -> of(op.getOtherPartySubscription(), op.getOtherPartyAppointeeSubscription(), op.getOtherPartyRepresentativeSubscription()));
 
-        return concat(of(subscriptions.getAppellantSubscription(), subscriptions.getAppointeeSubscription(), subscriptions.getRepresentativeSubscription(),
-                subscriptions.getJointPartySubscription()), otherPartySubscriptionStream)
-                .anyMatch(subscription -> subscription != null && tya.equals(subscription.getTya()) && email.equalsIgnoreCase(subscription.getEmail()));
-    }
+        return concat(of(
+                        subscriptions.getAppellantSubscription(),
+                        subscriptions.getAppointeeSubscription(),
+                        subscriptions.getRepresentativeSubscription(),
+                        subscriptions.getJointPartySubscription(),
+                        subscriptions.getSupporterSubscription()),
+                        otherPartySubscriptionStream);
 
-    private boolean caseHasSubscriptionWithMatchingEmail(SscsCaseDetails sscsCaseDetails, String email) {
-        Subscriptions subscriptions = sscsCaseDetails.getData().getSubscriptions();
-
-        return of(subscriptions.getAppellantSubscription(), subscriptions.getAppointeeSubscription(), subscriptions.getRepresentativeSubscription())
-                .anyMatch(subscription -> subscription != null && email.equalsIgnoreCase(subscription.getEmail()));
     }
 
     private void updateSubscriptionWithLastLoggedIntoMya(SscsCaseDetails sscsCaseDetails, String email) {
-        SscsCaseData sscsCaseData = sscsCaseDetails.getData();
-        Subscriptions subscriptions = sscsCaseData.getSubscriptions();
         String lastLoggedIntoMya = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
-        if (subscriptions != null && subscriptions.getAppellantSubscription() != null
-                && email.equalsIgnoreCase(subscriptions.getAppellantSubscription().getEmail())) {
-            subscriptions.getAppellantSubscription().setLastLoggedIntoMya(lastLoggedIntoMya);
-        }
-        if (subscriptions != null && subscriptions.getAppointeeSubscription() != null
-                && email.equalsIgnoreCase(subscriptions.getAppointeeSubscription().getEmail())) {
-            subscriptions.getAppointeeSubscription().setLastLoggedIntoMya(lastLoggedIntoMya);
-        }
 
-        if (subscriptions != null && subscriptions.getRepresentativeSubscription() != null
-                && email.equalsIgnoreCase(subscriptions.getRepresentativeSubscription().getEmail())) {
-            subscriptions.getRepresentativeSubscription().setLastLoggedIntoMya(lastLoggedIntoMya);
-        }
-
+        getAllSubscriptionsOnCase(sscsCaseDetails).filter(subscription -> subscription != null && email.equalsIgnoreCase(subscription.getEmail()))
+                .forEach(subscription -> subscription.setLastLoggedIntoMya(lastLoggedIntoMya));
     }
-
 }
