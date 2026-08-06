@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
 import static java.util.Arrays.asList;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
@@ -498,8 +499,19 @@ public class NotificationService {
     }
 
     private Subscription getMaskedSubscription(Subscription subscription) {
-        subscription.setEmail(getMaskedEmail(subscription.getEmail()));
-        subscription.setMobile(getMaskedPostcodeOrPhone(subscription.getMobile()));
-        return subscription;
+        if (isNull(subscription)) {
+            return null;
+        }
+
+        return Subscription.builder()
+                .wantSmsNotifications(subscription.getWantSmsNotifications())
+                .tya(subscription.getTya())
+                .email(getMaskedEmail(subscription.getEmail()))
+                .mobile(getMaskedPostcodeOrPhone(subscription.getMobile()))
+                .subscribeEmail(subscription.getSubscribeEmail())
+                .subscribeSms(subscription.getSubscribeSms())
+                .reason(subscription.getReason())
+                .lastLoggedIntoMya(subscription.getLastLoggedIntoMya())
+                .build();
     }
 }

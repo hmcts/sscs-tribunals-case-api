@@ -960,7 +960,7 @@ class SscsUtilTest {
 
     @ParameterizedTest
     @CsvSource({"paddington_bear@gmail.com, pad***r@gmail.com", "007@bond.co.uk, 00***@bond.co.uk",
-        "el@test.com, e***@test.com", "b@tmanMail.com, ***@tmanMail.com"})
+        "el@test.com, e***@test.com", "b@tmanMail.com, ***@tmanMail.com", ",", "'',''"})
     void testGetMaskedEmail(String email, String expected) {
         assertThat(SscsUtil.getMaskedEmail(email)).isEqualTo(expected);
     }

@@ -6,6 +6,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.function.Predicate.not;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
@@ -780,7 +781,7 @@ public class SscsUtil {
     }
 
     public static String getMaskedEmail(String email) {
-        if (isNull(email)) {
+        if (isEmpty(email) || email.indexOf('@') < 0) {
             return email;
         }
         int atIndex = email.indexOf('@');
