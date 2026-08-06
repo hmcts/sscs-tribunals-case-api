@@ -53,8 +53,6 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtil
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.isOkToSendEmailNotification;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.isOkToSendSmsNotification;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationValidService.isBundledLetter;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedEmail;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPostcodeOrPhone;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;

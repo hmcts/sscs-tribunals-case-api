@@ -785,7 +785,7 @@ public class SscsUtil {
         }
         int atIndex = email.indexOf('@');
         if (atIndex > 3) {
-            return email.substring(0, 3) + "***" + email.substring(atIndex-1);
+            return email.substring(0, 3) + "***" + email.substring(atIndex - 1);
         }
         return email.substring(0, atIndex - 1) + "***" + email.substring(atIndex);
     }
