@@ -6,8 +6,12 @@ import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.*;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyName;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyUcb;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.hasNewOtherPartyAdded;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.haveOtherPartiesChanged;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isConfidential;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isValidBenefitTypeForConfidentiality;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.sendNewOtherPartyNotification;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.updateOtherPartiesConfidentialityChangedDate;
 
@@ -17,6 +21,7 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -35,6 +40,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
 
 public class OtherPartyDataUtilTest {
 
@@ -249,7 +255,7 @@ public class OtherPartyDataUtilTest {
     @Test
     void updateOtherPartiesConfidentialityChangedDate_whenNoPreviousParties_updatesDateForAllCurrentParties() {
         final LocalDateTime originalDate = now().minusHours(1);
-        final List<CcdValue<OtherParty>> current = List.of(buildOtherPartyWithConfidentiality(ID_1, YES, originalDate));
+        final List<CcdValue<OtherParty>> current = List.of(buildOtherPartyWithConfidentiality(ID_1, YesNoUndetermined.YES, originalDate));
 
         updateOtherPartiesConfidentialityChangedDate(current, null);
 
@@ -259,8 +265,8 @@ public class OtherPartyDataUtilTest {
     @Test
     void updateOtherPartiesConfidentialityChangedDate_whenNoMatchingPreviousPartyById_updatesDate() {
         final LocalDateTime originalDate = now().minusHours(1);
-        final List<CcdValue<OtherParty>> previous = List.of(buildOtherPartyWithConfidentiality(ID_2, YES, originalDate));
-        final List<CcdValue<OtherParty>> current = List.of(buildOtherPartyWithConfidentiality(ID_1, YES, originalDate));
+        final List<CcdValue<OtherParty>> previous = List.of(buildOtherPartyWithConfidentiality(ID_2, YesNoUndetermined.YES, originalDate));
+        final List<CcdValue<OtherParty>> current = List.of(buildOtherPartyWithConfidentiality(ID_1, YesNoUndetermined.YES, originalDate));
 
         updateOtherPartiesConfidentialityChangedDate(current, previous);
 
@@ -270,8 +276,8 @@ public class OtherPartyDataUtilTest {
     @Test
     void updateConfidentialityChangedDate_whenConfidentialityUnchanged_doesNotUpdateOtherPartiesDate() {
         final LocalDateTime originalDate = now().minusHours(1);
-        final List<CcdValue<OtherParty>> previous = List.of(buildOtherPartyWithConfidentiality(ID_1, YES, originalDate));
-        final List<CcdValue<OtherParty>> current = List.of(buildOtherPartyWithConfidentiality(ID_1, YES, originalDate));
+        final List<CcdValue<OtherParty>> previous = List.of(buildOtherPartyWithConfidentiality(ID_1, YesNoUndetermined.YES, originalDate));
+        final List<CcdValue<OtherParty>> current = List.of(buildOtherPartyWithConfidentiality(ID_1, YesNoUndetermined.YES, originalDate));
 
         updateOtherPartiesConfidentialityChangedDate(current, previous);
 
@@ -281,86 +287,51 @@ public class OtherPartyDataUtilTest {
     @Test
     void updateConfidentialityChangedDate_whenOtherPartiesConfidentialityChanged_updatesDate() {
         final LocalDateTime originalDate = now().minusHours(1);
-        final List<CcdValue<OtherParty>> previous = List.of(buildOtherPartyWithConfidentiality(ID_1, NO, originalDate));
-        final List<CcdValue<OtherParty>> current = List.of(buildOtherPartyWithConfidentiality(ID_1, YES, originalDate));
+        final List<CcdValue<OtherParty>> previous = List.of(buildOtherPartyWithConfidentiality(ID_1, YesNoUndetermined.NO, originalDate));
+        final List<CcdValue<OtherParty>> current = List.of(buildOtherPartyWithConfidentiality(ID_1, YesNoUndetermined.YES, originalDate));
 
         updateOtherPartiesConfidentialityChangedDate(current, previous);
 
         assertThat(current.getFirst().getValue().getConfidentialityRequiredChangedDate()).isAfter(originalDate);
     }
 
-    @ParameterizedTest
-    @MethodSource("benefitsWithSsCsType2And5")
-    void givenACaseAppellantConfidentialityIsRequired_thenCaseConfidentialYes(Benefit benefit) {
-        var caseData = buildSscsCaseData(benefit, YES);
-
-        assertThat(isConfidential(caseData,false)).isEqualTo(YES);
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("isConfidentialScenarios")
+    void isConfidential_returnsExpectedResult(final String scenario, final SscsCaseData caseData,
+        final boolean cmOtherPartyConfidentialityEnabled, final YesNo expected) {
+        assertThat(isConfidential(caseData, cmOtherPartyConfidentialityEnabled)).isEqualTo(expected);
     }
 
-    @ParameterizedTest
-    @MethodSource("benefitsWithSsCsType2And5")
-    void givenACaseWithOtherPartyButConfidentialityIsNotRequired_thenCaseConfidentialNull(Benefit benefit) {
-        var caseData = buildSscsCaseData(benefit);
-        caseData.setOtherParties(List.of(buildOtherParty("otherparty-1", true, null)));
-
-        assertThat(isConfidential(caseData,false)).isNull();
+    static Stream<Arguments> isConfidentialScenarios() {
+        return Stream.of(
+            Arguments.of("null case data returns null", null, false, null),
+            Arguments.of("null appeal returns null", SscsCaseData.builder().build(), false, null),
+            Arguments.of("null benefit type returns null", buildSscsCaseData(null), false, null),
+            Arguments.of("universal credit without confidentiality flag returns null", buildSscsCaseData(Benefit.UC), false, null),
+            Arguments.of("appellant confidentiality yes returns yes",
+                buildSscsCaseData(Benefit.CHILD_SUPPORT, YesNoUndetermined.YES), false, YesNo.YES),
+            Arguments.of("other party confidentiality yes with appellant not yes returns yes",
+                withOtherParties(buildSscsCaseData(Benefit.CHILD_SUPPORT),
+                    buildOtherParty("otherparty-1", true, YesNoUndetermined.YES)), false, YesNo.YES),
+            Arguments.of("appellant no and no other parties returns no",
+                buildSscsCaseData(Benefit.CHILD_SUPPORT, YesNoUndetermined.NO), false, YesNo.NO),
+            Arguments.of("appellant no but other party undetermined returns undetermined",
+                withOtherParties(buildSscsCaseData(Benefit.CHILD_SUPPORT, YesNoUndetermined.NO),
+                    buildOtherParty("otherparty-1", true, YesNoUndetermined.UNDETERMINED)), false, null),
+            Arguments.of("appellant undetermined and no other party confidentiality returns undetermined",
+                buildSscsCaseData(Benefit.CHILD_SUPPORT), false, null),
+            Arguments.of("universal credit with confidentiality flag enabled and appellant yes returns yes",
+                buildSscsCaseData(Benefit.UC, YesNoUndetermined.YES), true, YesNo.YES),
+            Arguments.of("universal credit with confidentiality flag enabled and appellant no returns no",
+                buildSscsCaseData(Benefit.UC, YesNoUndetermined.NO), true, YesNo.NO),
+            Arguments.of("universal credit with confidentiality flag enabled and no confidentiality returns undetermined",
+                buildSscsCaseData(Benefit.UC), true, null)
+        );
     }
 
-    @ParameterizedTest
-    @MethodSource("benefitsWithSsCsType2And5")
-    void givenACaseWithOtherPartyConfidentialityYesAndCmFlagEnabled_thenCaseConfidentialYes(Benefit benefit) {
-        var caseData = buildSscsCaseData(benefit);
-        caseData.setOtherParties(List.of(buildOtherParty("otherparty-1", true, YES)));
-
-        assertThat(isConfidential(caseData,false)).isEqualTo(YES);
-    }
-
-    @ParameterizedTest
-    @ValueSource (booleans = {true, false})
-    void givenACaseWithoutBenefitType_thenCaseConfidentialNull(boolean cmOtherPartyConfidentialityEnabled) {
-        var caseData = buildSscsCaseData(null);
-        caseData.setOtherParties(List.of(buildOtherParty("otherparty-1", true, YES)));
-
-        assertThat(isConfidential(caseData,cmOtherPartyConfidentialityEnabled)).isNull();
-    }
-
-    @Test
-    void givenUniversalCreditCaseOtherPartyConfidentialityYesAndCmFlagEnabled_thenCaseConfidentialYes() {
-        var caseData = buildSscsCaseData(Benefit.UC);
-        caseData.setOtherParties(List.of(buildOtherParty("otherparty-1", true, YES)));
-
-        assertThat(isConfidential(caseData,true)).isEqualTo(YES);
-    }
-
-    @Test
-    void givenUniversalCreditCaseWithoutOtherPartiesAndCmFlagEnabled_thenCaseConfidentialIsNull() {
-        var caseData = buildSscsCaseData(Benefit.UC);
-
-        assertThat(isConfidential(caseData,true)).isNull();
-    }
-
-    @Test
-    void givenUniversalCreditCaseWithOtherPartiesButConfidentialityIsNotRequiredAndCmFlagEnabled_thenCaseConfidentialIsNull() {
-        var caseData = buildSscsCaseData(Benefit.UC);
-        caseData.setOtherParties(List.of(buildOtherParty("otherparty-1", true, NO)));
-
-        assertThat(isConfidential(caseData,true)).isNull();
-    }
-
-    @Test
-    void givenUniversalCreditCaseWithOtherPartiesConfidentialityRequiredButCmFlagDisabled_thenCaseConfidentialIsNull() {
-        var caseData = buildSscsCaseData(Benefit.UC);
-        caseData.setOtherParties(List.of(buildOtherParty("otherparty-1", true, YES)));
-
-        assertThat(isConfidential(caseData,false)).isNull();
-    }
-
-    @Test
-    void givenUniversalCreditCaseWithOtherPartiesButConfidentialityIsNotRequiredAndCmFlagDisabled_thenCaseConfidentialIsNul() {
-        var caseData = buildSscsCaseData(Benefit.UC);
-        caseData.setOtherParties(List.of(buildOtherParty("otherparty-1", true, NO), buildOtherParty("otherparty-2", true, null)));
-
-        assertThat(isConfidential(caseData,false)).isNull();
+    private static SscsCaseData withOtherParties(final SscsCaseData caseData, final CcdValue<OtherParty> otherParty) {
+        caseData.setOtherParties(List.of(otherParty));
+        return caseData;
     }
 
     @ParameterizedTest
@@ -395,10 +366,10 @@ public class OtherPartyDataUtilTest {
         return buildOtherParty(id, true);
     }
 
-    private static CcdValue<OtherParty> buildOtherParty(String id, boolean ucb, YesNo confidentialityRequired) {
+    private static CcdValue<OtherParty> buildOtherParty(String id, boolean ucb, YesNoUndetermined confidentialityRequired) {
         return CcdValue.<OtherParty>builder().value(
             OtherParty.builder().id(id).name(name("OtherParty", id)).unacceptableCustomerBehaviour(ucb ? YesNo.YES : YesNo.NO)
-                .confidentialityRequired(confidentialityRequired)
+                .confidentialityRequirement(confidentialityRequired)
                 .build()).build();
     }
 
@@ -425,18 +396,18 @@ public class OtherPartyDataUtilTest {
         return Name.builder().firstName(name).lastName(id).build();
     }
 
-    private CcdValue<OtherParty> buildOtherPartyWithConfidentiality(final String id, final YesNo confidentiality,
+    private CcdValue<OtherParty> buildOtherPartyWithConfidentiality(final String id, final YesNoUndetermined confidentiality,
         final LocalDateTime changedDate) {
         return CcdValue.<OtherParty>builder().value(
-            OtherParty.builder().id(id).confidentialityRequired(confidentiality).confidentialityRequiredChangedDate(changedDate)
+            OtherParty.builder().id(id).confidentialityRequirement(confidentiality).confidentialityRequiredChangedDate(changedDate)
                 .build()).build();
     }
 
-    private SscsCaseData buildSscsCaseData(Benefit benefit) {
+    private static SscsCaseData buildSscsCaseData(Benefit benefit) {
         return buildSscsCaseData(benefit, null);
     }
 
-    private SscsCaseData buildSscsCaseData(Benefit benefit, YesNo confidentialityRequired) {
+    private static SscsCaseData buildSscsCaseData(Benefit benefit, YesNoUndetermined confidentialityRequired) {
         var benefitType = benefit != null
             ? buildBenefitType(benefit)
             : null;
@@ -449,7 +420,7 @@ public class OtherPartyDataUtilTest {
                     .address(Address.builder().line1("Line1").line2("Line2").postcode("CM120NS").build())
                     .identity(Identity.builder().nino("AB223344B").dob("1995-12-20").build())
                     .isAppointee("Yes")
-                    .confidentialityRequired(confidentialityRequired)
+                    .confidentialityRequirement(confidentialityRequired)
                     .appointee(Appointee.builder()
                         .address(Address.builder().line1("123 the Street").postcode("CM120NS").build())
                         .build()).build())

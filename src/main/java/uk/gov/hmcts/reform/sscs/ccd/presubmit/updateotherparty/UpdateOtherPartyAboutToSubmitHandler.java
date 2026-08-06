@@ -6,7 +6,7 @@ import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_OTHER_PARTY_DATA;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined.isNoOrNullOrUndetermined;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.issuehearingenquiryform.IssueHearingEnquiryFormAboutToSubmit.getHearingResponseExpectedByDays;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getUpdatedDirectionDueDate;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.validateHearingOptionsAndExcludeDates;
@@ -145,13 +145,13 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
 
     private boolean isChildSupportOrUcAdditionalOtherPartyAdded(SscsCaseData sscsCaseData, SscsCaseData caseDataBefore) {
         return isBenefitTypeChildSupportOrUc(sscsCaseData)
-            && appellantConfidentialityNotRequiredOrUnknown(sscsCaseData)
+            && appellantConfidentialityNotRequiredOrUndetermined(sscsCaseData)
             && additionalOtherPartyAddedPredicate.test(sscsCaseData, caseDataBefore);
     }
 
-    private static boolean appellantConfidentialityNotRequiredOrUnknown(SscsCaseData sscsCaseData) {
-        return isNull(sscsCaseData.getAppeal().getAppellant()) || isNoOrNull(
-            sscsCaseData.getAppeal().getAppellant().getConfidentialityRequired());
+    private static boolean appellantConfidentialityNotRequiredOrUndetermined(SscsCaseData sscsCaseData) {
+        return isNull(sscsCaseData.getAppeal().getAppellant()) || isNoOrNullOrUndetermined(
+            sscsCaseData.getAppeal().getAppellant().getConfidentialityRequirement());
     }
 
     private List<String> verifyHearingUnavailableDates(final List<CcdValue<OtherParty>> otherParties) {
