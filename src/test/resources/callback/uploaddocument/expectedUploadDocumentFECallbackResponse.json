@@ -36,7 +36,6 @@
           "nino": "JT 12 34 56 D"
         },
         "isAppointee": null,
-        "confidentialityRequired": null,
         "role": null,
         "appointee": {
           "id": null,
@@ -81,7 +80,7 @@
         }
       },
       "signer": null,
-      "hearingSubtype":null,
+      "hearingSubtype": null,
       "hearingType": "paper",
       "receivedVia": "Paper"
     },
@@ -145,7 +144,7 @@
         "wantSmsNotifications": "Yes",
         "tya": "NpmhpYaFLa",
         "email": "sscstest+notify@greencroftconsulting.com",
-        "lastLoggedIntoMya":null,
+        "lastLoggedIntoMya": null,
         "mobile": "07398785050",
         "subscribeEmail": "Yes",
         "subscribeSms": "Yes",
@@ -159,13 +158,13 @@
         "subscribeEmail": null,
         "subscribeSms": null,
         "reason": null,
-        "lastLoggedIntoMya":null
+        "lastLoggedIntoMya": null
       },
       "representativeSubscription": {
         "wantSmsNotifications": null,
         "tya": "",
         "email": "",
-        "lastLoggedIntoMya":null,
+        "lastLoggedIntoMya": null,
         "mobile": "",
         "subscribeEmail": "No",
         "subscribeSms": "No",
@@ -175,7 +174,7 @@
         "wantSmsNotifications": null,
         "tya": null,
         "email": null,
-        "lastLoggedIntoMya":null,
+        "lastLoggedIntoMya": null,
         "mobile": null,
         "subscribeEmail": null,
         "subscribeSms": null,
