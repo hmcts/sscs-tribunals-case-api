@@ -140,28 +140,28 @@ public class CitizenLoginService {
         String ibcaReference = searchDetails.getIbcaReference();
 
         if (caseByAppealNumber != null) {
-            log.info(format("Associate case: Found case to assign id [%s] for tya [%s] email [%s] postcode [%s]",
-                    caseByAppealNumber.getId(), tya, email, postcode));
+            log.info(format("Associate case: Found case to assign id [%s] for tya [%s] user [%s] postcode [%s]",
+                    caseByAppealNumber.getId(), tya, citizenIdamTokens.getUserId(), postcode));
             String appellantPostcode = caseByAppealNumber.getData().getAppeal().getAppellant().getAddress().getPostcode();
             if (isNotBlank(appellantPostcode) || isNotBlank(ibcaReference)) {
                 if (caseAssignmentVerifier.verifyPostcodeOrIbcaReference(caseByAppealNumber, postcode, ibcaReference, email)) {
-                    log.info(format("Associate case: Found case to assign id [%s] for tya [%s] email [%s] postcode [%s] matches postcode", caseByAppealNumber.getId(), tya, email, postcode));
+                    log.info(format("Associate case: Found case to assign id [%s] for tya [%s] user [%s] postcode [%s] matches postcode", caseByAppealNumber.getId(), tya, citizenIdamTokens.getUserId(), postcode));
                     if (caseHasSubscriptionWithTyaAndEmail(caseByAppealNumber, tya, email)) {
-                        log.info(format("Found case to assign id [%s] for tya [%s] email [%s] postcode [%s] has subscription", caseByAppealNumber.getId(), tya, email, postcode));
+                        log.info(format("Found case to assign id [%s] for tya [%s] user [%s] postcode [%s] has subscription", caseByAppealNumber.getId(), tya, citizenIdamTokens.getUserId(), postcode));
                         citizenCcdService.addUserToCase(idamService.getIdamTokens(), citizenIdamTokens.getUserId(), caseByAppealNumber.getId());
-                        updateCaseWithLastLoggedIntoMya(email, caseByAppealNumber);
+                        updateCaseWithLastLoggedIntoMya(email, caseByAppealNumber, citizenIdamTokens.getUserId());
                         return onlineHearingService.loadHearing(caseByAppealNumber, tya, email);
                     } else {
-                        log.info(format("Associate case: Subscription does not match id [%s] for tya [%s] email [%s] postcode [%s]", caseByAppealNumber.getId(), tya, email, postcode));
+                        log.info(format("Associate case: Subscription does not match id [%s] for tya [%s] user [%s] postcode [%s]", caseByAppealNumber.getId(), tya, citizenIdamTokens.getUserId(), postcode));
                     }
                 } else {
-                    log.info(format("Associate case: Postcode/Ibca reference does not match id [%s] for tya [%s] email [%s] postcode [%s]", caseByAppealNumber.getId(), tya, email, postcode));
+                    log.info(format("Associate case: Postcode/Ibca reference does not match id [%s] for tya [%s] user [%s] postcode [%s]", caseByAppealNumber.getId(), tya, citizenIdamTokens.getUserId(), postcode));
                 }
             } else {
                 log.info(format("Associate case: Found case to assign id [%s], however appellant postcode/ibca reference does not exist", caseByAppealNumber.getId()));
             }
         } else {
-            log.info(format("Associate case: No case found for tya [%s] email [%s] postcode [%s]", tya, email, postcode));
+            log.info(format("Associate case: No case found for tya [%s] user [%s] postcode [%s]", tya, citizenIdamTokens.getUserId(), postcode));
         }
         return Optional.empty();
     }
@@ -170,15 +170,16 @@ public class CitizenLoginService {
         if (StringUtils.isNotEmpty(caseId)) {
             SscsCaseDetails caseDetails = ccdService.getByCaseId(Long.valueOf(caseId), idamService.getIdamTokens());
             if (caseDetails != null && caseHasSubscriptionWithMatchingEmail(caseDetails, citizenIdamTokens.getEmail())) {
-                log.info("MYA log time: found matching email {} for case id {}", citizenIdamTokens.getEmail(), caseId);
-                updateCaseWithLastLoggedIntoMya(citizenIdamTokens.getEmail(), caseDetails);
+                log.info("MYA log time: found matching email for user {} for case id {}", citizenIdamTokens.getUserId(), caseId);
+                updateCaseWithLastLoggedIntoMya(citizenIdamTokens.getEmail(), caseDetails, citizenIdamTokens.getUserId());
             }
         }
 
     }
 
-    private void updateCaseWithLastLoggedIntoMya(String email, SscsCaseDetails caseByAppealNumber) {
-        log.info("Updating case with last logged in MYA using V2, case id: {}, matching email: {}", caseByAppealNumber.getId(), email);
+    private void updateCaseWithLastLoggedIntoMya(String email, SscsCaseDetails caseByAppealNumber, String userId) {
+        //gemma
+        log.info("Updating case with last logged in MYA using V2, case id: {}, for user: {}", caseByAppealNumber.getId(), userId);
         updateCcdCaseService.updateCaseV2(caseByAppealNumber.getId(), EventType.UPDATE_CASE_ONLY.getCcdType(), "SSCS - update last logged in MYA",
                 UPDATED_SSCS, idamService.getIdamTokens(), sscsCaseDetails -> updateSubscriptionWithLastLoggedIntoMya(sscsCaseDetails, email));
     }

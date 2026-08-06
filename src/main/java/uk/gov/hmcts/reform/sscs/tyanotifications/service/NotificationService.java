@@ -15,6 +15,8 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.getSubscription;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.isOkToSendNotification;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationValidService.isMandatoryLetterEventType;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedEmail;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPostcodeOrPhone;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isBenefitTypeChildSupportOrUc;
 
 import java.time.ZonedDateTime;
@@ -167,7 +169,7 @@ public class NotificationService {
                 Optional.ofNullable(sub.getEntity()).map(Object::getClass).orElse(null),
                 sub.getPartyId(),
                 sub.getSubscriptionType(),
-                sub.getSubscription()))
+                getMaskedSubscription(sub.getSubscription())))
             .collect(Collectors.joining("\n", "\n", ""));
         log.info("Processing for the Notification Type {} and Case Id {} the following subscriptions: {}",
             notificationWrapper.getNotificationType(),
@@ -493,5 +495,11 @@ public class NotificationService {
     private boolean isDigitalCase(final NotificationWrapper notificationWrapper) {
         return READY_TO_LIST
             .equals(notificationWrapper.getSscsCaseDataWrapper().getNewSscsCaseData().getCreatedInGapsFrom());
+    }
+
+    private Subscription getMaskedSubscription(Subscription subscription) {
+        subscription.setEmail(getMaskedEmail(subscription.getEmail()));
+        subscription.setMobile(getMaskedPostcodeOrPhone(subscription.getMobile()));
+        return subscription;
     }
 }

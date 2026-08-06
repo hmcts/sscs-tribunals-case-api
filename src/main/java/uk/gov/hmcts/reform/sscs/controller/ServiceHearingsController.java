@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
 import static io.swagger.v3.oas.annotations.enums.ParameterIn.HEADER;
+import static java.util.Objects.nonNull;
 import static org.springframework.http.ResponseEntity.status;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -22,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.exception.GetCaseException;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.exception.UpdateCaseException;
 import uk.gov.hmcts.reform.sscs.model.service.ServiceHearingRequest;
+import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.PartyDetails;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.ServiceHearingValues;
 import uk.gov.hmcts.reform.sscs.model.service.linkedcases.ServiceLinkedCases;
 import uk.gov.hmcts.reform.sscs.service.ServiceHearingsService;
@@ -55,7 +57,7 @@ public class ServiceHearingsController {
 
             ServiceHearingValues model = serviceHearingsService.getServiceHearingValues(request);
 
-            log.info("serviceHearingValues response {}", model);
+            log.info("serviceHearingValues response {}", getServiceHearingValuesForLogging(model));
 
             return status(HttpStatus.OK).body(model);
         } catch (Exception exc) {
@@ -103,5 +105,21 @@ public class ServiceHearingsController {
         } else if (exc instanceof ListingException) {
             log.error("Listing Exception for case id {}", caseId, exc);
         }
+    }
+
+    private ServiceHearingValues getServiceHearingValuesForLogging(ServiceHearingValues serviceHearingValues) {
+        List<PartyDetails> partyDetailsList = serviceHearingValues.getParties();
+        if (nonNull(partyDetailsList)) {
+            for (PartyDetails party : partyDetailsList) {
+                party.setPartyName(null);
+                party.getIndividualDetails().setFirstName(null);
+                party.getIndividualDetails().setLastName(null);
+                party.getIndividualDetails().setHearingChannelEmail(null);
+                party.getIndividualDetails().setHearingChannelPhone(null);
+            }
+        }
+        serviceHearingValues.setParties(partyDetailsList);
+
+        return serviceHearingValues;
     }
 }

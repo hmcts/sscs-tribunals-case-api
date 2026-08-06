@@ -53,6 +53,8 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtil
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.isOkToSendEmailNotification;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.isOkToSendSmsNotification;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationValidService.isBundledLetter;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedEmail;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPostcodeOrPhone;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
@@ -207,7 +209,7 @@ public class SendNotificationService {
             );
         log.info("In sendSmsNotification method notificationSender is available {} ", notificationSender != null);
 
-        notificationLog(notification, "sms", notification.getMobile(), wrapper);
+        notificationLog(notification, "sms", wrapper);
 
         return notificationHandler.sendNotification(wrapper, smsTemplateId, "SMS", sendNotification);
     }
@@ -227,7 +229,7 @@ public class SendNotificationService {
 
             log.info("In sendEmailNotification method notificationSender is available {} ", notificationSender != null);
 
-            notificationLog(notification, "email", notification.getEmail(), wrapper);
+            notificationLog(notification, "email", wrapper);
 
             return notificationHandler.sendNotification(wrapper, notification.getEmailTemplate(), "Email", sendNotification);
         }
@@ -285,7 +287,7 @@ public class SendNotificationService {
             placeholders.put(POSTPONEMENT_REQUEST,  getPostponementRequestStatus(wrapper.getNewSscsCaseData()));
 
             log.info("In sendLetterNotificationToAddress method notificationSender is available {} ", notificationSender != null);
-            notificationLog(notification, "GovNotify letter", address.getPostcode(), wrapper);
+            notificationLog(notification, "GovNotify letter", wrapper);
 
             notificationSender.sendLetter(
                 notification.getLetterTemplate(),
@@ -335,7 +337,7 @@ public class SendNotificationService {
                 log.info("In sendBundledAndDocmosisLetterNotification method notificationSender is available {} ",
                         notificationSender != null);
 
-                notificationLog(notification, "Docmosis Letter", nameToUse, wrapper);
+                notificationLog(notification, "Docmosis Letter", wrapper);
 
                 if (ArrayUtils.isNotEmpty(bundledLetter)) {
                     notificationHandler.sendNotification(wrapper, notification.getDocmosisLetterTemplate(), NOTIFICATION_TYPE_LETTER, sendNotification);
@@ -350,7 +352,7 @@ public class SendNotificationService {
         return false;
     }
 
-    private void notificationLog(Notification notification, String notificationType, String recipient, NotificationWrapper wrapper) {
+    private void notificationLog(Notification notification, String notificationType, NotificationWrapper wrapper) {
         Object partyType = Optional.ofNullable(notification)
             .map(Notification::getPlaceholders)
             .map(map -> map.get(PARTY_TYPE))
@@ -359,8 +361,8 @@ public class SendNotificationService {
             .map(Notification::getPlaceholders)
             .map(map -> map.get(ENTITY_TYPE))
             .orElse(null);
-        log.info("Sending {} Notification for Party {}, Entity {}, Contact {} and Notification Type {}",
-            notificationType, partyType, entityType, recipient, wrapper.getNotificationType());
+        log.info("Sending {} Notification for Party {}, Entity {}, case Id {} and Notification Type {}",
+            notificationType, partyType, entityType, wrapper.getCaseId(), wrapper.getNotificationType());
     }
 
     private byte[] downloadAssociatedCasePdf(NotificationWrapper wrapper) {

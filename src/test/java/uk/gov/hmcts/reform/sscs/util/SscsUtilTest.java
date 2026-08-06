@@ -957,4 +957,17 @@ class SscsUtilTest {
         SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefitCode).build()).build()).build();
         assertThat(isBenefitTypeChildSupportOrUc(sscsCaseData)).isEqualTo(expectedValue);
     }
+
+    @ParameterizedTest
+    @CsvSource({"paddington_bear@gmail.com, pad***r@gmail.com", "007@bond.co.uk, 00***@bond.co.uk",
+    "el@test.com, e***@test.com", "b@tmanMail.com, ***@tmanMail.com"})
+    void testGetMaskedEmail(String email, String expected) {
+        assertThat(SscsUtil.getMaskedEmail(email)).isEqualTo(expected);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"TS1 1ST, ***1ST", "07734850607, ***607"})
+    void testGetMaskedPostcodeOrPhone(String stringToMask, String expected) {
+        assertThat(SscsUtil.getMaskedPostcodeOrPhone(stringToMask)).isEqualTo(expected);
+    }
 }
