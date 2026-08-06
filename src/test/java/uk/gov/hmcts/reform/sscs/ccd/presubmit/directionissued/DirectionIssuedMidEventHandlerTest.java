@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
+import uk.gov.hmcts.reform.sscs.reference.data.model.ConfidentialityType;
 
 @RunWith(JUnitParamsRunner.class)
 public class DirectionIssuedMidEventHandlerTest {
@@ -151,6 +152,7 @@ public class DirectionIssuedMidEventHandlerTest {
     public void givenOtherPartiesButSendDirectionNoticeToOtherPartyNotAnswered_thenReturnsError(Benefit benefit) {
         sscsCaseData.setHasOtherParties(YES);
         sscsCaseData.setSendDirectionNoticeToOtherParty(null);
+        sscsCaseData.setConfidentialityType(ConfidentialityType.CONFIDENTIAL.getCode());
         BenefitType benefitType = BenefitType.builder().code(benefit.getShortName().toUpperCase()).build();
         sscsCaseData.getAppeal().setBenefitType(benefitType);
 
