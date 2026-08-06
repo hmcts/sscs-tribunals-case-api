@@ -169,5 +169,12 @@
   {"LiveFrom": "07/09/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-dwpresponsewriter", "CaseFieldID": "infoRequestFromTribunal", "Label": "Info request from Tribunal", "DisplayOrder": 31},
   {"LiveFrom": "07/09/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-dwpresponsewriter", "CaseFieldID": "tribunalResponseDueDate", "Label": "Tribunal reply by date", "DisplayOrder": 32},
   {"LiveFrom": "07/09/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-dwpresponsewriter", "CaseFieldID": "tribunalResponseProvidedDate", "Label": "Tribunal reply provided date", "DisplayOrder": 33},
-  {"LiveFrom": "07/09/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-dwpresponsewriter", "CaseFieldID": "ftaResponseDueDate", "Label": "FTA reply by date", "DisplayOrder": 34}
+  {"LiveFrom": "07/09/2025", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-dwpresponsewriter", "CaseFieldID": "ftaResponseDueDate", "Label": "FTA reply by date", "DisplayOrder": 34},
+  {"LiveFrom": "01/07/2026", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-clerk", "CaseFieldID": "hasUndeterminedPartyConfidentiality", "Label": "Confidentiality undetermined for a party", "DisplayOrder": 12},
+  {"LiveFrom": "01/07/2026", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-dwpresponsewriter", "CaseFieldID": "hasUndeterminedPartyConfidentiality", "Label": "Confidentiality undetermined for a party", "DisplayOrder": 12},
+  {"LiveFrom": "01/07/2026", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-judge", "CaseFieldID": "hasUndeterminedPartyConfidentiality", "Label": "Confidentiality undetermined for a party", "DisplayOrder": 12},
+  {"LiveFrom": "01/07/2026", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-registrar", "CaseFieldID": "hasUndeterminedPartyConfidentiality", "Label": "Confidentiality undetermined for a party", "DisplayOrder": 12},
+  {"LiveFrom": "01/07/2026", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-superuser", "CaseFieldID": "hasUndeterminedPartyConfidentiality", "Label": "Confidentiality undetermined for a party", "DisplayOrder": 12},
+  {"LiveFrom": "01/07/2026", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-hmrcresponsewriter", "CaseFieldID": "hasUndeterminedPartyConfidentiality", "Label": "Confidentiality undetermined for a party", "DisplayOrder": 12},
+  {"LiveFrom": "01/07/2026", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "hasUndeterminedPartyConfidentiality", "Label": "Confidentiality undetermined for a party", "DisplayOrder": 12}
 ]

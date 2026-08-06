@@ -73,7 +73,6 @@
             "nino": "BB000000B"
           },
           "isAppointee": "Yes",
-          "confidentialityRequired": null,
           "appointee": {
             "id": "5362d389-307a-4e4e-b32c-7b7eef0048fa",
             "name": {
