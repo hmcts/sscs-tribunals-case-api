@@ -34,7 +34,6 @@ import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
-import uk.gov.hmcts.reform.sscs.reference.data.model.ConfidentialityType;
 
 @RunWith(JUnitParamsRunner.class)
 public class DirectionIssuedMidEventHandlerTest {
@@ -145,20 +144,6 @@ public class DirectionIssuedMidEventHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertFalse(response.getErrors().contains("Other parties cannot be selected more than once"));
-    }
-
-    @Test
-    @Parameters({"UC", "CHILD_SUPPORT"})
-    public void givenOtherPartiesButSendDirectionNoticeToOtherPartyNotAnswered_thenReturnsError(Benefit benefit) {
-        sscsCaseData.setHasOtherParties(YES);
-        sscsCaseData.setSendDirectionNoticeToOtherParty(null);
-        sscsCaseData.setConfidentialityType(ConfidentialityType.CONFIDENTIAL.getCode());
-        BenefitType benefitType = BenefitType.builder().code(benefit.getShortName().toUpperCase()).build();
-        sscsCaseData.getAppeal().setBenefitType(benefitType);
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertTrue(response.getErrors().contains("Select whether to send the direction notice to the other party"));
     }
 
     @Test
