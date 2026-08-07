@@ -178,7 +178,6 @@ public class CitizenLoginService {
     }
 
     private void updateCaseWithLastLoggedIntoMya(String email, SscsCaseDetails caseByAppealNumber, String userId) {
-        //gemma
         log.info("Updating case with last logged in MYA using V2, case id: {}, for user: {}", caseByAppealNumber.getId(), userId);
         updateCcdCaseService.updateCaseV2(caseByAppealNumber.getId(), EventType.UPDATE_CASE_ONLY.getCcdType(), "SSCS - update last logged in MYA",
                 UPDATED_SSCS, idamService.getIdamTokens(), sscsCaseDetails -> updateSubscriptionWithLastLoggedIntoMya(sscsCaseDetails, email));

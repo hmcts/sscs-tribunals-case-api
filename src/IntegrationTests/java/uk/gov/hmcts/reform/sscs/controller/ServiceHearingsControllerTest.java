@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -9,6 +10,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,6 +25,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.sscs.exception.GetCaseException;
 import uk.gov.hmcts.reform.sscs.model.service.ServiceHearingRequest;
+import uk.gov.hmcts.reform.sscs.model.single.hearing.IndividualDetails;
+import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.PartyDetails;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.ServiceHearingValues;
 import uk.gov.hmcts.reform.sscs.model.service.linkedcases.ServiceLinkedCases;
 import uk.gov.hmcts.reform.sscs.service.ServiceHearingsService;
@@ -131,5 +136,84 @@ class ServiceHearingsControllerTest {
 
     public static String asJsonString(final Object obj) throws JsonProcessingException {
         return mapper.writeValueAsString(obj);
+    }
+
+    @DisplayName("getServiceHearingValuesForLogging should handle null parties")
+    @Test
+    void testGetServiceHearingValuesForLoggingWithNullParties() throws Exception {
+        ServiceHearingValues serviceHearingValues = ServiceHearingValues.builder()
+                .parties(null)
+                .build();
+
+        Method method = ServiceHearingsController.class.getDeclaredMethod("getServiceHearingValuesForLogging", ServiceHearingValues.class);
+        method.setAccessible(true);
+        String result = (String) method.invoke(new ServiceHearingsController(serviceHearingsService), serviceHearingValues);
+
+        assertThat(result).isNotNull();
+        assertThat(result).contains("parties=null");
+    }
+
+    @DisplayName("getServiceHearingValuesForLogging should handle empty parties list")
+    @Test
+    void testGetServiceHearingValuesForLoggingWithEmptyPartiesList() throws Exception {
+        ServiceHearingValues serviceHearingValues = ServiceHearingValues.builder()
+                .parties(new ArrayList<>())
+                .build();
+
+        Method method = ServiceHearingsController.class.getDeclaredMethod("getServiceHearingValuesForLogging", ServiceHearingValues.class);
+        method.setAccessible(true);
+        String result = (String) method.invoke(new ServiceHearingsController(serviceHearingsService), serviceHearingValues);
+
+        assertThat(result).isNotNull();
+        assertThat(result).contains("parties=[]");
+
+    }
+
+    @DisplayName("getServiceHearingValuesForLogging should mask multiple parties")
+    @Test
+    void testGetServiceHearingValuesForLoggingMasksMultipleParties() throws Exception {
+        IndividualDetails individualDetails1 = IndividualDetails.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .hearingChannelEmail(List.of("john.doe@example.com"))
+                .hearingChannelPhone(List.of("07123456789"))
+                .build();
+        PartyDetails partyDetails1 = PartyDetails.builder()
+                .partyName("John Doe")
+                .individualDetails(individualDetails1)
+                .build();
+
+        IndividualDetails individualDetails2 = IndividualDetails.builder()
+                .firstName("Jane")
+                .lastName("Smith")
+                .hearingChannelEmail(List.of("jane.smith@example.com"))
+                .hearingChannelPhone(List.of("07987654321"))
+                .build();
+        PartyDetails partyDetails2 = PartyDetails.builder()
+                .partyName("Jane Smith")
+                .individualDetails(individualDetails2)
+                .build();
+
+        List<PartyDetails> parties = new ArrayList<>();
+        parties.add(partyDetails1);
+        parties.add(partyDetails2);
+
+        ServiceHearingValues serviceHearingValues = ServiceHearingValues.builder()
+                .parties(parties)
+                .build();
+
+        Method method = ServiceHearingsController.class.getDeclaredMethod("getServiceHearingValuesForLogging", ServiceHearingValues.class);
+        method.setAccessible(true);
+        String result = (String) method.invoke(new ServiceHearingsController(serviceHearingsService), serviceHearingValues);
+
+        assertThat(result).isNotNull();
+        assertThat(result).doesNotContain("John");
+        assertThat(result).doesNotContain("Doe");
+        assertThat(result).doesNotContain("john.doe@example.com");
+        assertThat(result).doesNotContain("07123456789");
+        assertThat(result).doesNotContain("Jane");
+        assertThat(result).doesNotContain("Smith");
+        assertThat(result).doesNotContain("jane.smith@example.com");
+        assertThat(result).doesNotContain("07987654321");
     }
 }
