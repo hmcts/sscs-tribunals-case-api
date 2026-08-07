@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +52,8 @@ public class HmcHearingApiService {
                 roleAssignmentUrl,
                 dataStoreUrl,
                 hearingPayload.getCaseDetails().getCaseId(),
-                hearingPayload);
+                getMaskedHearingPayload(hearingPayload));
+        log.info("Verify hearing payload unaffected: ()", hearingPayload);
         return hmcHearingApi.createHearingRequest(
                 getIdamTokens().getIdamOauth2Token(),
                 getIdamTokens().getServiceAuthorization(),
@@ -67,7 +69,8 @@ public class HmcHearingApiService {
                 roleAssignmentUrl,
                 dataStoreUrl,
                 hearingId,
-                hearingPayload);
+                getMaskedHearingPayload(hearingPayload));
+        log.info("Verify hearing payload unaffected: ()", hearingPayload);
         return hmcHearingApi.updateHearingRequest(
                 getIdamTokens().getIdamOauth2Token(),
                 getIdamTokens().getServiceAuthorization(),
@@ -109,5 +112,19 @@ public class HmcHearingApiService {
 
     private IdamTokens getIdamTokens() {
         return idamService.getIdamTokens();
+    }
+
+    private HearingRequestPayload getMaskedHearingPayload(HearingRequestPayload hearingPayload) {
+        hearingPayload.getCaseDetails().setHmctsInternalCaseName(null);
+        hearingPayload.getCaseDetails().setPublicCaseName(null);
+        if (nonNull(hearingPayload.getPartiesDetails())) {
+            hearingPayload.getPartiesDetails().forEach(party -> {
+                if (nonNull(party.getIndividualDetails())) {
+                    party.getIndividualDetails().setFirstName(null);
+                    party.getIndividualDetails().setLastName(null);
+                }
+            });
+        }
+        return hearingPayload;
     }
 }
