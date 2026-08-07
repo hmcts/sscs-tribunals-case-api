@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.lenient;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -14,8 +15,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.exception.GetHearingException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -31,15 +30,12 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.PartyDetails;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.RequestDetails;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 class HmcHearingApiServiceTest {
 
     private static final String IDAM_OAUTH2_TOKEN = "TestOauth2Token";
     private static final String SERVICE_AUTHORIZATION = "TestServiceAuthorization";
-    private static final String CANCEL_REASON_TEMP = "AWAITING_LISTING";
     private static final long VERSION = 1;
     private static final long CASE_ID = 1625080769409918L;
-    private static final long MISSING_CASE_ID = 99250807409918L;
     private static final String HEARING_ID = "12345";
     private static final long HEARING_REQUEST_ID = 12345;
 
@@ -54,7 +50,7 @@ class HmcHearingApiServiceTest {
 
     @BeforeEach
     void setUp() {
-        given(idamService.getIdamTokens()).willAnswer(inv -> IdamTokens.builder()
+        lenient().when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder()
                 .serviceAuthorization(SERVICE_AUTHORIZATION)
                 .idamOauth2Token(IDAM_OAUTH2_TOKEN)
                 .build());
