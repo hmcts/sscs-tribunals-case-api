@@ -792,7 +792,7 @@ public class SscsUtil {
     }
 
     public static String getMaskedPostcodeOrPhone(String stringToMask) {
-        return nonNull(stringToMask) ? "***" + stringToMask.substring(stringToMask.length() - 3) : null;
+        return isEmpty(stringToMask) ? "***" + stringToMask.substring(stringToMask.length() - 3) : null;
     }
 }
 

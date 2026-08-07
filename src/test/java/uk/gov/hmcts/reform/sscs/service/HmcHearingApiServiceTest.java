@@ -4,7 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.BDDMockito.given;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +14,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.exception.GetHearingException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -22,9 +26,12 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingGetResponse;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingRequestPayload;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingResponse;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HmcUpdateResponse;
+import uk.gov.hmcts.reform.sscs.model.single.hearing.IndividualDetails;
+import uk.gov.hmcts.reform.sscs.model.single.hearing.PartyDetails;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.RequestDetails;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class HmcHearingApiServiceTest {
 
     private static final String IDAM_OAUTH2_TOKEN = "TestOauth2Token";
@@ -47,7 +54,7 @@ class HmcHearingApiServiceTest {
 
     @BeforeEach
     void setUp() {
-        given(idamService.getIdamTokens()).willReturn(IdamTokens.builder()
+        given(idamService.getIdamTokens()).willAnswer(inv -> IdamTokens.builder()
                 .serviceAuthorization(SERVICE_AUTHORIZATION)
                 .idamOauth2Token(IDAM_OAUTH2_TOKEN)
                 .build());
@@ -149,5 +156,72 @@ class HmcHearingApiServiceTest {
         assertThat(result)
                 .isNotNull()
                 .isEqualTo(response);
+    }
+
+    @DisplayName("getMaskedHearingPayload should mask sensitive fields in string output")
+    @Test
+    void testGetMaskedHearingPayloadMasksCaseNames() throws Exception {
+        IndividualDetails individualDetails = IndividualDetails.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .build();
+        PartyDetails partyDetails = PartyDetails.builder()
+                .individualDetails(individualDetails)
+                .build();
+        List<PartyDetails> parties = new ArrayList<>();
+        parties.add(partyDetails);
+
+        HearingRequestPayload payload = HearingRequestPayload.builder()
+               .caseDetails(CaseDetails.builder()
+                       .caseId(String.valueOf(CASE_ID))
+                       .hmctsInternalCaseName("HMCTS Internal Name")
+                       .publicCaseName("Public Case Name")
+                       .build())
+               .partiesDetails(parties)
+               .build();
+
+        HmcHearingApiService realService = new HmcHearingApiService(hmcHearingApi, idamService);
+        
+        Method method = HmcHearingApiService.class.getDeclaredMethod("getMaskedHearingPayload", HearingRequestPayload.class);
+        method.setAccessible(true);
+        
+        String result = (String) method.invoke(realService, payload);
+        assertThat(result).isNotNull();
+        assertThat(result).contains("hmctsInternalCaseName=null");
+        assertThat(result).contains("publicCaseName=null");
+        assertThat(result).doesNotContain("HMCTS Internal Name");
+        assertThat(result).doesNotContain("Public Case Name");
+        assertThat(result).contains("firstName=null");
+        assertThat(result).contains("lastName=null");
+        assertThat(result).doesNotContain("John");
+        assertThat(result).doesNotContain("Doe");
+    }
+
+    @DisplayName("getMaskedHearingPayload should handle null party individual details")
+    @Test
+    void testGetMaskedHearingPayloadWithNullIndividualDetails() throws Exception {
+        PartyDetails partyDetails = PartyDetails.builder()
+               .individualDetails(null)
+               .build();
+        List<PartyDetails> parties = new ArrayList<>();
+        parties.add(partyDetails);
+
+        HearingRequestPayload payload = HearingRequestPayload.builder()
+               .caseDetails(CaseDetails.builder()
+                       .caseId(String.valueOf(CASE_ID))
+                       .build())
+               .partiesDetails(parties)
+               .build();
+
+        HmcHearingApiService realService = new HmcHearingApiService(hmcHearingApi, idamService);
+        
+        Method method = HmcHearingApiService.class.getDeclaredMethod("getMaskedHearingPayload", HearingRequestPayload.class);
+        method.setAccessible(true);
+        
+        String result = (String) method.invoke(realService, payload);
+        assertThat(result).isNotNull();
+        assertThat(result).contains("hmctsInternalCaseName=null");
+        assertThat(result).contains("publicCaseName=null");
+        assertThat(result).contains("individualDetails=null");
     }
 }

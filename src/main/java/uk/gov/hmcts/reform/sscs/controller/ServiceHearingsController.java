@@ -107,7 +107,7 @@ public class ServiceHearingsController {
         }
     }
 
-    private ServiceHearingValues getServiceHearingValuesForLogging(ServiceHearingValues serviceHearingValues) {
+    private String getServiceHearingValuesForLogging(ServiceHearingValues serviceHearingValues) {
         List<PartyDetails> partyDetailsList = serviceHearingValues.getParties();
         if (nonNull(partyDetailsList)) {
             for (PartyDetails party : partyDetailsList) {
@@ -120,6 +120,6 @@ public class ServiceHearingsController {
         }
         serviceHearingValues.setParties(partyDetailsList);
 
-        return serviceHearingValues;
+        return serviceHearingValues.toString();
     }
 }

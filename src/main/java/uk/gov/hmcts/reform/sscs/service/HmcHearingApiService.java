@@ -53,7 +53,7 @@ public class HmcHearingApiService {
                 dataStoreUrl,
                 hearingPayload.getCaseDetails().getCaseId(),
                 getMaskedHearingPayload(hearingPayload));
-        log.info("Verify hearing payload unaffected: ()", hearingPayload);
+        log.info("Verify hearing payload unaffected: {}", hearingPayload);
         return hmcHearingApi.createHearingRequest(
                 getIdamTokens().getIdamOauth2Token(),
                 getIdamTokens().getServiceAuthorization(),
@@ -70,7 +70,6 @@ public class HmcHearingApiService {
                 dataStoreUrl,
                 hearingId,
                 getMaskedHearingPayload(hearingPayload));
-        log.info("Verify hearing payload unaffected: ()", hearingPayload);
         return hmcHearingApi.updateHearingRequest(
                 getIdamTokens().getIdamOauth2Token(),
                 getIdamTokens().getServiceAuthorization(),
@@ -114,7 +113,7 @@ public class HmcHearingApiService {
         return idamService.getIdamTokens();
     }
 
-    private HearingRequestPayload getMaskedHearingPayload(HearingRequestPayload hearingPayload) {
+    private String getMaskedHearingPayload(HearingRequestPayload hearingPayload) {
         hearingPayload.getCaseDetails().setHmctsInternalCaseName(null);
         hearingPayload.getCaseDetails().setPublicCaseName(null);
         if (nonNull(hearingPayload.getPartiesDetails())) {
@@ -125,6 +124,6 @@ public class HmcHearingApiService {
                 }
             });
         }
-        return hearingPayload;
+        return hearingPayload.toString();
     }
 }
