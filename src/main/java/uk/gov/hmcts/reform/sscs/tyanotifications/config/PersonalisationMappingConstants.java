@@ -39,6 +39,7 @@ public final class PersonalisationMappingConstants {
     public static final String CREATED_DATE_WELSH = "created_date_welsh";
     public static final String CURRENT_DATE_WELSH = "welsh_current_date";
     public static final String DAYS_TO_HEARING_LITERAL = "days_to_hearing_text";
+    public static final String DAYS_TO_HEARING_LITERAL_WELSH = "days_to_hearing_text_welsh";
     public static final String DECISION_DATE_LITERAL = "decision_date";
     public static final String DECISION_POSTED_RECEIVE_DATE = "decision_posted_receive_date";
     public static final String DECISION_POSTED_RECEIVE_DATE_WELSH = "welsh_decision_posted_receive_date";

@@ -77,6 +77,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMa
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.CREATED_DATE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.CURRENT_DATE_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.DAYS_TO_HEARING_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.DAYS_TO_HEARING_LITERAL_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.DECISION_DATE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.DECISION_POSTED_RECEIVE_DATE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.DECISION_POSTED_RECEIVE_DATE_WELSH;
@@ -1479,6 +1480,7 @@ class PersonalisationTest {
         assertEquals("The venue, 12 The Road Avenue, Village, Aberdeen, Aberdeenshire, TS3 3ST", result.get(VENUE_ADDRESS_LITERAL));
         assertEquals("http://www.googlemaps.com/aberdeenvenue", result.get(VENUE_MAP_LINK_LITERAL));
         assertEquals("in 7 days", result.get(DAYS_TO_HEARING_LITERAL));
+        assertEquals("ymhen 7 ddiwrnod", result.get(DAYS_TO_HEARING_LITERAL_WELSH));
     }
 
     @ParameterizedTest
@@ -1536,6 +1538,7 @@ class PersonalisationTest {
             .notificationEventType(HEARING_BOOKED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertEquals("tomorrow", result.get(DAYS_TO_HEARING_LITERAL));
+        assertEquals("yfory", result.get(DAYS_TO_HEARING_LITERAL_WELSH));
     }
 
     @Test

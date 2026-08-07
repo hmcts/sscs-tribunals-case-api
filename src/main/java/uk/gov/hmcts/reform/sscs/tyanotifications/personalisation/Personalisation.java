@@ -25,6 +25,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.YES;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsDetailsMapping.getHearingType;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.CC_DATE_FORMAT;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DAYS_STRING;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DAYS_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DWP_ACRONYM;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DWP_ACRONYM_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DWP_FIRST_TIER_AGENCY_GROUP;
@@ -44,6 +45,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBCA
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBCA_FULL_NAME_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBC_ACRONYM;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBC_ACRONYM_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IN_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.JOINT_TEXT_WITH_A_SPACE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.JOINT_TEXT_WITH_A_SPACE_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.MAC_LITERAL;
@@ -55,6 +57,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.SSCS
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.THE_STRING;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.THE_STRING_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.TOMORROW_STRING;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.TOMORROW_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists.EVENTS_WITH_SUBSCRIPTION_TYPE_DOCMOSIS_TEMPLATES;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists.EVENTS_WITH_SUBSCRIPTION_TYPE_EMAIL_TEMPLATES;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.DISABLED_ACCESS;
@@ -89,6 +92,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMa
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.CREATED_DATE_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.CURRENT_DATE_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.DAYS_TO_HEARING_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.DAYS_TO_HEARING_LITERAL_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.DECISION_DATE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.DECISION_POSTED_RECEIVE_DATE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.DECISION_POSTED_RECEIVE_DATE_WELSH;
@@ -442,6 +446,7 @@ public class Personalisation<E extends NotificationWrapper> {
                 translateToWelshDate(hearingDateTime.toLocalDate(), ccdResponse, value -> personalisation.put(HEARING_DATE_WELSH, value));
                 personalisation.put(HEARING_TIME, formatLocalTime(hearingDateTime));
                 personalisation.put(DAYS_TO_HEARING_LITERAL, calculateDaysToHearingText(hearingDateTime.toLocalDate()));
+                personalisation.put(DAYS_TO_HEARING_LITERAL_WELSH, calculateDaysToHearingTextWelsh(hearingDateTime.toLocalDate()));
                 personalisation.put(VENUE_ADDRESS_LITERAL, formatAddress(latestHearing));
                 personalisation.put(VENUE_MAP_LINK_LITERAL, latestHearingValue.getVenue().getGoogleMapLink());
             }
@@ -892,9 +897,19 @@ public class Personalisation<E extends NotificationWrapper> {
     }
 
     private String calculateDaysToHearingText(LocalDate hearingDate) {
-        long daysBetween = ChronoUnit.DAYS.between(LocalDate.now(), hearingDate);
+        long daysBetween = calculateDaysToHearing(hearingDate);
 
         return daysBetween == 1 ? TOMORROW_STRING : "in " + daysBetween + DAYS_STRING;
+    }
+
+    private String calculateDaysToHearingTextWelsh(LocalDate hearingDate) {
+        long daysBetween = calculateDaysToHearing(hearingDate);
+
+        return daysBetween == 1 ? TOMORROW_WELSH : IN_WELSH + daysBetween + DAYS_WELSH;
+    }
+
+    private long calculateDaysToHearing(LocalDate hearingDate) {
+        return ChronoUnit.DAYS.between(LocalDate.now(), hearingDate);
     }
 
     private String getMacToken(String id, String benefitType) {
