@@ -154,7 +154,12 @@ fi
 
 az acr login --name hmctsprod --subscription 8999dec3-0104-4a27-94ee-6588559729d1
 
+# Run as the host user so generated xlsx files are not root-owned.
+# Root-owned outputs break Jenkins unstash after env-agent hops (AccessDeniedException).
 docker run --rm --name json2xlsx \
+  --user "$(id -u):$(id -g)" \
+  -e HOME=/tmp \
+  -e XDG_CACHE_HOME=/tmp/.cache \
   -v "${RUN_DIR}/definitions/${TYPE}:/tmp/json" \
   -v "${RUN_DIR}/definitions/${TYPE}:/tmp/output" \
   -e "CCD_DEF_EM_CCD_ORCHESTRATOR_URL=${EM_CCD_ORCHESTRATOR_URL}" \

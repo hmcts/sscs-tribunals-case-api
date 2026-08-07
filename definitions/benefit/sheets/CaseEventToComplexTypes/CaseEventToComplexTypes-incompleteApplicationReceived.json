@@ -565,7 +565,7 @@
   {
     "CaseEventID": "incompleteApplicationReceived",
     "CaseFieldID": "appeal",
-    "ListElementCode": "appellant.confidentialityRequired",
+    "ListElementCode": "appellant.confidentialityRequirement",
     "DisplayContext": "OPTIONAL",
     "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
