@@ -182,7 +182,8 @@ public class CcdNotificationWrapper implements NotificationWrapper {
             NotificationEventType eventType,
             String... partyIds) {
 
-        if (!isDirectionNotice(eventType) || !isBenefitTypeChildSupportOrUc(caseData)) {
+        if (!isDirectionNotice(eventType) || !isBenefitTypeChildSupportOrUc(caseData)
+            || !Objects.equals(ConfidentialityType.CONFIDENTIAL.getCode(), caseData.getConfidentialityType())) {
             return true;
         }
 
