@@ -2300,14 +2300,13 @@
     "CaseFieldID": "otherPartySelection",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
-    "FieldShowCondition": "(appeal.benefitType.code=\"childSupport\" OR appeal.benefitType.code=\"UC\") AND sendDirectionNoticeToOtherParty = \"Yes\"",
+    "FieldShowCondition": "sendDirectionNoticeToOtherParty = \"Yes\" AND confidentialityType=\"confidential\" AND (appeal.benefitType.code=\"childSupport\" OR appeal.benefitType.code=\"UC\")",
     "LiveFrom": "23/06/2026",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 9,
     "PageID": "1.0",
     "PageLabel": "Issue direction",
-    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent",
-    "RetainHiddenValue": "Yes"
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent"
   },
   {
     "CaseEventID": "directionIssued",

@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.ccd.util.SelectionValidator.otherPartySelectionContainsDuplicates;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.isDateInTheFuture;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isBenefitTypeChildSupportOrUc;
 
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +20,6 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
-import uk.gov.hmcts.reform.sscs.reference.data.model.ConfidentialityType;
 
 @Component
 @Slf4j
@@ -49,13 +47,6 @@ public class DirectionIssuedMidEventHandler extends IssueDocumentHandler impleme
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
-
-        if (isYes(caseData.getHasOtherParties()) && isBenefitTypeChildSupportOrUc(caseData)
-                && Objects.equals(ConfidentialityType.CONFIDENTIAL.getCode(), caseData.getConfidentialityType())
-                && caseData.getSendDirectionNoticeToOtherParty() == null) {
-            errorResponse.addError("Select whether to send the direction notice to the other party");
-            return errorResponse;
-        }
 
         if (otherPartySelectionContainsDuplicates(caseData.getOtherPartySelection())) {
             errorResponse.addError("Other parties cannot be selected more than once");
