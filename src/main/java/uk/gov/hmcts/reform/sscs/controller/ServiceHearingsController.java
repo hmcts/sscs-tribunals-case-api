@@ -6,6 +6,7 @@ import static org.springframework.http.ResponseEntity.status;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -110,6 +111,7 @@ public class ServiceHearingsController {
 
     private String getServiceHearingValuesForLogging(ServiceHearingValues serviceHearingValues) {
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
         ServiceHearingValues copyOfServiceHearingValues = mapper.convertValue(serviceHearingValues, ServiceHearingValues.class);
         List<PartyDetails> partyDetailsList = copyOfServiceHearingValues.getParties();
         if (nonNull(partyDetailsList)) {

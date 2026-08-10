@@ -4,6 +4,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -117,6 +118,7 @@ public class HmcHearingApiService {
     private String getMaskedHearingPayload(HearingRequestPayload hearingPayload) {
         // Create a deep copyOfHearingRequestPayload to avoid mutating the original payload that will be sent
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
         HearingRequestPayload copyOfHearingRequestPayload = mapper.convertValue(hearingPayload, HearingRequestPayload.class);
 
         if (copyOfHearingRequestPayload.getCaseDetails() != null) {
