@@ -126,6 +126,10 @@ public class HmcHearingApiService {
             copyOfHearingRequestPayload.getCaseDetails().setPublicCaseName(null);
         }
 
+        if (nonNull(copyOfHearingRequestPayload.getHearingDetails())) {
+            copyOfHearingRequestPayload.getHearingDetails().setListingComments(null);
+        }
+
         if (nonNull(copyOfHearingRequestPayload.getPartiesDetails())) {
             copyOfHearingRequestPayload.getPartiesDetails().forEach(party -> {
                 if (nonNull(party.getIndividualDetails())) {

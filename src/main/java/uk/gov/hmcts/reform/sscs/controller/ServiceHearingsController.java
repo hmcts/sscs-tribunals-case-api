@@ -117,10 +117,12 @@ public class ServiceHearingsController {
         if (nonNull(partyDetailsList)) {
             for (PartyDetails party : partyDetailsList) {
                 party.setPartyName(null);
-                party.getIndividualDetails().setFirstName(null);
-                party.getIndividualDetails().setLastName(null);
-                party.getIndividualDetails().setHearingChannelEmail(null);
-                party.getIndividualDetails().setHearingChannelPhone(null);
+                if (nonNull(party.getIndividualDetails())) {
+                    party.getIndividualDetails().setFirstName(null);
+                    party.getIndividualDetails().setLastName(null);
+                    party.getIndividualDetails().setHearingChannelEmail(null);
+                    party.getIndividualDetails().setHearingChannelPhone(null);
+                }
             }
         }
         copyOfServiceHearingValues.setParties(partyDetailsList);

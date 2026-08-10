@@ -185,6 +185,7 @@ class HmcHearingApiServiceTest {
                        .publicCaseName("Public Case Name")
                        .build())
                .partiesDetails(parties)
+               .hearingDetails(HearingDetails.builder().listingComments("Appellant - John Doe").build())
                .build();
 
         HmcHearingApiService realService = new HmcHearingApiService(hmcHearingApi, idamService);
@@ -202,6 +203,7 @@ class HmcHearingApiServiceTest {
         assertThat(result).contains("lastName=null");
         assertThat(result).doesNotContain("John");
         assertThat(result).doesNotContain("Doe");
+        assertThat(result).doesNotContain("Appellant - John Doe");
     }
 
     @DisplayName("getMaskedHearingPayload should handle null party individual details")
@@ -218,6 +220,7 @@ class HmcHearingApiServiceTest {
                        .caseId(String.valueOf(CASE_ID))
                        .build())
                .partiesDetails(parties)
+               .hearingDetails(null)
                .build();
 
         HmcHearingApiService realService = new HmcHearingApiService(hmcHearingApi, idamService);
