@@ -83,6 +83,9 @@ public class ServiceHearingsControllerTest {
         parties.add(partyDetails2);
 
         ServiceHearingValues serviceHearingValues = ServiceHearingValues.builder()
+                .hmctsInternalCaseName("hmctsInternalCaseNameTest")
+                .publicCaseName("publicCaseNameTest")
+                .listingComments("listingCommentsTest")
                 .parties(parties)
                 .build();
 
@@ -99,6 +102,9 @@ public class ServiceHearingsControllerTest {
         assertThat(result).doesNotContain("Smith");
         assertThat(result).doesNotContain("jane.smith@example.com");
         assertThat(result).doesNotContain("07987654321");
+        assertThat(result).doesNotContain("hmctsInternalCaseNameTest");
+        assertThat(result).doesNotContain("publicCaseNameTest");
+        assertThat(result).doesNotContain("listingCommentsTest");
     }
 
     @DisplayName("getServiceHearingValuesForLogging should not set the original serviceHearingValues parties to null")
@@ -118,6 +124,9 @@ public class ServiceHearingsControllerTest {
         parties.add(partyDetails);
 
         ServiceHearingValues serviceHearingValues = ServiceHearingValues.builder()
+                .hmctsInternalCaseName("hmctsInternalCaseNameTest")
+                .publicCaseName("publicCaseNameTest")
+                .listingComments("listingCommentsTest")
                 .parties(parties)
                 .build();
 
@@ -133,6 +142,9 @@ public class ServiceHearingsControllerTest {
         // Verify original object's parties are NOT set to null
         assertThat(serviceHearingValues.getParties()).isNotNull();
         assertThat(serviceHearingValues.getParties()).isNotEmpty();
+        assertThat(serviceHearingValues.getHmctsInternalCaseName()).isEqualTo("hmctsInternalCaseNameTest");
+        assertThat(serviceHearingValues.getPublicCaseName()).isEqualTo("publicCaseNameTest");
+        assertThat(serviceHearingValues.getListingComments()).isEqualTo("listingCommentsTest");
         assertThat(serviceHearingValues.getParties().get(0).getPartyName()).isEqualTo("Paddington Bear");
         assertThat(serviceHearingValues.getParties().get(0).getIndividualDetails().getFirstName()).isEqualTo("Paddington");
         assertThat(serviceHearingValues.getParties().get(0).getIndividualDetails().getLastName()).isEqualTo("Bear");

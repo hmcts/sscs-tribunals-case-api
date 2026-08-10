@@ -113,6 +113,11 @@ public class ServiceHearingsController {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         ServiceHearingValues copyOfServiceHearingValues = mapper.convertValue(serviceHearingValues, ServiceHearingValues.class);
+
+        copyOfServiceHearingValues.setHmctsInternalCaseName(null);
+        copyOfServiceHearingValues.setPublicCaseName(null);
+        copyOfServiceHearingValues.setListingComments(null);
+
         List<PartyDetails> partyDetailsList = copyOfServiceHearingValues.getParties();
         if (nonNull(partyDetailsList)) {
             for (PartyDetails party : partyDetailsList) {
