@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.personalisation;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.String.format;
-import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
@@ -71,7 +70,6 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMa
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPELLANT_CONFIDENTIALITY_REQUIRED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPELLANT_NAME;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPOINTEE_DESCRIPTION;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPOINTEE_DESCRIPTION_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPOINTEE_NAME;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.BENEFIT_FULL_NAME_LITERAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.BENEFIT_FULL_NAME_LITERAL_WELSH;
@@ -109,7 +107,6 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMa
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HEARING_ARRANGEMENT_DETAILS_LITERAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HEARING_ARRANGEMENT_DETAILS_LITERAL_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HEARING_CONTACT_DATE;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HEARING_DATE_FORMATTED_LITERAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HEARING_DATE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HEARING_DATE_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HEARING_INFO_LINK_LITERAL;
@@ -184,6 +181,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -437,8 +435,6 @@ public class Personalisation<E extends NotificationWrapper> {
 
             if (nonNull(hearingDateTime) && nonNull(latestHearingValue.getVenue())) {
                 personalisation.put(HEARING_DATE_LITERAL, hearingDateTime.toLocalDate().toString());
-                personalisation.put(HEARING_DATE_FORMATTED_LITERAL,
-                    hearingDateTime.toLocalDate().format(ofPattern("dd-MM-yyyy")));
                 translateToWelshDate(hearingDateTime.toLocalDate(), ccdResponse, value -> personalisation.put(HEARING_DATE_WELSH, value));
                 personalisation.put(HEARING_TIME, formatLocalTime(hearingDateTime));
                 personalisation.put(DAYS_TO_HEARING_LITERAL, calculateDaysToHearingText(hearingDateTime.toLocalDate()));
@@ -464,7 +460,6 @@ public class Personalisation<E extends NotificationWrapper> {
         personalisation.put(ONLINE_HEARING_SIGN_IN_LINK_LITERAL, config.getOnlineHearingLink() + "/sign-in");
 
         personalisation.put(APPOINTEE_DESCRIPTION, getAppointeeDescription(subscriptionWithType.getSubscriptionType(), ccdResponse));
-        personalisation.put(APPOINTEE_DESCRIPTION_WELSH, getAppointeeDescriptionWelsh(subscriptionWithType.getSubscriptionType(), ccdResponse));
         personalisation.put(APPOINTEE_NAME, getName(APPOINTEE, ccdResponse, responseWrapper));
 
         personalisation.put(HEARING_TYPE, responseWrapper.getNewSscsCaseData().getAppeal().getHearingType());
@@ -497,7 +492,7 @@ public class Personalisation<E extends NotificationWrapper> {
             LocalDate finalDecisionDate = ccdResponse.getSscsFinalDecisionCaseData().getFinalDecisionIssuedDate();
 
             if (nonNull(finalDecisionDate)) {
-                String formattedDate = finalDecisionDate.format(ofPattern(FINAL_DECISION_DATE_FORMAT));
+                String formattedDate = finalDecisionDate.format(DateTimeFormatter.ofPattern(FINAL_DECISION_DATE_FORMAT));
                 personalisation.put(FINAL_DECISION_DATE, formattedDate);
             }
         }
@@ -723,16 +718,6 @@ public class Personalisation<E extends NotificationWrapper> {
         }
     }
 
-    private String getAppointeeDescriptionWelsh(SubscriptionType subscriptionType, SscsCaseData ccdResponse) {
-        if (APPOINTEE.equals(subscriptionType) && ccdResponse.getAppeal() != null
-            && ccdResponse.getAppeal().getAppellant().getName() != null) {
-            return format("Fe anfonir y diweddariad hwn atoch gan mai chi yw’r penodai ar gyfer %s.%s%s",
-                ccdResponse.getAppeal().getAppellant().getName().getFullNameNoTitle(), CRLF, CRLF);
-        } else {
-            return EMPTY;
-        }
-    }
-
     private void subscriptionDetails(Map<String, Object> personalisation, Subscription subscription, Benefit benefit, SscsCaseData sscsCaseData) {
         final String tya = tya(subscription);
         personalisation.put(APPEAL_ID_LITERAL, tya);
@@ -902,11 +887,11 @@ public class Personalisation<E extends NotificationWrapper> {
     }
 
     private String formatLocalDate(LocalDate date) {
-        return date.format(ofPattern(RESPONSE_DATE_FORMAT));
+        return date.format(DateTimeFormatter.ofPattern(RESPONSE_DATE_FORMAT));
     }
 
     private String formatLocalTime(LocalDateTime date) {
-        return date.format(ofPattern(HEARING_TIME_FORMAT, Locale.ENGLISH)).toUpperCase();
+        return date.format(DateTimeFormatter.ofPattern(HEARING_TIME_FORMAT, Locale.ENGLISH)).toUpperCase();
     }
 
     public Template getTemplate(E notificationWrapper, Benefit benefit, SubscriptionType subscriptionType) {
