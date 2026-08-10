@@ -114,23 +114,35 @@ public class HmcHearingApiService {
     }
 
     private String getMaskedHearingPayload(HearingRequestPayload hearingPayload) {
-        HearingRequestPayload newHearingRequestPayload = new HearingRequestPayload();
+        // Create a deep copy to avoid mutating the original payload that will be sent
+        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        HearingRequestPayload copy = mapper.convertValue(hearingPayload, HearingRequestPayload.class);
 
-        newHearingRequestPayload.setRequestDetails(hearingPayload.getRequestDetails());
-        newHearingRequestPayload.setHearingDetails(hearingPayload.getHearingDetails());
-        newHearingRequestPayload.setCaseDetails(hearingPayload.getCaseDetails());
-        newHearingRequestPayload.setPartiesDetails(hearingPayload.getPartiesDetails());
+        if (copy.getCaseDetails() != null) {
+            copy.getCaseDetails().setHmctsInternalCaseName(null);
+            copy.getCaseDetails().setPublicCaseName(null);
+        }
 
-        newHearingRequestPayload.getCaseDetails().setHmctsInternalCaseName(null);
-        newHearingRequestPayload.getCaseDetails().setPublicCaseName(null);
-        if (nonNull(newHearingRequestPayload.getPartiesDetails())) {
-            newHearingRequestPayload.getPartiesDetails().forEach(party -> {
+        if (nonNull(copy.getPartiesDetails())) {
+            copy.getPartiesDetails().forEach(party -> {
                 if (nonNull(party.getIndividualDetails())) {
                     party.getIndividualDetails().setFirstName(null);
                     party.getIndividualDetails().setLastName(null);
+                    // Some IndividualDetails models may have hearing channel fields
+                    try {
+                        party.getIndividualDetails().setHearingChannelEmail(null);
+                    } catch (NoSuchMethodError ignored) {
+                        // ignore if the method doesn't exist on that model
+                    }
+                    try {
+                        party.getIndividualDetails().setHearingChannelPhone(null);
+                    } catch (NoSuchMethodError ignored) {
+                        // ignore if the method doesn't exist on that model
+                    }
                 }
             });
         }
-        return newHearingRequestPayload.toString();
+
+        return copy.toString();
     }
 }
