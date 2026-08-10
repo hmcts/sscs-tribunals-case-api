@@ -58,6 +58,8 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.UPDATE_OTHER_PARTY_DATA;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.VALID_APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.getSubscription;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedEmail;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPostcodeOrPhone;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -3245,6 +3247,43 @@ public class NotificationServiceTest {
         service.manageNotificationAndSubscription(wrapper, false);
 
         then(factory).should(atLeastOnce()).create(any(), any());
+    }
+
+    @Test
+    public void getMaskedSubscriptionShouldReturnMaskedSubscriptionAndNotMutateWrapper() throws Exception {
+        Subscription original = Subscription.builder()
+                .tya("tya")
+                .email("john.smith@example.com")
+                .mobile("07123456789")
+                .subscribeEmail("Yes")
+                .subscribeSms("Yes")
+                .wantSmsNotifications("Yes")
+                .build();
+
+        SscsCaseData caseData = SscsCaseData.builder()
+                .subscriptions(Subscriptions.builder().appellantSubscription(original).build())
+                .build();
+
+        NotificationSscsCaseDataWrapper wrapper = NotificationSscsCaseDataWrapper.builder()
+                .newSscsCaseData(caseData)
+                .oldSscsCaseData(caseData)
+                .build();
+
+        CcdNotificationWrapper ccdWrapper = new CcdNotificationWrapper(wrapper);
+
+        Subscription subscriptionFromWrapper = ccdWrapper.getSscsCaseDataWrapper().getNewSscsCaseData().getSubscriptions().getAppellantSubscription();
+
+        java.lang.reflect.Method method = NotificationService.class.getDeclaredMethod("getMaskedSubscription", Subscription.class);
+        method.setAccessible(true);
+        Subscription masked = (Subscription) method.invoke(notificationService, subscriptionFromWrapper);
+
+        // Assert masked values
+        assertThat(masked.getEmail()).isEqualTo(getMaskedEmail(original.getEmail()));
+        assertThat(masked.getMobile()).isEqualTo(getMaskedPostcodeOrPhone(original.getMobile()));
+
+        // Assert wrapper subscription unchanged
+        assertThat(subscriptionFromWrapper.getEmail()).isEqualTo(original.getEmail());
+        assertThat(subscriptionFromWrapper.getMobile()).isEqualTo(original.getMobile());
     }
 
     private static List<OtherPartyOption> getOtherPartyOptions(YesNo resendToOtherParty) {
