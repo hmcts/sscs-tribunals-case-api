@@ -1097,6 +1097,22 @@ notification:
                     emailId: 1a2683d0-ca0f-4465-b25d-59d3d817750a
                 other_party:
                     emailId: e2ee8609-7d56-4857-b3f8-79028e8960aa
+            hearingBooked:
+                appellant:
+                    emailId: aa0930a3-e1bd-4b50-ac6b-34df73ec8378
+                    smsId: 8aa77a9c-9bc6-424d-8716-1c948681270e
+                representative:
+                    emailId: a56e67cb-6b4b-41e3-8f4c-cd1cdb6809c1
+                    smsId: e04c548d-1ba9-40b5-bf9b-ea5e7bbadbac
+                appointee:
+                    emailId: aa0930a3-e1bd-4b50-ac6b-34df73ec8378
+                    smsId: 8aa77a9c-9bc6-424d-8716-1c948681270e
+                joint_party:
+                    emailId: aa0930a3-e1bd-4b50-ac6b-34df73ec8378
+                    smsId: 8aa77a9c-9bc6-424d-8716-1c948681270e
+                other_party:
+                    emailId: a56e67cb-6b4b-41e3-8f4c-cd1cdb6809c1
+                    smsId: e04c548d-1ba9-40b5-bf9b-ea5e7bbadbac
         listAssist:
             oral:
                 hearingPostponed:
@@ -1765,6 +1781,22 @@ notification:
                     emailId: 10e958ff-4ff4-4a38-b79c-298e89aa8079
                 joint_party:
                     emailId: a3c3ace2-6b88-4557-b18a-7df1923a50f5
+            hearingBooked:
+                appellant:
+                    emailId: aca83c9c-05c0-49d5-8ded-e581a0107408
+                    smsId: a51a7435-dffe-4455-9183-5c6f4f13bee3
+                representative:
+                    emailId: c7047e95-42ac-4d6a-91d9-c8f31f2685b8
+                    smsId: 5e7444fe-860c-4623-b5c5-b23af1ddbb0b
+                appointee:
+                    emailId: aca83c9c-05c0-49d5-8ded-e581a0107408
+                    smsId: a51a7435-dffe-4455-9183-5c6f4f13bee3
+                joint_party:
+                    emailId: aca83c9c-05c0-49d5-8ded-e581a0107408
+                    smsId: a51a7435-dffe-4455-9183-5c6f4f13bee3
+                other_party:
+                    emailId: c7047e95-42ac-4d6a-91d9-c8f31f2685b8
+                    smsId: 5e7444fe-860c-4623-b5c5-b23af1ddbb0b
         listAssist:
             oral:
                 hearingPostponed:
