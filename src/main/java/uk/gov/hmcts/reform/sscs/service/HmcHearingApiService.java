@@ -114,16 +114,23 @@ public class HmcHearingApiService {
     }
 
     private String getMaskedHearingPayload(HearingRequestPayload hearingPayload) {
-        hearingPayload.getCaseDetails().setHmctsInternalCaseName(null);
-        hearingPayload.getCaseDetails().setPublicCaseName(null);
-        if (nonNull(hearingPayload.getPartiesDetails())) {
-            hearingPayload.getPartiesDetails().forEach(party -> {
+        HearingRequestPayload newHearingRequestPayload = new HearingRequestPayload();
+
+        newHearingRequestPayload.setRequestDetails(hearingPayload.getRequestDetails());
+        newHearingRequestPayload.setHearingDetails(hearingPayload.getHearingDetails());
+        newHearingRequestPayload.setCaseDetails(hearingPayload.getCaseDetails());
+        newHearingRequestPayload.setPartiesDetails(hearingPayload.getPartiesDetails());
+
+        newHearingRequestPayload.getCaseDetails().setHmctsInternalCaseName(null);
+        newHearingRequestPayload.getCaseDetails().setPublicCaseName(null);
+        if (nonNull(newHearingRequestPayload.getPartiesDetails())) {
+            newHearingRequestPayload.getPartiesDetails().forEach(party -> {
                 if (nonNull(party.getIndividualDetails())) {
                     party.getIndividualDetails().setFirstName(null);
                     party.getIndividualDetails().setLastName(null);
                 }
             });
         }
-        return hearingPayload.toString();
+        return newHearingRequestPayload.toString();
     }
 }

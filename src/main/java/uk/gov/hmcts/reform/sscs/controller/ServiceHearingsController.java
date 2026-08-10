@@ -59,6 +59,8 @@ public class ServiceHearingsController {
 
             log.info("serviceHearingValues response {}", getServiceHearingValuesForLogging(model));
 
+            log.info("testing Service Hearing values gemma: {}", model);
+
             return status(HttpStatus.OK).body(model);
         } catch (Exception exc) {
             logException(exc, request.getCaseId());
