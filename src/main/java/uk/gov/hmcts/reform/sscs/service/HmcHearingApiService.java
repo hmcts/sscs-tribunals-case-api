@@ -55,7 +55,6 @@ public class HmcHearingApiService {
                 dataStoreUrl,
                 hearingPayload.getCaseDetails().getCaseId(),
                 getMaskedHearingPayload(hearingPayload));
-        log.info("Verify hearing payload unaffected: {}", hearingPayload);
         return hmcHearingApi.createHearingRequest(
                 getIdamTokens().getIdamOauth2Token(),
                 getIdamTokens().getServiceAuthorization(),
