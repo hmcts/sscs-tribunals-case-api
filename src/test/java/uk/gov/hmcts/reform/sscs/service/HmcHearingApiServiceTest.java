@@ -88,13 +88,21 @@ class HmcHearingApiServiceTest {
                 .withMessageContaining("Failed to retrieve hearing");
     }
 
-    @DisplayName("sendDeleteHearingRequest should send request successfully")
+    @DisplayName("sendCreateHearingRequest should send request successfully")
     @Test
     void testSendCreateHearingRequest() {
         HearingRequestPayload payload = HearingRequestPayload.builder()
                 .caseDetails(CaseDetails.builder()
                         .caseId(String.valueOf(CASE_ID))
+                        .hmctsInternalCaseName("hmctsInternalCaseName")
+                        .publicCaseName("publicCaseName")
                         .build())
+                .partiesDetails(List.of(PartyDetails.builder()
+                        .individualDetails(IndividualDetails.builder()
+                                .firstName("John")
+                                .lastName("Doe")
+                                .build())
+                        .build()))
                 .build();
 
         HmcUpdateResponse response = HmcUpdateResponse.builder()
@@ -105,10 +113,13 @@ class HmcHearingApiServiceTest {
         given(hmcHearingApi.createHearingRequest(IDAM_OAUTH2_TOKEN, SERVICE_AUTHORIZATION, null, null, null,  payload)).willReturn(response);
 
         HmcUpdateResponse result = hmcHearingsService.sendCreateHearingRequest(payload);
-
         assertThat(result)
                 .isNotNull()
                 .isEqualTo(response);
+        assertThat(payload.getCaseDetails().getHmctsInternalCaseName()).isEqualTo("hmctsInternalCaseName");
+        assertThat(payload.getCaseDetails().getPublicCaseName()).isEqualTo("publicCaseName");
+        assertThat(payload.getPartiesDetails().get(0).getIndividualDetails().getFirstName()).isEqualTo("John");
+        assertThat(payload.getPartiesDetails().get(0).getIndividualDetails().getLastName()).isEqualTo("Doe");
     }
 
     @DisplayName("sendDeleteHearingRequest should send request successfully")

@@ -49,10 +49,6 @@ class ServiceHearingsControllerTest {
 
     private static final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
-    public static final String PROCESSING_VENUE = "Liverpool";
-
-    public static final String BASE_LOCATION = "12345";
-
     @Autowired
     private MockMvc mockMvc;
 

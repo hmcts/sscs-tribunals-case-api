@@ -5,6 +5,7 @@ import static java.util.Objects.nonNull;
 import static org.springframework.http.ResponseEntity.status;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -59,8 +60,6 @@ public class ServiceHearingsController {
 
             log.info("serviceHearingValues response {}", getServiceHearingValuesForLogging(model));
 
-            log.info("testing Service Hearing values gemma: {}", model);
-
             return status(HttpStatus.OK).body(model);
         } catch (Exception exc) {
             logException(exc, request.getCaseId());
@@ -110,7 +109,9 @@ public class ServiceHearingsController {
     }
 
     private String getServiceHearingValuesForLogging(ServiceHearingValues serviceHearingValues) {
-        List<PartyDetails> partyDetailsList = serviceHearingValues.getParties();
+        ObjectMapper mapper = new ObjectMapper();
+        ServiceHearingValues copyOfServiceHearingValues = mapper.convertValue(serviceHearingValues, ServiceHearingValues.class);
+        List<PartyDetails> partyDetailsList = copyOfServiceHearingValues.getParties();
         if (nonNull(partyDetailsList)) {
             for (PartyDetails party : partyDetailsList) {
                 party.setPartyName(null);
@@ -120,8 +121,8 @@ public class ServiceHearingsController {
                 party.getIndividualDetails().setHearingChannelPhone(null);
             }
         }
-        serviceHearingValues.setParties(partyDetailsList);
+        copyOfServiceHearingValues.setParties(partyDetailsList);
 
-        return serviceHearingValues.toString();
+        return copyOfServiceHearingValues.toString();
     }
 }

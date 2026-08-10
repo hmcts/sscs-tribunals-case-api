@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.service;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -114,35 +115,26 @@ public class HmcHearingApiService {
     }
 
     private String getMaskedHearingPayload(HearingRequestPayload hearingPayload) {
-        // Create a deep copy to avoid mutating the original payload that will be sent
-        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-        HearingRequestPayload copy = mapper.convertValue(hearingPayload, HearingRequestPayload.class);
+        // Create a deep copyOfHearingRequestPayload to avoid mutating the original payload that will be sent
+        ObjectMapper mapper = new ObjectMapper();
+        HearingRequestPayload copyOfHearingRequestPayload = mapper.convertValue(hearingPayload, HearingRequestPayload.class);
 
-        if (copy.getCaseDetails() != null) {
-            copy.getCaseDetails().setHmctsInternalCaseName(null);
-            copy.getCaseDetails().setPublicCaseName(null);
+        if (copyOfHearingRequestPayload.getCaseDetails() != null) {
+            copyOfHearingRequestPayload.getCaseDetails().setHmctsInternalCaseName(null);
+            copyOfHearingRequestPayload.getCaseDetails().setPublicCaseName(null);
         }
 
-        if (nonNull(copy.getPartiesDetails())) {
-            copy.getPartiesDetails().forEach(party -> {
+        if (nonNull(copyOfHearingRequestPayload.getPartiesDetails())) {
+            copyOfHearingRequestPayload.getPartiesDetails().forEach(party -> {
                 if (nonNull(party.getIndividualDetails())) {
                     party.getIndividualDetails().setFirstName(null);
                     party.getIndividualDetails().setLastName(null);
-                    // Some IndividualDetails models may have hearing channel fields
-                    try {
-                        party.getIndividualDetails().setHearingChannelEmail(null);
-                    } catch (NoSuchMethodError ignored) {
-                        // ignore if the method doesn't exist on that model
-                    }
-                    try {
-                        party.getIndividualDetails().setHearingChannelPhone(null);
-                    } catch (NoSuchMethodError ignored) {
-                        // ignore if the method doesn't exist on that model
-                    }
+                    party.getIndividualDetails().setHearingChannelEmail(null);
+                    party.getIndividualDetails().setHearingChannelPhone(null);
                 }
             });
         }
 
-        return copy.toString();
+        return copyOfHearingRequestPayload.toString();
     }
 }
