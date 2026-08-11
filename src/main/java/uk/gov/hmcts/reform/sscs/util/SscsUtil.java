@@ -786,13 +786,13 @@ public class SscsUtil {
         }
         int atIndex = email.indexOf('@');
         if (atIndex > 3) {
-            return email.substring(0, 3) + "***" + email.substring(atIndex - 1);
+            return email.substring(0, 3) + "***" + email.substring(atIndex, atIndex + 3) + "***";
         }
-        return email.substring(0, atIndex - 1) + "***" + email.substring(atIndex);
+        return email.substring(0, atIndex) + "***" + email.substring(atIndex, atIndex + 3) + "***";
     }
 
-    public static String getMaskedPostcodeOrPhone(String stringToMask) {
-        return !isEmpty(stringToMask) ? "***" + stringToMask.substring(stringToMask.length() - 3) : null;
+    public static String getMaskedPhone(String stringToMask) {
+        return !isEmpty(stringToMask) ? "***" + stringToMask.substring(stringToMask.length() - 4) : null;
     }
 }
 
