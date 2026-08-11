@@ -2074,10 +2074,6 @@ ld:
     sdk-key: ${LAUNCH_DARKLY_SDK_KEY:AAAAAAAAAAAAA}
     user-key: sscs-evidence-share
 
-send-grid:
-    apiKey: AAAAAAAAAAAAAAAAAAAa
-    host: smtp.sendgrid.net
-    port: 587
 send-letter:
     enabled: ${SEND_LETTER_SERVICE_ENABLED:true}
     maxRetryAttempts: ${MAX_RETRY_ATTEMPTS:3}
