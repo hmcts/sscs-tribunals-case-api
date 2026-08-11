@@ -400,7 +400,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'sscs-common', version: '6.3.58'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '8.0.0'
 
-    implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '6.1.0-RELEASE'
+    implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.2.1-RELEASE'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.55.3'
     implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.11'
