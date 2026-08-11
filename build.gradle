@@ -310,7 +310,6 @@ dependencyManagement {
         // CVE-2026-66274, CVE-2026-66273, CVE-2026-63140, CVE-2026-66276, CVE-2026-66275, CVE-2026-66277, CVE-2026-66257
         dependency group: 'org.apache.qpid', name: 'proton-j', version: '0.35.0'
         dependency group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.6.3'
-        dependency group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.13'
 
         // CVE-2026-54399, CVE-2026-54428
         dependencySet(group: 'org.apache.httpcomponents.core5', version: '5.4.3') {
@@ -337,7 +336,7 @@ def versions = [
         jackson        : '2.22.1',
         lombok         : '1.18.38',
         commonsio      : '2.19.0',
-        openfeign      : '13.13'
+        openfeign      : '13.6'
 ]
 
 dependencies {
