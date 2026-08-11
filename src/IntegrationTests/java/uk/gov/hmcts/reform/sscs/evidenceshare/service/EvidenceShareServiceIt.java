@@ -164,15 +164,15 @@ public class EvidenceShareServiceIt {
 
     protected MimeMessage message;
 
-    @MockitoBean(name = "sendGridMailSender")
-    protected JavaMailSender mailSender;
+    @MockitoBean(name = "mtaMailSender")
+    protected JavaMailSender mtaMailSender;
 
     Optional<UUID> expectedOptionalUuid = Optional.of(UUID.fromString("0f14d0ab-9605-4a62-a9e4-5ed26688389b"));
 
     @Before
     public void setup() {
         message = new MimeMessage(session);
-        when(mailSender.createMimeMessage()).thenReturn(message);
+        when(mtaMailSender.createMimeMessage()).thenReturn(message);
 
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
 

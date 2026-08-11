@@ -54,8 +54,6 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
           alias: ROBOTICS_EMAIL_PIP_AE_TO
         - name: ld-sdk-key
           alias: ld.sdk-key
-        - name: sscs-sendgrid-api-key
-          alias: send-grid.apiKey
         - name: notification-key
           alias: NOTIFICATION_API_KEY
         - name: notification-test-key

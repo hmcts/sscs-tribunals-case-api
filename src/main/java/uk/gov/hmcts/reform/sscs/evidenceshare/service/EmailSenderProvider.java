@@ -10,19 +10,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class EmailSenderProvider {
 
-    private final FeatureToggleService featureToggleService;
-
-    @Autowired
-    @Qualifier("sendGridMailSender")
-    private final JavaMailSender sendGridMailSender;
-
     @Autowired
     @Qualifier("mtaMailSender")
     private final JavaMailSender mtaMailSender;
 
-
     public JavaMailSender getMailSender() {
-        return featureToggleService.isSendGridEnabled() ? sendGridMailSender : mtaMailSender;
+        return  mtaMailSender;
     }
-
 }

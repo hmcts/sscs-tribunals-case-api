@@ -21,7 +21,5 @@ public class EnvironmentPropertiesPrinter {
         log.info("{}={}", "robotics.email.from", env.getProperty("robotics.email.from"));
         log.info("{}={}", "robotics.email.pipAeTo", env.getProperty("robotics.email.pipAeTo"));
         log.info("{}={}", "robotics.email.scottishTo", env.getProperty("robotics.email.scottishTo"));
-        log.info("{}={}", "ld.sdk-key", env.getProperty("ld.sdk-key"));
-        log.info("{}={}", "send-grid.apiKey", env.getProperty("send-grid.apiKey"));
     }
 }

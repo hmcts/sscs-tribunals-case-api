@@ -364,7 +364,6 @@ robotics:
             location: /schema/sscs-robotics.json
     email:
         from: ${ROBOTICS_EMAIL_FROM:sscs@hmcts.net}
-        from-send-grid: noreply@mail-sscs-nonprod.platform.hmcts.net
         message: "${ROBOTICS_EMAIL_MESSAGE:Please find attached the robotics json\
             \ file \nPlease do not respond to this email}"
         pipAeTo: ${ROBOTICS_EMAIL_PIP_AE_TO:receiver3@hmcts.net}
@@ -2093,7 +2092,6 @@ wlu:
     email:
         dateOfReturn: ${WLU_RETURN_DATE:24 hours from requested date.}
         from: ${WLU_EMAIL_FROM:noreply@mail-sscs-nonprod.platform.hmcts.net}
-        from-send-grid: noreply@mail-sscs-nonprod.platform.hmcts.net
         message: |-
             ${WLU_EMAIL_MESSAGE:Please find attached the files along with request translation form.
             Thank you very much}
