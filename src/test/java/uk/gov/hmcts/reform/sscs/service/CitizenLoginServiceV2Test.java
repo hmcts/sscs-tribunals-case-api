@@ -125,6 +125,7 @@ class CitizenLoginServiceV2Test {
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, null);
 
         verify(sscsCcdConvertService, times(2)).getCaseDetails(any(CaseDetails.class));
+        verify(ccdService, times(2)).getByCaseId(any(Long.class), any(IdamTokens.class));
         assertThat(casesForCitizen, is(asList(onlineHearing1, onlineHearing2)));
     }
 
@@ -176,6 +177,7 @@ class CitizenLoginServiceV2Test {
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, null);
 
         verify(sscsCcdConvertService).getCaseDetails(eq(case2));
+        verify(ccdService, times(2)).getByCaseId(any(Long.class), any(IdamTokens.class));
         assertThat(casesForCitizen, is(singletonList(onlineHearing2)));
     }
 
@@ -203,6 +205,7 @@ class CitizenLoginServiceV2Test {
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, null);
 
         verify(sscsCcdConvertService).getCaseDetails(eq(case2));
+        verify(ccdService, times(2)).getByCaseId(any(Long.class), any(IdamTokens.class));
         assertThat(casesForCitizen, is(singletonList(onlineHearing2)));
     }
 
