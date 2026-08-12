@@ -486,7 +486,7 @@ dependencies {
         exclude group: 'commons-io', module: 'commons-io'
     }
 
-    testImplementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5-fluent', version: '5.6.3'
+    testImplementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5-fluent', version: '5.6.4'
 
     testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '4.1.1'
     testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-assertj', version: '4.1.1'
