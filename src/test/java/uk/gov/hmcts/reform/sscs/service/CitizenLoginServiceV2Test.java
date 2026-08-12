@@ -16,7 +16,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.util.DataFixtures.someOnlineHearing;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPhoneOrString;
 
+import ch.qos.logback.classic.Level;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -26,6 +28,7 @@ import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
@@ -52,6 +55,7 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.OnlineHearing;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.util.CaseAssignmentVerifier;
+import uk.gov.hmcts.reform.sscs.util.LogCaptureExtension;
 
 @ExtendWith(MockitoExtension.class)
 class CitizenLoginServiceV2Test {
@@ -73,6 +77,9 @@ class CitizenLoginServiceV2Test {
     private String tya;
     private CaseAssignmentVerifier caseAssignmentVerifier;
     private OnlineHearingService onlineHearingService;
+
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(CitizenLoginService.class);
 
     @Captor
     private ArgumentCaptor<Consumer<SscsCaseDetails>> sscsCaseDataCaptor;
@@ -482,6 +489,7 @@ class CitizenLoginServiceV2Test {
         sscsCaseDataCaptor.getValue().accept(expectedCase);
         String capturedTimestamp = expectedCase.getData().getSubscriptions().getRepresentativeSubscription().getLastLoggedIntoMya();
         assertThat(capturedTimestamp, containsString(beforeTimestamp.substring(0, 19)));
+        logCapture.assertLogContains("MYA log time: found matching email for user " + citizenIdamTokens.getUserId() + " for case id " + expectedCaseId, Level.INFO);
     }
 
     @Test
@@ -558,6 +566,25 @@ class CitizenLoginServiceV2Test {
 
         verify(citizenCcdService, never()).addUserToCase(any(IdamTokens.class), any(String.class), anyLong());
         assertThat(sscsCaseDetails.isPresent(), is(false));
+    }
+
+    @Test
+    void verifyPostcodeIsMaskedInLogs() {
+        SscsCaseDetails expectedCase = createSscsCaseDetailsWithAppointeeSubscription(tya);
+        when(ccdService.findCaseByAppealNumber(tya, serviceIdamTokens))
+                .thenReturn(expectedCase);
+        OnlineHearing expectedOnlineHearing = someOnlineHearing(123L);
+        when(onlineHearingService.loadHearing(expectedCase, tya, SUBSCRIPTION_EMAIL_ADDRESS))
+                .thenReturn(Optional.of(expectedOnlineHearing));
+        AssociateCaseDetails associateCaseDetails =
+                new AssociateCaseDetails(SUBSCRIPTION_EMAIL_ADDRESS, APPEAL_POSTCODE, IBCA_REFERENCE);
+
+        underTest.associateCaseToCitizen(citizenIdamTokens, tya, associateCaseDetails);
+
+        logCapture.assertLogContains("Found case to assign id [" + expectedCase.getId() + "] for tya [" + tya + "] "
+                + "user [" + citizenIdamTokens.getUserId() + "] postcode ["
+                + getMaskedPhoneOrString(APPEAL_POSTCODE) + "] has subscription", Level.INFO);
+        logCapture.assertLogDoesNotContain(APPEAL_POSTCODE, Level.INFO);
     }
 
     private static Object[] createValidCaseDataSubscriptions() {

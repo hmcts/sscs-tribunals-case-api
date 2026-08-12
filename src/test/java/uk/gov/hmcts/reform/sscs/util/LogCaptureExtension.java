@@ -40,4 +40,13 @@ public class LogCaptureExtension implements BeforeEachCallback, AfterEachCallbac
             throw new AssertionError("Expected log not found: [" + level + "] " + message);
         }
     }
+
+    public void assertLogDoesNotContain(String message, Level level) {
+        boolean found = appender.list.stream()
+            .anyMatch(event -> event.getLevel().equals(level) && event.getFormattedMessage().contains(message));
+
+        if (found) {
+            throw new AssertionError("Unexpected log found: [" + level + "] " + message);
+        }
+    }
 }

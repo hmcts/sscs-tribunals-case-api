@@ -78,6 +78,7 @@ import java.util.Objects;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -141,6 +142,7 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationFactory;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis.PdfLetterService;
 
+@Slf4j
 @RunWith(JUnitParamsRunner.class)
 public class NotificationServiceTest {
 
@@ -908,6 +910,8 @@ public class NotificationServiceTest {
             any(NotificationHandler.SendNotification.class));
 
         verifyNoErrorsLogged(mockAppender, captorLoggingEvent);
+        verifyExpectedLogMessage(mockAppender, captorLoggingEvent, CASE_ID,
+                "email=" + getMaskedEmail(NEW_TEST_EMAIL_COM) + ", mobile=" + getMaskedPhoneOrString(MOBILE_NUMBER_2), Level.INFO);
     }
 
     @Test
@@ -984,6 +988,8 @@ public class NotificationServiceTest {
             any(NotificationHandler.SendNotification.class));
 
         verifyNoErrorsLogged(mockAppender, captorLoggingEvent);
+        verifyExpectedLogMessage(mockAppender, captorLoggingEvent, CASE_ID,
+                "email=" + getMaskedEmail(SAME_TEST_EMAIL_COM) + ", mobile=" + getMaskedPhoneOrString(MOBILE_NUMBER_1), Level.INFO);
     }
 
     @Test
@@ -3247,43 +3253,6 @@ public class NotificationServiceTest {
         service.manageNotificationAndSubscription(wrapper, false);
 
         then(factory).should(atLeastOnce()).create(any(), any());
-    }
-
-    @Test
-    public void getMaskedSubscriptionShouldReturnMaskedSubscriptionAndNotMutateWrapper() throws Exception {
-        Subscription original = Subscription.builder()
-                .tya("tya")
-                .email("john.smith@example.com")
-                .mobile("07123456789")
-                .subscribeEmail("Yes")
-                .subscribeSms("Yes")
-                .wantSmsNotifications("Yes")
-                .build();
-
-        SscsCaseData caseData = SscsCaseData.builder()
-                .subscriptions(Subscriptions.builder().appellantSubscription(original).build())
-                .build();
-
-        NotificationSscsCaseDataWrapper wrapper = NotificationSscsCaseDataWrapper.builder()
-                .newSscsCaseData(caseData)
-                .oldSscsCaseData(caseData)
-                .build();
-
-        CcdNotificationWrapper ccdWrapper = new CcdNotificationWrapper(wrapper);
-
-        Subscription subscriptionFromWrapper = ccdWrapper.getSscsCaseDataWrapper().getNewSscsCaseData().getSubscriptions().getAppellantSubscription();
-
-        java.lang.reflect.Method method = NotificationService.class.getDeclaredMethod("getMaskedSubscription", Subscription.class);
-        method.setAccessible(true);
-        Subscription masked = (Subscription) method.invoke(notificationService, subscriptionFromWrapper);
-
-        // Assert masked values
-        assertThat(masked.getEmail()).isEqualTo(getMaskedEmail(original.getEmail()));
-        assertThat(masked.getMobile()).isEqualTo(getMaskedPhoneOrString(original.getMobile()));
-
-        // Assert wrapper subscription unchanged
-        assertThat(subscriptionFromWrapper.getEmail()).isEqualTo(original.getEmail());
-        assertThat(subscriptionFromWrapper.getMobile()).isEqualTo(original.getMobile());
     }
 
     private static List<OtherPartyOption> getOtherPartyOptions(YesNo resendToOtherParty) {
