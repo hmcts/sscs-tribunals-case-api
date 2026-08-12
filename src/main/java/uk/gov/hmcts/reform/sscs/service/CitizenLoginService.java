@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static java.lang.String.format;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static java.util.stream.Stream.concat;
 import static java.util.stream.Stream.of;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
@@ -67,7 +69,7 @@ public class CitizenLoginService {
         List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
                 .map(sscsCcdConvertService::getCaseDetails)
                 .filter(AppealNumberGenerator::filterCaseNotDraftOrArchivedDraft)
-                .peek(this::attachOtherPartyDetails)
+                .peek(this::attachOtherAndJointPartyDetails)
                 .toList();
         if (!isBlank(tya)) {
             log.info(format("Find case: Filtering for case with tya [%s] for user [%s]", tya, idamTokens.getUserId()));
@@ -88,10 +90,13 @@ public class CitizenLoginService {
         return convert;
     }
 
-    private void attachOtherPartyDetails(SscsCaseDetails sscsCaseDetailsItem) {
-        if (sscsCaseDetailsItem.getData().getOtherParties() == null) {
-            SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(sscsCaseDetailsItem.getId(), idamService.getIdamTokens());
-            if (sscsCaseDetails != null) {
+    private void attachOtherAndJointPartyDetails(SscsCaseDetails sscsCaseDetailsItem) {
+        SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(sscsCaseDetailsItem.getId(), idamService.getIdamTokens());
+        if (nonNull(sscsCaseDetails)) {
+            log.info("Attaching Joint party details to case {}", sscsCaseDetailsItem.getId());
+            sscsCaseDetailsItem.getData().setJointParty(sscsCaseDetails.getData().getJointParty());
+            if (isNull(sscsCaseDetailsItem.getData().getOtherParties())) {
+                log.info("Attaching Other party details to case {}", sscsCaseDetailsItem.getId());
                 sscsCaseDetailsItem.getData().setOtherParties(sscsCaseDetails.getData().getOtherParties());
             }
         }
