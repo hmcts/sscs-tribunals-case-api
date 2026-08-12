@@ -17,7 +17,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtil
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.isOkToSendNotification;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationValidService.isMandatoryLetterEventType;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedEmail;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPhone;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPhoneOrString;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isBenefitTypeChildSupportOrUc;
 
 import java.time.ZonedDateTime;
@@ -507,7 +507,7 @@ public class NotificationService {
                 .wantSmsNotifications(subscription.getWantSmsNotifications())
                 .tya(subscription.getTya())
                 .email(getMaskedEmail(subscription.getEmail()))
-                .mobile(getMaskedPhone(subscription.getMobile()))
+                .mobile(getMaskedPhoneOrString(subscription.getMobile()))
                 .subscribeEmail(subscription.getSubscribeEmail())
                 .subscribeSms(subscription.getSubscribeSms())
                 .reason(subscription.getReason())

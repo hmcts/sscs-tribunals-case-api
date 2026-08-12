@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedEmail;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPhoneOrString;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -76,7 +78,7 @@ public class NotificationSender {
 
         if (notificationTestRecipients.getEmails().contains(emailAddress)
             || emailAddress.matches("test[\\d]+@hmcts.net")) {
-            log.info(USING_TEST_GOV_NOTIFY_KEY_FOR, testNotificationClient.getApiKey(), emailAddress);
+            log.info(USING_TEST_GOV_NOTIFY_KEY_FOR, testNotificationClient.getApiKey(), getMaskedEmail(emailAddress));
             client = testNotificationClient;
         } else {
             client = notificationClient;
@@ -315,7 +317,7 @@ public class NotificationSender {
         NotificationClient client;
         if (notificationTestRecipients.getPostcodes().contains("*")
             || notificationTestRecipients.getPostcodes().contains(postcode)) {
-            log.info(USING_TEST_GOV_NOTIFY_KEY_FOR, testNotificationClient.getApiKey(), postcode);
+            log.info(USING_TEST_GOV_NOTIFY_KEY_FOR, testNotificationClient.getApiKey(), getMaskedPhoneOrString(postcode));
             client = testNotificationClient;
         } else {
             client = notificationClient;

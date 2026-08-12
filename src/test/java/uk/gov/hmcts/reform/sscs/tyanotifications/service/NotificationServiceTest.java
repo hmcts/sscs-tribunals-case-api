@@ -59,7 +59,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.VALID_APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.getSubscription;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedEmail;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPhone;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPhoneOrString;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -3279,7 +3279,7 @@ public class NotificationServiceTest {
 
         // Assert masked values
         assertThat(masked.getEmail()).isEqualTo(getMaskedEmail(original.getEmail()));
-        assertThat(masked.getMobile()).isEqualTo(getMaskedPhone(original.getMobile()));
+        assertThat(masked.getMobile()).isEqualTo(getMaskedPhoneOrString(original.getMobile()));
 
         // Assert wrapper subscription unchanged
         assertThat(subscriptionFromWrapper.getEmail()).isEqualTo(original.getEmail());

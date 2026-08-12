@@ -2,9 +2,11 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedEmail;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPhoneOrString;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +28,7 @@ public class HmcHearingApiService {
 
     private final HmcHearingApi hmcHearingApi;
     private final IdamService idamService;
+    private final ObjectMapper objectMapper;
     @Value("${hmc.deployment-id}")
     private String hmctsDeploymentId;
     @Value("${role-assignment.api.url:#{null}}")
@@ -116,26 +119,32 @@ public class HmcHearingApiService {
 
     private String getMaskedHearingPayload(HearingRequestPayload hearingPayload) {
         // Create a deep copyOfHearingRequestPayload to avoid mutating the original payload that will be sent
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        HearingRequestPayload copyOfHearingRequestPayload = mapper.convertValue(hearingPayload, HearingRequestPayload.class);
+        HearingRequestPayload copyOfHearingRequestPayload = objectMapper.convertValue(hearingPayload, HearingRequestPayload.class);
 
         if (copyOfHearingRequestPayload.getCaseDetails() != null) {
-            copyOfHearingRequestPayload.getCaseDetails().setHmctsInternalCaseName(null);
-            copyOfHearingRequestPayload.getCaseDetails().setPublicCaseName(null);
+            copyOfHearingRequestPayload.getCaseDetails().setHmctsInternalCaseName(getMaskedPhoneOrString(copyOfHearingRequestPayload.getCaseDetails().getHmctsInternalCaseName()));
+            copyOfHearingRequestPayload.getCaseDetails().setPublicCaseName(getMaskedPhoneOrString(copyOfHearingRequestPayload.getCaseDetails().getPublicCaseName()));
         }
 
         if (nonNull(copyOfHearingRequestPayload.getHearingDetails())) {
-            copyOfHearingRequestPayload.getHearingDetails().setListingComments(null);
+            copyOfHearingRequestPayload.getHearingDetails().setListingComments(getMaskedPhoneOrString(copyOfHearingRequestPayload.getHearingDetails().getListingComments()));
         }
 
         if (nonNull(copyOfHearingRequestPayload.getPartiesDetails())) {
             copyOfHearingRequestPayload.getPartiesDetails().forEach(party -> {
                 if (nonNull(party.getIndividualDetails())) {
-                    party.getIndividualDetails().setFirstName(null);
-                    party.getIndividualDetails().setLastName(null);
-                    party.getIndividualDetails().setHearingChannelEmail(null);
-                    party.getIndividualDetails().setHearingChannelPhone(null);
+                    party.getIndividualDetails().setFirstName(getMaskedPhoneOrString(party.getIndividualDetails().getFirstName()));
+                    party.getIndividualDetails().setLastName(getMaskedPhoneOrString(party.getIndividualDetails().getLastName()));
+                    party.getIndividualDetails().setHearingChannelEmail(
+                            nonNull(party.getIndividualDetails().getHearingChannelEmail())
+                                    ? party.getIndividualDetails().getHearingChannelEmail().stream()
+                                    .map(email -> getMaskedEmail(email))
+                                    .collect(Collectors.toList()) : null);
+                    party.getIndividualDetails().setHearingChannelPhone(
+                            nonNull(party.getIndividualDetails().getHearingChannelPhone())
+                                    ? party.getIndividualDetails().getHearingChannelPhone().stream()
+                                    .map(phone -> getMaskedPhoneOrString(phone))
+                                    .collect(Collectors.toList()) : null);
                 }
             });
         }

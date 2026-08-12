@@ -791,8 +791,9 @@ public class SscsUtil {
         return email.substring(0, atIndex) + "***" + email.substring(atIndex, atIndex + 3) + "***";
     }
 
-    public static String getMaskedPhone(String stringToMask) {
-        return !isEmpty(stringToMask) ? "***" + stringToMask.substring(stringToMask.length() - 4) : null;
+    public static String getMaskedPhoneOrString(String stringToMask) {
+        return isEmpty(stringToMask) ? null : stringToMask.length() > 4
+                ? "***" + stringToMask.substring(stringToMask.length() - 4) : "***";
     }
 }
 

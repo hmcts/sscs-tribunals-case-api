@@ -4,7 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.lenient;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedEmail;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPhoneOrString;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +17,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.sscs.config.SpringConfig;
 import uk.gov.hmcts.reform.sscs.exception.GetHearingException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -44,6 +49,9 @@ class HmcHearingApiServiceTest {
 
     @Mock
     private IdamService idamService;
+
+    @Spy
+    private ObjectMapper objectMapper = SpringConfig.mapper();
 
     @InjectMocks
     private HmcHearingApiService hmcHearingsService;
@@ -169,8 +177,10 @@ class HmcHearingApiServiceTest {
     @Test
     void testGetMaskedHearingPayloadMasksCaseNames() throws Exception {
         IndividualDetails individualDetails = IndividualDetails.builder()
-                .firstName("John")
-                .lastName("Doe")
+                .firstName("Paddington")
+                .lastName("Bear")
+                .hearingChannelEmail(List.of("paddington.bear@example.com"))
+                .hearingChannelPhone(null)
                 .build();
         PartyDetails partyDetails = PartyDetails.builder()
                 .individualDetails(individualDetails)
@@ -185,25 +195,28 @@ class HmcHearingApiServiceTest {
                        .publicCaseName("Public Case Name")
                        .build())
                .partiesDetails(parties)
-               .hearingDetails(HearingDetails.builder().listingComments("Appellant - John Doe").build())
+               .hearingDetails(HearingDetails.builder().listingComments("Listing Comments").build())
                .build();
 
-        HmcHearingApiService realService = new HmcHearingApiService(hmcHearingApi, idamService);
+        HmcHearingApiService realService = new HmcHearingApiService(hmcHearingApi, idamService, SpringConfig.mapper());
         
         Method method = HmcHearingApiService.class.getDeclaredMethod("getMaskedHearingPayload", HearingRequestPayload.class);
         method.setAccessible(true);
         
         String result = (String) method.invoke(realService, payload);
         assertThat(result).isNotNull();
-        assertThat(result).contains("hmctsInternalCaseName=null");
-        assertThat(result).contains("publicCaseName=null");
+        assertThat(result).contains("hmctsInternalCaseName=" + getMaskedPhoneOrString("HMCTS Internal Name"));
         assertThat(result).doesNotContain("HMCTS Internal Name");
+        assertThat(result).contains("publicCaseName=" + getMaskedPhoneOrString("Public Case Name"));
         assertThat(result).doesNotContain("Public Case Name");
-        assertThat(result).contains("firstName=null");
-        assertThat(result).contains("lastName=null");
-        assertThat(result).doesNotContain("John");
-        assertThat(result).doesNotContain("Doe");
-        assertThat(result).doesNotContain("Appellant - John Doe");
+        assertThat(result).contains("firstName=" + getMaskedPhoneOrString("Paddington"));
+        assertThat(result).doesNotContain("Paddington");
+        assertThat(result).contains("lastName=" + getMaskedPhoneOrString("Bear"));
+        assertThat(result).doesNotContain("Bear");
+        assertThat(result).contains("listingComments=" + getMaskedPhoneOrString("Listing Comments"));
+        assertThat(result).doesNotContain("Listing Comments");
+        assertThat(result).contains("hearingChannelEmail=[" + getMaskedEmail("paddington.bear@example.com"));
+        assertThat(result).doesNotContain("paddington.bear@example.com");
     }
 
     @DisplayName("getMaskedHearingPayload should handle null party individual details")
@@ -223,7 +236,7 @@ class HmcHearingApiServiceTest {
                .hearingDetails(null)
                .build();
 
-        HmcHearingApiService realService = new HmcHearingApiService(hmcHearingApi, idamService);
+        HmcHearingApiService realService = new HmcHearingApiService(hmcHearingApi, idamService, SpringConfig.mapper());
         
         Method method = HmcHearingApiService.class.getDeclaredMethod("getMaskedHearingPayload", HearingRequestPayload.class);
         method.setAccessible(true);
