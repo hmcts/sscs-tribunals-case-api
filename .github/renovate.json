@@ -2,7 +2,7 @@
   "extends": [
     "local>hmcts/.github:renovate-config",
     "github>hmcts/sscs-common//.github/sscs-renovate.json",
-    "github>hmcts/.github//renovate/cnp-jenkins-library",
+    "github>hmcts/.github//renovate/cnp-jenkins-library"
   ],
   "packageRules": [
     {
