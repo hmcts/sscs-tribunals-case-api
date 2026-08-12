@@ -298,14 +298,42 @@ tasks.register('runGitPreCommitTasks') {
 }
 
 dependencyManagement {
+    imports {
+        // CVE-2026-41852, CVE-2026-41853, CVE-2026-41839
+        mavenBom 'org.springframework:spring-framework-bom:6.2.19'
+
+        // CVE-2026-47838, CVE-2026-40988, CVE-2026-41706, CVE-2026-41003, CVE-2026-41694
+        mavenBom 'org.springframework.security:spring-security-bom:6.5.11'
+
+        // CVE-2026-50020, CVE-2026-45536, CVE-2026-42578
+        mavenBom 'io.netty:netty-bom:4.2.16.Final'
+
+        // CVE-2026-34479, CVE-2026-34477, CVE-2026-49844
+        mavenBom 'org.apache.logging.log4j:log4j-bom:2.26.1'
+    }
+
     dependencies {
-        imports {
-            mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2025.0.2'
+        // CVE-2026-33227, CVE-2026-46605
+        dependency 'org.apache.activemq:activemq-client:6.2.8'
+
+        // CVE-2025-48924
+        dependency 'org.apache.commons:commons-lang3:3.20.0'
+
+        // CVE-2026-42498
+        dependencySet(group: 'org.apache.tomcat.embed', version: '11.0.24') {
+            entry 'tomcat-embed-core'
+            entry 'tomcat-embed-el'
+            entry 'tomcat-embed-websocket'
+        }
+
+        // CVE-2026-53914, CVE-2020-29582
+        dependencySet(group: 'org.jetbrains.kotlin', version: '2.4.10') {
+            entry 'kotlin-stdlib'
+            entry 'kotlin-reflect'
         }
 
         // CVE-2023-36415, CVE-2024-35255
         dependency group: 'com.azure', name: 'azure-identity', version: '1.18.3'
-        dependency group: 'com.microsoft.azure', name: 'msal4j', version: '1.24.1'
 
         // CVE-2026-66274, CVE-2026-66273, CVE-2026-63140, CVE-2026-66276, CVE-2026-66275, CVE-2026-66277, CVE-2026-66257
         dependency group: 'org.apache.qpid', name: 'proton-j', version: '0.35.0'
@@ -320,41 +348,30 @@ dependencyManagement {
     }
 }
 
-ext {
-    set('activemq.version', '6.2.7')
-    set('netty.version', '4.2.16.Final')
-    set('log4j2.version', '2.26.1')
-    set('commons-lang3.version', '3.20.0')
-    set('kotlin.version', '2.2.21')
-    set('tomcat.version', '11.0.24')
-    set('spring-framework.version', '6.2.19')
-}
-
 def versions = [
         springboot     : springBoot.class.package.implementationVersion,
-        springsecurity : '6.5.11',
         jackson        : '2.22.1',
         lombok         : '1.18.38',
         commonsio      : '2.19.0',
-        openfeign      : '13.6'
+        openfeign      : '13.13'
 ]
 
 dependencies {
-    implementation group: 'org.springframework.boot', name: 'spring-boot-autoconfigure', version: versions.springboot
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter', version: versions.springboot
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-activemq', version: versions.springboot
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: versions.springboot
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop', version: versions.springboot
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc', version: versions.springboot
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: versions.springboot
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: versions.springboot
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: versions.springboot
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: versions.springboot
+    implementation group: 'org.springframework.boot', name: 'spring-boot-autoconfigure'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-activemq'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
 
-    implementation group: 'org.springframework.security', name: 'spring-security-config', version: versions.springsecurity
-    implementation group: 'org.springframework.security', name: 'spring-security-core', version: versions.springsecurity
-    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: versions.springsecurity
-    implementation group: 'org.springframework.security', name: 'spring-security-web', version: versions.springsecurity
+    implementation group: 'org.springframework.security', name: 'spring-security-config'
+    implementation group: 'org.springframework.security', name: 'spring-security-core'
+    implementation group: 'org.springframework.security', name: 'spring-security-crypto'
+    implementation group: 'org.springframework.security', name: 'spring-security-web'
 
     implementation group: 'org.springframework', name: 'spring-jms'
     implementation group: 'org.springframework', name: 'spring-context-support'
@@ -444,7 +461,7 @@ dependencies {
     implementation group: 'org.apache.pdfbox', name: 'xmpbox', version: '3.0.7'
     implementation group: 'org.apache.tika', name: 'tika-core', version: '3.3.2'
     implementation group: 'org.apache.tika', name: 'tika-parsers', version: '3.3.2'
-    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '11.0.24'
+    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core'
 
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -454,9 +471,9 @@ dependencies {
     contractTestImplementation sourceSets.main.runtimeClasspath
     contractTestImplementation sourceSets.test.runtimeClasspath
 
-    cftlibImplementation group: 'org.springframework.boot', name: 'spring-boot-devtools', version: versions.springboot
-    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-quartz', version: versions.springboot
-    contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springboot
+    cftlibImplementation group: 'org.springframework.boot', name: 'spring-boot-devtools'
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-quartz'
+    contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springboot, {
         exclude group: 'com.vaadin.external.google', module: 'android-json'
     }
