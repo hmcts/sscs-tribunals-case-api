@@ -59,15 +59,22 @@ export class LoginPage {
     }
 
     const maxAttempts = 3;
-    const newLoginPresent = await this.page
-      .getByText('Enter your email address')
-      .isVisible()
-      .catch(() => false);
+    // const newLoginPresent = await this.page
+    //   .getByText('Enter your email address')
+    //   .isVisible()
+    //   .catch(() => false);
 
-    await(newLoginPresent
-      ? this.verifyNewSuccessfulLoginForUser(maxAttempts, user)
-      : this.verifyOldSuccessfulLoginForUser(maxAttempts, user)
-    );
+    // await(newLoginPresent
+    //   ? this.verifyNewSuccessfulLoginForUser(maxAttempts, user)
+    //   : this.verifyOldSuccessfulLoginForUser(maxAttempts, user)
+    // );
+
+    try {
+      await webActions.verifyTextVisibility('Enter your email address');
+      await this.verifyNewSuccessfulLoginForUser(maxAttempts, user)
+    } catch {
+      await this.verifyOldSuccessfulLoginForUser(maxAttempts, user)
+    }
     
     await expect(this.signOutBtn).toBeVisible({ timeout: 15000 });
   }
