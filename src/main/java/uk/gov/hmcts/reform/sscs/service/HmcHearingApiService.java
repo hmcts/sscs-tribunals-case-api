@@ -118,10 +118,9 @@ public class HmcHearingApiService {
     }
 
     private String getMaskedHearingPayload(HearingRequestPayload hearingPayload) {
-        // Create a deep copyOfHearingRequestPayload to avoid mutating the original payload that will be sent
         HearingRequestPayload copyOfHearingRequestPayload = objectMapper.convertValue(hearingPayload, HearingRequestPayload.class);
 
-        if (copyOfHearingRequestPayload.getCaseDetails() != null) {
+        if (nonNull(copyOfHearingRequestPayload.getCaseDetails())) {
             copyOfHearingRequestPayload.getCaseDetails().setHmctsInternalCaseName(getMaskedPhoneOrString(copyOfHearingRequestPayload.getCaseDetails().getHmctsInternalCaseName()));
             copyOfHearingRequestPayload.getCaseDetails().setPublicCaseName(getMaskedPhoneOrString(copyOfHearingRequestPayload.getCaseDetails().getPublicCaseName()));
         }

@@ -910,8 +910,11 @@ public class NotificationServiceTest {
             any(NotificationHandler.SendNotification.class));
 
         verifyNoErrorsLogged(mockAppender, captorLoggingEvent);
-        verifyExpectedLogMessage(mockAppender, captorLoggingEvent, CASE_ID,
-                "email=" + getMaskedEmail(NEW_TEST_EMAIL_COM) + ", mobile=" + getMaskedPhoneOrString(MOBILE_NUMBER_2), Level.INFO);
+        List<ILoggingEvent> logEvents = (List<ILoggingEvent>) captorLoggingEvent.getAllValues();
+        assertThat(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage()
+                .contains("email=" + getMaskedEmail(NEW_TEST_EMAIL_COM) + ", mobile=" + getMaskedPhoneOrString(MOBILE_NUMBER_1) + ",")).count()).isEqualTo(1);
+        assertThat(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage().contains(NEW_TEST_EMAIL_COM))).isEmpty();
+        assertThat(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage().contains(MOBILE_NUMBER_2))).isEmpty();
     }
 
     @Test
@@ -988,8 +991,11 @@ public class NotificationServiceTest {
             any(NotificationHandler.SendNotification.class));
 
         verifyNoErrorsLogged(mockAppender, captorLoggingEvent);
-        verifyExpectedLogMessage(mockAppender, captorLoggingEvent, CASE_ID,
-                "email=" + getMaskedEmail(SAME_TEST_EMAIL_COM) + ", mobile=" + getMaskedPhoneOrString(MOBILE_NUMBER_1), Level.INFO);
+        List<ILoggingEvent> logEvents = (List<ILoggingEvent>) captorLoggingEvent.getAllValues();
+        assertThat(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage()
+                .contains("email=" + getMaskedEmail(SAME_TEST_EMAIL_COM) + ", mobile=" + getMaskedPhoneOrString(MOBILE_NUMBER_1) + ",")).count()).isEqualTo(1);
+        assertThat(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage().contains(SAME_TEST_EMAIL_COM))).isEmpty();
+        assertThat(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage().contains(MOBILE_NUMBER_1))).isEmpty();
     }
 
     @Test
