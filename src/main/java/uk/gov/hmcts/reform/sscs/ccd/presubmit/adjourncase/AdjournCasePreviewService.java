@@ -128,9 +128,6 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
             handleFaceToFaceHearing(adjournment, adjournCaseBuilder, venueName, caseData);
         } else {
             adjournCaseBuilder.nextHearingAtVenue(false);
-            if (adjournment.getNextHearingVenueSelected() != null) {
-                throw new IllegalStateException("adjournCaseNextHearingVenueSelected field should not be set");
-            }
         }
         if (nextHearingType.isOralHearingType()) {
             handleOralHearing(adjournment, adjournCaseBuilder);
