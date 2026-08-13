@@ -117,7 +117,7 @@ public class ServiceHearingsController {
 
         copyOfServiceHearingValues.setHmctsInternalCaseName(getMaskedPhoneOrString(copyOfServiceHearingValues.getHmctsInternalCaseName()));
         copyOfServiceHearingValues.setPublicCaseName(getMaskedPhoneOrString(copyOfServiceHearingValues.getPublicCaseName()));
-        copyOfServiceHearingValues.setListingComments(null);
+        copyOfServiceHearingValues.setListingComments(getMaskedPhoneOrString(copyOfServiceHearingValues.getListingComments()));
 
         List<PartyDetails> partyDetailsList = copyOfServiceHearingValues.getParties();
         if (nonNull(partyDetailsList)) {
