@@ -10,10 +10,13 @@ import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.JUDGE;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.TCW;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPresent;
+import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.addOtherPartiesToListOptions;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isBenefitTypeChildSupportOrUc;
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -23,8 +26,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
-import uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil;
 
+@Slf4j
 @Service
 public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private final boolean isPostHearingsEnabled;
@@ -65,11 +68,12 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
             sscsCaseData.setPrePostHearing(null);
         }
 
-        clearFields(sscsCaseData);
         setPartiesToSendLetter(sscsCaseData);
         if (callbackType.equals(CallbackType.ABOUT_TO_START)) {
+            clearFields(sscsCaseData);
             sscsCaseData.getExtendedSscsCaseData().setSelectNextHmcHearingType(NO);
             sscsCaseData.setHmcHearingType(null);
+            setOtherPartySelectionList(sscsCaseData);
         }
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
@@ -150,9 +154,24 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
         sscsCaseData.setSendDirectionNoticeToAppellantOrAppointee(null);
     }
 
+    private void setOtherPartySelectionList(SscsCaseData sscsCaseData) {
+        if (cmDirectionTypesConfidentiality
+            && isBenefitTypeChildSupportOrUc(sscsCaseData)
+            && isOtherPartyPresent(sscsCaseData)) {
+            List<DynamicListItem> listOptions = new ArrayList<>();
+            addOtherPartiesToListOptions(sscsCaseData, listOptions, true);
+            List<CcdValue<OtherPartySelectionDetails>> selection = new ArrayList<>();
+            selection.add(new CcdValue<>(new OtherPartySelectionDetails(new DynamicList(null, listOptions))));
+            sscsCaseData.setOtherPartySelection(selection);
+            log.info("Other party selection set for case {}", sscsCaseData.getCcdCaseId());
+        } else {
+            sscsCaseData.setOtherPartySelection(null);
+        }
+    }
+
     private void setPartiesToSendLetter(SscsCaseData sscsCaseData) {
 
-        YesNo hasOtherParty = OtherPartyDataUtil.isOtherPartyPresent(sscsCaseData) ? YES : NO;
+        YesNo hasOtherParty = isOtherPartyPresent(sscsCaseData) ? YES : NO;
         YesNo hasOtherPartyRep = NO;
         YesNo hasOtherPartyAppointee = NO;
 
