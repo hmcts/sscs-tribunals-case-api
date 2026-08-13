@@ -106,6 +106,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartyOption;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartyOptionDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartySelectionDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReasonableAdjustmentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReasonableAdjustments;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
@@ -122,6 +123,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType;
@@ -1390,6 +1392,8 @@ public class NotificationServiceTest {
             .willReturn(true);
 
         given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(getCoversheet());
+
+        updateOtherPartySelection(ccdNotificationWrapper.getNewSscsCaseData());
 
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
 
@@ -3335,5 +3339,34 @@ public class NotificationServiceTest {
     private byte[] getCoversheet() throws IOException {
         return IOUtils.toByteArray(
             Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("pdf/direction-notice-coversheet-sample.pdf")));
+    }
+
+    private void updateOtherPartySelection(SscsCaseData caseData) {
+        if (caseData.getOtherParties() != null) {
+            List<String> codes = new ArrayList<>();
+            for (CcdValue<OtherParty> op : caseData.getOtherParties()) {
+                if (op.getValue().getId() != null) {
+                    codes.add(PartyItemList.OTHER_PARTY.getCode() + op.getValue().getId());
+                }
+                if (op.getValue().getAppointee() != null && op.getValue().getAppointee().getId() != null) {
+                    codes.add(PartyItemList.OTHER_PARTY.getCode() + op.getValue().getAppointee().getId());
+                }
+                if (op.getValue().getRep() != null && op.getValue().getRep().getId() != null) {
+                    codes.add(PartyItemList.OTHER_PARTY_REPRESENTATIVE.getCode() + op.getValue().getRep().getId());
+                }
+            }
+            if (!codes.isEmpty()) {
+                caseData.setOtherPartySelection(otherPartySelection(codes.toArray(new String[0])));
+            }
+        }
+    }
+
+    private List<CcdValue<OtherPartySelectionDetails>> otherPartySelection(String... codes) {
+        List<CcdValue<OtherPartySelectionDetails>> selection = new ArrayList<>();
+        for (String code : codes) {
+            DynamicListItem item = new DynamicListItem(code, code);
+            selection.add(new CcdValue<>(new OtherPartySelectionDetails(new DynamicList(item, List.of(item)))));
+        }
+        return selection;
     }
 }
