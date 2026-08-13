@@ -307,12 +307,16 @@ dependencyManagement {
         dependency group: 'com.azure', name: 'azure-identity', version: '1.18.3'
         dependency group: 'com.microsoft.azure', name: 'msal4j', version: '1.24.1'
 
+        // CVE-2026-66274, CVE-2026-66273, CVE-2026-63140, CVE-2026-66276, CVE-2026-66275, CVE-2026-66277, CVE-2026-66257
+        dependency group: 'org.apache.qpid', name: 'proton-j', version: '0.35.0'
+        dependency group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.6.3'
+
         // CVE-2026-54399, CVE-2026-54428
         dependencySet(group: 'org.apache.httpcomponents.core5', version: '5.4.3') {
             entry 'httpcore5'
             entry 'httpcore5-h2'
         }
-        dependency group: '', name: '', version: ''
+
     }
 }
 
@@ -438,8 +442,8 @@ dependencies {
     implementation group: 'org.apache.commons', name: 'commons-text', version: '1.15.0'
     implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '3.0.7'
     implementation group: 'org.apache.pdfbox', name: 'xmpbox', version: '3.0.7'
-    implementation group: 'org.apache.tika', name: 'tika-core', version: '3.2.3'
-    implementation group: 'org.apache.tika', name: 'tika-parsers', version: '3.2.3'
+    implementation group: 'org.apache.tika', name: 'tika-core', version: '3.3.2'
+    implementation group: 'org.apache.tika', name: 'tika-parsers', version: '3.3.2'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '11.0.24'
 
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -465,7 +469,7 @@ dependencies {
         exclude group: 'commons-io', module: 'commons-io'
     }
 
-    testImplementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5-fluent', version: '5.5'
+    testImplementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5-fluent', version: '5.6.3'
 
     testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '4.1.1'
     testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-assertj', version: '4.1.1'
