@@ -1,16 +1,23 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing.FACE_TO_FACE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing.PAPER;
 
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingVenue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
@@ -41,6 +48,45 @@ class AdjournCaseAboutToSubmitHandlerTest extends AdjournCaseAboutToSubmitHandle
 
         verify(previewDocumentService, times(1)).writePreviewDocumentToSscsInternalDocument(
             sscsCaseData, DRAFT_ADJOURNMENT_NOTICE, null);
+    }
+
+    @DisplayName("Given type of next hearing is not face to face, then next hearing venue selected is cleared")
+    @Test
+    void givenTypeOfNextHearingNotFaceToFace_thenNextHearingVenueSelectedIsCleared() {
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(PAPER);
+        sscsCaseData.getAdjournment().setNextHearingVenueSelected(new DynamicList("someVenue"));
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getAdjournment().getNextHearingVenueSelected()).isNull();
+    }
+
+    @DisplayName("Given type of next hearing is face to face but venue is not somewhere else, then next hearing venue selected is cleared")
+    @Test
+    void givenFaceToFaceHearingWithVenueNotSomewhereElse_thenNextHearingVenueSelectedIsCleared() {
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(FACE_TO_FACE);
+        sscsCaseData.getAdjournment().setNextHearingVenue(AdjournCaseNextHearingVenue.SAME_VENUE);
+        sscsCaseData.getAdjournment().setNextHearingVenueSelected(new DynamicList("someVenue"));
+        Appellant appellant = new Appellant();
+        appellant.setAddress(Address.builder().build());
+        sscsCaseData.getAppeal().setAppellant(appellant);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getAdjournment().getNextHearingVenueSelected()).isNull();
+    }
+
+    @DisplayName("Given type of next hearing is face to face and venue is somewhere else, then next hearing venue selected is retained")
+    @Test
+    void givenFaceToFaceHearingWithVenueSomewhereElse_thenNextHearingVenueSelectedIsRetained() {
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(FACE_TO_FACE);
+        sscsCaseData.getAdjournment().setNextHearingVenue(AdjournCaseNextHearingVenue.SOMEWHERE_ELSE);
+        final DynamicList selectedVenue = new DynamicList("someVenue");
+        sscsCaseData.getAdjournment().setNextHearingVenueSelected(selectedVenue);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getAdjournment().getNextHearingVenueSelected()).isEqualTo(selectedVenue);
     }
 
 }
