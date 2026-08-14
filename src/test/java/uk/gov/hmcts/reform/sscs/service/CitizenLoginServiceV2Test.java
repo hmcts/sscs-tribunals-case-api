@@ -158,6 +158,9 @@ class CitizenLoginServiceV2Test {
 
         verify(sscsCcdConvertService, times(2)).getCaseDetails(any(CaseDetails.class));
         assertThat(casesForCitizen, is(new ArrayList<>()));
+        logCapture.assertLogContains("Find case: Searching for case with tya [null] for user [" + citizenIdamTokens.getUserId(), Level.INFO);
+        logCapture.assertLogContains("No matching subscription email found for case id 111 and user id [" + citizenIdamTokens.getUserId(), Level.INFO);
+        logCapture.assertLogContains("No matching subscription email found for case id 222 and user id [" + citizenIdamTokens.getUserId(), Level.INFO);
     }
 
     @Test
@@ -391,6 +394,11 @@ class CitizenLoginServiceV2Test {
         verify(citizenCcdService).addUserToCase(serviceIdamTokens, citizenIdamTokens.getUserId(), expectedCaseId);
         assertThat(sscsCaseDetails.isPresent(), is(true));
         assertThat(sscsCaseDetails.get(), is(expectedOnlineHearing));
+        logCapture.assertLogContains("Associate case: Found case to assign id [" + expectedCaseId + "] for tya [" + tya + "] user [" + citizenIdamTokens.getUserId() + "] postcode [" + getMaskedPhoneOrString(APPEAL_POSTCODE) + "]", Level.INFO);
+        logCapture.assertLogContains("Associate case: Found case to assign id [" + expectedCaseId + "] for tya [" + tya + "] user [" + citizenIdamTokens.getUserId() + "] postcode [" + getMaskedPhoneOrString(APPEAL_POSTCODE) + "] matches postcode", Level.INFO);
+        logCapture.assertLogContains("Found case to assign id [" + expectedCaseId + "] for tya [" + tya + "] user [" + citizenIdamTokens.getUserId() + "] postcode [" + getMaskedPhoneOrString(APPEAL_POSTCODE) + "] has subscription", Level.INFO);
+        logCapture.assertLogContains("Updating case with last logged in MYA using V2, case id: " + expectedCaseId + ", for user: " + citizenIdamTokens.getUserId(), Level.INFO);
+
     }
 
     @Test
@@ -518,6 +526,7 @@ class CitizenLoginServiceV2Test {
 
         verify(citizenCcdService, never()).addUserToCase(any(IdamTokens.class), any(String.class), anyLong());
         assertThat(sscsCaseDetails.isPresent(), is(false));
+        logCapture.assertLogContains("Associate case: Postcode/Ibca reference does not match id [123456789] for tya [" + tya + "] user [" + citizenIdamTokens.getUserId() + "] postcode [" + getMaskedPhoneOrString(APPEAL_POSTCODE) + "]", Level.INFO);
     }
 
     @Test
@@ -566,6 +575,7 @@ class CitizenLoginServiceV2Test {
 
         verify(citizenCcdService, never()).addUserToCase(any(IdamTokens.class), any(String.class), anyLong());
         assertThat(sscsCaseDetails.isPresent(), is(false));
+        logCapture.assertLogContains("Associate case: No case found for tya [" + tya + "] user [" + citizenIdamTokens.getUserId() + "] postcode [" + getMaskedPhoneOrString(someOtherPostcode) + "]", Level.INFO);
     }
 
     @Test
