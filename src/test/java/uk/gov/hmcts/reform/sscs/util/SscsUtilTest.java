@@ -966,7 +966,7 @@ class SscsUtilTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"07734850607, ***0607",  ",", "'',", "12, ***"})
+    @CsvSource({"07734850607, ***0607",  ",", "'',''", "12, ***"})
     void testGetMaskedPhone(String stringToMask, String expected) {
         assertThat(SscsUtil.getMaskedPhone(stringToMask)).isEqualTo(expected);
     }

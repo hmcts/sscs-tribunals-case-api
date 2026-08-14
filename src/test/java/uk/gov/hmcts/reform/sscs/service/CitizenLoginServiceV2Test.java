@@ -16,7 +16,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.util.DataFixtures.someOnlineHearing;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPhone;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPostcode;
 
 import ch.qos.logback.classic.Level;
 import java.time.LocalDateTime;
@@ -394,9 +394,9 @@ class CitizenLoginServiceV2Test {
         verify(citizenCcdService).addUserToCase(serviceIdamTokens, citizenIdamTokens.getUserId(), expectedCaseId);
         assertThat(sscsCaseDetails.isPresent(), is(true));
         assertThat(sscsCaseDetails.get(), is(expectedOnlineHearing));
-        logCapture.assertLogContains("Associate case: Found case to assign id [" + expectedCaseId + "] for tya [" + tya + "] user [" + citizenIdamTokens.getUserId() + "] postcode [" + getMaskedPhone(APPEAL_POSTCODE) + "]", Level.INFO);
-        logCapture.assertLogContains("Associate case: Found case to assign id [" + expectedCaseId + "] for tya [" + tya + "] user [" + citizenIdamTokens.getUserId() + "] postcode [" + getMaskedPhone(APPEAL_POSTCODE) + "] matches postcode", Level.INFO);
-        logCapture.assertLogContains("Found case to assign id [" + expectedCaseId + "] for tya [" + tya + "] user [" + citizenIdamTokens.getUserId() + "] postcode [" + getMaskedPhone(APPEAL_POSTCODE) + "] has subscription", Level.INFO);
+        logCapture.assertLogContains("Associate case: Found case to assign id [" + expectedCaseId + "] for tya [" + tya + "] user [" + citizenIdamTokens.getUserId() + "] postcode [" + getMaskedPostcode(APPEAL_POSTCODE) + "]", Level.INFO);
+        logCapture.assertLogContains("Associate case: Found case to assign id [" + expectedCaseId + "] for tya [" + tya + "] user [" + citizenIdamTokens.getUserId() + "] postcode [" + getMaskedPostcode(APPEAL_POSTCODE) + "] matches postcode", Level.INFO);
+        logCapture.assertLogContains("Found case to assign id [" + expectedCaseId + "] for tya [" + tya + "] user [" + citizenIdamTokens.getUserId() + "] postcode [" + getMaskedPostcode(APPEAL_POSTCODE) + "] has subscription", Level.INFO);
         logCapture.assertLogContains("Updating case with last logged in MYA using V2, case id: " + expectedCaseId + ", for user: " + citizenIdamTokens.getUserId(), Level.INFO);
 
     }
@@ -526,7 +526,7 @@ class CitizenLoginServiceV2Test {
 
         verify(citizenCcdService, never()).addUserToCase(any(IdamTokens.class), any(String.class), anyLong());
         assertThat(sscsCaseDetails.isPresent(), is(false));
-        logCapture.assertLogContains("Associate case: Postcode/Ibca reference does not match id [123456789] for tya [" + tya + "] user [" + citizenIdamTokens.getUserId() + "] postcode [" + getMaskedPhone(APPEAL_POSTCODE) + "]", Level.INFO);
+        logCapture.assertLogContains("Associate case: Postcode/Ibca reference does not match id [123456789] for tya [" + tya + "] user [" + citizenIdamTokens.getUserId() + "] postcode [" + getMaskedPostcode(APPEAL_POSTCODE) + "]", Level.INFO);
     }
 
     @Test
@@ -575,7 +575,7 @@ class CitizenLoginServiceV2Test {
 
         verify(citizenCcdService, never()).addUserToCase(any(IdamTokens.class), any(String.class), anyLong());
         assertThat(sscsCaseDetails.isPresent(), is(false));
-        logCapture.assertLogContains("Associate case: No case found for tya [" + tya + "] user [" + citizenIdamTokens.getUserId() + "] postcode [" + getMaskedPhone(someOtherPostcode) + "]", Level.INFO);
+        logCapture.assertLogContains("Associate case: No case found for tya [" + tya + "] user [" + citizenIdamTokens.getUserId() + "] postcode [" + getMaskedPostcode(someOtherPostcode) + "]", Level.INFO);
     }
 
     @Test
@@ -593,7 +593,7 @@ class CitizenLoginServiceV2Test {
 
         logCapture.assertLogContains("Found case to assign id [" + expectedCase.getId() + "] for tya [" + tya + "] "
                 + "user [" + citizenIdamTokens.getUserId() + "] postcode ["
-                + getMaskedPhone(APPEAL_POSTCODE) + "] has subscription", Level.INFO);
+                + getMaskedPostcode(APPEAL_POSTCODE) + "] has subscription", Level.INFO);
         logCapture.assertLogDoesNotContain(APPEAL_POSTCODE, Level.INFO);
     }
 
