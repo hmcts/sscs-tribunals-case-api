@@ -32,21 +32,23 @@ public class LogCaptureExtension implements BeforeEachCallback, AfterEachCallbac
         logger.detachAppender(appender);
     }
 
-    public void assertLogContains(String message, Level level) {
+    public LogCaptureExtension assertLogContains(String message, Level level) {
         boolean found = appender.list.stream()
             .anyMatch(event -> event.getLevel().equals(level) && event.getFormattedMessage().contains(message));
 
         if (!found) {
             throw new AssertionError("Expected log not found: [" + level + "] " + message);
         }
+        return this;
     }
 
-    public void assertLogDoesNotContain(String message, Level level) {
+    public LogCaptureExtension assertLogDoesNotContain(String message, Level level) {
         boolean found = appender.list.stream()
             .anyMatch(event -> event.getLevel().equals(level) && event.getFormattedMessage().contains(message));
 
         if (found) {
             throw new AssertionError("Unexpected log found: [" + level + "] " + message);
         }
+        return this;
     }
 }

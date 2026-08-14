@@ -103,6 +103,7 @@ public class SscsUtil {
 
     public static final String CATEGORY_TYPE_TEMPLATE = "%s-%03d";
     public static final String CATEGORY_SUBTYPE_TEMPLATE = "%s%s";
+    public static final String MASKED_STRING_VALUE = "***";
 
     private SscsUtil() {
         //
@@ -781,19 +782,35 @@ public class SscsUtil {
     }
 
     public static String getMaskedEmail(String email) {
-        if (isEmpty(email) || email.indexOf('@') < 0) {
+        if (isEmpty(email)) {
             return email;
         }
         int atIndex = email.indexOf('@');
-        if (atIndex > 3) {
-            return email.substring(0, 3) + "***" + email.substring(atIndex, atIndex + 3) + "***";
+        if (atIndex < 0) {
+            return MASKED_STRING_VALUE;
         }
-        return email.substring(0, atIndex) + "***" + email.substring(atIndex, atIndex + 3) + "***";
+
+        int visibleLocalChars = Math.min(atIndex, 3);
+        int domainEnd = Math.min(email.length(), atIndex + 3);
+
+        return email.substring(0, visibleLocalChars)
+                + MASKED_STRING_VALUE
+                + email.substring(atIndex, domainEnd)
+                + MASKED_STRING_VALUE;
     }
 
-    public static String getMaskedPhoneOrString(String stringToMask) {
-        return isEmpty(stringToMask) ? null : stringToMask.length() > 4
-                ? "***" + stringToMask.substring(stringToMask.length() - 4) : "***";
+    public static String getMaskedPhone(String stringToMask) {
+        return isEmpty(stringToMask) ? stringToMask : stringToMask.length() > 4
+                ? MASKED_STRING_VALUE + stringToMask.substring(stringToMask.length() - 4) : MASKED_STRING_VALUE;
+    }
+
+    public static String getMaskedPostcode(String postcode) {
+        return isEmpty(postcode) ? postcode : postcode.length() > 3
+                ? postcode.substring(0, 3) + MASKED_STRING_VALUE : MASKED_STRING_VALUE;
+    }
+
+    public static String getMaskedValue(String stringToMask) {
+        return isEmpty(stringToMask) ? stringToMask : MASKED_STRING_VALUE;
     }
 }
 

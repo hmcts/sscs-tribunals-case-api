@@ -4,7 +4,8 @@ import static io.swagger.v3.oas.annotations.enums.ParameterIn.HEADER;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.ResponseEntity.status;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedEmail;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPhoneOrString;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPhone;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedValue;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -115,28 +116,26 @@ public class ServiceHearingsController {
     private String getServiceHearingValuesForLogging(ServiceHearingValues serviceHearingValues) {
         ServiceHearingValues copyOfServiceHearingValues = objectMapper.convertValue(serviceHearingValues, ServiceHearingValues.class);
 
-        copyOfServiceHearingValues.setHmctsInternalCaseName(getMaskedPhoneOrString(copyOfServiceHearingValues.getHmctsInternalCaseName()));
-        copyOfServiceHearingValues.setPublicCaseName(getMaskedPhoneOrString(copyOfServiceHearingValues.getPublicCaseName()));
-        copyOfServiceHearingValues.setListingComments(getMaskedPhoneOrString(copyOfServiceHearingValues.getListingComments()));
+        copyOfServiceHearingValues.setHmctsInternalCaseName(getMaskedValue(copyOfServiceHearingValues.getHmctsInternalCaseName()));
+        copyOfServiceHearingValues.setPublicCaseName(getMaskedValue(copyOfServiceHearingValues.getPublicCaseName()));
+        copyOfServiceHearingValues.setListingComments(getMaskedValue(copyOfServiceHearingValues.getListingComments()));
 
         List<PartyDetails> partyDetailsList = copyOfServiceHearingValues.getParties();
         if (nonNull(partyDetailsList)) {
             for (PartyDetails party : partyDetailsList) {
-                party.setPartyName(getMaskedPhoneOrString(party.getPartyName()));
+                party.setPartyName(getMaskedValue(party.getPartyName()));
                 if (nonNull(party.getIndividualDetails())) {
-                    party.getIndividualDetails().setFirstName(getMaskedPhoneOrString(party.getIndividualDetails().getFirstName()));
-                    party.getIndividualDetails().setLastName(getMaskedPhoneOrString(party.getIndividualDetails().getLastName()));
-                    if (nonNull(party.getIndividualDetails().getHearingChannelEmail())) {
-                        party.getIndividualDetails().setHearingChannelEmail(
-                                nonNull(party.getIndividualDetails().getHearingChannelEmail())
-                                        ? party.getIndividualDetails().getHearingChannelEmail().stream()
-                                        .map(email -> getMaskedEmail(email))
-                                        .collect(Collectors.toList()) : null);
-                    }
+                    party.getIndividualDetails().setFirstName(getMaskedValue(party.getIndividualDetails().getFirstName()));
+                    party.getIndividualDetails().setLastName(getMaskedValue(party.getIndividualDetails().getLastName()));
+                    party.getIndividualDetails().setHearingChannelEmail(
+                            nonNull(party.getIndividualDetails().getHearingChannelEmail())
+                                    ? party.getIndividualDetails().getHearingChannelEmail().stream()
+                                    .map(email -> getMaskedEmail(email))
+                                    .collect(Collectors.toList()) : null);
                     party.getIndividualDetails().setHearingChannelPhone(
                             nonNull(party.getIndividualDetails().getHearingChannelPhone())
                                     ? party.getIndividualDetails().getHearingChannelPhone().stream()
-                                    .map(phone -> getMaskedPhoneOrString(phone))
+                                    .map(phone -> getMaskedPhone(phone))
                                     .collect(Collectors.toList()) : null);
                 }
             }

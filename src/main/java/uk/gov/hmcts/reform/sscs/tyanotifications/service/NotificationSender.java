@@ -4,7 +4,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedEmail;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPhoneOrString;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPostcode;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -317,7 +317,7 @@ public class NotificationSender {
         NotificationClient client;
         if (notificationTestRecipients.getPostcodes().contains("*")
             || notificationTestRecipients.getPostcodes().contains(postcode)) {
-            log.info(USING_TEST_GOV_NOTIFY_KEY_FOR, testNotificationClient.getApiKey(), getMaskedPhoneOrString(postcode));
+            log.info(USING_TEST_GOV_NOTIFY_KEY_FOR, testNotificationClient.getApiKey(), getMaskedPostcode(postcode));
             client = testNotificationClient;
         } else {
             client = notificationClient;

@@ -960,7 +960,7 @@ class SscsUtilTest {
 
     @ParameterizedTest
     @CsvSource({"paddington_bear@gmail.com, pad***@gm***", "007@bond.co.uk, 007***@bo***",
-        "el@test.com, el***@te***", "b@tmanMail.com, b***@tm***", ",", "'',''"})
+        "el@test.com, el***@te***", "b@tmanMail.com, b***@tm***", ",", "'',''", "a@b, a***@b***", "testemail,***"})
     void testGetMaskedEmail(String email, String expected) {
         assertThat(SscsUtil.getMaskedEmail(email)).isEqualTo(expected);
     }
@@ -968,6 +968,18 @@ class SscsUtilTest {
     @ParameterizedTest
     @CsvSource({"07734850607, ***0607",  ",", "'',", "12, ***"})
     void testGetMaskedPhone(String stringToMask, String expected) {
-        assertThat(SscsUtil.getMaskedPhoneOrString(stringToMask)).isEqualTo(expected);
+        assertThat(SscsUtil.getMaskedPhone(stringToMask)).isEqualTo(expected);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"AB12 3CD, AB1***", "EC1A 1BB, EC1***", ",", "'',''", "W1A, ***", "S,***", "1234, 123***"})
+    void testGetMaskedPostcode(String postcode, String expected) {
+        assertThat(SscsUtil.getMaskedPostcode(postcode)).isEqualTo(expected);
+    }
+
+    @ParameterizedTest
+    @CsvSource({",","'',''","stringToMask, ***"})
+    void testGetMaskedString(String stringToMask, String expected) {
+        assertThat(SscsUtil.getMaskedValue(stringToMask)).isEqualTo(expected);
     }
 }

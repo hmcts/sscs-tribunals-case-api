@@ -2,8 +2,9 @@ package uk.gov.hmcts.reform.sscs.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.MASKED_STRING_VALUE;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedEmail;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPhoneOrString;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPhone;
 
 import ch.qos.logback.classic.Level;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -86,7 +87,7 @@ public class ServiceHearingsControllerTest {
     }
 
     @Test
-    void testGetServiceHearingValuesForLoggingMasksMultipleParties() throws Exception {
+    void getServiceHearingValuesForLoggingMasksMultipleParties() throws Exception {
         IndividualDetails individualDetails1 = IndividualDetails.builder()
                 .firstName("Paddington")
                 .lastName("Bear")
@@ -132,30 +133,67 @@ public class ServiceHearingsControllerTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        logCapture.assertLogContains(getMaskedPhoneOrString("hmctsInternalCaseNameTest"), Level.INFO);
-        logCapture.assertLogContains(getMaskedPhoneOrString("publicCaseNameTest"), Level.INFO);
-        logCapture.assertLogContains(getMaskedPhoneOrString("listingCommentsTest"), Level.INFO);
-        logCapture.assertLogContains(getMaskedPhoneOrString("Paddington"), Level.INFO);
-        logCapture.assertLogContains(getMaskedPhoneOrString("Bear"), Level.INFO);
-        logCapture.assertLogContains(getMaskedEmail("paddington.bear@example.com"), Level.INFO);
-        logCapture.assertLogContains(getMaskedPhoneOrString("07123456789"), Level.INFO);
+        logCapture
+                .assertLogContains("hmctsInternalCaseName=" + MASKED_STRING_VALUE, Level.INFO)
+                .assertLogContains("publicCaseName=" + MASKED_STRING_VALUE, Level.INFO)
+                .assertLogContains("listingComments=" + MASKED_STRING_VALUE, Level.INFO)
+                .assertLogContains("partyName=" + MASKED_STRING_VALUE, Level.INFO)
+                .assertLogContains("firstName=" + MASKED_STRING_VALUE, Level.INFO)
+                .assertLogContains("lastName=" + MASKED_STRING_VALUE, Level.INFO)
+                .assertLogContains("hearingChannelEmail=[" + getMaskedEmail("paddington.bear@example.com"), Level.INFO)
+                .assertLogContains("hearingChannelPhone=[" + getMaskedPhone("07123456789"), Level.INFO)
 
-        logCapture.assertLogContains(getMaskedPhoneOrString("Jane"), Level.INFO);
-        logCapture.assertLogContains(getMaskedPhoneOrString("Smith"), Level.INFO);
-        logCapture.assertLogContains(getMaskedEmail("jane.smith@example.com"), Level.INFO);
-        logCapture.assertLogContains(getMaskedPhoneOrString("07987654321"), Level.INFO);
+                .assertLogContains("firstName=" + MASKED_STRING_VALUE, Level.INFO)
+                .assertLogContains("lastName=" + MASKED_STRING_VALUE, Level.INFO)
+                .assertLogContains("hearingChannelEmail=[" + getMaskedEmail("jane.smith@example.com"), Level.INFO)
+                .assertLogContains("hearingChannelPhone=[" + getMaskedPhone("07987654321"), Level.INFO)
 
-        logCapture.assertLogDoesNotContain("hmctsInternalCaseNameTest", Level.INFO);
-        logCapture.assertLogDoesNotContain("publicCaseNameTest", Level.INFO);
-        logCapture.assertLogDoesNotContain("listingCommentsTest", Level.INFO);
-        logCapture.assertLogDoesNotContain("paddington.bear@example.com", Level.INFO);
-        logCapture.assertLogDoesNotContain("07123456789", Level.INFO);
-        logCapture.assertLogDoesNotContain("jane.smith@example.com", Level.INFO);
-        logCapture.assertLogDoesNotContain("07987654321", Level.INFO);
+                .assertLogDoesNotContain("hmctsInternalCaseNameTest", Level.INFO)
+                .assertLogDoesNotContain("publicCaseNameTest", Level.INFO)
+                .assertLogDoesNotContain("listingCommentsTest", Level.INFO)
+                .assertLogDoesNotContain("paddington.bear@example.com", Level.INFO)
+                .assertLogDoesNotContain("07123456789", Level.INFO)
+                .assertLogDoesNotContain("jane.smith@example.com", Level.INFO)
+                .assertLogDoesNotContain("07987654321", Level.INFO);
 
         assertThat(response.getBody().getHmctsInternalCaseName()).isEqualTo("hmctsInternalCaseNameTest");
         assertThat(response.getBody().getPublicCaseName()).isEqualTo("publicCaseNameTest");
         assertThat(response.getBody().getListingComments()).isEqualTo("listingCommentsTest");
         assertThat(response.getBody().getParties()).isEqualTo(parties);
+    }
+
+    @Test
+    void getServiceHearingValuesForNullOrEmptyIndividualDetails() throws Exception {
+        PartyDetails partyDetails1 = PartyDetails.builder()
+                .partyName("Paddington Bear")
+                .individualDetails(null)
+                .build();
+
+        List<PartyDetails> parties = new ArrayList<>();
+        parties.add(partyDetails1);
+
+        ServiceHearingRequest request = ServiceHearingRequest.builder()
+                .caseId(String.valueOf(CASE_ID))
+                .build();
+
+        when(serviceHearingsService.getServiceHearingValues(request)).thenReturn(
+                ServiceHearingValues.builder()
+                        .hmctsInternalCaseName(null)
+                        .publicCaseName(null)
+                        .listingComments("")
+                        .parties(parties)
+                        .build()
+        );
+
+        serviceHearingsController = new ServiceHearingsController(serviceHearingsService, objectMapper);
+
+        serviceHearingsController.serviceHearingValues(request);
+
+        logCapture
+                .assertLogContains("hmctsInternalCaseName=null", Level.INFO)
+                .assertLogContains("publicCaseName=null", Level.INFO)
+                .assertLogContains("listingComments=,", Level.INFO)
+                .assertLogContains("individualDetails=null", Level.INFO);
+
     }
 }

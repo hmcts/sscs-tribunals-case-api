@@ -9,7 +9,7 @@ import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.lang3.BooleanUtils.isFalse;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPhoneOrString;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPostcode;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -148,27 +148,27 @@ public class CitizenLoginService {
 
         if (caseByAppealNumber != null) {
             log.info(format("Associate case: Found case to assign id [%s] for tya [%s] user [%s] postcode [%s]",
-                    caseByAppealNumber.getId(), tya, citizenIdamTokens.getUserId(), getMaskedPhoneOrString(postcode)));
+                    caseByAppealNumber.getId(), tya, citizenIdamTokens.getUserId(), getMaskedPostcode(postcode)));
             String appellantPostcode = caseByAppealNumber.getData().getAppeal().getAppellant().getAddress().getPostcode();
             if (isNotBlank(appellantPostcode) || isNotBlank(ibcaReference)) {
                 if (caseAssignmentVerifier.verifyPostcodeOrIbcaReference(caseByAppealNumber, postcode, ibcaReference, email)) {
-                    log.info(format("Associate case: Found case to assign id [%s] for tya [%s] user [%s] postcode [%s] matches postcode", caseByAppealNumber.getId(), tya, citizenIdamTokens.getUserId(), getMaskedPhoneOrString(postcode)));
+                    log.info(format("Associate case: Found case to assign id [%s] for tya [%s] user [%s] postcode [%s] matches postcode", caseByAppealNumber.getId(), tya, citizenIdamTokens.getUserId(), getMaskedPostcode(postcode)));
                     if (caseHasSubscriptionWithTyaAndEmail(caseByAppealNumber, tya, email)) {
-                        log.info(format("Found case to assign id [%s] for tya [%s] user [%s] postcode [%s] has subscription", caseByAppealNumber.getId(), tya, citizenIdamTokens.getUserId(), getMaskedPhoneOrString(postcode)));
+                        log.info(format("Found case to assign id [%s] for tya [%s] user [%s] postcode [%s] has subscription", caseByAppealNumber.getId(), tya, citizenIdamTokens.getUserId(), getMaskedPostcode(postcode)));
                         citizenCcdService.addUserToCase(idamService.getIdamTokens(), citizenIdamTokens.getUserId(), caseByAppealNumber.getId());
                         updateCaseWithLastLoggedIntoMya(email, caseByAppealNumber, citizenIdamTokens.getUserId());
                         return onlineHearingService.loadHearing(caseByAppealNumber, tya, email);
                     } else {
-                        log.info(format("Associate case: Subscription does not match id [%s] for tya [%s] user [%s] postcode [%s]", caseByAppealNumber.getId(), tya, citizenIdamTokens.getUserId(), getMaskedPhoneOrString(postcode)));
+                        log.info(format("Associate case: Subscription does not match id [%s] for tya [%s] user [%s] postcode [%s]", caseByAppealNumber.getId(), tya, citizenIdamTokens.getUserId(), getMaskedPostcode(postcode)));
                     }
                 } else {
-                    log.info(format("Associate case: Postcode/Ibca reference does not match id [%s] for tya [%s] user [%s] postcode [%s]", caseByAppealNumber.getId(), tya, citizenIdamTokens.getUserId(), getMaskedPhoneOrString(postcode)));
+                    log.info(format("Associate case: Postcode/Ibca reference does not match id [%s] for tya [%s] user [%s] postcode [%s]", caseByAppealNumber.getId(), tya, citizenIdamTokens.getUserId(), getMaskedPostcode(postcode)));
                 }
             } else {
                 log.info(format("Associate case: Found case to assign id [%s], however appellant postcode/ibca reference does not exist", caseByAppealNumber.getId()));
             }
         } else {
-            log.info(format("Associate case: No case found for tya [%s] user [%s] postcode [%s]", tya, citizenIdamTokens.getUserId(), getMaskedPhoneOrString(postcode)));
+            log.info(format("Associate case: No case found for tya [%s] user [%s] postcode [%s]", tya, citizenIdamTokens.getUserId(), getMaskedPostcode(postcode)));
         }
         return Optional.empty();
     }

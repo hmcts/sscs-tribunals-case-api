@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.lenient;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.MASKED_STRING_VALUE;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedEmail;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPhoneOrString;
 
 import ch.qos.logback.classic.Level;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -210,18 +210,20 @@ class HmcHearingApiServiceTest {
 
         hmcHearingsService.sendCreateHearingRequest(payload);
 
-        logCapture.assertLogContains("hmctsInternalCaseName=" + getMaskedPhoneOrString("HMCTS Internal Name"), Level.INFO);
-        logCapture.assertLogDoesNotContain("HMCTS Internal Name", Level.INFO);
-        logCapture.assertLogContains("publicCaseName=" + getMaskedPhoneOrString("Public Case Name"), Level.INFO);
-        logCapture.assertLogDoesNotContain("Public Case Name", Level.INFO);
-        logCapture.assertLogContains("firstName=" + getMaskedPhoneOrString("Paddington"), Level.INFO);
-        logCapture.assertLogDoesNotContain("Paddington", Level.INFO);
-        logCapture.assertLogContains("lastName=" + getMaskedPhoneOrString("Bear"), Level.INFO);
-        logCapture.assertLogDoesNotContain("Bear", Level.INFO);
-        logCapture.assertLogContains("listingComments=" + getMaskedPhoneOrString("Listing Comments"), Level.INFO);
-        logCapture.assertLogDoesNotContain("Listing Comments", Level.INFO);
-        logCapture.assertLogContains("hearingChannelEmail=[" + getMaskedEmail("paddington.bear@example.com"), Level.INFO);
-        logCapture.assertLogDoesNotContain("paddington.bear@example.com", Level.INFO);
+        logCapture
+                .assertLogContains("hmctsInternalCaseName=" + MASKED_STRING_VALUE, Level.INFO)
+                .assertLogContains("publicCaseName=" + MASKED_STRING_VALUE, Level.INFO)
+                .assertLogContains("firstName=" + MASKED_STRING_VALUE, Level.INFO)
+                .assertLogContains("lastName=" + MASKED_STRING_VALUE, Level.INFO)
+                .assertLogContains("listingComments=" + MASKED_STRING_VALUE, Level.INFO)
+                .assertLogContains("hearingChannelEmail=[" + getMaskedEmail("paddington.bear@example.com"), Level.INFO)
+
+                .assertLogDoesNotContain("HMCTS Internal Name", Level.INFO)
+                .assertLogDoesNotContain("Public Case Name", Level.INFO)
+                .assertLogDoesNotContain("Paddington", Level.INFO)
+                .assertLogDoesNotContain("Bear", Level.INFO)
+                .assertLogDoesNotContain("Listing Comments", Level.INFO)
+                .assertLogDoesNotContain("paddington.bear@example.com", Level.INFO);
     }
 
     @DisplayName("getMaskedHearingPayload should handle null party individual details")
@@ -243,8 +245,9 @@ class HmcHearingApiServiceTest {
 
         hmcHearingsService.sendCreateHearingRequest(payload);
 
-        logCapture.assertLogContains("hmctsInternalCaseName=null", Level.INFO);
-        logCapture.assertLogContains("publicCaseName=null", Level.INFO);
-        logCapture.assertLogContains("individualDetails=null", Level.INFO);
+        logCapture
+                .assertLogContains("hmctsInternalCaseName=null", Level.INFO)
+                .assertLogContains("publicCaseName=null", Level.INFO)
+                .assertLogContains("individualDetails=null", Level.INFO);
     }
 }

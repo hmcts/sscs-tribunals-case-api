@@ -6,8 +6,9 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.MASKED_STRING_VALUE;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedEmail;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPhoneOrString;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPhone;
 
 import ch.qos.logback.classic.Level;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -105,20 +106,22 @@ class ServiceHearingsControllerTest {
                     assertThat(response.getParties()).isEqualTo(List.of(partyDetails1));
                 });
 
-        logCapture.assertLogContains(getMaskedPhoneOrString("Internal Case Name"), Level.INFO);
-        logCapture.assertLogContains(getMaskedPhoneOrString("Public Case Name"), Level.INFO);
-        logCapture.assertLogContains(getMaskedPhoneOrString("Listing Comments"), Level.INFO);
-        logCapture.assertLogContains(getMaskedPhoneOrString("Paddington"), Level.INFO);
-        logCapture.assertLogContains(getMaskedPhoneOrString("Bear"), Level.INFO);
-        logCapture.assertLogContains(getMaskedEmail("paddington.bear@example.com"), Level.INFO);
-        logCapture.assertLogContains(getMaskedPhoneOrString("07123456789"), Level.INFO);
+        logCapture
+                .assertLogContains("hmctsInternalCaseName=" + MASKED_STRING_VALUE, Level.INFO)
+                .assertLogContains("publicCaseName=" + MASKED_STRING_VALUE, Level.INFO)
+                .assertLogContains("listingComments=" + MASKED_STRING_VALUE, Level.INFO)
+                .assertLogContains("partyName=" + MASKED_STRING_VALUE, Level.INFO)
+                .assertLogContains("firstName=" + MASKED_STRING_VALUE, Level.INFO)
+                .assertLogContains("lastName=" + MASKED_STRING_VALUE, Level.INFO)
+                .assertLogContains("hearingChannelEmail=[" + getMaskedEmail("paddington.bear@example.com"), Level.INFO)
+                .assertLogContains("hearingChannelPhone=[" + getMaskedPhone("07123456789"), Level.INFO)
 
-        logCapture.assertLogDoesNotContain("Internal Case Name", Level.INFO);
-        logCapture.assertLogDoesNotContain("Public Case Name", Level.INFO);
-        logCapture.assertLogDoesNotContain("Listing Comments", Level.INFO);
-        logCapture.assertLogDoesNotContain("Paddington", Level.INFO);
-        logCapture.assertLogDoesNotContain("paddington.bear@example.com", Level.INFO);
-        logCapture.assertLogDoesNotContain("07123456789", Level.INFO);
+                .assertLogDoesNotContain("Internal Case Name", Level.INFO)
+                .assertLogDoesNotContain("Public Case Name", Level.INFO)
+                .assertLogDoesNotContain("Listing Comments", Level.INFO)
+                .assertLogDoesNotContain("Paddington", Level.INFO)
+                .assertLogDoesNotContain("paddington.bear@example.com", Level.INFO)
+                .assertLogDoesNotContain("07123456789", Level.INFO);
     }
 
     @DisplayName("When Case Not Found should return a with 404 response code")
