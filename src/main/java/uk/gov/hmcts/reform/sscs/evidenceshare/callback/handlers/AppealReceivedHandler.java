@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 
@@ -47,18 +48,17 @@ public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
             .getId()
             .equals(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom());
 
-        if (cmOtherPartyConfidentialityEnabled && submittedAndReadToList && callback
-            .getCaseDetails()
-            .getCaseData()
-            .isBenefitType(CHILD_SUPPORT)) {
+        if (cmOtherPartyConfidentialityEnabled && submittedAndReadToList && callback.getCaseDetails().getCaseData().isBenefitType(CHILD_SUPPORT)) {
             return callback.getEvent() == EventType.CONFIDENTIALITY_CONFIRMED;
         }
 
-        return submittedAndReadToList
-            && (callback.getEvent() == EventType.VALID_APPEAL_CREATED
+        return submittedAndReadToList && (callback.getEvent() == EventType.VALID_APPEAL_CREATED
             || callback.getEvent() == EventType.DRAFT_TO_VALID_APPEAL_CREATED
             || callback.getEvent() == EventType.VALID_APPEAL
-            || callback.getEvent() == EventType.INTERLOC_VALID_APPEAL);
+            || callback.getEvent() == EventType.INTERLOC_VALID_APPEAL
+            || (cmOtherPartyConfidentialityEnabled
+            && callback.getCaseDetails().getCaseData().isBenefitType(UC)
+            && callback.getEvent() == EventType.CONFIDENTIALITY_CONFIRMED));
     }
 
     @Override

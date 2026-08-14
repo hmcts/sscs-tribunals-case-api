@@ -104,17 +104,26 @@ public class OnlineHearingService {
 
     private UserDetails convertUserDetails(SscsCaseDetails sscsCaseDetails, String tya, String email) {
         Map<UserType, Subscription> appellantSubscriptions = getAppealSubscriptionMap(sscsCaseDetails);
+        Map<UserType, Subscription> jointPartySubscriptions = getJointPartySubscriptionMap(sscsCaseDetails);
         boolean isSignInSubscription = isSignInSubscription(appellantSubscriptions.values(), tya, email);
         if (isSignInSubscription) {
+            log.info("Populating user details for case id {} and email {} as APPELLANT", sscsCaseDetails.getId(), email);
             return populateUserDetails(UserType.APPELLANT, sscsCaseDetails.getData().getAppeal().getAppellant().getName(),
                     sscsCaseDetails.getData().getAppeal().getAppellant().getAddress(),
                     Optional.ofNullable(sscsCaseDetails.getData().getAppeal().getAppellant().getContact()),
                     appellantSubscriptions);
+        } else if (sscsCaseDetails.getData().isThereAJointParty() && isSignInSubscription(jointPartySubscriptions.values(), tya, email)) {
+            log.info("Populating user details for case id {} and email {} as JOINT_PARTY", sscsCaseDetails.getId(), email);
+            return populateUserDetails(UserType.JOINT_PARTY, sscsCaseDetails.getData().getJointParty().getName(),
+                    sscsCaseDetails.getData().getJointParty().getAddress(),
+                    Optional.ofNullable(sscsCaseDetails.getData().getJointParty().getContact()),
+                    jointPartySubscriptions);
         } else {
             List<CcdValue<OtherParty>> otherParties = sscsCaseDetails.getData().getOtherParties();
             for (CcdValue<OtherParty> op : emptyIfNull(otherParties)) {
                 Map<UserType, Subscription> otherPartySubscriptions = getOtherPartySubscriptionMap(op);
                 if (isSignInSubscription(otherPartySubscriptions.values(), tya, email)) {
+                    log.info("Populating user details for case id {} and email {} as OTHER_PARTY", sscsCaseDetails.getId(), email);
                     return populateUserDetails(UserType.OTHER_PARTY, op.getValue().getName(),
                             op.getValue().getAddress(),
                             Optional.ofNullable(op.getValue().getContact()),
@@ -141,8 +150,16 @@ public class OnlineHearingService {
         return of(Pair.of(UserType.APPELLANT, subscriptions.getAppellantSubscription()),
                 Pair.of(UserType.APPOINTEE, subscriptions.getAppointeeSubscription()),
                 Pair.of(UserType.REP, subscriptions.getRepresentativeSubscription()),
-                Pair.of(UserType.SUPPORTER, subscriptions.getSupporterSubscription()),
-                Pair.of(UserType.JOINT_PARTY, subscriptions.getJointPartySubscription()))
+                Pair.of(UserType.SUPPORTER, subscriptions.getSupporterSubscription()))
+                .filter(p -> p.getLeft() != null && p.getRight() != null)
+                .filter(p -> p.getRight().getEmail() != null || p.getRight().getMobile() != null)
+                .collect(Collectors.toMap(Pair::getLeft, Pair::getValue));
+    }
+
+    @NotNull
+    private Map<UserType, Subscription> getJointPartySubscriptionMap(SscsCaseDetails sscsCaseDetails) {
+        Subscriptions subscriptions = sscsCaseDetails.getData().getSubscriptions();
+        return of(Pair.of(UserType.JOINT_PARTY, subscriptions.getJointPartySubscription()))
                 .filter(p -> p.getLeft() != null && p.getRight() != null)
                 .filter(p -> p.getRight().getEmail() != null || p.getRight().getMobile() != null)
                 .collect(Collectors.toMap(Pair::getLeft, Pair::getValue));
@@ -172,7 +189,6 @@ public class OnlineHearingService {
     private List<uk.gov.hmcts.reform.sscs.domain.wrapper.Subscription> getSubscriptions(Map<UserType, Subscription> subscriptionsMap) {
         return subscriptionsMap.entrySet().stream()
                 .filter(Objects::nonNull)
-                .filter(s -> !UserType.JOINT_PARTY.equals(s.getKey()))
                 .map(s -> new uk.gov.hmcts.reform.sscs.domain.wrapper.Subscription(s.getKey().getType(), s.getValue().getEmail(), s.getValue().getMobile()))
                 .collect(Collectors.toList());
     }

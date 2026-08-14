@@ -259,7 +259,7 @@ export class UrgentHearing extends BaseStep {
   }
 
   async requestAnUrgentHearing(caseId: string): Promise<void> {
-    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
+    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
     await this.homePage.chooseEvent(actionFurtherEvidenceTestdata.eventName);
     await this.actionFurtherEvidencePage.submitActionFurtherEvidence(
       actionFurtherEvidenceTestdata.sender,
