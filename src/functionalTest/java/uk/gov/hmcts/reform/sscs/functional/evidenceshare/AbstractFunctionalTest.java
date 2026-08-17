@@ -76,7 +76,7 @@ abstract class AbstractFunctionalTest {
     String ccdCaseId;
 
     @Autowired
-    private IdamService idamService;
+    IdamService idamService;
     private IdamTokens idamTokens;
     @Autowired
     private CcdService ccdService;

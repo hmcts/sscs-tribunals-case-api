@@ -257,7 +257,6 @@ def setAatEnvVars() {
     env.EM_STITCHING_API_URL = "http://em-stitching-aat.service.core-compute-aat.internal"
     env.ENVIRONMENT = "aat"
     env.WORK_ALLOCATION_FEATURE_ENABLED = 'false'
-    env.CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED = true
     env.USE_IDENTITY = 'true'
 }
 
@@ -272,7 +271,6 @@ def setPreviewEnvVars() {
     env.CASE_DOCUMENT_AM_URL = "https://ccd-case-document-am-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.EM_STITCHING_API_URL = "https://em-stitching-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.ENVIRONMENT = "pr"
-    env.CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED = true
     env.USE_IDENTITY = 'true'
 }
 
