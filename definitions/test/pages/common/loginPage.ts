@@ -23,12 +23,12 @@ export class LoginPage {
     this.mainPageTitle = page.locator('h1');
     this.signOutBtn = page.locator("//li/a[normalize-space()='Sign out']");
     this.crownCopyrightLink = page.locator('a', { hasText: '© Crown copyright' });
-    this.oldUsernameField = this.page.locator('#username');
-    this.oldPasswordField = this.page.locator('#password');
-    this.signInButton = this.page.getByRole('button', {name: 'Sign in',exact: true});
-    this.newUsernameField = this.page.locator('#email');
-    this.newPasswordField = this.page.locator('#password');
-    this.continueButton = this.page.getByRole('button', {name: 'Continue', exact: true});
+    this.oldUsernameField = page.locator('#username');
+    this.oldPasswordField = page.locator('#password');
+    this.signInButton = page.getByRole('button', {name: 'Sign in',exact: true});
+    this.newUsernameField = page.locator('#email');
+    this.newPasswordField = page.locator('#password');
+    this.continueButton = page.getByRole('button', {name: 'Continue', exact: true});
     webActions = new WebAction(this.page);
   }
 
@@ -58,25 +58,27 @@ export class LoginPage {
       return;
     }
 
-    const maxAttempts = 3;
-    const newLoginPresent = await this.page
-      .getByText('Enter your email address')
-      .isVisible()
-      .catch(() => false);
+    let newLoginPresent = false;
+    try {
+      await expect(this.newUsernameField).toBeVisible({ timeout: 5000 });
+      newLoginPresent = true;
+    } catch {
+      newLoginPresent = false;
+    }
 
-    await(newLoginPresent
-      ? this.verifyNewSuccessfulLoginForUser(maxAttempts, user)
-      : this.verifyOldSuccessfulLoginForUser(maxAttempts, user)
-    );
+    console.log('verifySuccessfulLoginForUser: newLoginPresent=', newLoginPresent);
     
+    await(newLoginPresent
+      ? this.verifyNewSuccessfulLoginForUser(user)
+      : this.verifyOldSuccessfulLoginForUser(user)
+    );
+  
     await expect(this.signOutBtn).toBeVisible({ timeout: 15000 });
   }
 
   async verifyOldSuccessfulLoginForUser(
-    maxAttempts: number,
     user: { email: string; password?: string }
-  ): Promise<void> {
-    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+  ): Promise<void> { 
       await this.oldUsernameField.fill(user.email);
       await this.oldPasswordField.fill(user.password ?? '');
 
@@ -87,14 +89,11 @@ export class LoginPage {
 
       // verifySuccessfulSignIn may return early on success
       await this.verifySuccessfulSignIn();
-    }
   }
 
   async verifyNewSuccessfulLoginForUser(
-    maxAttempts: number,
     user: { email: string; password?: string }
   ): Promise<void> {
-    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       await this.newUsernameField.fill(user.email);
 
       // ensure the continue button is visible and clickable
@@ -113,26 +112,12 @@ export class LoginPage {
 
       // verifySuccessfulSignIn may return early on success
       await this.verifySuccessfulSignIn();
-    }
   }
 
   async verifySuccessfulSignIn(): Promise<void> {
     const signedIn = await this.signOutBtn
       .isVisible({ timeout: 15000 })
       .catch(() => false);
-
-    if (signedIn) {
-      return;
-    }
-
-    const backAtLogin =
-      (await this.oldUsernameField.isVisible({ timeout: 3000 }).catch(() => false)) &&
-      (await this.oldPasswordField.isVisible({ timeout: 3000 }).catch(() => false));
-
-    if (!backAtLogin) {
-      // Not signed in and not back at login; exit to allow caller to handle accordingly
-      return;
-    }
   }
 
   private async localLogin(user: { email: string; }) {
