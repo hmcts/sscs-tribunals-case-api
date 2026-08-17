@@ -93,18 +93,7 @@ public class CitizenCcdClient {
 
     public List<CaseDetails> searchForCitizenAllCases(IdamTokens idamTokens) {
         if (elasticSearchEnabled) {
-            String searchCriteria = """
-                {
-                  "size": 200,
-                  "query": {
-                    "bool": {
-                      "must": [ { "match_all": {} } ],
-                      "must_not": [ { "match": { "state": "dormantAppealState" } } ]
-                    }
-                  },
-                  "sort": [ { "last_modified": { "order": "desc" } } ]
-                }
-                """;
+            String searchCriteria = "{\"query\":{\"match_all\":{}}}";
             SearchResult searchResult = coreCaseDataApi.searchCases(
                     idamTokens.getIdamOauth2Token(),
                     idamTokens.getServiceAuthorization(),
@@ -123,6 +112,27 @@ public class CitizenCcdClient {
                     searchCriteria
             );
         }
+    }
+
+    public List<CaseDetails> searchForCitizenAllCasesNonDormant(IdamTokens idamTokens) {
+        String searchCriteria = """
+                {
+                  "size": 200,
+                  "query": {
+                    "bool": {
+                      "must": [ { "match_all": {} } ],
+                      "must_not": [ { "match": { "state": "dormantAppealState" } } ]
+                    }
+                  },
+                  "sort": [ { "last_modified": { "order": "desc" } } ]
+                }
+                """;
+        SearchResult searchResult = coreCaseDataApi.searchCases(
+                idamTokens.getIdamOauth2Token(),
+                idamTokens.getServiceAuthorization(),
+                ccdRequestDetails.getCaseTypeId(),
+                searchCriteria);
+        return Optional.ofNullable(searchResult).isEmpty() ? new ArrayList<>() : searchResult.getCases();
     }
 
     CaseDetails submitEventForCitizen(IdamTokens idamTokens, String caseId, CaseDataContent caseDataContent) {
