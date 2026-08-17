@@ -31,7 +31,9 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.CTSC_CLERK;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPostcode;
 
+import ch.qos.logback.classic.Level;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -45,6 +47,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EmptySource;
@@ -103,6 +106,7 @@ import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.RefDataService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
+import uk.gov.hmcts.reform.sscs.util.LogCaptureExtension;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
@@ -132,6 +136,10 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
     @Mock
     private AssociatedCaseLinkHelper associatedCaseLinkHelper;
+
+    @RegisterExtension
+    private final LogCaptureExtension logCapture =
+            new LogCaptureExtension(CaseUpdatedAboutToSubmitHandler.class);
 
     private CaseUpdatedAboutToSubmitHandler handler;
 
@@ -993,6 +1001,8 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("AppellantVenue", response.getData().getRegionalProcessingCenter().getName());
+        logCapture.assertLogContains("Checking whether processing venue requires updating for post code " + getMaskedPostcode("AB1200B")
+                + ", case 1234", Level.INFO);
     }
 
     @Disabled("commented out as case loader is failing on this validation checks, we need to do another data exercise to clean the data")

@@ -100,8 +100,9 @@ public class OnlineHearingServiceTest {
         Optional<OnlineHearing> onlineHearing = underTest.loadHearing(sscsCaseDetails, tya, email);
 
         assertOnlineHearingForAppellant(onlineHearing, sscsCaseDetails);
-        logCapture.assertLogContains(getMaskedEmail(email), Level.INFO);
-        logCapture.assertLogDoesNotContain(email, Level.INFO);
+        logCapture
+                .assertLogContains(getMaskedEmail(email), Level.INFO)
+                .assertLogDoesNotContain(email, Level.INFO);
     }
 
     @Test
@@ -111,8 +112,9 @@ public class OnlineHearingServiceTest {
         Optional<OnlineHearing> onlineHearing = underTest.loadHearing(sscsCaseDetails, "jointPartyTya", "jointparty@hmcts.com");
 
         assertOnlineHearingForJointParty(onlineHearing, sscsCaseDetails);
-        logCapture.assertLogContains(getMaskedEmail("jointparty@hmcts.com"), Level.INFO);
-        logCapture.assertLogDoesNotContain("jointparty@hmcts.com", Level.INFO);
+        logCapture
+                .assertLogContains(getMaskedEmail("jointparty@hmcts.com"), Level.INFO)
+                .assertLogDoesNotContain("jointparty@hmcts.com", Level.INFO);
     }
 
     @ParameterizedTest
@@ -123,8 +125,9 @@ public class OnlineHearingServiceTest {
         Optional<OnlineHearing> onlineHearing = underTest.loadHearing(sscsCaseDetails, tya, email);
 
         assertOnlineHearingForOtherParty(onlineHearing, sscsCaseDetails);
-        logCapture.assertLogContains(getMaskedEmail(email), Level.INFO);
-        logCapture.assertLogDoesNotContain(email, Level.INFO);
+        logCapture
+                .assertLogContains(getMaskedEmail(email), Level.INFO)
+                .assertLogDoesNotContain(email, Level.INFO);
     }
 
     private void assertOnlineHearingForOtherParty(Optional<OnlineHearing> onlineHearing, SscsCaseDetails sscsCaseDetails) {

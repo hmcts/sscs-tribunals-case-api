@@ -142,9 +142,6 @@ public class ServiceHearingsControllerTest {
                 .assertLogContains("lastName=" + MASKED_STRING_VALUE, Level.INFO)
                 .assertLogContains("hearingChannelEmail=[" + getMaskedEmail("paddington.bear@example.com"), Level.INFO)
                 .assertLogContains("hearingChannelPhone=[" + getMaskedPhone("07123456789"), Level.INFO)
-
-                .assertLogContains("firstName=" + MASKED_STRING_VALUE, Level.INFO)
-                .assertLogContains("lastName=" + MASKED_STRING_VALUE, Level.INFO)
                 .assertLogContains("hearingChannelEmail=[" + getMaskedEmail("jane.smith@example.com"), Level.INFO)
                 .assertLogContains("hearingChannelPhone=[" + getMaskedPhone("07987654321"), Level.INFO)
 
