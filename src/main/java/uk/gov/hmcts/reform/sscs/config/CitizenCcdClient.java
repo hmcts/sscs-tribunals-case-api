@@ -120,9 +120,10 @@ public class CitizenCcdClient {
               "size": 200,
               "query": {
                 "bool": {
+                  "must": [ { "match_all": {} } ],
                   "must_not": [
-                    { "term": { "state": "dormantAppealState" } },
-                    { "term": { "state": "voidState" } }
+                    { "match": { "state": "dormantAppealState" } },
+                    { "match": { "state": "voidState" } }
                   ]
                 }
               },
