@@ -116,20 +116,18 @@ public class CitizenCcdClient {
 
     public List<CaseDetails> searchForCitizenAllCasesNonDormant(IdamTokens idamTokens) {
         String searchCriteria = """
-            {
-              "size": 200,
-              "query": {
-                "bool": {
-                  "must": [ { "match_all": {} } ],
-                  "must_not": [
-                    { "match": { "state": "dormantAppealState" } },
-                    { "match": { "state": "voidState" } }
-                  ]
+                {
+                  "size": 200,
+                  "query": {
+                    "bool": {
+                      "must_not": [
+                        { "terms": { "state.keyword": ["dormantAppealState", "voidState"] } }
+                      ]
+                    }
+                  },
+                  "sort": [ { "last_modified": { "order": "desc" } } ]
                 }
-              },
-              "sort": [ { "last_modified": { "order": "desc" } } ]
-            }
-            """;
+                """;
         SearchResult searchResult = coreCaseDataApi.searchCases(
                 idamTokens.getIdamOauth2Token(),
                 idamTokens.getServiceAuthorization(),
