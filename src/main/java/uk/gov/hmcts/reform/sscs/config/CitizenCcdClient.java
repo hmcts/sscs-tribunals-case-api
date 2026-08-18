@@ -121,7 +121,8 @@ public class CitizenCcdClient {
                   "query": {
                     "bool": {
                       "must": [ { "match_all": {} } ],
-                      "must_not": [ { "match": { "state": "dormantAppealState" } } ]
+                      "must_not": [ { "match": { "state": "dormantAppealState" } },
+                      "must_not": [ { "match": { "state": "voidState" } }]
                     }
                   },
                   "sort": [ { "last_modified": { "order": "desc" } } ]
