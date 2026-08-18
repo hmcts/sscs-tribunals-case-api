@@ -8,6 +8,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing.FACE_TO_FACE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing.PAPER;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,6 +89,34 @@ class AdjournCaseAboutToSubmitHandlerTest extends AdjournCaseAboutToSubmitHandle
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(sscsCaseData.getAdjournment().getNextHearingVenueSelected()).isEqualTo(selectedVenue);
+    }
+
+    @DisplayName("Given type of next hearing is paper, then interpreter language and requirement are cleared")
+    @Test
+    void givenTypeOfNextHearingIsPaper_thenInterpreterLanguageAndRequiredAreCleared() {
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(PAPER);
+        sscsCaseData.getAdjournment().setInterpreterLanguage(new DynamicList("someLanguage"));
+        sscsCaseData.getAdjournment().setInterpreterRequired(YES);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getAdjournment().getInterpreterLanguage()).isNull();
+        assertThat(sscsCaseData.getAdjournment().getInterpreterRequired()).isEqualTo(NO);
+    }
+
+    @DisplayName("Given type of next hearing is not paper, then interpreter language and requirement are retained")
+    @Test
+    void givenTypeOfNextHearingIsNotPaper_thenInterpreterLanguageAndRequiredAreRetained() {
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(FACE_TO_FACE);
+        sscsCaseData.getAdjournment().setNextHearingVenue(AdjournCaseNextHearingVenue.SOMEWHERE_ELSE);
+        final DynamicList interpreterLanguage = new DynamicList("someLanguage");
+        sscsCaseData.getAdjournment().setInterpreterLanguage(interpreterLanguage);
+        sscsCaseData.getAdjournment().setInterpreterRequired(YES);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getAdjournment().getInterpreterLanguage()).isEqualTo(interpreterLanguage);
+        assertThat(sscsCaseData.getAdjournment().getInterpreterRequired()).isEqualTo(YES);
     }
 
 }

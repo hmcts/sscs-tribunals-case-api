@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing.FACE_TO_FACE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing.PAPER;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.resolvePostCode;
 
 import java.time.LocalDate;
@@ -66,6 +68,11 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
         if (adjournment.getTypeOfNextHearing() != FACE_TO_FACE
             || adjournment.getNextHearingVenue() != AdjournCaseNextHearingVenue.SOMEWHERE_ELSE) {
             adjournment.setNextHearingVenueSelected(null);
+        }
+
+        if (adjournment.getTypeOfNextHearing() == PAPER) {
+            adjournment.setInterpreterLanguage(null);
+            adjournment.setInterpreterRequired(NO);
         }
 
         previewDocumentService.writePreviewDocumentToSscsInternalDocument(
