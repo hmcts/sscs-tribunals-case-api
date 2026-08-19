@@ -17,7 +17,6 @@ import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;

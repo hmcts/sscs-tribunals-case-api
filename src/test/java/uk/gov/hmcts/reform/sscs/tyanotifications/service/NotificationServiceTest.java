@@ -1073,7 +1073,7 @@ public class NotificationServiceTest {
 
         notificationService = new NotificationService(factory, reminderService,
             notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService,
-            false, false
+            false
         );
 
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
@@ -1247,8 +1247,7 @@ public class NotificationServiceTest {
 
         notificationService = new NotificationService(factory, reminderService,
             notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService,
-            true, false
-        );
+            true);
 
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
 
@@ -2687,7 +2686,7 @@ public class NotificationServiceTest {
             notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
         final NotificationService cmConfidentialityService = new NotificationService(
             factory, reminderService, notificationValidService, notificationHandler,
-            outOfHoursCalculator, notificationConfig, sendNotificationService, false, true);
+            outOfHoursCalculator, notificationConfig, sendNotificationService, false);
 
         final SscsCaseData.SscsCaseDataBuilder baseBuilder = getSscsCaseDataBuilder(
             APPELLANT_WITH_ADDRESS, null,
@@ -2719,7 +2718,7 @@ public class NotificationServiceTest {
     public void givenCmConfidentialityEnabledAndOtherPartiesUnchangedById_thenDoNotTriggerOtherPartyAddedToAppeal() throws IOException {
         final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
         final NotificationService cmConfidentialityService = new NotificationService(factory, reminderService,
-            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, true);
+            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false);
 
         ccdNotificationWrapper = buildBaseWrapperOtherParty(UPDATE_OTHER_PARTY_DATA, APPELLANT_WITH_ADDRESS, SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build());
 
@@ -2738,7 +2737,7 @@ public class NotificationServiceTest {
     public void givenCmConfidentialityEnabledAndUpdateOtherPartyDataWithSingleOtherParty_thenDoNotTriggerOtherPartyAddedToAppeal() throws IOException {
         final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
         final NotificationService cmConfidentialityService = new NotificationService(factory, reminderService,
-            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, true);
+            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false);
 
         final OtherParty singleOtherParty = OtherParty.builder()
                                                       .id("1")
@@ -2784,7 +2783,7 @@ public class NotificationServiceTest {
     public void givenCmConfidentialityEnabledAndUpdateOtherPartyDataWithNoOtherParties_thenDoNotTriggerOtherPartyAddedToAppeal() {
         final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
         final NotificationService cmConfidentialityService = new NotificationService(factory, reminderService,
-            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, true);
+            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false);
 
         final SscsCaseData sscsCaseDataNoOtherParties = getSscsCaseDataBuilder(APPELLANT_WITH_ADDRESS, null, SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build())
             .otherParties(null)
@@ -2882,25 +2881,6 @@ public class NotificationServiceTest {
         return new SubscriptionWithType(getSubscription(ccdNotificationWrapper.getNewSscsCaseData(), REPRESENTATIVE),
             SubscriptionType.REPRESENTATIVE, ccdNotificationWrapper.getNewSscsCaseData().getAppeal().getAppellant(),
             ccdNotificationWrapper.getNewSscsCaseData().getAppeal().getRep());
-    }
-
-    @Test
-    public void givenAddOtherPartyDataAndFeatureFlagDisabled_willProceedWithNotification() {
-        ccdNotificationWrapper = buildBaseWrapper(ADD_OTHER_PARTY_DATA, APPELLANT_WITH_ADDRESS, null, null);
-        ccdNotificationWrapper.getSscsCaseDataWrapper().setState(State.WITH_DWP);
-
-        final Notification notification = new Notification(
-            Template.builder().docmosisTemplateId(LETTER_TEMPLATE_ID).build(),
-            Destination.builder().build(),
-            new HashMap<>(), new Reference(), null);
-        given(factory.create(any(NotificationWrapper.class), any(SubscriptionWithType.class))).willReturn(notification);
-        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(new byte[]{1});
-
-        notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
-
-        then(notificationHandler).should(times(1)).sendNotification(
-            eq(ccdNotificationWrapper), any(), eq(LETTER),
-            any(NotificationHandler.SendNotification.class));
     }
 
     @Test
@@ -3043,8 +3023,7 @@ public class NotificationServiceTest {
 
         final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
         final NotificationService serviceWithCmEnabled = new NotificationService(factory, reminderService,
-            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, true
-        );
+            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false);
 
         serviceWithCmEnabled.manageNotificationAndSubscription(wrapper, false);
 
@@ -3054,13 +3033,12 @@ public class NotificationServiceTest {
 
     @Test
     @Parameters({
-        "false, CHILD_SUPPORT, APPEAL_TO_PROCEED",
-        "true, PIP, APPEAL_TO_PROCEED",
-        "true, PIP, PROVIDE_INFORMATION",
-        "true, CHILD_SUPPORT, PROVIDE_INFORMATION"
+        "PIP, APPEAL_TO_PROCEED",
+        "PIP, PROVIDE_INFORMATION",
+        "CHILD_SUPPORT, PROVIDE_INFORMATION"
     })
     public void givenDirectionIssuedWithVariousScenarios_thenSendAppropriateNumberOfNotifications(
-        boolean cmFeatureEnabled, String benefitCode, String directionType) {
+        String benefitCode, String directionType) {
 
         final SscsCaseData.SscsCaseDataBuilder caseDataBuilder = getSscsCaseDataBuilder(
             APPELLANT_WITH_ADDRESS,
@@ -3095,8 +3073,7 @@ public class NotificationServiceTest {
 
         final NotificationService service = new NotificationService(
             factory, reminderService, notificationValidService, notificationHandler,
-            outOfHoursCalculator, notificationConfig, sendNotificationService, false, cmFeatureEnabled
-        );
+            outOfHoursCalculator, notificationConfig, sendNotificationService, false);
 
         service.manageNotificationAndSubscription(wrapper, false);
 
@@ -3126,8 +3103,7 @@ public class NotificationServiceTest {
 
         final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
         final NotificationService serviceWithCmEnabled = new NotificationService(factory, reminderService,
-            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, true
-        );
+            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false);
 
         serviceWithCmEnabled.manageNotificationAndSubscription(wrapper, false);
 
@@ -3137,13 +3113,12 @@ public class NotificationServiceTest {
 
     @Test
     @Parameters({
-        "false, CHILD_SUPPORT, APPEAL_TO_PROCEED",
         "true, PIP, APPEAL_TO_PROCEED",
         "true, PIP, PROVIDE_INFORMATION",
         "true, CHILD_SUPPORT, PROVIDE_INFORMATION"
     })
     public void givenDirectionIssuedWelshWithVariousScenarios_thenSendOnlyOneNotification(
-        boolean cmFeatureEnabled, String benefitCode, String directionType) {
+        String benefitCode, String directionType) {
 
         final SscsCaseData.SscsCaseDataBuilder caseDataBuilder = getSscsCaseDataBuilder(
             APPELLANT_WITH_ADDRESS,
@@ -3178,8 +3153,7 @@ public class NotificationServiceTest {
 
         final NotificationService service = new NotificationService(
             factory, reminderService, notificationValidService, notificationHandler,
-            outOfHoursCalculator, notificationConfig, sendNotificationService, false, cmFeatureEnabled
-        );
+            outOfHoursCalculator, notificationConfig, sendNotificationService, false);
 
         service.manageNotificationAndSubscription(wrapper, false);
 
@@ -3190,13 +3164,10 @@ public class NotificationServiceTest {
     @Parameters({
         "ADMIN_SEND_TO_VALID_APPEAL, true",
         "INTERLOC_VALID_APPEAL, true",
-        "VALID_APPEAL, true",
-        "ADMIN_SEND_TO_VALID_APPEAL, false",
-        "INTERLOC_VALID_APPEAL, false",
-        "VALID_APPEAL, false"
+        "VALID_APPEAL, true"
     })
-    public void givenValidAppealEventNotification_whenCmEnabledOrDisabledAndNotChildSupport_shouldNotSendNotification(
-        final NotificationEventType eventType, boolean cmEnabled) {
+    public void givenValidAppealEventNotification_whenNotChildSupport_shouldNotSendNotification(
+        final NotificationEventType eventType) {
         final SscsCaseData caseData = getSscsCaseDataBuilder(APPELLANT_WITH_ADDRESS, null, null).build();
         final CcdNotificationWrapper wrapper = buildBaseWrapperWithCaseData(caseData, eventType);
 
@@ -3204,8 +3175,7 @@ public class NotificationServiceTest {
             notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
         final NotificationService service = new NotificationService(
             factory, reminderService, notificationValidService, notificationHandler,
-            outOfHoursCalculator, notificationConfig, sendNotificationService, false, cmEnabled
-        );
+            outOfHoursCalculator, notificationConfig, sendNotificationService, false);
 
         service.manageNotificationAndSubscription(wrapper, false);
 
@@ -3243,8 +3213,7 @@ public class NotificationServiceTest {
             notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
         final NotificationService service = new NotificationService(
             factory, reminderService, notificationValidService, notificationHandler,
-            outOfHoursCalculator, notificationConfig, sendNotificationService, false, true
-        );
+            outOfHoursCalculator, notificationConfig, sendNotificationService, false);
 
         service.manageNotificationAndSubscription(wrapper, false);
 
@@ -3286,8 +3255,7 @@ public class NotificationServiceTest {
             notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
         return new NotificationService(factory, reminderService,
             notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService,
-            false, true
-        );
+            false);
     }
 
     private static SscsCaseData.SscsCaseDataBuilder getSscsCaseDataBuilderSettingInformationFromAppellant(String informationFromAppellant) {
@@ -3332,8 +3300,7 @@ public class NotificationServiceTest {
             notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
         return new NotificationService(factory, reminderService,
             notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService,
-            false, false
-        );
+            false);
     }
 
     private byte[] getCoversheet() throws IOException {

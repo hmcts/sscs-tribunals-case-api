@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.createcase;
 import static java.util.List.of;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_APPEAL_PDF;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_TO_INCOMPLETE_APPLICATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_TO_NON_COMPLIANT;
@@ -50,8 +51,6 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
 
     @Value("${feature.work-allocation.enabled}")
     private final boolean workAllocationFeature;
-    @Value("${feature.cm-other-party-confidentiality.enabled}")
-    private final boolean cmOtherPartyConfidentialityEnabled;
 
     private static final List<EventType> NON_PAPER_EVENTS = of(VALID_APPEAL_CREATED, DRAFT_TO_VALID_APPEAL_CREATED,
             NON_COMPLIANT, DRAFT_TO_NON_COMPLIANT, INCOMPLETE_APPLICATION_RECEIVED, DRAFT_TO_INCOMPLETE_APPLICATION);
@@ -107,7 +106,7 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
                     caseData.getIsScottishCase(), callback.getCaseDetails().getId());
         }
 
-        caseData.setIsConfidentialCase(isConfidential(caseData, cmOtherPartyConfidentialityEnabled));
+        caseData.setIsConfidentialCase(isConfidential(caseData, List.of(UC)));
 
         return preSubmitCallbackResponse;
     }

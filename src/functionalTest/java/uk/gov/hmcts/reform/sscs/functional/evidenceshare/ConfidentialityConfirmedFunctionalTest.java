@@ -40,68 +40,64 @@ class ConfidentialityConfirmedFunctionalTest extends AbstractFunctionalTest {
 
     private final UpdateCcdCaseService updateCcdCaseService;
 
-    @Nested
-    class CmToggleOn {
+    @Test
+    void shouldTransitionToWithDwpStateWhenConfidentialityConfirmed() {
 
-        @Test
-        void shouldTransitionToWithDwpStateWhenConfidentialityConfirmed() {
+        final SscsCaseDetails caseWithState = createCaseFromEvent(Benefit.CHILD_SUPPORT, VALID_APPEAL_CREATED,
+            this::addMinimalCaseData);
 
-            final SscsCaseDetails caseWithState = createCaseFromEvent(Benefit.CHILD_SUPPORT, VALID_APPEAL_CREATED,
-                this::addMinimalCaseData);
+        defaultAwait().untilAsserted(() -> {
+            var caseDetails = findCaseById(ccdCaseId);
+            assertThat(caseDetails.getState()).isEqualTo(State.AWAIT_OTHER_PARTY_DATA.toString());
+        });
 
-            defaultAwait().untilAsserted(() -> {
-                var caseDetails = findCaseById(ccdCaseId);
-                assertThat(caseDetails.getState()).isEqualTo(State.AWAIT_OTHER_PARTY_DATA.toString());
+        var otherParty = buildOtherParty();
+        updateCcdCaseService.updateCaseV2(caseWithState.getId(), ADD_OTHER_PARTY_DATA.getCcdType(),
+            idamService.getIdamTokens(), cd -> {
+                cd.getData().setOtherParties(List.of(new CcdValue<>(otherParty)));
+                cd.getData().getExtendedSscsCaseData().setAwareOfAnyAdditionalOtherParties(YesNo.YES);
+                cd.getData().setInterlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION);
+                return new UpdateCcdCaseService.UpdateResult("add other party", "add other party");
             });
 
-            var otherParty = buildOtherParty();
-            updateCcdCaseService.updateCaseV2(caseWithState.getId(), ADD_OTHER_PARTY_DATA.getCcdType(),
-                idamService.getIdamTokens(), cd -> {
-                    cd.getData().setOtherParties(List.of(new CcdValue<>(otherParty)));
-                    cd.getData().getExtendedSscsCaseData().setAwareOfAnyAdditionalOtherParties(YesNo.YES);
-                    cd.getData().setInterlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION);
-                    return new UpdateCcdCaseService.UpdateResult("add other party", "add other party");
-                });
+        defaultAwait().untilAsserted(() -> {
+            var cdAfterEvent = findCaseById(ccdCaseId);
+            assertThat(cdAfterEvent.getState()).isEqualTo(State.AWAIT_CONFIDENTIALITY_REQUIREMENTS.toString());
+            assertThat(cdAfterEvent.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.AWAITING_ADMIN_ACTION);
+        });
 
-            defaultAwait().untilAsserted(() -> {
-                var cdAfterEvent = findCaseById(ccdCaseId);
-                assertThat(cdAfterEvent.getState()).isEqualTo(State.AWAIT_CONFIDENTIALITY_REQUIREMENTS.toString());
-                assertThat(cdAfterEvent.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.AWAITING_ADMIN_ACTION);
+        updateCcdCaseService.updateCaseV2(caseWithState.getId(), CONFIDENTIALITY_CONFIRMED.getCcdType(),
+            idamService.getIdamTokens(), cd -> {
+                cd.getData().getOtherParties().getFirst().getValue().setConfidentialityRequirement(YesNoUndetermined.YES);
+                return new UpdateCcdCaseService.UpdateResult(CONFIRMED, CONFIRMED);
             });
 
-            updateCcdCaseService.updateCaseV2(caseWithState.getId(), CONFIDENTIALITY_CONFIRMED.getCcdType(),
-                idamService.getIdamTokens(), cd -> {
-                    cd.getData().getOtherParties().getFirst().getValue().setConfidentialityRequirement(YesNoUndetermined.YES);
-                    return new UpdateCcdCaseService.UpdateResult(CONFIRMED, CONFIRMED);
-                });
+        defaultAwait().untilAsserted(() -> {
+            var cdAfterEvent = findCaseById(ccdCaseId);
+            assertThat(cdAfterEvent.getState()).isEqualTo(State.WITH_DWP.toString());
+            assertThat(cdAfterEvent.getData().getDwpDueDate()).isEqualTo(
+                LocalDate.now(systemDefault()).plusDays(42).toString());
+        });
+    }
 
-            defaultAwait().untilAsserted(() -> {
-                var cdAfterEvent = findCaseById(ccdCaseId);
-                assertThat(cdAfterEvent.getState()).isEqualTo(State.WITH_DWP.toString());
-                assertThat(cdAfterEvent.getData().getDwpDueDate()).isEqualTo(
-                    LocalDate.now(systemDefault()).plusDays(42).toString());
-            });
-        }
+    private OtherParty buildOtherParty() {
+        return OtherParty
+            .builder()
+            .name(Name.builder().title(TITLE).firstName(FIRST_NAME).lastName(USER).build())
+            .address(Address.builder().postcode(POSTCODE).line1(ADDRESS_LINE_1).town(TOWN).build())
+            .build();
+    }
 
-        private OtherParty buildOtherParty() {
-            return OtherParty
-                .builder()
-                .name(Name.builder().title(TITLE).firstName(FIRST_NAME).lastName(USER).build())
-                .address(Address.builder().postcode(POSTCODE).line1(ADDRESS_LINE_1).town(TOWN).build())
-                .build();
-        }
-
-        private void addMinimalCaseData(SscsCaseData data) {
-            data
-                .getAppeal()
-                .getAppellant()
-                .setAddress(Address.builder().line1(LINE_1).town(TOWN).county(COUNTY).postcode(POSTCODE).build());
-            data
-                .getAppeal()
-                .getRep()
-                .setAddress(Address.builder().line1(LINE_1).town(TOWN).county(COUNTY).postcode(POSTCODE).build());
-            data.setEvidencePresent("Yes");
-        }
+    private void addMinimalCaseData(SscsCaseData data) {
+        data
+            .getAppeal()
+            .getAppellant()
+            .setAddress(Address.builder().line1(LINE_1).town(TOWN).county(COUNTY).postcode(POSTCODE).build());
+        data
+            .getAppeal()
+            .getRep()
+            .setAddress(Address.builder().line1(LINE_1).town(TOWN).county(COUNTY).postcode(POSTCODE).build());
+        data.setEvidencePresent("Yes");
     }
 
 }

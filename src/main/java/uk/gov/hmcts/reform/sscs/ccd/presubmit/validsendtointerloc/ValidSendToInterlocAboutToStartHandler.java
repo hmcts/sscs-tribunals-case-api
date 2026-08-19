@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.*;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_JUDGE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_TCW;
 import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getPartiesOnCase;
 import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown;
 import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.isChildSupportAppeal;
@@ -13,7 +15,12 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Component
@@ -21,13 +28,11 @@ public class ValidSendToInterlocAboutToStartHandler implements PreSubmitCallback
 
     private final boolean postponementsFeature;
     private final boolean postHearingsB;
-    private final boolean cmConfidentialityEnabled;
 
     public ValidSendToInterlocAboutToStartHandler(@Value("${feature.postponements.enabled}")  boolean postponementsFeature,
-                                                  @Value("${feature.postHearingsB.enabled}")  boolean postHearingsB, @Value("${feature.cm-other-party-confidentiality.enabled}") final boolean cmConfidentialityEnabled) {
+                                                  @Value("${feature.postHearingsB.enabled}")  boolean postHearingsB) {
         this.postponementsFeature = postponementsFeature;
         this.postHearingsB = postHearingsB;
-        this.cmConfidentialityEnabled = cmConfidentialityEnabled;
     }
 
     @Override
@@ -51,7 +56,7 @@ public class ValidSendToInterlocAboutToStartHandler implements PreSubmitCallback
 
         setSelectWhoReviewsCase(sscsCaseData);
         setOriginalSenderDropdown(sscsCaseData);
-        if (cmConfidentialityEnabled && (isChildSupportAppeal(sscsCaseData) || sscsCaseData.isBenefitType(Benefit.UC))) {
+        if ((isChildSupportAppeal(sscsCaseData) || sscsCaseData.isBenefitType(Benefit.UC))) {
             sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
                     getSelectedConfidentialityPartyDropdown(sscsCaseData));
         }

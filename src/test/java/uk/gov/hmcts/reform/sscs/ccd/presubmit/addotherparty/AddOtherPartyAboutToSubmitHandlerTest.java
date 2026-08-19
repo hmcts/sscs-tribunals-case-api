@@ -66,11 +66,6 @@ class AddOtherPartyAboutToSubmitHandlerTest {
     }
 
     @Test
-    void shouldReturnFalseWhenFeatureIsDisabled() {
-        assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
-    }
-
-    @Test
     void shouldReturnFalseWhenCallbackTypeIsNotAboutToSubmit() {
         assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
         assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();

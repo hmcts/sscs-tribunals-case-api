@@ -18,7 +18,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -63,7 +62,7 @@ class HmctsResponseReviewedAboutToStartHandlerTest {
     void setUp() {
         openMocks(this);
         dwpAddressLookupService = new DwpAddressLookupService();
-        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService, false);
+        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService);
 
         when(callback.getEvent()).thenReturn(EventType.HMCTS_RESPONSE_REVIEWED);
 
@@ -312,7 +311,7 @@ class HmctsResponseReviewedAboutToStartHandlerTest {
     @ParameterizedTest
     @EnumSource(value = Benefit.class, names = {"UC", "CHILD_SUPPORT"})
     void givenFlagEnabledAndChildSupport_thenSelectedConfidentialityPartyHasNoDefaultSelection(Benefit benefit) {
-        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService, true);
+        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService);
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(benefit.getShortName()).build());
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -320,17 +319,10 @@ class HmctsResponseReviewedAboutToStartHandlerTest {
         assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode()).isEmpty();
     }
 
-    @ParameterizedTest
-    @CsvSource({
-        "false, childSupport",
-        "true, PIP"
-    })
-    void givenVariousFlagAndBenefitCombinations_whenNotChildSupportWithFlagEnabled_thenSelectedConfidentialityPartyIsNotSet(
-        boolean featureFlag, String benefitCode) {
-        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService, featureFlag);
+    void givenNonConfidentialBenefitType_thenSelectedConfidentialityPartyIsNotSet() {
+        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService);
 
-        String codeToUse = benefitCode.equals("PIP") ? Benefit.PIP.getShortName() : benefitCode;
-        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(codeToUse).build());
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(Benefit.PIP.getShortName()).build());
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 

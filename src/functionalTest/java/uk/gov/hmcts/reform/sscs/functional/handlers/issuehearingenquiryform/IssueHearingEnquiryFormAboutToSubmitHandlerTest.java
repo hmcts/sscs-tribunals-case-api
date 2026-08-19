@@ -7,7 +7,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;

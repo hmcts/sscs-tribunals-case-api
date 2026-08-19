@@ -57,7 +57,7 @@ class ValidSendToInterlocAboutToStartHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new ValidSendToInterlocAboutToStartHandler(false, false, false);
+        handler = new ValidSendToInterlocAboutToStartHandler(false, false);
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
     }
 
@@ -184,7 +184,7 @@ class ValidSendToInterlocAboutToStartHandlerTest {
     @ParameterizedTest
     @MethodSource("benefitStates")
     void givenFlagEnabledAndBenefit_thenSelectedConfidentialityPartyHasNoDefaultSelection(EventType eventType, Benefit benefit) {
-        handler = new ValidSendToInterlocAboutToStartHandler(false, false, true);
+        handler = new ValidSendToInterlocAboutToStartHandler(false, false);
         when(callback.getEvent()).thenReturn(eventType);
         setupCallback();
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(benefit.getShortName()).build());
@@ -196,7 +196,7 @@ class ValidSendToInterlocAboutToStartHandlerTest {
 
     @Test
     void givenFlagEnabledAndNonChildSupport_thenSelectedConfidentialityPartyIsNotSet() {
-        handler = new ValidSendToInterlocAboutToStartHandler(false, false, true);
+        handler = new ValidSendToInterlocAboutToStartHandler(false, false);
         setupCallback();
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("PIP").build());
 
