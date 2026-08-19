@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.sscs.config;
 
+import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -73,7 +75,7 @@ public class CitizenCcdClient {
                     idamTokens.getServiceAuthorization(),
                     ccdRequestDetails.getCaseTypeId(),
                     searchCriteria);
-            return Optional.ofNullable(searchResult).isEmpty() ? new ArrayList<>() : searchResult.getCases();
+            return ofNullable(searchResult).isEmpty() ? new ArrayList<>() : searchResult.getCases();
         } else {
             Map<String, String> searchCriteria = new HashMap<>();
             searchCriteria.put("state", State.DRAFT.getId());
@@ -99,7 +101,7 @@ public class CitizenCcdClient {
                     idamTokens.getServiceAuthorization(),
                     ccdRequestDetails.getCaseTypeId(),
                     searchCriteria);
-            return Optional.ofNullable(searchResult).isEmpty() ? new ArrayList<>() : searchResult.getCases();
+            return ofNullable(searchResult).isEmpty() ? new ArrayList<>() : searchResult.getCases();
         } else {
             Map<String, String> searchCriteria = new HashMap<>();
             searchCriteria.put("sortDirection", "desc");
@@ -133,7 +135,7 @@ public class CitizenCcdClient {
                 idamTokens.getServiceAuthorization(),
                 ccdRequestDetails.getCaseTypeId(),
                 searchCriteria);
-        return Optional.ofNullable(searchResult).isEmpty() ? new ArrayList<>() : searchResult.getCases();
+        return ofNullable(searchResult).map(SearchResult::getCases).orElse(emptyList());
     }
 
     CaseDetails submitEventForCitizen(IdamTokens idamTokens, String caseId, CaseDataContent caseDataContent) {
