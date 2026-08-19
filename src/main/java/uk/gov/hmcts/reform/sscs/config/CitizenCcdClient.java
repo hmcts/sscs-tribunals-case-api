@@ -8,6 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Retryable;
@@ -31,6 +34,10 @@ public class CitizenCcdClient {
     private final CoreCaseDataApi coreCaseDataApi;
     private final CaseAccessApi caseAccessApi;
     private final boolean elasticSearchEnabled;
+    private static final List<String> EXCLUDED_STATES_FOR_ACTIVE_CASES =
+            List.of(State.DORMANT_APPEAL_STATE.getId(), State.VOID_STATE.getId());
+    private static final int MYA_MAX_CASES_PER_PAGE = 200;
+
 
     @Autowired
     CitizenCcdClient(CcdRequestDetails ccdRequestDetails,
@@ -117,19 +124,13 @@ public class CitizenCcdClient {
     }
 
     public List<CaseDetails> searchForCitizenAllCasesNonDormant(IdamTokens idamTokens) {
-        String searchCriteria = """
-                {
-                  "size": 200,
-                  "query": {
-                    "bool": {
-                      "must_not": [
-                        { "terms": { "state.keyword": ["dormantAppealState", "voidState"] } }
-                      ]
-                    }
-                  },
-                  "sort": [ { "last_modified": { "order": "desc" } } ]
-                }
-                """;
+        SearchSourceBuilder searchBuilder = new SearchSourceBuilder();
+        searchBuilder.query(QueryBuilders
+                        .boolQuery()
+                        .mustNot(QueryBuilders.termsQuery("state.keyword", EXCLUDED_STATES_FOR_ACTIVE_CASES)))
+                .sort("last_modified", SortOrder.DESC)
+                .size(MYA_MAX_CASES_PER_PAGE);
+        String searchCriteria = searchBuilder.toString();
         SearchResult searchResult = coreCaseDataApi.searchCases(
                 idamTokens.getIdamOauth2Token(),
                 idamTokens.getServiceAuthorization(),
