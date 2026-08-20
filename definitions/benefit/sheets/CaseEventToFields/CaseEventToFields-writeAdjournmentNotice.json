@@ -147,7 +147,7 @@
     "CaseFieldID": "tribunalDirectPoToAttend",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
-    "PageShowCondition": "adjournCaseTypeOfNextHearing != \"paper\" AND hearingRoute=\"listAssist\"",
+    "PageShowCondition": "adjournCaseTypeOfNextHearing != \"paper\" AND (hearingRoute=\"listAssist\" OR appeal.hearingOptions.hearingRoute=\"listAssist\")",
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 10,
     "PageFieldDisplayOrder": 1,
