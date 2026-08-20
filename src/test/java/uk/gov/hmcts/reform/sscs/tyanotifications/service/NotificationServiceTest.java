@@ -2896,7 +2896,7 @@ public class NotificationServiceTest {
             new HashMap<>(), new Reference(), null);
         given(factory.create(any(NotificationWrapper.class), any(SubscriptionWithType.class))).willReturn(notification);
 
-        getNotificationServiceWithCmOtherPartyConfidentialityEnabled()
+        getNotificationService()
             .manageNotificationAndSubscription(ccdNotificationWrapper, false);
 
         then(notificationHandler).should(atLeastOnce()).sendNotification(
@@ -2909,7 +2909,7 @@ public class NotificationServiceTest {
         ccdNotificationWrapper = buildBaseWrapper(ADD_OTHER_PARTY_DATA, APPELLANT_WITH_ADDRESS, null, null);
         ccdNotificationWrapper.getSscsCaseDataWrapper().setState(State.AWAIT_CONFIDENTIALITY_REQUIREMENTS);
 
-        getNotificationServiceWithCmOtherPartyConfidentialityEnabled()
+        getNotificationService()
             .manageNotificationAndSubscription(ccdNotificationWrapper, false);
 
         verifyNoInteractions(notificationValidService);
@@ -2922,7 +2922,7 @@ public class NotificationServiceTest {
         ccdNotificationWrapper.getNewSscsCaseData().getAppeal().getBenefitType().setCode(Benefit.UC.getShortName());
         ccdNotificationWrapper.getSscsCaseDataWrapper().setState(State.WITH_DWP);
 
-        getNotificationServiceWithCmOtherPartyConfidentialityEnabled()
+        getNotificationService()
             .manageNotificationAndSubscription(ccdNotificationWrapper, false);
 
         verifyNoInteractions(notificationValidService);
@@ -2942,7 +2942,7 @@ public class NotificationServiceTest {
         given(factory.create(any(NotificationWrapper.class), any(SubscriptionWithType.class))).willReturn(notification);
         given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(new byte[]{1});
 
-        getNotificationServiceWithCmOtherPartyConfidentialityEnabled()
+        getNotificationService()
             .manageNotificationAndSubscription(ccdNotificationWrapper, false);
 
         then(notificationHandler).should(times(1)).sendNotification(
@@ -3250,7 +3250,7 @@ public class NotificationServiceTest {
         return null;
     }
 
-    private NotificationService getNotificationServiceWithCmOtherPartyConfidentialityEnabled() {
+    private NotificationService getNotificationService() {
         final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender,
             notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
         return new NotificationService(factory, reminderService,
@@ -3293,14 +3293,6 @@ public class NotificationServiceTest {
                            .hearings(List.of(Hearing.builder().value(HearingDetails.builder().build()).build()))
                            .sscsDocument(new ArrayList<>(singletonList(null)))
                            .informationFromAppellant(informationFromAppellant);
-    }
-
-    private NotificationService getNotificationService() {
-        final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender,
-            notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
-        return new NotificationService(factory, reminderService,
-            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService,
-            false);
     }
 
     private byte[] getCoversheet() throws IOException {

@@ -66,10 +66,6 @@ export const environment = {
   aatDefVersion: yaml.load(fs.readFileSync(versionFilePath, 'utf8'))
 };
 
-export const featureFlags = {
-  cmOtherPartyConfidentialityEnabled: getCmOtherPartyConfidentialityFlag()
-};
-
 export const credentials = {
   caseWorker: {
     email: process.env.TEST_CASEOFFICER_USERNAME,
