@@ -319,6 +319,7 @@ class HmctsResponseReviewedAboutToStartHandlerTest {
         assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty().getValue().getCode()).isEmpty();
     }
 
+    @Test
     void givenNonConfidentialBenefitType_thenSelectedConfidentialityPartyIsNotSet() {
         handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService, hearingsService);
 
