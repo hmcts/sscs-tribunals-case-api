@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -73,10 +72,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
 import org.apache.pdfbox.io.IOUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -181,6 +182,7 @@ public class NotificationServiceTest {
                                                           .subscribeSms(YES).wantSmsNotifications(YES)
                                                           .build();
     private NotificationService notificationService;
+    private AutoCloseable mocks;
     @Mock
     private NotificationSender notificationSender;
     @Mock
@@ -258,9 +260,9 @@ public class NotificationServiceTest {
                                                  .address(Address.builder().line1("line 1").postcode("TS4 4ST").build())
                                                  .build();
         SscsCaseData sscsCaseData = getSscsCaseDataBuilder(appellant, null, sscsDocument)
-            .otherParties(List.of(otherParty1, otherParty2).stream()
-                              .map(CcdValue::new)
-                              .collect(toList()))
+            .otherParties(Stream.of(otherParty1, otherParty2)
+                                .map(CcdValue::new)
+                                .toList())
             .functionalTest(YesNo.YES)
             .build();
         return buildBaseWrapperWithCaseData(sscsCaseData, eventType);
@@ -396,20 +398,20 @@ public class NotificationServiceTest {
                            .sscsDocument(new ArrayList<>(singletonList(sscsDocument)));
     }
 
-    static void verifyNoErrorsLogged(Appender<ILoggingEvent> mockAppender, ArgumentCaptor captorLoggingEvent) {
+    static void verifyNoErrorsLogged(Appender<ILoggingEvent> mockAppender, ArgumentCaptor<ILoggingEvent> captorLoggingEvent) {
         verify(mockAppender, atLeast(0)).doAppend(
-            (ILoggingEvent) captorLoggingEvent.capture()
+            captorLoggingEvent.capture()
         );
-        List<ILoggingEvent> logEvents = (List<ILoggingEvent>) captorLoggingEvent.getAllValues();
+        List<ILoggingEvent> logEvents = captorLoggingEvent.getAllValues();
         assertTrue(logEvents.stream().noneMatch(e -> e.getLevel().equals(Level.ERROR)));
     }
 
-    static void verifyExpectedLogMessage(Appender<ILoggingEvent> mockAppender, ArgumentCaptor captorLoggingEvent,
+    static void verifyExpectedLogMessage(Appender<ILoggingEvent> mockAppender, ArgumentCaptor<ILoggingEvent> captorLoggingEvent,
         String ccdCaseId, String errorMessage, Level logLevel) {
         verify(mockAppender, atLeastOnce()).doAppend(
-            (ILoggingEvent) captorLoggingEvent.capture()
+            captorLoggingEvent.capture()
         );
-        List<ILoggingEvent> logEvents = (List<ILoggingEvent>) captorLoggingEvent.getAllValues();
+        List<ILoggingEvent> logEvents = captorLoggingEvent.getAllValues();
         assertFalse(logEvents.stream().noneMatch(e -> e.getLevel().equals(logLevel)));
         assertEquals(1, logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage().contains(errorMessage)).count());
         assertTrue(logEvents.stream().anyMatch(logEvent -> logEvent.getFormattedMessage().contains(ccdCaseId)));
@@ -417,7 +419,7 @@ public class NotificationServiceTest {
 
     @Before
     public void setup() {
-        openMocks(this);
+        mocks = openMocks(this);
 
         notificationService = getNotificationService();
 
@@ -451,6 +453,11 @@ public class NotificationServiceTest {
 
         Logger logger = (Logger) LoggerFactory.getLogger(NotificationService.class.getName());
         logger.addAppender(mockAppender);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        mocks.close();
     }
 
     @Test
@@ -3113,9 +3120,9 @@ public class NotificationServiceTest {
 
     @Test
     @Parameters({
-        "true, PIP, APPEAL_TO_PROCEED",
-        "true, PIP, PROVIDE_INFORMATION",
-        "true, CHILD_SUPPORT, PROVIDE_INFORMATION"
+        "PIP, APPEAL_TO_PROCEED",
+        "PIP, PROVIDE_INFORMATION",
+        "CHILD_SUPPORT, PROVIDE_INFORMATION"
     })
     public void givenDirectionIssuedWelshWithVariousScenarios_thenSendOnlyOneNotification(
         String benefitCode, String directionType) {
@@ -3162,9 +3169,9 @@ public class NotificationServiceTest {
 
     @Test
     @Parameters({
-        "ADMIN_SEND_TO_VALID_APPEAL, true",
-        "INTERLOC_VALID_APPEAL, true",
-        "VALID_APPEAL, true"
+        "ADMIN_SEND_TO_VALID_APPEAL",
+        "INTERLOC_VALID_APPEAL",
+        "VALID_APPEAL"
     })
     public void givenValidAppealEventNotification_whenNotChildSupport_shouldNotSendNotification(
         final NotificationEventType eventType) {
