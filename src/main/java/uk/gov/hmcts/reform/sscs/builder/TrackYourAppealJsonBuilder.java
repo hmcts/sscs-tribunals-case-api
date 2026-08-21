@@ -335,29 +335,29 @@ public class TrackYourAppealJsonBuilder {
 
     private void setLatestEventAs(List<Event> eventList, Event currentEvent, EventType eventType) {
         Event event = Event.builder().value(currentEvent.getValue().toBuilder().type(eventType
-            .getCcdType()).build()).build();
+                .getCcdType()).build()).build();
         eventList.set(0, event);
     }
 
     private boolean isPastHearingBookedDate(Event event, Boolean isPaperCase) {
         return DWP_RESPOND.equals(getEventType(event))
-            && LocalDateTime.now().isAfter(
-            LocalDateTime.parse(event.getValue().getDate()).plusWeeks(PAST_HEARING_BOOKED_IN_WEEKS))
-            && !isPaperCase;
+                && LocalDateTime.now().isAfter(
+                LocalDateTime.parse(event.getValue().getDate()).plusWeeks(PAST_HEARING_BOOKED_IN_WEEKS))
+                && !isPaperCase;
     }
 
     private boolean isNewHearingBookedEvent(List<Event> eventList) {
         return eventList.size() > 1
-            && HEARING_BOOKED.equals(getEventType(eventList.get(0)))
-            && (POSTPONED.equals(getEventType(eventList.get(1)))
-            || ADJOURNED.equals(getEventType(eventList.get(1))));
+                && HEARING_BOOKED.equals(getEventType(eventList.get(0)))
+                && (POSTPONED.equals(getEventType(eventList.get(1)))
+                || ADJOURNED.equals(getEventType(eventList.get(1))));
     }
 
     private boolean isAppealClosed(Event event) {
         return DORMANT.equals(getEventType(event))
-            && LocalDateTime.now().isAfter(
-            LocalDateTime.parse(event.getValue().getDate()).plusMonths(
-                DORMANT_TO_CLOSED_DURATION_IN_MONTHS));
+                && LocalDateTime.now().isAfter(
+                LocalDateTime.parse(event.getValue().getDate()).plusMonths(
+                        DORMANT_TO_CLOSED_DURATION_IN_MONTHS));
     }
 
     private boolean isDwpRespondOverdue(Event event, String benefitCode, String dateSentToDwp) {
@@ -453,7 +453,7 @@ public class TrackYourAppealJsonBuilder {
                             DWP_RESPONSE_HEARING_CONTACT_DATE_IN_WEEKS, false));
             case HEARING_BOOKED, NEW_HEARING_BOOKED -> {
                 Hearing hearing = eventHearingMap.get(event);
-                if (hearing != null) {
+                if (hearing != null && hearing.getValue().getVenue() != null) {
                     eventNode.put(POSTCODE, hearing.getValue().getVenue().getAddress().getPostcode());
                     eventNode.put(HEARING_DATETIME,
                             DATEFORMATTER.format(getLocalDateTime(hearing.getValue().getHearingDate(), hearing.getValue().getTime())));
@@ -565,15 +565,15 @@ public class TrackYourAppealJsonBuilder {
             for (Document document : documentList) {
                 if (document != null && document.getValue() != null) {
                     EventDetails eventDetails = EventDetails.builder()
-                        .date(LocalDate.parse(document.getValue().getDateReceived()).atStartOfDay().plusHours(1)
-                            .toString())
-                        .type(EventType.EVIDENCE_RECEIVED.getCcdType())
-                        .description("Evidence received")
-                        .build();
+                            .date(LocalDate.parse(document.getValue().getDateReceived()).atStartOfDay().plusHours(1)
+                                    .toString())
+                            .type(EventType.EVIDENCE_RECEIVED.getCcdType())
+                            .description("Evidence received")
+                            .build();
 
                     events.add(Event.builder()
-                        .value(eventDetails)
-                        .build());
+                            .value(eventDetails)
+                            .build());
                 }
             }
             caseData.getEvents().addAll(events);
@@ -619,7 +619,7 @@ public class TrackYourAppealJsonBuilder {
                 int hearingIndex = 0;
                 for (Event event : events) {
                     if (HEARING_BOOKED.equals(getEventType(event))
-                        || NEW_HEARING_BOOKED.equals(getEventType(event))) {
+                            || NEW_HEARING_BOOKED.equals(getEventType(event))) {
                         if (hearingIndex < hearingList.size()) {
                             eventHearingMap.put(event, hearingList.get(hearingIndex));
                             hearingIndex++;
@@ -635,14 +635,14 @@ public class TrackYourAppealJsonBuilder {
     private SscsCaseData createAppealReceivedEventTypeForAppealCreatedEvent(SscsCaseData caseData) {
 
         EventDetails eventDetails = EventDetails.builder()
-            .date(LocalDate.parse(caseData.getCaseCreated()).atStartOfDay().plusHours(1).toString())
-            .type(EventType.APPEAL_RECEIVED.getCcdType())
-            .description("Appeal received")
-            .build();
+                .date(LocalDate.parse(caseData.getCaseCreated()).atStartOfDay().plusHours(1).toString())
+                .type(EventType.APPEAL_RECEIVED.getCcdType())
+                .description("Appeal received")
+                .build();
 
         Event event = Event.builder()
-            .value(eventDetails)
-            .build();
+                .value(eventDetails)
+                .build();
 
         List<Event> events = new ArrayList<>();
         events.add(event);
