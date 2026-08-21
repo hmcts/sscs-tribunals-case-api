@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_SEND_TO_INTERL
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.CONFIDENTIALITY;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty.REP;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.REPRESENTATIVE;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isBenefitTypeChildSupportOrUc;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -19,7 +20,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -125,7 +125,7 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
     }
 
     private boolean isConfidentialitySelectionMissing(SscsCaseData sscsCaseData) {
-        return (sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT) || sscsCaseData.isBenefitType(Benefit.UC))
+        return (isBenefitTypeChildSupportOrUc(sscsCaseData))
                 && isConfidentialityReferral(sscsCaseData)
                 && isSelectionMissing(sscsCaseData.getExtendedSscsCaseData().getSelectedConfidentialityParty());
     }

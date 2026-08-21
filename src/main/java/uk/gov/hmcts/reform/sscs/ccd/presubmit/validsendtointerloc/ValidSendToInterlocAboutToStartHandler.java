@@ -6,7 +6,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_TCW;
 import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getPartiesOnCase;
 import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown;
-import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.isChildSupportAppeal;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isBenefitTypeChildSupportOrUc;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
@@ -56,7 +55,7 @@ public class ValidSendToInterlocAboutToStartHandler implements PreSubmitCallback
 
         setSelectWhoReviewsCase(sscsCaseData);
         setOriginalSenderDropdown(sscsCaseData);
-        if ((isChildSupportAppeal(sscsCaseData) || sscsCaseData.isBenefitType(Benefit.UC))) {
+        if (isBenefitTypeChildSupportOrUc(sscsCaseData)) {
             sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
                     getSelectedConfidentialityPartyDropdown(sscsCaseData));
         }
