@@ -1457,6 +1457,21 @@ class AdjournCasePreviewServiceTest {
         assertThat(templateBody.getAdjournCaseTemplateBody().getNextHearingVenue()).isEqualTo(GAP_VENUE_NAME);
     }
 
+    @Test
+    void previewSanitizesDataByClearingStaleNextHearingVenueSelected() {
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
+        when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
+        when(generateFile.assemble(any())).thenReturn(URL);
+
+        adjournment.setNextHearingVenue(SAME_VENUE);
+        adjournment.setNextHearingVenueSelected(new DynamicList(new DynamicListItem("123", ""), List.of()));
+
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+
+        assertThat(sscsCaseData.getAdjournment().getNextHearingVenueSelected()).isNull();
+    }
+
     @ParameterizedTest
     @EnumSource(value = AdjournCaseTypeOfHearing.class, names = {"FACE_TO_FACE"})
     void givenCaseWithSelectedVenueSetForFaceToFace_thenCorrectlySetTheVenueToBeTheNewVenue(AdjournCaseTypeOfHearing nextHearingType) {

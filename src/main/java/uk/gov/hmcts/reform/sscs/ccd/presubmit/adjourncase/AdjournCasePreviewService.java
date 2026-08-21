@@ -3,8 +3,10 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.stripToEmpty;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADJOURN_CASE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.IN_CHAMBERS;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.clearAdjournmentFields;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getLastValidHearing;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.resolvePostCode;
 
@@ -379,8 +381,15 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
     protected void setGeneratedDateIfRequired(SscsCaseData sscsCaseData, EventType eventType) {
         // Update the generated date if (and only if) the event type is Adjourn Case
         // ( not for EventType.ISSUE_ADJOURNMENT)
-        if (eventType == EventType.ADJOURN_CASE) {
+        if (eventType == ADJOURN_CASE) {
             sscsCaseData.getAdjournment().setGeneratedDate(LocalDate.now());
+        }
+    }
+
+    @Override
+    protected void sanitizeData(SscsCaseData caseData, EventType eventType) {
+        if (eventType == ADJOURN_CASE) {
+            clearAdjournmentFields(caseData);
         }
     }
 }
