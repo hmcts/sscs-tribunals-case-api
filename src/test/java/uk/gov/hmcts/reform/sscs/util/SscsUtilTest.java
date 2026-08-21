@@ -34,12 +34,14 @@ import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getSscsType;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getWriteFinalDecisionDocumentType;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleIbcaCase;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isBenefitTypeChildSupportOrUc;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isSAndLCase;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.updateHearingChannel;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.updateHearingInterpreter;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,6 +49,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -956,5 +959,46 @@ class SscsUtilTest {
     void givenBenefitType_isBenefitTypeChildSupportOrUcReturnsCorrectValue(String benefitCode, Boolean expectedValue) {
         SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefitCode).build()).build()).build();
         assertThat(isBenefitTypeChildSupportOrUc(sscsCaseData)).isEqualTo(expectedValue);
+    }
+
+    @ParameterizedTest
+    @MethodSource("createListAssistCaseData")
+    void givenHearingRouteIsListAssist_isSAndLCaseReturnsTrue(SscsCaseData sscsCaseData) {
+        assertThat(isSAndLCase(sscsCaseData)).isTrue();
+    }
+
+    private static Stream<SscsCaseData> createListAssistCaseData() {
+        return Stream.of(
+                SscsCaseData.builder()
+                .schedulingAndListingFields(SchedulingAndListingFields.builder().hearingRoute(LIST_ASSIST).build())
+                .appeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build())
+                .build(),
+                SscsCaseData.builder()
+                        .schedulingAndListingFields(SchedulingAndListingFields.builder().build())
+                        .appeal(Appeal.builder().hearingOptions(HearingOptions.builder().hearingRoute(LIST_ASSIST).build()).build())
+                        .build()
+                );
+    }
+
+    @ParameterizedTest
+    @MethodSource("createGapsOrNullCaseData")
+    void givenHearingRouteIsGapsOrNull_isSAndLCaseReturnsFalse(SscsCaseData sscsCaseData) {
+        assertThat(isSAndLCase(sscsCaseData)).isFalse();
+    }
+
+    private static Stream<SscsCaseData> createGapsOrNullCaseData() {
+        return Stream.of(
+                SscsCaseData.builder()
+                        .schedulingAndListingFields(SchedulingAndListingFields.builder().hearingRoute(GAPS).build())
+                        .appeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build())
+                        .build(),
+                SscsCaseData.builder()
+                        .schedulingAndListingFields(SchedulingAndListingFields.builder().build())
+                        .appeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build())
+                        .build(),
+                SscsCaseData.builder()
+                        .appeal(Appeal.builder().hearingOptions(HearingOptions.builder().hearingRoute(GAPS).build()).build())
+                        .build()
+        );
     }
 }

@@ -115,7 +115,8 @@ public class SscsUtil {
         return LIST_ASSIST == Optional.of(sscsCaseData)
             .map(SscsCaseData::getSchedulingAndListingFields)
             .map(SchedulingAndListingFields::getHearingRoute)
-            .orElse(null);
+            .orElse(null)
+                || LIST_ASSIST == sscsCaseData.getAppeal().getHearingOptions().getHearingRoute();
     }
 
     public static boolean isBenefitTypeChildSupportOrUc(SscsCaseData sscsCaseData) {
