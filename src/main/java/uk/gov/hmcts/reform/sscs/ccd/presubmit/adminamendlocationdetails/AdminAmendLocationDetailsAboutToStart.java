@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adminamendlocationdetails;
 import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -93,6 +94,7 @@ public class AdminAmendLocationDetailsAboutToStart implements PreSubmitCallbackH
     private List<DynamicListItem> getRpcDropdown() {
         ArrayList<DynamicListItem> rpcList = regionalProcessingCenterService.getRegionalProcessingCenterMap().values().stream()
                 .map(regionalProcessingCenter -> new DynamicListItem(regionalProcessingCenter.getName(), regionalProcessingCenter.getName()))
+                .sorted(Comparator.comparing(DynamicListItem::getLabel, String.CASE_INSENSITIVE_ORDER))
                 .collect(Collectors.toCollection(ArrayList::new));
 
         rpcList.addFirst(new DynamicListItem("null", "Choose a processing centre"));
@@ -102,6 +104,7 @@ public class AdminAmendLocationDetailsAboutToStart implements PreSubmitCallbackH
     private List<DynamicListItem> getGapsVenueDropdown() {
         ArrayList<DynamicListItem> venueList = venueService.getAllVenuesMap().values().stream()
                 .map(venueDetails -> new DynamicListItem(venueDetails.getEpimsId(), venueDetails.getGapsVenName()))
+                .sorted(Comparator.comparing(DynamicListItem::getLabel, String.CASE_INSENSITIVE_ORDER))
                 .collect(Collectors.toCollection(ArrayList::new));
 
         venueList.addFirst(new DynamicListItem("null", "Choose a Venue"));
