@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
-import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
@@ -40,8 +39,8 @@ public class CaseUpdatedSubmittedHandler implements PreSubmitCallbackHandler<Ssc
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
         return callbackType.equals(CallbackType.SUBMITTED)
-                && callback.getEvent() == EventType.CASE_UPDATED
-                && READY_TO_LIST.getId().equals(sscsCaseData.getCreatedInGapsFrom());
+            && callback.getEvent() == EventType.CASE_UPDATED
+            && READY_TO_LIST.getId().equals(sscsCaseData.getCreatedInGapsFrom());
     }
 
     @Override
@@ -52,7 +51,7 @@ public class CaseUpdatedSubmittedHandler implements PreSubmitCallbackHandler<Ssc
         }
 
         if (callback.getCaseDetails().getCaseData().getAppeal() == null
-                || callback.getCaseDetails().getCaseData().getAppeal().getBenefitType() == null) {
+            || callback.getCaseDetails().getCaseData().getAppeal().getBenefitType() == null) {
             log.info("Cannot handle this event as no data");
             throw new IllegalStateException("Cannot handle callback");
         }
@@ -62,25 +61,15 @@ public class CaseUpdatedSubmittedHandler implements PreSubmitCallbackHandler<Ssc
         BenefitType benefitType = caseData.getAppeal().getBenefitType();
         log.info("Benefit type {} for case id {} ", benefitType, callback.getCaseDetails().getId());
 
-        sanitizeHearingOptions(caseData);
-
         if (StringUtils.equalsIgnoreCase(benefitType.getCode(), "uc") && isANewJointParty(callback, caseData)) {
             log.info("Pre Calling JOINT_PARTY_ADDED event V2 for case id {}", callback.getCaseDetails().getId());
             SscsCaseDetails sscsCaseDetails = updateCcdCaseService.triggerCaseEventV2(callback.getCaseDetails().getId(),
-                    EventType.JOINT_PARTY_ADDED.getCcdType(), "Joint party added",
-                    "", idamService.getIdamTokens());
+                EventType.JOINT_PARTY_ADDED.getCcdType(), "Joint party added",
+                "", idamService.getIdamTokens());
             log.info("jointPartyAdded event updated V2 for case id {}", callback.getCaseDetails().getId());
             return new PreSubmitCallbackResponse<>(sscsCaseDetails.getData());
         }
-
         return new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
-    }
-
-    private static void sanitizeHearingOptions(SscsCaseData caseData) {
-        final HearingOptions hearingOptions = caseData.getAppeal().getHearingOptions();
-        if (nonNull(hearingOptions) && !hearingOptions.wantsToAttendWithInterpreterSupport()) {
-            hearingOptions.setLanguagesList(null);
-        }
     }
 
     protected static boolean isANewJointParty(Callback<SscsCaseData> callback, SscsCaseData caseData) {
