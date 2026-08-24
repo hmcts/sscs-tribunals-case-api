@@ -76,11 +76,9 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             }
         }
 
-        if (nonNull(sscsCaseData.getAppeal().getHearingOptions()) && !sscsCaseData
-            .getAppeal()
-            .getHearingOptions()
-            .wantsInterpreter()) {
-            sscsCaseData.getAppeal().getHearingOptions().setLanguagesList(null);
+        final HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
+        if (nonNull(hearingOptions) && !hearingOptions.wantsInterpreter()) {
+            hearingOptions.setLanguagesList(null);
         }
 
         sscsCaseData.getAppeal()
