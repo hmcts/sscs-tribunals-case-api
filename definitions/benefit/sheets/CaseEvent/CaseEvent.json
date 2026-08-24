@@ -2796,25 +2796,6 @@
     "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
-    "LiveFrom": "21/03/2023",
-    "CaseTypeID": "Benefit",
-    "ID": "adminActionCorrection",
-    "Name": "Admin - action correction",
-    "Description": "Admin - action correction",
-    "DisplayOrder": 139,
-    "PreConditionState(s)": "dormantAppealState;postHearing;withUT",
-    "PostConditionState": "*",
-    "EventEnablingCondition": "hearingRoute=\"listAssist\"",
-    "ShowEventNotes": "Y",
-    "ShowSummary": "N",
-    "CallBackURLAboutToStartEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToStart",
-    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent",
-    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
-    "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdSubmittedEvent",
-    "SecurityClassification": "Public",
-    "Publish": "${CCD_DEF_PUBLISH}"
-  },
-  {
     "LiveFrom": "23/03/2023",
     "CaseTypeID": "Benefit",
     "ID": "adminCorrectionBody",
