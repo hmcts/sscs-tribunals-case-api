@@ -1,5 +1,11 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.adminAmendLocationDetails;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.adminamendlocationdetails;
 
+import static java.util.Objects.requireNonNull;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -10,13 +16,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import static java.util.Objects.requireNonNull;
 
 @Service
 @Slf4j
@@ -79,7 +78,7 @@ public class AdminAmendLocationDetailsAboutToStart implements PreSubmitCallbackH
                 latestHearingEpims = null;
             }
 
-        int defaultHearingVenueIndex = IntStream.range(0, gapsVenuesDropdownList.size())
+            int defaultHearingVenueIndex = IntStream.range(0, gapsVenuesDropdownList.size())
                 .filter(i -> gapsVenuesDropdownList.get(i).getCode().equals(latestHearingEpims))
                 .findFirst()
                 .orElse(0);
