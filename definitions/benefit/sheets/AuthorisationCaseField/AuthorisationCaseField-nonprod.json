@@ -1,3 +1,15 @@
 [
-  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "functionalTest", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"}
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "functionalTest", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "21/08/2026", "CaseTypeID": "Benefit", "CaseFieldID": "locationDetailsDefault", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"},
+  {"LiveFrom": "21/08/2026", "CaseTypeID": "Benefit", "CaseFieldID": "locationDetailsDefault", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
+  {"LiveFrom": "21/03/2023", "CaseTypeID": "Benefit", "CaseFieldID": "locationDetailsDefault", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
+  {"LiveFrom": "21/03/2023", "CaseTypeID": "Benefit", "CaseFieldID": "locationDetailsRpc", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"},
+  {"LiveFrom": "21/08/2026", "CaseTypeID": "Benefit", "CaseFieldID": "locationDetailsRpc", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
+  {"LiveFrom": "21/03/2023", "CaseTypeID": "Benefit", "CaseFieldID": "locationDetailsRpc", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
+  {"LiveFrom": "21/03/2023", "CaseTypeID": "Benefit", "CaseFieldID": "locationDetailsProcessingVenue", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"},
+  {"LiveFrom": "21/08/2026", "CaseTypeID": "Benefit", "CaseFieldID": "locationDetailsProcessingVenue", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
+  {"LiveFrom": "21/03/2023", "CaseTypeID": "Benefit", "CaseFieldID": "locationDetailsProcessingVenue", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
+  {"LiveFrom": "21/03/2023", "CaseTypeID": "Benefit", "CaseFieldID": "locationDetailsHearingVenue", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"},
+  {"LiveFrom": "21/08/2026", "CaseTypeID": "Benefit", "CaseFieldID": "locationDetailsHearingVenue", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
+  {"LiveFrom": "21/03/2023", "CaseTypeID": "Benefit", "CaseFieldID": "locationDetailsHearingVenue", "AccessProfile": "caseworker-sscs", "CRUD": "R"}
 ]

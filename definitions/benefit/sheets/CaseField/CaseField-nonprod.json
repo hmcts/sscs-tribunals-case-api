@@ -1,3 +1,7 @@
 [
-  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "functionalTest", "Label": "From functional test", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"}
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "functionalTest", "Label": "From functional test", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "21/08/2026", "CaseTypeID": "Benefit", "ID": "locationDetailsDefault", "Label": " ", "FieldType": "MultiSelectList", "FieldTypeParameter": "FL_locationDetailsDefault", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "21/08/2026", "CaseTypeID": "Benefit", "ID": "locationDetailsRpc", "Label": "Regional Processing Centre", "FieldType": "DynamicList", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "21/08/2026", "CaseTypeID": "Benefit", "ID": "locationDetailsProcessingVenue", "Label": "Processing Venue", "FieldType": "DynamicList", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "21/08/2026", "CaseTypeID": "Benefit", "ID": "locationDetailsHearingVenue", "Label": "Hearing Venue", "FieldType": "DynamicList", "SecurityClassification": "PUBLIC"}
 ]

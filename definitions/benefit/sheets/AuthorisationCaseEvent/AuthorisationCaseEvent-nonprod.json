@@ -1,0 +1,5 @@
+[
+  {"LiveFrom": "21/03/2023", "CaseTypeID": "Benefit", "CaseEventID": "adminAmendLocationDetails", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"},
+  {"LiveFrom": "09/06/2026", "CaseTypeID": "Benefit", "CaseEventID": "adminAmendLocationDetails", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
+  {"LiveFrom": "21/03/2023", "CaseTypeID": "Benefit", "CaseEventID": "adminAmendLocationDetails", "AccessProfile": "caseworker-sscs", "CRUD": "R"}
+]
