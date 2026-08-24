@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -14,7 +13,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated.CaseUpdatedSubmittedHandler.isANewJointParty;
 
-import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,14 +23,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -41,7 +35,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 
-class CaseUpdatedSubmittedHandlerTest {
+public class CaseUpdatedSubmittedHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private CaseUpdatedSubmittedHandler handler;
 
@@ -59,7 +53,7 @@ class CaseUpdatedSubmittedHandlerTest {
     private UpdateCcdCaseService updateCcdCaseService;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         MockitoAnnotations.openMocks(this);
         handler = new CaseUpdatedSubmittedHandler(idamService, updateCcdCaseService);
         when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
@@ -74,13 +68,13 @@ class CaseUpdatedSubmittedHandlerTest {
     }
 
     @Test
-    void givenANonCaseUpdatedEvent_thenReturnFalse() {
+    public void givenANonCaseUpdatedEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
         assertFalse(handler.canHandle(SUBMITTED, callback));
     }
 
     @Test
-    void givenACaseUpdatedEventNotDigital_thenReturnFalse() {
+    public void givenACaseUpdatedEventNotDigital_thenReturnFalse() {
         sscsCaseData.setCreatedInGapsFrom(VALID_APPEAL.getId());
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
@@ -88,24 +82,24 @@ class CaseUpdatedSubmittedHandlerTest {
     }
 
     @Test
-    void givenACaseUpdatedEvent_thenReturnTrue() {
+    public void givenACaseUpdatedEvent_thenReturnTrue() {
         when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
         assertTrue(handler.canHandle(SUBMITTED, callback));
     }
 
     @ParameterizedTest
     @EnumSource(names = {"ABOUT_TO_START", "MID_EVENT", "ABOUT_TO_SUBMIT"})
-    void givenANonCaseUpdatedCallbackType_thenReturnFalse(CallbackType callbackType) {
+    public void givenANonCaseUpdatedCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
     }
 
     @Test
-    void givenACaseUpdatedCallbackType_thenReturnTrue() {
+    public void givenACaseUpdatedCallbackType_thenReturnTrue() {
         assertTrue(handler.canHandle(SUBMITTED, callback));
     }
 
     @Test
-    void givenACaseUpdatedWithJointParty_runJointPartyAddedEvent() {
+    public void givenACaseUpdatedWithJointParty_runJointPartyAddedEvent() {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(caseDetails.getId()).thenReturn(1563382899630221L);
         when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
@@ -128,7 +122,7 @@ class CaseUpdatedSubmittedHandlerTest {
         "ESA,ESA",
         "PIP,Personal Independence Payment"
     })
-    void givenACaseUpdatedWithJointPartyNotUc_dontRunJointPartyAddedEvent(String benefitCode, String benefitDescription) {
+    public void givenACaseUpdatedWithJointPartyNotUc_dontRunJointPartyAddedEvent(String benefitCode, String benefitDescription) {
         BenefitType benefitType = BenefitType.builder().code(benefitCode).description(benefitDescription).build();
         sscsCaseData.getAppeal().setBenefitType(benefitType);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -144,7 +138,7 @@ class CaseUpdatedSubmittedHandlerTest {
     }
 
     @Test
-    void givenACaseUpdatedWithNoJointPartyUc_dontRunJointPartyAddedEvent() {
+    public void givenACaseUpdatedWithNoJointPartyUc_dontRunJointPartyAddedEvent() {
         sscsCaseData.getJointParty().setHasJointParty(NO);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(caseDetails.getId()).thenReturn(1563382899630221L);
@@ -159,7 +153,7 @@ class CaseUpdatedSubmittedHandlerTest {
     }
 
     @Test
-    void givenAJointPartyIsNew_thenReturnTrue() {
+    public void givenAJointPartyIsNew_thenReturnTrue() {
         SscsCaseData caseData = SscsCaseData.builder()
                 .ccdCaseId("1563382899630221").jointParty(JointParty.builder().hasJointParty(YES).build())
                 .appeal(Appeal.builder().build())
@@ -169,7 +163,7 @@ class CaseUpdatedSubmittedHandlerTest {
     }
 
     @Test
-    void givenAJointPartyIsExisting_thenReturnFalse() {
+    public void givenAJointPartyIsExisting_thenReturnFalse() {
         SscsCaseData oldCaseData = SscsCaseData.builder()
                 .ccdCaseId("1563382899630221").jointParty(JointParty.builder().hasJointParty(YES).build())
                 .appeal(Appeal.builder().build())
@@ -188,7 +182,7 @@ class CaseUpdatedSubmittedHandlerTest {
     }
 
     @Test
-    void givenAJointPartyWasNoIsYes_thenReturnTrue() {
+    public void givenAJointPartyWasNoIsYes_thenReturnTrue() {
         SscsCaseData oldCaseData = SscsCaseData.builder()
                 .ccdCaseId("1563382899630221").jointParty(JointParty.builder().hasJointParty(NO).build())
                 .appeal(Appeal.builder().build())
@@ -203,47 +197,5 @@ class CaseUpdatedSubmittedHandlerTest {
                 .build();
 
         assertTrue(isANewJointParty(callback, caseData));
-    }
-
-    @Test
-    void givenHearingOptionsDoesNotWantInterpreterSupport_thenLanguagesListIsCleared() {
-        sscsCaseData.getJointParty().setHasJointParty(NO);
-        final DynamicList languagesList = new DynamicList(new DynamicListItem("fr", "French"), List.of());
-        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder()
-                .wantsToAttend("Yes")
-                .wantsSupport("Yes")
-                .languageInterpreter("No")
-                .languagesList(languagesList)
-                .build());
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getAppeal().getHearingOptions().getLanguagesList()).isNull();
-    }
-
-    @Test
-    void givenHearingOptionsWantsInterpreterSupport_thenLanguagesListIsKept() {
-        sscsCaseData.getJointParty().setHasJointParty(NO);
-        final DynamicList languagesList = new DynamicList(new DynamicListItem("fr", "French"), List.of());
-        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder()
-                .wantsToAttend("Yes")
-                .wantsSupport("Yes")
-                .languageInterpreter("Yes")
-                .languagesList(languagesList)
-                .build());
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getAppeal().getHearingOptions().getLanguagesList()).isEqualTo(languagesList);
-    }
-
-    @Test
-    void givenNoHearingOptions_thenHandleDoesNotThrow() {
-        sscsCaseData.getJointParty().setHasJointParty(NO);
-        sscsCaseData.getAppeal().setHearingOptions(null);
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getAppeal().getHearingOptions()).isNull();
     }
 }

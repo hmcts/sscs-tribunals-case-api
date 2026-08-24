@@ -309,6 +309,90 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getDuration()).isNull();
     }
 
+    @Test
+    void givenNoHearingOptions_thenHandleDoesNotThrow() {
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+                ABOUT_TO_SUBMIT,
+                callback,
+                USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getAppeal().getHearingOptions()).isNotNull();
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguagesList()).isNull();
+    }
+
+    @Test
+    void givenHearingOptionsWantsInterpreter_thenLanguagesListIsKept() {
+        final DynamicList languagesList = new DynamicList(new DynamicListItem("fr", "French"), List.of());
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder()
+                .languageInterpreter("Yes")
+                .languagesList(languagesList)
+                .build());
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+                ABOUT_TO_SUBMIT,
+                callback,
+                USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguagesList()).isEqualTo(languagesList);
+    }
+
+    @Test
+    void givenHearingOptionsDoesNotWantInterpreter_thenLanguagesListIsCleared() {
+        final DynamicList languagesList = new DynamicList(new DynamicListItem("fr", "French"), List.of());
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder()
+                .languageInterpreter("No")
+                .languages("French")
+                .languagesList(languagesList)
+                .build());
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+                ABOUT_TO_SUBMIT,
+                callback,
+                USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguagesList()).isNull();
+    }
+
+    @Test
+    void givenHearingOptionsLanguageInterpreterIsUnset_thenLanguagesListIsCleared() {
+        final DynamicList languagesList = new DynamicList(new DynamicListItem("fr", "French"), List.of());
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder()
+                .languagesList(languagesList)
+                .build());
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+                ABOUT_TO_SUBMIT,
+                callback,
+                USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguagesList()).isNull();
+    }
+
+    @Test
+    void givenOverrideInterpreterChangedToNo_thenLanguagesListIsClearedAfterSync() {
+        final DynamicList languagesList = new DynamicList(new DynamicListItem("sk", "Slovak"), List.of());
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder()
+                .languageInterpreter("Yes")
+                .languages("Slovak")
+                .languagesList(languagesList)
+                .build());
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder()
+                .appellantInterpreter(HearingInterpreter.builder().isInterpreterWanted(NO).build())
+                .build());
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+                ABOUT_TO_SUBMIT,
+                callback,
+                USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo("No");
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguagesList()).isNull();
+    }
 
     @Test
     void updateHearingDuration_shouldUpdateDurationWhenChannelHasChanged() {
