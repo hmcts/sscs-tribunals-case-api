@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEvent
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.*;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.*;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isBenefitTypeChildSupportOrUc;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -152,17 +153,21 @@ public class CcdNotificationWrapper implements NotificationWrapper {
 
         boolean isSendNewOtherPartyNotification = YesNo.isYes(otherParty.getSendNewOtherPartyNotification());
 
+        String appointeeId = otherParty.getAppointee() != null ? otherParty.getAppointee().getId() : null;
         if (hasAppointee(otherParty.getAppointee(), otherParty.getIsAppointee())
-            && isNotificationEventValidToSendToOtherPartySubscription(otherParty.getOtherPartyAppointeeSubscription(), isSendNewOtherPartyNotification, newSscsCaseData, notificationEventType, ConfidentialityPartyMembers.OTHER_PARTY_APPOINTEE.getCode())) {
+            && isNotificationEventValidToSendToOtherPartySubscription(otherParty.getOtherPartyAppointeeSubscription(), isSendNewOtherPartyNotification, newSscsCaseData, notificationEventType, ConfidentialityPartyMembers.OTHER_PARTY_APPOINTEE.getCode())
+            && isOtherPartySelectedForDirectionNotice(newSscsCaseData, notificationEventType, otherParty.getAppointee().getId(), otherParty.getId())) {
             otherPartySubscription.add(new SubscriptionWithType(otherParty.getOtherPartyAppointeeSubscription(),
                 OTHER_PARTY, otherParty, otherParty.getAppointee(), otherParty.getAppointee().getId()));
-        } else if (isNotificationEventValidToSendToOtherPartySubscription(otherParty.getOtherPartySubscription(), isSendNewOtherPartyNotification, newSscsCaseData, notificationEventType, ConfidentialityPartyMembers.OTHER_PARTY.getCode())) {
+        } else if (isNotificationEventValidToSendToOtherPartySubscription(otherParty.getOtherPartySubscription(), isSendNewOtherPartyNotification, newSscsCaseData, notificationEventType, ConfidentialityPartyMembers.OTHER_PARTY.getCode())
+            && isOtherPartySelectedForDirectionNotice(newSscsCaseData, notificationEventType, otherParty.getId(), appointeeId)) {
             otherPartySubscription.add(new SubscriptionWithType(otherParty.getOtherPartySubscription(), OTHER_PARTY,
                 otherParty, otherParty, otherParty.getId()));
         }
 
         if (hasRepresentative(otherParty)
-            && isNotificationEventValidToSendToOtherPartySubscription(otherParty.getOtherPartyRepresentativeSubscription(), isSendNewOtherPartyNotification, newSscsCaseData, notificationEventType, ConfidentialityPartyMembers.OTHER_PARTY_REP.getCode())) {
+            && isNotificationEventValidToSendToOtherPartySubscription(otherParty.getOtherPartyRepresentativeSubscription(), isSendNewOtherPartyNotification, newSscsCaseData, notificationEventType, ConfidentialityPartyMembers.OTHER_PARTY_REP.getCode())
+            && isOtherPartySelectedForDirectionNotice(newSscsCaseData, notificationEventType, otherParty.getRep().getId())) {
             otherPartySubscription.add(new SubscriptionWithType(otherParty.getOtherPartyRepresentativeSubscription(),
                 OTHER_PARTY, otherParty, otherParty.getRep(), otherParty.getRep().getId()));
         }
@@ -170,6 +175,46 @@ public class CcdNotificationWrapper implements NotificationWrapper {
         log.info("Number of subscription {}", otherPartySubscription.size());
 
         return otherPartySubscription;
+    }
+
+    private boolean isOtherPartySelectedForDirectionNotice(
+            SscsCaseData caseData,
+            NotificationEventType eventType,
+            String... partyIds) {
+
+        if (!isDirectionNotice(eventType) || !isBenefitTypeChildSupportOrUc(caseData)
+            || !Objects.equals(ConfidentialityType.CONFIDENTIAL.getCode(), caseData.getConfidentialityType())) {
+            return true;
+        }
+
+        List<String> selectedCodes = getSelectedOtherPartyCodes(caseData);
+
+        return partyIds != null
+                && Arrays.stream(partyIds)
+                .filter(Objects::nonNull)
+                .anyMatch(partyId -> isOtherPartySelected(selectedCodes, partyId));
+    }
+
+    private boolean isDirectionNotice(NotificationEventType eventType) {
+        return DIRECTION_ISSUED.equals(eventType)
+                || DIRECTION_ISSUED_WELSH.equals(eventType);
+    }
+
+    private List<String> getSelectedOtherPartyCodes(SscsCaseData caseData) {
+        return emptyIfNull(caseData.getOtherPartySelection()).stream()
+                .map(CcdValue::getValue)
+                .map(OtherPartySelectionDetails::getOtherPartiesList)
+                .filter(Objects::nonNull)
+                .map(DynamicList::getValue)
+                .filter(Objects::nonNull)
+                .map(DynamicListItem::getCode)
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    private boolean isOtherPartySelected(List<String> selectedCodes, String partyId) {
+        return selectedCodes.contains(PartyItemList.OTHER_PARTY.getCode() + partyId)
+                || selectedCodes.contains(PartyItemList.OTHER_PARTY_REPRESENTATIVE.getCode() + partyId);
     }
 
     private boolean isOtherPartyPresent(SscsCaseData sscsCaseData) {

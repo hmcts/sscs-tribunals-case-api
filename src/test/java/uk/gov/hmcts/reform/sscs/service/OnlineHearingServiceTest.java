@@ -1,21 +1,21 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Contact;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
@@ -41,7 +42,7 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.UserType;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class OnlineHearingServiceTest {
     private CcdService ccdService;
 
@@ -51,12 +52,11 @@ public class OnlineHearingServiceTest {
     private IdamTokens idamTokens;
     private IdamService idamService;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         ccdService = mock(CcdService.class);
         idamTokens = IdamTokens.builder().build();
         idamService = mock(IdamService.class);
-        when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         underTest = new OnlineHearingService(ccdService, idamService);
 
@@ -64,18 +64,19 @@ public class OnlineHearingServiceTest {
     }
 
     @Test
-    public void getsACcdCaseByIdentifierFromCcdId() {
+    void getsACcdCaseByIdentifierFromCcdId() {
         SscsCaseDetails caseDetails = createCaseDetails(someCaseId, "someCaseReference", "firstName", "lastName");
+        when(idamService.getIdamTokens()).thenReturn(idamTokens);
         when(ccdService.getByCaseId(someCaseId, idamTokens)).thenReturn(caseDetails);
 
         Optional<SscsCaseDetails> sscsCaseDetails = underTest.getCcdCaseByIdentifier(someCaseId.toString());
 
-        assertThat(sscsCaseDetails.isPresent(), is(true));
-        assertThat(sscsCaseDetails.get(), is(caseDetails));
+        assertThat(sscsCaseDetails.isPresent()).isTrue();
+        assertThat(sscsCaseDetails.get()).isSameAs(caseDetails);
     }
 
     @Test
-    public void loadHearingWithoutCorCase() {
+    void loadHearingWithoutCorCase() {
         SscsCaseDetails sscsCaseDetails = createCaseDetails(someCaseId, "caseref", "firstname", "lastname", "paper");
 
         Optional<OnlineHearing> onlineHearing = underTest.loadHearing(sscsCaseDetails, null, "appellant@hmct.com");
@@ -83,9 +84,9 @@ public class OnlineHearingServiceTest {
         assertOnlineHearing(onlineHearing, sscsCaseDetails, "firstname lastname");
     }
 
-    @Test
-    @Parameters({"appellantTya,appellant@hmct.com", "appointeeTya, appointee@hmct.com"})
-    public void loadHearingWithTyaAndEmailForAppellant(String tya, String email) {
+    @ParameterizedTest
+    @CsvSource({"appellantTya,appellant@hmct.com", "appointeeTya, appointee@hmct.com"})
+    void loadHearingWithTyaAndEmailForAppellant(String tya, String email) {
         SscsCaseDetails sscsCaseDetails = createCaseDetails(someCaseId, "caseref", "firstname", "lastname", "paper");
 
         Optional<OnlineHearing> onlineHearing = underTest.loadHearing(sscsCaseDetails, tya, email);
@@ -94,8 +95,17 @@ public class OnlineHearingServiceTest {
     }
 
     @Test
-    @Parameters({"otherpartyTya,otherparty@hmct.com", "otherpartyAppointeeTya,otherpartyAppointee@hmct.com"})
-    public void loadHearingWithTyaAndEmailForOtherParty(String tya, String email) {
+    void loadHearingWithTyaAndEmailForJointParty() {
+        SscsCaseDetails sscsCaseDetails = createCaseDetails(someCaseId, "caseref", "firstname", "lastname", "paper");
+
+        Optional<OnlineHearing> onlineHearing = underTest.loadHearing(sscsCaseDetails, "jointPartyTya", "jointparty@hmcts.com");
+
+        assertOnlineHearingForJointParty(onlineHearing, sscsCaseDetails);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"otherpartyTya,otherparty@hmct.com", "otherpartyAppointeeTya,otherpartyAppointee@hmct.com"})
+    void loadHearingWithTyaAndEmailForOtherParty(String tya, String email) {
         SscsCaseDetails sscsCaseDetails = createCaseDetails(someCaseId, "caseref", "firstname", "lastname", "paper");
 
         Optional<OnlineHearing> onlineHearing = underTest.loadHearing(sscsCaseDetails, tya, email);
@@ -104,8 +114,8 @@ public class OnlineHearingServiceTest {
     }
 
     private void assertOnlineHearingForOtherParty(Optional<OnlineHearing> onlineHearing, SscsCaseDetails sscsCaseDetails) {
-        assertThat(onlineHearing.isPresent(), is(true));
-        assertThat(onlineHearing.get(), is(new OnlineHearing(
+        assertThat(onlineHearing.isPresent()).isTrue();
+        assertThat(onlineHearing.get()).isEqualTo((new OnlineHearing(
                 "firstname lastname",
                 "caseref",
                 1234321L,
@@ -125,21 +135,44 @@ public class OnlineHearingServiceTest {
                                 new uk.gov.hmcts.reform.sscs.domain.wrapper.Subscription(UserType.OTHER_PARTY_APPOINTEE.getType(), "otherpartyAppointee@hmct.com", "888"))),
                 new AppealDetails(sscsCaseDetails.getData().getCaseCreated(), "12-12-2019", "PIP", State.HEARING.getId())
         )));
-        assertThat(onlineHearing.get().getUserDetails().getSubscriptions(),
-                containsInAnyOrder(new uk.gov.hmcts.reform.sscs.domain.wrapper.Subscription(UserType.OTHER_PARTY.getType(), "otherparty@hmct.com", "777"),
-                        new uk.gov.hmcts.reform.sscs.domain.wrapper.Subscription(UserType.OTHER_PARTY_APPOINTEE.getType(), "otherpartyAppointee@hmct.com", "888")));
+        assertThat(onlineHearing.get().getUserDetails().getSubscriptions()).contains(new uk.gov.hmcts.reform.sscs.domain.wrapper.Subscription(UserType.OTHER_PARTY.getType(), "otherparty@hmct.com", "777"),
+                        new uk.gov.hmcts.reform.sscs.domain.wrapper.Subscription(UserType.OTHER_PARTY_APPOINTEE.getType(), "otherpartyAppointee@hmct.com", "888"));
+    }
+
+    private void assertOnlineHearingForJointParty(Optional<OnlineHearing> onlineHearing, SscsCaseDetails sscsCaseDetails) {
+        assertThat(onlineHearing.isPresent()).isTrue();
+        assertThat(onlineHearing.get()).isEqualTo(new OnlineHearing(
+                "firstname lastname",
+                "caseref",
+                1234321L,
+                new HearingArrangements(
+                        true,
+                        "french",
+                        true,
+                        "BSL",
+                        true,
+                        true,
+                        "other arrangements"
+                ),
+                new UserDetails(UserType.JOINT_PARTY.getType(), "joint party", new AddressDetails("joint","street","joint town", "UK","joint"),
+                        "joint@hmcts.com", "007", "120", List.of()),
+                new AppealDetails(sscsCaseDetails.getData().getCaseCreated(), "12-12-2019", "PIP", State.HEARING.getId())
+        ));
+        assertThat(onlineHearing.get().getUserDetails().getSubscriptions()).isEqualTo(List.of(
+                new uk.gov.hmcts.reform.sscs.domain.wrapper.Subscription(UserType.JOINT_PARTY.getType(), "jointparty@hmcts.com", "555")));
     }
 
     private void assertOnlineHearingForAppellant(Optional<OnlineHearing> onlineHearing, SscsCaseDetails sscsCaseDetails) {
         assertOnlineHearing(onlineHearing, sscsCaseDetails, "firstname lastname");
-        assertThat(onlineHearing.get().getUserDetails().getSubscriptions(),
-                containsInAnyOrder(new uk.gov.hmcts.reform.sscs.domain.wrapper.Subscription(UserType.APPELLANT.getType(), "appellant@hmct.com", "444"),
-                        new uk.gov.hmcts.reform.sscs.domain.wrapper.Subscription(UserType.APPOINTEE.getType(), "appointee@hmct.com", "333")));
+        assertThat(onlineHearing.get().getUserDetails().getSubscriptions()).containsExactlyInAnyOrder(
+                new uk.gov.hmcts.reform.sscs.domain.wrapper.Subscription(UserType.APPELLANT.getType(), "appellant@hmct.com", "444"),
+                new uk.gov.hmcts.reform.sscs.domain.wrapper.Subscription(UserType.APPOINTEE.getType(), "appointee@hmct.com", "333")
+        );
     }
 
     private void assertOnlineHearing(Optional<OnlineHearing> onlineHearing, SscsCaseDetails sscsCaseDetails, String name) {
-        assertThat(onlineHearing.isPresent(), is(true));
-        assertThat(onlineHearing.get(), is(new OnlineHearing(
+        assertThat(onlineHearing.isPresent()).isTrue();
+        assertThat(onlineHearing.get()).isEqualTo(new OnlineHearing(
                 "firstname lastname",
                 "caseref",
                 1234321L,
@@ -155,7 +188,7 @@ public class OnlineHearingServiceTest {
                 new UserDetails(UserType.APPELLANT.getType(), name, new AddressDetails("line1","line2","town", "county","postcode"),
                         "email", "012", "120", List.of()),
                 new AppealDetails(sscsCaseDetails.getData().getCaseCreated(), "12-12-2019", "PIP", State.HEARING.getId())
-        )));
+        ));
     }
 
     private SscsCaseDetails createCaseDetails(Long caseId, String expectedCaseReference, String firstName, String lastName) {
@@ -180,6 +213,11 @@ public class OnlineHearingServiceTest {
                                         .email("appointee@hmct.com")
                                         .mobile("333")
                                         .tya("appointeeTya")
+                                        .build())
+                                .jointPartySubscription(Subscription.builder()
+                                        .email("jointparty@hmcts.com")
+                                        .mobile("555")
+                                        .tya("jointPartyTya")
                                         .build())
                                 .build())
                         .appeal(Appeal.builder()
@@ -219,6 +257,25 @@ public class OnlineHearingServiceTest {
                                         .build())
                                 .build()
                         )
+                        .jointParty(JointParty.builder()
+                                .name(Name.builder()
+                                        .firstName("joint")
+                                        .lastName("party")
+                                        .build())
+                                .address(Address.builder()
+                                        .line1("joint")
+                                        .line2("street")
+                                        .town("joint town")
+                                        .county("UK")
+                                        .postcode("joint")
+                                        .build())
+                                .contact(Contact.builder()
+                                        .email("joint@hmcts.com")
+                                        .phone("007")
+                                        .mobile("120")
+                                        .build())
+                                .hasJointParty(YES)
+                                .build())
                         .otherParties(List.of(
                                 CcdValue.<OtherParty>builder()
                                         .value(OtherParty.builder()
