@@ -43,6 +43,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
 import net.objectlab.kit.datecalc.common.DateCalculator;
 import net.objectlab.kit.datecalc.jdk8.LocalDateKitCalculatorsFactory;
@@ -613,7 +615,9 @@ public class TrackYourAppealJsonBuilder {
         if (hearingList != null && !hearingList.isEmpty()) {
             hearingList = hearingList.stream()
                     .filter(hearing -> hearing.getValue().getHearingStatus() != HearingStatus.CANCELLED)
-                    .toList();
+                    .collect(Collectors.toCollection(ArrayList::new));
+
+            hearingList.sort(Comparator.reverseOrder());
 
             List<Event> events = caseData.getEvents();
 
