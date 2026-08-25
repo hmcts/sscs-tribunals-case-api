@@ -78,6 +78,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
         final HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
         if (nonNull(hearingOptions) && !hearingOptions.wantsInterpreter()) {
+            hearingOptions.setLanguages(null);
             hearingOptions.setLanguagesList(null);
         }
 

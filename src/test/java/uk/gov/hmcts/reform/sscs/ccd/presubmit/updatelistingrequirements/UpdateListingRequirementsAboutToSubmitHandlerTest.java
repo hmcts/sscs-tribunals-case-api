@@ -322,10 +322,11 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenHearingOptionsWantsInterpreter_thenLanguagesListIsKept() {
+    void givenHearingOptionsWantsInterpreter_thenLanguagesAndLanguagesListAreKept() {
         final DynamicList languagesList = new DynamicList(new DynamicListItem("fr", "French"), List.of());
         sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder()
                 .languageInterpreter("Yes")
+                .languages("French")
                 .languagesList(languagesList)
                 .build());
 
@@ -335,11 +336,12 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
                 USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isEqualTo("French");
         assertThat(response.getData().getAppeal().getHearingOptions().getLanguagesList()).isEqualTo(languagesList);
     }
 
     @Test
-    void givenHearingOptionsDoesNotWantInterpreter_thenLanguagesListIsCleared() {
+    void givenHearingOptionsDoesNotWantInterpreter_thenLanguagesAndLanguagesListAreCleared() {
         final DynamicList languagesList = new DynamicList(new DynamicListItem("fr", "French"), List.of());
         sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder()
                 .languageInterpreter("No")
@@ -353,13 +355,15 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
                 USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isNull();
         assertThat(response.getData().getAppeal().getHearingOptions().getLanguagesList()).isNull();
     }
 
     @Test
-    void givenHearingOptionsLanguageInterpreterIsUnset_thenLanguagesListIsCleared() {
+    void givenHearingOptionsLanguageInterpreterIsUnset_thenLanguagesAndLanguagesListAreCleared() {
         final DynamicList languagesList = new DynamicList(new DynamicListItem("fr", "French"), List.of());
         sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder()
+                .languages("French")
                 .languagesList(languagesList)
                 .build());
 
@@ -369,11 +373,12 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
                 USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isNull();
         assertThat(response.getData().getAppeal().getHearingOptions().getLanguagesList()).isNull();
     }
 
     @Test
-    void givenOverrideInterpreterChangedToNo_thenLanguagesListIsClearedAfterSync() {
+    void givenOverrideInterpreterChangedToNo_thenLanguagesAndLanguagesListAreClearedAfterSync() {
         final DynamicList languagesList = new DynamicList(new DynamicListItem("sk", "Slovak"), List.of());
         sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder()
                 .languageInterpreter("Yes")
@@ -391,6 +396,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
         assertThat(response.getErrors()).isEmpty();
         assertThat(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo("No");
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isNull();
         assertThat(response.getData().getAppeal().getHearingOptions().getLanguagesList()).isNull();
     }
 
