@@ -1,5 +1,9 @@
 package uk.gov.hmcts.reform.sscs.builder;
 
+import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.*;
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.Before;
 import org.junit.Test;
@@ -7,10 +11,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-
-import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
-import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.*;
 
 public class TrackYourAppealJsonBuilderTest {
 
@@ -151,6 +151,7 @@ public class TrackYourAppealJsonBuilderTest {
         );
         assertThat(objectNode.at("/appeal/latestEvents/0/hearingDateTime").asText()).containsOnlyOnce("2026-09-04T15:15:00.000Z");
     }
+
     private RegionalProcessingCenter populateRegionalProcessingCenter() {
         return RegionalProcessingCenter.builder()
             .name("LIVERPOOL")
