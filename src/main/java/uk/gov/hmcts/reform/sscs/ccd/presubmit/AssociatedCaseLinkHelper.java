@@ -4,6 +4,7 @@ import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static uk.gov.hmcts.reform.sscs.utility.StringUtils.getMaskedNino;
 
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +43,7 @@ public class AssociatedCaseLinkHelper {
         if (isNotEmpty(nino) && isEmpty(previousNino)) {
             List<SscsCaseDetails> matchedByNinoCases = getMatchedCases(nino, idamService.getIdamTokens());
             if (!matchedByNinoCases.isEmpty()) {
-                log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino " + nino);
+                log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino " + getMaskedNino(nino));
                 return addAssociatedCases(sscsCaseData, matchedByNinoCases);
             }
         }

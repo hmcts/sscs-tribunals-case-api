@@ -107,12 +107,7 @@ public class SorWriteHandler implements CallbackHandler<SscsCaseData> {
             letter.add(pdf);
 
             String recipient = (String) placeholders.get(NAME);
-            log.info("Party {} {}", party, party.getName());
-            log.info("Sending letter to {}", recipient);
-            log.info("Appellant name {} entity type {} name {}",
-                placeholders.get(APPELLANT_NAME),
-                placeholders.get(ENTITY_TYPE),
-                placeholders.get(NAME));
+            log.info("Sending letter to Entity {}", placeholders.get(ENTITY_TYPE));
             bulkPrintService.sendToBulkPrint(Long.parseLong(caseData.getCcdCaseId()), caseData, letter,
                 EventType.POST_HEARING_APP_SOR_WRITTEN, recipient);
         }

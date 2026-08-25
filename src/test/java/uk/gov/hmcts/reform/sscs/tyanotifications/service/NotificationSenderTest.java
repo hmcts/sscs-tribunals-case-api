@@ -21,7 +21,11 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationSender.DATE_TIME_FORMATTER;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationSender.ZONE_ID_LONDON;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedEmail;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPhone;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPostcode;
 
+import ch.qos.logback.classic.Level;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -30,6 +34,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
@@ -50,6 +55,7 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationTestRecipien
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
+import uk.gov.hmcts.reform.sscs.util.LogCaptureExtension;
 import uk.gov.service.notify.LetterResponse;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
@@ -91,6 +97,8 @@ public class NotificationSenderTest {
     private SaveCorrespondenceAsyncService saveCorrespondenceAsyncService;
     @Captor
     private ArgumentCaptor<Correspondence> correspondenceArgumentCaptor;
+    @RegisterExtension
+    private LogCaptureExtension logCapture = new LogCaptureExtension(NotificationSender.class);
 
     private NotificationSender notificationSender;
 
@@ -131,6 +139,10 @@ public class NotificationSenderTest {
 
         verifyNoInteractions(notificationClient);
         verify(testNotificationClient).sendEmail(templateId, emailAddress, personalisation, reference);
+        logCapture
+                .assertLogContains(getMaskedEmail(emailAddress), Level.INFO)
+                .assertLogDoesNotContain(emailAddress, Level.INFO);
+
     }
 
     @Test
@@ -175,6 +187,8 @@ public class NotificationSenderTest {
 
         verifyNoInteractions(testNotificationClient);
         verify(notificationClient).sendSms(templateId, phoneNumber, personalisation, reference, SMS_SENDER);
+        logCapture
+                .assertLogDoesNotContain(phoneNumber, Level.INFO);
     }
 
     @Test
@@ -191,6 +205,9 @@ public class NotificationSenderTest {
 
         verifyNoInteractions(notificationClient);
         verify(testNotificationClient).sendSms(templateId, phoneNumber, personalisation, reference, SMS_SENDER);
+        logCapture
+                .assertLogContains(getMaskedPhone(phoneNumber), Level.INFO)
+                .assertLogDoesNotContain(phoneNumber, Level.INFO);
     }
 
     @Test
@@ -267,6 +284,9 @@ public class NotificationSenderTest {
 
         verifyNoInteractions(notificationClient);
         verify(testNotificationClient).sendLetter(any(), any(), any());
+        logCapture
+                .assertLogContains(getMaskedPostcode(postcode), Level.INFO)
+                .assertLogDoesNotContain(postcode, Level.INFO);
     }
 
     @Test

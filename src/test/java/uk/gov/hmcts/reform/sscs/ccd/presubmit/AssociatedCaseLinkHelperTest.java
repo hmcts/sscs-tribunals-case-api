@@ -6,28 +6,28 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ASSOCIATE_CASE;
+import static uk.gov.hmcts.reform.sscs.utility.StringUtils.getMaskedNino;
 
+import ch.qos.logback.classic.Level;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-import junitparams.JUnitParamsRunner;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockito.quality.Strictness;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
@@ -40,12 +40,10 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.util.LogCaptureExtension;
 
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class AssociatedCaseLinkHelperTest {
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.LENIENT);
 
     @Mock
     private CcdService ccdService;
@@ -58,15 +56,19 @@ public class AssociatedCaseLinkHelperTest {
     @Captor
     private ArgumentCaptor<Consumer<SscsCaseDetails>> caseDetailsCaptor;
 
-    @Before
-    public void setUp() {
+    @RegisterExtension
+    private final LogCaptureExtension logCapture =
+            new LogCaptureExtension(AssociatedCaseLinkHelper.class);
+
+    @BeforeEach
+    void setUp() {
         associatedCaseLinkHelper = new AssociatedCaseLinkHelper(ccdService, idamService, updateCcdCaseService);
 
-        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+        lenient().when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
     }
 
     @Test
-    public void shouldLinkCaseByNinoIfPreviousNinoNotPresentV2() {
+    void shouldLinkCaseByNinoIfPreviousNinoNotPresentV2() {
 
         Appellant appellant = Appellant.builder().identity(Identity.builder().nino("AB223344B").build()).build();
 
@@ -98,10 +100,13 @@ public class AssociatedCaseLinkHelperTest {
 
         assertEquals("Yes", matchingCase2.getData().getLinkedCasesBoolean());
         assertEquals("33333333", matchingCase2.getData().getAssociatedCase().get(0).getValue().getCaseReference());
+        logCapture
+                .assertLogContains(getMaskedNino("AB223344B"), Level.INFO)
+                .assertLogDoesNotContain("AB223344B", Level.INFO);
     }
 
     @Test
-    public void shouldNotLinkCaseByNinoIfPreviousNinoIsPresent() {
+    void shouldNotLinkCaseByNinoIfPreviousNinoIsPresent() {
         Appellant appellant = Appellant.builder().identity(Identity.builder().nino("AB223344B").build()).build();
 
         SscsCaseDetails matchingCase1 = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().ccdCaseId("12345678").appeal(Appeal.builder().appellant(appellant).build()).build()).build();
@@ -111,7 +116,6 @@ public class AssociatedCaseLinkHelperTest {
         matchedByNinoCases.add(matchingCase2);
         SscsCaseData previousCaseData  = SscsCaseData.builder().appeal(Appeal.builder().appellant(appellant).build()).ccdCaseId("33333333").build();
         Optional<CaseDetails<SscsCaseData>> previousSscsCaseDataCaseDetails = Optional.of(new CaseDetails<SscsCaseData>(33333333L, "", State.APPEAL_CREATED, previousCaseData, LocalDateTime.now(), "Benefit"));
-        when(ccdService.findCaseBy(anyString(), anyString(), any())).thenReturn(matchedByNinoCases);
 
         SscsCaseData caseData = SscsCaseData.builder().appeal(Appeal.builder().appellant(appellant).build()).ccdCaseId("33333333").build();
         SscsCaseData result = associatedCaseLinkHelper.linkCaseByNino(caseData, previousSscsCaseDataCaseDetails);
@@ -127,7 +131,7 @@ public class AssociatedCaseLinkHelperTest {
     }
 
     @Test
-    public void shouldLinkCaseByNinoButNotToOthersIfCaseIdIsNull() {
+    void shouldLinkCaseByNinoButNotToOthersIfCaseIdIsNull() {
         Appellant appellant = Appellant.builder().identity(Identity.builder().nino("AB223344B").build()).build();
         SscsCaseDetails matchingCase1 = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().ccdCaseId("12345678").appeal(Appeal.builder().appellant(appellant).build()).build()).build();
         SscsCaseDetails matchingCase2 = SscsCaseDetails.builder().id(56765676L).data(SscsCaseData.builder().ccdCaseId("56765676").appeal(Appeal.builder().appellant(appellant).build()).build()).build();
@@ -152,7 +156,7 @@ public class AssociatedCaseLinkHelperTest {
     }
 
     @Test
-    public void givenMultipleAssociatedCases_thenAddAllAssociatedCaseLinksToCaseV2() {
+    void givenMultipleAssociatedCases_thenAddAllAssociatedCaseLinksToCaseV2() {
         SscsCaseDetails matchingCase1 = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().ccdCaseId("12345678").build()).build();
         SscsCaseDetails matchingCase2 = SscsCaseDetails.builder().id(56765676L).data(SscsCaseData.builder().ccdCaseId("56765676").build()).build();
         List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
@@ -182,7 +186,7 @@ public class AssociatedCaseLinkHelperTest {
     }
 
     @Test
-    public void addNoAssociatedCases() {
+    void addNoAssociatedCases() {
         List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
 
         SscsCaseData caseData = associatedCaseLinkHelper.addAssociatedCases(
@@ -195,7 +199,7 @@ public class AssociatedCaseLinkHelperTest {
     }
 
     @Test
-    public void getMatchedCases() {
+    void getMatchedCases() {
         given(ccdService.findCaseBy(any(), any(), any())).willReturn(Collections.singletonList(
                 SscsCaseDetails.builder().id(12345678L).build()
         ));
