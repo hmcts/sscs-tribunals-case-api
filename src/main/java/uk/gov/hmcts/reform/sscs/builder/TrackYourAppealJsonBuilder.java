@@ -611,9 +611,11 @@ public class TrackYourAppealJsonBuilder {
         List<Hearing> hearingList = caseData.getHearings();
 
         if (hearingList != null && !hearingList.isEmpty()) {
-            List<Event> events = caseData.getEvents();
+            hearingList = hearingList.stream()
+                    .filter(hearing -> hearing.getValue().getHearingStatus() != HearingStatus.CANCELLED)
+                    .toList();
 
-            hearingList.sort(Comparator.reverseOrder());
+            List<Event> events = caseData.getEvents();
 
             if (null != events && !events.isEmpty()) {
                 int hearingIndex = 0;
