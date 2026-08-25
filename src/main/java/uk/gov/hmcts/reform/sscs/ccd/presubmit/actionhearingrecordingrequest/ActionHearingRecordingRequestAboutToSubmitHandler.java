@@ -46,6 +46,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandler implements PreSub
         SscsHearingRecordingCaseData sscsHearingRecordingCaseData =
                 sscsCaseData.getSscsHearingRecordingCaseData();
 
+        log.info("Received action hearing recording request about to submit callback");
         processPartyRequests(sscsCaseData, sscsHearingRecordingCaseData, sscsHearingRecordingCaseData.getProcessHearingRecordingRequest());
 
         if (mutableEmptyListIfNull(sscsHearingRecordingCaseData.getRequestedHearings()).isEmpty()) {
@@ -58,6 +59,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandler implements PreSub
     }
 
     private void processPartyRequests(SscsCaseData sscsCaseData, SscsHearingRecordingCaseData sscsHearingRecordingCaseData, ProcessHearingRecordingRequest processHearingRecordingRequest) {
+        log.info("processPartyRequests");
         String hearingId = processHearingRecordingRequest.getHearingId();
         if (isPartyItemSet(processHearingRecordingRequest.getDwp())) {
             processHearingRecordingsRequestsForParty(sscsCaseData, PartyItemList.DWP, sscsHearingRecordingCaseData,
@@ -76,6 +78,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandler implements PreSub
                     hearingId, processHearingRecordingRequest.getRep().getValue().getCode(), null);
         }
         if (sscsCaseData.getSscsHearingRecordingCaseData().getOtherPartyHearingRecordingReqUi() != null) {
+            log.info("processPartyRequests - otherParty");
             sscsCaseData.getSscsHearingRecordingCaseData().getOtherPartyHearingRecordingReqUi().stream()
                     .map(OtherPartyHearingRecordingReqUi::getValue)
                     .forEach(opr -> processOtherPartyRequest(sscsCaseData, sscsHearingRecordingCaseData, hearingId, opr));

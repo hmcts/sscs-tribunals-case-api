@@ -75,6 +75,7 @@ public class CcdNotificationWrapper implements NotificationWrapper {
 
     @Override
     public List<SubscriptionWithType> getOtherPartySubscriptions(SscsCaseData newSscsCaseData, NotificationEventType notificationEventType) {
+        log.info("Get other party subscriptions for notification event type {}", notificationEventType);
         return emptyIfNull(newSscsCaseData.getOtherParties()).stream()
             .map(CcdValue::getValue)
             .flatMap(o -> filterOtherPartySubscription(newSscsCaseData, notificationEventType, o).stream())
@@ -112,6 +113,7 @@ public class CcdNotificationWrapper implements NotificationWrapper {
 
     @Override
     public List<SubscriptionWithType> getSubscriptionsBasedOnNotificationType() {
+        log.info("Get subscriptions based on notification event type {}", getNotificationType());
         List<SubscriptionWithType> subscriptionWithTypeList = new ArrayList<>();
 
         SscsCaseData newSscsCaseData = getNewSscsCaseData();
@@ -327,6 +329,7 @@ public class CcdNotificationWrapper implements NotificationWrapper {
     }
 
     private boolean isNotificationEventValidToSendToOtherPartySubscription(Subscription subscription, boolean isSendNewOtherPartyNotification, SscsCaseData newSscsCaseData, NotificationEventType notificationEventType, String partyMember) {
+        log.info("Running check for isNotificationEventValidToSendToOtherPartySubscription");
         boolean isValid = isValidSubscriptionOrIsMandatoryLetter(subscription, responseWrapper.getNotificationEventType())
             && (EVENTS_VALID_FOR_ALL_ENTITIES.contains(notificationEventType)
             || EVENTS_VALID_FOR_OTHER_PARTY.contains(notificationEventType)
