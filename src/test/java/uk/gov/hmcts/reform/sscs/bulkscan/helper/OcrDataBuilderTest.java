@@ -1,20 +1,22 @@
 package uk.gov.hmcts.reform.sscs.bulkscan.helper;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.sscs.bulkscan.helper.OcrDataBuilder.build;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.OcrDataField;
 
 public class OcrDataBuilderTest {
 
     @Test
-    public void givenValidationOcrData_thenConvertIntoKeyValuePairs() {
+    void givenValidationOcrData_thenConvertIntoKeyValuePairs() {
         Map<String, Object> valueMap = new HashMap<>();
 
         valueMap.put("name", "person1_first_name");
@@ -22,35 +24,44 @@ public class OcrDataBuilderTest {
 
         Map<String, Object> result = build(buildScannedValidationOcrData(valueMap));
 
-        assertEquals("Bob", result.get("person1_first_name"));
+        assertThat(result).containsEntry("person1_first_name", "Bob");
     }
 
-    @Test
-    public void givenValidationOcrDataWithNullValue_thenConvertIntoKeyValuePairs() {
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {"", "   "})
+    void givenValidationOcrDataWithBlankValue_thenConvertIntoKeyValuePairsWithNullValue(String value) {
         Map<String, Object> valueMap = new HashMap<>();
 
         valueMap.put("name", "person1_first_name");
-        valueMap.put("value", null);
+        valueMap.put("value", value);
 
         Map<String, Object> result = build(buildScannedValidationOcrData(valueMap));
 
-        assertNull(result.get("person1_first_name"));
+        assertThat(result.get("person1_first_name")).isNull();
     }
 
     @Test
-    public void givenValidationOcrDataWithEmptyStringValue_thenConvertIntoKeyValuePairsWithNullValue() {
+    void givenValidationOcrDataWithLeadingAndTrailingSpacesInValue_thenConvertIntoKeyValuePairsTrimmed() {
         Map<String, Object> valueMap = new HashMap<>();
 
         valueMap.put("name", "person1_first_name");
-        valueMap.put("value", "");
+        valueMap.put("value", "  Bob  ");
 
         Map<String, Object> result = build(buildScannedValidationOcrData(valueMap));
 
-        assertNull(result.get("person1_first_name"));
+        assertThat(result).containsEntry("person1_first_name", "Bob");
     }
 
     @Test
-    public void givenValidationOcrDataWithNullKeyAndNullValue_thenConvertIntoKeyValuePairs() {
+    void givenNullOcrData_thenReturnEmptyMap() {
+        Map<String, Object> result = build(null);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void givenValidationOcrDataWithNullKeyAndNullValue_thenConvertIntoKeyValuePairs() {
         Map<String, Object> valueMap = new HashMap<>();
 
         valueMap.put("name", null);
@@ -58,7 +69,7 @@ public class OcrDataBuilderTest {
 
         Map<String, Object> result = build(buildScannedValidationOcrData(valueMap));
 
-        assertEquals(0, result.size());
+        assertThat(result).isEmpty();
     }
 
     @SafeVarargs
