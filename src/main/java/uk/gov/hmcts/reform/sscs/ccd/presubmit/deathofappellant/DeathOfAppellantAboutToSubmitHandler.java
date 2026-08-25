@@ -96,9 +96,7 @@ public class DeathOfAppellantAboutToSubmitHandler implements PreSubmitCallbackHa
 
         Appointee appointeeAfter = caseDataAfter.getCaseData().getAppeal().getAppellant().getAppointee();
 
-        if (shouldSetInterlocReviewState(appointeeBefore, appointeeAfter)) {
-            preSubmitCallbackResponse.getData().setInterlocReviewState(AWAITING_ADMIN_ACTION);
-        }
+        preSubmitCallbackResponse.getData().setInterlocReviewState(AWAITING_ADMIN_ACTION);
 
         if ((appointeeBefore == null || "no".equalsIgnoreCase(caseDataBefore.getCaseData().getAppeal().getAppellant().getIsAppointee()) || null == caseDataBefore.getCaseData().getAppeal().getAppellant().getIsAppointee())
                 && appointeeAfter == null || "no".equalsIgnoreCase(caseDataAfter.getCaseData().getAppeal().getAppellant().getIsAppointee()) || null == caseDataAfter.getCaseData().getAppeal().getAppellant().getIsAppointee()) {
@@ -132,11 +130,6 @@ public class DeathOfAppellantAboutToSubmitHandler implements PreSubmitCallbackHa
             && SscsUtil.isValidCaseState(callback.getCaseDetailsBefore().map(CaseDetails::getState)
                 .orElse(State.UNKNOWN), List.of(State.HEARING, State.READY_TO_LIST))
             && SscsUtil.isSAndLCase(callback.getCaseDetails().getCaseData());
-
-    private boolean shouldSetInterlocReviewState(Appointee appointeeBefore, Appointee appointeeAfter) {
-
-        return !(null != appointeeBefore && null != appointeeAfter && appointeeBefore.equals(appointeeAfter));
-    }
 
     private boolean shouldKeepConfidentialCaseFlag(CaseDetails<SscsCaseData> caseData) {
 
