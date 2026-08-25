@@ -1,6 +1,14 @@
 package uk.gov.hmcts.reform.sscs.builder;
 
 import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
+import static org.junit.Assert.assertNull;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.ADDRESS_LINE_1;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.ADDRESS_LINE_2;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.ADDRESS_LINE_3;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.GOOGLE_MAP_URL;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.HEARING_DATETIME;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.POSTCODE;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.VENUE_NAME;
 import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.ADJOURNED_HEARING_CCD;
 import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.ADJOURNED_HEARING_MYA;
 import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.ADJOURNMENT_NOTICE_CCD;
@@ -27,12 +35,15 @@ import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.NOT_LIST
 import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.NOT_LISTABLE_MYA;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+
 
 public class TrackYourAppealJsonBuilderTest {
 
@@ -156,22 +167,47 @@ public class TrackYourAppealJsonBuilderTest {
     public void shouldReturnHmcHearingTypeInTheMyaResponseWithHearing() {
         SscsCaseData caseData = HMC_HEARING_TYPE_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
-            populateRegionalProcessingCenter(), 1L, true, "hearing");
+                populateRegionalProcessingCenter(), 1L, true, "hearing");
         assertJsonEquals(HMC_HEARING_TYPE_MYA.getSerializedMessage(), objectNode);
+    }
+
+    @Test
+    public void shouldNotThrowNpeAndOmitVenueFieldsWhenHearingVenueIsNull() {
+        SscsCaseData caseData = HEARING_CCD.getDeserializeMessage();
+
+        List<Hearing> hearings = caseData.getHearings();
+        Hearing hearing = hearings.getFirst();
+        Hearing hearingWithNullVenue = hearing.toBuilder()
+                .value(hearing.getValue().toBuilder().venue(null).build())
+                .build();
+        hearings.set(0, hearingWithNullVenue);
+
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
+                populateRegionalProcessingCenter(), 1L, true, "hearing");
+
+        ObjectNode eventNode = (ObjectNode) objectNode.get("appeal").get("latestEvents").get(0);
+
+        assertNull(eventNode.get(POSTCODE));
+        assertNull(eventNode.get(VENUE_NAME));
+        assertNull(eventNode.get(ADDRESS_LINE_1));
+        assertNull(eventNode.get(ADDRESS_LINE_2));
+        assertNull(eventNode.get(ADDRESS_LINE_3));
+        assertNull(eventNode.get(GOOGLE_MAP_URL));
+        assertNull(eventNode.get(HEARING_DATETIME));
     }
 
     private RegionalProcessingCenter populateRegionalProcessingCenter() {
         return RegionalProcessingCenter.builder()
-            .name("LIVERPOOL")
-            .address1("HM Courts & Tribunals Service")
-            .address2("Social Security & Child Support Appeals")
-            .address3("Prudential Buildings")
-            .address4("36 Dale Street")
-            .city("LIVERPOOL")
-            .postcode("L2 5UZ")
-            .phoneNumber("0300 123 1142")
-            .faxNumber("0870 324 0109")
-            .build();
+                .name("LIVERPOOL")
+                .address1("HM Courts & Tribunals Service")
+                .address2("Social Security & Child Support Appeals")
+                .address3("Prudential Buildings")
+                .address4("36 Dale Street")
+                .city("LIVERPOOL")
+                .postcode("L2 5UZ")
+                .phoneNumber("0300 123 1142")
+                .faxNumber("0870 324 0109")
+                .build();
     }
 
 }
