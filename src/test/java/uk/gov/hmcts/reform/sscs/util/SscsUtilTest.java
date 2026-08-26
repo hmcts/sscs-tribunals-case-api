@@ -984,6 +984,8 @@ class SscsUtilTest {
     @CsvSource({",","'',''","stringToMask, ***"})
     void testGetMaskedString(String stringToMask, String expected) {
         assertThat(SscsUtil.getMaskedValue(stringToMask)).isEqualTo(expected);
+    }
+
     @Test
     void givenNoAdjournment_clearAdjournmentFieldsDoesNotThrow() {
         caseData.setAdjournment(null);
