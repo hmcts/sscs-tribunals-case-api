@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -11,9 +12,13 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
 class AdjournCaseAboutToSubmitHandlerTest extends AdjournCaseAboutToSubmitHandlerTestBase {
 
@@ -41,6 +46,21 @@ class AdjournCaseAboutToSubmitHandlerTest extends AdjournCaseAboutToSubmitHandle
 
         verify(previewDocumentService, times(1)).writePreviewDocumentToSscsInternalDocument(
             sscsCaseData, DRAFT_ADJOURNMENT_NOTICE, null);
+    }
+
+    @DisplayName("Given a paper hearing, then clearAdjournmentFields is called to clear the interpreter fields")
+    @Test
+    void handleClearsAdjournmentFieldsBeforeSubmitting() {
+        sscsCaseData.setAdjournment(Adjournment.builder()
+            .typeOfNextHearing(AdjournCaseTypeOfHearing.PAPER)
+            .interpreterRequired(YesNo.YES)
+            .interpreterLanguage(new DynamicList("welsh"))
+            .build());
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getAdjournment().getInterpreterLanguage()).isNull();
+        assertThat(sscsCaseData.getAdjournment().getInterpreterRequired()).isEqualTo(YesNo.NO);
     }
 
 }
