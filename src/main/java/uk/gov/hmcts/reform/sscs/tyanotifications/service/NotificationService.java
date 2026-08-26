@@ -168,7 +168,9 @@ public class NotificationService {
                 sub.getPartyId(),
                 sub.getSubscriptionType(),
                 sub.getSubscription()))
-            .collect(Collectors.joining("\n", "\n", ""));
+            .collect(Collectors.collectingAndThen(
+                    Collectors.joining("\n", "\n", ""),
+                    result -> result.isBlank() ? "No subscriptions found" : result));
         log.info("Processing for the Notification Type {} and Case Id {} the following subscriptions: {}",
             notificationWrapper.getNotificationType(),
             notificationWrapper.getCaseId(),
