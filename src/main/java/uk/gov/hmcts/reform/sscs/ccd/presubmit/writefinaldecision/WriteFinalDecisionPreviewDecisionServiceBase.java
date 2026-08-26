@@ -336,4 +336,9 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
             sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGeneratedDate(LocalDate.now().toString());
         }
     }
+
+    @Override
+    protected void sanitizeData(SscsCaseData caseData, EventType eventType) {
+        //No data sanitization required.
+    }
 }
