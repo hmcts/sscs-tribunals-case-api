@@ -1,0 +1,80 @@
+{
+  "caseId": "1",
+  "caseReference": "SC333/33/33333",
+  "appeal": {
+    "appellant": {
+      "name": {
+        "title": "Mr.",
+        "lastName": "Charlie",
+        "firstName": "C"
+      }
+    },
+    "benefitType": {
+      "code": "PIP"
+    },
+    "hearingOptions": {
+      "wantsToAttend": "Yes"
+    }
+  },
+  "hearings": [
+    {
+      "id": "33cf0f87-5796-4958-b16c-5b13e7586bdd",
+      "value": {
+        "hearingId": "3000252004",
+        "hearingStatus": "CANCELLED",
+        "versionNumber": 1
+      }
+    },
+    {
+      "id": "56e87418-bdfa-4ffa-abd6-acf0779ac338",
+      "value": {
+        "time": "15:15:00",
+        "venue": {
+          "name": "Prudential House",
+          "address": {
+            "line1": "36 Dale Street",
+            "line2": "",
+            "town": "Liverpool",
+            "postcode": "L2 5UZ"
+          },
+          "googleMapLink": "https://www.google.com/maps/place/36+Dale+Street+Liverpool+Merseyside+L2+5UZ/@53.407820,-2.988509"
+        },
+        "venueId": "96",
+        "adjourned": "No",
+        "hearingId": "6158952",
+        "hearingDate": "2026-09-04"
+      }
+    }
+  ],
+  "events": [
+    {
+      "id": "cfa54d4c-4417-4bfb-91f9-5dd837ec30a1",
+      "value": {
+        "date": "2026-08-04T11:30:57.507",
+        "type": "hearingBooked",
+        "description": "Hearing booked"
+      }
+    },
+    {
+      "id": "e231943e-68af-4017-9552-1caae99b5c71",
+      "value": {
+        "date": "2026-07-01T16:23:38.310",
+        "type": "responseReceived",
+        "description": "Response received"
+      }
+    },
+    {
+      "id": "6bf39830-65d9-4a02-a48a-2e2933bb2611",
+      "value": {
+        "date": "2026-07-01T16:22:52.373",
+        "type": "appealReceived",
+        "description": "Appeal received"
+      }
+    }
+  ],
+  "subscriptions": {
+    "appellantSubscription": {
+      "tya": "abcde12345"
+    }
+  }
+}
