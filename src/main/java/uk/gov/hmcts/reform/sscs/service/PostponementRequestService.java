@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument.BY_DOCUMENT_DATE_ADDED_DESCENDING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
@@ -45,7 +46,9 @@ public class PostponementRequestService {
     }
 
     private void addToSscsDocuments(SscsCaseData sscsCaseData, SscsDocument sscsDocument) {
-        sscsCaseData.getSscsDocument().add(sscsDocument);
+        final List<SscsDocument> sscsDocuments = sscsCaseData.getSscsDocument();
+        sscsDocuments.add(sscsDocument);
+        sscsDocuments.sort(BY_DOCUMENT_DATE_ADDED_DESCENDING);
     }
 
     private void clearTransientFields(SscsCaseData sscsCaseData) {

@@ -208,17 +208,17 @@ public class BundleAudioVideoPdfServiceTest {
         service.createAudioVideoPdf(caseDetails.getCaseData());
 
         assertEquals(3, capture.getValue().getContent().size());
-        assertEquals("Video document", capture.getValue().getContent().get(0).getDocumentType());
-        assertEquals("Appellant", capture.getValue().getContent().get(0).getUploadParty());
+        assertEquals("Audio document", capture.getValue().getContent().get(0).getDocumentType());
+        assertEquals("Representative", capture.getValue().getContent().get(0).getUploadParty());
         assertEquals(nowFormatted, capture.getValue().getContent().get(0).getDateApproved());
-        assertEquals(yesterdayFormatted, capture.getValue().getContent().get(0).getDateAdded());
-        assertEquals("Myfilename1.mp4|gateway-link/123/binary", capture.getValue().getContent().get(0).getDocumentUrl());
+        assertEquals(nowFormatted, capture.getValue().getContent().get(0).getDateAdded());
+        assertEquals("Myfilename4.mp3|gateway-link/789/binary", capture.getValue().getContent().get(0).getDocumentUrl());
 
-        assertEquals("Audio document", capture.getValue().getContent().get(1).getDocumentType());
-        assertEquals("Representative", capture.getValue().getContent().get(1).getUploadParty());
+        assertEquals("Video document", capture.getValue().getContent().get(1).getDocumentType());
+        assertEquals("Appellant", capture.getValue().getContent().get(1).getUploadParty());
         assertEquals(nowFormatted, capture.getValue().getContent().get(1).getDateApproved());
-        assertEquals(nowFormatted, capture.getValue().getContent().get(1).getDateAdded());
-        assertEquals("Myfilename4.mp3|gateway-link/789/binary", capture.getValue().getContent().get(1).getDocumentUrl());
+        assertEquals(yesterdayFormatted, capture.getValue().getContent().get(1).getDateAdded());
+        assertEquals("Myfilename1.mp4|gateway-link/123/binary", capture.getValue().getContent().get(1).getDocumentUrl());
 
         assertEquals("Audio document", capture.getValue().getContent().get(2).getDocumentType());
         assertEquals("DWP", capture.getValue().getContent().get(2).getUploadParty());

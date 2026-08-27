@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,6 +35,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 
 @RunWith(JUnitParamsRunner.class)
@@ -97,6 +99,25 @@ public class PostponementRequestServiceTest {
             .extracting(SscsDocument::getValue)
             .extracting("documentType", "documentFileName", "originalPartySender")
             .containsExactly(tuple(DocumentType.POSTPONEMENT_REQUEST.getValue(), DOCUMENT_FILENAME, uploadParty.getLabel()));
+    }
+
+    @Test
+    public void testProcessPostponementRequestSortsNewDocumentAheadOfOlderExistingDocument() {
+        final SscsDocument olderExistingDoc = SscsDocument.builder().value(
+            SscsDocumentDetails.builder()
+                .documentFileName("old.pdf")
+                .documentDateAdded(LocalDate.now().minusDays(1).toString())
+                .build()).build();
+        caseData.setSscsDocument(new ArrayList<>(List.of(olderExistingDoc)));
+
+        final DynamicListItem value = new DynamicListItem(UploadParty.APPELLANT.getValue(), UploadParty.APPELLANT.getLabel());
+        caseData.setOriginalSender(new DynamicList(value, Collections.singletonList(value)));
+
+        postponementRequestService.processPostponementRequest(caseData, UploadParty.APPELLANT, Optional.of(UploadParty.APPELLANT));
+
+        assertThat(caseData.getSscsDocument())
+            .extracting(doc -> doc.getValue().getDocumentFileName())
+            .containsExactly(DOCUMENT_FILENAME, "old.pdf");
     }
 
     @DisplayName("When case has a hearing and no existing excluded dates addCurrentHearingToExcludeDates adds the "
