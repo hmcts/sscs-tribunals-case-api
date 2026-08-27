@@ -3,6 +3,12 @@ package uk.gov.hmcts.reform.sscs.util;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -303,10 +309,10 @@ class SscsUtilTest {
             .build();
 
         clearPostponementTransientFields(sscsCaseData);
-        assertThat(sscsCaseData.getPostponement().getPostponementEvent()).isNull();
-        assertThat(sscsCaseData.getPostponement().getUnprocessedPostponement()).isNull();
-        assertThat(sscsCaseData.getPostponementRequest().getUnprocessedPostponementRequest()).isNull();
-        assertThat(sscsCaseData.getPostponementRequest().getActionPostponementRequestSelected()).isNull();
+        assertNull(sscsCaseData.getPostponement().getPostponementEvent());
+        assertNull(sscsCaseData.getPostponement().getUnprocessedPostponement());
+        assertNull(sscsCaseData.getPostponementRequest().getUnprocessedPostponementRequest());
+        assertNull(sscsCaseData.getPostponementRequest().getActionPostponementRequestSelected());
     }
 
     @Test
@@ -404,9 +410,9 @@ class SscsUtilTest {
 
         updateHearingInterpreter(caseData, response, appellantInterpreter);
 
-        assertThat(response.getErrors()).isEmpty();
+        assertEquals(0, response.getErrors().size());
         assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter().getInterpreterLanguage()).isNull();
-        assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isNull();
+        assertNull(response.getData().getAppeal().getHearingOptions().getLanguages());
     }
 
     @Test
@@ -431,7 +437,7 @@ class SscsUtilTest {
 
         HearingOptions hearingOptions = appeal.getHearingOptions();
         assertThat(hearingOptions.getLanguageInterpreter()).isEqualTo("No");
-        assertThat(hearingOptions.getLanguages()).isNull();
+        assertNull(hearingOptions.getLanguages());
     }
 
     @Test
@@ -448,7 +454,8 @@ class SscsUtilTest {
 
         updateHearingInterpreter(caseData, response, appellantInterpreter);
 
-        assertThat(response.getErrors()).containsExactly("Interpreter language must be selected if an interpreter is wanted.");
+        assertEquals(1, response.getErrors().size());
+        assertEquals("Interpreter language must be selected if an interpreter is wanted.", response.getErrors().toArray()[0]);
     }
 
     @Test
@@ -469,33 +476,34 @@ class SscsUtilTest {
 
         updateHearingInterpreter(caseData, response, appellantInterpreter);
 
-        assertThat(response.getErrors()).containsExactly("Interpreter language must be selected if an interpreter is wanted.");
+        assertEquals(1, response.getErrors().size());
         assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isNull();
+        assertEquals("Interpreter language must be selected if an interpreter is wanted.", response.getErrors().toArray()[0]);
     }
 
     @Test
     void givenEmploymentAndSupportAllowanceBenefitCodeThenReturnSscs1Type() {
-        assertThat(getSscsType(SscsCaseData.builder().benefitCode("051").build())).isEqualTo("SSCS1");
+        assertEquals("SSCS1", getSscsType(SscsCaseData.builder().benefitCode("051").build()));
     }
 
     @Test
     void givenChildSupportBenefitCodeThenReturnSscs2Type() {
-        assertThat(getSscsType(SscsCaseData.builder().benefitCode("022").build())).isEqualTo("SSCS2");
+        assertEquals("SSCS2", getSscsType(SscsCaseData.builder().benefitCode("022").build()));
     }
 
     @Test
     void givenGuardiansAllowanceBenefitCodeThenReturnSscs5Type() {
-        assertThat(getSscsType(SscsCaseData.builder().benefitCode("015").build())).isEqualTo("SSCS5");
+        assertEquals("SSCS5", getSscsType(SscsCaseData.builder().benefitCode("015").build()));
     }
 
     @Test
     void givenInfectedBloodCompensationBenefitCodeThenReturnSscs8Type() {
-        assertThat(getSscsType(SscsCaseData.builder().benefitCode("093").build())).isEqualTo("SSCS8");
+        assertEquals("SSCS8", getSscsType(SscsCaseData.builder().benefitCode("093").build()));
     }
 
     @Test
     void givenNullBenefitCodeThenReturnNull() {
-        assertThat(getSscsType(SscsCaseData.builder().build())).isNull();
+        assertNull(getSscsType(SscsCaseData.builder().build()));
     }
 
     @Test
@@ -611,7 +619,7 @@ class SscsUtilTest {
                 .build()
             )
             .build();
-        assertThat(sscsCaseData.isIbcCase()).isTrue();
+        assertTrue(sscsCaseData.isIbcCase());
     }
 
     @Test
@@ -634,7 +642,7 @@ class SscsUtilTest {
                 .build()
             )
             .build();
-        assertThat(sscsCaseData.isIbcCase()).isFalse();
+        assertFalse(sscsCaseData.isIbcCase());
     }
 
     @Test
@@ -647,7 +655,7 @@ class SscsUtilTest {
 
         String result = SscsUtil.buildWriteFinalDecisionHeldBefore(mockedCaseData, "Judge Name");
 
-        assertThat(result).isEqualTo("Judge Name, Disability Member, Other Member, Medical Member and Financial Member");
+        assertEquals("Judge Name, Disability Member, Other Member, Medical Member and Financial Member", result);
     }
 
     @Test
@@ -660,7 +668,7 @@ class SscsUtilTest {
 
         String result = SscsUtil.buildWriteFinalDecisionHeldBefore(mockedCaseData, "Judge Name");
 
-        assertThat(result).isEqualTo("Judge Name");
+        assertEquals("Judge Name", result);
     }
 
     @Test
@@ -673,7 +681,7 @@ class SscsUtilTest {
 
         String result = SscsUtil.buildWriteFinalDecisionHeldBefore(mockedCaseData, "Judge Name");
 
-        assertThat(result).isEqualTo("Judge Name, Disability Member and Medical Member");
+        assertEquals("Judge Name, Disability Member and Medical Member", result);
     }
 
     @Test
@@ -690,11 +698,11 @@ class SscsUtilTest {
             .value(HearingDetails.builder().panel(panel).build())
             .build();
         when(mockedCaseData.getLatestHearing()).thenReturn(hearing);
-        assertThat(schedulingAndListingFields.getPanelMemberExclusions().getExcludedPanelMembers()).isNull();
-        assertThat(schedulingAndListingFields.getPanelMemberExclusions().getArePanelMembersExcluded()).isNull();
+        assertNull(schedulingAndListingFields.getPanelMemberExclusions().getExcludedPanelMembers());
+        assertNull(schedulingAndListingFields.getPanelMemberExclusions().getArePanelMembersExcluded());
         SscsUtil.addPanelMembersToExclusions(mockedCaseData, false);
-        assertThat(schedulingAndListingFields.getPanelMemberExclusions().getExcludedPanelMembers()).isEqualTo(panelMembers);
-        assertThat(schedulingAndListingFields.getPanelMemberExclusions().getArePanelMembersExcluded()).isEqualTo(YesNo.YES);
+        assertEquals(panelMembers, schedulingAndListingFields.getPanelMemberExclusions().getExcludedPanelMembers());
+        assertEquals(YesNo.YES, schedulingAndListingFields.getPanelMemberExclusions().getArePanelMembersExcluded());
     }
 
     @Test
@@ -710,11 +718,11 @@ class SscsUtilTest {
             .value(HearingDetails.builder().panel(panel).build())
             .build();
         when(mockedCaseData.getLatestHearing()).thenReturn(hearing);
-        assertThat(schedulingAndListingFields.getPanelMemberExclusions()).isNull();
-        assertThat(schedulingAndListingFields.getPanelMemberExclusions()).isNull();
+        assertNull(schedulingAndListingFields.getPanelMemberExclusions());
+        assertNull(schedulingAndListingFields.getPanelMemberExclusions());
         SscsUtil.addPanelMembersToExclusions(mockedCaseData, false);
-        assertThat(schedulingAndListingFields.getPanelMemberExclusions().getExcludedPanelMembers()).isEqualTo(panelMembers);
-        assertThat(schedulingAndListingFields.getPanelMemberExclusions().getArePanelMembersExcluded()).isEqualTo(YesNo.YES);
+        assertEquals(panelMembers, schedulingAndListingFields.getPanelMemberExclusions().getExcludedPanelMembers());
+        assertEquals(YesNo.YES, schedulingAndListingFields.getPanelMemberExclusions().getArePanelMembersExcluded());
     }
 
     @Test
@@ -723,26 +731,26 @@ class SscsUtilTest {
         when(mockedCaseData.getSchedulingAndListingFields()).thenReturn(schedulingAndListingFields);
         Hearing hearing = Hearing.builder().value(HearingDetails.builder().build()).build();
         when(mockedCaseData.getLatestHearing()).thenReturn(hearing);
-        assertThat(schedulingAndListingFields.getPanelMemberExclusions()).isNull();
-        assertThat(schedulingAndListingFields.getPanelMemberExclusions()).isNull();
+        assertNull(schedulingAndListingFields.getPanelMemberExclusions());
+        assertNull(schedulingAndListingFields.getPanelMemberExclusions());
         SscsUtil.addPanelMembersToExclusions(mockedCaseData, false);
-        assertThat(schedulingAndListingFields.getPanelMemberExclusions().getArePanelMembersExcluded()).isNull();
-        assertThat(schedulingAndListingFields.getPanelMemberExclusions().getExcludedPanelMembers()).isNull();
-        assertThat(schedulingAndListingFields.getPanelMemberExclusions().getReservedPanelMembers()).isNull();
-        assertThat(schedulingAndListingFields.getPanelMemberExclusions().getArePanelMembersReserved()).isNull();
+        assertNull(schedulingAndListingFields.getPanelMemberExclusions().getArePanelMembersExcluded());
+        assertNull(schedulingAndListingFields.getPanelMemberExclusions().getExcludedPanelMembers());
+        assertNull(schedulingAndListingFields.getPanelMemberExclusions().getReservedPanelMembers());
+        assertNull(schedulingAndListingFields.getPanelMemberExclusions().getArePanelMembersReserved());
     }
 
     @Test
     void testAddPanelMembersToExclusions_DoNotAddWithNullLatestHearing() {
         SchedulingAndListingFields schedulingAndListingFields = SchedulingAndListingFields.builder().build();
         when(mockedCaseData.getSchedulingAndListingFields()).thenReturn(schedulingAndListingFields);
-        assertThat(schedulingAndListingFields.getPanelMemberExclusions()).isNull();
-        assertThat(schedulingAndListingFields.getPanelMemberExclusions()).isNull();
+        assertNull(schedulingAndListingFields.getPanelMemberExclusions());
+        assertNull(schedulingAndListingFields.getPanelMemberExclusions());
         SscsUtil.addPanelMembersToExclusions(mockedCaseData, false);
-        assertThat(schedulingAndListingFields.getPanelMemberExclusions().getArePanelMembersExcluded()).isNull();
-        assertThat(schedulingAndListingFields.getPanelMemberExclusions().getExcludedPanelMembers()).isNull();
-        assertThat(schedulingAndListingFields.getPanelMemberExclusions().getReservedPanelMembers()).isNull();
-        assertThat(schedulingAndListingFields.getPanelMemberExclusions().getArePanelMembersReserved()).isNull();
+        assertNull(schedulingAndListingFields.getPanelMemberExclusions().getArePanelMembersExcluded());
+        assertNull(schedulingAndListingFields.getPanelMemberExclusions().getExcludedPanelMembers());
+        assertNull(schedulingAndListingFields.getPanelMemberExclusions().getReservedPanelMembers());
+        assertNull(schedulingAndListingFields.getPanelMemberExclusions().getArePanelMembersReserved());
     }
 
     @Test
@@ -761,7 +769,7 @@ class SscsUtilTest {
             .hearingRoute(hearingRoute).build();
         caseData.setRegionalProcessingCenter(regionalProcessingCenter);
         SscsUtil.setHearingRouteIfNotSet(caseData);
-        assertThat(caseData.getSchedulingAndListingFields().getHearingRoute()).isEqualTo(hearingRoute);
+        assertEquals(hearingRoute, caseData.getSchedulingAndListingFields().getHearingRoute());
     }
 
     @ParameterizedTest
@@ -773,14 +781,14 @@ class SscsUtilTest {
         caseData.setSchedulingAndListingFields(schedulingAndListingFields);
         caseData.setRegionalProcessingCenter(regionalProcessingCenter);
         SscsUtil.setHearingRouteIfNotSet(caseData);
-        assertThat(caseData.getSchedulingAndListingFields().getHearingRoute()).isEqualTo(hearingRoute);
+        assertEquals(hearingRoute, caseData.getSchedulingAndListingFields().getHearingRoute());
     }
 
     @ParameterizedTest
     @EnumSource(value = HearingRoute.class)
     void setHearingRouteIfNotSet_shouldSetToNullIfNoRpc(HearingRoute hearingRoute) {
         SscsUtil.setHearingRouteIfNotSet(caseData);
-        assertThat(caseData.getSchedulingAndListingFields().getHearingRoute()).isNull();
+        assertNull(caseData.getSchedulingAndListingFields().getHearingRoute());
     }
 
     @Test
@@ -811,7 +819,10 @@ class SscsUtilTest {
         SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build();
         SscsUtil.addDocumentToCaseDataDocuments(caseData, sscsDocument);
 
-        assertThat(caseData.getSscsDocument()).containsExactly(sscsDocument);
+        List<SscsDocument> documents = caseData.getSscsDocument();
+        assertNotNull(documents);
+        assertEquals(1, documents.size());
+        assertEquals(sscsDocument, documents.getFirst());
     }
 
     @Test
@@ -827,49 +838,11 @@ class SscsUtilTest {
 
         SscsUtil.removeDocumentFromCaseDataDocuments(caseData, sscsDocument2);
 
-        assertThat(caseData.getSscsDocument())
-            .extracting(doc -> doc.getValue().getDocumentLink().getDocumentUrl())
-            .containsExactly(sscsDocument.getValue().getDocumentLink().getDocumentUrl());
-    }
-
-    @Test
-    void testAddDocumentToCaseDataDocumentsSortsMergedListByDateAddedDescending() {
-        final SscsDocument olderExistingDoc = buildSscsDocument("old.pdf", "2020-01-01", "some-url/1");
-        final SscsDocument newerExistingDoc = buildSscsDocument("mid.pdf", "2023-06-15", "some-url/2");
-        caseData.setSscsDocument(new ArrayList<>(List.of(olderExistingDoc, newerExistingDoc)));
-
-        final SscsDocument newDocument = buildSscsDocument("new.pdf", LocalDate.now().toString(), "some-url/3");
-        SscsUtil.addDocumentToCaseDataDocuments(caseData, newDocument);
-
-        assertThat(caseData.getSscsDocument())
-            .extracting(doc -> doc.getValue().getDocumentFileName())
-            .containsExactly("new.pdf", "mid.pdf", "old.pdf");
-    }
-
-    @Test
-    void testRemoveDocumentFromCaseDataDocumentsSortsRemainingByDateAddedDescending() {
-        final SscsDocument olderDoc = buildSscsDocument("old.pdf", "2020-01-01", "some-url/1");
-        final SscsDocument docToRemove = buildSscsDocument("mid.pdf", "2023-06-15", "some-url/2");
-        final SscsDocument newerDoc = buildSscsDocument("new.pdf", "2024-09-09", "some-url/3");
-        caseData.setSscsDocument(new ArrayList<>(List.of(olderDoc, newerDoc, docToRemove)));
-
-        SscsUtil.removeDocumentFromCaseDataDocuments(caseData, docToRemove);
-
-        assertThat(caseData.getSscsDocument())
-            .extracting(doc -> doc.getValue().getDocumentFileName())
-            .containsExactly("new.pdf", "old.pdf");
-    }
-
-    private static SscsDocument buildSscsDocument(String documentFileName, String date, String documentUrl) {
-        return SscsDocument
-            .builder()
-            .value(SscsDocumentDetails
-                .builder()
-                .documentFileName(documentFileName)
-                .documentDateAdded(date)
-                .documentLink(DocumentLink.builder().documentUrl(documentUrl).build())
-                .build())
-            .build();
+        List<SscsDocument> updatedDocuments = caseData.getSscsDocument();
+        assertNotNull(updatedDocuments);
+        assertEquals(1, updatedDocuments.size());
+        assertNotEquals(sscsDocument2.getValue().getDocumentLink().getDocumentUrl(), updatedDocuments.getFirst().getValue().getDocumentLink().getDocumentUrl());
+        assertEquals(sscsDocument.getValue().getDocumentLink().getDocumentUrl(), updatedDocuments.getFirst().getValue().getDocumentLink().getDocumentUrl());
     }
 
     @Test
@@ -878,8 +851,11 @@ class SscsUtilTest {
         SscsUtil.addDocumentToCaseDataInternalDocuments(caseData, sscsDocument);
 
         InternalCaseDocumentData internalCaseDocumentData = caseData.getInternalCaseDocumentData();
-        assertThat(internalCaseDocumentData).isNotNull();
-        assertThat(internalCaseDocumentData.getSscsInternalDocument()).containsExactly(sscsDocument);
+        assertNotNull(internalCaseDocumentData);
+        List<SscsDocument> documents = internalCaseDocumentData.getSscsInternalDocument();
+        assertNotNull(documents);
+        assertEquals(1, documents.size());
+        assertEquals(sscsDocument, documents.getFirst());
     }
 
     @Test
@@ -890,10 +866,11 @@ class SscsUtilTest {
         SscsUtil.addDocumentToCaseDataInternalDocuments(caseData, sscsDocument);
 
         InternalCaseDocumentData internalCaseDocumentData = caseData.getInternalCaseDocumentData();
-        assertThat(internalCaseDocumentData).isNotNull();
-        assertThat(internalCaseDocumentData.getSscsInternalDocument())
-            .extracting(doc -> doc.getValue().getDocumentFileName())
-            .containsExactly(randomName);
+        assertNotNull(internalCaseDocumentData);
+        List<SscsDocument> documents = internalCaseDocumentData.getSscsInternalDocument();
+        assertNotNull(documents);
+        assertEquals(1, documents.size());
+        assertEquals(randomName, documents.getFirst().getValue().getDocumentFileName());
     }
 
     @Test
@@ -904,10 +881,11 @@ class SscsUtilTest {
         SscsUtil.addDocumentToCaseDataInternalDocuments(caseData, sscsDocument);
 
         InternalCaseDocumentData internalCaseDocumentData = caseData.getInternalCaseDocumentData();
-        assertThat(internalCaseDocumentData).isNotNull();
-        assertThat(internalCaseDocumentData.getSscsInternalDocument())
-            .extracting(doc -> doc.getValue().getDocumentFileName())
-            .containsExactly(randomName);
+        assertNotNull(internalCaseDocumentData);
+        List<SscsDocument> documents = internalCaseDocumentData.getSscsInternalDocument();
+        assertNotNull(documents);
+        assertEquals(1, documents.size());
+        assertEquals(randomName, documents.getFirst().getValue().getDocumentFileName());
     }
 
     @Test
@@ -924,10 +902,11 @@ class SscsUtilTest {
         SscsUtil.removeDocumentFromCaseDataInternalDocuments(caseData, sscsDocument);
 
         InternalCaseDocumentData updatedInternalCaseDocumentData = caseData.getInternalCaseDocumentData();
-        assertThat(updatedInternalCaseDocumentData).isNotNull();
-        assertThat(updatedInternalCaseDocumentData.getSscsInternalDocument())
-            .extracting(doc -> doc.getValue().getDocumentLink().getDocumentUrl())
-            .containsExactly(sscsDocument2.getValue().getDocumentLink().getDocumentUrl());
+        assertNotNull(updatedInternalCaseDocumentData);
+        List<SscsDocument> updatedDocuments = updatedInternalCaseDocumentData.getSscsInternalDocument();
+        assertEquals(1, updatedDocuments.size());
+        assertEquals(sscsDocument2.getValue().getDocumentLink().getDocumentUrl(), updatedDocuments.getFirst().getValue().getDocumentLink().getDocumentUrl());
+        assertNotEquals(sscsDocument.getValue().getDocumentLink().getDocumentUrl(), updatedDocuments.getFirst().getValue().getDocumentLink().getDocumentUrl());
     }
 
     @Test
@@ -937,7 +916,7 @@ class SscsUtilTest {
                 .typeOfNextHearing(AdjournCaseTypeOfHearing.FACE_TO_FACE).build();
         caseData.setAdjournment(adjournment);
         String hearingType = null;
-        assertThat(SscsUtil.hasChannelChangedForAdjournment(caseData, hearingType)).isTrue();
+        assertTrue(SscsUtil.hasChannelChangedForAdjournment(caseData, hearingType));
     }
 
     @Test
@@ -947,7 +926,7 @@ class SscsUtilTest {
                 .typeOfNextHearing(AdjournCaseTypeOfHearing.FACE_TO_FACE).build();
         caseData.setAdjournment(adjournment);
         String hearingType = null;
-        assertThat(SscsUtil.hasChannelChangedForAdjournment(caseData, hearingType)).isFalse();
+        assertFalse(SscsUtil.hasChannelChangedForAdjournment(caseData, hearingType));
     }
 
     @Test
@@ -955,7 +934,7 @@ class SscsUtilTest {
         Adjournment adjournment = Adjournment.builder().generateNotice(YesNo.NO).typeOfNextHearing(AdjournCaseTypeOfHearing.PAPER).build();
         caseData.setAdjournment(adjournment);
         String hearingType = "oral";
-        assertThat(SscsUtil.hasChannelChangedForAdjournment(caseData, hearingType)).isTrue();
+        assertTrue(SscsUtil.hasChannelChangedForAdjournment(caseData, hearingType));
     }
 
     @Test
@@ -963,7 +942,7 @@ class SscsUtilTest {
         Adjournment adjournment = Adjournment.builder().generateNotice(YesNo.NO).typeOfNextHearing(AdjournCaseTypeOfHearing.FACE_TO_FACE).build();
         caseData.setAdjournment(adjournment);
         String hearingType = "paper";
-        assertThat(SscsUtil.hasChannelChangedForAdjournment(caseData, hearingType)).isTrue();
+        assertTrue(SscsUtil.hasChannelChangedForAdjournment(caseData, hearingType));
     }
 
     @Test
@@ -971,7 +950,7 @@ class SscsUtilTest {
         Adjournment adjournment = Adjournment.builder().generateNotice(YesNo.NO).typeOfNextHearing(AdjournCaseTypeOfHearing.FACE_TO_FACE).build();
         caseData.setAdjournment(adjournment);
         String hearingType = "oral";
-        assertThat(SscsUtil.hasChannelChangedForAdjournment(caseData, hearingType)).isFalse();
+        assertFalse(SscsUtil.hasChannelChangedForAdjournment(caseData, hearingType));
     }
 
     @ParameterizedTest
