@@ -83,7 +83,7 @@ public class HearingReminder implements ReminderHandler {
         String jobGroup = jobGroupGenerator.generate(caseId, eventId);
         ZonedDateTime reminderDate = calculateReminderDate(ccdResponse, secondsBeforeHearing);
 
-        if (reminderDate != null) {
+        if (reminderDate != null && !reminderDate.isBefore(ZonedDateTime.now(ZoneId.of(AppConstants.ZONE_ID)))) {
             jobScheduler.schedule(new Job<>(
                 jobGroup,
                 eventId,
