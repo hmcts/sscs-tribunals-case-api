@@ -264,8 +264,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (nonNull(hearingOptions.getLanguages())) {
             overrideLanguageList = new DynamicList(languageList.getValue(), languageList.getListItems());
         }
+        final YesNo isInterpreterWanted = nonNull(languageInterpreter) ? YesNo.valueOf(languageInterpreter.toUpperCase()) : YesNo.NO;
         HearingInterpreter hearingInterpreter = HearingInterpreter.builder()
-                .isInterpreterWanted(YesNo.valueOf(languageInterpreter.toUpperCase()))
+                .isInterpreterWanted(isInterpreterWanted)
                 .interpreterLanguage(overrideLanguageList).build();
         overrideFields.setAppellantInterpreter(hearingInterpreter);
     }
@@ -367,6 +368,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (nonNull(hearingOptions) && !hearingOptions.wantsToAttendWithInterpreterSupport()) {
             hearingOptions.setLanguages(null);
             hearingOptions.setLanguagesList(null);
+            hearingOptions.setLanguageInterpreter(null);
         }
 
         if (hearingOptions != null

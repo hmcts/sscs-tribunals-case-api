@@ -1373,7 +1373,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
         "Yes,No,Yes",
         "Yes,Yes,No"
     })
-    void givenHearingOptionsDoesNotWantInterpreterSupport_thenLanguagesAndLanguagesListAreCleared(String wantsToAttend, String wantsSupport, String languageInterpreter) {
+    void givenHearingOptionsDoesNotWantInterpreterSupport_thenLanguagesAndLanguagesListAndLanguageInterpreterAreCleared(String wantsToAttend, String wantsSupport, String languageInterpreter) {
         final DynamicList languagesList = new DynamicList(new DynamicListItem("fr", "French"), Collections.emptyList());
         appeal.setHearingOptions(HearingOptions.builder()
                 .wantsToAttend(wantsToAttend)
@@ -1386,10 +1386,11 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         Assertions.assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isNull();
         Assertions.assertThat(response.getData().getAppeal().getHearingOptions().getLanguagesList()).isNull();
+        Assertions.assertThat(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter()).isNull();
     }
 
     @Test
-    void givenHearingOptionsWantsInterpreterSupport_thenLanguagesAndLanguagesListAreKept() {
+    void givenHearingOptionsWantsInterpreterSupport_thenLanguagesAndLanguagesListAndLanguageInterpreterAreKept() {
         final DynamicList languagesList = new DynamicList(new DynamicListItem("fr", "French"), Collections.emptyList());
         appeal.setHearingOptions(HearingOptions.builder()
                 .wantsToAttend("Yes")
@@ -1402,6 +1403,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
         Assertions.assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isEqualTo("French");
         Assertions.assertThat(response.getData().getAppeal().getHearingOptions().getLanguagesList()).isEqualTo(languagesList);
+        Assertions.assertThat(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo("Yes");
     }
 
     @Test
@@ -2031,13 +2033,14 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
     }
 
     @Test
-    void shouldNotUpdateOverrideInterpreterWhenInterpreterNotUpdated() {
+    void shouldSetOverrideInterpreterToNotWantedWhenLanguageInterpreterIsClearedByValidation() {
         sscsCaseDataBefore.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("No").build());
         sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("No").build());
         sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder().duration(60).build());
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter(), nullValue());
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter(),
+            is(HearingInterpreter.builder().isInterpreterWanted(NO).build()));
     }
 
     @Test
