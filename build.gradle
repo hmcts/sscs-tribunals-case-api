@@ -322,7 +322,7 @@ dependencyManagement {
 
 ext {
     set('activemq.version', '6.2.7')
-    set('netty.version', '4.2.16.Final')
+    set('netty.version', '4.2.17.Final')
     set('log4j2.version', '2.26.1')
     set('commons-lang3.version', '3.20.0')
     set('kotlin.version', '2.2.21')
@@ -444,7 +444,7 @@ dependencies {
     implementation group: 'org.apache.pdfbox', name: 'xmpbox', version: '3.0.7'
     implementation group: 'org.apache.tika', name: 'tika-core', version: '3.3.2'
     implementation group: 'org.apache.tika', name: 'tika-parsers', version: '3.3.2'
-    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '11.0.24'
+    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '11.0.25'
 
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
