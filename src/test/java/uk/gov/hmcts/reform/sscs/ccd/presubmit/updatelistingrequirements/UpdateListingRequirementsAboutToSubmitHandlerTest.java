@@ -395,7 +395,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
                 USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
-        assertThat(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo("No");
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter()).isNull();
         assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isNull();
         assertThat(response.getData().getAppeal().getHearingOptions().getLanguagesList()).isNull();
     }
