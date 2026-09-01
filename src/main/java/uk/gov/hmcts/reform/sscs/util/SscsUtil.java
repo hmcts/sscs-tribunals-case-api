@@ -114,10 +114,16 @@ public class SscsUtil {
     }
 
     public static boolean isSAndLCase(SscsCaseData sscsCaseData) {
-        return LIST_ASSIST == Optional.of(sscsCaseData)
-            .map(SscsCaseData::getSchedulingAndListingFields)
-            .map(SchedulingAndListingFields::getHearingRoute)
-            .orElse(null);
+        return
+            LIST_ASSIST == Optional.of(sscsCaseData)
+                .map(SscsCaseData::getSchedulingAndListingFields)
+                .map(SchedulingAndListingFields::getHearingRoute)
+                .orElse(null)
+            || LIST_ASSIST == Optional.of(sscsCaseData)
+                .map(SscsCaseData::getAppeal)
+                .map(Appeal::getHearingOptions)
+                .map(HearingOptions::getHearingRoute)
+                .orElse(null);
     }
 
     public static boolean isBenefitTypeChildSupportOrUc(SscsCaseData sscsCaseData) {
