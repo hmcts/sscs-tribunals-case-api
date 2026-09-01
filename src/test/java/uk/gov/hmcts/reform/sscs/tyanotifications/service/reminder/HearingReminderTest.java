@@ -12,14 +12,18 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 
 import com.google.common.collect.Lists;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.jobscheduler.model.Job;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobScheduler;
@@ -136,6 +140,49 @@ public class HearingReminderTest {
         assertEquals(HEARING_REMINDER.getId(), secondJob.name);
         assertEquals(SscsCaseDataUtils.CASE_ID, secondJob.payload);
         assertEquals(expectedSecondTriggerAt, secondJob.triggerAt);
+    }
+
+    @Test
+    public void schedulesReminder_usingStartDateOverHearingDateTime() {
+
+        final String expectedJobGroup = "ID_EVENT";
+        LocalDateTime start = LocalDateTime.now(ZoneId.of(AppConstants.ZONE_ID)).plusDays(10);
+        LocalDateTime hearingDateTime = start.minusHours(1);
+
+        final ZonedDateTime expectedFirstTriggerBasedOnStart = ZonedDateTime.ofLocal(
+                start.minusSeconds(BEFORE_FIRST_HEARING_REMINDER),
+            ZoneId.of(AppConstants.ZONE_ID),
+            null
+        );
+        final ZonedDateTime expectedSecondTriggerBasedOnStart  = ZonedDateTime.ofLocal(
+                start.minusSeconds(BEFORE_SECOND_HEARING_REMINDER),
+            ZoneId.of(AppConstants.ZONE_ID),
+            null
+        );
+
+        CcdNotificationWrapper wrapper = SscsCaseDataUtils.buildBasicCcdNotificationWrapper(HEARING_BOOKED);
+        List<Hearing> hearingList = List.of(Hearing.builder().value(HearingDetails.builder()
+                        .start(start)
+                        .hearingDate(hearingDateTime.toLocalDate().toString())
+                        .time(hearingDateTime.toLocalTime().toString())
+                .build()).build());
+        wrapper.getNewSscsCaseData().setHearings(hearingList);
+
+        when(jobGroupGenerator.generate(wrapper.getCaseId(), HEARING_REMINDER.getId())).thenReturn(expectedJobGroup);
+
+        hearingReminder.handle(wrapper);
+
+        ArgumentCaptor<Job> jobCaptor = ArgumentCaptor.forClass(Job.class);
+
+        verify(jobScheduler, times(2)).schedule(
+            jobCaptor.capture()
+        );
+
+        Job<String> firstJob = jobCaptor.getAllValues().getFirst();
+        assertEquals(expectedFirstTriggerBasedOnStart, firstJob.triggerAt);
+
+        Job<String> secondJob = jobCaptor.getAllValues().getLast();
+        assertEquals(expectedSecondTriggerBasedOnStart, secondJob.triggerAt);
     }
 
     @Test
