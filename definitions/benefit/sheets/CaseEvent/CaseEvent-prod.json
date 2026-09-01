@@ -5,7 +5,7 @@
     "ID": "adminActionCorrection",
     "Name": "Admin - action correction",
     "Description": "Admin - action correction",
-    "DisplayOrder": 138,
+    "DisplayOrder": 139,
     "PreConditionState(s)": "dormantAppealState;postHearing;withUT",
     "PostConditionState": "*",
     "EventEnablingCondition": "hearingRoute=\"listAssist\"",
@@ -17,18 +17,5 @@
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdSubmittedEvent",
     "SecurityClassification": "Public",
     "Publish": "${CCD_DEF_PUBLISH}"
-  },
-  {
-    "LiveFrom": "21/08/2026",
-    "CaseTypeID": "Benefit",
-    "ID": "adminAmendLocationDetails",
-    "Name": "Admin - Amend Location Details",
-    "DisplayOrder": 139,
-    "PreConditionState(s)": "*",
-    "PostConditionState": "*",
-    "CallBackURLAboutToStartEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToStart",
-    "ShowEventNotes": "Y",
-    "SecurityClassification": "Public",
-    "Publish": "N"
   }
 ]

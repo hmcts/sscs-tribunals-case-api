@@ -1,0 +1,46 @@
+[
+  {
+    "CaseEventID": "adminAmendLocationDetails",
+    "CaseFieldID": "locationDetailsDefault",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "21/08/2026",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "PageLabel": "Admin - Amend Location Details"
+  },
+  {
+    "CaseEventID": "adminAmendLocationDetails",
+    "CaseFieldID": "locationDetailsRpc",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "21/08/2026",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseEventID": "adminAmendLocationDetails",
+    "CaseFieldID": "locationDetailsProcessingVenue",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "21/08/2026",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 3,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseEventID": "adminAmendLocationDetails",
+    "CaseFieldID": "locationDetailsHearingVenue",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "21/08/2026",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 4,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "Y"
+  }
+]
