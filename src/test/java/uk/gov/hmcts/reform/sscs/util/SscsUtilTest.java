@@ -24,6 +24,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.NOT_ATTENDING;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.TELEPHONE;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.clearAdjournmentFields;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.clearPostponementTransientFields;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.generateUniqueIbcaId;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getIssueFinalDecisionDocumentType;
@@ -34,12 +35,14 @@ import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getSscsType;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getWriteFinalDecisionDocumentType;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleIbcaCase;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isBenefitTypeChildSupportOrUc;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isSAndLCase;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.updateHearingChannel;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.updateHearingInterpreter;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,11 +50,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingVenue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
@@ -956,5 +961,165 @@ class SscsUtilTest {
     void givenBenefitType_isBenefitTypeChildSupportOrUcReturnsCorrectValue(String benefitCode, Boolean expectedValue) {
         SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefitCode).build()).build()).build();
         assertThat(isBenefitTypeChildSupportOrUc(sscsCaseData)).isEqualTo(expectedValue);
+    }
+
+    @ParameterizedTest
+    @MethodSource("createListAssistCaseData")
+    void givenHearingRouteIsListAssist_isSAndLCaseReturnsTrue(SscsCaseData sscsCaseData) {
+        assertThat(isSAndLCase(sscsCaseData)).isTrue();
+    }
+
+    private static Stream<SscsCaseData> createListAssistCaseData() {
+        return Stream.of(
+                SscsCaseData.builder()
+                .schedulingAndListingFields(SchedulingAndListingFields.builder().hearingRoute(LIST_ASSIST).build())
+                .appeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build())
+                .build(),
+                SscsCaseData.builder()
+                        .schedulingAndListingFields(SchedulingAndListingFields.builder().build())
+                        .appeal(Appeal.builder().hearingOptions(HearingOptions.builder().hearingRoute(LIST_ASSIST).build()).build())
+                        .build()
+                );
+    }
+
+    @ParameterizedTest
+    @MethodSource("createGapsOrNullCaseData")
+    void givenHearingRouteIsGapsOrNull_isSAndLCaseReturnsFalse(SscsCaseData sscsCaseData) {
+        assertThat(isSAndLCase(sscsCaseData)).isFalse();
+    }
+
+    private static Stream<SscsCaseData> createGapsOrNullCaseData() {
+        return Stream.of(
+                SscsCaseData.builder()
+                        .schedulingAndListingFields(SchedulingAndListingFields.builder().hearingRoute(GAPS).build())
+                        .appeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build())
+                        .build(),
+                SscsCaseData.builder()
+                        .schedulingAndListingFields(SchedulingAndListingFields.builder().build())
+                        .appeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build())
+                        .build(),
+                SscsCaseData.builder()
+                        .appeal(Appeal.builder().hearingOptions(HearingOptions.builder().hearingRoute(GAPS).build()).build())
+                        .build()
+        );
+    } 
+      
+    @Test
+    void givenNoAdjournment_clearAdjournmentFieldsDoesNotThrow() {
+        caseData.setAdjournment(null);
+
+        clearAdjournmentFields(caseData);
+
+        assertThat(caseData.getAdjournment().getNextHearingVenueSelected()).isNull();
+        assertThat(caseData.getAdjournment().getInterpreterLanguage()).isNull();
+    }
+
+    @Test
+    void givenFaceToFaceAtDifferentVenue_clearAdjournmentFieldsKeepsNextHearingVenueSelected() {
+        final DynamicList venueSelected = new DynamicList("someVenue");
+        final Adjournment adjournment = Adjournment.builder()
+                .typeOfNextHearing(AdjournCaseTypeOfHearing.FACE_TO_FACE)
+                .nextHearingVenue(AdjournCaseNextHearingVenue.SOMEWHERE_ELSE)
+                .nextHearingVenueSelected(venueSelected)
+                .build();
+        caseData.setAdjournment(adjournment);
+
+        clearAdjournmentFields(caseData);
+
+        assertThat(caseData.getAdjournment().getNextHearingVenueSelected()).isEqualTo(venueSelected);
+    }
+
+    @Test
+    void givenFaceToFaceAtSameVenue_clearAdjournmentFieldsNullsNextHearingVenueSelected() {
+        final Adjournment adjournment = Adjournment.builder()
+                .typeOfNextHearing(AdjournCaseTypeOfHearing.FACE_TO_FACE)
+                .nextHearingVenue(AdjournCaseNextHearingVenue.SAME_VENUE)
+                .nextHearingVenueSelected(new DynamicList("someVenue"))
+                .build();
+        caseData.setAdjournment(adjournment);
+
+        clearAdjournmentFields(caseData);
+
+        assertThat(caseData.getAdjournment().getNextHearingVenueSelected()).isNull();
+    }
+
+    @Test
+    void givenFaceToFaceWithNoNextHearingVenueYetSelected_clearAdjournmentFieldsNullsNextHearingVenueSelected() {
+        final Adjournment adjournment = Adjournment.builder()
+                .typeOfNextHearing(AdjournCaseTypeOfHearing.FACE_TO_FACE)
+                .nextHearingVenue(null)
+                .nextHearingVenueSelected(new DynamicList("someVenue"))
+                .build();
+        caseData.setAdjournment(adjournment);
+
+        clearAdjournmentFields(caseData);
+
+        assertThat(caseData.getAdjournment().getNextHearingVenueSelected()).isNull();
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = AdjournCaseTypeOfHearing.class, names = "FACE_TO_FACE", mode = EnumSource.Mode.EXCLUDE)
+    void givenTypeOfNextHearingIsNotFaceToFace_clearAdjournmentFieldsNullsNextHearingVenueSelected(AdjournCaseTypeOfHearing typeOfNextHearing) {
+        final Adjournment adjournment = Adjournment.builder()
+                .typeOfNextHearing(typeOfNextHearing)
+                .nextHearingVenue(AdjournCaseNextHearingVenue.SOMEWHERE_ELSE)
+                .nextHearingVenueSelected(new DynamicList("someVenue"))
+                .build();
+        caseData.setAdjournment(adjournment);
+
+        clearAdjournmentFields(caseData);
+
+        assertThat(caseData.getAdjournment().getNextHearingVenueSelected()).isNull();
+    }
+
+    @Test
+    void givenPaperHearing_clearAdjournmentFieldsClearsInterpreterFields() {
+        final Adjournment adjournment = Adjournment.builder()
+                .typeOfNextHearing(AdjournCaseTypeOfHearing.PAPER)
+                .interpreterRequired(YesNo.YES)
+                .interpreterLanguage(new DynamicList("welsh"))
+                .build();
+        caseData.setAdjournment(adjournment);
+
+        clearAdjournmentFields(caseData);
+
+        assertThat(caseData.getAdjournment().getInterpreterLanguage()).isNull();
+        assertThat(caseData.getAdjournment().getInterpreterRequired()).isEqualTo(YesNo.NO);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = AdjournCaseTypeOfHearing.class, names = "PAPER", mode = EnumSource.Mode.EXCLUDE)
+    void givenTypeOfNextHearingIsNotPaper_clearAdjournmentFieldsKeepsInterpreterFields(AdjournCaseTypeOfHearing typeOfNextHearing) {
+        final DynamicList interpreterLanguage = new DynamicList("welsh");
+        final Adjournment adjournment = Adjournment.builder()
+                .typeOfNextHearing(typeOfNextHearing)
+                .interpreterRequired(YesNo.YES)
+                .interpreterLanguage(interpreterLanguage)
+                .build();
+        caseData.setAdjournment(adjournment);
+
+        clearAdjournmentFields(caseData);
+
+        assertThat(caseData.getAdjournment().getInterpreterLanguage()).isEqualTo(interpreterLanguage);
+        assertThat(caseData.getAdjournment().getInterpreterRequired()).isEqualTo(YesNo.YES);
+    }
+
+    @Test
+    void givenTypeOfNextHearingIsNull_clearAdjournmentFieldsNullsVenueButKeepsInterpreterFields() {
+        final DynamicList interpreterLanguage = new DynamicList("welsh");
+        final Adjournment adjournment = Adjournment.builder()
+                .typeOfNextHearing(null)
+                .nextHearingVenue(AdjournCaseNextHearingVenue.SOMEWHERE_ELSE)
+                .nextHearingVenueSelected(new DynamicList("someVenue"))
+                .interpreterRequired(YesNo.YES)
+                .interpreterLanguage(interpreterLanguage)
+                .build();
+        caseData.setAdjournment(adjournment);
+
+        clearAdjournmentFields(caseData);
+
+        assertThat(caseData.getAdjournment().getNextHearingVenueSelected()).isNull();
+        assertThat(caseData.getAdjournment().getInterpreterLanguage()).isEqualTo(interpreterLanguage);
+        assertThat(caseData.getAdjournment().getInterpreterRequired()).isEqualTo(YesNo.YES);
     }
 }

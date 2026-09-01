@@ -35,8 +35,10 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingVenue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCasePanelMembersExcluded;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
@@ -112,10 +114,16 @@ public class SscsUtil {
     }
 
     public static boolean isSAndLCase(SscsCaseData sscsCaseData) {
-        return LIST_ASSIST == Optional.of(sscsCaseData)
-            .map(SscsCaseData::getSchedulingAndListingFields)
-            .map(SchedulingAndListingFields::getHearingRoute)
-            .orElse(null);
+        return
+            LIST_ASSIST == Optional.of(sscsCaseData)
+                .map(SscsCaseData::getSchedulingAndListingFields)
+                .map(SchedulingAndListingFields::getHearingRoute)
+                .orElse(null)
+            || LIST_ASSIST == Optional.of(sscsCaseData)
+                .map(SscsCaseData::getAppeal)
+                .map(Appeal::getHearingOptions)
+                .map(HearingOptions::getHearingRoute)
+                .orElse(null);
     }
 
     public static boolean isBenefitTypeChildSupportOrUc(SscsCaseData sscsCaseData) {
@@ -677,6 +685,21 @@ public class SscsUtil {
                 docGen.setPermissionToAppealBodyContent(null);
             }
             case null, default -> {
+            }
+        }
+    }
+
+    public static void clearAdjournmentFields(SscsCaseData caseData) {
+        final Adjournment adjournment = caseData.getAdjournment();
+        if (nonNull(adjournment)) {
+            if (adjournment.getTypeOfNextHearing() != AdjournCaseTypeOfHearing.FACE_TO_FACE
+                || adjournment.getNextHearingVenue() != AdjournCaseNextHearingVenue.SOMEWHERE_ELSE) {
+                adjournment.setNextHearingVenueSelected(null);
+            }
+
+            if (adjournment.getTypeOfNextHearing() == AdjournCaseTypeOfHearing.PAPER) {
+                adjournment.setInterpreterLanguage(null);
+                adjournment.setInterpreterRequired(NO);
             }
         }
     }

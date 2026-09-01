@@ -27,8 +27,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Resources;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,7 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import org.apache.commons.codec.Charsets;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.Before;
 import org.junit.Test;
@@ -68,28 +69,52 @@ import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class SscsBulkScanExceptionRecordCallback extends BaseTest {
 
-    public static final String TRANSFORM_EXCEPTION_RECORD = "/transform-exception-record/";
-    public static final String TRANSFORM_SCANNED_DATA = "/transform-scanned-data/";
-    public static final String MRN_DATE_YESTERDAY_YYYY_MM_DD = LocalDate.now().minusDays(1).toString();
-    public static final String MRN_DATE_YESTERDAY_DD_MM_YYYY =
-        LocalDate.now().minusDays(1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-    public static final String COVENTRY_CMCB = "Coventry (CMCB)";
-    public static final String COVENTRY_CMCB_EPIMS_ID = "1234";
-    public static final String CHELMSFORD_EPIMS_ID = "555";
-    public static final String CHELMSFORD = "Chelmsford";
-    public static final String BASILDON_CC = "Basildon CC";
-    public static final String BASILDON_CC_EPIMS_ID = "1";
+    private static final String TRANSFORM_EXCEPTION_RECORD = "/transform-exception-record/";
+    private static final String TRANSFORM_SCANNED_DATA = "/transform-scanned-data/";
+    private static final String URL = "http://localhost:";
+    private static final String MRN_DATE_YESTERDAY_YYYY_MM_DD =
+        LocalDate.now(ZoneId.of("Europe/London")).minusDays(1).toString();
+    private static final String MRN_DATE_YESTERDAY_DD_MM_YYYY =
+        LocalDate.now(ZoneId.of("Europe/London")).minusDays(1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    private static final String COVENTRY_CMCB = "Coventry (CMCB)";
+    private static final String COVENTRY_CMCB_EPIMS_ID = "1234";
+    private static final String CHELMSFORD_EPIMS_ID = "555";
+    private static final String CHELMSFORD = "Chelmsford";
+    private static final String BASILDON_CC = "Basildon CC";
+    private static final String BASILDON_CC_EPIMS_ID = "1";
+    private static final String SSCS_1_PEU = "SSCS1PEU";
+    private static final String IS_HEARING_TYPE_ORAL = "is_hearing_type_oral";
+    private static final String IS_HEARING_TYPE_PAPER = "is_hearing_type_paper";
+    private static final String HEARING_OPTIONS_EXCLUDE_DATES = "hearing_options_exclude_dates";
+    private static final String MRN_DATE = "mrn_date";
+    private static final String OFFICE = "office";
+    private static final String CONTAINS_MRN = "contains_mrn";
+    private static final String PERSON_1_TITLE = "person1_title";
+    private static final String PERSON_1_FIRST_NAME = "person1_first_name";
+    private static final String HEARING_TYPE_TELEPHONE = "hearing_type_telephone";
+    private static final String HEARING_TYPE_VIDEO = "hearing_type_video";
+    private static final String HEARING_TYPE_FACE_TO_FACE = "hearing_type_face_to_face";
+    private static final String SCAN_OCR_DATA = "scanOCRData";
+    private static final String SCANNED_DOCUMENTS = "scannedDocuments";
+    private static final String PERSON_1_CHILD_MAINTENANCE_NUMBER = "person1_child_maintenance_number";
+    private static final String IS_PAYING_PARENT = "is_paying_parent";
+    private static final String HEARING_TELEPHONE_NUMBER = "hearing_telephone_number";
+    private static final String HEARING_VIDEO_EMAIL = "hearing_video_email";
+    private static final String CHILD_SUPPORT = "childSupport";
+    private static final String SSCS_2 = "SSCS2";
+    private static final String SSCS_1 = "SSCS1";
+    private static final String TEST_SERVICE = "test_service";
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     private static String loadJson(String fileName) throws IOException {
         URL url = getResource(fileName);
-        return Resources.toString(url, Charsets.toCharset("UTF-8"));
+        return Resources.toString(url, StandardCharsets.UTF_8);
     }
 
     @Before
     public void setup() {
-        baseUrl = "http://localhost:" + randomServerPort;
+        baseUrl = URL + randomServerPort;
     }
 
     //FIXME: delete after bulk scan auto case creation is switch on
@@ -99,10 +124,10 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         checkForLinkedCases();
         findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "ESA");
 
-        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
-            exceptionCaseData(caseDataWithMrnDate(MRN_DATE_YESTERDAY_DD_MM_YYYY, this::addAppellant, "SSCS1")),
+            exceptionCaseData(caseDataWithMrnDate(MRN_DATE_YESTERDAY_DD_MM_YYYY, this::addAppellant, SSCS_1)),
             httpHeaders());
 
         ResponseEntity<SuccessfulTransformationResponse> result =
@@ -115,7 +140,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     //FIXME: delete after bulk scan auto case creation is switch on
     @Test
     public void should_transform_incomplete_case_when_data_missing() throws Exception {
-        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
             exceptionCaseData(caseDataWithMissingAppellantDetails()),
@@ -136,10 +161,10 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         checkForLinkedCases();
         findCaseByForCaseworker("2017-01-01", "ESA");
 
-        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
-            exceptionCaseData(caseDataWithMrnDate("01/01/2017", this::addAppellant, "SSCS1")),
+            exceptionCaseData(caseDataWithMrnDate("01/01/2017", this::addAppellant, SSCS_1)),
             httpHeaders()
         );
 
@@ -155,7 +180,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     @Test
     public void should_return_error_list_populated_when_exception_record_transformation_fails() {
         // Given
-        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
             exceptionCaseData(caseDataWithContradictingValues()),
@@ -178,7 +203,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     @Test
     public void should_return_error_list_populated_when_key_value_pair_validation_fails() {
         // Given
-        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
             exceptionCaseData(caseDataWithInvalidKey()),
@@ -202,10 +227,10 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     public void should_not_create_duplicate_non_compliant_case_when_mrndate_nino_benefit_code_case_exists() throws Exception {
         // Given
         checkForLinkedCases();
-        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
-            exceptionCaseData(caseDataWithMrnDate("01/01/2017", this::addAppellant, "SSCS1")),
+            exceptionCaseData(caseDataWithMrnDate("01/01/2017", this::addAppellant, SSCS_1)),
             httpHeaders()
         );
 
@@ -227,7 +252,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     @Test
     public void should_return_warnings_when_tell_tribunal_about_dates_is_true_and_no_excluded_dates_provided() {
         // Given
-        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
             exceptionCaseData(caseDataWithNoExcludedHearingDates()),
@@ -255,7 +280,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         headers.set(USER_ID_HEADER, USER_ID);
 
         ExceptionRecord exceptionRecord =
-            (isAuto) ? autoExceptionCaseData(caseData(), "SSCS1PEU") : exceptionCaseData(caseData());
+            (isAuto) ? autoExceptionCaseData(caseData(), SSCS_1_PEU) : exceptionCaseData(caseData());
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(exceptionRecord, headers);
 
         // When
@@ -273,7 +298,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("forbidden_service");
 
         ExceptionRecord exceptionRecord =
-            (isAuto) ? autoExceptionCaseData(caseData(), "SSCS1PEU") : exceptionCaseData(caseData());
+            (isAuto) ? autoExceptionCaseData(caseData(), SSCS_1_PEU) : exceptionCaseData(caseData());
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(exceptionRecord, httpHeaders());
 
         // When
@@ -291,11 +316,11 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         checkForLinkedCases();
         findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "ESA");
 
-        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
-            autoExceptionCaseData(caseDataWithMrnDate(MRN_DATE_YESTERDAY_DD_MM_YYYY, this::addAppellant, "SSCS1PEU"),
-                "SSCS1PEU"),
+            autoExceptionCaseData(caseDataWithMrnDate(MRN_DATE_YESTERDAY_DD_MM_YYYY, this::addAppellant, SSCS_1_PEU),
+                SSCS_1_PEU),
             httpHeaders());
 
         ResponseEntity<SuccessfulTransformationResponse> result =
@@ -310,7 +335,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         checkForLinkedCases();
         findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "attendanceAllowance");
 
-        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
             autoExceptionCaseData(caseDataWithMrnDate(MRN_DATE_YESTERDAY_DD_MM_YYYY, this::addAppellant, "SSCS1U"),
@@ -330,14 +355,14 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         checkForLinkedCases();
         findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "ESA");
 
-        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
         when(venueService.getEpimsIdForVenue(COVENTRY_CMCB)).thenReturn(COVENTRY_CMCB_EPIMS_ID);
         when(refDataService.getCourtVenueRefDataByEpimsId(COVENTRY_CMCB_EPIMS_ID)).thenReturn(CourtVenue.builder().regionId(
             "1").courtStatus("Open").build());
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(autoExceptionCaseData(
-            caseDataWithMrnDate(MRN_DATE_YESTERDAY_DD_MM_YYYY, this::addAppellantAndAppointee, "SSCS1PEU"), "SSCS1PEU"),
+            caseDataWithMrnDate(MRN_DATE_YESTERDAY_DD_MM_YYYY, this::addAppellantAndAppointee, SSCS_1_PEU), SSCS_1_PEU),
             httpHeaders());
 
         ResponseEntity<SuccessfulTransformationResponse> result =
@@ -352,10 +377,10 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
 
     @Test
     public void auto_scan_should_not_transform_incomplete_case_when_data_missing() {
-        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
-            autoExceptionCaseData(caseDataWithMissingAppellantAndHearingSubTypeDetails(), "SSCS1PEU"),
+            autoExceptionCaseData(caseDataWithMissingAppellantAndHearingSubTypeDetails(), SSCS_1_PEU),
             httpHeaders()
         );
 
@@ -378,9 +403,30 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     }
 
     @Test
+    public void auto_scan_should_handle_callback_and_return_caseid_and_state_case_created_and_remove_spaces() throws Exception {
+        checkForLinkedCases();
+        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "ESA");
+
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
+
+        HttpEntity<ExceptionRecord> request = new HttpEntity<>(
+            autoExceptionCaseData(caseDataWithMrnDate(MRN_DATE_YESTERDAY_DD_MM_YYYY, this::addAppellant, SSCS_1_PEU),
+                SSCS_1_PEU),
+            httpHeaders());
+
+        updateOcrDataFieldValues(request.getBody().getOcrDataFields(), Map.of(HEARING_TYPE_VIDEO, "  Yes ", IS_HEARING_TYPE_PAPER, "  false  ", HEARING_VIDEO_EMAIL, "  my@email.com  "));
+
+        ResponseEntity<SuccessfulTransformationResponse> result =
+            this.restTemplate
+                .postForEntity(baseUrl + TRANSFORM_SCANNED_DATA, request, SuccessfulTransformationResponse.class);
+
+        verifyResultData(result, "mappings/exception/auto-valid-appeal-response.json", this::getAppellantTya);
+    }
+
+    @Test
     public void auto_scan_should_not_transform_case_when_tell_tribunal_about_dates_is_true_and_no_excluded_dates_provided() {
         // Given
-        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
             exceptionCaseData(caseDataWithNoExcludedHearingDates()),
@@ -403,16 +449,16 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     public void should_handle_sscs2_callback_and_return_caseid_and_state_case_created_in_exception_record_data()
         throws Exception {
         checkForLinkedCases();
-        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "childSupport");
+        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, CHILD_SUPPORT);
 
-        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
         when(venueService.getEpimsIdForVenue(CHELMSFORD)).thenReturn(CHELMSFORD_EPIMS_ID);
         when(refDataService.getCourtVenueRefDataByEpimsId(CHELMSFORD_EPIMS_ID)).thenReturn(CourtVenue.builder().regionId(
             "1").courtStatus("Open").build());
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
-            exceptionCaseData(caseDataWithMrnDate(MRN_DATE_YESTERDAY_DD_MM_YYYY, this::addAppellant, "SSCS2"), "SSCS2", false),
+            exceptionCaseData(caseDataWithMrnDate(MRN_DATE_YESTERDAY_DD_MM_YYYY, this::addAppellant, SSCS_2), SSCS_2, false),
             httpHeaders());
 
         ResponseEntity<SuccessfulTransformationResponse> result =
@@ -428,7 +474,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         checkForLinkedCases();
         findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "taxFreeChildcare");
 
-        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
         when(venueService.getEpimsIdForVenue(BASILDON_CC)).thenReturn(BASILDON_CC_EPIMS_ID);
         when(refDataService.getCourtVenueRefDataByEpimsId(BASILDON_CC_EPIMS_ID)).thenReturn(CourtVenue.builder().regionId("1").epimsId(
@@ -447,10 +493,10 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
 
     @Test
     public void should_return_error_list_populated_when_sscs2_key_value_pair_validation_fails() {
-        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
-            exceptionCaseData(caseDataWithInvalidKey(), "SSCS2", false),
+            exceptionCaseData(caseDataWithInvalidKey(), SSCS_2, false),
             httpHeaders()
         );
 
@@ -467,11 +513,11 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     @Test
     public void should_return_warning_list_populated_when_sscs2_missing_data_validation_fails() {
         checkForLinkedCases();
-        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "childSupport");
-        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, CHILD_SUPPORT);
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
-            exceptionCaseData(caseDataWithoutChildMaintenanceAndPartiallyMissingOtherPartyNameAddress(), "SSCS2", false),
+            exceptionCaseData(caseDataWithoutChildMaintenanceAndPartiallyMissingOtherPartyNameAddress(), SSCS_2, false),
             httpHeaders()
         );
 
@@ -491,11 +537,11 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     @Test
     public void should_return_warning_list_populated_when_sscs2_appellant_role_empty() {
         checkForLinkedCases();
-        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "childSupport");
-        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, CHILD_SUPPORT);
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
-            exceptionCaseData(caseDataWithoutAppellantRole(), "SSCS2", false),
+            exceptionCaseData(caseDataWithoutAppellantRole(), SSCS_2, false),
             httpHeaders()
         );
 
@@ -512,11 +558,11 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     @Test
     public void should_return_no_warning_when_sscs2_appellant_role_empty_ignore_warnings() {
         checkForLinkedCases();
-        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "childSupport");
-        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, CHILD_SUPPORT);
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
-            exceptionCaseData(caseDataWithoutAppellantRole(), "SSCS2", true),
+            exceptionCaseData(caseDataWithoutAppellantRole(), SSCS_2, true),
             httpHeaders()
         );
 
@@ -532,11 +578,11 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     @Test
     public void should_return_warning_list_populated_when_sscs2_appellant_role_invalid() {
         checkForLinkedCases();
-        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "childSupport");
-        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, CHILD_SUPPORT);
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
-            exceptionCaseData(caseDataWithInvalidAppellantRole(), "SSCS2", false),
+            exceptionCaseData(caseDataWithInvalidAppellantRole(), SSCS_2, false),
             httpHeaders()
         );
 
@@ -553,11 +599,11 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     @Test
     public void should_return_no_warning_sscs2_appellant_role_invalid_ignore_warning() {
         checkForLinkedCases();
-        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "childSupport");
-        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
+        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, CHILD_SUPPORT);
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
-            exceptionCaseData(caseDataWithInvalidAppellantRole(), "SSCS2", true),
+            exceptionCaseData(caseDataWithInvalidAppellantRole(), SSCS_2, true),
             httpHeaders()
         );
 
@@ -574,16 +620,16 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     //FIXME: update after bulk scan auto case creation is switch on
     private Object[] endPoints() {
         return new Object[] {
-            new Object[] {"http://localhost:" + randomServerPort + TRANSFORM_EXCEPTION_RECORD, false},
-            new Object[] {"http://localhost:" + randomServerPort + TRANSFORM_SCANNED_DATA, true}
+            new Object[] {URL + randomServerPort + TRANSFORM_EXCEPTION_RECORD, false},
+            new Object[] {URL + randomServerPort + TRANSFORM_SCANNED_DATA, true}
         };
     }
 
     private Map<String, Object> caseDataWithContradictingValues() {
         Map<String, Object> ocrList = new HashMap<>();
 
-        ocrList.put("is_hearing_type_oral", true);
-        ocrList.put("is_hearing_type_paper", true);
+        ocrList.put(IS_HEARING_TYPE_ORAL, true);
+        ocrList.put(IS_HEARING_TYPE_PAPER, true);
 
         return exceptionRecord(ocrList, null);
     }
@@ -592,7 +638,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         Map<String, Object> ocrList = new HashMap<>();
 
         ocrList.put("tell_tribunal_about_dates", true);
-        ocrList.put("hearing_options_exclude_dates", "");
+        ocrList.put(HEARING_OPTIONS_EXCLUDE_DATES, "");
 
         return exceptionRecord(ocrList, null);
     }
@@ -608,14 +654,14 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     private Map<String, Object> caseDataWithMissingAppellantDetails() {
         Map<String, Object> ocrList = new HashMap<>();
 
-        ocrList.put("mrn_date", "09/12/2018");
-        ocrList.put("office", "Balham DRT");
-        ocrList.put("contains_mrn", true);
+        ocrList.put(MRN_DATE, "09/12/2018");
+        ocrList.put(OFFICE, "Balham DRT");
+        ocrList.put(CONTAINS_MRN, true);
         ocrList.put("benefit_type_description", "ESA");
-        ocrList.put("person1_title", "Mr");
-        ocrList.put("person1_first_name", "John");
-        ocrList.put("is_hearing_type_oral", true);
-        ocrList.put("is_hearing_type_paper", false);
+        ocrList.put(PERSON_1_TITLE, "Mr");
+        ocrList.put(PERSON_1_FIRST_NAME, "John");
+        ocrList.put(IS_HEARING_TYPE_ORAL, true);
+        ocrList.put(IS_HEARING_TYPE_PAPER, false);
 
         return exceptionRecord(ocrList, null);
     }
@@ -623,17 +669,17 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     private Map<String, Object> caseDataWithMissingAppellantAndHearingSubTypeDetails() {
         Map<String, Object> ocrList = new HashMap<>();
 
-        ocrList.put("mrn_date", "09/12/2018");
-        ocrList.put("office", "Balham DRT");
-        ocrList.put("contains_mrn", true);
+        ocrList.put(MRN_DATE, "09/12/2018");
+        ocrList.put(OFFICE, "Balham DRT");
+        ocrList.put(CONTAINS_MRN, true);
         ocrList.put("is_benefit_type_esa", "true");
-        ocrList.put("person1_title", "Mr");
-        ocrList.put("person1_first_name", "John");
-        ocrList.put("is_hearing_type_oral", true);
-        ocrList.put("is_hearing_type_paper", false);
-        ocrList.put("hearing_type_telephone", "");
-        ocrList.put("hearing_type_video", "");
-        ocrList.put("hearing_type_face_to_face", "");
+        ocrList.put(PERSON_1_TITLE, "Mr");
+        ocrList.put(PERSON_1_FIRST_NAME, "John");
+        ocrList.put(IS_HEARING_TYPE_ORAL, true);
+        ocrList.put(IS_HEARING_TYPE_PAPER, false);
+        ocrList.put(HEARING_TYPE_TELEPHONE, "");
+        ocrList.put(HEARING_TYPE_VIDEO, "");
+        ocrList.put(HEARING_TYPE_FACE_TO_FACE, "");
 
 
         return exceptionRecord(ocrList, null);
@@ -641,19 +687,19 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
 
     private Map<String, Object> exceptionRecord(Map<String, Object> ocrList, List<InputScannedDoc> docList) {
         Map<String, Object> exceptionRecord = new HashMap<>();
-        exceptionRecord.put("scanOCRData", ocrList);
-        exceptionRecord.put("scannedDocuments", docList);
+        exceptionRecord.put(SCAN_OCR_DATA, ocrList);
+        exceptionRecord.put(SCANNED_DOCUMENTS, docList);
         return exceptionRecord;
     }
 
     //FIXME: delete after bulk scan auto case creation is switch on
     private ExceptionRecord exceptionCaseData(Map<String, Object> caseData) {
-        return exceptionCaseData(caseData, "SSCS1", false);
+        return exceptionCaseData(caseData, SSCS_1, false);
     }
 
     @SuppressWarnings("unchecked")
     private ExceptionRecord exceptionCaseData(Map<String, Object> caseData, String formType, boolean ignoreWarnings) {
-        Map<String, Object> scannedData = (HashMap<String, Object>) caseData.get("scanOCRData");
+        Map<String, Object> scannedData = (HashMap<String, Object>) caseData.get(SCAN_OCR_DATA);
         List<OcrDataField> scanOcrData = getOcrDataFields(scannedData);
 
         return ExceptionRecord.builder()
@@ -663,7 +709,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
             .formType(formType)
             .journeyClassification(NEW_APPLICATION)
             .ignoreWarnings(ignoreWarnings)
-            .scannedDocuments((List<InputScannedDoc>) caseData.get("scannedDocuments"))
+            .scannedDocuments((List<InputScannedDoc>) caseData.get(SCANNED_DOCUMENTS))
             .id("1234567890")
             .openingDate(LocalDateTime.parse("2018-01-11 12:00:00", formatter))
             .deliveryDate(LocalDateTime.parse("2018-01-11 12:00:00", formatter))
@@ -675,7 +721,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
 
     @SuppressWarnings("unchecked")
     private ExceptionRecord autoExceptionCaseData(Map<String, Object> caseData, String formType) {
-        Map<String, Object> scannedData = (HashMap<String, Object>) caseData.get("scanOCRData");
+        Map<String, Object> scannedData = (HashMap<String, Object>) caseData.get(SCAN_OCR_DATA);
         List<OcrDataField> scanOcrData = getOcrDataFields(scannedData);
 
         return ExceptionRecord.builder()
@@ -684,7 +730,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
             .jurisdiction("SSCS")
             .formType(formType)
             .journeyClassification(NEW_APPLICATION)
-            .scannedDocuments((List<InputScannedDoc>) caseData.get("scannedDocuments"))
+            .scannedDocuments((List<InputScannedDoc>) caseData.get(SCANNED_DOCUMENTS))
             .id(null)
             .openingDate(LocalDateTime.parse("2018-01-11 12:00:00", formatter))
             .deliveryDate(LocalDateTime.parse("2018-01-11 12:00:00", formatter))
@@ -692,6 +738,15 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
             .isAutomatedProcess(true)
             .exceptionRecordId("1234567891011")
             .build();
+    }
+
+    private void updateOcrDataFieldValues(List<OcrDataField> ocrDataFields, Map<String, String> updates) {
+        for (int i = 0; i < ocrDataFields.size(); i++) {
+            OcrDataField field = ocrDataFields.get(i);
+            if (updates.containsKey(field.getName())) {
+                ocrDataFields.set(i, new OcrDataField(field.getName(), updates.get(field.getName())));
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -705,7 +760,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     }
 
     private Map<String, Object> caseData() {
-        return caseDataWithMrnDate("09/12/2018", this::addAppellant, "SSCS1PEU");
+        return caseDataWithMrnDate("09/12/2018", this::addAppellant, SSCS_1_PEU);
     }
 
     private Map<String, Object> caseDataWithMrnDate(String mrnDate, Consumer<Map<String, Object>> addPersonDetails,
@@ -728,13 +783,13 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
                 .fileName("11111.pdf")
                 .build());
 
-        ocrList.put("mrn_date", mrnDate);
+        ocrList.put(MRN_DATE, mrnDate);
         if (formType.toLowerCase().equals(FormType.SSCS1U.toString())) {
-            ocrList.put("office", "The Pension Service 11");
+            ocrList.put(OFFICE, "The Pension Service 11");
         } else if (!formType.toLowerCase().equals(SSCS2.toString()) && !formType.toLowerCase().equals(SSCS5.toString())) {
-            ocrList.put("office", "Balham DRT");
+            ocrList.put(OFFICE, "Balham DRT");
         }
-        ocrList.put("contains_mrn", true);
+        ocrList.put(CONTAINS_MRN, true);
 
         if (formType.toLowerCase().equals(FormType.SSCS1.toString())) {
             ocrList.put("benefit_type_description", "ESA");
@@ -748,28 +803,28 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         }
 
         if (formType.toLowerCase().equals(SSCS2.toString())) {
-            ocrList.put("person1_child_maintenance_number", "Test1234");
-            ocrList.put("is_paying_parent", "true");
+            ocrList.put(PERSON_1_CHILD_MAINTENANCE_NUMBER, "Test1234");
+            ocrList.put(IS_PAYING_PARENT, "true");
             addOtherParty(ocrList);
         }
 
 
-        ocrList.put("is_hearing_type_oral", true);
-        ocrList.put("is_hearing_type_paper", false);
-        ocrList.put("hearing_options_exclude_dates", "01/12/2030");
-        ocrList.put("hearing_type_telephone", "Yes");
-        ocrList.put("hearing_telephone_number", "01234567890");
-        ocrList.put("hearing_type_video", "Yes");
-        ocrList.put("hearing_video_email", "my@email.com");
-        ocrList.put("hearing_type_face_to_face", "No");
+        ocrList.put(IS_HEARING_TYPE_ORAL, true);
+        ocrList.put(IS_HEARING_TYPE_PAPER, false);
+        ocrList.put(HEARING_OPTIONS_EXCLUDE_DATES, "01/12/2030");
+        ocrList.put(HEARING_TYPE_TELEPHONE, "Yes");
+        ocrList.put(HEARING_TELEPHONE_NUMBER, "01234567890");
+        ocrList.put(HEARING_TYPE_VIDEO, "Yes");
+        ocrList.put(HEARING_VIDEO_EMAIL, "my@email.com");
+        ocrList.put(HEARING_TYPE_FACE_TO_FACE, "No");
 
         return exceptionRecord(ocrList, docList);
     }
 
     private void addAppellant(Map<String, Object> ocrList) {
-        ocrList.put("person1_title", "Mr");
-        ocrList.put("person1_first_name", "John");
-        ocrList.put("person1_last_name", "Smith");
+        ocrList.put(PERSON_1_TITLE, "Mr");
+        ocrList.put(PERSON_1_FIRST_NAME, "John ");
+        ocrList.put("person1_last_name", "Smith ");
         ocrList.put("person1_address_line1", "2 Drake Close");
         ocrList.put("person1_address_line2", "Hutton");
         ocrList.put("person1_address_line3", "Brentwood");
@@ -782,8 +837,8 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     }
 
     private void addAppellantAndAppointee(Map<String, Object> ocrList) {
-        ocrList.put("person1_title", "Mr");
-        ocrList.put("person1_first_name", "Tyrion");
+        ocrList.put(PERSON_1_TITLE, "Mr");
+        ocrList.put(PERSON_1_FIRST_NAME, "Tyrion");
         ocrList.put("person1_last_name", "Lannister");
         ocrList.put("person1_address_line1", "2 Casterly Rock");
         ocrList.put("person1_address_line2", "Benedictine");
@@ -821,24 +876,24 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     private Map<String, Object> caseDataWithoutChildMaintenanceAndPartiallyMissingOtherPartyNameAddress() {
 
         Map<String, Object> ocrList = new HashMap<>();
-        ocrList.put("person1_child_maintenance_number", "");
+        ocrList.put(PERSON_1_CHILD_MAINTENANCE_NUMBER, "");
         ocrList.put("other_party_title", "Mrs");
         ocrList.put("other_party_first_name", "Zoe");
         ocrList.put("is_other_party_address_known","true");
         ocrList.put("other_party_address_line1","299 Harrow");
         ocrList.put("other_party_address_line3","Hatch End");
         addAppellant(ocrList);
-        ocrList.put("mrn_date", MRN_DATE_YESTERDAY_DD_MM_YYYY);
-        ocrList.put("contains_mrn", true);
-        ocrList.put("is_hearing_type_oral", true);
-        ocrList.put("is_hearing_type_paper", false);
-        ocrList.put("hearing_options_exclude_dates", "01/12/2030");
-        ocrList.put("hearing_type_telephone", "Yes");
-        ocrList.put("hearing_telephone_number", "01234567890");
-        ocrList.put("hearing_type_video", "Yes");
-        ocrList.put("hearing_video_email", "my@email.com");
-        ocrList.put("hearing_type_face_to_face", "No");
-        ocrList.put("is_paying_parent", "true");
+        ocrList.put(MRN_DATE, MRN_DATE_YESTERDAY_DD_MM_YYYY);
+        ocrList.put(CONTAINS_MRN, true);
+        ocrList.put(IS_HEARING_TYPE_ORAL, true);
+        ocrList.put(IS_HEARING_TYPE_PAPER, false);
+        ocrList.put(HEARING_OPTIONS_EXCLUDE_DATES, "01/12/2030");
+        ocrList.put(HEARING_TYPE_TELEPHONE, "Yes");
+        ocrList.put(HEARING_TELEPHONE_NUMBER, "01234567890");
+        ocrList.put(HEARING_TYPE_VIDEO, "Yes");
+        ocrList.put(HEARING_VIDEO_EMAIL, "my@email.com");
+        ocrList.put(HEARING_TYPE_FACE_TO_FACE, "No");
+        ocrList.put(IS_PAYING_PARENT, "true");
 
         return exceptionRecord(ocrList, null);
     }
@@ -846,18 +901,18 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     private Map<String, Object> caseDataWithoutAppellantRole() {
 
         Map<String, Object> ocrList = new HashMap<>();
-        ocrList.put("person1_child_maintenance_number", "12334");
+        ocrList.put(PERSON_1_CHILD_MAINTENANCE_NUMBER, "12334");
         addAppellant(ocrList);
-        ocrList.put("mrn_date", MRN_DATE_YESTERDAY_DD_MM_YYYY);
-        ocrList.put("contains_mrn", true);
-        ocrList.put("is_hearing_type_oral", true);
-        ocrList.put("is_hearing_type_paper", false);
-        ocrList.put("hearing_options_exclude_dates", "01/12/2030");
-        ocrList.put("hearing_type_telephone", "Yes");
-        ocrList.put("hearing_telephone_number", "01234567890");
-        ocrList.put("hearing_type_video", "Yes");
-        ocrList.put("hearing_video_email", "my@email.com");
-        ocrList.put("hearing_type_face_to_face", "No");
+        ocrList.put(MRN_DATE, MRN_DATE_YESTERDAY_DD_MM_YYYY);
+        ocrList.put(CONTAINS_MRN, true);
+        ocrList.put(IS_HEARING_TYPE_ORAL, true);
+        ocrList.put(IS_HEARING_TYPE_PAPER, false);
+        ocrList.put(HEARING_OPTIONS_EXCLUDE_DATES, "01/12/2030");
+        ocrList.put(HEARING_TYPE_TELEPHONE, "Yes");
+        ocrList.put(HEARING_TELEPHONE_NUMBER, "01234567890");
+        ocrList.put(HEARING_TYPE_VIDEO, "Yes");
+        ocrList.put(HEARING_VIDEO_EMAIL, "my@email.com");
+        ocrList.put(HEARING_TYPE_FACE_TO_FACE, "No");
 
         return exceptionRecord(ocrList, null);
     }
@@ -865,19 +920,19 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     private Map<String, Object> caseDataWithInvalidAppellantRole() {
 
         Map<String, Object> ocrList = new HashMap<>();
-        ocrList.put("person1_child_maintenance_number", "123");
+        ocrList.put(PERSON_1_CHILD_MAINTENANCE_NUMBER, "123");
         addAppellant(ocrList);
-        ocrList.put("mrn_date", MRN_DATE_YESTERDAY_DD_MM_YYYY);
-        ocrList.put("contains_mrn", true);
-        ocrList.put("is_hearing_type_oral", true);
-        ocrList.put("is_hearing_type_paper", false);
-        ocrList.put("hearing_options_exclude_dates", "01/12/2030");
-        ocrList.put("hearing_type_telephone", "Yes");
-        ocrList.put("hearing_telephone_number", "01234567890");
-        ocrList.put("hearing_type_video", "Yes");
-        ocrList.put("hearing_video_email", "my@email.com");
-        ocrList.put("hearing_type_face_to_face", "No");
-        ocrList.put("is_paying_parent", "true");
+        ocrList.put(MRN_DATE, MRN_DATE_YESTERDAY_DD_MM_YYYY);
+        ocrList.put(CONTAINS_MRN, true);
+        ocrList.put(IS_HEARING_TYPE_ORAL, true);
+        ocrList.put(IS_HEARING_TYPE_PAPER, false);
+        ocrList.put(HEARING_OPTIONS_EXCLUDE_DATES, "01/12/2030");
+        ocrList.put(HEARING_TYPE_TELEPHONE, "Yes");
+        ocrList.put(HEARING_TELEPHONE_NUMBER, "01234567890");
+        ocrList.put(HEARING_TYPE_VIDEO, "Yes");
+        ocrList.put(HEARING_VIDEO_EMAIL, "my@email.com");
+        ocrList.put(HEARING_TYPE_FACE_TO_FACE, "No");
+        ocrList.put(IS_PAYING_PARENT, "true");
         ocrList.put("is_receiving_parent", "true");
         ocrList.put("is_another_party", "true");
 
@@ -925,12 +980,12 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     }
 
     private String getAppellantTya(SuccessfulTransformationResponse callbackResponse) {
-        return ((HashMap) ((HashMap) callbackResponse.getCaseCreationDetails().getCaseData().get("subscriptions"))
+        return ((HashMap<?, ?>) ((HashMap<?, ?>) callbackResponse.getCaseCreationDetails().getCaseData().get("subscriptions"))
             .get("appellantSubscription")).get("tya").toString();
     }
 
     private String getAppointeeTya(SuccessfulTransformationResponse callbackResponse) {
-        return ((HashMap) ((HashMap) callbackResponse.getCaseCreationDetails().getCaseData().get("subscriptions"))
+        return ((HashMap<?, ?>) ((HashMap<?, ?>) callbackResponse.getCaseCreationDetails().getCaseData().get("subscriptions"))
             .get("appointeeSubscription")).get("tya").toString();
     }
 
@@ -940,16 +995,5 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         headers.set(SERVICE_AUTHORIZATION_HEADER_KEY, SERVICE_AUTH_TOKEN);
         headers.set(USER_ID_HEADER, USER_ID);
         return headers;
-    }
-
-    private String getParamsMatchCaseUrl() {
-        Map<String, String> searchCriteria = new HashMap<>();
-        searchCriteria.put("case.appeal.appellant.identity.nino", "BB000000B");
-
-        return searchCriteria.entrySet().stream()
-            .map(p -> p.getKey() + "=" + p.getValue())
-            .reduce((p1, p2) -> p1 + "&" + p2)
-            .map(s -> "?" + s)
-            .orElse("");
     }
 }
