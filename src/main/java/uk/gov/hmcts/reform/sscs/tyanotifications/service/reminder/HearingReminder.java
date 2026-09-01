@@ -84,15 +84,17 @@ public class HearingReminder implements ReminderHandler {
         ZonedDateTime reminderDate = calculateReminderDate(ccdResponse, secondsBeforeHearing);
 
         if (reminderDate != null) {
-            jobScheduler.schedule(new Job<>(
-                jobGroup,
-                eventId,
-                caseId,
-                reminderDate
-            ));
-
-
-            LOG.info("Scheduled hearing reminder for case id: {} @ {}", caseId, reminderDate);
+            if (!reminderDate.isBefore(ZonedDateTime.now(ZoneId.of(AppConstants.ZONE_ID)))) {
+                jobScheduler.schedule(new Job<>(
+                        jobGroup,
+                        eventId,
+                        caseId,
+                        reminderDate
+                ));
+                LOG.info("Scheduled hearing reminder for case id: {} @ {}", caseId, reminderDate);
+            } else {
+                LOG.info("Could not schedule hearing reminder for case id: {} @ {}", caseId, reminderDate);
+            }
         } else {
             LOG.info("Could not find reminder date for case id {}", ccdResponse.getCcdCaseId());
         }
