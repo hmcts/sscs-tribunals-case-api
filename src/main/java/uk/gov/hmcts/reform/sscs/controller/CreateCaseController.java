@@ -5,6 +5,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.ResponseEntity.created;
 import static uk.gov.hmcts.reform.sscs.controller.SyaController.logBadRequest;
+import static uk.gov.hmcts.reform.sscs.utility.StringUtils.getMaskedNino;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -175,7 +176,7 @@ public class CreateCaseController {
         }
         syaCaseWrapper.getAppellant().setNino(getRandomNino());
         syaCaseWrapper.getMrn().setDate(getRandomMrnDate());
-        log.info("Appeal with Nino - {} and benefit type {} received", syaCaseWrapper.getAppellant().getNino(),
+        log.info("Appeal with (test) Nino - {} and benefit type {} received", getMaskedNino(syaCaseWrapper.getAppellant().getNino()),
             syaCaseWrapper.getBenefitType().getCode());
         Long caseId = submitAppealServiceBase.submitAppeal(syaCaseWrapper, authorisation);
 

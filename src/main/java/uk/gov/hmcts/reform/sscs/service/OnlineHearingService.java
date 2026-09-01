@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.service;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Stream.of;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedEmail;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -107,13 +108,13 @@ public class OnlineHearingService {
         Map<UserType, Subscription> jointPartySubscriptions = getJointPartySubscriptionMap(sscsCaseDetails);
         boolean isSignInSubscription = isSignInSubscription(appellantSubscriptions.values(), tya, email);
         if (isSignInSubscription) {
-            log.info("Populating user details for case id {} and email {} as APPELLANT", sscsCaseDetails.getId(), email);
+            log.info("Populating user details for case id {} and email {} as APPELLANT", sscsCaseDetails.getId(), getMaskedEmail(email));
             return populateUserDetails(UserType.APPELLANT, sscsCaseDetails.getData().getAppeal().getAppellant().getName(),
                     sscsCaseDetails.getData().getAppeal().getAppellant().getAddress(),
                     Optional.ofNullable(sscsCaseDetails.getData().getAppeal().getAppellant().getContact()),
                     appellantSubscriptions);
         } else if (sscsCaseDetails.getData().isThereAJointParty() && isSignInSubscription(jointPartySubscriptions.values(), tya, email)) {
-            log.info("Populating user details for case id {} and email {} as JOINT_PARTY", sscsCaseDetails.getId(), email);
+            log.info("Populating user details for case id {} and email {} as JOINT_PARTY", sscsCaseDetails.getId(), getMaskedEmail(email));
             return populateUserDetails(UserType.JOINT_PARTY, sscsCaseDetails.getData().getJointParty().getName(),
                     sscsCaseDetails.getData().getJointParty().getAddress(),
                     Optional.ofNullable(sscsCaseDetails.getData().getJointParty().getContact()),
@@ -123,7 +124,7 @@ public class OnlineHearingService {
             for (CcdValue<OtherParty> op : emptyIfNull(otherParties)) {
                 Map<UserType, Subscription> otherPartySubscriptions = getOtherPartySubscriptionMap(op);
                 if (isSignInSubscription(otherPartySubscriptions.values(), tya, email)) {
-                    log.info("Populating user details for case id {} and email {} as OTHER_PARTY", sscsCaseDetails.getId(), email);
+                    log.info("Populating user details for case id {} and email {} as OTHER_PARTY", sscsCaseDetails.getId(), getMaskedEmail(email));
                     return populateUserDetails(UserType.OTHER_PARTY, op.getValue().getName(),
                             op.getValue().getAddress(),
                             Optional.ofNullable(op.getValue().getContact()),

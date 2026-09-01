@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
 import static java.util.Arrays.asList;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
@@ -15,6 +16,8 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.getSubscription;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.isOkToSendNotification;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationValidService.isMandatoryLetterEventType;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedEmail;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPhone;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isBenefitTypeChildSupportOrUc;
 
 import java.time.ZonedDateTime;
@@ -167,7 +170,7 @@ public class NotificationService {
                 Optional.ofNullable(sub.getEntity()).map(Object::getClass).orElse(null),
                 sub.getPartyId(),
                 sub.getSubscriptionType(),
-                sub.getSubscription()))
+                getMaskedSubscription(sub.getSubscription())))
             .collect(Collectors.joining("\n", "\n", ""));
         log.info("Processing for the Notification Type {} and Case Id {} the following subscriptions: {}",
             notificationWrapper.getNotificationType(),
@@ -493,5 +496,22 @@ public class NotificationService {
     private boolean isDigitalCase(final NotificationWrapper notificationWrapper) {
         return READY_TO_LIST
             .equals(notificationWrapper.getSscsCaseDataWrapper().getNewSscsCaseData().getCreatedInGapsFrom());
+    }
+
+    private Subscription getMaskedSubscription(Subscription subscription) {
+        if (isNull(subscription)) {
+            return null;
+        }
+
+        return Subscription.builder()
+                .wantSmsNotifications(subscription.getWantSmsNotifications())
+                .tya(subscription.getTya())
+                .email(getMaskedEmail(subscription.getEmail()))
+                .mobile(getMaskedPhone(subscription.getMobile()))
+                .subscribeEmail(subscription.getSubscribeEmail())
+                .subscribeSms(subscription.getSubscribeSms())
+                .reason(subscription.getReason())
+                .lastLoggedIntoMya(subscription.getLastLoggedIntoMya())
+                .build();
     }
 }

@@ -4,6 +4,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.ResponseEntity.created;
 import static org.springframework.http.ResponseEntity.status;
+import static uk.gov.hmcts.reform.sscs.utility.StringUtils.getMaskedNino;
 
 import com.google.common.base.Preconditions;
 import io.swagger.v3.oas.annotations.Operation;
@@ -60,7 +61,7 @@ public class SyaController {
                 || syaCaseWrapper.getBenefitType() == null || syaCaseWrapper.getBenefitType().getCode() == null) {
             logBadRequest(syaCaseWrapper);
         }
-        log.info("Appeal with Nino - {} and benefit type {} received", syaCaseWrapper.getAppellant().getNino(),
+        log.info("Appeal with Nino - {} and benefit type {} received", getMaskedNino(syaCaseWrapper.getAppellant().getNino()),
             syaCaseWrapper.getBenefitType().getCode());
         Long caseId = submitAppealServiceBase.submitAppeal(syaCaseWrapper, authorisation);
 
@@ -83,7 +84,7 @@ public class SyaController {
             stringBuilder.append(" Benefit description ").append(syaCaseWrapper.getBenefitType().getDescription());
         }
         if (syaCaseWrapper.getAppellant() != null && syaCaseWrapper.getAppellant().getNino() != null) {
-            stringBuilder.append(" Nino ").append(syaCaseWrapper.getAppellant().getNino());
+            stringBuilder.append(" Nino ").append(getMaskedNino(syaCaseWrapper.getAppellant().getNino()));
         }
         if (syaCaseWrapper.getCcdCaseId() != null) {
             stringBuilder.append(" CCD ID ").append(syaCaseWrapper.getCcdCaseId());

@@ -6,6 +6,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.function.Predicate.not;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
@@ -104,6 +105,7 @@ public class SscsUtil {
 
     public static final String CATEGORY_TYPE_TEMPLATE = "%s-%03d";
     public static final String CATEGORY_SUBTYPE_TEMPLATE = "%s%s";
+    public static final String MASKED_STRING_VALUE = "***";
 
     private SscsUtil() {
         //
@@ -794,6 +796,38 @@ public class SscsUtil {
 
             return sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode();
         }
+    }
+
+    public static String getMaskedEmail(String email) {
+        if (isEmpty(email)) {
+            return email;
+        }
+        int atIndex = email.indexOf('@');
+        if (atIndex < 0) {
+            return MASKED_STRING_VALUE;
+        }
+
+        int visibleLocalChars = Math.min(atIndex, 3);
+        int domainEnd = Math.min(email.length(), atIndex + 3);
+
+        return email.substring(0, visibleLocalChars)
+                + MASKED_STRING_VALUE
+                + email.substring(atIndex, domainEnd)
+                + MASKED_STRING_VALUE;
+    }
+
+    public static String getMaskedPhone(String stringToMask) {
+        return isEmpty(stringToMask) ? stringToMask : stringToMask.length() > 4
+                ? MASKED_STRING_VALUE + stringToMask.substring(stringToMask.length() - 4) : MASKED_STRING_VALUE;
+    }
+
+    public static String getMaskedPostcode(String postcode) {
+        return isEmpty(postcode) ? postcode : postcode.length() > 3
+                ? postcode.substring(0, 3) + MASKED_STRING_VALUE : MASKED_STRING_VALUE;
+    }
+
+    public static String getMaskedValue(String stringToMask) {
+        return isEmpty(stringToMask) ? stringToMask : MASKED_STRING_VALUE;
     }
 }
 
