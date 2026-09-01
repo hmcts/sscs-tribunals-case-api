@@ -47,7 +47,7 @@ public class PostponementRequestService {
 
     private void addToSscsDocuments(SscsCaseData sscsCaseData, SscsDocument sscsDocument) {
         final List<SscsDocument> sscsDocuments = sscsCaseData.getSscsDocument();
-        sscsDocuments.add(sscsDocument);
+        sscsDocuments.addFirst(sscsDocument);
         sscsDocuments.sort(BY_DOCUMENT_DATE_ADDED_DESCENDING);
     }
 

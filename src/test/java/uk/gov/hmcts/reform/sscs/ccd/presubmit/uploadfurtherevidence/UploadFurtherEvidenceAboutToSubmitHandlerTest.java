@@ -336,6 +336,26 @@ class UploadFurtherEvidenceAboutToSubmitHandlerTest {
                 .containsExactly("new.pdf", "mid.pdf", "old.pdf");
     }
 
+    @Test
+    void shouldMergeMultipleNewDraftUploadsAheadOfExistingSscsDocumentsPreservingUploadOrder() {
+        final SscsDocument existingDoc = SscsDocument.builder().value(SscsDocumentDetails.builder()
+                .documentFileName("existing.pdf")
+                .documentDateAdded("2020-01-01")
+                .build()).build();
+        sscsCaseData.setSscsDocument(new ArrayList<>(List.of(existingDoc)));
+
+        final ArrayList<DraftSscsDocument> draftSscsDocuments = new ArrayList<>();
+        draftSscsDocuments.addAll(getDraftSscsDocuments("", "new1.pdf"));
+        draftSscsDocuments.addAll(getDraftSscsDocuments("", "new2.pdf"));
+        sscsCaseData.setDraftFurtherEvidenceDocuments(draftSscsDocuments);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getSscsDocument())
+                .extracting(doc -> doc.getValue().getDocumentFileName())
+                .containsExactly("new1.pdf", "new2.pdf", "existing.pdf");
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"doc.mp4", "doc.mp3"})
     void shouldNotOnlyAllowAudioVisualFilesWhenInterlocReviewStateIsNotReviewByTcw(final String fileName) {
