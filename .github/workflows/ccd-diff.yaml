@@ -33,6 +33,9 @@ jobs:
   report:
     runs-on: ubuntu-latest
     needs: [buildBranch, buildMaster]
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - uses: actions/setup-node@v6
         with:
@@ -54,9 +57,20 @@ jobs:
       - name: Display
         run: |
           cat report.txt
+      # The run summary needs no token, so it works for every pull request
+      # including one from a fork. It is the report's reliable home; the comment
+      # below is a convenience on top of it.
+      - name: Publish report to the run summary
+        run: cat report.txt >> "$GITHUB_STEP_SUMMARY"
+      # A pull request from a fork is given a read-only GITHUB_TOKEN, and no
+      # `permissions:` block can raise it, so this step fails with "Resource not
+      # accessible by integration" and turns the run red for a change that may be
+      # perfectly good. Skipping it there costs nothing: the report is in the run
+      # summary above either way.
       - name: Add report
+        if: github.event.pull_request.head.repo.full_name == github.repository
         uses: thollander/actions-comment-pull-request@v3
         with:
           file-path: report.txt
           comment-tag: CCD_diff_report
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
