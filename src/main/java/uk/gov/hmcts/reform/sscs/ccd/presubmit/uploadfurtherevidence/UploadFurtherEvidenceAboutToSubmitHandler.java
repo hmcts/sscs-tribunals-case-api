@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadfurtherevidence;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.sort;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
@@ -167,7 +166,6 @@ public class UploadFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         if (!newAudioVideoEvidence.isEmpty()) {
             List<AudioVideoEvidence> audioVideoEvidence = new ArrayList<>(ofNullable(sscsCaseData.getAudioVideoEvidence()).orElse(emptyList()));
             audioVideoEvidence.addAll(newAudioVideoEvidence);
-            sort(newAudioVideoEvidence);
             sscsCaseData.setAudioVideoEvidence(audioVideoEvidence);
             sscsCaseData.setInterlocReferralReason(REVIEW_AUDIO_VIDEO_EVIDENCE);
         }
