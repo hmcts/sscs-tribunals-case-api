@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.callback.handlers;
 
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists.*;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
 
@@ -43,8 +42,7 @@ public class FilterNotificationsEventsHandler implements CallbackHandler {
             || (isPostHearingsEnabled && EVENTS_TO_HANDLE_POSTHEARINGS_A.contains(callback.getNotificationEventType()))
             || (isPostHearingsBEnabled && EVENTS_TO_HANDLE_POSTHEARINGS_B.contains(callback.getNotificationEventType()))
             || shouldActionPostponementBeNotified(callback)
-            || hasNewAppointeeAddedForAppellantDeceasedCase(callback)
-            || shouldHandleForHearingRoute(callback);
+            || hasNewAppointeeAddedForAppellantDeceasedCase(callback);
     }
 
     @Override
@@ -96,11 +94,6 @@ public class FilterNotificationsEventsHandler implements CallbackHandler {
 
         return ((appointeeBefore == null && appointeeAfter != null)
             || (appointeeBefore != null && appointeeAfter != null && !appointeeBefore.equals(appointeeAfter)));
-    }
-
-    private boolean shouldHandleForHearingRoute(NotificationSscsCaseDataWrapper callback) {
-        return HEARING_BOOKED == callback.getNotificationEventType()
-            && GAPS != callback.getNewSscsCaseData().getSchedulingAndListingFields().getHearingRoute();
     }
 
     @Override
