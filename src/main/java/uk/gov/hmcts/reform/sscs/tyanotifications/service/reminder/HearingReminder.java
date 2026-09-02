@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service.reminder;
 
+import static java.util.Objects.nonNull;
 import static org.slf4j.LoggerFactory.getLogger;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.HEARING_BOOKED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.HEARING_REMINDER;
@@ -84,15 +85,17 @@ public class HearingReminder implements ReminderHandler {
         ZonedDateTime reminderDate = calculateReminderDate(ccdResponse, secondsBeforeHearing);
 
         if (reminderDate != null) {
-            jobScheduler.schedule(new Job<>(
-                jobGroup,
-                eventId,
-                caseId,
-                reminderDate
-            ));
-
-
-            LOG.info("Scheduled hearing reminder for case id: {} @ {}", caseId, reminderDate);
+            if (!reminderDate.isBefore(ZonedDateTime.now(ZoneId.of(AppConstants.ZONE_ID)))) {
+                jobScheduler.schedule(new Job<>(
+                        jobGroup,
+                        eventId,
+                        caseId,
+                        reminderDate
+                ));
+                LOG.info("Scheduled hearing reminder for case id: {} @ {}", caseId, reminderDate);
+            } else {
+                LOG.info("Could not schedule hearing reminder for case id: {} @ {}", caseId, reminderDate);
+            }
         } else {
             LOG.info("Could not find reminder date for case id {}", ccdResponse.getCcdCaseId());
         }
@@ -102,8 +105,9 @@ public class HearingReminder implements ReminderHandler {
 
         if (!ccdResponse.getHearings().isEmpty()) {
             Hearing hearing = ccdResponse.getHearings().get(0);
-            LocalDateTime dateBefore = hearing.getValue().getHearingDateTime().minusSeconds(secondsBeforeHearing);
-            return ZonedDateTime.ofLocal(dateBefore, ZoneId.of(AppConstants.ZONE_ID), null);
+            LocalDateTime dateBefore = nonNull(hearing.getValue().getStart())
+                    ? hearing.getValue().getStart() : hearing.getValue().getHearingDateTime();
+            return ZonedDateTime.ofLocal(dateBefore, ZoneId.of(AppConstants.ZONE_ID), null).minusSeconds(secondsBeforeHearing);
         }
 
         return null;
