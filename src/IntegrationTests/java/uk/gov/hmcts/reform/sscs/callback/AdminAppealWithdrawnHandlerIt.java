@@ -41,10 +41,10 @@ public class AdminAppealWithdrawnHandlerIt extends AbstractEventIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
         assertEquals(4, result.getData().getSscsDocument().size());
-        assertEquals(WITHDRAWAL_REQUEST.getValue(), result.getData().getSscsDocument().get(3).getValue().getDocumentType());
+        assertEquals(WITHDRAWAL_REQUEST.getValue(), result.getData().getSscsDocument().getFirst().getValue().getDocumentType());
         assertEquals(WITHDRAWAL_RECEIVED, result.getData().getDwpState());
         assertEquals(1, result.getData().getAppealNotePad().getNotesCollection().size());
-        assertEquals("withdrawal note added", result.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());
+        assertEquals("withdrawal note added", result.getData().getAppealNotePad().getNotesCollection().getFirst().getValue().getNoteDetail());
     }
 
 

@@ -90,11 +90,11 @@ public class ProcessAudioVideoIt extends AbstractEventIt {
         assertEquals(InterlocReferralReason.NONE, caseData.getInterlocReferralReason());
         assertEquals(DIRECTION_ACTION_REQUIRED, caseData.getDwpState());
         assertEquals(2, caseData.getSscsDocument().size());
-        assertEquals("Addition A - Audio/Video evidence direction notice issued on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + ".pdf", caseData.getSscsDocument().get(1).getValue().getDocumentFileName());
-        assertEquals("A", caseData.getSscsDocument().get(1).getValue().getBundleAddition());
-        assertEquals("Addition B - Appellant - Statement for A/V file: evidence.mp3", caseData.getSscsDocument().get(0).getValue().getDocumentFileName());
-        assertEquals("evidence.mp3", caseData.getSscsDocument().get(0).getValue().getAvDocumentLink().getDocumentFilename());
-        assertEquals("B", caseData.getSscsDocument().get(0).getValue().getBundleAddition());
+        assertEquals("Addition A - Audio/Video evidence direction notice issued on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + ".pdf", caseData.getSscsDocument().getFirst().getValue().getDocumentFileName());
+        assertEquals("A", caseData.getSscsDocument().getFirst().getValue().getBundleAddition());
+        assertEquals("Addition B - Appellant - Statement for A/V file: evidence.mp3", caseData.getSscsDocument().get(1).getValue().getDocumentFileName());
+        assertEquals("evidence.mp3", caseData.getSscsDocument().get(1).getValue().getAvDocumentLink().getDocumentFilename());
+        assertEquals("B", caseData.getSscsDocument().get(1).getValue().getBundleAddition());
 
         assertNull(caseData.getAudioVideoEvidence());
     }
@@ -114,14 +114,14 @@ public class ProcessAudioVideoIt extends AbstractEventIt {
         assertEquals(InterlocReferralReason.NONE, caseData.getInterlocReferralReason());
         assertEquals(DIRECTION_ACTION_REQUIRED, caseData.getDwpState());
         assertEquals(2, caseData.getSscsDocument().size());
-        assertEquals("Addition A - Audio/Video evidence direction notice issued on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + ".pdf", caseData.getSscsDocument().get(1).getValue().getDocumentFileName());
-        assertEquals("A", caseData.getSscsDocument().get(1).getValue().getBundleAddition());
-        assertEquals("Addition B - DWP - RIP 1 document for A/V file: evidence.mp3", caseData.getSscsDocument().get(0).getValue().getDocumentFileName());
-        assertEquals("B", caseData.getSscsDocument().get(0).getValue().getBundleAddition());
-        assertEquals("dwp", caseData.getSscsDocument().get(0).getValue().getPartyUploaded().getValue());
-        assertEquals("evidence.mp3", caseData.getDwpDocuments().get(0).getValue().getDocumentFileName());
-        assertEquals("evidence.mp3", caseData.getDwpDocuments().get(0).getValue().getAvDocumentLink().getDocumentFilename());
-        assertEquals("dwp", caseData.getDwpDocuments().get(0).getValue().getPartyUploaded().getValue());
+        assertEquals("Addition A - Audio/Video evidence direction notice issued on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + ".pdf", caseData.getSscsDocument().getFirst().getValue().getDocumentFileName());
+        assertEquals("A", caseData.getSscsDocument().getFirst().getValue().getBundleAddition());
+        assertEquals("Addition B - DWP - RIP 1 document for A/V file: evidence.mp3", caseData.getSscsDocument().get(1).getValue().getDocumentFileName());
+        assertEquals("B", caseData.getSscsDocument().get(1).getValue().getBundleAddition());
+        assertEquals("dwp", caseData.getSscsDocument().get(1).getValue().getPartyUploaded().getValue());
+        assertEquals("evidence.mp3", caseData.getDwpDocuments().getFirst().getValue().getDocumentFileName());
+        assertEquals("evidence.mp3", caseData.getDwpDocuments().getFirst().getValue().getAvDocumentLink().getDocumentFilename());
+        assertEquals("dwp", caseData.getDwpDocuments().getFirst().getValue().getPartyUploaded().getValue());
 
         assertNull(caseData.getAudioVideoEvidence());
     }
