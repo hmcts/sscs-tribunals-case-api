@@ -75,7 +75,14 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
                 overrideFields.setDuration(hearingDurationsService.getHearingDurationBenefitIssueCodes(sscsCaseData));
             }
         }
-      
+
+        final HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
+        if (nonNull(hearingOptions) && !hearingOptions.wantsInterpreter()) {
+            hearingOptions.setLanguages(null);
+            hearingOptions.setLanguagesList(null);
+            hearingOptions.setLanguageInterpreter(null);
+        }
+
         sscsCaseData.getAppeal()
             .setHearingOptions(ofNullable(sscsCaseData.getAppeal().getHearingOptions())
                 .map(HearingOptions::toBuilder)

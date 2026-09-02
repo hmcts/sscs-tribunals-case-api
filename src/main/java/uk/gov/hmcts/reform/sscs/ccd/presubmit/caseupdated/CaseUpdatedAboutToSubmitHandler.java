@@ -264,8 +264,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (nonNull(hearingOptions.getLanguages())) {
             overrideLanguageList = new DynamicList(languageList.getValue(), languageList.getListItems());
         }
+        final YesNo isInterpreterWanted = nonNull(languageInterpreter) ? YesNo.valueOf(languageInterpreter.toUpperCase()) : YesNo.NO;
         HearingInterpreter hearingInterpreter = HearingInterpreter.builder()
-                .isInterpreterWanted(YesNo.valueOf(languageInterpreter.toUpperCase()))
+                .isInterpreterWanted(isInterpreterWanted)
                 .interpreterLanguage(overrideLanguageList).build();
         overrideFields.setAppellantInterpreter(hearingInterpreter);
     }
@@ -363,6 +364,13 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private void validateHearingOptions(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
+
+        if (nonNull(hearingOptions) && !hearingOptions.wantsToAttendWithInterpreterSupport()) {
+            hearingOptions.setLanguages(null);
+            hearingOptions.setLanguagesList(null);
+            hearingOptions.setLanguageInterpreter(null);
+        }
+
         if (hearingOptions != null
             && sscsCaseData.getAppeal().getHearingType() != null
             && HearingType.ORAL.getValue().equals(sscsCaseData.getAppeal().getHearingType())
@@ -376,6 +384,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                     validateHearingOptionsAndExcludeDates(hearingOptions.getExcludeDates())
             );
         }
+
     }
 
     private void updateHearingTypeForNonSscs1Case(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response, boolean hasSystemUserRole) {
