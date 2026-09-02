@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.personalisation;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.String.format;
+import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
@@ -24,6 +25,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.YES;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsDetailsMapping.getHearingType;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.CC_DATE_FORMAT;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DAYS_STRING;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DAYS_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DWP_ACRONYM;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DWP_ACRONYM_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DWP_FIRST_TIER_AGENCY_GROUP;
@@ -43,6 +45,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBCA
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBCA_FULL_NAME_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBC_ACRONYM;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBC_ACRONYM_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IN_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.JOINT_TEXT_WITH_A_SPACE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.JOINT_TEXT_WITH_A_SPACE_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.MAC_LITERAL;
@@ -54,6 +57,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.SSCS
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.THE_STRING;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.THE_STRING_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.TOMORROW_STRING;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.TOMORROW_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists.EVENTS_WITH_SUBSCRIPTION_TYPE_DOCMOSIS_TEMPLATES;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists.EVENTS_WITH_SUBSCRIPTION_TYPE_EMAIL_TEMPLATES;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.DISABLED_ACCESS;
@@ -70,6 +74,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMa
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPELLANT_CONFIDENTIALITY_REQUIRED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPELLANT_NAME;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPOINTEE_DESCRIPTION;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPOINTEE_DESCRIPTION_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPOINTEE_NAME;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.BENEFIT_FULL_NAME_LITERAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.BENEFIT_FULL_NAME_LITERAL_WELSH;
@@ -87,6 +92,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMa
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.CREATED_DATE_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.CURRENT_DATE_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.DAYS_TO_HEARING_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.DAYS_TO_HEARING_LITERAL_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.DECISION_DATE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.DECISION_POSTED_RECEIVE_DATE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.DECISION_POSTED_RECEIVE_DATE_WELSH;
@@ -107,6 +113,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMa
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HEARING_ARRANGEMENT_DETAILS_LITERAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HEARING_ARRANGEMENT_DETAILS_LITERAL_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HEARING_CONTACT_DATE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HEARING_DATE_FORMATTED_LITERAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HEARING_DATE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HEARING_DATE_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.HEARING_INFO_LINK_LITERAL;
@@ -181,7 +188,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -435,9 +441,12 @@ public class Personalisation<E extends NotificationWrapper> {
 
             if (nonNull(hearingDateTime) && nonNull(latestHearingValue.getVenue())) {
                 personalisation.put(HEARING_DATE_LITERAL, hearingDateTime.toLocalDate().toString());
+                personalisation.put(HEARING_DATE_FORMATTED_LITERAL,
+                    hearingDateTime.toLocalDate().format(ofPattern("dd-MM-yyyy")));
                 translateToWelshDate(hearingDateTime.toLocalDate(), ccdResponse, value -> personalisation.put(HEARING_DATE_WELSH, value));
                 personalisation.put(HEARING_TIME, formatLocalTime(hearingDateTime));
                 personalisation.put(DAYS_TO_HEARING_LITERAL, calculateDaysToHearingText(hearingDateTime.toLocalDate()));
+                personalisation.put(DAYS_TO_HEARING_LITERAL_WELSH, calculateDaysToHearingTextWelsh(hearingDateTime.toLocalDate()));
                 personalisation.put(VENUE_ADDRESS_LITERAL, formatAddress(latestHearing));
                 personalisation.put(VENUE_MAP_LINK_LITERAL, latestHearingValue.getVenue().getGoogleMapLink());
             }
@@ -460,6 +469,7 @@ public class Personalisation<E extends NotificationWrapper> {
         personalisation.put(ONLINE_HEARING_SIGN_IN_LINK_LITERAL, config.getOnlineHearingLink() + "/sign-in");
 
         personalisation.put(APPOINTEE_DESCRIPTION, getAppointeeDescription(subscriptionWithType.getSubscriptionType(), ccdResponse));
+        personalisation.put(APPOINTEE_DESCRIPTION_WELSH, getAppointeeDescriptionWelsh(subscriptionWithType.getSubscriptionType(), ccdResponse));
         personalisation.put(APPOINTEE_NAME, getName(APPOINTEE, ccdResponse, responseWrapper));
 
         personalisation.put(HEARING_TYPE, responseWrapper.getNewSscsCaseData().getAppeal().getHearingType());
@@ -492,7 +502,7 @@ public class Personalisation<E extends NotificationWrapper> {
             LocalDate finalDecisionDate = ccdResponse.getSscsFinalDecisionCaseData().getFinalDecisionIssuedDate();
 
             if (nonNull(finalDecisionDate)) {
-                String formattedDate = finalDecisionDate.format(DateTimeFormatter.ofPattern(FINAL_DECISION_DATE_FORMAT));
+                String formattedDate = finalDecisionDate.format(ofPattern(FINAL_DECISION_DATE_FORMAT));
                 personalisation.put(FINAL_DECISION_DATE, formattedDate);
             }
         }
@@ -718,6 +728,16 @@ public class Personalisation<E extends NotificationWrapper> {
         }
     }
 
+    private String getAppointeeDescriptionWelsh(SubscriptionType subscriptionType, SscsCaseData ccdResponse) {
+        if (APPOINTEE.equals(subscriptionType) && ccdResponse.getAppeal() != null
+            && ccdResponse.getAppeal().getAppellant().getName() != null) {
+            return format("Fe anfonir y diweddariad hwn atoch gan mai chi yw’r penodai ar gyfer %s.%s%s",
+                ccdResponse.getAppeal().getAppellant().getName().getFullNameNoTitle(), CRLF, CRLF);
+        } else {
+            return EMPTY;
+        }
+    }
+
     private void subscriptionDetails(Map<String, Object> personalisation, Subscription subscription, Benefit benefit, SscsCaseData sscsCaseData) {
         final String tya = tya(subscription);
         personalisation.put(APPEAL_ID_LITERAL, tya);
@@ -877,9 +897,19 @@ public class Personalisation<E extends NotificationWrapper> {
     }
 
     private String calculateDaysToHearingText(LocalDate hearingDate) {
-        long daysBetween = ChronoUnit.DAYS.between(LocalDate.now(), hearingDate);
+        long daysBetween = calculateDaysToHearing(hearingDate);
 
         return daysBetween == 1 ? TOMORROW_STRING : "in " + daysBetween + DAYS_STRING;
+    }
+
+    private String calculateDaysToHearingTextWelsh(LocalDate hearingDate) {
+        long daysBetween = calculateDaysToHearing(hearingDate);
+
+        return daysBetween == 1 ? TOMORROW_WELSH : IN_WELSH + daysBetween + DAYS_WELSH;
+    }
+
+    private long calculateDaysToHearing(LocalDate hearingDate) {
+        return ChronoUnit.DAYS.between(LocalDate.now(), hearingDate);
     }
 
     private String getMacToken(String id, String benefitType) {
@@ -887,11 +917,11 @@ public class Personalisation<E extends NotificationWrapper> {
     }
 
     private String formatLocalDate(LocalDate date) {
-        return date.format(DateTimeFormatter.ofPattern(RESPONSE_DATE_FORMAT));
+        return date.format(ofPattern(RESPONSE_DATE_FORMAT));
     }
 
     private String formatLocalTime(LocalDateTime date) {
-        return date.format(DateTimeFormatter.ofPattern(HEARING_TIME_FORMAT, Locale.ENGLISH)).toUpperCase();
+        return date.format(ofPattern(HEARING_TIME_FORMAT, Locale.ENGLISH)).toUpperCase();
     }
 
     public Template getTemplate(E notificationWrapper, Benefit benefit, SubscriptionType subscriptionType) {
