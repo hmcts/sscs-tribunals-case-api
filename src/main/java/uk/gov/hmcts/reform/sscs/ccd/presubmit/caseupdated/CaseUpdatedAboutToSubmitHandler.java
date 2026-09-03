@@ -151,6 +151,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
         final boolean hasSuperUserRole = userDetails.hasRole(SUPER_USER);
 
+        log.info("SSCS Court venue for epims : {}", refDataService.getCourtVenueRefDataByEpimsId("698118"));
+
         handleBenefitType(sscsCaseData);
         if (IBCA_BENEFIT_CODE.equals(sscsCaseData.getBenefitCode())) {
             handleIbcaCase(sscsCaseData);
