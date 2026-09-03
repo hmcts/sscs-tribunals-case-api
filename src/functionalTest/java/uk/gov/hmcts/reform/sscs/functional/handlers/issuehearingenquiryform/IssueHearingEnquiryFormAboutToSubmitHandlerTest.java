@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.functional.handlers.issuehearingenquiryform;
 
+import static java.time.ZoneId.systemDefault;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.HEF_ISSUED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
@@ -7,18 +8,16 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_
 import java.io.IOException;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.springframework.boot.test.context.SpringBootTest;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
 @SpringBootTest
-@EnabledIfEnvironmentVariable(named = "CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED", matches = "true")
 class IssueHearingEnquiryFormAboutToSubmitHandlerTest extends BaseHandler {
 
     private static final String BASE_CASE_DATA = "handlers/issuehearingenquiryform/issueHearingEnquiryFormCallback.json";
-    private static final String RESPONSE_DUE_DATE = LocalDate.now().plusDays(21).toString();
+    private static final String RESPONSE_DUE_DATE = LocalDate.now(systemDefault()).plusDays(21).toString();
 
     @Test
     void shouldHandleIssueHearingEnquiryFormAboutToSubmit() throws IOException {

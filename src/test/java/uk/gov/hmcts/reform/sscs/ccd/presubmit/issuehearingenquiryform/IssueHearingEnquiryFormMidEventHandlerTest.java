@@ -55,7 +55,7 @@ class IssueHearingEnquiryFormMidEventHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new IssueHearingEnquiryFormMidEventHandler(true);
+        handler = new IssueHearingEnquiryFormMidEventHandler();
         caseData = SscsCaseData.builder().build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -84,7 +84,7 @@ class IssueHearingEnquiryFormMidEventHandlerTest {
 
     @Test
     void shouldNotHandleWhenCmOtherPartyConfidentialityIsDisabled() {
-        final IssueHearingEnquiryFormMidEventHandler disabledHandler = new IssueHearingEnquiryFormMidEventHandler(false);
+        final IssueHearingEnquiryFormMidEventHandler disabledHandler = new IssueHearingEnquiryFormMidEventHandler();
 
         assertThat(disabledHandler.canHandle(ABOUT_TO_START, callback)).isFalse();
     }

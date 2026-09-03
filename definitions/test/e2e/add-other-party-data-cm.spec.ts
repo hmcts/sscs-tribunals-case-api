@@ -1,6 +1,6 @@
 import { test } from '../lib/steps.factory';
 import { createChildSupportCaseForCmConfidentiality, createUCCaseForConfidentiality} from '../api/client/sscs/factory/appeal.type.factory';
-import { credentials, featureFlags } from '../config/config';
+import { credentials } from '../config/config';
 
 const benefitTypes = [
   {
@@ -14,11 +14,6 @@ const benefitTypes = [
 ]
 
 test.describe('CM add other party data', () => {
-  test.skip(
-    !featureFlags.cmOtherPartyConfidentialityEnabled,
-    'CM confidentiality flag is disabled'
-  );
-
   for (const benefit of benefitTypes) {
     test(
       `Add other party data to a ${benefit.label} appeal in Await Other Party Data and moves it to Await Confidentiality Requirements`,

@@ -61,7 +61,7 @@ class IssueHearingEnquiryFormAboutToStartTest {
 
     @BeforeEach
     void setUp() {
-        handler = new IssueHearingEnquiryFormAboutToStart(true);
+        handler = new IssueHearingEnquiryFormAboutToStart();
         caseData = SscsCaseData.builder().build();
 
         lenient().when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -109,13 +109,6 @@ class IssueHearingEnquiryFormAboutToStartTest {
         assertThat(response.getData().getOtherPartySelection()).isNull();
         assertThat(response.getData().getDocumentSelection()).hasSize(1);
         assertThat(response.getData().getDocumentSelection().getFirst().getValue().getDocumentsList().getListItems()).isEmpty();
-    }
-
-    @Test
-    void shouldNotHandleWhenCmOtherPartyConfidentialityIsDisabled() {
-        final IssueHearingEnquiryFormAboutToStart disabledHandler = new IssueHearingEnquiryFormAboutToStart(false);
-
-        assertThat(disabledHandler.canHandle(ABOUT_TO_START, callback)).isFalse();
     }
 
     @Test

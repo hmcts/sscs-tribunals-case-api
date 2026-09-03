@@ -9,10 +9,10 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingStatus.CANCELLED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INCOMPLETE_APPLICATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INCOMPLETE_APPLICATION_INFORMATION_REQUESTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
+import static uk.gov.hmcts.reform.sscs.ccd.predicates.BenefitTypeConfidentialityPredicate.isValidBenefitTypeForConfidentiality;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse.DwpUploadResponseAboutToSubmitHandler.NEW_OTHER_PARTY_RESPONSE_DUE_DAYS;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.generateDwpResponseDueDate;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDateTime;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isValidBenefitTypeForConfidentiality;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

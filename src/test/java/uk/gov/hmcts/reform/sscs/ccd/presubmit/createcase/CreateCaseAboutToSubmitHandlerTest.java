@@ -2,11 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.createcase;
 
 import static java.time.LocalDateTime.now;
 import static java.util.Optional.empty;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.never;
@@ -52,7 +49,7 @@ import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 
 @ExtendWith(MockitoExtension.class)
-public class CreateCaseAboutToSubmitHandlerTest {
+class CreateCaseAboutToSubmitHandlerTest {
     
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final Long CCD_CASE_ID = 1234567890L;
@@ -85,7 +82,7 @@ public class CreateCaseAboutToSubmitHandlerTest {
         callback = new Callback<>(caseDetails, empty(), CREATE_APPEAL_PDF, false);
 
         createCaseAboutToSubmitHandler =
-                new CreateCaseAboutToSubmitHandler(sscsPdfService, emailHelper, false, true);
+                new CreateCaseAboutToSubmitHandler(sscsPdfService, emailHelper, false);
     }
 
     @ParameterizedTest
@@ -100,11 +97,11 @@ public class CreateCaseAboutToSubmitHandlerTest {
     })
     void givenASscs1PdfHandlerEventForSyaCases_thenReturnTrue(EventType eventType) {
         var caseData = buildCaseData();
-        var caseDetails =
+        var caseDetailsData =
                 new CaseDetails<>(1234L, "SSCS", WITH_DWP, caseData, now(), "Benefit");
-        var callback = new Callback<>(caseDetails, empty(), eventType, false);
+        var callbackData = new Callback<>(caseDetailsData, empty(), eventType, false);
 
-        assertTrue(createCaseAboutToSubmitHandler.canHandle(ABOUT_TO_SUBMIT, callback));
+        assertThat(createCaseAboutToSubmitHandler.canHandle(ABOUT_TO_SUBMIT, callbackData)).isTrue();
     }
 
     @ParameterizedTest
@@ -120,37 +117,37 @@ public class CreateCaseAboutToSubmitHandlerTest {
     void givenASscs1PdfHandlerEventForBulkScanCases_thenReturnAllowableValue(EventType eventType, boolean allowable) {
         var caseData = buildCaseData();
         caseData.getAppeal().setReceivedVia("Paper");
-        var caseDetails =
+        var caseDetailsData =
                 new CaseDetails<>(1234L, "SSCS", WITH_DWP, caseData, now(), "Benefit");
-        var callback = new Callback<>(caseDetails, empty(), eventType, false);
+        var callbackData = new Callback<>(caseDetailsData, empty(), eventType, false);
 
-        assertEquals(allowable, createCaseAboutToSubmitHandler.canHandle(ABOUT_TO_SUBMIT, callback));
+        assertThat(createCaseAboutToSubmitHandler.canHandle(ABOUT_TO_SUBMIT, callbackData)).isEqualTo(allowable);
     }
 
     @Test
     void givenANonSscs1PdfHandlerEvent_thenReturnFalse() {
         var caseData = buildCaseData();
-        var caseDetails =
+        var caseDetailsData =
                 new CaseDetails<>(1234L, "SSCS", WITH_DWP, caseData, now(), "Benefit");
-        var callback = new Callback<>(caseDetails, empty(), APPEAL_RECEIVED, false);
+        var callbackData = new Callback<>(caseDetailsData, empty(), APPEAL_RECEIVED, false);
 
-        assertFalse(createCaseAboutToSubmitHandler.canHandle(ABOUT_TO_SUBMIT, callback));
+        assertThat(createCaseAboutToSubmitHandler.canHandle(ABOUT_TO_SUBMIT, callbackData)).isFalse();
     }
 
     @Test
     void shouldCallPdfService() throws CcdException {
         var caseData = buildCaseDataWithoutPdf();
-        var caseDetails =
+        var caseDetailsData =
                 new CaseDetails<>(1234L, "SSCS", WITH_DWP, caseData, now(), "Benefit");
-        var callback = new Callback<>(caseDetails, empty(), CREATE_APPEAL_PDF, false);
+        var callbackData = new Callback<>(caseDetailsData, empty(), CREATE_APPEAL_PDF, false);
 
-        when(emailHelper.generateUniqueEmailId(caseDetails.getCaseData().getAppeal().getAppellant()))
+        when(emailHelper.generateUniqueEmailId(caseDetailsData.getCaseData().getAppeal().getAppellant()))
                 .thenReturn("Test");
 
-        createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callbackData, USER_AUTHORISATION);
 
-        verify(emailHelper).generateUniqueEmailId(eq(caseDetails.getCaseData().getAppeal().getAppellant()));
-        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), eq("sscs1"), any());
+        verify(emailHelper).generateUniqueEmailId(eq(caseDetailsData.getCaseData().getAppeal().getAppellant()));
+        verify(sscsPdfService).generatePdf(eq(caseDetailsData.getCaseData()), any(), eq("sscs1"), any());
     }
 
 
@@ -161,15 +158,15 @@ public class CreateCaseAboutToSubmitHandlerTest {
                 .regionalProcessingCenter(RegionalProcessingCenter.builder().build())
                 .build();
         caseData.getAppeal().getAppellant().getIdentity().setIbcaReference("ibcaRef");
-        var caseDetails =
+        var caseDetailsData =
                 new CaseDetails<>(1234L, "SSCS", WITH_DWP, caseData, now(), "Benefit");
-        var callback = new Callback<>(caseDetails, empty(), CREATE_APPEAL_PDF, false);
+        var callbackData = new Callback<>(caseDetailsData, empty(), CREATE_APPEAL_PDF, false);
 
-        createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callbackData, USER_AUTHORISATION);
 
         verify(emailHelper, never()).generateUniqueEmailId(any());
         String expectedFilename = String.format("%s_%s", "appellantLastName", "ibcaRef") + ".pdf";
-        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), any(), eq(expectedFilename));
+        verify(sscsPdfService).generatePdf(eq(caseDetailsData.getCaseData()), any(), any(), eq(expectedFilename));
     }
 
 
@@ -177,14 +174,14 @@ public class CreateCaseAboutToSubmitHandlerTest {
     void isIbcFalseIfNullBenefitType() throws CcdException {
         var caseData = SscsCaseData.builder()
                 .caseReference("").caseCreated("").ccdCaseId("1021").benefitCode("").appeal(appeal).build();
-        var caseDetails =
+        var caseDetailsData =
                 new CaseDetails<>(1234L, "SSCS", WITH_DWP, caseData, now(), "Benefit");
-        var callback = new Callback<>(caseDetails, empty(), CREATE_APPEAL_PDF, false);
+        var callbackData = new Callback<>(caseDetailsData, empty(), CREATE_APPEAL_PDF, false);
 
-        createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callbackData, USER_AUTHORISATION);
 
         verify(emailHelper, times(1)).generateUniqueEmailId(any());
-        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), any(), any());
+        verify(sscsPdfService).generatePdf(eq(caseDetailsData.getCaseData()), any(), any(), any());
     }
 
     @Test
@@ -196,7 +193,7 @@ public class CreateCaseAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response =
                 createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertNull(response.getData().getAppeal().getAppellant().getAppointee());
+        assertThat(response.getData().getAppeal().getAppellant().getAppointee()).isNull();
         verify(emailHelper).generateUniqueEmailId(eq(caseDetails.getCaseData().getAppeal().getAppellant()));
         verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), eq("sscs1"), any());
     }
@@ -208,43 +205,43 @@ public class CreateCaseAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(response.getData().getPoAttendanceConfirmed(), YesNo.NO);
-        assertEquals(response.getData().getTribunalDirectPoToAttend(), YesNo.NO);
+        assertThat(response.getData().getPoAttendanceConfirmed()).isEqualTo(YesNo.NO);
+        assertThat(response.getData().getTribunalDirectPoToAttend()).isEqualTo(YesNo.NO);
 
     }
 
     @Test
     void shouldCallPdfServiceWhenSscsDocumentIsNull() {
         SscsCaseData caseDataWithNullSscsDocument = buildCaseDataWithNullSscsDocument();
-        var caseDetails =
+        var caseDetailsData =
                 new CaseDetails<>(1234L, "SSCS", WITH_DWP, caseDataWithNullSscsDocument, now(), "Benefit");
-        var callback = new Callback<>(caseDetails, empty(), CREATE_APPEAL_PDF, false);
-        when(emailHelper.generateUniqueEmailId(caseDetails.getCaseData().getAppeal().getAppellant()))
+        var callbackData = new Callback<>(caseDetailsData, empty(), CREATE_APPEAL_PDF, false);
+        when(emailHelper.generateUniqueEmailId(caseDetailsData.getCaseData().getAppeal().getAppellant()))
                 .thenReturn("Test");
 
         PreSubmitCallbackResponse<SscsCaseData> response =
-                createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+                createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callbackData, USER_AUTHORISATION);
 
-        assertEquals("No", response.getData().getEvidencePresent());
-        verify(emailHelper).generateUniqueEmailId(eq(caseDetails.getCaseData().getAppeal().getAppellant()));
-        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), eq("sscs1"), any());
+        assertThat(response.getData().getEvidencePresent()).isEqualTo("No");
+        verify(emailHelper).generateUniqueEmailId(eq(caseDetailsData.getCaseData().getAppeal().getAppellant()));
+        verify(sscsPdfService).generatePdf(eq(caseDetailsData.getCaseData()), any(), eq("sscs1"), any());
     }
 
     @Test
     void shouldCallPdfServiceWhenSscsDocumentIsPopulated() {
         SscsCaseData caseDataWithSscsDocument = buildCaseDataWithPdf();
-        var caseDetails =
+        var caseDetailsData =
                 new CaseDetails<>(1234L, "SSCS", WITH_DWP, caseDataWithSscsDocument, now(), "Benefit");
-        var callback = new Callback<>(caseDetails, empty(), CREATE_APPEAL_PDF, false);
-        when(emailHelper.generateUniqueEmailId(caseDetails.getCaseData().getAppeal().getAppellant()))
+        var callbackData = new Callback<>(caseDetailsData, empty(), CREATE_APPEAL_PDF, false);
+        when(emailHelper.generateUniqueEmailId(caseDetailsData.getCaseData().getAppeal().getAppellant()))
                 .thenReturn("Bla");
 
         PreSubmitCallbackResponse<SscsCaseData> response =
-                createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+                createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callbackData, USER_AUTHORISATION);
 
-        assertEquals("Yes", response.getData().getEvidencePresent());
-        verify(emailHelper).generateUniqueEmailId(eq(caseDetails.getCaseData().getAppeal().getAppellant()));
-        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), eq("sscs1"), any());
+        assertThat(response.getData().getEvidencePresent()).isEqualTo("Yes");
+        verify(emailHelper).generateUniqueEmailId(eq(caseDetailsData.getCaseData().getAppeal().getAppellant()));
+        verify(sscsPdfService).generatePdf(eq(caseDetailsData.getCaseData()), any(), eq("sscs1"), any());
     }
 
     @Test
@@ -255,15 +252,15 @@ public class CreateCaseAboutToSubmitHandlerTest {
         caseDataWithSscsDocument.setBenefitCode(IBCA_BENEFIT_CODE);
         caseDataWithSscsDocument.getAppeal().getAppellant().getIdentity().setIbcaReference("IBCA12345");
         caseDataWithSscsDocument.setSscsDocument(buildDocuments());
-        var caseDetails =
+        var caseDetailsData =
                 new CaseDetails<>(1234L, "SSCS", WITH_DWP, caseDataWithSscsDocument, now(), "Benefit");
-        var callback = new Callback<>(caseDetails, empty(), CREATE_APPEAL_PDF, false);
+        var callbackData = new Callback<>(caseDetailsData, empty(), CREATE_APPEAL_PDF, false);
 
         PreSubmitCallbackResponse<SscsCaseData> response =
-                createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+                createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callbackData, USER_AUTHORISATION);
 
-        assertEquals("Yes", response.getData().getEvidencePresent());
-        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), eq("sscs8"), any());
+        assertThat(response.getData().getEvidencePresent()).isEqualTo("Yes");
+        verify(sscsPdfService).generatePdf(eq(caseDetailsData.getCaseData()), any(), eq("sscs8"), any());
     }
 
     @Test
@@ -274,30 +271,30 @@ public class CreateCaseAboutToSubmitHandlerTest {
         caseDataWithNullSscsDocument.setBenefitCode(IBCA_BENEFIT_CODE);
         caseDataWithNullSscsDocument.getAppeal().getAppellant().getIdentity().setIbcaReference("IBCA12345");
         caseDataWithNullSscsDocument.setSscsDocument(null);
-        var caseDetails =
+        var caseDetailsData =
                 new CaseDetails<>(1234L, "SSCS", WITH_DWP, caseDataWithNullSscsDocument, now(), "Benefit");
-        var callback = new Callback<>(caseDetails, empty(), CREATE_APPEAL_PDF, false);
+        var callbackData = new Callback<>(caseDetailsData, empty(), CREATE_APPEAL_PDF, false);
 
         PreSubmitCallbackResponse<SscsCaseData> response =
-                createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+                createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callbackData, USER_AUTHORISATION);
 
-        assertEquals("No", response.getData().getEvidencePresent());
-        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), eq("sscs8"), any());
+        assertThat(response.getData().getEvidencePresent()).isEqualTo("No");
+        verify(sscsPdfService).generatePdf(eq(caseDetailsData.getCaseData()), any(), eq("sscs8"), any());
     }
 
     @Test
     void givenPdfAlreadyExists_shouldNotCallPdfService() throws CcdException {
         SscsCaseData caseDataWithPdf = buildCaseDataWithPdf();
-        var caseDetails =
+        var caseDetailsData =
                 new CaseDetails<>(1234L, "SSCS", WITH_DWP, caseDataWithPdf, now(), "Benefit");
-        var callback = new Callback<>(caseDetails, empty(), CREATE_APPEAL_PDF, false);
+        var callbackData = new Callback<>(caseDetailsData, empty(), CREATE_APPEAL_PDF, false);
         when(emailHelper.generateUniqueEmailId(caseDataWithPdf.getAppeal().getAppellant())).thenReturn("Test");
 
-        createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callbackData, USER_AUTHORISATION);
 
-        assertNull(caseDetails.getCaseData().getEvidencePresent());
-        verify(emailHelper).generateUniqueEmailId(eq(caseDetails.getCaseData().getAppeal().getAppellant()));
-        verify(sscsPdfService, never()).generatePdf(eq(caseDetails.getCaseData()), any(), any(), any());
+        assertThat(caseDetailsData.getCaseData().getEvidencePresent()).isNull();
+        verify(emailHelper).generateUniqueEmailId(eq(caseDetailsData.getCaseData().getAppeal().getAppellant()));
+        verify(sscsPdfService, never()).generatePdf(eq(caseDetailsData.getCaseData()), any(), any(), any());
     }
 
     @Test
@@ -306,15 +303,16 @@ public class CreateCaseAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("1234567890", response.getData().getCcdCaseId());
+        assertThat(response.getData().getCcdCaseId()).isEqualTo("1234567890");
     }
 
     @Test
     void throwsExceptionIfItCannotHandleTheAppeal() {
-        var callback = new Callback<>(caseDetails, empty(), APPEAL_RECEIVED, false);
+        var callbackData = new Callback<>(caseDetails, empty(), APPEAL_RECEIVED, false);
 
-        assertThrows(IllegalStateException.class, () ->
-                createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION));
+        assertThatThrownBy(() ->
+                createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callbackData, USER_AUTHORISATION))
+                .isInstanceOf(IllegalStateException.class);
     }
 
     @Test
@@ -324,8 +322,8 @@ public class CreateCaseAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response =
                 createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(1, response.getErrors().size());
-        assertTrue(response.getErrors().contains("The Case Created Date must be set to generate the SSCS5"));
+        assertThat(response.getErrors()).hasSize(1);
+        assertThat(response.getErrors()).contains("The Case Created Date must be set to generate the SSCS5");
     }
 
     @Test
@@ -334,7 +332,7 @@ public class CreateCaseAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response =
                 createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertTrue(YesNo.isYes(response.getData().getDwpIsOfficerAttending()));
+        assertThat(YesNo.isYes(response.getData().getDwpIsOfficerAttending())).isTrue();
     }
 
     @Test
@@ -343,7 +341,7 @@ public class CreateCaseAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response =
                 createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals("001DD", response.getData().getCaseCode());
+        assertThat(response.getData().getCaseCode()).isEqualTo("001DD");
     }
 
     @Test
@@ -353,7 +351,7 @@ public class CreateCaseAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response =
                 createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals("001US", response.getData().getCaseCode());
+        assertThat(response.getData().getCaseCode()).isEqualTo("001US");
     }
 
 

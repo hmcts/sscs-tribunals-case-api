@@ -2722,7 +2722,6 @@ class PersonalisationTest {
     void givenChildSupportOrUcBenefitAndFeatureEnabled_thenSetsOtherPartySize(String benefitType,
                                                                           final List<CcdValue<OtherParty>> otherParties,
                                                                           final int expectedSize) {
-        setField(personalisation, "cmOtherPartyConfidentialityEnabled", true);
         final SscsCaseData response = SscsCaseData
             .builder()
             .ccdCaseId(CASE_ID)
@@ -2769,7 +2768,6 @@ class PersonalisationTest {
         final List<CcdValue<OtherParty>> newOtherParties,
         final int expectedSize,
         final String expectedNames) {
-        setField(personalisation, "cmOtherPartyConfidentialityEnabled", true);
         final SscsCaseData newData = SscsCaseData
             .builder()
             .ccdCaseId(CASE_ID)

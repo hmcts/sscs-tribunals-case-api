@@ -15,6 +15,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -36,11 +37,11 @@ class AddOtherPartyAboutToSubmitHandlerTest {
     private CaseDetails<SscsCaseData> caseDetails;
 
     private SscsCaseData sscsCaseData;
+    @InjectMocks
     private AddOtherPartyAboutToSubmitHandler handler;
 
     @BeforeEach
     void setUp() {
-        handler = new AddOtherPartyAboutToSubmitHandler(true);
         sscsCaseData = SscsCaseData
             .builder()
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code(UC.getShortName()).build()).build())
@@ -65,13 +66,6 @@ class AddOtherPartyAboutToSubmitHandlerTest {
     }
 
     @Test
-    void shouldReturnFalseWhenFeatureIsDisabled() {
-        handler = new AddOtherPartyAboutToSubmitHandler(false);
-
-        assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
-    }
-
-    @Test
     void shouldReturnFalseWhenCallbackTypeIsNotAboutToSubmit() {
         assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
         assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
@@ -89,15 +83,6 @@ class AddOtherPartyAboutToSubmitHandlerTest {
         sscsCaseData.getAppeal().getBenefitType().setCode("PIP");
 
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
-    }
-
-    @Test
-    void shouldThrowExceptionWhenCannotHandle() {
-        final AddOtherPartyAboutToSubmitHandler disabledHandler = new AddOtherPartyAboutToSubmitHandler(false);
-
-        assertThatThrownBy(() -> disabledHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION))
-            .isInstanceOf(IllegalStateException.class)
-            .hasMessage("Cannot handle callback");
     }
 
     @Test

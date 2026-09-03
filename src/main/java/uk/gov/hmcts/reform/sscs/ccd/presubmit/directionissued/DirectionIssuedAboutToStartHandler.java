@@ -31,16 +31,13 @@ import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 @Service
 public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private final boolean isPostHearingsEnabled;
-    private final boolean cmDirectionTypesConfidentiality;
     private final IdamService idamService;
 
     public DirectionIssuedAboutToStartHandler(
         @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled,
-        @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentiality,
         IdamService idamService
     ) {
         this.isPostHearingsEnabled = isPostHearingsEnabled;
-        this.cmDirectionTypesConfidentiality = cmOtherPartyConfidentiality;
         this.idamService = idamService;
     }
 
@@ -86,8 +83,7 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
         listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
         listOptions.add(new DynamicListItem(ISSUE_AND_SEND_TO_ADMIN.toString(), ISSUE_AND_SEND_TO_ADMIN.getLabel()));
 
-        if (cmDirectionTypesConfidentiality
-            && isAuthorisedToGrantConfidentiality(userAuthorisation)
+        if (isAuthorisedToGrantConfidentiality(userAuthorisation)
             && isBenefitTypeChildSupportOrUc(sscsCaseData)
             && InterlocReferralReason.CONFIDENTIALITY.equals(sscsCaseData.getInterlocReferralReason())) {
             listOptions.add(new DynamicListItem(CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.toString(), CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN.getLabel()));
@@ -155,8 +151,7 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
     }
 
     private void setOtherPartySelectionList(SscsCaseData sscsCaseData) {
-        if (cmDirectionTypesConfidentiality
-            && isBenefitTypeChildSupportOrUc(sscsCaseData)
+        if (isBenefitTypeChildSupportOrUc(sscsCaseData)
             && isOtherPartyPresent(sscsCaseData)) {
             List<DynamicListItem> listOptions = new ArrayList<>();
             addOtherPartiesToListOptions(sscsCaseData, listOptions, true);

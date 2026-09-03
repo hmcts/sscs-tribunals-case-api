@@ -284,9 +284,6 @@ public class Personalisation<E extends NotificationWrapper> {
     @Value("${feature.postHearings.enabled}")
     private boolean isPostHearingsEnabled;
 
-    @Value("${feature.cm-other-party-confidentiality.enabled}")
-    private boolean cmOtherPartyConfidentialityEnabled;
-
     private static String tya(Subscription subscription) {
         if (subscription != null) {
             return defaultIfBlank(subscription.getTya(), EMPTY);
@@ -484,8 +481,7 @@ public class Personalisation<E extends NotificationWrapper> {
         }
 
         setConfidentialFields(ccdResponse, subscriptionWithType, personalisation, responseWrapper.getState());
-        if (cmOtherPartyConfidentialityEnabled
-            && (isBenefitTypeChildSupportOrUc(ccdResponse))
+        if ((isBenefitTypeChildSupportOrUc(ccdResponse))
             && OTHER_PARTY_ADDED_TO_APPEAL.equals(responseWrapper.getNotificationEventType())) {
             setOtherPartyConfidentialityFields(ccdResponse, ccdResponsePrevious, personalisation);
         }

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.functional.sya;
 
 import static io.restassured.RestAssured.baseURI;
+import static java.time.ZoneId.systemDefault;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTHORISATION_HEADER;
@@ -20,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,7 +38,7 @@ import uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer;
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 @Slf4j
-public class SubmitAppealTest {
+class SubmitAppealTest {
 
     @Value("${test-url}")
     private String testUrl;
@@ -52,39 +52,38 @@ public class SubmitAppealTest {
     private IdamTokens idamTokens;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         baseURI = testUrl;
         idamTokens = idamService.getIdamTokens();
         RestAssured.useRelaxedHTTPSValidation();
     }
 
-    public static long getCcdIdFromLocationHeader(String location) {
+    static long getCcdIdFromLocationHeader(String location) {
         return Long.parseLong(location.substring(location.lastIndexOf("/") + 1));
     }
 
     @Test
-    public void givenValidAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateValidAppeal() {
+    void givenValidAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateValidAppeal() {
         assertSscsCaseIsExpectedResult("validAppeal", ALL_DETAILS_NON_SAVE_AND_RETURN_CCD.getSerializedMessage(), ALL_DETAILS_NON_SAVE_AND_RETURN);
     }
 
     @Test
-    @EnabledIfEnvironmentVariable(named = "CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED", matches = "false")
-    public void givenValidChildSupportAppealIsSubmitted_thenCreateValidAppeal() {
+    void givenValidChildSupportAppealIsSubmitted_thenCreateValidAppeal() {
         assertSscsCaseIsExpectedResult("validAppeal", ALL_DETAILS_NON_SAVE_AND_RETURN_CCD_CHILD_SUPPORT.getSerializedMessage(), ALL_DETAILS_NON_SAVE_AND_RETURN_CHILD_SUPPORT);
     }
 
     @Test
-    public void givenValidSscs5AppealIsSubmitted_thenCreateValidAppeal() {
+    void givenValidSscs5AppealIsSubmitted_thenCreateValidAppeal() {
         assertSscsCaseIsExpectedResult("validAppeal", ALL_DETAILS_NON_SAVE_AND_RETURN_CCD_SSCS5.getSerializedMessage(), ALL_DETAILS_NON_SAVE_AND_RETURN_SSCS5);
     }
 
     @Test
-    public void givenIncompleteAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateIncompleteAppeal() {
+    void givenIncompleteAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateIncompleteAppeal() {
         assertSscsCaseIsExpectedResult("incompleteApplication", ALL_DETAILS_NON_SAVE_AND_RETURN_NO_MRN_DATE_CCD.getSerializedMessage(), ALL_DETAILS_NON_SAVE_AND_RETURN);
     }
 
     @Test
-    public void givenNonCompliantAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateNonCompliantAppeal() {
+    void givenNonCompliantAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateNonCompliantAppeal() {
         assertSscsCaseIsExpectedResult("interlocutoryReviewState", ALL_DETAILS_NON_SAVE_AND_RETURN_WITH_INTERLOC_CCD.getSerializedMessage(), ALL_DETAILS_NON_SAVE_AND_RETURN);
     }
 
@@ -95,7 +94,7 @@ public class SubmitAppealTest {
     }
 
     private void assertCaseIsExpectedResult(String expectedBody, String expectedState, String expectedResponse) {
-        LocalDate now = LocalDate.now();
+        LocalDate now = LocalDate.now(systemDefault());
         LocalDate interlocutoryReviewDate = now.minusMonths(13).minusDays(1);
         LocalDate mrnDate = switch (expectedState) {
             case "interlocutoryReviewState" -> interlocutoryReviewDate;
@@ -178,7 +177,7 @@ public class SubmitAppealTest {
     }
 
     @Test
-    public void appealShouldCreateDuplicateAndLinked() {
+    void appealShouldCreateDuplicateAndLinked() {
         String nino = submitHelper.getRandomNino();
         LocalDate mrnDate = LocalDate.now();
         log.info("Generated NINO: {} and MRN date: {}", nino, mrnDate);
