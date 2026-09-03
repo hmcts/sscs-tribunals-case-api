@@ -59,7 +59,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
         throws Exception {
         // Given
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
-        checkForLinkedCases();
+        checkForLinkedCases("BB000000B");
 
         String validationJson = loadJson("mappings/validation/validate-appeal-created-case-request.json");
 
@@ -88,7 +88,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
         throws Exception {
         // Given
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
-        checkForLinkedCases();
+        checkForLinkedCases("BB000000B");
 
         String validationJson = loadJson("mappings/validation/validate-interloc-appeal-created-case-request.json");
 
@@ -114,7 +114,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
         throws Exception {
         // Given
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
-        checkForLinkedCases();
+        checkForLinkedCases("BB000000B");
 
         String validationJson = loadJson("mappings/validation/sscs2-validate-appeal-created-case-request.json");
 
@@ -399,7 +399,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
         throws Exception {
         // Given
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
-        checkForLinkedCases();
+        checkForLinkedCases("BB000000B");
 
         final String invalidPostcode = "CM13 9HY";
         String validationJson = loadJson("mappings/validation/validate-appeal-created-case-request.json")
@@ -469,7 +469,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
         throws Exception {
         // Given
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
-        checkForLinkedCases();
+        checkForLinkedCases("BB000000B");
 
         String validationJson = loadJson("mappings/validation/sscs5-validate-appeal-created-case-request.json");
 

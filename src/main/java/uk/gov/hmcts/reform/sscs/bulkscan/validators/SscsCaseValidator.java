@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.bulkscan.validators;
 
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.*;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.WarningMessage.getMessageByCallbackType;
 import static uk.gov.hmcts.reform.sscs.bulkscan.domain.CallbackType.EXCEPTION_CALLBACK;
@@ -89,6 +90,7 @@ public class SscsCaseValidator implements CaseValidator {
     @SuppressWarnings("squid:S5843")
     private static final String COUNTY_REGEX =
         "^\\.$|^[a-zA-ZÀ-ž0-9]{1}[a-zA-ZÀ-ž0-9 \\r\\n\\.“”\",’\\?\\!\\[\\]\\(\\)/£:\\\\_+\\-%&;]{1,}$";
+    private static final String NINO_REGEX = "^(?!BG)(?!GB)(?!NK)(?!KN)(?!TN)(?!NT)(?!ZZ)\\s?(?:[A-CEGHJ-PR-TW-Z]\\s?[A-CEGHJ-NPR-TW-Z])\\s?(?:\\d\\s?){6}([A-D]|\\s)\\s?$";
 
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final DwpAddressLookupService dwpAddressLookupService;
@@ -641,7 +643,7 @@ public class SscsCaseValidator implements CaseValidator {
 
     private Boolean doesTitleExist(Name name) {
         if (name != null) {
-            return StringUtils.isNotEmpty(name.getTitle());
+            return isNotEmpty(name.getTitle());
         }
         return false;
     }
@@ -656,21 +658,21 @@ public class SscsCaseValidator implements CaseValidator {
 
     private Boolean doesFirstNameExist(Name name) {
         if (name != null) {
-            return StringUtils.isNotEmpty(name.getFirstName());
+            return isNotEmpty(name.getFirstName());
         }
         return false;
     }
 
     private Boolean doesLastNameExist(Name name) {
         if (name != null) {
-            return StringUtils.isNotEmpty(name.getLastName());
+            return isNotEmpty(name.getLastName());
         }
         return false;
     }
 
     private Boolean doesAddressLine1Exist(Address address) {
         if (address != null) {
-            return StringUtils.isNotEmpty(address.getLine1());
+            return isNotEmpty(address.getLine1());
         }
         return false;
     }
@@ -681,28 +683,28 @@ public class SscsCaseValidator implements CaseValidator {
 
     private Boolean doesAddressPostcodeExist(Address address) {
         if (address != null) {
-            return StringUtils.isNotEmpty(address.getPostcode());
+            return isNotEmpty(address.getPostcode());
         }
         return false;
     }
 
     private Boolean doesAddressTownExist(Address address) {
         if (address != null) {
-            return StringUtils.isNotEmpty(address.getTown());
+            return isNotEmpty(address.getTown());
         }
         return false;
     }
 
     private Boolean doesAddressCountyExist(Address address) {
         if (address != null) {
-            return StringUtils.isNotEmpty(address.getCounty());
+            return isNotEmpty(address.getCounty());
         }
         return false;
     }
 
     private Boolean doesAddressPortOfEntryExist(Address address) {
         if (address != null) {
-            return StringUtils.isNotEmpty(address.getPortOfEntry());
+            return isNotEmpty(address.getPortOfEntry());
         }
         return false;
     }
@@ -745,7 +747,7 @@ public class SscsCaseValidator implements CaseValidator {
     private void checkAppellantNino(Appellant appellant, String personType) {
         if (appellant != null && appellant.getIdentity() != null && appellant.getIdentity().getNino() != null) {
             if (!appellant.getIdentity().getNino().matches(
-                "^(?!BG)(?!GB)(?!NK)(?!KN)(?!TN)(?!NT)(?!ZZ)\\s?(?:[A-CEGHJ-PR-TW-Z]\\s?[A-CEGHJ-NPR-TW-Z])\\s?(?:\\d\\s?){6}([A-D]|\\s)\\s?$")) {
+                NINO_REGEX)) {
                 warnings.add(getMessageByCallbackType(callbackType, personType,
                     getWarningMessageName(personType, appellant) + NINO, IS_INVALID));
             }
@@ -754,6 +756,10 @@ public class SscsCaseValidator implements CaseValidator {
                 getMessageByCallbackType(callbackType, personType, getWarningMessageName(personType, appellant) + NINO,
                     IS_EMPTY));
         }
+    }
+
+    public static boolean isValidNino(String nino) {
+        return isNotEmpty(nino) && nino.matches(NINO_REGEX);
     }
 
     private void checkAppellantIbcaReference(Appellant appellant, String personType) {
@@ -798,7 +804,7 @@ public class SscsCaseValidator implements CaseValidator {
 
     private Boolean doesIssuingOfficeExist(Appeal appeal) {
         if (appeal.getMrnDetails() != null) {
-            return StringUtils.isNotEmpty(appeal.getMrnDetails().getDwpIssuingOffice());
+            return isNotEmpty(appeal.getMrnDetails().getDwpIssuingOffice());
         }
         return false;
     }
