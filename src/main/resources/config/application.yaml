@@ -904,6 +904,8 @@ notification:
                 docmosisId: TB-SCS-GNO-ENG-00760-v2.docx
             joint_party:
                 docmosisId: TB-SCS-GNO-ENG-00760-v2.docx
+            other_party:
+                docmosisId: TB-SCS-GNO-ENG-00760-v2.docx
         deathOfAppellant:
             representative:
                 docmosisId: TB-SCS-GNO-ENG-00773.docx
@@ -1592,6 +1594,8 @@ notification:
             appointee:
                 docmosisId: TB-SCS-GNO-WEL-00765-v2.docx
             joint_party:
+                docmosisId: TB-SCS-GNO-WEL-00765-v2.docx
+            other_party:
                 docmosisId: TB-SCS-GNO-WEL-00765-v2.docx
         deathOfAppellant:
             representative:
