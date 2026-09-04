@@ -67,7 +67,7 @@ public class ValidSendToInterlocIt extends AbstractEventIt {
         assertNull(result.getData().getSelectWhoReviewsCase());
         assertEquals(InterlocReviewState.REVIEW_BY_TCW, result.getData().getInterlocReviewState());
         assertEquals(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST, result.getData().getInterlocReferralReason());
-        assertEquals(DocumentType.POSTPONEMENT_REQUEST.getValue(), result.getData().getSscsDocument().get(3).getValue().getDocumentType());
+        assertEquals(DocumentType.POSTPONEMENT_REQUEST.getValue(), result.getData().getSscsDocument().getFirst().getValue().getDocumentType());
     }
 
 }

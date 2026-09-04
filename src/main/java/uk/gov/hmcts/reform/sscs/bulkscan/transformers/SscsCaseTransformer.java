@@ -23,6 +23,7 @@ import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.isExactlyOn
 import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.isExactlyZeroBooleanTrue;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AppellantRole.OTHER;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument.BY_DOCUMENT_DATE_ADDED_DESCENDING;
 import static uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService.normaliseNino;
 import static uk.gov.hmcts.reform.sscs.model.AllowedFileTypes.getContentTypeForFileName;
 import static uk.gov.hmcts.reform.sscs.utility.AppealNumberGenerator.generateAppealNumber;
@@ -1048,6 +1049,7 @@ public class SscsCaseTransformer implements CaseTransformer {
                 documentDetails.add(SscsDocument.builder().value(details).build());
             }
         }
+        documentDetails.sort(BY_DOCUMENT_DATE_ADDED_DESCENDING);
         return documentDetails;
     }
 

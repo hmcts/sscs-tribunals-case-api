@@ -1,18 +1,14 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.procesaudiovideo;
 
 import static java.util.Collections.singletonList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE;
@@ -27,17 +23,18 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAu
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import junitparams.converters.Nullable;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -76,8 +73,8 @@ import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
-@RunWith(JUnitParamsRunner.class)
-public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
+@ExtendWith(MockitoExtension.class)
+class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final String DOCUMENT_URL = "dm-store/documents/123";
@@ -103,14 +100,12 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
 
     private SscsDocument expectedDocument;
 
-    @Before
-    public void setUp() {
-        openMocks(this);
-
-        Map<EventType, String> englishEventTypeDocs = new HashMap<>();
+    @BeforeEach
+    void setUp() {
+        final Map<EventType, String> englishEventTypeDocs = new EnumMap<>(EventType.class);
         englishEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-ENG-directions-notice-v2.docx");
 
-        Map<LanguagePreference, Map<EventType, String>> documents = new HashMap<>();
+        final Map<LanguagePreference, Map<EventType, String>> documents = new EnumMap<>(LanguagePreference.class);
         documents.put(LanguagePreference.ENGLISH, englishEventTypeDocs);
 
         documentConfiguration.setDocuments(documents);
@@ -174,89 +169,87 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
                 .documentType(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE.getValue())
                 .build()).build();
 
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(callback.getEvent()).thenReturn(EventType.PROCESS_AUDIO_VIDEO);
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn("John Lewis");
-        when(footerService.getNextBundleAddition(any())).thenReturn("A");
-        when(footerService.addFooter(any(), any(), eq("A"))).thenReturn(DocumentLink.builder().documentFilename("New doc with footer").build());
+        lenient().when(callback.getCaseDetails()).thenReturn(caseDetails);
+        lenient().when(callback.getEvent()).thenReturn(EventType.PROCESS_AUDIO_VIDEO);
+        lenient().when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        lenient().when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn("John Lewis");
+        lenient().when(footerService.getNextBundleAddition(any())).thenReturn("A");
+        lenient().when(footerService.addFooter(any(), any(), eq("A"))).thenReturn(DocumentLink.builder().documentFilename("New doc with footer").build());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = EventType.class, names = {"APPEAL_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
+    void givenANonHandleEvidenceEvent_thenReturnFalse(final EventType eventType) {
+        lenient().when(callback.getEvent()).thenReturn(eventType);
+        assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
     }
 
     @Test
-    @Parameters({"APPEAL_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
-    public void givenANonHandleEvidenceEvent_thenReturnFalse(EventType eventType) {
-        when(callback.getEvent()).thenReturn(eventType);
-        assertFalse(handler.canHandle(MID_EVENT, callback));
+    void givenAValidHandleAndEventType_thenReturnTrue() {
+        assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isTrue();
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = CallbackType.class, names = {"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
+    void givenANonCallbackType_thenReturnFalse(final CallbackType callbackType) {
+        assertThat(handler.canHandle(callbackType, callback)).isFalse();
     }
 
     @Test
-    public void givenAValidHandleAndEventType_thenReturnTrue() {
-        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
-    }
-
-    @Test
-    @Parameters({"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
-    public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
-        assertFalse(handler.canHandle(callbackType, callback));
-    }
-
-    @Test
-    public void shouldShowError_whenThereIsNoActionSelected() {
+    void shouldShowError_whenThereIsNoActionSelected() {
         sscsCaseData.setProcessAudioVideoAction(null);
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getErrors().size(), is(1));
-        assertThat(response.getErrors().iterator().next(), is("Select an action to process the audio/video evidence"));
+        assertThat(response.getErrors()).containsExactly("Select an action to process the audio/video evidence");
     }
 
     @Test
-    public void shouldShowError_whenThereIsNoPreviewDocument() {
+    void shouldShowError_whenThereIsNoPreviewDocument() {
         sscsCaseData.getDocumentStaging().setPreviewDocument(null);
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getErrors().size(), is(1));
-        assertThat(response.getErrors().iterator().next(), is("There is no document notice"));
+        assertThat(response.getErrors()).containsExactly("There is no document notice");
     }
 
     @Test
-    public void givenAdmitEvidenceFromAppellant_willRemoveDocFromAudioVideoEvidenceAndInterlocReviewStateAndAddToSscsDocumentsCollection() {
+    void givenAdmitEvidenceFromAppellant_willRemoveDocFromAudioVideoEvidenceAndInterlocReviewStateAndAddToSscsDocumentsCollection() {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(ADMIT_EVIDENCE.getCode()));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertNull(response.getData().getDocumentStaging().getPreviewDocument());
-        assertNull(response.getData().getDocumentGeneration().getSignedBy());
-        assertNull(response.getData().getDocumentGeneration().getSignedRole());
-        assertNull(response.getData().getDocumentGeneration().getGenerateNotice());
-        assertNull(response.getData().getDocumentStaging().getDateAdded());
+        assertThat(response.getData().getDocumentStaging().getPreviewDocument()).isNull();
+        assertThat(response.getData().getDocumentGeneration().getSignedBy()).isNull();
+        assertThat(response.getData().getDocumentGeneration().getSignedRole()).isNull();
+        assertThat(response.getData().getDocumentGeneration().getGenerateNotice()).isNull();
+        assertThat(response.getData().getDocumentStaging().getDateAdded()).isNull();
 
-        DocumentLink expectedDocumentLink = DocumentLink.builder().documentFilename("statement1.pdf").documentUrl("statement1.url").documentBinaryUrl("statement1.url/binary").build();
+        final DocumentLink expectedDocumentLink = DocumentLink.builder().documentFilename("statement1.pdf").documentUrl("statement1.url").documentBinaryUrl("statement1.url/binary").build();
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
-        verify(footerService).addFooter(eq(expectedDocumentLink), eq("Statement of audio/video evidence"), eq("A"));
+        verify(footerService).addFooter(expectedDocumentLink, "Statement of audio/video evidence", "A");
 
-        assertNull(response.getData().getInterlocReviewState());
-        assertEquals(InterlocReferralReason.NONE, response.getData().getInterlocReferralReason());
-        assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED));
-        assertEquals(1, response.getData().getAudioVideoEvidence().size());
-        assertEquals(1, response.getData().getSscsDocument().size());
-        assertEquals(DocumentLink.builder().documentFilename("music.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build(), response.getData().getSscsDocument().get(0).getValue().getAvDocumentLink());
-        assertEquals("A", response.getData().getSscsDocument().get(0).getValue().getBundleAddition());
-        assertEquals(LocalDate.now().toString(), response.getData().getSscsDocument().get(0).getValue().getDateApproved());
-        assertEquals(LocalDate.now().toString(), response.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
-        assertEquals("Addition A - Appellant - Statement for A/V file: music.mp3", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
-        assertEquals(DocumentType.AUDIO_DOCUMENT.getValue(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
-        assertEquals("Appellant", response.getData().getSscsDocument().get(0).getValue().getPartyUploaded().getLabel());
-        assertNull(response.getData().getSscsDocument().get(0).getValue().getOriginalSenderOtherPartyName());
-        assertNull(response.getData().getSscsDocument().get(0).getValue().getOriginalSenderOtherPartyId());
-        assertEquals("New doc with footer", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentFilename());
-        assertEquals(YesNo.YES, response.getData().getHasUnprocessedAudioVideoEvidence());
+        assertThat(response.getData().getInterlocReviewState()).isNull();
+        assertThat(response.getData().getInterlocReferralReason()).isEqualTo(InterlocReferralReason.NONE);
+        assertThat(response.getData().getDwpState()).isEqualTo(DIRECTION_ACTION_REQUIRED);
+        assertThat(response.getData().getAudioVideoEvidence()).hasSize(1);
+        assertThat(response.getData().getSscsDocument()).hasSize(1);
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getAvDocumentLink()).isEqualTo(DocumentLink.builder().documentFilename("music.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build());
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getBundleAddition()).isEqualTo("A");
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDateApproved()).isEqualTo(LocalDate.now().toString());
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentDateAdded()).isEqualTo(LocalDate.now().toString());
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentFileName()).isEqualTo("Addition A - Appellant - Statement for A/V file: music.mp3");
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentType()).isEqualTo(DocumentType.AUDIO_DOCUMENT.getValue());
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getPartyUploaded().getLabel()).isEqualTo("Appellant");
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getOriginalSenderOtherPartyName()).isNull();
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getOriginalSenderOtherPartyId()).isNull();
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentLink().getDocumentFilename()).isEqualTo("New doc with footer");
+        assertThat(response.getData().getHasUnprocessedAudioVideoEvidence()).isEqualTo(YesNo.YES);
     }
 
     @Test
-    public void givenAdmitEvidenceFromAppellantWithExistingSscsDocuments_willClearAudioVideoEvidenceAndInterlocReviewStateAndAddToSscsDocumentsCollection() {
+    void givenAdmitEvidenceFromAppellantWithExistingSscsDocuments_willClearAudioVideoEvidenceAndInterlocReviewStateAndAddToSscsDocumentsCollection() {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(ADMIT_EVIDENCE.getCode()));
 
-        List<SscsDocument> sscsDocuments = singletonList(SscsDocument.builder().value(
+        final List<SscsDocument> sscsDocuments = singletonList(SscsDocument.builder().value(
                 SscsDocumentDetails.builder()
                         .documentLink(DocumentLink.builder().documentFilename("existing.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
                         .documentFileName("existing.mp3")
@@ -267,36 +260,68 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.setSscsDocument(sscsDocuments);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertNull(response.getData().getDocumentStaging().getPreviewDocument());
-        assertNull(response.getData().getDocumentGeneration().getSignedBy());
-        assertNull(response.getData().getDocumentGeneration().getSignedRole());
-        assertNull(response.getData().getDocumentGeneration().getGenerateNotice());
-        assertNull(response.getData().getDocumentStaging().getDateAdded());
+        assertThat(response.getData().getDocumentStaging().getPreviewDocument()).isNull();
+        assertThat(response.getData().getDocumentGeneration().getSignedBy()).isNull();
+        assertThat(response.getData().getDocumentGeneration().getSignedRole()).isNull();
+        assertThat(response.getData().getDocumentGeneration().getGenerateNotice()).isNull();
+        assertThat(response.getData().getDocumentStaging().getDateAdded()).isNull();
 
-        DocumentLink expectedDocumentLink = DocumentLink.builder().documentFilename("statement1.pdf").documentUrl("statement1.url").documentBinaryUrl("statement1.url/binary").build();
+        final DocumentLink expectedDocumentLink = DocumentLink.builder().documentFilename("statement1.pdf").documentUrl("statement1.url").documentBinaryUrl("statement1.url/binary").build();
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
-        verify(footerService).addFooter(eq(expectedDocumentLink), eq("Statement of audio/video evidence"), eq("A"));
+        verify(footerService).addFooter(expectedDocumentLink,"Statement of audio/video evidence","A");
 
-        assertNull(response.getData().getInterlocReviewState());
-        assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED));
-        assertEquals(1, response.getData().getAudioVideoEvidence().size());
-        assertEquals(2, response.getData().getSscsDocument().size());
-        assertEquals(DocumentLink.builder().documentFilename("music.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build(), response.getData().getSscsDocument().get(0).getValue().getAvDocumentLink());
-        assertEquals("A", response.getData().getSscsDocument().get(0).getValue().getBundleAddition());
-        assertEquals(LocalDate.now().toString(), response.getData().getSscsDocument().get(0).getValue().getDateApproved());
-        assertEquals(LocalDate.now().toString(), response.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
-        assertEquals("Addition A - Appellant - Statement for A/V file: music.mp3", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
-        assertEquals(DocumentType.AUDIO_DOCUMENT.getValue(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
-        assertEquals("Appellant", response.getData().getSscsDocument().get(0).getValue().getPartyUploaded().getLabel());
-        assertEquals("New doc with footer", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentFilename());
+        assertThat(response.getData().getInterlocReviewState()).isNull();
+        assertThat(response.getData().getDwpState()).isEqualTo(DIRECTION_ACTION_REQUIRED);
+        assertThat(response.getData().getAudioVideoEvidence()).hasSize(1);
+        assertThat(response.getData().getSscsDocument()).hasSize(2);
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getAvDocumentLink()).isEqualTo(DocumentLink.builder().documentFilename("music.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build());
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getBundleAddition()).isEqualTo("A");
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDateApproved()).isEqualTo(LocalDate.now().toString());
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentDateAdded()).isEqualTo(LocalDate.now().toString());
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentFileName()).isEqualTo("Addition A - Appellant - Statement for A/V file: music.mp3");
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentType()).isEqualTo(DocumentType.AUDIO_DOCUMENT.getValue());
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getPartyUploaded().getLabel()).isEqualTo("Appellant");
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentLink().getDocumentFilename()).isEqualTo("New doc with footer");
     }
 
     @Test
-    public void givenAdmitEvidenceFromAppellantWithExistingSscsDocumentsAndNoStatementOfEvidence_willClearAudioVideoEvidenceAndInterlocReviewStateAndAddToSscsDocumentsCollection() {
+    void givenAdmitEvidenceOlderThanExistingSscsDocument_thenSscsDocumentsAreOrderedByDateDescendingNotInsertionOrder() {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(ADMIT_EVIDENCE.getCode()));
 
-        AudioVideoEvidenceDetails selectedAudioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder()
+        final AudioVideoEvidenceDetails selectedAudioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder()
+                .documentLink(DocumentLink.builder().documentFilename("music.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
+                .fileName("music.mp3")
+                .partyUploaded(UploadParty.APPELLANT)
+                .dateAdded(LocalDate.now().minusDays(10))
+                .statementOfEvidencePdf(DocumentLink.builder().documentFilename("statement1.pdf").documentUrl("statement1.url").documentBinaryUrl("statement1.url/binary").build())
+                .build();
+        sscsCaseData.setSelectedAudioVideoEvidenceDetails(selectedAudioVideoEvidenceDetails);
+
+        final List<SscsDocument> sscsDocuments = singletonList(SscsDocument.builder().value(
+                        SscsDocumentDetails.builder()
+                                .documentLink(DocumentLink.builder().documentFilename("existing.pdf").documentUrl("existing.com").documentBinaryUrl("existing.com/binary").build())
+                                .documentFileName("existing.pdf")
+                                .partyUploaded(UploadParty.DWP)
+                                .documentDateAdded(LocalDate.now().toString())
+                                .build())
+                .build());
+        sscsCaseData.setSscsDocument(sscsDocuments);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getSscsDocument()).hasSize(2);
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentFileName()).isEqualTo("existing.pdf");
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentDateAdded()).isEqualTo(LocalDate.now().toString());
+        assertThat(response.getData().getSscsDocument().get(1).getValue().getDocumentFileName()).isEqualTo("Addition A - Appellant - Statement for A/V file: music.mp3");
+        assertThat(response.getData().getSscsDocument().get(1).getValue().getDocumentDateAdded()).isEqualTo(LocalDate.now().minusDays(10).toString());
+    }
+
+    @Test
+    void givenAdmitEvidenceFromAppellantWithExistingSscsDocumentsAndNoStatementOfEvidence_willClearAudioVideoEvidenceAndInterlocReviewStateAndAddToSscsDocumentsCollection() {
+        sscsCaseData.setProcessAudioVideoAction(new DynamicList(ADMIT_EVIDENCE.getCode()));
+
+        final AudioVideoEvidenceDetails selectedAudioVideoEvidenceDetails = AudioVideoEvidenceDetails.builder()
                         .documentLink(DocumentLink.builder().documentFilename("music.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
                         .fileName("music.mp3")
                         .partyUploaded(UploadParty.APPELLANT)
@@ -306,7 +331,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
 
         sscsCaseData.setSelectedAudioVideoEvidenceDetails(selectedAudioVideoEvidenceDetails);
 
-        List<AudioVideoEvidence> audioVideoEvidence = new ArrayList<>(Arrays.asList(AudioVideoEvidence.builder().value(
+        final List<AudioVideoEvidence> audioVideoEvidence = new ArrayList<>(Arrays.asList(AudioVideoEvidence.builder().value(
                         AudioVideoEvidenceDetails.builder()
                                 .documentLink(DocumentLink.builder().documentFilename("music.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
                                 .fileName("music.mp3")
@@ -326,7 +351,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
 
         sscsCaseData.setAudioVideoEvidence(audioVideoEvidence);
 
-        List<SscsDocument> sscsDocuments = singletonList(SscsDocument.builder().value(
+        final List<SscsDocument> sscsDocuments = singletonList(SscsDocument.builder().value(
                 SscsDocumentDetails.builder()
                         .documentLink(DocumentLink.builder().documentFilename("existing.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
                         .documentFileName("existing.mp3")
@@ -337,32 +362,32 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.setSscsDocument(sscsDocuments);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertNull(response.getData().getDocumentStaging().getPreviewDocument());
-        assertNull(response.getData().getDocumentGeneration().getSignedBy());
-        assertNull(response.getData().getDocumentGeneration().getSignedRole());
-        assertNull(response.getData().getDocumentGeneration().getGenerateNotice());
-        assertNull(response.getData().getDocumentStaging().getDateAdded());
+        assertThat(response.getData().getDocumentStaging().getPreviewDocument()).isNull();
+        assertThat(response.getData().getDocumentGeneration().getSignedBy()).isNull();
+        assertThat(response.getData().getDocumentGeneration().getSignedRole()).isNull();
+        assertThat(response.getData().getDocumentGeneration().getGenerateNotice()).isNull();
+        assertThat(response.getData().getDocumentStaging().getDateAdded()).isNull();
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
-        assertNull(response.getData().getInterlocReviewState());
-        assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED));
-        assertEquals(1, response.getData().getAudioVideoEvidence().size());
-        assertEquals(2, response.getData().getSscsDocument().size());
-        assertEquals(DocumentLink.builder().documentFilename("music.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build(), response.getData().getSscsDocument().get(0).getValue().getAvDocumentLink());
-        assertNull(response.getData().getSscsDocument().get(0).getValue().getBundleAddition());
-        assertEquals(LocalDate.now().toString(), response.getData().getSscsDocument().get(0).getValue().getDateApproved());
-        assertEquals(LocalDate.now().toString(), response.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
-        assertEquals("music.mp3", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
-        assertEquals(DocumentType.AUDIO_DOCUMENT.getValue(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
-        assertEquals("Appellant", response.getData().getSscsDocument().get(0).getValue().getPartyUploaded().getLabel());
-        assertNull(response.getData().getSscsDocument().get(0).getValue().getDocumentLink());
+        assertThat(response.getData().getInterlocReviewState()).isNull();
+        assertThat(response.getData().getDwpState()).isEqualTo(DIRECTION_ACTION_REQUIRED);
+        assertThat(response.getData().getAudioVideoEvidence()).hasSize(1);
+        assertThat(response.getData().getSscsDocument()).hasSize(2);
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getAvDocumentLink()).isEqualTo(DocumentLink.builder().documentFilename("music.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build());
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getBundleAddition()).isNull();
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDateApproved()).isEqualTo(LocalDate.now().toString());
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentDateAdded()).isEqualTo(LocalDate.now().toString());
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentFileName()).isEqualTo("music.mp3");
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentType()).isEqualTo(DocumentType.AUDIO_DOCUMENT.getValue());
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getPartyUploaded().getLabel()).isEqualTo("Appellant");
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentLink()).isNull();
     }
 
     @Test
-    public void givenAdmitEvidenceIsNotAnMp3OrMp4_thenDisplayError() {
+    void givenAdmitEvidenceIsNotAnMp3OrMp4_thenDisplayError() {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(ADMIT_EVIDENCE.getCode()));
 
-        AudioVideoEvidenceDetails evidenceDetails = AudioVideoEvidenceDetails.builder()
+        final AudioVideoEvidenceDetails evidenceDetails = AudioVideoEvidenceDetails.builder()
                 .documentLink(DocumentLink.builder().documentFilename("nonvideo.pdf").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
                 .fileName("nonvideo.pdf")
                 .partyUploaded(UploadParty.DWP)
@@ -371,61 +396,59 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
 
         sscsCaseData.setSelectedAudioVideoEvidenceDetails(evidenceDetails);
 
-        List<AudioVideoEvidence> videoList = new ArrayList<>(singletonList(AudioVideoEvidence.builder().value(evidenceDetails).build()));
+        final List<AudioVideoEvidence> videoList = new ArrayList<>(singletonList(AudioVideoEvidence.builder().value(evidenceDetails).build()));
 
         sscsCaseData.setAudioVideoEvidence(videoList);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(1, response.getErrors().size());
-
-        assertEquals("Evidence cannot be included as it is not in .mp3 or .mp4 format", response.getErrors().toArray()[0]);
+        assertThat(response.getErrors()).containsExactly("Evidence cannot be included as it is not in .mp3 or .mp4 format");
     }
 
     @Test
-    public void givenAdmitEvidenceFromDwp_willClearAudioVideoEvidenceAndInterlocReviewStateAndAddToDwpDocumentsCollection() {
+    void givenAdmitEvidenceFromDwp_willClearAudioVideoEvidenceAndInterlocReviewStateAndAddToDwpDocumentsCollection() {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(ADMIT_EVIDENCE.getCode()));
 
-        AudioVideoEvidenceDetails evidenceDetails = AudioVideoEvidenceDetails.builder()
+        final AudioVideoEvidenceDetails evidenceDetails = AudioVideoEvidenceDetails.builder()
                 .documentLink(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
                 .fileName("video.mp4")
                 .partyUploaded(UploadParty.DWP)
                 .dateAdded(LocalDate.now())
                 .build();
 
-        List<AudioVideoEvidence> videoList = new ArrayList<>(singletonList(AudioVideoEvidence.builder().value(evidenceDetails).build()));
+        final List<AudioVideoEvidence> videoList = new ArrayList<>(singletonList(AudioVideoEvidence.builder().value(evidenceDetails).build()));
 
         sscsCaseData.setSelectedAudioVideoEvidenceDetails(evidenceDetails);
 
         sscsCaseData.setAudioVideoEvidence(videoList);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertNull(response.getData().getDocumentStaging().getPreviewDocument());
-        assertNull(response.getData().getDocumentGeneration().getSignedBy());
-        assertNull(response.getData().getDocumentGeneration().getSignedRole());
-        assertNull(response.getData().getDocumentGeneration().getGenerateNotice());
-        assertNull(response.getData().getDocumentStaging().getDateAdded());
+        assertThat(response.getData().getDocumentStaging().getPreviewDocument()).isNull();
+        assertThat(response.getData().getDocumentGeneration().getSignedBy()).isNull();
+        assertThat(response.getData().getDocumentGeneration().getSignedRole()).isNull();
+        assertThat(response.getData().getDocumentGeneration().getGenerateNotice()).isNull();
+        assertThat(response.getData().getDocumentStaging().getDateAdded()).isNull();
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
-        assertNull(response.getData().getInterlocReviewState());
-        assertEquals(InterlocReferralReason.NONE, response.getData().getInterlocReferralReason());
-        assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED));
-        assertNull(response.getData().getAudioVideoEvidence());
-        assertEquals(1, response.getData().getDwpDocuments().size());
-        assertEquals(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build(), response.getData().getDwpDocuments().get(0).getValue().getAvDocumentLink());
-        assertEquals(LocalDate.now().toString(), response.getData().getDwpDocuments().get(0).getValue().getDateApproved());
-        assertEquals(LocalDate.now().toString(), response.getData().getDwpDocuments().get(0).getValue().getDocumentDateAdded());
-        assertEquals("video.mp4", response.getData().getDwpDocuments().get(0).getValue().getDocumentFileName());
-        assertEquals("videoDocument", response.getData().getDwpDocuments().get(0).getValue().getDocumentType());
-        assertEquals("DWP", response.getData().getDwpDocuments().get(0).getValue().getPartyUploaded().getLabel());
-        assertEquals(YesNo.NO, response.getData().getHasUnprocessedAudioVideoEvidence());
+        assertThat(response.getData().getInterlocReviewState()).isNull();
+        assertThat(response.getData().getInterlocReferralReason()).isEqualTo(InterlocReferralReason.NONE);
+        assertThat(response.getData().getDwpState()).isEqualTo(DIRECTION_ACTION_REQUIRED);
+        assertThat(response.getData().getAudioVideoEvidence()).isNull();
+        assertThat(response.getData().getDwpDocuments()).hasSize(1);
+        assertThat(response.getData().getDwpDocuments().getFirst().getValue().getAvDocumentLink()).isEqualTo(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build());
+        assertThat(response.getData().getDwpDocuments().getFirst().getValue().getDateApproved()).isEqualTo(LocalDate.now().toString());
+        assertThat(response.getData().getDwpDocuments().getFirst().getValue().getDocumentDateAdded()).isEqualTo(LocalDate.now().toString());
+        assertThat(response.getData().getDwpDocuments().getFirst().getValue().getDocumentFileName()).isEqualTo("video.mp4");
+        assertThat(response.getData().getDwpDocuments().getFirst().getValue().getDocumentType()).isEqualTo("videoDocument");
+        assertThat(response.getData().getDwpDocuments().getFirst().getValue().getPartyUploaded().getLabel()).isEqualTo("DWP");
+        assertThat(response.getData().getHasUnprocessedAudioVideoEvidence()).isEqualTo(YesNo.NO);
     }
 
     @Test
-    public void givenAdmitEvidenceFromDwpWithRip1Document_willClearAudioVideoEvidenceAndInterlocReviewStateAndAddToDwpDocumentsCollection() {
+    void givenAdmitEvidenceFromDwpWithRip1Document_willClearAudioVideoEvidenceAndInterlocReviewStateAndAddToDwpDocumentsCollection() {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(ADMIT_EVIDENCE.getCode()));
 
-        AudioVideoEvidenceDetails evidenceDetails = AudioVideoEvidenceDetails.builder()
+        final AudioVideoEvidenceDetails evidenceDetails = AudioVideoEvidenceDetails.builder()
                 .documentLink(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
                 .fileName("video.mp4")
                 .partyUploaded(UploadParty.DWP)
@@ -435,59 +458,58 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
 
         sscsCaseData.setSelectedAudioVideoEvidenceDetails(evidenceDetails);
 
-        List<AudioVideoEvidence> videoList = new ArrayList<>(singletonList(AudioVideoEvidence.builder().value(evidenceDetails).build()));
+        final List<AudioVideoEvidence> videoList = new ArrayList<>(singletonList(AudioVideoEvidence.builder().value(evidenceDetails).build()));
 
         sscsCaseData.setAudioVideoEvidence(videoList);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertNull(response.getData().getDocumentStaging().getPreviewDocument());
-        assertNull(response.getData().getDocumentGeneration().getSignedBy());
-        assertNull(response.getData().getDocumentGeneration().getSignedRole());
-        assertNull(response.getData().getDocumentGeneration().getGenerateNotice());
-        assertNull(response.getData().getDocumentStaging().getDateAdded());
+        assertThat(response.getData().getDocumentStaging().getPreviewDocument()).isNull();
+        assertThat(response.getData().getDocumentGeneration().getSignedBy()).isNull();
+        assertThat(response.getData().getDocumentGeneration().getSignedRole()).isNull();
+        assertThat(response.getData().getDocumentGeneration().getGenerateNotice()).isNull();
+        assertThat(response.getData().getDocumentStaging().getDateAdded()).isNull();
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
-        verify(footerService).addFooter(eq(DocumentLink.builder().documentFilename("RIP 1 document uploaded on " + LocalDate.now().toString() + ".pdf").documentUrl("rip1.com").documentBinaryUrl("rip1.com/binary").build()), eq("RIP 1 document"), eq("A"));
+        verify(footerService).addFooter(DocumentLink.builder().documentFilename("RIP 1 document uploaded on " + LocalDate.now() + ".pdf").documentUrl("rip1.com").documentBinaryUrl("rip1.com/binary").build(), "RIP 1 document", "A");
 
-        assertNull(response.getData().getInterlocReviewState());
-        assertEquals(InterlocReferralReason.NONE, response.getData().getInterlocReferralReason());
-        assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED));
-        assertNull(response.getData().getAudioVideoEvidence());
-        assertEquals(1, response.getData().getDwpDocuments().size());
-        assertEquals(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build(), response.getData().getDwpDocuments().get(0).getValue().getAvDocumentLink());
-        assertNull(response.getData().getDwpDocuments().get(0).getValue().getBundleAddition());
-        assertEquals(LocalDate.now().toString(), response.getData().getDwpDocuments().get(0).getValue().getDateApproved());
-        assertEquals(LocalDate.now().toString(), response.getData().getDwpDocuments().get(0).getValue().getDocumentDateAdded());
-        assertEquals("video.mp4", response.getData().getDwpDocuments().get(0).getValue().getDocumentFileName());
-        assertEquals("videoDocument", response.getData().getDwpDocuments().get(0).getValue().getDocumentType());
-        assertEquals("DWP", response.getData().getDwpDocuments().get(0).getValue().getPartyUploaded().getLabel());
+        assertThat(response.getData().getInterlocReviewState()).isNull();
+        assertThat(response.getData().getInterlocReferralReason()).isEqualTo(InterlocReferralReason.NONE);
+        assertThat(response.getData().getDwpState()).isEqualTo(DIRECTION_ACTION_REQUIRED);
+        assertThat(response.getData().getAudioVideoEvidence()).isNull();
+        assertThat(response.getData().getDwpDocuments()).hasSize(1);
+        assertThat(response.getData().getDwpDocuments().getFirst().getValue().getAvDocumentLink()).isEqualTo(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build());
+        assertThat(response.getData().getDwpDocuments().getFirst().getValue().getBundleAddition()).isNull();
+        assertThat(response.getData().getDwpDocuments().getFirst().getValue().getDateApproved()).isEqualTo(LocalDate.now().toString());
+        assertThat(response.getData().getDwpDocuments().getFirst().getValue().getDocumentDateAdded()).isEqualTo(LocalDate.now().toString());
+        assertThat(response.getData().getDwpDocuments().getFirst().getValue().getDocumentFileName()).isEqualTo("video.mp4");
+        assertThat(response.getData().getDwpDocuments().getFirst().getValue().getDocumentType()).isEqualTo("videoDocument");
+        assertThat(response.getData().getDwpDocuments().getFirst().getValue().getPartyUploaded().getLabel()).isEqualTo("DWP");
         // RIP1
-        assertEquals("A", response.getData().getSscsDocument().get(0).getValue().getBundleAddition());
-        assertEquals(RIP1.getValue(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
-        assertEquals("New doc with footer", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentFilename());
-        assertEquals("Addition A - DWP - RIP 1 document for A/V file: video.mp4", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
-        assertEquals("DWP", response.getData().getSscsDocument().get(0).getValue().getPartyUploaded().getLabel());
-
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getBundleAddition()).isEqualTo("A");
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentType()).isEqualTo(RIP1.getValue());
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentLink().getDocumentFilename()).isEqualTo("New doc with footer");
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentFileName()).isEqualTo("Addition A - DWP - RIP 1 document for A/V file: video.mp4");
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getPartyUploaded().getLabel()).isEqualTo("DWP");
     }
 
     @Test
-    public void givenAdmitEvidenceFromDwpWithExistingDwpDocumentsAndNoRip1_willClearAudioVideoEvidenceAndInterlocReviewStateAndAddToDwpDocumentsCollectionAndShouldNotAddRip1ToBundle() {
+    void givenAdmitEvidenceFromDwpWithExistingDwpDocumentsAndNoRip1_willClearAudioVideoEvidenceAndInterlocReviewStateAndAddToDwpDocumentsCollectionAndShouldNotAddRip1ToBundle() {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(ADMIT_EVIDENCE.getCode()));
 
-        AudioVideoEvidenceDetails evidenceDetails = AudioVideoEvidenceDetails.builder()
+        final AudioVideoEvidenceDetails evidenceDetails = AudioVideoEvidenceDetails.builder()
                 .documentLink(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
                 .fileName("video.mp4")
                 .partyUploaded(UploadParty.DWP)
                 .dateAdded(LocalDate.now())
                 .build();
 
-        List<AudioVideoEvidence> videoList = new ArrayList<>(singletonList(AudioVideoEvidence.builder().value(evidenceDetails).build()));
+        final List<AudioVideoEvidence> videoList = new ArrayList<>(singletonList(AudioVideoEvidence.builder().value(evidenceDetails).build()));
 
         sscsCaseData.setSelectedAudioVideoEvidenceDetails(evidenceDetails);
 
         sscsCaseData.setAudioVideoEvidence(videoList);
 
-        List<DwpDocument> dwpDocuments = singletonList(DwpDocument.builder().value(
+        final List<DwpDocument> dwpDocuments = singletonList(DwpDocument.builder().value(
                 DwpDocumentDetails.builder()
                         .documentLink(DocumentLink.builder().documentFilename("existing.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
                         .documentFileName("existing.mp4")
@@ -498,82 +520,82 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.setDwpDocuments(dwpDocuments);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertNull(response.getData().getDocumentStaging().getPreviewDocument());
-        assertNull(response.getData().getDocumentGeneration().getSignedBy());
-        assertNull(response.getData().getDocumentGeneration().getSignedRole());
-        assertNull(response.getData().getDocumentGeneration().getGenerateNotice());
-        assertNull(response.getData().getDocumentStaging().getDateAdded());
+        assertThat(response.getData().getDocumentStaging().getPreviewDocument()).isNull();
+        assertThat(response.getData().getDocumentGeneration().getSignedBy()).isNull();
+        assertThat(response.getData().getDocumentGeneration().getSignedRole()).isNull();
+        assertThat(response.getData().getDocumentGeneration().getGenerateNotice()).isNull();
+        assertThat(response.getData().getDocumentStaging().getDateAdded()).isNull();
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
-        assertNull(response.getData().getInterlocReviewState());
-        assertEquals(InterlocReferralReason.NONE, response.getData().getInterlocReferralReason());
-        assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED));
-        assertNull(response.getData().getAudioVideoEvidence());
-        assertEquals(2, response.getData().getDwpDocuments().size());
-        assertEquals(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build(), response.getData().getDwpDocuments().get(0).getValue().getAvDocumentLink());
-        assertNull(response.getData().getDwpDocuments().get(0).getValue().getBundleAddition());
-        assertEquals(LocalDate.now().toString(), response.getData().getDwpDocuments().get(0).getValue().getDateApproved());
-        assertEquals(LocalDate.now().toString(), response.getData().getDwpDocuments().get(0).getValue().getDocumentDateAdded());
-        assertEquals("video.mp4", response.getData().getDwpDocuments().get(0).getValue().getDocumentFileName());
-        assertEquals("videoDocument", response.getData().getDwpDocuments().get(0).getValue().getDocumentType());
-        assertEquals("DWP", response.getData().getDwpDocuments().get(0).getValue().getPartyUploaded().getLabel());
+        assertThat(response.getData().getInterlocReviewState()).isNull();
+        assertThat(response.getData().getInterlocReferralReason()).isEqualTo(InterlocReferralReason.NONE);
+        assertThat(response.getData().getDwpState()).isEqualTo(DIRECTION_ACTION_REQUIRED);
+        assertThat(response.getData().getAudioVideoEvidence()).isNull();
+        assertThat(response.getData().getDwpDocuments()).hasSize(2);
+        assertThat(response.getData().getDwpDocuments().getFirst().getValue().getAvDocumentLink()).isEqualTo(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build());
+        assertThat(response.getData().getDwpDocuments().getFirst().getValue().getBundleAddition()).isNull();
+        assertThat(response.getData().getDwpDocuments().getFirst().getValue().getDateApproved()).isEqualTo(LocalDate.now().toString());
+        assertThat(response.getData().getDwpDocuments().getFirst().getValue().getDocumentDateAdded()).isEqualTo(LocalDate.now().toString());
+        assertThat(response.getData().getDwpDocuments().getFirst().getValue().getDocumentFileName()).isEqualTo("video.mp4");
+        assertThat(response.getData().getDwpDocuments().getFirst().getValue().getDocumentType()).isEqualTo("videoDocument");
+        assertThat(response.getData().getDwpDocuments().getFirst().getValue().getPartyUploaded().getLabel()).isEqualTo("DWP");
 
         //FIXME: Check RIP1 empty in sscs documents
     }
 
     @Test
-    public void excludeEvidence_willClearAudioVideoEvidenceAndInterlocReviewState() {
+    void excludeEvidence_willClearAudioVideoEvidenceAndInterlocReviewState() {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(EXCLUDE_EVIDENCE.getCode()));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertNull(response.getData().getDocumentStaging().getPreviewDocument());
-        assertNull(response.getData().getDocumentGeneration().getSignedBy());
-        assertNull(response.getData().getDocumentGeneration().getSignedRole());
-        assertNull(response.getData().getDocumentGeneration().getGenerateNotice());
-        assertNull(response.getData().getDocumentStaging().getDateAdded());
+        assertThat(response.getData().getDocumentStaging().getPreviewDocument()).isNull();
+        assertThat(response.getData().getDocumentGeneration().getSignedBy()).isNull();
+        assertThat(response.getData().getDocumentGeneration().getSignedRole()).isNull();
+        assertThat(response.getData().getDocumentGeneration().getGenerateNotice()).isNull();
+        assertThat(response.getData().getDocumentStaging().getDateAdded()).isNull();
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
-        assertNull(response.getData().getInterlocReviewState());
-        assertEquals(InterlocReferralReason.NONE, response.getData().getInterlocReferralReason());
-        assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED));
-        assertEquals(1, response.getData().getAudioVideoEvidence().size());
+        assertThat(response.getData().getInterlocReviewState()).isNull();
+        assertThat(response.getData().getInterlocReferralReason()).isEqualTo(InterlocReferralReason.NONE);
+        assertThat(response.getData().getDwpState()).isEqualTo(DIRECTION_ACTION_REQUIRED);
+        assertThat(response.getData().getAudioVideoEvidence()).hasSize(1);
     }
 
     @Test
-    public void excludeEvidenceWithNoMoreAudioVideoEvidenceToProcess_willClearAudioVideoEvidenceCollectionAndInterlocReviewState() {
+    void excludeEvidenceWithNoMoreAudioVideoEvidenceToProcess_willClearAudioVideoEvidenceCollectionAndInterlocReviewState() {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(EXCLUDE_EVIDENCE.getCode()));
         sscsCaseData.getAudioVideoEvidence().remove(1);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertNull(response.getData().getDocumentStaging().getPreviewDocument());
-        assertNull(response.getData().getDocumentGeneration().getSignedBy());
-        assertNull(response.getData().getDocumentGeneration().getSignedRole());
-        assertNull(response.getData().getDocumentGeneration().getGenerateNotice());
-        assertNull(response.getData().getDocumentStaging().getDateAdded());
+        assertThat(response.getData().getDocumentStaging().getPreviewDocument()).isNull();
+        assertThat(response.getData().getDocumentGeneration().getSignedBy()).isNull();
+        assertThat(response.getData().getDocumentGeneration().getSignedRole()).isNull();
+        assertThat(response.getData().getDocumentGeneration().getGenerateNotice()).isNull();
+        assertThat(response.getData().getDocumentStaging().getDateAdded()).isNull();
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
-        assertNull(response.getData().getInterlocReviewState());
-        assertEquals(InterlocReferralReason.NONE, response.getData().getInterlocReferralReason());
-        assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED));
-        assertNull(response.getData().getAudioVideoEvidence());
+        assertThat(response.getData().getInterlocReviewState()).isNull();
+        assertThat(response.getData().getInterlocReferralReason()).isEqualTo(InterlocReferralReason.NONE);
+        assertThat(response.getData().getDwpState()).isEqualTo(DIRECTION_ACTION_REQUIRED);
+        assertThat(response.getData().getAudioVideoEvidence()).isNull();
     }
 
     @Test
-    public void sendToJudge_shouldSetInterlocReviewState_toReviewByJudge() {
+    void sendToJudge_shouldSetInterlocReviewState_toReviewByJudge() {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(SEND_TO_JUDGE.getCode()));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verifyNoInteractions(footerService);
-        assertThat(response.getErrors().size(), is(0));
-        assertThat(response.getWarnings().size(), is(0));
-        assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.REVIEW_BY_JUDGE));
-        assertEquals(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE, response.getData().getInterlocReferralReason());
-        assertThat(response.getData().getInterlocReferralDate(), is(LocalDate.now()));
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getWarnings()).isEmpty();
+        assertThat(response.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.REVIEW_BY_JUDGE);
+        assertThat(response.getData().getInterlocReferralReason()).isEqualTo(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE);
+        assertThat(response.getData().getInterlocReferralDate()).isEqualTo(LocalDate.now());
     }
 
     @Test
-    public void processIssueDirectionNoticeForWelshAppeal_shouldSetWelshInterlocReviewState_toAwaitingInformation() {
+    void processIssueDirectionNoticeForWelshAppeal_shouldSetWelshInterlocReviewState_toAwaitingInformation() {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(ISSUE_DIRECTIONS_NOTICE.getCode()));
         sscsCaseData.setLanguagePreferenceWelsh(YesNo.YES.getValue());
 
@@ -581,57 +603,54 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED));
 
-        assertThat(response.getErrors().size(), is(0));
-        assertThat(response.getWarnings().size(), is(0));
-        assertThat(response.getData().getWelshInterlocNextReviewState(), is(InterlocReviewState.AWAITING_INFORMATION.getCcdDefinition()));
-        assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.WELSH_TRANSLATION));
-        assertEquals(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE, response.getData().getInterlocReferralReason());
-        assertThat(response.getData().getInterlocReferralDate(), is(LocalDate.now()));
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getWarnings()).isEmpty();
+        assertThat(response.getData().getWelshInterlocNextReviewState()).isEqualTo(InterlocReviewState.AWAITING_INFORMATION.getCcdDefinition());
+        assertThat(response.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.WELSH_TRANSLATION);
+        assertThat(response.getData().getInterlocReferralReason()).isEqualTo(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE);
+        assertThat(response.getData().getInterlocReferralDate()).isEqualTo(LocalDate.now());
     }
 
     @Test
-    public void sendToJudgeForWelshAppeal_shouldSetWelshInterlocReviewState_toReviewByJudge() {
+    void sendToJudgeForWelshAppeal_shouldSetWelshInterlocReviewState_toReviewByJudge() {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(SEND_TO_JUDGE.getCode()));
         sscsCaseData.setLanguagePreferenceWelsh(YesNo.YES.getValue());
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verifyNoInteractions(footerService);
-        assertThat(response.getErrors().size(), is(0));
-        assertThat(response.getWarnings().size(), is(0));
-        assertThat(response.getData().getWelshInterlocNextReviewState(), is(InterlocReviewState.REVIEW_BY_JUDGE.getCcdDefinition()));
-        assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.WELSH_TRANSLATION));
-        assertEquals(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE, response.getData().getInterlocReferralReason());
-        assertThat(response.getData().getInterlocReferralDate(), is(LocalDate.now()));
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getWarnings()).isEmpty();
+        assertThat(response.getData().getWelshInterlocNextReviewState()).isEqualTo(InterlocReviewState.REVIEW_BY_JUDGE.getCcdDefinition());
+        assertThat(response.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.WELSH_TRANSLATION);
+        assertThat(response.getData().getInterlocReferralReason()).isEqualTo(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE);
+        assertThat(response.getData().getInterlocReferralDate()).isEqualTo(LocalDate.now());
     }
 
     @Test
-    public void givenSendToAdminEventSelected_verifySetInterlocReviewState() {
+    void givenSendToAdminEventSelected_verifySetInterlocReviewState() {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(SEND_TO_ADMIN.getCode()));
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.AWAITING_ADMIN_ACTION));
-        assertEquals(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE, response.getData().getInterlocReferralReason());
+        assertThat(response.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.AWAITING_ADMIN_ACTION);
+        assertThat(response.getData().getInterlocReferralReason()).isEqualTo(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE);
     }
 
     @Test
-    public void givenSendToAdminEventSelectedForWelshAppeal_verifySetWelshInterlocNextReviewState() {
+    void givenSendToAdminEventSelectedForWelshAppeal_verifySetWelshInterlocNextReviewState() {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(SEND_TO_ADMIN.getCode()));
         sscsCaseData.setLanguagePreferenceWelsh(YesNo.YES.getValue());
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getWelshInterlocNextReviewState(),
-            is(InterlocReviewState.AWAITING_ADMIN_ACTION.getCcdDefinition()));
-        assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.WELSH_TRANSLATION));
-        assertEquals(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE, response.getData().getInterlocReferralReason());
+        assertThat(response.getData().getWelshInterlocNextReviewState()).isEqualTo(InterlocReviewState.AWAITING_ADMIN_ACTION.getCcdDefinition());
+        assertThat(response.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.WELSH_TRANSLATION);
+        assertThat(response.getData().getInterlocReferralReason()).isEqualTo(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE);
     }
 
-    @Test
-    @Parameters({
-        "SEND_TO_JUDGE", "SEND_TO_ADMIN"
-    })
-    public void shouldAddNote_whenActionIsSelected(ProcessAudioVideoActionDynamicListItems action) {
+    @ParameterizedTest
+    @EnumSource(value = ProcessAudioVideoActionDynamicListItems.class, names = {"SEND_TO_JUDGE", "SEND_TO_ADMIN"})
+    void shouldAddNote_whenActionIsSelected(final ProcessAudioVideoActionDynamicListItems action) {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(action.getCode()));
         final String note = "This is a note";
         final String userName = "John Lewis";
@@ -640,30 +659,30 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verifyNoInteractions(footerService);
-        assertThat(response.getErrors().size(), is(0));
-        assertThat(response.getWarnings().size(), is(0));
-        assertNull(response.getData().getTempNoteDetail());
-        assertThat(response.getData().getAppealNotePad().getNotesCollection().size(), is(1));
-        assertThat(response.getData().getAppealNotePad().getNotesCollection().get(0), is(Note.builder().value(NoteDetails.builder().noteDate(LocalDate.now().toString()).noteDetail(note).author(userName).build()).build()));
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getWarnings()).isEmpty();
+        assertThat(response.getData().getTempNoteDetail()).isNull();
+        assertThat(response.getData().getAppealNotePad().getNotesCollection()).hasSize(1);
+        assertThat(response.getData().getAppealNotePad().getNotesCollection().getFirst()).isEqualTo(Note.builder().value(NoteDetails.builder().noteDate(LocalDate.now().toString()).noteDetail(note).author(userName).build()).build());
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void shouldAddNoteAndNoUserDetails_thenThrowsException() {
+    @Test
+    void shouldAddNoteAndNoUserDetails_thenThrowsException() {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenThrow(new IllegalStateException("Unable to obtain signed in user details"));
 
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(SEND_TO_ADMIN.getCode()));
-        final String note = "This is a note";
-        sscsCaseData.setTempNoteDetail(note);
+        sscsCaseData.setTempNoteDetail("This is a note");
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThatThrownBy(() -> handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION))
+            .isInstanceOf(IllegalStateException.class);
     }
 
     @Test
-    public void givenAdmitEvidenceFromDwpWithRip1DocumentForWelshCase_willSetInterlocReviewStateAndDocumentTranslationStatus() {
+    void givenAdmitEvidenceFromDwpWithRip1DocumentForWelshCase_willSetInterlocReviewStateAndDocumentTranslationStatus() {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(ProcessAudioVideoActionDynamicListItems.ADMIT_EVIDENCE.getCode()));
         sscsCaseData.setLanguagePreferenceWelsh("Yes");
 
-        AudioVideoEvidenceDetails evidenceDetails = AudioVideoEvidenceDetails.builder()
+        final AudioVideoEvidenceDetails evidenceDetails = AudioVideoEvidenceDetails.builder()
                 .documentLink(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
                 .fileName("video.mp4")
                 .partyUploaded(UploadParty.DWP)
@@ -673,54 +692,55 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
 
         sscsCaseData.setSelectedAudioVideoEvidenceDetails(evidenceDetails);
 
-        List<AudioVideoEvidence> videoList = new ArrayList<>(singletonList(AudioVideoEvidence.builder().value(evidenceDetails).build()));
+        final List<AudioVideoEvidence> videoList = new ArrayList<>(singletonList(AudioVideoEvidence.builder().value(evidenceDetails).build()));
 
         sscsCaseData.setAudioVideoEvidence(videoList);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertNull(response.getData().getDocumentStaging().getPreviewDocument());
-        assertNull(response.getData().getDocumentGeneration().getSignedBy());
-        assertNull(response.getData().getDocumentGeneration().getSignedRole());
-        assertNull(response.getData().getDocumentGeneration().getGenerateNotice());
-        assertNull(response.getData().getDocumentStaging().getDateAdded());
+        assertThat(response.getData().getDocumentStaging().getPreviewDocument()).isNull();
+        assertThat(response.getData().getDocumentGeneration().getSignedBy()).isNull();
+        assertThat(response.getData().getDocumentGeneration().getSignedRole()).isNull();
+        assertThat(response.getData().getDocumentGeneration().getGenerateNotice()).isNull();
+        assertThat(response.getData().getDocumentStaging().getDateAdded()).isNull();
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED));
-        verify(footerService).addFooter(eq(DocumentLink.builder().documentFilename("RIP 1 document uploaded on " + LocalDate.now().toString() + ".pdf").documentUrl("rip1.com").documentBinaryUrl("rip1.com/binary").build()), eq("RIP 1 document"), eq("A"));
+        verify(footerService).addFooter(DocumentLink.builder().documentFilename("RIP 1 document uploaded on " + LocalDate.now() + ".pdf").documentUrl("rip1.com").documentBinaryUrl("rip1.com/binary").build(), "RIP 1 document", "A");
 
-        assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.WELSH_TRANSLATION));
-        assertEquals(InterlocReferralReason.NONE, response.getData().getInterlocReferralReason());
-        assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED));
-        assertNull(response.getData().getAudioVideoEvidence());
-        assertEquals(1, response.getData().getDwpDocuments().size());
-        assertEquals(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build(), response.getData().getDwpDocuments().get(0).getValue().getAvDocumentLink());
-        assertEquals(LocalDate.now().toString(), response.getData().getDwpDocuments().get(0).getValue().getDateApproved());
-        assertEquals(LocalDate.now().toString(), response.getData().getDwpDocuments().get(0).getValue().getDocumentDateAdded());
-        assertEquals("video.mp4", response.getData().getDwpDocuments().get(0).getValue().getDocumentFileName());
-        assertEquals("videoDocument", response.getData().getDwpDocuments().get(0).getValue().getDocumentType());
-        assertEquals("DWP", response.getData().getDwpDocuments().get(0).getValue().getPartyUploaded().getLabel());
+        assertThat(response.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.WELSH_TRANSLATION);
+        assertThat(response.getData().getInterlocReferralReason()).isEqualTo(InterlocReferralReason.NONE);
+        assertThat(response.getData().getDwpState()).isEqualTo(DwpState.DIRECTION_ACTION_REQUIRED);
+        assertThat(response.getData().getAudioVideoEvidence()).isNull();
+        assertThat(response.getData().getDwpDocuments()).hasSize(1);
+        assertThat(response.getData().getDwpDocuments().getFirst().getValue().getAvDocumentLink()).isEqualTo(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build());
+        assertThat(response.getData().getDwpDocuments().getFirst().getValue().getDateApproved()).isEqualTo(LocalDate.now().toString());
+        assertThat(response.getData().getDwpDocuments().getFirst().getValue().getDocumentDateAdded()).isEqualTo(LocalDate.now().toString());
+        assertThat(response.getData().getDwpDocuments().getFirst().getValue().getDocumentFileName()).isEqualTo("video.mp4");
+        assertThat(response.getData().getDwpDocuments().getFirst().getValue().getDocumentType()).isEqualTo("videoDocument");
+        assertThat(response.getData().getDwpDocuments().getFirst().getValue().getPartyUploaded().getLabel()).isEqualTo("DWP");
         // RIP1
-        assertEquals(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED, response.getData().getSscsDocument().get(0).getValue().getDocumentTranslationStatus());
-        assertEquals("A", response.getData().getSscsDocument().get(0).getValue().getBundleAddition());
-        assertEquals(RIP1.getValue(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
-        assertEquals("New doc with footer", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentFilename());
-        assertEquals("Addition A - DWP - RIP 1 document for A/V file: video.mp4", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
-        assertEquals("DWP", response.getData().getSscsDocument().get(0).getValue().getPartyUploaded().getLabel());
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentTranslationStatus()).isEqualTo(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED);
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getBundleAddition()).isEqualTo("A");
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentType()).isEqualTo(RIP1.getValue());
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentLink().getDocumentFilename()).isEqualTo("New doc with footer");
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentFileName()).isEqualTo("Addition A - DWP - RIP 1 document for A/V file: video.mp4");
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getPartyUploaded().getLabel()).isEqualTo("DWP");
     }
 
-    @Test
-    @Parameters({"ADMIT_EVIDENCE, AWAITING_INFORMATION, AWAITING_INFORMATION",
+    @ParameterizedTest
+    @CsvSource(value = {
+        "ADMIT_EVIDENCE, AWAITING_INFORMATION, AWAITING_INFORMATION",
         "ADMIT_EVIDENCE, REVIEW_BY_JUDGE, REVIEW_BY_JUDGE",
         "ADMIT_EVIDENCE, AWAITING_ADMIN_ACTION, AWAITING_ADMIN_ACTION",
         "SEND_TO_ADMIN, CLEAR_INTERLOC_REVIEW_STATE, null",
-        "SEND_TO_ADMIN, null, AWAITING_ADMIN_ACTION",
-    })
-    public void givenProcessAudioVideoReviewStateSelected_overrideTheInterlocReviewState(ProcessAudioVideoActionDynamicListItems action,
-                                                                                         @Nullable ProcessAudioVideoReviewState overrideState,
-                                                                                         @Nullable InterlocReviewState finalState) {
+        "SEND_TO_ADMIN, null, AWAITING_ADMIN_ACTION"
+    }, nullValues = "null")
+    void givenProcessAudioVideoReviewStateSelected_overrideTheInterlocReviewState(final ProcessAudioVideoActionDynamicListItems action,
+                                                                                   final ProcessAudioVideoReviewState overrideState,
+                                                                                   final InterlocReviewState finalState) {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(action.getCode()));
         sscsCaseData.setProcessAudioVideoReviewState(overrideState);
 
-        AudioVideoEvidenceDetails evidenceDetails = AudioVideoEvidenceDetails.builder()
+        final AudioVideoEvidenceDetails evidenceDetails = AudioVideoEvidenceDetails.builder()
                 .documentLink(DocumentLink.builder().documentFilename("video.mp4").documentUrl("test.com").documentBinaryUrl("test.com/binary").build())
                 .fileName("video.mp4")
                 .partyUploaded(UploadParty.DWP)
@@ -730,35 +750,34 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
 
         sscsCaseData.setSelectedAudioVideoEvidenceDetails(evidenceDetails);
 
-        List<AudioVideoEvidence> videoList = new ArrayList<>(singletonList(AudioVideoEvidence.builder().value(evidenceDetails).build()));
+        final List<AudioVideoEvidence> videoList = new ArrayList<>(singletonList(AudioVideoEvidence.builder().value(evidenceDetails).build()));
 
         sscsCaseData.setAudioVideoEvidence(videoList);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertNull(response.getData().getProcessAudioVideoReviewState());
+        assertThat(response.getData().getProcessAudioVideoReviewState()).isNull();
         if (finalState == null) {
-            assertNull(response.getData().getInterlocReviewState());
+            assertThat(response.getData().getInterlocReviewState()).isNull();
         } else {
-            assertThat(response.getData().getInterlocReviewState(), is(finalState));
+            assertThat(response.getData().getInterlocReviewState()).isEqualTo(finalState);
         }
     }
 
-
     @Test
-    public void givenAdmitEvidence_willCopyOtherPartyFieldsToSscsDocuments() {
+    void givenAdmitEvidence_willCopyOtherPartyFieldsToSscsDocuments() {
         sscsCaseData.setProcessAudioVideoAction(new DynamicList(ADMIT_EVIDENCE.getCode()));
-        sscsCaseData.getAudioVideoEvidence().get(0).getValue().setOriginalSenderOtherPartyId("1");
-        sscsCaseData.getAudioVideoEvidence().get(0).getValue().setOriginalSenderOtherPartyName("Other Party");
-        sscsCaseData.setSelectedAudioVideoEvidenceDetails(sscsCaseData.getAudioVideoEvidence().get(0).getValue());
+        sscsCaseData.getAudioVideoEvidence().getFirst().getValue().setOriginalSenderOtherPartyId("1");
+        sscsCaseData.getAudioVideoEvidence().getFirst().getValue().setOriginalSenderOtherPartyName("Other Party");
+        sscsCaseData.setSelectedAudioVideoEvidenceDetails(sscsCaseData.getAudioVideoEvidence().getFirst().getValue());
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("Addition A - Appellant - Statement for A/V file: music.mp3", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
-        assertEquals(DocumentType.AUDIO_DOCUMENT.getValue(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
-        assertEquals("Appellant", response.getData().getSscsDocument().get(0).getValue().getPartyUploaded().getLabel());
-        assertEquals("New doc with footer", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentFilename());
-        assertEquals("Other Party", response.getData().getSscsDocument().get(0).getValue().getOriginalSenderOtherPartyName());
-        assertEquals("1", response.getData().getSscsDocument().get(0).getValue().getOriginalSenderOtherPartyId());
-        assertEquals(YesNo.YES, response.getData().getHasUnprocessedAudioVideoEvidence());
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentFileName()).isEqualTo("Addition A - Appellant - Statement for A/V file: music.mp3");
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentType()).isEqualTo(DocumentType.AUDIO_DOCUMENT.getValue());
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getPartyUploaded().getLabel()).isEqualTo("Appellant");
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentLink().getDocumentFilename()).isEqualTo("New doc with footer");
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getOriginalSenderOtherPartyName()).isEqualTo("Other Party");
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getOriginalSenderOtherPartyId()).isEqualTo("1");
+        assertThat(response.getData().getHasUnprocessedAudioVideoEvidence()).isEqualTo(YesNo.YES);
     }
 }
