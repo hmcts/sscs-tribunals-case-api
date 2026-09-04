@@ -164,9 +164,7 @@ public class CitizenController {
     })
     public ResponseEntity<OnlineHearing> resendTyaReq(
             @Parameter(description = "user authorisation header", example = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdW")
-            @RequestHeader(AUTHORIZATION) String authorisation,
-            @Parameter(description = "email address of the appellant", example = "foo@bar.com")
-            @RequestBody() AssociateCaseDetails associateCaseDetails
+            @RequestHeader(AUTHORIZATION) String authorisation
     ) {
         citizenLoginService.resendTyaForCitizen(getUserTokens(authorisation));
 
