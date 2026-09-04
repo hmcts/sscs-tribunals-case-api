@@ -321,7 +321,8 @@ dependencyManagement {
 }
 
 ext {
-    set('activemq.version', '6.2.7')
+    // CVE-2026-59878, CVE-2026-61487
+    set('activemq.version', '6.2.9')
     set('netty.version', '4.2.17.Final')
     set('log4j2.version', '2.26.1')
     set('commons-lang3.version', '3.20.0')
