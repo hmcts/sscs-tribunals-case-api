@@ -268,10 +268,10 @@ sonarqube {
                 "src/main/java/uk/gov/hmcts/reform/sscs/tyanotifications/utils/GetAllTemplatesFromNotify.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/bulkscan/domain/**," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/bulkscan/bulkscancore/domain/**," +
-                "src/main/java/uk/gov/hmcts/reform/sscs/controller/*.java" +
-                "src/main/java/uk/gov/hmcts/reform/sscs/service/*.java" +
-                "src/test/java/uk/gov/hmcts/reform/sscs/service/*.java" +
-                "src/main/java/uk/gov/hmcts/reform/sscs/tyanotifications/service/*.java"
+                "src/main/java/uk/gov/hmcts/reform/sscs/controller/*.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/service/*.java," +
+                "src/test/java/uk/gov/hmcts/reform/sscs/service/*.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/tyanotifications/service/*.java,"
         property "sonar.host.url", "https://sonar.reform.hmcts.net/"
     }
 }
