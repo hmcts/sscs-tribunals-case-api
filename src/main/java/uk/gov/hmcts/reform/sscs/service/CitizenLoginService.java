@@ -233,4 +233,19 @@ public class CitizenLoginService {
         getAllSubscriptionsOnCase(sscsCaseDetails).filter(subscription -> subscription != null && email.equalsIgnoreCase(subscription.getEmail()))
                 .forEach(subscription -> subscription.setLastLoggedIntoMya(lastLoggedIntoMya));
     }
+
+    public void resendTyaForCitizen(IdamTokens authorisation) {
+        String email = authorisation.getEmail();
+        IdamTokens idamToken = idamService.getIdamTokens();
+        List<CaseDetails> caseDetails = citizenCcdService.searchForCitizensBasedOnEmail(idamToken, email);
+        List<Subscription> subscriptions = caseDetails.stream()
+                .map(sscsCcdConvertService::getCaseDetails)
+                .flatMap(sscCaseDetails -> getAllSubscriptionsOnCase(sscCaseDetails)
+                        .filter(subscription -> subscription != null
+                                && authorisation.getEmail().equalsIgnoreCase(subscription.getEmail())))
+                .toList();
+
+        log.info("Received resend tya request for: {}", subscriptions);
+
+    }
 }

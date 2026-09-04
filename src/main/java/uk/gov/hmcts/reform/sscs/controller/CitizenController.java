@@ -156,6 +156,23 @@ public class CitizenController {
             .orElseGet(() -> ResponseEntity.status(FORBIDDEN.value()).build());
     }
 
+
+    @PostMapping(value = "/sendReq", produces = APPLICATION_JSON_VALUE)
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "The citizen has resent the tya code"),
+        @ApiResponse(responseCode = "403", description = "The citizen cannot be resent the tya code, ")
+    })
+    public ResponseEntity<OnlineHearing> resendTyaReq(
+            @Parameter(description = "user authorisation header", example = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdW")
+            @RequestHeader(AUTHORIZATION) String authorisation,
+            @Parameter(description = "email address of the appellant", example = "foo@bar.com")
+            @RequestBody() AssociateCaseDetails associateCaseDetails
+    ) {
+        citizenLoginService.resendTyaForCitizen(getUserTokens(authorisation));
+
+        return ResponseEntity.ok().build();
+    }
+
     @Operation(summary = "Log time against a case for a citizen", description = "Log time against a case a case for "
         + "a citizen idam user. Checks the email is match the case before logging the mya time with the idam user.")
     @ApiResponses(value = {
