@@ -6,7 +6,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 
 import java.util.Objects;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -21,20 +20,14 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Service
 class ConfidentialityConfirmedMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private final boolean cmOtherPartyConfidentialityEnabled;
     private static final String MISSING_CONFIDENTIALITY_MSG = "Confidentiality for all parties must be determined to either Yes or No.";
-
-    public ConfidentialityConfirmedMidEventHandler(@Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
-        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
-    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
 
-        if (!cmOtherPartyConfidentialityEnabled
-            || callbackType != CallbackType.MID_EVENT
+        if (callbackType != CallbackType.MID_EVENT
             || callback.getEvent() != EventType.CONFIDENTIALITY_CONFIRMED) {
             return false;
         }

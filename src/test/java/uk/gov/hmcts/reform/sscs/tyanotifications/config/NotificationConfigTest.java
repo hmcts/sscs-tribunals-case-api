@@ -217,12 +217,8 @@ class NotificationConfigTest {
         assertThat(template.getSmsSenderTemplateId()).isEmpty();
     }
 
-    @ParameterizedTest
-    @CsvSource({
-        "false, PIP",
-        "true, PIP"
-    })
-    void getTemplateSetsNullDocmosisWhenValidAppealCreatedAndNonChildSupport(boolean cmFlagEnabled, Benefit benefit) {
+    @Test
+    void getTemplateSetsNullDocmosisWhenValidAppealCreatedAndNonChildSupport() {
         when(env.getProperty("notification.english.oral.letterTemplateName.docmosisId")).thenReturn("docmosisId");
 
         final CcdNotificationWrapper wrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper
@@ -232,22 +228,19 @@ class NotificationConfigTest {
             .build());
 
         final NotificationConfig config = new NotificationConfig(env);
-        if (cmFlagEnabled) {
-            setField(config, "cmOtherPartyConfidentialityEnabled", true);
-        }
 
         final Template template = config.getTemplate("emailTemplateName", "smsTemplateName",
-            "letterTemplateName", "letterTemplateName", benefit, wrapper, "readyToList");
+            "letterTemplateName", "letterTemplateName", Benefit.PIP, wrapper, "readyToList");
     
         assertThat(template.getDocmosisTemplateId()).isNull();
     }
 
     @ParameterizedTest
     @CsvSource({
-        "VALID_APPEAL_CREATED, childSupport, true, docmosisId",
-        "APPEAL_RECEIVED, , true, docmosisId"
+        "VALID_APPEAL_CREATED, childSupport, docmosisId",
+        "APPEAL_RECEIVED, , docmosisId"
     })
-    void getTemplateKeepsDocmosisWhenConditionsMet(String notificationEventType, String benefitCode, boolean cmFlagEnabled,
+    void getTemplateKeepsDocmosisWhenConditionsMet(String notificationEventType, String benefitCode,
         String expectedDocmosisId) {
         when(env.getProperty("notification.english.oral.letterTemplateName.docmosisId")).thenReturn("docmosisId");
 
@@ -269,7 +262,6 @@ class NotificationConfigTest {
             .build());
 
         final NotificationConfig config = new NotificationConfig(env);
-        setField(config, "cmOtherPartyConfidentialityEnabled", cmFlagEnabled);
 
         final Template template = config.getTemplate("emailTemplateName", "smsTemplateName",
             "letterTemplateName", "letterTemplateName", Benefit.PIP, wrapper, "readyToList");
@@ -297,7 +289,6 @@ class NotificationConfigTest {
             .build());
 
         final NotificationConfig config = new NotificationConfig(env);
-        setField(config, "cmOtherPartyConfidentialityEnabled", true);
 
         final Template template = config.getTemplate("emailTemplateName", "smsTemplateName",
             "letterTemplateName", "updateOtherPartyData.other_party", Benefit.PIP, wrapper, "readyToList");
@@ -307,12 +298,11 @@ class NotificationConfigTest {
 
     @ParameterizedTest
     @CsvSource({
-        "false, uc, UPDATE_OTHER_PARTY_DATA",
-        "true, pip, UPDATE_OTHER_PARTY_DATA",
-        "true, uc, ADD_OTHER_PARTY_DATA"
+        "pip, UPDATE_OTHER_PARTY_DATA",
+        "uc, ADD_OTHER_PARTY_DATA"
     })
     void getTemplateKeepsDocmosisForUpdateOtherPartyDataWhenConditionsNotMet(
-        final boolean cmFlagEnabled, final String benefitCode, final String eventType) {
+         final String benefitCode, final String eventType) {
         when(env.getProperty("notification.english.oral.updateOtherPartyData.other_party.docmosisId")).thenReturn("docmosisId");
 
         final CcdNotificationWrapper wrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper
@@ -328,7 +318,6 @@ class NotificationConfigTest {
             .build());
 
         final NotificationConfig config = new NotificationConfig(env);
-        setField(config, "cmOtherPartyConfidentialityEnabled", cmFlagEnabled);
 
         final Template template = config.getTemplate("emailTemplateName", "smsTemplateName",
             "letterTemplateName", "updateOtherPartyData.other_party", Benefit.PIP, wrapper, "readyToList");
@@ -352,7 +341,6 @@ class NotificationConfigTest {
             .build());
 
         final NotificationConfig config = new NotificationConfig(env);
-        setField(config, "cmOtherPartyConfidentialityEnabled", true);
 
         final Template template = config.getTemplate("emailTemplateName", "smsTemplateName",
             "letterTemplateName", "letterTemplateName", Benefit.PIP, wrapper, "readyToList");
