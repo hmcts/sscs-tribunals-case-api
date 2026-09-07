@@ -171,7 +171,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
                 sscsDocuments.addAll(0, caseData.getSscsDocument());
             }
 
-            caseData.setSscsDocument(sscsDocuments);
+            caseData.setAndSortSscsDocument(sscsDocuments);
 
             caseData.getAudioVideoEvidence().removeIf(evidence -> isSelectedEvidence(evidence, caseData));
         }

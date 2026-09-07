@@ -430,7 +430,7 @@ public class EvidenceUploadService {
     private void removeStatementDocFromDocumentTab(SscsCaseData sscsCaseData, List<SscsDocument> sscsDocument) {
         sscsDocument.removeIf(doc -> doc.getValue().getDocumentFileName().startsWith(TEMP_UNIQUE_ID)
                 || doc.getValue().getDocumentLink().getDocumentFilename().startsWith(TEMP_UNIQUE_ID));
-        sscsCaseData.setSscsDocument(sscsDocument);
+        sscsCaseData.setAndSortSscsDocument(sscsDocument);
     }
 
     protected List<SscsDocument> pullAudioVideoFilesFromDraft(List<SscsDocument> sscsDocuments) {

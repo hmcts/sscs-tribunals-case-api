@@ -99,7 +99,7 @@ public class AdminAppealWithdrawnHandler implements PreSubmitCallbackHandler<Ssc
 
         List<SscsDocument> allDocuments = new ArrayList<>(ofNullable(caseData.getSscsDocument()).orElse(emptyList()));
         allDocuments.addFirst(SscsDocument.builder().value(details).build());
-        caseData.setSscsDocument(allDocuments);
+        caseData.setAndSortSscsDocument(allDocuments);
         caseData.getDocumentStaging().setPreviewDocument(null);
     }
 }

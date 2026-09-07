@@ -60,7 +60,7 @@ public class PostponementRequestService {
 
     private void ensureSscsDocumentsIsNotNull(SscsCaseData sscsCaseData) {
         final List<SscsDocument> sscsDocuments = (sscsCaseData.getSscsDocument() == null) ? new ArrayList<>() : sscsCaseData.getSscsDocument();
-        sscsCaseData.setSscsDocument(sscsDocuments);
+        sscsCaseData.setAndSortSscsDocument(sscsDocuments);
     }
 
     public void addCurrentHearingToExcludeDates(PreSubmitCallbackResponse<SscsCaseData> response) {

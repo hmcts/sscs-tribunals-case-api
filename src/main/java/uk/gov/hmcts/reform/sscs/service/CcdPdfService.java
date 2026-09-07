@@ -116,7 +116,7 @@ public class CcdPdfService {
                     buildScannedDocListFromSscsDoc(pdfDocuments)));
             caseData.setEvidenceHandled(NO.getValue());
         } else {
-            caseData.setSscsDocument(ListUtils.union(emptyIfNull(caseData.getSscsDocument()),
+            caseData.setAndSortSscsDocument(ListUtils.union(emptyIfNull(caseData.getSscsDocument()),
                     emptyIfNull(pdfDocuments)));
         }
     }
