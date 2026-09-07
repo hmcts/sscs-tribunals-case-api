@@ -112,7 +112,7 @@ class CitizenLoginServiceV2Test {
         caseDetails.add(case2);
         SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().id(111L).data(sscsCaseData).build();
         SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().id(222L).data(sscsCaseData).build();
-        when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
+        when(citizenCcdService.searchForCitizenAllCasesNonDormant(citizenIdamTokens)).thenReturn(caseDetails);
         lenient().when(case1.getState()).thenReturn(State.READY_TO_LIST.getId());
         lenient().when(case2.getState()).thenReturn(State.APPEAL_CREATED.getId());
         when(sscsCcdConvertService.getCaseDetails(case1)).thenReturn(sscsCaseDetails1);
@@ -137,7 +137,7 @@ class CitizenLoginServiceV2Test {
         caseDetails.add(case2);
         SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().id(111L).data(sscsCaseData).build();
         SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().id(222L).data(sscsCaseData).build();
-        when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
+        when(citizenCcdService.searchForCitizenAllCasesNonDormant(citizenIdamTokens)).thenReturn(caseDetails);
         lenient().when(case1.getState()).thenReturn(State.READY_TO_LIST.getId());
         lenient().when(case2.getState()).thenReturn(State.APPEAL_CREATED.getId());
         when(sscsCcdConvertService.getCaseDetails(case1)).thenReturn(sscsCaseDetails1);
@@ -168,7 +168,7 @@ class CitizenLoginServiceV2Test {
                 ).build()).build()).build();
         lenient().when(case1.getState()).thenReturn(State.DRAFT.getId());
         lenient().when(case2.getState()).thenReturn(State.APPEAL_CREATED.getId());
-        when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
+        when(citizenCcdService.searchForCitizenAllCasesNonDormant(citizenIdamTokens)).thenReturn(caseDetails);
         when(sscsCcdConvertService.getCaseDetails(eq(case1))).thenReturn(sscsCaseDetails1);
         when(sscsCcdConvertService.getCaseDetails(eq(case2))).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
@@ -196,7 +196,7 @@ class CitizenLoginServiceV2Test {
                 ).build()).build()).id(222L).build();
         lenient().when(case1.getState()).thenReturn(State.DRAFT_ARCHIVED.getId());
         lenient().when(case2.getState()).thenReturn(State.READY_TO_LIST.getId());
-        when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
+        when(citizenCcdService.searchForCitizenAllCasesNonDormant(citizenIdamTokens)).thenReturn(caseDetails);
         when(sscsCcdConvertService.getCaseDetails(case1)).thenReturn(sscsCaseDetails1);
         when(sscsCcdConvertService.getCaseDetails(eq(case2))).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
@@ -319,7 +319,7 @@ class CitizenLoginServiceV2Test {
         caseDetails.add(case1);
         caseDetails.add(case2);
         SscsCaseDetails sscsCaseDetailsWithTya = createSscsCaseDetailsWithAppellantSubscription(tya);
-        when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
+        when(citizenCcdService.searchForCitizenAllCasesNonDormant(citizenIdamTokens)).thenReturn(caseDetails);
         when(sscsCcdConvertService.getCaseDetails(case1)).thenReturn(sscsCaseDetailsWithDifferentTya);
         when(sscsCcdConvertService.getCaseDetails(case2)).thenReturn(sscsCaseDetailsWithTya);
         OnlineHearing onlineHearing = someOnlineHearing(111L);
@@ -337,7 +337,7 @@ class CitizenLoginServiceV2Test {
         caseDetails.add(case1);
         caseDetails.add(case2);
         SscsCaseDetails sscsCaseDetailsWithTya = createSscsCaseDetailsWithAppointeeSubscription(tya);
-        when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
+        when(citizenCcdService.searchForCitizenAllCasesNonDormant(citizenIdamTokens)).thenReturn(caseDetails);
 
         when(sscsCcdConvertService.getCaseDetails(case1)).thenReturn(sscsCaseDetailsWithDifferentTya);
         when(sscsCcdConvertService.getCaseDetails(case2)).thenReturn(sscsCaseDetailsWithTya);
@@ -356,7 +356,7 @@ class CitizenLoginServiceV2Test {
         caseDetails.add(case1);
         caseDetails.add(case2);
         SscsCaseDetails sscsCaseDetailsWithTya = createSscsCaseDetailsWithRepSubscription(tya);
-        when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
+        when(citizenCcdService.searchForCitizenAllCasesNonDormant(citizenIdamTokens)).thenReturn(caseDetails);
         when(sscsCcdConvertService.getCaseDetails(case1)).thenReturn(sscsCaseDetailsWithDifferentTya);
         when(sscsCcdConvertService.getCaseDetails(case2)).thenReturn(sscsCaseDetailsWithTya);
         OnlineHearing onlineHearing = someOnlineHearing(111L);
