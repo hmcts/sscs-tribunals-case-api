@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_SEND_TO_INTERL
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.CONFIDENTIALITY;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty.REP;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.REPRESENTATIVE;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isBenefitTypeChildSupportOrUc;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -15,12 +16,10 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -36,14 +35,12 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
 
     private final PostponementRequestService postponementRequestService;
     private final AddNoteService addNoteService;
-    private final boolean cmConfidentialityEnabled;
 
     @Autowired
     public ValidSendToInterlocAboutToSubmitHandler(PostponementRequestService postponementRequestService,
-                                                   AddNoteService addNoteService, @Value("${feature.cm-other-party-confidentiality.enabled}") final boolean cmConfidentialityEnabled) {
+                                                   AddNoteService addNoteService) {
         this.postponementRequestService = postponementRequestService;
         this.addNoteService = addNoteService;
-        this.cmConfidentialityEnabled = cmConfidentialityEnabled;
     }
 
     @Override
@@ -128,8 +125,7 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
     }
 
     private boolean isConfidentialitySelectionMissing(SscsCaseData sscsCaseData) {
-        return cmConfidentialityEnabled
-                && (sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT) || sscsCaseData.isBenefitType(Benefit.UC))
+        return (isBenefitTypeChildSupportOrUc(sscsCaseData))
                 && isConfidentialityReferral(sscsCaseData)
                 && isSelectionMissing(sscsCaseData.getExtendedSscsCaseData().getSelectedConfidentialityParty());
     }

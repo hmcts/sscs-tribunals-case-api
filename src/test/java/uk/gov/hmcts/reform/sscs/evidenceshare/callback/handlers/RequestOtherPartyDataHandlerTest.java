@@ -54,8 +54,8 @@ class RequestOtherPartyDataHandlerTest {
     @BeforeEach
     void setUp() {
         handler = new RequestOtherPartyDataHandler(updateCcdCaseService,
-            idamService,
-            true);
+            idamService
+        );
     }
 
     @ParameterizedTest(name = "event={0} => can handle")
@@ -144,8 +144,8 @@ class RequestOtherPartyDataHandlerTest {
     void handle_shouldNotUpdateCcd_whenToggledOff() {
 
         boolean canHandle = new RequestOtherPartyDataHandler(updateCcdCaseService,
-            idamService,
-            false).canHandle(SUBMITTED,
+            idamService
+        ).canHandle(SUBMITTED,
             callback);
 
         assertThat(canHandle).isFalse();

@@ -1,6 +1,6 @@
 import { test } from '../lib/steps.factory';
 import { createChildSupportCaseForInterlocReviewValidation } from '../api/client/sscs/factory/appeal.type.factory';
-import { credentials, featureFlags } from '../config/config';
+import { credentials } from '../config/config';
 
 const users = [
   {
@@ -10,11 +10,6 @@ const users = [
 ] as const;
 
 test.describe('CM interlocutory review appeal validated', () => {
-  test.skip(
-    !featureFlags.cmOtherPartyConfidentialityEnabled,
-    'CM confidentiality flag is disabled'
-  );
-
   for (const user of users) {
     test(
       `${user.label} validates an interlocutory review pre-valid Child Support appeal and moves it to Await Other Party Data`,

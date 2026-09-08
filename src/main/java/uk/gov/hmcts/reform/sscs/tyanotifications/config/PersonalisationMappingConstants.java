@@ -18,6 +18,7 @@ public final class PersonalisationMappingConstants {
     public static final String APPELLANT_NAME = "appellant_name";
     public static final String APPELLANT_CONFIDENTIALITY_REQUIRED = "appellant_confidentiality_required";
     public static final String APPOINTEE_DESCRIPTION = "appointee_description";
+    public static final String APPOINTEE_DESCRIPTION_WELSH = "appointee_description_welsh";
     public static final String APPOINTEE_DETAILS_LITERAL = "appointee_details";
     public static final String APPOINTEE_DETAILS_LITERAL_WELSH = "welsh_appointee_details";
     public static final String APPOINTEE_NAME = "appointee_name";
@@ -38,6 +39,7 @@ public final class PersonalisationMappingConstants {
     public static final String CREATED_DATE_WELSH = "created_date_welsh";
     public static final String CURRENT_DATE_WELSH = "welsh_current_date";
     public static final String DAYS_TO_HEARING_LITERAL = "days_to_hearing_text";
+    public static final String DAYS_TO_HEARING_LITERAL_WELSH = "days_to_hearing_text_welsh";
     public static final String DECISION_DATE_LITERAL = "decision_date";
     public static final String DECISION_POSTED_RECEIVE_DATE = "decision_posted_receive_date";
     public static final String DECISION_POSTED_RECEIVE_DATE_WELSH = "welsh_decision_posted_receive_date";
@@ -63,6 +65,7 @@ public final class PersonalisationMappingConstants {
     public static final String HEARING_ARRANGEMENT_DETAILS_LITERAL_WELSH = "welsh_hearing_arrangement_details";
     public static final String HEARING_CONTACT_DATE = "hearing_contact_date";
     public static final String HEARING_DATE_LITERAL = "hearing_date";
+    public static final String HEARING_DATE_FORMATTED_LITERAL = "hearing_date_formatted";
     public static final String HEARING_DATE_WELSH = "welsh_hearing_date";
     public static final String HEARING_DETAILS_LITERAL = "hearing_details";
     public static final String HEARING_DETAILS_LITERAL_WELSH = "welsh_hearing_details";

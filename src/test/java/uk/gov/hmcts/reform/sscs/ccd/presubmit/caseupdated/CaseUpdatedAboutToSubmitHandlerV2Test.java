@@ -44,7 +44,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -110,7 +109,7 @@ import uk.gov.hmcts.reform.sscs.util.LogCaptureExtension;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
-public class CaseUpdatedAboutToSubmitHandlerV2Test {
+class CaseUpdatedAboutToSubmitHandlerV2Test {
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
@@ -130,7 +129,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     private VenueService venueService;
     @Mock
     private PanelCompositionService panelCompositionService;
-  
+
     @Mock
     private HearingDurationsService hearingDurationsService;
 
@@ -151,7 +150,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
 
     @BeforeEach
     void setUp() {
-        handler = createNewCaseHandler(false);
+        handler = createNewCaseHandler();
 
         sscsCaseData = SscsCaseData.builder()
                 .ccdCaseId("ccdId")
@@ -311,7 +310,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     }
 
     @Test
-    public void givenPartyTypeHasFirstLineOfAddressAndInvalidPostcode_thenProvideAnError() {
+    void givenPartyTypeHasFirstLineOfAddressAndInvalidPostcode_thenProvideAnError() {
         Representative representative = Representative.builder()
                 .name(Name.builder().firstName("Test").lastName("Test").build())
                 .address(Address.builder().line1("123 Lane").postcode("73GH Y7U").build())
@@ -344,7 +343,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     }
 
     @Test
-    public void givenPartyTypeHasNoFirstLineOfAddressAndValidPostcode_thenProvideAnError() {
+    void givenPartyTypeHasNoFirstLineOfAddressAndValidPostcode_thenProvideAnError() {
         Representative representative = Representative.builder()
                 .name(Name.builder().firstName("Test").lastName("Test").build())
                 .address(Address.builder().line1(null).postcode("CM120NS").build())
@@ -377,7 +376,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     }
 
     @Test
-    public void givenPartyTypeIsSetToFalse_thenGiveNoValidation() {
+    void givenPartyTypeIsSetToFalse_thenGiveNoValidation() {
         Representative representative = Representative.builder()
                 .name(Name.builder().firstName("").lastName("").build())
                 .address(Address.builder().line1(null).postcode(null).build())
@@ -402,7 +401,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     }
 
     @Test
-    public void givenPartyTypeIsSetToTrueAndAddressIsEmpty_thenGiveValidation() {
+    void givenPartyTypeIsSetToTrueAndAddressIsEmpty_thenGiveValidation() {
         Representative representative = Representative.builder()
                 .name(Name.builder().firstName("").lastName("").build())
                 .address(Address.builder().line1(null).postcode(null).build())
@@ -431,7 +430,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     }
 
     @Test
-    public void givenIsThereAJointPartyHasBeenSetToNo_thenClearJointPartyFieldsOnCaseDetails() {
+    void givenIsThereAJointPartyHasBeenSetToNo_thenClearJointPartyFieldsOnCaseDetails() {
         callback.getCaseDetails().getCaseData().setHasJointParty(YesNo.NO);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -446,7 +445,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     }
 
     @Test
-    public void givenJointPartySameAddressAsAppellantIsYes_validateJointPartyAddressIsUpdated() {
+    void givenJointPartySameAddressAsAppellantIsYes_validateJointPartyAddressIsUpdated() {
         JointParty jointParty = JointParty.builder()
                 .name(Name.builder().firstName("Test").lastName("Test").build())
                 .jointPartyAddressSameAsAppellant(YES)
@@ -464,7 +463,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     }
 
     @Test
-    public void givenJointPartySameAddressAsAppellantIsNull_validateJointPartyAddress() {
+    void givenJointPartySameAddressAsAppellantIsNull_validateJointPartyAddress() {
         JointParty jointParty = JointParty.builder()
                 .name(Name.builder().firstName("Test").lastName("Test").build())
                 .jointPartyAddressSameAsAppellant(null)
@@ -484,7 +483,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     }
 
     @Test
-    public void givenJointSameAddressAsAppeallantIsSetToNo_validateJointPartyAddress() {
+    void givenJointSameAddressAsAppeallantIsSetToNo_validateJointPartyAddress() {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setLine1("123 The Street");
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("CM120NS");
 
@@ -505,7 +504,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     }
 
     @Test
-    public void givenJointPartySameAddressAsAppeallantIsSetToYes_validateAppeallantAddressNotJointParty() {
+    void givenJointPartySameAddressAsAppeallantIsSetToYes_validateAppeallantAddressNotJointParty() {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setLine1(null);
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("73GH Y7U");
 
@@ -527,7 +526,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     }
 
     @Test
-    public void givenJointSameAddressAsAppeallantIsSetToYes_validateJointPartyAddress() {
+    void givenJointSameAddressAsAppeallantIsSetToYes_validateJointPartyAddress() {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setLine1("123 The Street");
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("CM120NS");
 
@@ -1387,34 +1386,6 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     @CsvSource({"childSupport,Child Support", "taxCredit,Tax Credit", "guardiansAllowance,Guardians Allowance",
         "taxFreeChildcare,Tax-Free Childcare", "homeResponsibilitiesProtection,Home Responsibilities Protection",
         "childBenefit,Child Benefit","thirtyHoursFreeChildcare,30 Hours Free Childcare",
-        "guaranteedMinimumPension,Guaranteed Minimum Pension (COEG)","nationalInsuranceCredits,National Insurance Credits"})
-    void givenACaseAppellantConfidentialityYes_thenCaseConfidentialYes(String shortName, String benefitDescription) {
-        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(YesNoUndetermined.YES);
-        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
-        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefitDescription);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertEquals(YES, response.getData().getIsConfidentialCase());
-    }
-
-    @ParameterizedTest
-    @CsvSource({"childSupport,Child Support", "taxCredit,Tax Credit", "guardiansAllowance,Guardians Allowance",
-        "taxFreeChildcare,Tax-Free Childcare", "homeResponsibilitiesProtection,Home Responsibilities Protection",
-        "childBenefit,Child Benefit","thirtyHoursFreeChildcare,30 Hours Free Childcare",
-        "guaranteedMinimumPension,Guaranteed Minimum Pension (COEG)","nationalInsuranceCredits,National Insurance Credits"})
-    void givenACaseAppellantConfidentialityNo_thenCaseConfidentialNull(String shortName, String benefitDescription) {
-        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(YesNoUndetermined.NO);
-        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
-        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefitDescription);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertEquals(NO, response.getData().getIsConfidentialCase());
-    }
-
-    @ParameterizedTest
-    @CsvSource({"childSupport,Child Support", "taxCredit,Tax Credit", "guardiansAllowance,Guardians Allowance",
-        "taxFreeChildcare,Tax-Free Childcare", "homeResponsibilitiesProtection,Home Responsibilities Protection",
-        "childBenefit,Child Benefit","thirtyHoursFreeChildcare,30 Hours Free Childcare",
         "guaranteedMinimumPension,Guaranteed Minimum Pension","nationalInsuranceCredits,National Insurance Credits"})
     void givenACaseAppellantConfidentialityNoOtherPartyYes_thenCaseConfidentialYes(String shortName, String benefitDescription) {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(YesNoUndetermined.NO);
@@ -1489,11 +1460,11 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         sscsCaseData.getCaseAccessManagementFields().setCaseNameHmctsInternal("Old Name");
 
         BenefitType benefitType = BenefitType.builder().code("UC").description("Universal credit").build();
-        var appeal = callback.getCaseDetails().getCaseData().getAppeal();
-        appeal.setBenefitType(benefitType);
-        appeal.getAppellant().setName(new Name("", "New", "Name"));
-        appeal.getAppellant().getAddress().setPostcode("Postcode");
-        appeal.getAppellant().setIdentity(new Identity("1", "Nino"));
+        var appealData = callback.getCaseDetails().getCaseData().getAppeal();
+        appealData.setBenefitType(benefitType);
+        appealData.getAppellant().setName(new Name("", "New", "Name"));
+        appealData.getAppellant().getAddress().setPostcode("Postcode");
+        appealData.getAppellant().setIdentity(new Identity("1", "Nino"));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals("New Name", response.getData().getCaseAccessManagementFields().getCaseNameHmctsInternal());
@@ -1504,11 +1475,11 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     @Test
     void givenAppellantNameAdded_thenSetCaseName() {
         BenefitType benefitType = BenefitType.builder().code("UC").description("Universal credit").build();
-        var appeal = callback.getCaseDetails().getCaseData().getAppeal();
-        appeal.setBenefitType(benefitType);
-        appeal.getAppellant().setName(new Name("", "New", "Name"));
-        appeal.getAppellant().getAddress().setPostcode("Postcode");
-        appeal.getAppellant().setIdentity(new Identity("1", "Nino"));
+        var appealData = callback.getCaseDetails().getCaseData().getAppeal();
+        appealData.setBenefitType(benefitType);
+        appealData.getAppellant().setName(new Name("", "New", "Name"));
+        appealData.getAppellant().getAddress().setPostcode("Postcode");
+        appealData.getAppellant().setIdentity(new Identity("1", "Nino"));
         sscsCaseData.setBenefitCode("001");
         sscsCaseData.setIssueCode("DD");
 
@@ -1539,11 +1510,11 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     void givenOldCaseNameExists_shouldStillSetNewCaseName() {
         sscsCaseDataBefore.getCaseAccessManagementFields().setCaseNameHmctsInternal("Harvey Specter");
         BenefitType benefitType = BenefitType.builder().code("UC").description("Universal credit").build();
-        var appeal = callback.getCaseDetails().getCaseData().getAppeal();
-        appeal.setBenefitType(benefitType);
-        appeal.getAppellant().setName(new Name("", "Louis", "Litt"));
-        appeal.getAppellant().getAddress().setPostcode("Postcode");
-        appeal.getAppellant().setIdentity(new Identity("1", "Nino"));
+        var appealData = callback.getCaseDetails().getCaseData().getAppeal();
+        appealData.setBenefitType(benefitType);
+        appealData.getAppellant().setName(new Name("", "Louis", "Litt"));
+        appealData.getAppellant().getAddress().setPostcode("Postcode");
+        appealData.getAppellant().setIdentity(new Identity("1", "Nino"));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -1559,11 +1530,11 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         sscsCaseDataBefore.getCaseAccessManagementFields().setCategories(Benefit.ESA);
 
         BenefitType benefitType = BenefitType.builder().code("UC").description("Universal credit").build();
-        var appeal = callback.getCaseDetails().getCaseData().getAppeal();
-        appeal.setBenefitType(benefitType);
-        appeal.getAppellant().setName(new Name("", "New", "Name"));
-        appeal.getAppellant().getAddress().setPostcode("Postcode");
-        appeal.getAppellant().setIdentity(new Identity("1", "Nino"));
+        var appealData = callback.getCaseDetails().getCaseData().getAppeal();
+        appealData.setBenefitType(benefitType);
+        appealData.getAppellant().setName(new Name("", "New", "Name"));
+        appealData.getAppellant().getAddress().setPostcode("Postcode");
+        appealData.getAppellant().setIdentity(new Identity("1", "Nino"));
         sscsCaseData.getCaseAccessManagementFields().setCategories(Benefit.ESA);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -1613,11 +1584,11 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
                 .build();
 
         BenefitType benefitType = BenefitType.builder().code("").description("").build();
-        var appeal = callback.getCaseDetails().getCaseData().getAppeal();
-        appeal.setBenefitType(benefitType);
-        appeal.getAppellant().setName(new Name("", "New", "Name"));
-        appeal.getAppellant().getAddress().setPostcode("Postcode");
-        appeal.getAppellant().setIdentity(new Identity("1", "Nino"));
+        var appealData = callback.getCaseDetails().getCaseData().getAppeal();
+        appealData.setBenefitType(benefitType);
+        appealData.getAppellant().setName(new Name("", "New", "Name"));
+        appealData.getAppellant().getAddress().setPostcode("Postcode");
+        appealData.getAppellant().setIdentity(new Identity("1", "Nino"));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(1, response.getWarnings().size());
@@ -1642,11 +1613,11 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         sscsCaseDataBefore = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder()
                         .appellant(Appellant.builder().address(Address.builder().line1("123 Street").postcode("CM120NS").build()).build()).build())
                 .build();
-        var appeal = callback.getCaseDetails().getCaseData().getAppeal();
-        appeal.setBenefitType(new BenefitType("turnip", null, null));
-        appeal.getAppellant().setName(new Name("", "New", "Name"));
-        appeal.getAppellant().getAddress().setPostcode("CM120NS");
-        appeal.getAppellant().setIdentity(new Identity("1", "Nino"));
+        var appealData = callback.getCaseDetails().getCaseData().getAppeal();
+        appealData.setBenefitType(new BenefitType("turnip", null, null));
+        appealData.getAppellant().setName(new Name("", "New", "Name"));
+        appealData.getAppellant().getAddress().setPostcode("CM120NS");
+        appealData.getAppellant().setIdentity(new Identity("1", "Nino"));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
@@ -1661,8 +1632,8 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(description);
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
-        otherPartyList.add(buildOtherParty("No",null));
-        otherPartyList.add(buildOtherParty("No", YesNoUndetermined.NO));
+        otherPartyList.add(buildOtherParty(null));
+        otherPartyList.add(buildOtherParty(YesNoUndetermined.NO));
         callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
         callback.getCaseDetails().getCaseData().getAppeal().setHearingType(HearingType.PAPER.getValue());
         callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(
@@ -1682,8 +1653,8 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     void givenNonSscs1PaperCaseAppellantWantsToAttendYesCaseLoader_thenCaseIsOralAndNoWarningShown() {
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode("childSupport");
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
-        otherPartyList.add(buildOtherParty("No",null));
-        otherPartyList.add(buildOtherParty("No", YesNoUndetermined.NO));
+        otherPartyList.add(buildOtherParty(null));
+        otherPartyList.add(buildOtherParty(YesNoUndetermined.NO));
         callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
         callback.getCaseDetails().getCaseData().getAppeal().setHearingType(HearingType.PAPER.getValue());
         callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(
@@ -1732,10 +1703,10 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         assertEquals(hearingType, response.getData().getAppeal().getHearingType());
     }
 
-    private CcdValue<OtherParty> buildOtherParty(String wantsToAttend, YesNoUndetermined confidentiality) {
+    private CcdValue<OtherParty> buildOtherParty(YesNoUndetermined confidentiality) {
         return CcdValue.<OtherParty>builder().value(OtherParty.builder()
                 .confidentialityRequirement(confidentiality != null ? confidentiality : YesNoUndetermined.NO)
-                .hearingOptions(HearingOptions.builder().wantsToAttend(wantsToAttend).build())
+                .hearingOptions(HearingOptions.builder().wantsToAttend("No").build())
                 .build()).build();
     }
 
@@ -1874,16 +1845,16 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     }
 
     @Test
-    public void givenAnyCaseAndLanguageIsNotSet_thenSetTheLanguageFieldToEmpty() {
-        Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
-        appeal.getBenefitType().setCode("PIP");
-        appeal.setHearingType("paper");
-        appeal.setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").languages(null).build());
+    void givenAnyCaseAndLanguageIsNotSet_thenSetTheLanguageFieldToEmpty() {
+        Appeal appealData = callback.getCaseDetails().getCaseData().getAppeal();
+        appealData.getBenefitType().setCode("PIP");
+        appealData.setHearingType("paper");
+        appealData.setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").languages(null).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getWarnings().size());
-        assertNull(appeal.getHearingOptions().getLanguages());
+        assertNull(appealData.getHearingOptions().getLanguages());
     }
 
     @Test
@@ -1901,7 +1872,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     }
 
     @Test
-    public void givenInvalidIssueBenefitCode_thenThrowError() {
+    void givenInvalidIssueBenefitCode_thenThrowError() {
         when(panelCompositionService.isBenefitIssueCodeValid(any(), any())).thenReturn(false);
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -1910,7 +1881,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     }
 
     @Test
-    public void givenInvalidHearingVideoEmail_thenValidateAndReturnErrorMessage() {
+    void givenInvalidHearingVideoEmail_thenValidateAndReturnErrorMessage() {
         HearingSubtype hearingSubType = HearingSubtype.builder()
                 .hearingVideoEmail("12345")
                 .wantsHearingTypeVideo(YES.getValue())
@@ -1924,7 +1895,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
     }
 
     @Test
-    public void givenInterpreterLanguage_thenSetInterpreterLanguageFromLanguageList() {
+    void givenInterpreterLanguage_thenSetInterpreterLanguageFromLanguageList() {
         DynamicListItem item = new DynamicListItem("ENG", "english");
         DynamicList languagesList = new DynamicList(item, null);
 
@@ -2044,7 +2015,7 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         when(panelCompositionService.resetPanelCompositionIfStale(sscsCaseData, Optional.of(caseDetailsBefore)))
                 .thenReturn(panelMemberComposition);
         when(panelCompositionService.isBenefitIssueCodeValid(any(), any())).thenReturn(true);
-        handler = createNewCaseHandler(false);
+        handler = createNewCaseHandler();
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -2052,99 +2023,44 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
         assertEquals(panelMemberComposition, response.getData().getPanelMemberComposition());
     }
 
-    @Nested
-    class CmOtherPartyConfidentialityDisabled {
-        @BeforeEach
-        void beforeEach() {
-            handler = createNewCaseHandler(false);
-        }
+    @ParameterizedTest
+    @MethodSource("benefits")
+    void givenAppellantConfidentialityYes_thenCaseConfidentialYes(Benefit benefit) {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(YesNoUndetermined.YES);
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(benefit.getShortName());
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefit.getDescription());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
+            USER_AUTHORISATION);
 
-        @Test
-        void givenUniversalCreditBenefitTypeWithoutOtherParties_thenCaseConfidentialNull() {
-            callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(Benefit.UC.getShortName());
-            callback.getCaseDetails()
-                .getCaseData()
-                .getAppeal()
-                .getBenefitType()
-                .setDescription(Benefit.UC.getDescription());
-            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-                USER_AUTHORISATION);
-
-            Assertions.assertThat(response.getData().getIsConfidentialCase()).isNull();
-        }
-
-        @Test
-        void givenUniversalCreditBenefitTypeWithOtherParties_thenCaseConfidentialNull() {
-            callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(Benefit.UC.getShortName());
-            callback.getCaseDetails()
-                .getCaseData()
-                .getAppeal()
-                .getBenefitType()
-                .setDescription(Benefit.UC.getDescription());
-            List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
-            CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder()
-                .value(OtherParty.builder().confidentialityRequirement(YesNoUndetermined.NO).build())
-                .build();
-            otherPartyList.add(ccdValue);
-            CcdValue<OtherParty> ccdValue1 = CcdValue.<OtherParty>builder()
-                .value(OtherParty.builder().confidentialityRequirement(YesNoUndetermined.YES).build())
-                .build();
-            otherPartyList.add(ccdValue1);
-            callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
-            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-                USER_AUTHORISATION);
-
-            Assertions.assertThat(response.getData().getIsConfidentialCase()).isNull();
-        }
+        Assertions.assertThat(response.getData().getIsConfidentialCase()).isEqualTo(YES);
     }
 
-    @Nested
-    class CmOtherPartyConfidentialityEnabled {
+    @ParameterizedTest
+    @MethodSource("benefits")
+    void givenAppellantConfidentialityNoOtherPartyYes_thenCaseConfidentialYes(Benefit benefit) {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(YesNoUndetermined.NO);
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(benefit.getShortName());
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefit.getDescription());
+        List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
+        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder()
+                                                .value(OtherParty.builder().confidentialityRequirement(YesNoUndetermined.YES).build())
+                                                .build();
+        otherPartyList.add(ccdValue);
+        callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
+            USER_AUTHORISATION);
 
-        static Stream<Benefit> benefits() {
-            return Stream.of(Benefit.CHILD_SUPPORT, Benefit.TAX_CREDIT, Benefit.GUARDIANS_ALLOWANCE,
-                Benefit.TAX_FREE_CHILDCARE, Benefit.HOME_RESPONSIBILITIES_PROTECTION, Benefit.CHILD_BENEFIT,
-                Benefit.THIRTY_HOURS_FREE_CHILDCARE, Benefit.GUARANTEED_MINIMUM_PENSION,
-                Benefit.NATIONAL_INSURANCE_CREDITS, Benefit.UC);
-        }
-
-        @BeforeEach
-        void beforeEach() {
-            handler = createNewCaseHandler(true);
-        }
-
-        @ParameterizedTest
-        @MethodSource("benefits")
-        void givenACaseAppellantConfidentialityYes_thenCaseConfidentialYes(Benefit benefit) {
-            callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(YesNoUndetermined.YES);
-            callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(benefit.getShortName());
-            callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefit.getDescription());
-            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-                USER_AUTHORISATION);
-
-            Assertions.assertThat(response.getData().getIsConfidentialCase()).isEqualTo(YES);
-        }
-
-        @ParameterizedTest
-        @MethodSource("benefits")
-        void givenACaseAppellantConfidentialityNoOtherPartyYes_thenCaseConfidentialYes(Benefit benefit) {
-            callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(YesNoUndetermined.NO);
-            callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(benefit.getShortName());
-            callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefit.getDescription());
-            List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
-            CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder()
-                .value(OtherParty.builder().confidentialityRequirement(YesNoUndetermined.YES).build())
-                .build();
-            otherPartyList.add(ccdValue);
-            callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
-            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-                USER_AUTHORISATION);
-
-            Assertions.assertThat(response.getData().getIsConfidentialCase()).isEqualTo(YES);
-        }
+        Assertions.assertThat(response.getData().getIsConfidentialCase()).isEqualTo(YES);
     }
 
-    private CaseUpdatedAboutToSubmitHandler createNewCaseHandler(boolean cmOtherPartyConfidentialityEnabled) {
+    static Stream<Benefit> benefits() {
+        return Stream.of(Benefit.CHILD_SUPPORT, Benefit.TAX_CREDIT, Benefit.GUARDIANS_ALLOWANCE,
+            Benefit.TAX_FREE_CHILDCARE, Benefit.HOME_RESPONSIBILITIES_PROTECTION, Benefit.CHILD_BENEFIT,
+            Benefit.THIRTY_HOURS_FREE_CHILDCARE, Benefit.GUARANTEED_MINIMUM_PENSION,
+            Benefit.NATIONAL_INSURANCE_CREDITS, Benefit.UC);
+    }
+
+    private CaseUpdatedAboutToSubmitHandler createNewCaseHandler() {
         return new CaseUpdatedAboutToSubmitHandler(
             regionalProcessingCenterService,
             associatedCaseLinkHelper,
@@ -2154,6 +2070,6 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test {
             refDataService,
             venueService,
             hearingDurationsService,
-            panelCompositionService, cmOtherPartyConfidentialityEnabled);
+            panelCompositionService);
     }
 }
