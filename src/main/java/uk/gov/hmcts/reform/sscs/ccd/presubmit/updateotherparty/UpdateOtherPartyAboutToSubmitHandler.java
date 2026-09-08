@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -60,14 +59,12 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
     private static final String ERR_ROLE_REQUIRED = "Role is required for the selected case";
 
     private IdamService idamService;
-    private final boolean cmOtherPartyConfidentialityEnabled;
     private final AdditionalOtherPartyAddedPredicate additionalOtherPartyAddedPredicate;
     private final FirstOtherPartyAddedPredicate firstOtherPartyAddedPredicate;
 
     @Autowired
-    UpdateOtherPartyAboutToSubmitHandler(IdamService idamService, @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
+    UpdateOtherPartyAboutToSubmitHandler(IdamService idamService) {
         this.idamService = idamService;
-        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
         this.additionalOtherPartyAddedPredicate = new AdditionalOtherPartyAddedPredicate();
         this.firstOtherPartyAddedPredicate = new FirstOtherPartyAddedPredicate();
     }
@@ -90,7 +87,7 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
 
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         sscsCaseData.setOtherPartyUcb(getOtherPartyUcb(sscsCaseData.getOtherParties()));
-        sscsCaseData.setIsConfidentialCase(isConfidential(sscsCaseData, cmOtherPartyConfidentialityEnabled));
+        sscsCaseData.setIsConfidentialCase(isConfidential(sscsCaseData, List.of(UC)));
         sscsCaseData.getOtherParties().forEach(otherPartyCcdValue -> otherPartyCcdValue.getValue()
                 .setSendNewOtherPartyNotification(sendNewOtherPartyNotification(otherPartyCcdValue)));
         sscsCaseData.setOtherParties(clearOtherPartiesIfEmpty(sscsCaseData));
@@ -104,7 +101,7 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
             response.addWarnings(!user.hasRole(SYSTEM_USER) ? List.of(WARN_NON_SSCS1_PAPER_TO_ORAL) : List.of());
         }
 
-        if (!(cmOtherPartyConfidentialityEnabled && isBenefitTypeChildSupportOrUc(sscsCaseData))) {
+        if (!isBenefitTypeChildSupportOrUc(sscsCaseData)) {
             sscsCaseData.setDirectionDueDate(getUpdatedDirectionDueDate(sscsCaseData));
         }
 
@@ -128,7 +125,7 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
 
         final SscsCaseData caseDataBefore = callback.getCaseDetailsBefore().map(CaseDetails::getCaseData).orElse(null);
 
-        if (cmOtherPartyConfidentialityEnabled && (
+        if ((
             isChildSupportOrUcAdditionalOtherPartyAdded(sscsCaseData, caseDataBefore)
                 || isUniversalCreditAndFirstOtherPartyAdded(sscsCaseData, caseDataBefore))) {
             sscsCaseData.setDirectionDueDate(now().plusDays(getHearingResponseExpectedByDays()).toString());

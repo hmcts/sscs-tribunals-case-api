@@ -7,14 +7,13 @@ import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsType.SSCS2;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsType.SSCS5;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.ccd.predicates.BenefitTypeConfidentialityPredicate.isValidBenefitTypeForConfidentiality;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDateTime;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,7 +27,6 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Entity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
@@ -39,13 +37,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
 
 public class OtherPartyDataUtil {
-
-    private static final Set<String> VALID_CONFIDENTIALITY_BENEFITS =
-        Arrays.stream(Benefit.values())
-            .filter(benefit ->
-                SSCS2.equals(benefit.getSscsType()) || SSCS5.equals(benefit.getSscsType()))
-            .map(Benefit::getShortName)
-            .collect(toSet());
 
     private OtherPartyDataUtil() {
     }
@@ -104,16 +95,16 @@ public class OtherPartyDataUtil {
     }
 
     public static YesNo isConfidential(final SscsCaseData sscsCaseData) {
-        return isConfidential(sscsCaseData, false);
+        return isConfidential(sscsCaseData,List.of());
     }
 
     public static YesNo isConfidential(final SscsCaseData sscsCaseData,
-        final boolean cmOtherPartyConfidentialityEnabled) {
+        final List<Benefit> additionalBenefits) {
         if (sscsCaseData == null || sscsCaseData.getAppeal() == null) {
             return null;
         }
         if (!isValidBenefitTypeForConfidentiality(sscsCaseData.getAppeal().getBenefitType(),
-            cmOtherPartyConfidentialityEnabled)) {
+            additionalBenefits)) {
             return null;
         }
         final YesNoUndetermined appellantConfidentiality = sscsCaseData.getAppellantConfidentiality().orElse(null);
@@ -124,27 +115,6 @@ public class OtherPartyDataUtil {
             return YesNo.NO;
         }
         return null;
-    }
-
-    // TODO Why is the FF hard-coded as false? Can we remove this and use the method below, and if we do that we can use the predicate in sscs-common
-    public static boolean isValidBenefitTypeForConfidentiality(final BenefitType benefitType) {
-        return isValidBenefitTypeForConfidentiality(benefitType, false);
-    }
-
-    // TODO Can replace this with the predicate defined in sscs-common once cmOtherPartyConfidentialityEnabled is removed
-    public static boolean isValidBenefitTypeForConfidentiality(
-        final BenefitType benefitType,
-        final boolean cmOtherPartyConfidentialityEnabled) {
-
-        if (benefitType == null) {
-            return false;
-        }
-
-        String benefitCode = benefitType.getCode();
-
-        return VALID_CONFIDENTIALITY_BENEFITS.contains(benefitCode)
-            || (cmOtherPartyConfidentialityEnabled
-            && Benefit.UC.getShortName().equals(benefitCode));
     }
 
     public static boolean isOtherPartyPresent(SscsCaseData sscsCaseData) {

@@ -95,7 +95,7 @@ class DirectionIssuedAboutToStartHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new DirectionIssuedAboutToStartHandler(false, false, idamService);
+        handler = new DirectionIssuedAboutToStartHandler(false, idamService);
         lenient().when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(userDetails);
         sscsCaseData = SscsCaseData.builder()
                 .appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build())
@@ -193,7 +193,7 @@ class DirectionIssuedAboutToStartHandlerTest {
 
     @Test
     void givenAppealWithConfidentialityReferralAndFeatureFlagEnabled_populateDirectionTypeDropdown() {
-        handler = new DirectionIssuedAboutToStartHandler(false, true, idamService);
+        handler = new DirectionIssuedAboutToStartHandler(false, idamService);
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
@@ -216,7 +216,7 @@ class DirectionIssuedAboutToStartHandlerTest {
 
     @Test
     void givenUcAppealWithConfidentialityReferralAndFeatureFlagEnabled_populateDirectionTypeDropdown() {
-        handler = new DirectionIssuedAboutToStartHandler(false, true, idamService);
+        handler = new DirectionIssuedAboutToStartHandler(false, idamService);
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
@@ -240,9 +240,9 @@ class DirectionIssuedAboutToStartHandlerTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideConfidentialityReferralTestCases")
     void givenAppealWithConfidentialityReferral_doNotPopulateDirectionTypeDropdown(
-        String scenario, boolean featureFlagEnabled, InterlocReferralReason referralReason,
+        String scenario, InterlocReferralReason referralReason,
         String benefitCode, boolean hasSuperUser) {
-        handler = new DirectionIssuedAboutToStartHandler(false, featureFlagEnabled, idamService);
+        handler = new DirectionIssuedAboutToStartHandler(false, idamService);
         sscsCaseData.setInterlocReferralReason(referralReason);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
@@ -268,11 +268,9 @@ class DirectionIssuedAboutToStartHandlerTest {
     private static Stream<Arguments> provideConfidentialityReferralTestCases() {
         return Stream.of(
             Arguments.of("confidentiality referral with feature flag enabled and not supported benefit",
-                true, InterlocReferralReason.CONFIDENTIALITY, PIP.getShortName(), true),
-            Arguments.of("confidentiality referral with feature flag disabled",
-                false, InterlocReferralReason.CONFIDENTIALITY, null, false),
+                InterlocReferralReason.CONFIDENTIALITY, PIP.getShortName(), true),
             Arguments.of("no confidentiality referral with feature flag enabled",
-                true, null, CHILD_SUPPORT.getShortName(), true)
+                null, CHILD_SUPPORT.getShortName(), true)
         );
     }
 
@@ -312,7 +310,7 @@ class DirectionIssuedAboutToStartHandlerTest {
 
     @Test
     void givenAppealWithReinstatementRequest_populateDirectionTypeDropdown() {
-        handler = new DirectionIssuedAboutToStartHandler(false, false, idamService);
+        handler = new DirectionIssuedAboutToStartHandler(false, idamService);
         sscsCaseData.setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
@@ -403,7 +401,7 @@ class DirectionIssuedAboutToStartHandlerTest {
 
     @Test
     void givenAppealWithHearingRecordingRequestOutstanding_populateDirectionTypeDropdownWithRefuseHearingRecordingRequest() {
-        handler = new DirectionIssuedAboutToStartHandler(false, false, idamService);
+        handler = new DirectionIssuedAboutToStartHandler(false, idamService);
         sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(YES);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
@@ -422,7 +420,7 @@ class DirectionIssuedAboutToStartHandlerTest {
 
     @Test
     void givenAppealWithNoHearingRecordingRequestOutstanding_doNotPopulateDirectionTypeDropdownWithRefuseHearingRecordingRequest() {
-        handler = new DirectionIssuedAboutToStartHandler(false, false, idamService);
+        handler = new DirectionIssuedAboutToStartHandler(false, idamService);
         sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(NO);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
@@ -439,7 +437,7 @@ class DirectionIssuedAboutToStartHandlerTest {
 
     @Test
     void givenAValidCallbackType_thenClearTheConfidentialityFields() {
-        handler = new DirectionIssuedAboutToStartHandler(false, false, idamService);
+        handler = new DirectionIssuedAboutToStartHandler(false, idamService);
         sscsCaseData.setConfidentialityType(ConfidentialityType.CONFIDENTIAL.getCode());
         sscsCaseData.setSendDirectionNoticeToFTA(YES);
         sscsCaseData.setSendDirectionNoticeToRepresentative(YES);
@@ -463,7 +461,7 @@ class DirectionIssuedAboutToStartHandlerTest {
 
     @Test
     void givenAValidCallbackType_thenVerifyAllPartiesOnTheCase() {
-        handler = new DirectionIssuedAboutToStartHandler(false, false, idamService);
+        handler = new DirectionIssuedAboutToStartHandler(false, idamService);
 
         Appointee otherPartyAppointee = Appointee.builder()
                 .id("2").name(Name.builder().firstName("Henry").lastName("Smith").build()).build();
@@ -493,7 +491,7 @@ class DirectionIssuedAboutToStartHandlerTest {
 
     @Test
     void givenCmCaseWithOtherParties_thenSeedsOtherPartySelectionForThePicker() {
-        handler = new DirectionIssuedAboutToStartHandler(false, true, idamService);
+        handler = new DirectionIssuedAboutToStartHandler(false, idamService);
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(CHILD_SUPPORT.getShortName()).build());
         CcdValue<OtherParty> op1 = CcdValue.<OtherParty>builder()
                 .value(OtherParty.builder().id("1").name(Name.builder().firstName("Harry").lastName("Kane").build()).build()).build();
@@ -504,14 +502,14 @@ class DirectionIssuedAboutToStartHandlerTest {
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertThat(sscsCaseData.getOtherPartySelection()).hasSize(1);
-        assertThat(sscsCaseData.getOtherPartySelection().get(0).getValue().getOtherPartiesList().getListItems())
+        assertThat(sscsCaseData.getOtherPartySelection().getFirst().getValue().getOtherPartiesList().getListItems())
                 .extracting(DynamicListItem::getCode)
                 .containsExactlyInAnyOrder("otherParty1", "otherParty2");
     }
 
     @Test
     void givenNonCmCase_thenOtherPartySelectionNotSeeded() {
-        handler = new DirectionIssuedAboutToStartHandler(false, true, idamService);
+        handler = new DirectionIssuedAboutToStartHandler(false, idamService);
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(PIP.getShortName()).build());
         CcdValue<OtherParty> op = CcdValue.<OtherParty>builder()
                 .value(OtherParty.builder().id("1").name(Name.builder().firstName("Harry").lastName("Kane").build()).build()).build();
@@ -524,7 +522,7 @@ class DirectionIssuedAboutToStartHandlerTest {
 
     @Test
     void givenAValidCallbackType_NoAdditionalPartiesForOtherParty() {
-        handler = new DirectionIssuedAboutToStartHandler(false, false, idamService);
+        handler = new DirectionIssuedAboutToStartHandler(false, idamService);
 
         CcdValue<OtherParty> otherParty = CcdValue.<OtherParty>builder()
                 .value(OtherParty.builder()
@@ -576,7 +574,7 @@ class DirectionIssuedAboutToStartHandlerTest {
     @ParameterizedTest(name = "{0} - {1}")
     @MethodSource("provideRoleAndBenefitTestCases")
     void givenConfidentialityFlagAndAuthorisedRole_populateConfidentialityDirections(UserRole roleName, String benefitShortName) {
-        handler = new DirectionIssuedAboutToStartHandler(false, true, idamService);
+        handler = new DirectionIssuedAboutToStartHandler(false, idamService);
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
         when(idamService.getUserDetails(anyString())).thenReturn(userDetails);
         lenient().when(userDetails.hasRole(roleName)).thenReturn(true);
@@ -605,7 +603,7 @@ class DirectionIssuedAboutToStartHandlerTest {
     @MethodSource("provideConfidentialityTestCases")
     void givenConfidentialityFlagAndVariousConditions_doNotPopulateConfidentialityDirections(String scenario,
         boolean hasUserDetails, InterlocReferralReason referralReason, boolean hasQualifyingRole, boolean hasRoleCheck) {
-        handler = new DirectionIssuedAboutToStartHandler(false, true, idamService);
+        handler = new DirectionIssuedAboutToStartHandler(false, idamService);
         sscsCaseData.setInterlocReferralReason(referralReason);
 
         if (hasUserDetails) {
