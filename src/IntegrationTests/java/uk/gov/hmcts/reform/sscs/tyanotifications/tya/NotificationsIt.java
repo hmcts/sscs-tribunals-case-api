@@ -76,6 +76,7 @@ import org.quartz.SchedulerException;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DatedRequestOutcome;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -5229,8 +5230,8 @@ class NotificationsIt extends NotificationsItBase {
         updatedJson = updateEmbeddedJson(updatedJson, benefitType, "case_details", "case_data", "appeal", "benefitType",
             "code");
         updatedJson = updateEmbeddedJson(updatedJson,
-            List.of(CcdValue.<OtherParty>builder().value(OtherParty.builder().build()).build(),
-                CcdValue.<OtherParty>builder().value(OtherParty.builder().build()).build()), "case_details", "case_data",
+            List.of(CcdValue.<OtherParty>builder().value(OtherParty.builder().name(Name.builder().firstName("Bob").lastName("Builder").build()).build()).build(),
+                CcdValue.<OtherParty>builder().value(OtherParty.builder().name(Name.builder().firstName("Jack").lastName("Hammer").build()).build()).build()), "case_details", "case_data",
             "otherParties");
 
         getResponse(getRequestWithAuthHeader(updatedJson));

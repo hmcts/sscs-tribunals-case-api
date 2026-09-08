@@ -57,8 +57,6 @@ public class NotificationConfig {
     private String helplineTelephoneIbc;
     @Value("${helpline.telephoneScotland}")
     private String helplineTelephoneScotland;
-    @Value("${feature.cm-other-party-confidentiality.enabled}")
-    private boolean cmOtherPartyConfidentialityEnabled;
 
     private Environment env;
 
@@ -149,18 +147,15 @@ public class NotificationConfig {
                 createdInGapsFrom)) {
                 docmosisTemplateId = null;
             }
-            if ((cmOtherPartyConfidentialityEnabled && VALID_APPEAL_CREATED.equals(
-                notificationWrapper.getNotificationType()) && !notificationWrapper
+            if ((VALID_APPEAL_CREATED.equals(notificationWrapper.getNotificationType()) && !notificationWrapper
                 .getNewSscsCaseData()
-                .isBenefitType(CHILD_SUPPORT))
-                || (!cmOtherPartyConfidentialityEnabled && VALID_APPEAL_CREATED.equals(notificationWrapper.getNotificationType()))) {
+                .isBenefitType(CHILD_SUPPORT))) {
                 docmosisTemplateId = null;
             }
-            if (cmOtherPartyConfidentialityEnabled
-                && (notificationWrapper.getNewSscsCaseData().isBenefitType(UC)
-                || notificationWrapper.getNewSscsCaseData().isBenefitType(CHILD_SUPPORT))
-                && (UPDATE_OTHER_PARTY_DATA
-                == notificationWrapper.getNotificationType())
+            if ((notificationWrapper.getNewSscsCaseData().isBenefitType(UC) || notificationWrapper
+                .getNewSscsCaseData()
+                .isBenefitType(CHILD_SUPPORT))
+                && (UPDATE_OTHER_PARTY_DATA == notificationWrapper.getNotificationType())
                 && "updateOtherPartyData.other_party".equals(docmosisTemplateName)) {
                 docmosisTemplateId = null;
             }

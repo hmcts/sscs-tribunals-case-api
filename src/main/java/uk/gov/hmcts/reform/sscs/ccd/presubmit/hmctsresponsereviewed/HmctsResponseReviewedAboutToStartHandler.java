@@ -10,20 +10,25 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.UCB;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_TCW;
 import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getSelectedConfidentialityPartyDropdown;
-import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.isChildSupportAppeal;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isBenefitTypeChildSupportOrUc;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpResponseDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
@@ -34,14 +39,11 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
 
     private final DwpAddressLookupService service;
     private final HearingsService hearingsService;
-    private final boolean cmConfidentialityEnabled;
 
     public HmctsResponseReviewedAboutToStartHandler(DwpAddressLookupService service,
-                                                    HearingsService hearingsService,
-        @Value("${feature.cm-other-party-confidentiality.enabled}") final boolean cmConfidentialityEnabled) {
+                                                    HearingsService hearingsService) {
         this.service = service;
         this.hearingsService = hearingsService;
-        this.cmConfidentialityEnabled = cmConfidentialityEnabled;
     }
 
     @Override
@@ -66,7 +68,7 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
         setDefaultFieldValues(sscsCaseData);
         setDwpDocuments(sscsCaseData);
         setSelectWhoReviewsCase(sscsCaseData);
-        if (cmConfidentialityEnabled && (isChildSupportAppeal(sscsCaseData) || sscsCaseData.isBenefitType(Benefit.UC))) {
+        if (isBenefitTypeChildSupportOrUc(sscsCaseData)) {
             sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(
                     getSelectedConfidentialityPartyDropdown(sscsCaseData));
         }

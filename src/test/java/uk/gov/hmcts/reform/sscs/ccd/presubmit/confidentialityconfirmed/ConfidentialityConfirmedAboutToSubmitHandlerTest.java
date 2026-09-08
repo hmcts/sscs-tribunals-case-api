@@ -48,7 +48,7 @@ class ConfidentialityConfirmedAboutToSubmitHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new ConfidentialityConfirmedAboutToSubmitHandler(DWP_DUE_DATE, CHILD_SUPPORT_DWP_DUE_DATE, true);
+        handler = new ConfidentialityConfirmedAboutToSubmitHandler(DWP_DUE_DATE, CHILD_SUPPORT_DWP_DUE_DATE);
     }
 
     @ParameterizedTest
@@ -137,7 +137,7 @@ class ConfidentialityConfirmedAboutToSubmitHandlerTest {
 
     @Test
     void givenCmOtherPartyConfidentialityFlagIsDisabled_thenReturnFalse() {
-        assertThat(new ConfidentialityConfirmedAboutToSubmitHandler(DWP_DUE_DATE, CHILD_SUPPORT_DWP_DUE_DATE, false).canHandle(ABOUT_TO_SUBMIT,
+        assertThat(new ConfidentialityConfirmedAboutToSubmitHandler(DWP_DUE_DATE, CHILD_SUPPORT_DWP_DUE_DATE).canHandle(ABOUT_TO_SUBMIT,
             callback)).isFalse();
     }
 
