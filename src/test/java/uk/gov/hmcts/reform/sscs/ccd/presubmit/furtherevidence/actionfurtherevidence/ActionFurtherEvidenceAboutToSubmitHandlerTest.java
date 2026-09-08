@@ -859,7 +859,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     private void assertHappyPaths(DocumentType expectedDocumentType,
         PreSubmitCallbackResponse<SscsCaseData> response) {
 
-        SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().get(1).getValue();
+        SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().getFirst().getValue();
         assertEquals((expectedDocumentType.getLabel() != null ? expectedDocumentType.getLabel() : expectedDocumentType.getValue()) + " received on 13-06-2019", sscsDocumentDetail.getDocumentFileName());
         assertEquals(expectedDocumentType.getValue(), sscsDocumentDetail.getDocumentType());
         assertEquals("www.test.com", sscsDocumentDetail.getDocumentLink().getDocumentUrl());
@@ -963,10 +963,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("Appellant evidence received on 12-06-2019", response.getData().getSscsDocument().getFirst().getValue().getDocumentFileName());
-        assertEquals("2019-06-12", response.getData().getSscsDocument().getFirst().getValue().getDocumentDateAdded());
-        assertEquals("Appellant evidence received on 13-06-2019", response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
-        assertEquals("2019-06-13", response.getData().getSscsDocument().get(1).getValue().getDocumentDateAdded());
+        assertEquals("Appellant evidence received on 13-06-2019", response.getData().getSscsDocument().getFirst().getValue().getDocumentFileName());
+        assertEquals("2019-06-13", response.getData().getSscsDocument().getFirst().getValue().getDocumentDateAdded());
+        assertEquals("Appellant evidence received on 12-06-2019", response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
+        assertEquals("2019-06-12", response.getData().getSscsDocument().get(1).getValue().getDocumentDateAdded());
         assertEquals("exist.pdf", response.getData().getSscsDocument().get(2).getValue().getDocumentFileName());
         assertNotNull(response.getData().getSscsDocument().getFirst().getValue().getControlNumber());
         assertNull(response.getData().getScannedDocuments());
@@ -989,13 +989,13 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("Appellant evidence received on 12-06-2019", response.getData().getSscsDocument().getFirst().getValue().getDocumentFileName());
-        assertEquals("2019-06-12", response.getData().getSscsDocument().getFirst().getValue().getDocumentDateAdded());
-        assertEquals(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED, response.getData().getSscsDocument().getFirst().getValue().getDocumentTranslationStatus());
-
-        assertEquals("Appellant evidence received on 13-06-2019", response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
-        assertEquals("2019-06-13", response.getData().getSscsDocument().get(1).getValue().getDocumentDateAdded());
+        assertEquals("Appellant evidence received on 12-06-2019", response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
+        assertEquals("2019-06-12", response.getData().getSscsDocument().get(1).getValue().getDocumentDateAdded());
         assertEquals(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED, response.getData().getSscsDocument().get(1).getValue().getDocumentTranslationStatus());
+
+        assertEquals("Appellant evidence received on 13-06-2019", response.getData().getSscsDocument().getFirst().getValue().getDocumentFileName());
+        assertEquals("2019-06-13", response.getData().getSscsDocument().getFirst().getValue().getDocumentDateAdded());
+        assertEquals(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED, response.getData().getSscsDocument().getFirst().getValue().getDocumentTranslationStatus());
 
         assertEquals("exist.pdf", response.getData().getSscsDocument().get(2).getValue().getDocumentFileName());
         assertNull(response.getData().getSscsDocument().get(2).getValue().getDocumentTranslationStatus());

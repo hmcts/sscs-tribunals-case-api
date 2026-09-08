@@ -140,7 +140,7 @@ public class UploadFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                                 .build()).build()).collect(toList());
         if (!newSscsDocuments.isEmpty()) {
             List<SscsDocument> allDocuments = new ArrayList<>(ofNullable(sscsCaseData.getSscsDocument()).orElse(emptyList()));
-            allDocuments.addAll(0, newSscsDocuments);
+            allDocuments.addAll(newSscsDocuments);
             sscsCaseData.setSscsDocument(allDocuments);
         }
     }

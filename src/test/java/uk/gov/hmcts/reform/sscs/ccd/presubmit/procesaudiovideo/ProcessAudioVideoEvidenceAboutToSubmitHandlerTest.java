@@ -274,14 +274,14 @@ class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertThat(response.getData().getDwpState()).isEqualTo(DIRECTION_ACTION_REQUIRED);
         assertThat(response.getData().getAudioVideoEvidence()).hasSize(1);
         assertThat(response.getData().getSscsDocument()).hasSize(2);
-        assertThat(response.getData().getSscsDocument().getLast().getValue().getAvDocumentLink()).isEqualTo(DocumentLink.builder().documentFilename("music.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build());
-        assertThat(response.getData().getSscsDocument().getLast().getValue().getBundleAddition()).isEqualTo("A");
-        assertThat(response.getData().getSscsDocument().getLast().getValue().getDateApproved()).isEqualTo(LocalDate.now().toString());
-        assertThat(response.getData().getSscsDocument().getLast().getValue().getDocumentDateAdded()).isEqualTo(LocalDate.now().toString());
-        assertThat(response.getData().getSscsDocument().getLast().getValue().getDocumentFileName()).isEqualTo("Addition A - Appellant - Statement for A/V file: music.mp3");
-        assertThat(response.getData().getSscsDocument().getLast().getValue().getDocumentType()).isEqualTo(DocumentType.AUDIO_DOCUMENT.getValue());
-        assertThat(response.getData().getSscsDocument().getLast().getValue().getPartyUploaded().getLabel()).isEqualTo("Appellant");
-        assertThat(response.getData().getSscsDocument().getLast().getValue().getDocumentLink().getDocumentFilename()).isEqualTo("New doc with footer");
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getAvDocumentLink()).isEqualTo(DocumentLink.builder().documentFilename("music.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build());
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getBundleAddition()).isEqualTo("A");
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDateApproved()).isEqualTo(LocalDate.now().toString());
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentDateAdded()).isEqualTo(LocalDate.now().toString());
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentFileName()).isEqualTo("Addition A - Appellant - Statement for A/V file: music.mp3");
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentType()).isEqualTo(DocumentType.AUDIO_DOCUMENT.getValue());
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getPartyUploaded().getLabel()).isEqualTo("Appellant");
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentLink().getDocumentFilename()).isEqualTo("New doc with footer");
     }
 
     @Test
@@ -340,14 +340,14 @@ class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertThat(response.getData().getDwpState()).isEqualTo(DIRECTION_ACTION_REQUIRED);
         assertThat(response.getData().getAudioVideoEvidence()).hasSize(1);
         assertThat(response.getData().getSscsDocument()).hasSize(2);
-        assertThat(response.getData().getSscsDocument().getLast().getValue().getAvDocumentLink()).isEqualTo(DocumentLink.builder().documentFilename("music.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build());
-        assertThat(response.getData().getSscsDocument().getLast().getValue().getBundleAddition()).isNull();
-        assertThat(response.getData().getSscsDocument().getLast().getValue().getDateApproved()).isEqualTo(LocalDate.now().toString());
-        assertThat(response.getData().getSscsDocument().getLast().getValue().getDocumentDateAdded()).isEqualTo(LocalDate.now().toString());
-        assertThat(response.getData().getSscsDocument().getLast().getValue().getDocumentFileName()).isEqualTo("music.mp3");
-        assertThat(response.getData().getSscsDocument().getLast().getValue().getDocumentType()).isEqualTo(DocumentType.AUDIO_DOCUMENT.getValue());
-        assertThat(response.getData().getSscsDocument().getLast().getValue().getPartyUploaded().getLabel()).isEqualTo("Appellant");
-        assertThat(response.getData().getSscsDocument().getLast().getValue().getDocumentLink()).isNull();
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getAvDocumentLink()).isEqualTo(DocumentLink.builder().documentFilename("music.mp3").documentUrl("test.com").documentBinaryUrl("test.com/binary").build());
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getBundleAddition()).isNull();
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDateApproved()).isEqualTo(LocalDate.now().toString());
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentDateAdded()).isEqualTo(LocalDate.now().toString());
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentFileName()).isEqualTo("music.mp3");
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentType()).isEqualTo(DocumentType.AUDIO_DOCUMENT.getValue());
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getPartyUploaded().getLabel()).isEqualTo("Appellant");
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentLink()).isNull();
     }
 
     @Test
