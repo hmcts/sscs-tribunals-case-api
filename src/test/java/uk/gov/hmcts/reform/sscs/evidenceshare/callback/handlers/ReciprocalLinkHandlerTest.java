@@ -1,31 +1,35 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ASSOCIATE_CASE;
+import static uk.gov.hmcts.reform.sscs.utility.StringUtils.getMaskedNino;
 
+import ch.qos.logback.classic.Level;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
@@ -41,8 +45,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.util.LogCaptureExtension;
 
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ReciprocalLinkHandlerTest {
 
     public static final String YES = "Yes";
@@ -68,12 +73,15 @@ public class ReciprocalLinkHandlerTest {
     @Captor
     private ArgumentCaptor<Consumer<SscsCaseDetails>> capture;
 
+    @RegisterExtension
+    private final LogCaptureExtension logCapture =
+            new LogCaptureExtension(ReciprocalLinkHandler.class);
+
     HashMap<String, String> map = new HashMap<String, String>();
 
-    @Before
-    public void setUp() {
-        openMocks(this);
-        when(callback.getEvent()).thenReturn(EventType.VALID_APPEAL_CREATED);
+    @BeforeEach
+    void setUp() {
+        lenient().when(callback.getEvent()).thenReturn(EventType.VALID_APPEAL_CREATED);
 
         handler = new ReciprocalLinkHandler(ccdService, idamService, updateCcdCaseService);
 
@@ -81,41 +89,42 @@ public class ReciprocalLinkHandlerTest {
                 Appellant.builder().identity(Identity.builder().nino("AB00000Y").build()).build())
             .mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
 
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getId()).thenReturn(7656765L);
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        lenient().when(callback.getCaseDetails()).thenReturn(caseDetails);
+        lenient().when(caseDetails.getId()).thenReturn(7656765L);
+        lenient().when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         map.put("case.appeal.appellant.identity.nino", "AB00000Y");
     }
 
-    @Test
-    @Parameters({"VALID_APPEAL_CREATED", "DRAFT_TO_VALID_APPEAL_CREATED", "NON_COMPLIANT", "DRAFT_TO_NON_COMPLIANT", "INCOMPLETE_APPLICATION_RECEIVED", "DRAFT_TO_INCOMPLETE_APPLICATION"})
-    public void givenAValidEvent_thenReturnTrue(EventType eventType) {
+    @ParameterizedTest
+    @EnumSource(value = EventType.class, names = {"VALID_APPEAL_CREATED", "DRAFT_TO_VALID_APPEAL_CREATED",
+        "NON_COMPLIANT", "DRAFT_TO_NON_COMPLIANT", "INCOMPLETE_APPLICATION_RECEIVED", "DRAFT_TO_INCOMPLETE_APPLICATION"})
+    void givenAValidEvent_thenReturnTrue(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
 
         assertTrue(handler.canHandle(SUBMITTED, callback));
     }
 
     @Test
-    public void givenANonReciprocalLinkEvent_thenReturnFalse() {
+    void givenANonReciprocalLinkEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
 
         assertFalse(handler.canHandle(SUBMITTED, callback));
     }
 
-    @Test
-    @Parameters({"ABOUT_TO_START", "MID_EVENT", "ABOUT_TO_SUBMIT"})
-    public void givenANonReciprocalLinkCallbackType_thenReturnFalse(CallbackType callbackType) {
+    @ParameterizedTest
+    @EnumSource(value = CallbackType.class, names = {"ABOUT_TO_START", "MID_EVENT", "ABOUT_TO_SUBMIT"})
+    void givenANonReciprocalLinkCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
     }
 
     @Test
-    public void givenAReciprocalLinkCallbackType_thenReturnTrue() {
+    void givenAReciprocalLinkCallbackType_thenReturnTrue() {
         assertTrue(handler.canHandle(SUBMITTED, callback));
     }
 
     @Test
-    public void givenAssociatedCase_thenAddReciprocalLinkToAssociatedCase() {
+    void givenAssociatedCase_thenAddReciprocalLinkToAssociatedCase() {
 
         SscsCaseDetails associatedCase1 = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().build()).build();
         SscsCaseDetails associatedCase2 = SscsCaseDetails.builder().id(7656765L).data(sscsCaseData).build();
@@ -132,10 +141,13 @@ public class ReciprocalLinkHandlerTest {
         capture.getValue().accept(associatedCase2);
         assertEquals("7656765", associatedCase2.getData().getAssociatedCase().get(0).getValue().getCaseReference());
         assertEquals(YES, associatedCase2.getData().getLinkedCasesBoolean());
+        logCapture
+                .assertLogContains("Nino " + getMaskedNino("AB00000Y"), Level.INFO)
+                .assertLogDoesNotContain("AB00000Y", Level.INFO);
     }
 
     @Test
-    public void givenAssociatedCaseWithExistingAssociatedCase_thenAddReciprocalLinkToAssociatedCase() {
+    void givenAssociatedCaseWithExistingAssociatedCase_thenAddReciprocalLinkToAssociatedCase() {
 
         List<CaseLink> caseLinks = new ArrayList<>();
         caseLinks.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("1").build()).build());
@@ -157,7 +169,7 @@ public class ReciprocalLinkHandlerTest {
     }
 
     @Test
-    public void givenMultipleAssociatedCases_thenAddReciprocalLinkToAllCases() {
+    void givenMultipleAssociatedCases_thenAddReciprocalLinkToAllCases() {
         List<SscsCaseDetails> associatedCaseList = new ArrayList<>();
         SscsCaseDetails associatedCase1 = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().build()).build();
         SscsCaseDetails associatedCase2 = SscsCaseDetails.builder().id(34343434L).data(SscsCaseData.builder().build()).build();
@@ -181,7 +193,7 @@ public class ReciprocalLinkHandlerTest {
     }
 
     @Test
-    public void givenMoreThan10AssociatedCases_thenDoNotAddReciprocalLinkToAllCases() {
+    void givenMoreThan10AssociatedCases_thenDoNotAddReciprocalLinkToAllCases() {
         List<SscsCaseDetails> associatedCaseList = new ArrayList<>();
         associatedCaseList.add(SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().build()).build());
         associatedCaseList.add(SscsCaseDetails.builder().id(56765671L).data(SscsCaseData.builder().build()).build());
@@ -203,7 +215,7 @@ public class ReciprocalLinkHandlerTest {
     }
 
     @Test
-    public void addNoAssociatedCases() {
+    void addNoAssociatedCases() {
         List<SscsCaseDetails> associatedCaseList = new ArrayList<>();
 
         given(ccdService.findCaseBy(anyString(), anyString(), any())).willReturn(associatedCaseList);

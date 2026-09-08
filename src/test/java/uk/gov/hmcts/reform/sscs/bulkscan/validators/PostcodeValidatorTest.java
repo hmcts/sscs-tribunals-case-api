@@ -1,43 +1,44 @@
 package uk.gov.hmcts.reform.sscs.bulkscan.validators;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPostcode;
 
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import ch.qos.logback.classic.Level;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockito.quality.Strictness;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.reform.sscs.util.LogCaptureExtension;
 
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class PostcodeValidatorTest {
     private static final String URL = "https://api.postcodes.io/postcodes/{postcode}/validate";
     private static final String TEST_POSTCODES = "TS2 2ST, TS1 1ST";
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
 
     @Mock
     private RestTemplate restTemplate;
     @Mock private ResponseEntity<byte[]> responseEntity;
 
+    @RegisterExtension
+    private final LogCaptureExtension logCapture =
+            new LogCaptureExtension(PostcodeValidator.class);
+
     private PostcodeValidator postcodeValidator;
 
-    @Before
+    @BeforeEach
     public void setup() {
         postcodeValidator = new PostcodeValidator(URL, true, TEST_POSTCODES, restTemplate);
     }
@@ -67,34 +68,32 @@ public class PostcodeValidatorTest {
     }
 
     @Test
-    public void shouldReturnTrueForAValidPostCode() {
+    void shouldReturnTrueForAValidPostCode() {
         setUpSuccessResponse();
-        boolean valid = postcodeValidator.isValid("w11 1AA");
-        assertTrue(valid);
+        assertThat(postcodeValidator.isValid("w11 1AA")).isTrue();
     }
 
-    @Test
-    @Parameters({"W1 1aa", "70002"})
-    public void shouldReturnFalseForAnInValidPostCode(String postcode) {
+    @ParameterizedTest
+    @ValueSource(strings = {"W1 1aa", "70002"})
+    void shouldReturnFalseForAnInValidPostCode(String postcode) {
         setUpFailureResponse();
-        assertFalse(postcodeValidator.isValid(postcode));
+        assertThat(postcodeValidator.isValid(postcode)).isFalse();
     }
 
     @Test
-    public void shouldReturnTrueWhenNotEnabled() {
+    void shouldReturnTrueWhenNotEnabled() {
         PostcodeValidator postcodeValidator = new PostcodeValidator(URL, false, TEST_POSTCODES, restTemplate);
-        assertTrue(postcodeValidator.isValid("W11 1AA"));
+        assertThat(postcodeValidator.isValid("W11 1AA")).isTrue();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"TS1 1ST", "TS2 2ST"})
+    void shouldReturnTrueForTheTestPostCode(String postcode) {
+        assertThat(postcodeValidator.isValid(postcode)).isTrue();
     }
 
     @Test
-    @Parameters({"TS1 1ST", "TS2 2ST"})
-    public void shouldReturnTrueForTheTestPostCode(String postcode) {
-        boolean valid = postcodeValidator.isValid(postcode);
-        assertTrue(valid);
-    }
-
-    @Test
-    public void shouldHandleRestClientResponseException() {
+    void shouldHandleRestClientResponseException() {
         when(restTemplate
             .exchange(
                 any(String.class),
@@ -104,13 +103,53 @@ public class PostcodeValidatorTest {
                 any(String.class)
             )
         ).thenThrow(new RestClientResponseException("error", 404, "error", null, null, null));
-        assertFalse(postcodeValidator.isValid("70002"));
+        assertThat(postcodeValidator.isValid("70002")).isFalse();
     }
 
     @Test
-    public void shouldHandleNon200Exception() {
+    void shouldHandleNon200Exception() {
         setupRestTemplateResponse();
         when(responseEntity.getStatusCode()).thenReturn(HttpStatus.NOT_FOUND);
-        assertFalse(postcodeValidator.isValid("80202"));
+        assertThat(postcodeValidator.isValid("80202")).isFalse();
+    }
+
+    @Test
+    void shouldMaskPostcodeInLogsWhenTestPostcodeReceived() {
+        postcodeValidator.isValid("TS1 1ST");
+
+        logCapture
+                .assertLogContains(getMaskedPostcode("TS1 1ST"), Level.INFO)
+                .assertLogDoesNotContain("TS1 1ST", Level.INFO);
+    }
+
+    @Test
+    void shouldMaskPostcodeInLogsWhenNon200ResponseReceived() {
+        setupRestTemplateResponse();
+        when(responseEntity.getStatusCode()).thenReturn(HttpStatus.NOT_FOUND);
+
+        postcodeValidator.isValid("80202");
+
+        logCapture
+                .assertLogContains(getMaskedPostcode("80202"), Level.INFO)
+                .assertLogDoesNotContain("80202", Level.INFO);
+    }
+
+    @Test
+    void shouldMaskPostcodeInLogsWhenRestClientResponseExceptionThrown() {
+        when(restTemplate
+            .exchange(
+                any(String.class),
+                eq(HttpMethod.GET),
+                any(HttpEntity.class),
+                eq(byte[].class),
+                any(String.class)
+            )
+        ).thenThrow(new RestClientResponseException("error", 404, "error", null, null, null));
+
+        postcodeValidator.isValid("70002");
+
+        logCapture
+                .assertLogContains(getMaskedPostcode("70002"), Level.INFO)
+                .assertLogDoesNotContain("70002", Level.INFO);
     }
 }

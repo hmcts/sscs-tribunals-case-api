@@ -57,6 +57,8 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.UPDATE_OTHER_PARTY_DATA;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.VALID_APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.getSubscription;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedEmail;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPhone;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -76,6 +78,7 @@ import java.util.stream.Stream;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -142,6 +145,7 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationFactory;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis.PdfLetterService;
 
+@Slf4j
 @RunWith(JUnitParamsRunner.class)
 public class NotificationServiceTest {
 
@@ -915,6 +919,11 @@ public class NotificationServiceTest {
             any(NotificationHandler.SendNotification.class));
 
         verifyNoErrorsLogged(mockAppender, captorLoggingEvent);
+        List<ILoggingEvent> logEvents = (List<ILoggingEvent>) captorLoggingEvent.getAllValues();
+        assertThat(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage()
+                .contains("email=" + getMaskedEmail(NEW_TEST_EMAIL_COM) + ", mobile=" + getMaskedPhone(MOBILE_NUMBER_1) + ",")).count()).isEqualTo(1);
+        assertThat(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage().contains(NEW_TEST_EMAIL_COM))).isEmpty();
+        assertThat(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage().contains(MOBILE_NUMBER_2))).isEmpty();
     }
 
     @Test
@@ -991,6 +1000,11 @@ public class NotificationServiceTest {
             any(NotificationHandler.SendNotification.class));
 
         verifyNoErrorsLogged(mockAppender, captorLoggingEvent);
+        List<ILoggingEvent> logEvents = (List<ILoggingEvent>) captorLoggingEvent.getAllValues();
+        assertThat(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage()
+                .contains("email=" + getMaskedEmail(SAME_TEST_EMAIL_COM) + ", mobile=" + getMaskedPhone(MOBILE_NUMBER_1) + ",")).count()).isEqualTo(1);
+        assertThat(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage().contains(SAME_TEST_EMAIL_COM))).isEmpty();
+        assertThat(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage().contains(MOBILE_NUMBER_1))).isEmpty();
     }
 
     @Test

@@ -4,6 +4,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.ResponseEntity.notFound;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPostcode;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -37,11 +38,11 @@ public class PostCodeController {
         String regionalCentre = airLookupService.lookupRegionalCentre(postCode);
 
         if (regionalCentre == null) {
-            log.warn("Could not find postcode " + postCode);
+            log.warn("Could not find postcode " + getMaskedPostcode(postCode));
             return notFound().build();
         }
 
-        log.debug("Found regional centre " + regionalCentre + " for post code " + postCode);
+        log.debug("Found regional centre " + regionalCentre + " for post code " + getMaskedPostcode(postCode));
 
         return ok("{\"regionalCentre\": \"" + regionalCentre + "\"}");
     }
