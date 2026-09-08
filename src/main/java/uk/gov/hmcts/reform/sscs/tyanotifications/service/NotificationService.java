@@ -53,7 +53,6 @@ public class NotificationService {
     private final NotificationConfig notificationConfig;
     private final SendNotificationService sendNotificationService;
     private final boolean covid19Feature;
-    private final boolean cmOtherPartyConfidentialityEnabled;
     private final AdditionalOtherPartyAddedPredicate additionalOtherPartyAddedPredicate;
     private final FirstOtherPartyAddedPredicate firstOtherPartyAddedPredicate;
 
@@ -67,8 +66,7 @@ public class NotificationService {
         OutOfHoursCalculator outOfHoursCalculator,
         NotificationConfig notificationConfig,
         SendNotificationService sendNotificationService,
-        @Value("${feature.covid19}") boolean covid19Feature,
-        @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
+        @Value("${feature.covid19}") boolean covid19Feature) {
 
         this.notificationFactory = notificationFactory;
         this.reminderService = reminderService;
@@ -78,7 +76,6 @@ public class NotificationService {
         this.notificationConfig = notificationConfig;
         this.sendNotificationService = sendNotificationService;
         this.covid19Feature = covid19Feature;
-        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
         this.additionalOtherPartyAddedPredicate = new AdditionalOtherPartyAddedPredicate();
         this.firstOtherPartyAddedPredicate = new FirstOtherPartyAddedPredicate();
     }
@@ -131,15 +128,13 @@ public class NotificationService {
             log.info("Trigger second notification event for {}", OTHER_PARTY_ADDED_TO_APPEAL.getId());
             notificationWrapper.getSscsCaseDataWrapper().setNotificationEventType(OTHER_PARTY_ADDED_TO_APPEAL);
             sendNotificationPerSubscription(notificationWrapper);
-        } else if (cmOtherPartyConfidentialityEnabled
-            && notificationWrapper.getNotificationType().equals(DIRECTION_ISSUED)
+        } else if (notificationWrapper.getNotificationType().equals(DIRECTION_ISSUED)
             && notificationWrapper.getSscsCaseDataWrapper().getNewSscsCaseData().isBenefitType(CHILD_SUPPORT)
             && isAppealToProceed(notificationWrapper)) {
             log.info("Trigger second notification event for {} with {}", DIRECTION_ISSUED.getId(), DirectionType.APPEAL_TO_PROCEED.getLabel());
             notificationWrapper.getSscsCaseDataWrapper().setNotificationEventType(NOTIFY_APPELLANT_VALID_APPEAL);
             sendNotificationPerSubscription(notificationWrapper);
-        } else if (cmOtherPartyConfidentialityEnabled
-            && notificationWrapper.getNotificationType().equals(DIRECTION_ISSUED_WELSH)
+        } else if (notificationWrapper.getNotificationType().equals(DIRECTION_ISSUED_WELSH)
             && notificationWrapper.getSscsCaseDataWrapper().getNewSscsCaseData().isBenefitType(CHILD_SUPPORT)
             && isAppealToProceed(notificationWrapper)) {
             log.info("Trigger second notification event for {} with {}", DIRECTION_ISSUED_WELSH.getId(), DirectionType.APPEAL_TO_PROCEED.getLabel());
@@ -149,7 +144,7 @@ public class NotificationService {
     }
 
     private boolean shouldNotifyAppellantAboutAdditionalOtherParty(final NotificationWrapper notificationWrapper) {
-        if (!cmOtherPartyConfidentialityEnabled || !notificationWrapper.getNotificationType().equals(UPDATE_OTHER_PARTY_DATA)) {
+        if (!notificationWrapper.getNotificationType().equals(UPDATE_OTHER_PARTY_DATA)) {
             return false;
         }
         return (notificationWrapper.getNewSscsCaseData().isBenefitType(UC) && firstOtherPartyAddedPredicate.test(
@@ -438,7 +433,7 @@ public class NotificationService {
             }
         }
 
-        if (cmOtherPartyConfidentialityEnabled && ADD_OTHER_PARTY_DATA.equals(notificationType) && (!notificationWrapper.getNewSscsCaseData().isBenefitType(UC)
+        if (ADD_OTHER_PARTY_DATA.equals(notificationType) && (!notificationWrapper.getNewSscsCaseData().isBenefitType(UC)
             || State.AWAIT_CONFIDENTIALITY_REQUIREMENTS != notificationWrapper.getSscsCaseDataWrapper().getState())) {
             log.debug(
                 "Cannot complete notification {} as benefit type is not UC or state is not awaiting confidentiality requirements for caseId {}.",
@@ -447,9 +442,7 @@ public class NotificationService {
         }
 
         boolean validAppealPostState = SEND_TO_VALID_APPEAL.contains(notificationType);
-        if ((cmOtherPartyConfidentialityEnabled && validAppealPostState && !notificationWrapper
-            .getNewSscsCaseData()
-            .isBenefitType(CHILD_SUPPORT)) || (!cmOtherPartyConfidentialityEnabled && validAppealPostState)) {
+        if ((validAppealPostState && !notificationWrapper.getNewSscsCaseData().isBenefitType(CHILD_SUPPORT))) {
             return false;
         }
 

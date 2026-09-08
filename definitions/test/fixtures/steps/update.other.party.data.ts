@@ -1,6 +1,6 @@
 import { expect, Page } from '@playwright/test';
 import { BaseStep } from './base';
-import { credentials, featureFlags } from '../../config/config';
+import { credentials } from '../../config/config';
 import addUpdateOtherPartyData from '../../pages/content/update.other.party.data_en.json';
 import addUpdateSubscriptionData from '../../pages/content/update.subscription.data_en.json';
 import createCaseBasedOnCaseType from '../../api/client/sscs/factory/appeal.type.factory';
@@ -17,9 +17,7 @@ export class UpdateOtherPartyData extends BaseStep {
   }
 
   private async getChildSupportEndState() {
-    return featureFlags.cmOtherPartyConfidentialityEnabled
-      ? 'Await Other Party Data'
-      : 'With FTA';
+    return 'Await Other Party Data';
   }
 
   private async navigateToConfidentialityTab() {
