@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.transform.deserialize;
 
 import static junit.framework.TestCase.assertNull;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -57,13 +56,12 @@ import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_WAN
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_WANTS_SUPPORT_CCD;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 
-import java.time.LocalDate;
 import java.util.Collections;
-import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
 import org.apache.commons.lang3.StringUtils;
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -76,7 +74,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.Reason;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
-import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaEvidence;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaMrn;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
@@ -440,7 +437,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTestV2 {
         Subscription representativeSubscription = caseData.getSubscriptions().getRepresentativeSubscription();
         assertNotNull(representativeSubscription);
         assertTrue(StringUtils.isNotEmpty(representativeSubscription.getTya()));
-        assertThat(representativeSubscription)
+        Assertions.assertThat(representativeSubscription)
                 .extracting("subscribeEmail","subscribeSms","wantSmsNotifications")
                 .containsExactly(NO, NO, NO);
     }
@@ -562,25 +559,6 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTestV2 {
         assertThatJson(caseData)
                 .whenIgnoringPaths(IGNORED_PATHS)
                 .isEqualTo(EVIDENCE_DOCUMENT_LANGUAGE_PREFERENCE_WELSH_CCD.getSerializedMessage());
-    }
-
-    @Test
-    public void shouldSortEvidenceDocumentsByUploadedDateDescending() {
-        final SyaCaseWrapper syaCaseWrapper = EVIDENCE_DOCUMENT.getDeserializeMessage();
-        final SyaEvidence oldest = SyaEvidence.builder()
-                .fileName("oldest.pdf").url("http://example.com/oldest").uploadedDate(LocalDate.of(2020, 1, 1)).build();
-        final SyaEvidence middle = SyaEvidence.builder()
-                .fileName("middle.pdf").url("http://example.com/middle").uploadedDate(LocalDate.of(2021, 6, 15)).build();
-        final SyaEvidence newest = SyaEvidence.builder()
-                .fileName("newest.pdf").url("http://example.com/newest").uploadedDate(LocalDate.of(2022, 12, 25)).build();
-        syaCaseWrapper.getReasonsForAppealing().setEvidences(List.of(middle, oldest, newest));
-
-        final SscsCaseData caseData = callConvertSyaToCcdCaseDataRelevantVersion(syaCaseWrapper,
-                regionalProcessingCenter.getName(), regionalProcessingCenter, false);
-
-        assertThat(caseData.getSscsDocument())
-                .extracting(document -> document.getValue().getDocumentFileName())
-                .containsExactly("newest.pdf", "middle.pdf", "oldest.pdf");
     }
 
     @Test

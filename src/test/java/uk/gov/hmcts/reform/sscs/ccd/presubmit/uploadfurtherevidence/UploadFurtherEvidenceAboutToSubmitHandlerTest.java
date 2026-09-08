@@ -333,7 +333,7 @@ class UploadFurtherEvidenceAboutToSubmitHandlerTest {
 
         assertThat(response.getData().getSscsDocument())
                 .extracting(doc -> doc.getValue().getDocumentFileName())
-                .containsExactly("new.pdf", "mid.pdf", "old.pdf");
+                .containsExactly("new.pdf", "old.pdf", "mid.pdf");
     }
 
     @Test

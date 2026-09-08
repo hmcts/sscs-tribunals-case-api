@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.managedocuments;
 
 import static java.util.Arrays.stream;
 import static java.util.Objects.requireNonNull;
-import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DocumentTabChoice.INTERNAL;
@@ -17,6 +16,7 @@ import static uk.gov.hmcts.reform.sscs.util.SscsUtil.removeDocumentFromCaseDataI
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -67,7 +67,7 @@ public class UploadDocumentAboutToSubmitHandler implements PreSubmitCallbackHand
             return new PreSubmitCallbackResponse<>(sscsCaseData);
         }
 
-        InternalCaseDocumentData internalCaseDocumentData = ofNullable(sscsCaseData.getInternalCaseDocumentData())
+        InternalCaseDocumentData internalCaseDocumentData = Optional.ofNullable(sscsCaseData.getInternalCaseDocumentData())
             .orElse(InternalCaseDocumentData.builder().build());
         if ("move".equalsIgnoreCase(internalCaseDocumentData.getUploadRemoveOrMoveDocument())) {
             boolean moveToInternal = INTERNAL.equals(internalCaseDocumentData.getMoveDocumentTo());
@@ -88,14 +88,12 @@ public class UploadDocumentAboutToSubmitHandler implements PreSubmitCallbackHand
         resetInternalCaseDocumentData(internalCaseDocumentData);
         sscsCaseData.setInternalCaseDocumentData(internalCaseDocumentData);
 
-        sscsCaseData.setAndSortSscsDocument(sscsCaseData.getSscsDocument());
-
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
 
     private PreSubmitCallbackResponse<SscsCaseData> processMoveRequest(SscsCaseData sscsCaseData, InternalCaseDocumentData internalCaseDocumentData, boolean moveToInternal, List<DynamicListItem> selectedOptions) {
-        List<SscsDocument> docList = ofNullable(moveToInternal ? sscsCaseData.getSscsDocument() : internalCaseDocumentData.getSscsInternalDocument())
+        List<SscsDocument> docList = Optional.ofNullable(moveToInternal ? sscsCaseData.getSscsDocument() : internalCaseDocumentData.getSscsInternalDocument())
             .orElse(Collections.emptyList());
         PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
         List<String> documentTypeList = stream(DocumentType.values()).map(DocumentType::getValue).toList();

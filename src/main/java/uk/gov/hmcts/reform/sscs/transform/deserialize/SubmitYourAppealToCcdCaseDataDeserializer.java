@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.transform.deserialize;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CARERS_ALLOWANCE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument.BY_DOCUMENT_DATE_ADDED_DESCENDING;
 import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.*;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getPortsOfEntry;
 import static uk.gov.hmcts.reform.sscs.utility.AppealNumberGenerator.generateAppealNumber;
@@ -804,7 +803,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                                 .documentComment(syaCaseWrapper.getReasonsForAppealing().getEvidenceDescription())
                                 .build();
                         return SscsDocument.builder().value(sscsDocumentDetails).build();
-                    }).sorted(BY_DOCUMENT_DATE_ADDED_DESCENDING).collect(Collectors.toList());
+                    }).collect(Collectors.toList());
         }
         return Collections.emptyList();
     }

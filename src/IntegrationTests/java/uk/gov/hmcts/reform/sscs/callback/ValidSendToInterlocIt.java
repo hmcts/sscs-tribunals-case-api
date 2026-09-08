@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.callback;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
@@ -38,12 +37,12 @@ public class ValidSendToInterlocIt extends AbstractEventIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
         DynamicList expected = new DynamicList(
-                new DynamicListItem("", ""),
-                Arrays.asList(new DynamicListItem(SelectWhoReviewsCase.REVIEW_BY_TCW.getId(), SelectWhoReviewsCase.REVIEW_BY_TCW.getLabel()),
-                        new DynamicListItem(SelectWhoReviewsCase.REVIEW_BY_JUDGE.getId(), SelectWhoReviewsCase.REVIEW_BY_JUDGE.getLabel()),
-                        new DynamicListItem(SelectWhoReviewsCase.POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId(), SelectWhoReviewsCase.POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getLabel()))
+            new DynamicListItem("", ""),
+            Arrays.asList(new DynamicListItem(SelectWhoReviewsCase.REVIEW_BY_TCW.getId(), SelectWhoReviewsCase.REVIEW_BY_TCW.getLabel()),
+                new DynamicListItem(SelectWhoReviewsCase.REVIEW_BY_JUDGE.getId(), SelectWhoReviewsCase.REVIEW_BY_JUDGE.getLabel()),
+                new DynamicListItem(SelectWhoReviewsCase.POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId(), SelectWhoReviewsCase.POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getLabel()))
         );
-        assertEquals(expected, result.getData().getSelectWhoReviewsCase());
+        assertThat(result.getData().getSelectWhoReviewsCase()).isEqualTo(expected);
     }
 
     @Test
@@ -53,8 +52,8 @@ public class ValidSendToInterlocIt extends AbstractEventIt {
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
-        assertNull(result.getData().getSelectWhoReviewsCase());
-        assertEquals(InterlocReviewState.REVIEW_BY_TCW, result.getData().getInterlocReviewState());
+        assertThat(result.getData().getSelectWhoReviewsCase()).isNull();
+        assertThat(result.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.REVIEW_BY_TCW);
     }
 
     @Test
@@ -64,10 +63,10 @@ public class ValidSendToInterlocIt extends AbstractEventIt {
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
-        assertNull(result.getData().getSelectWhoReviewsCase());
-        assertEquals(InterlocReviewState.REVIEW_BY_TCW, result.getData().getInterlocReviewState());
-        assertEquals(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST, result.getData().getInterlocReferralReason());
-        assertEquals(DocumentType.POSTPONEMENT_REQUEST.getValue(), result.getData().getSscsDocument().getFirst().getValue().getDocumentType());
+        assertThat(result.getData().getSelectWhoReviewsCase()).isNull();
+        assertThat(result.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.REVIEW_BY_TCW);
+        assertThat(result.getData().getInterlocReferralReason()).isEqualTo(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST);
+        assertThat(result.getData().getSscsDocument().getFirst().getValue().getDocumentType()).isEqualTo(DocumentType.POSTPONEMENT_REQUEST.getValue());
     }
 
 }

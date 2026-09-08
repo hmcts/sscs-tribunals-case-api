@@ -263,13 +263,13 @@ public class SscsUtil {
     public static void addDocumentToCaseDataDocuments(SscsCaseData caseData, SscsDocument sscsDocument) {
         List<SscsDocument> documents = new ArrayList<>(emptyIfNull(caseData.getSscsDocument()));
         documents.addFirst(sscsDocument);
-        caseData.setAndSortSscsDocument(documents);
+        caseData.setSscsDocument(documents);
     }
 
     public static void removeDocumentFromCaseDataDocuments(SscsCaseData caseData, SscsDocument sscsDocument) {
         List<SscsDocument> caseDocuments = new ArrayList<>(emptyIfNull(caseData.getSscsDocument()));
         caseDocuments = removeDocumentFromDocList(getDocumentIdFromUrl(sscsDocument), caseDocuments);
-        caseData.setAndSortSscsDocument(caseDocuments);
+        caseData.setSscsDocument(caseDocuments);
     }
 
     public static void addDocumentToCaseDataInternalDocuments(SscsCaseData caseData, SscsDocument sscsDocument) {

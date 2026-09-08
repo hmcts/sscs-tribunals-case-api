@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument.BY_DOCUMENT_DATE_ADDED_DESCENDING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
@@ -46,9 +45,7 @@ public class PostponementRequestService {
     }
 
     private void addToSscsDocuments(SscsCaseData sscsCaseData, SscsDocument sscsDocument) {
-        final List<SscsDocument> sscsDocuments = sscsCaseData.getSscsDocument();
-        sscsDocuments.addFirst(sscsDocument);
-        sscsDocuments.sort(BY_DOCUMENT_DATE_ADDED_DESCENDING);
+        sscsCaseData.getSscsDocument().addFirst(sscsDocument);
     }
 
     private void clearTransientFields(SscsCaseData sscsCaseData) {
@@ -60,7 +57,7 @@ public class PostponementRequestService {
 
     private void ensureSscsDocumentsIsNotNull(SscsCaseData sscsCaseData) {
         final List<SscsDocument> sscsDocuments = (sscsCaseData.getSscsDocument() == null) ? new ArrayList<>() : sscsCaseData.getSscsDocument();
-        sscsCaseData.setAndSortSscsDocument(sscsDocuments);
+        sscsCaseData.setSscsDocument(sscsDocuments);
     }
 
     public void addCurrentHearingToExcludeDates(PreSubmitCallbackResponse<SscsCaseData> response) {
