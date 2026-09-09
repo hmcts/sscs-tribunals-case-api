@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.bulkscan.transformers;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.*;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.WarningMessage.getMessageByCallbackType;
 import static uk.gov.hmcts.reform.sscs.bulkscan.domain.CallbackType.EXCEPTION_CALLBACK;
@@ -21,6 +22,7 @@ import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.hasAddress;
 import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.hasPerson;
 import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.isExactlyOneBooleanTrue;
 import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.isExactlyZeroBooleanTrue;
+import static uk.gov.hmcts.reform.sscs.bulkscan.validators.SscsCaseValidator.isValidNino;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AppellantRole.OTHER;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService.normaliseNino;
@@ -155,9 +157,9 @@ public class SscsCaseTransformer implements CaseTransformer {
         // New transformation request contains exceptionRecordId
         // Old transformation request contains id field, which is the exception record id
         String caseId = "N/A";
-        if (StringUtils.isNotEmpty(exceptionRecord.getExceptionRecordId())) {
+        if (isNotEmpty(exceptionRecord.getExceptionRecordId())) {
             caseId = exceptionRecord.getExceptionRecordId();
-        } else if (StringUtils.isNotEmpty(exceptionRecord.getId())) {
+        } else if (isNotEmpty(exceptionRecord.getId())) {
             caseId = exceptionRecord.getId();
         }
         log.info("Validating exception record against schema caseId {}", caseId);
@@ -592,7 +594,7 @@ public class SscsCaseTransformer implements CaseTransformer {
                     } else if (appellantRole != null) {
                         return Role.builder().name(appellantRole.getName()).build();
                     }
-                } else if (StringUtils.isNotEmpty(otherPartyDetails)) {
+                } else if (isNotEmpty(otherPartyDetails)) {
                     return Role.builder().name(OTHER.getName()).description(otherPartyDetails).build();
                 }
             }
@@ -609,7 +611,7 @@ public class SscsCaseTransformer implements CaseTransformer {
             return false;
         } else if (!validValues.isEmpty()) {
             if (validValues.size() > 1) {
-                if (StringUtils.isNotEmpty(otherPartyDetails)) {
+                if (isNotEmpty(otherPartyDetails)) {
                     validValues.add(OTHER_PARTY_DETAILS);
                 }
                 if (!ignoreWarnings) {
@@ -627,7 +629,7 @@ public class SscsCaseTransformer implements CaseTransformer {
                         FIELDS_EMPTY));
                 }
                 return false;
-            } else if (StringUtils.isNotEmpty(otherPartyDetails) && !OTHER.equals(appellantRole)) {
+            } else if (isNotEmpty(otherPartyDetails) && !OTHER.equals(appellantRole)) {
                 if (!ignoreWarnings) {
                     warnings.add(uk.gov.hmcts.reform.sscs.utility.StringUtils
                         .getGramaticallyJoinedStrings(List.of(validValues.get(0), OTHER_PARTY_DETAILS))
@@ -1084,8 +1086,10 @@ public class SscsCaseTransformer implements CaseTransformer {
 
         List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
 
-        if (!StringUtils.isEmpty(nino)) {
+        if (isValidNino(nino)) {
             matchedByNinoCases = ccdService.findCaseBy("data.appeal.appellant.identity.nino", nino, token);
+        } else {
+            log.warn("Skipping adding associated cases as NINO is not valid");
         }
 
         return addAssociatedCases(sscsCaseData, matchedByNinoCases);

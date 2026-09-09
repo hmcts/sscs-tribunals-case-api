@@ -1,17 +1,14 @@
 package uk.gov.hmcts.reform.sscs.bulkscan.transformers;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.bulkscan.TestDataConstants.*;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.APPEAL_GROUNDS;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.APPEAL_GROUNDS_2;
@@ -57,7 +54,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.FormType.SSCS8;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService.normaliseNino;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -74,9 +70,14 @@ import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.util.Assert;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.ExceptionRecord;
 import uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.InputScannedDoc;
@@ -133,7 +134,9 @@ import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
-public class SscsCaseTransformerTest {
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
+class SscsCaseTransformerTest {
 
     private static final String UNIVERSAL_CREDIT = "Universal Credit";
 
@@ -141,9 +144,9 @@ public class SscsCaseTransformerTest {
     private SscsJsonExtractor sscsJsonExtractor;
 
     @Mock
-    FormTypeValidator formTypeValidator;
+    private FormTypeValidator formTypeValidator;
 
-    FormTypeValidator formTypeValidator2;
+    private FormTypeValidator formTypeValidator2;
 
     @Mock
     private IdamService idamService;
@@ -179,8 +182,7 @@ public class SscsCaseTransformerTest {
     private ExceptionRecord sscs5ExceptionRecord;
 
     @BeforeEach
-    public void setup() {
-        openMocks(this);
+    void setup() {
         pairs = new HashMap<>();
         DwpAddressLookupService dwpAddressLookupService = new DwpAddressLookupService();
 
@@ -252,7 +254,7 @@ public class SscsCaseTransformerTest {
         "Carer's Allowance, Carer’s Allowance Dispute Resolution Team",
         "Maternity Allowance, Walsall Benefit Centre",
         "Bereavement Support Payment Scheme, Pensions Dispute Resolution Team"})
-    public void givenBenefitTypeIsOtherBenefitAutoOfficeWithAnyOffice_thenCorrectOfficeIsReturned(String benefit, String office) {
+    void givenBenefitTypeIsOtherBenefitAutoOfficeWithAnyOffice_thenCorrectOfficeIsReturned(String benefit, String office) {
 
         pairs.put(BenefitTypeIndicatorSscs1U.PIP.getIndicatorString(), false);
         pairs.put(BenefitTypeIndicatorSscs1U.ESA.getIndicatorString(), false);
@@ -261,22 +263,22 @@ public class SscsCaseTransformerTest {
         pairs.put(BENEFIT_TYPE_OTHER, benefit);
         pairs.put(ISSUING_OFFICE, "Anything");
         CaseResponse result = transformer.transformExceptionRecord(sscs1UExceptionRecord, false);
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
         Appeal appeal = (Appeal) result.getTransformedCase().get("appeal");
-        assertEquals(office, appeal.getMrnDetails().getDwpIssuingOffice());
+        assertThat(appeal.getMrnDetails().getDwpIssuingOffice()).isEqualTo(office);
     }
 
     @Test
-    public void givenInvalidBenefitTypePairings_thenReturnAnError() {
+    void givenInvalidBenefitTypePairings_thenReturnAnError() {
         pairs.put(BenefitTypeIndicator.ESA.getIndicatorString(), true);
         pairs.put(BenefitTypeIndicator.PIP.getIndicatorString(), true);
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
-        assertFalse(result.getErrors().isEmpty());
-        assertEquals("is_benefit_type_pip and is_benefit_type_esa have contradicting values", result.getErrors().getFirst());
+        assertThat(result.getErrors()).isNotEmpty();
+        assertThat(result.getErrors().getFirst()).isEqualTo("is_benefit_type_pip and is_benefit_type_esa have contradicting values");
     }
 
     @Test
-    public void givenInvalidBenefitTypePairingsForSscs5_thenReturnAnError() {
+    void givenInvalidBenefitTypePairingsForSscs5_thenReturnAnError() {
         pairs.put(BenefitTypeIndicatorSscs5.TAX_CREDIT.getIndicatorString(), true);
         pairs.put(BenefitTypeIndicatorSscs5.GUARDIANS_ALLOWANCE.getIndicatorString(), true);
         pairs.put(BenefitTypeIndicatorSscs5.TAX_FREE_CHILDCARE.getIndicatorString(), true);
@@ -286,12 +288,12 @@ public class SscsCaseTransformerTest {
         pairs.put(BenefitTypeIndicatorSscs5.GUARANTEED_MINIMUM_PENSION.getIndicatorString(), true);
         pairs.put(BenefitTypeIndicatorSscs5.NATIONAL_INSURANCE_CREDITS.getIndicatorString(), true);
         CaseResponse result = transformer.transformExceptionRecord(sscs5ExceptionRecord, false);
-        assertFalse(result.getErrors().isEmpty());
-        assertEquals("is_benefit_type_tax_credit, is_benefit_type_guardians_allowance, is_benefit_type_tax_free_childcare, is_benefit_type_home_responsibilities_protection, is_benefit_type_child_benefit, is_benefit_type_30_hours_tax_free_childcare, is_benefit_type_guaranteed_minimum_pension and is_benefit_type_national_insurance_credits have contradicting values", result.getErrors().getFirst());
+        assertThat(result.getErrors()).isNotEmpty();
+        assertThat(result.getErrors().getFirst()).isEqualTo("is_benefit_type_tax_credit, is_benefit_type_guardians_allowance, is_benefit_type_tax_free_childcare, is_benefit_type_home_responsibilities_protection, is_benefit_type_child_benefit, is_benefit_type_30_hours_tax_free_childcare, is_benefit_type_guaranteed_minimum_pension and is_benefit_type_national_insurance_credits have contradicting values");
     }
 
     @Test
-    public void givenTwoSscs5BenefitTypesAreTrue_thenReturnAnError() {
+    void givenTwoSscs5BenefitTypesAreTrue_thenReturnAnError() {
         pairs.put(BenefitTypeIndicatorSscs5.TAX_CREDIT.getIndicatorString(), true);
         pairs.put(BenefitTypeIndicatorSscs5.GUARDIANS_ALLOWANCE.getIndicatorString(), true);
         pairs.put(BenefitTypeIndicatorSscs5.TAX_FREE_CHILDCARE.getIndicatorString(), false);
@@ -301,12 +303,12 @@ public class SscsCaseTransformerTest {
         pairs.put(BenefitTypeIndicatorSscs5.GUARANTEED_MINIMUM_PENSION.getIndicatorString(), false);
         pairs.put(BenefitTypeIndicatorSscs5.NATIONAL_INSURANCE_CREDITS.getIndicatorString(), false);
         CaseResponse result = transformer.transformExceptionRecord(sscs5ExceptionRecord, false);
-        assertEquals(1, result.getErrors().size());
-        assertEquals("is_benefit_type_tax_credit and is_benefit_type_guardians_allowance have contradicting values", result.getErrors().getFirst());
+        assertThat(result.getErrors()).hasSize(1);
+        assertThat(result.getErrors().getFirst()).isEqualTo("is_benefit_type_tax_credit and is_benefit_type_guardians_allowance have contradicting values");
     }
 
     @Test
-    public void givenAllSscs5BenefitTypesAreFalse_thenReturnAnError() {
+    void givenAllSscs5BenefitTypesAreFalse_thenReturnAnError() {
         pairs.put(BenefitTypeIndicatorSscs5.TAX_CREDIT.getIndicatorString(), false);
         pairs.put(BenefitTypeIndicatorSscs5.GUARDIANS_ALLOWANCE.getIndicatorString(), false);
         pairs.put(BenefitTypeIndicatorSscs5.TAX_FREE_CHILDCARE.getIndicatorString(), false);
@@ -316,86 +318,86 @@ public class SscsCaseTransformerTest {
         pairs.put(BenefitTypeIndicatorSscs5.GUARANTEED_MINIMUM_PENSION.getIndicatorString(), false);
         pairs.put(BenefitTypeIndicatorSscs5.NATIONAL_INSURANCE_CREDITS.getIndicatorString(), false);
         CaseResponse result = transformer.transformExceptionRecord(sscs5ExceptionRecord, false);
-        assertEquals(1, result.getErrors().size());
-        assertEquals("is_benefit_type_tax_credit, is_benefit_type_guardians_allowance, is_benefit_type_tax_free_childcare, is_benefit_type_home_responsibilities_protection, is_benefit_type_child_benefit, is_benefit_type_30_hours_tax_free_childcare, is_benefit_type_guaranteed_minimum_pension and is_benefit_type_national_insurance_credits fields are empty or false", result.getErrors().getFirst());
+        assertThat(result.getErrors()).hasSize(1);
+        assertThat(result.getErrors().getFirst()).isEqualTo("is_benefit_type_tax_credit, is_benefit_type_guardians_allowance, is_benefit_type_tax_free_childcare, is_benefit_type_home_responsibilities_protection, is_benefit_type_child_benefit, is_benefit_type_30_hours_tax_free_childcare, is_benefit_type_guaranteed_minimum_pension and is_benefit_type_national_insurance_credits fields are empty or false");
     }
 
     @Test
-    public void givenAllSscs5BenefitTypesAreMissing_thenReturnAnError() {
+    void givenAllSscs5BenefitTypesAreMissing_thenReturnAnError() {
         CaseResponse result = transformer.transformExceptionRecord(sscs5ExceptionRecord, false);
-        assertEquals(1, result.getErrors().size());
-        assertEquals("is_benefit_type_tax_credit, is_benefit_type_guardians_allowance, is_benefit_type_tax_free_childcare, is_benefit_type_home_responsibilities_protection, is_benefit_type_child_benefit, is_benefit_type_30_hours_tax_free_childcare, is_benefit_type_guaranteed_minimum_pension and is_benefit_type_national_insurance_credits fields are empty or false", result.getErrors().getFirst());
+        assertThat(result.getErrors()).hasSize(1);
+        assertThat(result.getErrors().getFirst()).isEqualTo("is_benefit_type_tax_credit, is_benefit_type_guardians_allowance, is_benefit_type_tax_free_childcare, is_benefit_type_home_responsibilities_protection, is_benefit_type_child_benefit, is_benefit_type_30_hours_tax_free_childcare, is_benefit_type_guaranteed_minimum_pension and is_benefit_type_national_insurance_credits fields are empty or false");
     }
 
     @Test
-    public void givenNoTrueBenefitTypeIndicatorsOrOtherBenefitType_thenReturnAnError() {
+    void givenNoTrueBenefitTypeIndicatorsOrOtherBenefitType_thenReturnAnError() {
         pairs.put(BenefitTypeIndicatorSscs1U.ESA.getIndicatorString(), false);
         pairs.put(BenefitTypeIndicatorSscs1U.PIP.getIndicatorString(), false);
         pairs.put(BenefitTypeIndicatorSscs1U.UC.getIndicatorString(), false);
         pairs.put(BenefitTypeIndicatorSscs1U.OTHER.getIndicatorString(), false);
         CaseResponse result = transformer.transformExceptionRecord(sscs1UExceptionRecord, false);
-        assertEquals(1, result.getErrors().size());
-        assertEquals("is_benefit_type_pip, is_benefit_type_esa, is_benefit_type_uc and benefit_type_other fields are empty", result.getErrors().getFirst());
+        assertThat(result.getErrors()).hasSize(1);
+        assertThat(result.getErrors().getFirst()).isEqualTo("is_benefit_type_pip, is_benefit_type_esa, is_benefit_type_uc and benefit_type_other fields are empty");
     }
 
     @Test
-    public void givenNoBenefitTypePairings_thenReturnAnError() {
+    void givenNoBenefitTypePairings_thenReturnAnError() {
         pairs.remove(BenefitTypeIndicator.PIP.getIndicatorString());
         pairs.put(BenefitTypeIndicatorSscs1U.ESA.getIndicatorString(), false);
         pairs.put(BenefitTypeIndicatorSscs1U.PIP.getIndicatorString(), false);
         pairs.put(BenefitTypeIndicatorSscs1U.UC.getIndicatorString(), false);
         pairs.put(BenefitTypeIndicatorSscs1U.OTHER.getIndicatorString(), false);
         CaseResponse result = transformer.transformExceptionRecord(sscs1UExceptionRecord, false);
-        assertEquals(1, result.getErrors().size());
-        assertEquals("is_benefit_type_pip, is_benefit_type_esa, is_benefit_type_uc and benefit_type_other fields are empty", result.getErrors().getFirst());
+        assertThat(result.getErrors()).hasSize(1);
+        assertThat(result.getErrors().getFirst()).isEqualTo("is_benefit_type_pip, is_benefit_type_esa, is_benefit_type_uc and benefit_type_other fields are empty");
     }
 
     @Test
-    public void givenNullFormType_thenNoError() {
+    void givenNullFormType_thenNoError() {
         pairs.put(BenefitTypeIndicatorSscs1U.ESA.getIndicatorString(), false);
         pairs.put(BenefitTypeIndicatorSscs1U.PIP.getIndicatorString(), true);
         pairs.put(BenefitTypeIndicatorSscs1U.UC.getIndicatorString(), false);
         pairs.put(BenefitTypeIndicatorSscs1U.OTHER.getIndicatorString(), false);
         CaseResponse result = transformer.transformExceptionRecord(nullFormExceptionRecord, false);
-        assertEquals(0, result.getErrors().size());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @ParameterizedTest
     @CsvSource({"true", "false"})
-    public void givenBenefitTypeIsDefinedWithTrueFalse_thenCheckCorrectCodeIsReturned(boolean isPip) {
+    void givenBenefitTypeIsDefinedWithTrueFalse_thenCheckCorrectCodeIsReturned(boolean isPip) {
         pairs.put(BenefitTypeIndicator.PIP.getIndicatorString(), isPip);
         pairs.put(BenefitTypeIndicator.ESA.getIndicatorString(), !isPip);
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
         Appeal appeal = (Appeal) result.getTransformedCase().get("appeal");
         Benefit expectedBenefit = isPip ? PIP : ESA;
-        assertEquals(expectedBenefit.name(), appeal.getBenefitType().getCode());
+        assertThat(appeal.getBenefitType().getCode()).isEqualTo(expectedBenefit.name());
     }
 
     @Test
-    public void givenBenefitTypeIsOtherAttendanceAllowance_thenCorrectCodeIsReturned() {
+    void givenBenefitTypeIsOtherAttendanceAllowance_thenCorrectCodeIsReturned() {
         pairs.put(BenefitTypeIndicatorSscs1U.PIP.getIndicatorString(), false);
         pairs.put(BenefitTypeIndicatorSscs1U.ESA.getIndicatorString(), false);
         pairs.put(BenefitTypeIndicatorSscs1U.OTHER.getIndicatorString(), true);
         pairs.put(BENEFIT_TYPE_OTHER, "Attendance Allowance");
         CaseResponse result = transformer.transformExceptionRecord(sscs1UExceptionRecord, false);
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
         Appeal appeal = (Appeal) result.getTransformedCase().get("appeal");
         Benefit expectedBenefit = Benefit.ATTENDANCE_ALLOWANCE;
-        assertEquals(expectedBenefit.getShortName(), appeal.getBenefitType().getCode());
+        assertThat(appeal.getBenefitType().getCode()).isEqualTo(expectedBenefit.getShortName());
     }
 
     @Test
-    public void givenSscs2_thenBenefitTypeIsChildSupport() {
+    void givenSscs2_thenBenefitTypeIsChildSupport() {
         pairs.put(BenefitTypeIndicatorSscs1U.PIP.getIndicatorString(), false);
         pairs.put(BenefitTypeIndicatorSscs1U.ESA.getIndicatorString(), false);
         pairs.put(BenefitTypeIndicatorSscs1U.OTHER.getIndicatorString(), true);
         CaseResponse result = transformer.transformExceptionRecord(sscs2ExceptionRecord, false);
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
         Appeal appeal = (Appeal) result.getTransformedCase().get("appeal");
         Benefit expectedBenefit = Benefit.CHILD_SUPPORT;
-        assertEquals(expectedBenefit.getShortName(), appeal.getBenefitType().getCode());
-        assertEquals("Child Maintenance Service Group", appeal.getMrnDetails().getDwpIssuingOffice());
+        assertThat(appeal.getBenefitType().getCode()).isEqualTo(expectedBenefit.getShortName());
+        assertThat(appeal.getMrnDetails().getDwpIssuingOffice()).isEqualTo("Child Maintenance Service Group");
     }
 
     @ParameterizedTest
@@ -403,16 +405,16 @@ public class SscsCaseTransformerTest {
         "Income Support, incomeSupport", " Industrial Injuries Disablement Benefit, industrialInjuriesDisablement", "Job Seekers Allowance, JSA",
         "Maternity Allowance, maternityAllowance", "Social Fund, socialFund", "Bereavement Support Payment Scheme, bereavementSupportPaymentScheme",
         "Industrial Death Benefit, industrialDeathBenefit", "Pension Credit, pensionCredit", "Retirement Pension, retirementPension",})
-    public void givenBenefitTypeIsOtherWithValidType_thenCorrectCodeIsReturned(String benefitDescription, String shortName) {
+    void givenBenefitTypeIsOtherWithValidType_thenCorrectCodeIsReturned(String benefitDescription, String shortName) {
         pairs.put(BenefitTypeIndicatorSscs1U.PIP.getIndicatorString(), false);
         pairs.put(BenefitTypeIndicatorSscs1U.ESA.getIndicatorString(), false);
         pairs.put(BenefitTypeIndicatorSscs1U.UC.getIndicatorString(), false);
         pairs.put(BenefitTypeIndicatorSscs1U.OTHER.getIndicatorString(), true);
         pairs.put(BENEFIT_TYPE_OTHER, benefitDescription);
         CaseResponse result = transformer.transformExceptionRecord(sscs1UExceptionRecord, false);
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
         Appeal appeal = (Appeal) result.getTransformedCase().get("appeal");
-        assertEquals(shortName, appeal.getBenefitType().getCode());
+        assertThat(appeal.getBenefitType().getCode()).isEqualTo(shortName);
     }
 
     @ParameterizedTest
@@ -420,16 +422,16 @@ public class SscsCaseTransformerTest {
         "Income Support, incomeSupport", " Industrial Injuries Disablement Benefit, industrialInjuriesDisablement", "Job Seekers Allowance, JSA",
         "Maternity Allowance, maternityAllowance", "Social Fund, socialFund", "Bereavement Support Payment Scheme, bereavementSupportPaymentScheme",
         "Industrial Death Benefit, industrialDeathBenefit", "Pension Credit, pensionCredit", "Retirement Pension, retirementPension",})
-    public void givenBenefitTypeIsOtherNotTickedWithValidType_thenCorrectCodeIsReturned(String benefitDescription, String shortName) {
+    void givenBenefitTypeIsOtherNotTickedWithValidType_thenCorrectCodeIsReturned(String benefitDescription, String shortName) {
         pairs.put(BenefitTypeIndicatorSscs1U.PIP.getIndicatorString(), false);
         pairs.put(BenefitTypeIndicatorSscs1U.ESA.getIndicatorString(), false);
         pairs.put(BenefitTypeIndicatorSscs1U.UC.getIndicatorString(), false);
         pairs.put(BenefitTypeIndicatorSscs1U.OTHER.getIndicatorString(), false);
         pairs.put(BENEFIT_TYPE_OTHER, benefitDescription);
         CaseResponse result = transformer.transformExceptionRecord(sscs1UExceptionRecord, false);
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
         Appeal appeal = (Appeal) result.getTransformedCase().get("appeal");
-        assertEquals(shortName, appeal.getBenefitType().getCode());
+        assertThat(appeal.getBenefitType().getCode()).isEqualTo(shortName);
     }
 
     @ParameterizedTest
@@ -437,18 +439,18 @@ public class SscsCaseTransformerTest {
         "TAX_FREE_CHILDCARE, taxFreeChildcare, Childcare Service HMRC", "HOME_RESPONSIBILITIES_PROTECTION, homeResponsibilitiesProtection, PT Operations North East England",
         "CHILD_BENEFIT, childBenefit, Child Benefit Office", "THIRTY_HOURS_FREE_CHILDCARE, thirtyHoursFreeChildcare, Childcare Service HMRC",
         "GUARANTEED_MINIMUM_PENSION, guaranteedMinimumPension, PT Operations North East England", "NATIONAL_INSURANCE_CREDITS, nationalInsuranceCredits, PT Operations North East England"})
-    public void givenBenefitTypeIsSscs5_thenCorrectCodeIsReturned(BenefitTypeIndicatorSscs5 benefitType, String expectedBenefitCode, String issuingOffice) {
+    void givenBenefitTypeIsSscs5_thenCorrectCodeIsReturned(BenefitTypeIndicatorSscs5 benefitType, String expectedBenefitCode, String issuingOffice) {
         pairs.put(benefitType.getIndicatorString(), true);
         pairs.remove(BenefitTypeIndicator.PIP.getIndicatorString());
         CaseResponse result = transformer.transformExceptionRecord(sscs5ExceptionRecord, false);
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
         Appeal appeal = (Appeal) result.getTransformedCase().get("appeal");
-        assertEquals(expectedBenefitCode, appeal.getBenefitType().getCode());
-        assertEquals(issuingOffice, appeal.getMrnDetails().getDwpIssuingOffice());
+        assertThat(appeal.getBenefitType().getCode()).isEqualTo(expectedBenefitCode);
+        assertThat(appeal.getMrnDetails().getDwpIssuingOffice()).isEqualTo(issuingOffice);
     }
 
     @Test
-    public void givenBenefitTypeIsOtherWithInvalidType_thenErrorMessageReturned() {
+    void givenBenefitTypeIsOtherWithInvalidType_thenErrorMessageReturned() {
         pairs.remove("is_benefit_type_pip");
         pairs.put(BenefitTypeIndicatorSscs1U.ESA.getIndicatorString(), false);
         pairs.put(BenefitTypeIndicatorSscs1U.PIP.getIndicatorString(), false);
@@ -457,103 +459,103 @@ public class SscsCaseTransformerTest {
         pairs.put(BenefitTypeIndicatorSscs1U.OTHER.getIndicatorString(), true);
         pairs.put(BENEFIT_TYPE_OTHER, "Not a valid type");
         CaseResponse result = transformer.transformExceptionRecord(sscs1UExceptionRecord, false);
-        assertEquals(1, result.getErrors().size());
-        assertEquals("benefit_type_other is invalid", result.getErrors().getFirst());
+        assertThat(result.getErrors()).hasSize(1);
+        assertThat(result.getErrors().getFirst()).isEqualTo("benefit_type_other is invalid");
     }
 
     @Test
-    public void givenBenefitTypeIsOther_thenNullCodeIsReturned() {
+    void givenBenefitTypeIsOther_thenNullCodeIsReturned() {
         pairs.put(BenefitTypeIndicatorSscs1U.PIP.getIndicatorString(), false);
         pairs.put(BenefitTypeIndicatorSscs1U.ESA.getIndicatorString(), false);
         pairs.put(BenefitTypeIndicatorSscs1U.UC.getIndicatorString(), false);
         pairs.put(BenefitTypeIndicatorSscs1U.OTHER.getIndicatorString(), true);
         CaseResponse result = transformer.transformExceptionRecord(sscs1UExceptionRecord, false);
-        assertEquals(1, result.getErrors().size());
-        assertEquals("benefit_type_other is invalid", result.getErrors().getFirst());
+        assertThat(result.getErrors()).hasSize(1);
+        assertThat(result.getErrors().getFirst()).isEqualTo("benefit_type_other is invalid");
     }
 
     @Test
-    public void givenInvalidBenefitTypePipWithOtherBenefit_thenOneErrorMessage() {
+    void givenInvalidBenefitTypePipWithOtherBenefit_thenOneErrorMessage() {
         pairs.put(BENEFIT_TYPE_OTHER, "any value at all");
         pairs.put(BenefitTypeIndicatorSscs1U.ESA.getIndicatorString(), false);
         pairs.put(BenefitTypeIndicatorSscs1U.UC.getIndicatorString(), false);
         pairs.put(BenefitTypeIndicatorSscs1U.OTHER.getIndicatorString(), false);
 
         CaseResponse result = transformer.transformExceptionRecord(sscs1UExceptionRecord, false);
-        assertEquals(1, result.getErrors().size());
-        assertEquals("is_benefit_type_pip and benefit_type_other have contradicting values", result.getErrors().getFirst());
+        assertThat(result.getErrors()).hasSize(1);
+        assertThat(result.getErrors().getFirst()).isEqualTo("is_benefit_type_pip and benefit_type_other have contradicting values");
     }
 
     @Test
-    public void givenBenefitTypePipWithIsOtherBenefit_thenErrorMessage() {
+    void givenBenefitTypePipWithIsOtherBenefit_thenErrorMessage() {
         pairs.put(IS_BENEFIT_TYPE_OTHER, true);
         pairs.put(BenefitTypeIndicatorSscs1U.ESA.getIndicatorString(), false);
         pairs.put(BenefitTypeIndicatorSscs1U.UC.getIndicatorString(), false);
         pairs.put(BENEFIT_TYPE_OTHER, "Attendance Allowance");
         CaseResponse result = transformer.transformExceptionRecord(sscs1UExceptionRecord, false);
-        assertEquals(1, result.getErrors().size());
-        assertEquals("is_benefit_type_pip and benefit_type_other have contradicting values", result.getErrors().getFirst());
+        assertThat(result.getErrors()).hasSize(1);
+        assertThat(result.getErrors().getFirst()).isEqualTo("is_benefit_type_pip and benefit_type_other have contradicting values");
     }
 
     @Test
-    public void givenBenefitTypeEsaAndUcWithIsOtherBenefitYes_thenErrorMessage() {
+    void givenBenefitTypeEsaAndUcWithIsOtherBenefitYes_thenErrorMessage() {
         pairs.remove("is_benefit_type_pip");
         pairs.put(BenefitTypeIndicatorSscs1U.PIP.getIndicatorString(), "No");
         pairs.put(IS_BENEFIT_TYPE_OTHER, "Yes");
         pairs.put(BenefitTypeIndicatorSscs1U.ESA.getIndicatorString(), "Yes");
         pairs.put(BenefitTypeIndicatorSscs1U.UC.getIndicatorString(), "Yes");
         CaseResponse result = transformer.transformExceptionRecord(sscs1UExceptionRecord, false);
-        assertEquals(1, result.getErrors().size());
-        assertEquals("is_benefit_type_esa, is_benefit_type_uc and is_benefit_type_other have contradicting values", result.getErrors().getFirst());
+        assertThat(result.getErrors()).hasSize(1);
+        assertThat(result.getErrors().getFirst()).isEqualTo("is_benefit_type_esa, is_benefit_type_uc and is_benefit_type_other have contradicting values");
     }
 
     @Test
-    public void givenBenefitTypeEsaAndUcWithIsOtherBenefitTrue_thenErrorMessage() {
+    void givenBenefitTypeEsaAndUcWithIsOtherBenefitTrue_thenErrorMessage() {
         pairs.remove("is_benefit_type_pip");
         pairs.put(BenefitTypeIndicatorSscs1U.PIP.getIndicatorString(), false);
         pairs.put(IS_BENEFIT_TYPE_OTHER, true);
         pairs.put(BenefitTypeIndicatorSscs1U.ESA.getIndicatorString(), true);
         pairs.put(BenefitTypeIndicatorSscs1U.UC.getIndicatorString(), true);
         CaseResponse result = transformer.transformExceptionRecord(sscs1UExceptionRecord, false);
-        assertEquals(1, result.getErrors().size());
-        assertEquals("is_benefit_type_esa, is_benefit_type_uc and is_benefit_type_other have contradicting values", result.getErrors().getFirst());
+        assertThat(result.getErrors()).hasSize(1);
+        assertThat(result.getErrors().getFirst()).isEqualTo("is_benefit_type_esa, is_benefit_type_uc and is_benefit_type_other have contradicting values");
     }
 
     @ParameterizedTest
     @CsvSource({"Yes", "No"})
-    public void givenBenefitTypeIsDefinedWithYesNo_thenCheckCorrectCodeIsReturned(String isPip) {
+    void givenBenefitTypeIsDefinedWithYesNo_thenCheckCorrectCodeIsReturned(String isPip) {
         pairs.put(BenefitTypeIndicator.PIP.getIndicatorString(), isPip);
         pairs.put(BenefitTypeIndicator.ESA.getIndicatorString(), isPip.equals("Yes") ? "No" : "Yes");
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
         Appeal appeal = (Appeal) result.getTransformedCase().get("appeal");
         Benefit expectedBenefit = isPip.equals("Yes") ? PIP : ESA;
-        assertEquals(expectedBenefit.name(), appeal.getBenefitType().getCode());
+        assertThat(appeal.getBenefitType().getCode()).isEqualTo(expectedBenefit.name());
     }
 
     @Test
-    public void benefitTypeIsDefinedByDescriptionFieldWhenIsEsaOrIsPipIsNotSet() {
+    void benefitTypeIsDefinedByDescriptionFieldWhenIsEsaOrIsPipIsNotSet() {
         pairs.put("benefit_type_description", BENEFIT_TYPE);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
         Appeal appeal = (Appeal) result.getTransformedCase().get("appeal");
-        assertEquals(BENEFIT_TYPE, appeal.getBenefitType().getCode());
+        assertThat(appeal.getBenefitType().getCode()).isEqualTo(BENEFIT_TYPE);
     }
 
     @Test
-    public void givenBenefitTypeIsMisspelt_thenFuzzyMatchStillFindsCorrectType() {
+    void givenBenefitTypeIsMisspelt_thenFuzzyMatchStillFindsCorrectType() {
         pairs.put("benefit_type_description", "Personal misspelt payment");
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
         Appeal appeal = (Appeal) result.getTransformedCase().get("appeal");
-        assertEquals(BENEFIT_TYPE, appeal.getBenefitType().getCode());
+        assertThat(appeal.getBenefitType().getCode()).isEqualTo(BENEFIT_TYPE);
     }
 
     @ParameterizedTest
     @CsvSource({"person1", "person2", "representative"})
-    public void canHandleAddressWithoutAddressLine4(String personType) {
+    void canHandleAddressWithoutAddressLine4(String personType) {
         Address expectedAddress = Address.builder()
             .line1("10 my street")
             .town("town")
@@ -572,12 +574,12 @@ public class SscsCaseTransformerTest {
         Appeal appeal = (Appeal) result.getTransformedCase().get("appeal");
         Address actual = personType.equals("representative") ? appeal.getRep().getAddress() :
             personType.equals("person2") ? appeal.getAppellant().getAppointee().getAddress() : appeal.getAppellant().getAddress();
-        assertEquals(expectedAddress, actual);
+        assertThat(actual).isEqualTo(expectedAddress);
     }
 
     @ParameterizedTest
     @CsvSource({"person1", "person2", "representative"})
-    public void givenAddressLine3IsBlankAndAddressLine4IsNotPresent_thenAddressLine3PopulatedWithDot(String personType) {
+    void givenAddressLine3IsBlankAndAddressLine4IsNotPresent_thenAddressLine3PopulatedWithDot(String personType) {
         Address expectedAddress = Address.builder()
             .line1("10 my street")
             .town("town")
@@ -596,12 +598,12 @@ public class SscsCaseTransformerTest {
         Appeal appeal = (Appeal) result.getTransformedCase().get("appeal");
         Address actual = personType.equals("representative") ? appeal.getRep().getAddress() :
             personType.equals("person2") ? appeal.getAppellant().getAppointee().getAddress() : appeal.getAppellant().getAddress();
-        assertEquals(expectedAddress, actual);
+        assertThat(actual).isEqualTo(expectedAddress);
     }
 
     @ParameterizedTest
     @CsvSource({"person1", "person2", "representative"})
-    public void givenAddressLine3IsNullAndAddressLine4IsNotPresent_thenAddressLine3PopulatedWithDot(String personType) {
+    void givenAddressLine3IsNullAndAddressLine4IsNotPresent_thenAddressLine3PopulatedWithDot(String personType) {
         Address expectedAddress = Address.builder()
             .line1("10 my street")
             .town("town")
@@ -620,12 +622,12 @@ public class SscsCaseTransformerTest {
         Appeal appeal = (Appeal) result.getTransformedCase().get("appeal");
         Address actual = personType.equals("representative") ? appeal.getRep().getAddress() :
             personType.equals("person2") ? appeal.getAppellant().getAppointee().getAddress() : appeal.getAppellant().getAddress();
-        assertEquals(expectedAddress, actual);
+        assertThat(actual).isEqualTo(expectedAddress);
     }
 
     @ParameterizedTest
     @CsvSource({"person1", "person2", "representative"})
-    public void givenAddressLine2And3AreNullAndAddressLine4IsNotPresent_thenAddressLine3NotPopulatedWithDot(String personType) {
+    void givenAddressLine2And3AreNullAndAddressLine4IsNotPresent_thenAddressLine3NotPopulatedWithDot(String personType) {
         Address expectedAddress = Address.builder()
             .line1("10 my street")
             .town(null)
@@ -644,12 +646,12 @@ public class SscsCaseTransformerTest {
         Appeal appeal = (Appeal) result.getTransformedCase().get("appeal");
         Address actual = personType.equals("representative") ? appeal.getRep().getAddress() :
             personType.equals("person2") ? appeal.getAppellant().getAppointee().getAddress() : appeal.getAppellant().getAddress();
-        assertEquals(expectedAddress, actual);
+        assertThat(actual).isEqualTo(expectedAddress);
     }
 
     @ParameterizedTest
     @CsvSource({"person1", "person2", "representative"})
-    public void givenAddressLine3IsBlankAndAddressLine4IsPresent_thenAddressLine3NotPopulatedWithDot(String personType) {
+    void givenAddressLine3IsBlankAndAddressLine4IsPresent_thenAddressLine3NotPopulatedWithDot(String personType) {
         Address expectedAddress = Address.builder()
             .line1("10 my street")
             .line2("line2 address")
@@ -669,14 +671,14 @@ public class SscsCaseTransformerTest {
         Appeal appeal = (Appeal) result.getTransformedCase().get("appeal");
         Address actual = personType.equals("representative") ? appeal.getRep().getAddress() :
             personType.equals("person2") ? appeal.getAppellant().getAppointee().getAddress() : appeal.getAppellant().getAddress();
-        assertEquals(expectedAddress, actual);
-        assertEquals(0, result.getErrors().size());
-        assertEquals(0, result.getWarnings().size());
+        assertThat(actual).isEqualTo(expectedAddress);
+        assertThat(result.getErrors()).isEmpty();
+        assertThat(result.getWarnings()).isEmpty();
     }
 
     @ParameterizedTest
     @CsvSource({"Yes", "No"})
-    public void willGenerateSubscriptionsWithEmailAndPhoneAndSubscribeToEmail(String subscribeSms) {
+    void willGenerateSubscriptionsWithEmailAndPhoneAndSubscribeToEmail(String subscribeSms) {
 
         pairs.put("person1_title", APPELLANT_TITLE);
         pairs.put("person1_first_name", APPELLANT_FIRST_NAME);
@@ -703,12 +705,12 @@ public class SscsCaseTransformerTest {
             .tya(subscriptions.getAppellantSubscription().getTya())
             .build();
 
-        assertEquals(expectedSubscription, subscriptions.getAppellantSubscription());
+        assertThat(subscriptions.getAppellantSubscription()).isEqualTo(expectedSubscription);
     }
 
     @ParameterizedTest
     @CsvSource({"Yes", "No"})
-    public void willGenerateSubscriptionsWithEmailAndPhoneAndNotSubscribeToEmail(String subscribeSms) {
+    void willGenerateSubscriptionsWithEmailAndPhoneAndNotSubscribeToEmail(String subscribeSms) {
 
         pairs.put("person1_title", APPELLANT_TITLE);
         pairs.put("person1_first_name", APPELLANT_FIRST_NAME);
@@ -733,11 +735,11 @@ public class SscsCaseTransformerTest {
             .tya(subscriptions.getAppellantSubscription().getTya())
             .build();
 
-        assertEquals(expectedSubscription, subscriptions.getAppellantSubscription());
+        assertThat(subscriptions.getAppellantSubscription()).isEqualTo(expectedSubscription);
     }
 
     @Test
-    public void givenKeyValuePairsWithPerson1AndPipBenefitType_thenBuildAnAppealWithAppellant() {
+    void givenKeyValuePairsWithPerson1AndPipBenefitType_thenBuildAnAppealWithAppellant() {
 
         pairs.put("benefit_type_description", BENEFIT_TYPE);
         pairs.put("mrn_date", MRN_DATE_VALUE);
@@ -780,16 +782,17 @@ public class SscsCaseTransformerTest {
             .usingRecursiveComparison()
             .ignoringFields("appellant.id", "rep.id")
             .isEqualTo(buildTestAppealData());
-        assertEquals(BENEFIT_CODE, result.getTransformedCase().get("benefitCode"));
-        assertEquals(ISSUE_CODE, result.getTransformedCase().get("issueCode"));
-        assertEquals(CASE_CODE, result.getTransformedCase().get("caseCode"));
-        assertEquals(DWP_REGIONAL_CENTRE, result.getTransformedCase().get("dwpRegionalCentre"));
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getTransformedCase()).containsEntry("benefitCode",  BENEFIT_CODE);
+        assertThat(result.getTransformedCase()).containsEntry("issueCode",  ISSUE_CODE);
+        assertThat(result.getTransformedCase()).containsEntry("caseCode",  CASE_CODE);
+        assertThat(result.getTransformedCase()).containsEntry("dwpRegionalCentre",  DWP_REGIONAL_CENTRE);
+
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenSscs8IbcInUk_thenBuildAnAppealWithIbcRoleAndIbcaReference() {
+    void givenSscs8IbcInUk_thenBuildAnAppealWithIbcRoleAndIbcaReference() {
         pairs.put("person1_title", APPELLANT_TITLE);
         pairs.put("person1_first_name", APPELLANT_FIRST_NAME);
         pairs.put("person1_last_name", APPELLANT_LAST_NAME);
@@ -808,21 +811,21 @@ public class SscsCaseTransformerTest {
         pairs.put("form_type", SSCS8_FORM_TYPE);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
-
-        assertEquals(SSCS8, result.getTransformedCase().get("formType"));
+        
+        assertThat(result.getTransformedCase()).containsEntry("formType",  SSCS8);
         Appeal transformedAppeal = (Appeal) result.getTransformedCase().get("appeal");
-        assertNotNull(transformedAppeal);
-        assertEquals(APPELLANT_IBC_ROLE_FOR_SELF, transformedAppeal.getAppellant().getIbcRole());
-        assertEquals(APPELLANT_IBCA_REFERENCE, transformedAppeal.getAppellant().getIdentity().getIbcaReference());
+        assertThat(transformedAppeal).isNotNull();
+        assertThat(transformedAppeal.getAppellant().getIbcRole()).isEqualTo(APPELLANT_IBC_ROLE_FOR_SELF);
+        assertThat(transformedAppeal.getAppellant().getIdentity().getIbcaReference()).isEqualTo(APPELLANT_IBCA_REFERENCE);
         Address address = transformedAppeal.getAppellant().getAddress();
-        assertNotNull(address);
+        assertThat(address).isNotNull();
         Address expectedAddress = Address.builder().line1(APPELLANT_ADDRESS_LINE1).line2(APPELLANT_ADDRESS_LINE2).town(APPELLANT_ADDRESS_LINE3).postcode(APPELLANT_POSTCODE).inMainlandUk(YesNo.YES).build();
-        assertEquals(expectedAddress, address);
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(address).isEqualTo(expectedAddress);
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenPortOfEntry_thenBuildAnAppealWithAddressWithCountryPortOfEntry() {
+    void givenPortOfEntry_thenBuildAnAppealWithAddressWithCountryPortOfEntry() {
         pairs.put("person1_address_line1", APPELLANT_ADDRESS_LINE1);
         pairs.put("person1_address_line2", APPELLANT_ADDRESS_LINE2);
         pairs.put("person1_address_line3", APPELLANT_ADDRESS_LINE3);
@@ -836,16 +839,16 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals(SSCS8, result.getTransformedCase().get("formType"));
+        assertThat(result.getTransformedCase()).containsEntry("formType",  SSCS8);
         Appeal transformedAppeal = (Appeal) result.getTransformedCase().get("appeal");
-        assertNotNull(transformedAppeal);
-        assertEquals(APPELLANT_IBC_ROLE_FOR_SELF, transformedAppeal.getAppellant().getIbcRole());
-        assertEquals(APPELLANT_IBCA_REFERENCE, transformedAppeal.getAppellant().getIdentity().getIbcaReference());
+        assertThat(transformedAppeal).isNotNull();
+        assertThat(transformedAppeal.getAppellant().getIbcRole()).isEqualTo(APPELLANT_IBC_ROLE_FOR_SELF);
+        assertThat(transformedAppeal.getAppellant().getIdentity().getIbcaReference()).isEqualTo(APPELLANT_IBCA_REFERENCE);
         Address address = transformedAppeal.getAppellant().getAddress();
-        assertNotNull(address);
+        assertThat(address).isNotNull();
         Address expectedAddress = Address.builder().line1(APPELLANT_ADDRESS_LINE1).line2(APPELLANT_ADDRESS_LINE2).town(APPELLANT_ADDRESS_LINE3).country(APPELLANT_ADDRESS_COUNTRY).postcode(APPELLANT_POSTCODE).portOfEntry(APPELLANT_PORT_OF_ENTRY).inMainlandUk(YesNo.NO).build();
-        assertEquals(expectedAddress, address);
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(address).isEqualTo(expectedAddress);
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @ParameterizedTest
@@ -856,7 +859,7 @@ public class SscsCaseTransformerTest {
         IBC_ROLE_FOR_POA + "," + APPELLANT_IBC_ROLE_FOR_POA,
         IBC_ROLE_FOR_LACKING_CAPACITY + "," + APPELLANT_IBC_ROLE_FOR_LACKING_CAPACITY
     })
-    public void givenChosenIbcRole_thenBuildAnAppealWithIbcRoleSet(String ibcRoleBoolean, String ibcRoleValue) {
+    void givenChosenIbcRole_thenBuildAnAppealWithIbcRoleSet(String ibcRoleBoolean, String ibcRoleValue) {
         pairs.put("person1_address_line1", APPELLANT_ADDRESS_LINE1);
         pairs.put("person1_address_line2", APPELLANT_ADDRESS_LINE2);
         pairs.put("person1_address_line3", APPELLANT_ADDRESS_LINE3);
@@ -870,20 +873,20 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals(SSCS8, result.getTransformedCase().get("formType"));
+        assertThat(result.getTransformedCase()).containsEntry("formType",  SSCS8);
         Appeal transformedAppeal = (Appeal) result.getTransformedCase().get("appeal");
-        assertNotNull(transformedAppeal);
-        assertEquals(ibcRoleValue, transformedAppeal.getAppellant().getIbcRole());
-        assertEquals(APPELLANT_IBCA_REFERENCE, transformedAppeal.getAppellant().getIdentity().getIbcaReference());
+        assertThat(transformedAppeal).isNotNull();
+        assertThat(transformedAppeal.getAppellant().getIbcRole()).isEqualTo(ibcRoleValue);
+        assertThat(transformedAppeal.getAppellant().getIdentity().getIbcaReference()).isEqualTo(APPELLANT_IBCA_REFERENCE);
         Address address = transformedAppeal.getAppellant().getAddress();
-        assertNotNull(address);
+        assertThat(address).isNotNull();
         Address expectedAddress = Address.builder().line1(APPELLANT_ADDRESS_LINE1).line2(APPELLANT_ADDRESS_LINE2).town(APPELLANT_ADDRESS_LINE3).country(APPELLANT_ADDRESS_COUNTRY).postcode(APPELLANT_POSTCODE).portOfEntry(APPELLANT_PORT_OF_ENTRY).inMainlandUk(YesNo.NO).build();
-        assertEquals(expectedAddress, address);
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(address).isEqualTo(expectedAddress);
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenKeyValuePairsWithEsaBenefitType_thenBuildAnAppealWithAppellant() {
+    void givenKeyValuePairsWithEsaBenefitType_thenBuildAnAppealWithAppellant() {
 
         pairs.remove(BenefitTypeIndicator.PIP.getIndicatorString());
         pairs.put("is_benefit_type_esa", "true");
@@ -891,13 +894,12 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals("Sheffield DRT", result.getTransformedCase().get("dwpRegionalCentre"));
-
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getTransformedCase()).containsEntry("dwpRegionalCentre",  "Sheffield DRT");
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenKeyValuePairsWithUcBenefitTypeAndWrongOfficePopulated_thenBuildAnAppealWithDefaultHandlingOffice() {
+    void givenKeyValuePairsWithUcBenefitTypeAndWrongOfficePopulated_thenBuildAnAppealWithDefaultHandlingOffice() {
         transformer.setUcOfficeFeatureActive(true);
         pairs.put(BenefitTypeIndicator.PIP.getIndicatorString(), false);
 
@@ -906,13 +908,12 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals("Universal Credit", result.getTransformedCase().get("dwpRegionalCentre"));
-
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getTransformedCase()).containsEntry("dwpRegionalCentre",  "Universal Credit");
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenKeyValuePairsWithUcBenefitTypeAndRecoveryFromEstatesOffice_thenSetOfficesCorrectly() {
+    void givenKeyValuePairsWithUcBenefitTypeAndRecoveryFromEstatesOffice_thenSetOfficesCorrectly() {
         transformer.setUcOfficeFeatureActive(true);
         pairs.put(BenefitTypeIndicator.PIP.getIndicatorString(), false);
 
@@ -921,17 +922,17 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals("RfE", result.getTransformedCase().get("dwpRegionalCentre"));
+        assertThat(result.getTransformedCase()).containsEntry("dwpRegionalCentre",  "RfE");
 
         Appeal appeal = (Appeal) result.getTransformedCase().get("appeal");
-        assertEquals("UC Recovery from Estates", appeal.getMrnDetails().getDwpIssuingOffice());
+        assertThat(appeal.getMrnDetails().getDwpIssuingOffice()).isEqualTo("UC Recovery from Estates");
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
     //TODO: Remove when uc-office-feature switched on
-    public void givenKeyValuePairsWithUcBenefitTypeAndWrongOfficePopulated_thenBuildAnAppealWithUcOffice() {
+    void givenKeyValuePairsWithUcBenefitTypeAndWrongOfficePopulated_thenBuildAnAppealWithUcOffice() {
         pairs.put(BenefitTypeIndicator.PIP.getIndicatorString(), false);
 
         pairs.put("is_benefit_type_uc", "true");
@@ -939,13 +940,12 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals(UNIVERSAL_CREDIT, result.getTransformedCase().get("dwpRegionalCentre"));
-
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getTransformedCase()).containsEntry("dwpRegionalCentre",  UNIVERSAL_CREDIT);
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenKeyValuePairsWithUcBenefitTypeAndNoOfficePopulated_thenBuildAnAppealWithUcOffice() {
+    void givenKeyValuePairsWithUcBenefitTypeAndNoOfficePopulated_thenBuildAnAppealWithUcOffice() {
         pairs.put(BenefitTypeIndicator.PIP.getIndicatorString(), false);
 
         pairs.put("is_benefit_type_uc", "true");
@@ -953,13 +953,12 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals(UNIVERSAL_CREDIT, result.getTransformedCase().get("dwpRegionalCentre"));
-
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getTransformedCase()).containsEntry("dwpRegionalCentre",  UNIVERSAL_CREDIT);
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenKeyValuePairsWithPerson2AndPerson1_thenBuildAnAppealWithAppellantAndAppointee() {
+    void givenKeyValuePairsWithPerson2AndPerson1_thenBuildAnAppealWithAppellantAndAppointee() {
 
         pairs.put("person1_title", APPOINTEE_TITLE);
         pairs.put("person1_first_name", APPOINTEE_FIRST_NAME);
@@ -1003,11 +1002,11 @@ public class SscsCaseTransformerTest {
             .ignoringFields("id", "appointee.id")
             .isEqualTo(expectedAppellant);
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenKeyValuePairsWithPerson2AndNoPerson1_thenBuildAnAppealWithAppellant() {
+    void givenKeyValuePairsWithPerson2AndNoPerson1_thenBuildAnAppealWithAppellant() {
 
         pairs.put("person2_title", APPELLANT_TITLE);
         pairs.put("person2_first_name", APPELLANT_FIRST_NAME);
@@ -1034,70 +1033,70 @@ public class SscsCaseTransformerTest {
             .ignoringFields("id", "appointee.id")
             .isEqualTo(expectedAppellant);
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenAnAppellant_thenAddAppealNumberToAppellantSubscription() {
+    void givenAnAppellant_thenAddAppealNumberToAppellantSubscription() {
         pairs.put("person1_first_name", "Jeff");
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
         Subscriptions subscriptions = ((Subscriptions) result.getTransformedCase().get("subscriptions"));
-        assertNotNull(subscriptions.getAppellantSubscription().getTya());
-        assertNull(subscriptions.getAppointeeSubscription());
+        assertThat(subscriptions.getAppellantSubscription().getTya()).isNotNull();
+        assertThat(subscriptions.getAppointeeSubscription()).isNull();
     }
 
     @Test
-    public void givenAnAppellantAndAppointee_thenOnlyAddAppealNumberToAppointeeSubscription() {
+    void givenAnAppellantAndAppointee_thenOnlyAddAppealNumberToAppointeeSubscription() {
         pairs.put("person1_first_name", "Jeff");
         pairs.put("person2_first_name", "Terry");
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
         Subscriptions subscriptions = ((Subscriptions) result.getTransformedCase().get("subscriptions"));
-        assertNull(subscriptions.getAppellantSubscription());
-        assertNotNull(subscriptions.getAppointeeSubscription().getTya());
+        assertThat(subscriptions.getAppellantSubscription()).isNull();
+        assertThat(subscriptions.getAppointeeSubscription().getTya()).isNotNull();
     }
 
     @Test
-    public void givenARepresentative_thenAddAppealNumberToRepresentativeSubscription() {
+    void givenARepresentative_thenAddAppealNumberToRepresentativeSubscription() {
         pairs.put("representative_first_name", "Wendy");
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
         Subscriptions subscriptions = ((Subscriptions) result.getTransformedCase().get("subscriptions"));
-        assertNotNull(subscriptions.getRepresentativeSubscription().getTya());
+        assertThat(subscriptions.getRepresentativeSubscription().getTya()).isNotNull();
     }
 
     @Test
-    public void givenOralHearingType_thenBuildAnAppealWithWantsToAttendYes() {
+    void givenOralHearingType_thenBuildAnAppealWithWantsToAttendYes() {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals(HEARING_TYPE_ORAL, ((Appeal) result.getTransformedCase().get("appeal")).getHearingType());
-        assertEquals(YES_LITERAL, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getWantsToAttend());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingType()).isEqualTo(HEARING_TYPE_ORAL);
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getWantsToAttend()).isEqualTo(YES_LITERAL);
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenPaperHearingType_thenBuildAnAppealWithWantsToAttendNo() {
+    void givenPaperHearingType_thenBuildAnAppealWithWantsToAttendNo() {
 
         pairs.put(IS_HEARING_TYPE_ORAL_LITERAL, false);
         pairs.put(IS_HEARING_TYPE_PAPER_LITERAL, true);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals(HEARING_TYPE_PAPER, ((Appeal) result.getTransformedCase().get("appeal")).getHearingType());
-        assertEquals(NO_LITERAL, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getWantsToAttend());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingType()).isEqualTo(HEARING_TYPE_PAPER);
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getWantsToAttend()).isEqualTo(NO_LITERAL);
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @ParameterizedTest
     @CsvSource({"Yes", "No"})
-    public void givenHearingTypeYesNo_thenCorrectlyBuildAnAppealWithWantsToAttendValue(String isOral) {
+    void givenHearingTypeYesNo_thenCorrectlyBuildAnAppealWithWantsToAttendValue(String isOral) {
 
         pairs.put(IS_HEARING_TYPE_ORAL_LITERAL, isOral);
         pairs.put(IS_HEARING_TYPE_PAPER_LITERAL, isOral.equals("Yes") ? "No" : "Yes");
@@ -1107,14 +1106,14 @@ public class SscsCaseTransformerTest {
         String expectedHearingType = isOral.equals("Yes") ? HEARING_TYPE_ORAL : HEARING_TYPE_PAPER;
         String attendingHearing = isOral.equals("Yes") ? YES_LITERAL : NO_LITERAL;
 
-        assertEquals(expectedHearingType, ((Appeal) result.getTransformedCase().get("appeal")).getHearingType());
-        assertEquals(attendingHearing, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getWantsToAttend());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingType()).isEqualTo(expectedHearingType);
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getWantsToAttend()).isEqualTo(attendingHearing);
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenContradictingPaperAndOralCaseValues_thenAddErrorToList() {
+    void givenContradictingPaperAndOralCaseValues_thenAddErrorToList() {
         Map<String, Object> contradictingPairs = ImmutableMap.<String, Object>builder()
             .put(IS_HEARING_TYPE_ORAL_LITERAL, "true")
             .put(IS_HEARING_TYPE_PAPER_LITERAL, "true").build();
@@ -1123,11 +1122,11 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertTrue(result.getErrors().contains("is_hearing_type_oral and is_hearing_type_paper have contradicting values"));
+        assertThat(result.getErrors()).contains("is_hearing_type_oral and is_hearing_type_paper have contradicting values");
     }
 
     @Test
-    public void givenHearingTypeOralIsTrueAndHearingTypePaperIsEmpty_thenSetHearingTypeToOral() {
+    void givenHearingTypeOralIsTrueAndHearingTypePaperIsEmpty_thenSetHearingTypeToOral() {
         Map<String, Object> hearingTypePairs = new HashMap<>();
         hearingTypePairs.put("is_hearing_type_oral", true);
         hearingTypePairs.put("is_hearing_type_paper", "null");
@@ -1136,11 +1135,11 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals(HEARING_TYPE_ORAL, ((Appeal) result.getTransformedCase().get("appeal")).getHearingType());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingType()).isEqualTo(HEARING_TYPE_ORAL);
     }
 
     @Test
-    public void givenHearingTypePaperIsTrueAndHearingTypeOralIsEmpty_thenSetHearingTypeToPaper() {
+    void givenHearingTypePaperIsTrueAndHearingTypeOralIsEmpty_thenSetHearingTypeToPaper() {
         Map<String, Object> hearingTypePairs = new HashMap<>();
         hearingTypePairs.put("is_hearing_type_oral", "null");
         hearingTypePairs.put("is_hearing_type_paper", true);
@@ -1149,11 +1148,11 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals(HEARING_TYPE_PAPER, ((Appeal) result.getTransformedCase().get("appeal")).getHearingType());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingType()).isEqualTo(HEARING_TYPE_PAPER);
     }
 
     @Test
-    public void givenHearingTypeOralIsFalseAndHearingTypePaperIsEmpty_thenSetHearingTypeToPaper() {
+    void givenHearingTypeOralIsFalseAndHearingTypePaperIsEmpty_thenSetHearingTypeToPaper() {
         Map<String, Object> hearingTypePairs = new HashMap<>();
         hearingTypePairs.put("is_hearing_type_oral", false);
         hearingTypePairs.put("is_hearing_type_paper", "null");
@@ -1162,11 +1161,11 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals(HEARING_TYPE_PAPER, ((Appeal) result.getTransformedCase().get("appeal")).getHearingType());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingType()).isEqualTo(HEARING_TYPE_PAPER);
     }
 
     @Test
-    public void givenHearingTypePaperIsFalseAndHearingTypeOralIsEmpty_thenSetHearingTypeToOral() {
+    void givenHearingTypePaperIsFalseAndHearingTypeOralIsEmpty_thenSetHearingTypeToOral() {
         Map<String, Object> hearingTypePairs = new HashMap<>();
         hearingTypePairs.put("is_hearing_type_oral", "null");
         hearingTypePairs.put("is_hearing_type_paper", false);
@@ -1175,11 +1174,11 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals(HEARING_TYPE_ORAL, ((Appeal) result.getTransformedCase().get("appeal")).getHearingType());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingType()).isEqualTo(HEARING_TYPE_ORAL);
     }
 
     @Test
-    public void givenBooleanValueIsRandomText_thenSetHearingTypeToNull() {
+    void givenBooleanValueIsRandomText_thenSetHearingTypeToNull() {
         Map<String, Object> textBooleanValueMap = ImmutableMap.<String, Object>builder()
             .put("is_hearing_type_oral", "I am a text value")
             .put("is_hearing_type_paper", "true").build();
@@ -1188,148 +1187,148 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertNull(((Appeal) result.getTransformedCase().get("appeal")).getHearingType());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingType()).isNull();
     }
 
     @Test
-    public void givenAnInvalidDateOfBirth_thenAddErrorToList() {
+    void givenAnInvalidDateOfBirth_thenAddErrorToList() {
         pairs.put("person1_dob", "12/99/1987");
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertTrue(result.getErrors().contains("person1_dob is an invalid date field. Needs to be a valid date and in the format dd/mm/yyyy"));
+        assertThat(result.getErrors()).contains("person1_dob is an invalid date field. Needs to be a valid date and in the format dd/mm/yyyy");
     }
 
     @Test
-    public void givenAnInvalidMrnDate_thenAddErrorToList() {
+    void givenAnInvalidMrnDate_thenAddErrorToList() {
         pairs.put("mrn_date", "12/99/1987");
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertTrue(result.getErrors().contains("mrn_date is an invalid date field. Needs to be a valid date and in the format dd/mm/yyyy"));
+        assertThat(result.getErrors()).contains("mrn_date is an invalid date field. Needs to be a valid date and in the format dd/mm/yyyy");
     }
 
     @Test
-    public void givenANullMrnDate_thenAddErrorToList() {
+    void givenANullMrnDate_thenAddErrorToList() {
         pairs.put("mrn_date", null);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenAnEmptyStringMrnDate_thenAddErrorToList() {
+    void givenAnEmptyStringMrnDate_thenAddErrorToList() {
         pairs.put("mrn_date", "");
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenCaseContainsHearingOptions_thenBuildAnAppealWithSupport() {
+    void givenCaseContainsHearingOptions_thenBuildAnAppealWithSupport() {
 
         pairs.put("hearing_options_hearing_loop", HEARING_LOOP);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals("hearingLoop", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().getFirst());
-        assertEquals("Yes", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getWantsSupport());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().getFirst()).isEqualTo("hearingLoop");
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getWantsSupport()).isEqualTo("Yes");
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenCaseContainsNoHearingOptions_thenBuildAnAppealWithNoSupport() {
+    void givenCaseContainsNoHearingOptions_thenBuildAnAppealWithNoSupport() {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals("No", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getWantsSupport());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getWantsSupport()).isEqualTo("No");
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @ParameterizedTest
     @CsvSource({"true", "Yes"})
-    public void givenHearingLoopIsRequired_thenBuildAnAppealWithArrangementsWithHearingLoop(String hearingLoop) {
+    void givenHearingLoopIsRequired_thenBuildAnAppealWithArrangementsWithHearingLoop(String hearingLoop) {
 
         pairs.put("hearing_options_hearing_loop", hearingLoop);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals("hearingLoop", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().getFirst());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().getFirst()).isEqualTo("hearingLoop");
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @ParameterizedTest
     @CsvSource({"false", "No"})
-    public void givenHearingLoopIsNotRequired_thenBuildAnAppealWithNoHearingLoop(String hearingLoop) {
+    void givenHearingLoopIsNotRequired_thenBuildAnAppealWithNoHearingLoop(String hearingLoop) {
 
         pairs.put("hearing_options_hearing_loop", hearingLoop);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals(0, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().size());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements()).isEmpty();
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @ParameterizedTest
     @CsvSource({"true", "Yes"})
-    public void givenDisabledAccessIsRequired_thenBuildAnAppealWithArrangementsWithDisabledAccess(String disabledAccess) {
+    void givenDisabledAccessIsRequired_thenBuildAnAppealWithArrangementsWithDisabledAccess(String disabledAccess) {
         pairs.put(BenefitTypeIndicator.PIP.getIndicatorString(), true);
 
         pairs.put("hearing_options_accessible_hearing_rooms", disabledAccess);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals("disabledAccess", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().getFirst());
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().getFirst()).isEqualTo("disabledAccess");
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @ParameterizedTest
     @CsvSource({"false", "No"})
-    public void givenDisabledAccessIsNotRequired_thenBuildAnAppealWithNoDisabledAccess(String disabledAccess) {
+    void givenDisabledAccessIsNotRequired_thenBuildAnAppealWithNoDisabledAccess(String disabledAccess) {
 
         pairs.put("hearing_options_accessible_hearing_rooms", disabledAccess);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals(0, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().size());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements()).isEmpty();
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenSingleExcludedDate_thenBuildAnAppealWithExcludedStartDateAndScheduleHearingYes() {
+    void givenSingleExcludedDate_thenBuildAnAppealWithExcludedStartDateAndScheduleHearingYes() {
 
         pairs.put("hearing_options_exclude_dates", HEARING_OPTIONS_EXCLUDE_DATES);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals("2030-12-01", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates().getFirst().getValue().getStart());
-        assertEquals(YES_LITERAL, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getScheduleHearing());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates().getFirst().getValue().getStart()).isEqualTo("2030-12-01");
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getScheduleHearing()).isEqualTo(YES_LITERAL);
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenSingleExcludedDate_thenBuildAnAppealWithExcludedStartDateAndWantToAttendYes() {
+    void givenSingleExcludedDate_thenBuildAnAppealWithExcludedStartDateAndWantToAttendYes() {
 
         pairs.put("hearing_options_exclude_dates", HEARING_OPTIONS_EXCLUDE_DATES);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals("2030-12-01", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates().getFirst().getValue().getStart());
-        assertEquals(YES_LITERAL, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getWantsToAttend());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates().getFirst().getValue().getStart()).isEqualTo("2030-12-01");
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getWantsToAttend()).isEqualTo(YES_LITERAL);
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenMultipleExcludedDates_thenBuildAnAppealWithExcludedDatesAndWantToAttendYes() {
+    void givenMultipleExcludedDates_thenBuildAnAppealWithExcludedDatesAndWantToAttendYes() {
 
         pairs.put("hearing_options_exclude_dates", "01/12/2030, 15/12/2030-31/12/2030");
 
@@ -1337,27 +1336,27 @@ public class SscsCaseTransformerTest {
 
         List<ExcludeDate> excludeDateList = ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates();
 
-        assertEquals("2030-12-01", excludeDateList.getFirst().getValue().getStart());
-        assertEquals("2030-12-15", excludeDateList.get(1).getValue().getStart());
-        assertEquals("2030-12-31", excludeDateList.get(1).getValue().getEnd());
-        assertEquals(YES_LITERAL, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getWantsToAttend());
+        assertThat(excludeDateList.getFirst().getValue().getStart()).isEqualTo("2030-12-01");
+        assertThat(excludeDateList.get(1).getValue().getStart()).isEqualTo("2030-12-15");
+        assertThat(excludeDateList.get(1).getValue().getEnd()).isEqualTo("2030-12-31");
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getWantsToAttend()).isEqualTo(YES_LITERAL);
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenNoExcludedDate_thenBuildAnAppealWithExcludedStartDateAndScheduleHearingNo() {
+    void givenNoExcludedDate_thenBuildAnAppealWithExcludedStartDateAndScheduleHearingNo() {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertNull(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates());
-        assertEquals(NO_LITERAL, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getScheduleHearing());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates()).isNull();
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getScheduleHearing()).isEqualTo(NO_LITERAL);
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenAnExcludedDateAndDoesNotWantToAttendHearing_thenBuildAnAppealWithScheduleHearingNo() {
+    void givenAnExcludedDateAndDoesNotWantToAttendHearing_thenBuildAnAppealWithScheduleHearingNo() {
 
         pairs.put("hearing_options_exclude_dates", HEARING_OPTIONS_EXCLUDE_DATES);
         pairs.put("is_hearing_type_oral", false);
@@ -1365,42 +1364,42 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals("2030-12-01", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates().getFirst().getValue().getStart());
-        assertEquals(NO_LITERAL, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getScheduleHearing());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates().getFirst().getValue().getStart()).isEqualTo("2030-12-01");
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getScheduleHearing()).isEqualTo(NO_LITERAL);
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenTwoSingleExcludedDatesWithSpace_thenBuildAnAppealWithTwoExcludedStartDates() {
+    void givenTwoSingleExcludedDatesWithSpace_thenBuildAnAppealWithTwoExcludedStartDates() {
 
         pairs.put("hearing_options_exclude_dates", "12/12/2018, 16/12/2018");
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
         List<ExcludeDate> excludeDates = ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates();
-        assertEquals("2018-12-12", (excludeDates.getFirst().getValue().getStart()));
-        assertEquals("2018-12-16", (excludeDates.get(1).getValue().getStart()));
+        assertThat((excludeDates.getFirst().getValue().getStart())).isEqualTo("2018-12-12");
+        assertThat((excludeDates.get(1).getValue().getStart())).isEqualTo("2018-12-16");
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenTwoSingleExcludedDatesWithNoSpace_thenBuildAnAppealWithTwoExcludedStartDates() {
+    void givenTwoSingleExcludedDatesWithNoSpace_thenBuildAnAppealWithTwoExcludedStartDates() {
 
         pairs.put("hearing_options_exclude_dates", "12/12/2018,16/12/2018");
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
         List<ExcludeDate> excludeDates = ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates();
-        assertEquals("2018-12-12", (excludeDates.getFirst().getValue().getStart()));
-        assertEquals("2018-12-16", (excludeDates.get(1).getValue().getStart()));
+        assertThat((excludeDates.getFirst().getValue().getStart())).isEqualTo("2018-12-12");
+        assertThat((excludeDates.get(1).getValue().getStart())).isEqualTo("2018-12-16");
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenExcludedDateRangeIsEmpty_thenBuildAnAppealWithEmptyExcludedDateRange() {
+    void givenExcludedDateRangeIsEmpty_thenBuildAnAppealWithEmptyExcludedDateRange() {
 
         pairs.put("hearing_options_exclude_dates", "");
 
@@ -1408,12 +1407,12 @@ public class SscsCaseTransformerTest {
 
         List<ExcludeDate> excludeDates = ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates();
 
-        assertNull(excludeDates);
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(excludeDates).isNull();
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenExcludedDateRangeIsNull_thenBuildAnAppealWithEmptyExcludedDateRange() {
+    void givenExcludedDateRangeIsNull_thenBuildAnAppealWithEmptyExcludedDateRange() {
 
         pairs.put("hearing_options_exclude_dates", null);
 
@@ -1421,184 +1420,184 @@ public class SscsCaseTransformerTest {
 
         List<ExcludeDate> excludeDates = ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates();
 
-        assertNull(excludeDates);
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(excludeDates).isNull();
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenSingleExcludedDateFollowedByRangeWithSpace_thenBuildAnAppealWithSingleExcludedStartDateAndADateRange() {
+    void givenSingleExcludedDateFollowedByRangeWithSpace_thenBuildAnAppealWithSingleExcludedStartDateAndADateRange() {
 
         pairs.put("hearing_options_exclude_dates", "12/12/2018, 16/12/2018 - 18/12/2018");
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
         List<ExcludeDate> excludeDates = ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates();
-        assertEquals("2018-12-12", (excludeDates.getFirst().getValue().getStart()));
-        assertEquals("2018-12-16", (excludeDates.get(1).getValue().getStart()));
-        assertEquals("2018-12-18", (excludeDates.get(1).getValue().getEnd()));
+        assertThat((excludeDates.getFirst().getValue().getStart())).isEqualTo("2018-12-12");
+        assertThat((excludeDates.get(1).getValue().getStart())).isEqualTo("2018-12-16");
+        assertThat((excludeDates.get(1).getValue().getEnd())).isEqualTo("2018-12-18");
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenSingleExcludedDateFollowedByRangeWithNoSpace_thenBuildAnAppealWithSingleExcludedStartDateAndADateRange() {
+    void givenSingleExcludedDateFollowedByRangeWithNoSpace_thenBuildAnAppealWithSingleExcludedStartDateAndADateRange() {
 
         pairs.put("hearing_options_exclude_dates", "16/12/2018-18/12/2018");
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
         List<ExcludeDate> excludeDates = ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates();
-        assertEquals("2018-12-16", (excludeDates.getFirst().getValue().getStart()));
-        assertEquals("2018-12-18", (excludeDates.getFirst().getValue().getEnd()));
+        assertThat((excludeDates.getFirst().getValue().getStart())).isEqualTo("2018-12-16");
+        assertThat((excludeDates.getFirst().getValue().getEnd())).isEqualTo("2018-12-18");
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenMultipleExcludedDateFollowedByMultipleRange_thenBuildAnAppealWithMultipleExcludedStartDatesAndMultipleDateRanges() {
+    void givenMultipleExcludedDateFollowedByMultipleRange_thenBuildAnAppealWithMultipleExcludedStartDatesAndMultipleDateRanges() {
 
         pairs.put("hearing_options_exclude_dates", "12/12/2018, 14/12/2018, 16/12/2018 - 18/12/2018");
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
         List<ExcludeDate> excludeDates = ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates();
-        assertEquals("2018-12-12", (excludeDates.getFirst().getValue().getStart()));
-        assertEquals("2018-12-14", (excludeDates.get(1).getValue().getStart()));
-        assertEquals("2018-12-16", (excludeDates.get(2).getValue().getStart()));
-        assertEquals("2018-12-18", (excludeDates.get(2).getValue().getEnd()));
+        assertThat((excludeDates.getFirst().getValue().getStart())).isEqualTo("2018-12-12");
+        assertThat((excludeDates.get(1).getValue().getStart())).isEqualTo("2018-12-14");
+        assertThat((excludeDates.get(2).getValue().getStart())).isEqualTo("2018-12-16");
+        assertThat((excludeDates.get(2).getValue().getEnd())).isEqualTo("2018-12-18");
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenIncorrectExcludedDateFormat_thenAddAnError() {
+    void givenIncorrectExcludedDateFormat_thenAddAnError() {
 
         pairs.put("hearing_options_exclude_dates", "16th December 2018");
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertTrue(result.getErrors().contains("hearing_options_exclude_dates contains an invalid date range. Should be single dates separated by commas and/or a date range e.g. 01/01/2020, 07/01/2020, 12/01/2020 - 15/01/2020"));
+        assertThat(result.getErrors()).contains("hearing_options_exclude_dates contains an invalid date range. Should be single dates separated by commas and/or a date range e.g. 01/01/2020, 07/01/2020, 12/01/2020 - 15/01/2020");
     }
 
     @Test
-    public void givenIncorrectExcludedDateRangeFormat_thenAddAnError() {
+    void givenIncorrectExcludedDateRangeFormat_thenAddAnError() {
 
         pairs.put("hearing_options_exclude_dates", "16/12/2018 - 18/12/2018 - 20/12/2018");
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertTrue(result.getErrors().contains("hearing_options_exclude_dates contains an invalid date range. Should be single dates separated by commas and/or a date range e.g. 01/01/2020, 07/01/2020, 12/01/2020 - 15/01/2020"));
+        assertThat(result.getErrors()).contains("hearing_options_exclude_dates contains an invalid date range. Should be single dates separated by commas and/or a date range e.g. 01/01/2020, 07/01/2020, 12/01/2020 - 15/01/2020");
     }
 
     @Test
-    public void givenALanguageTypeIsEntered_thenBuildAnAppealWithArrangementsWithLanguageInterpreterAndTypeSet() {
+    void givenALanguageTypeIsEntered_thenBuildAnAppealWithArrangementsWithLanguageInterpreterAndTypeSet() {
 
         pairs.put(HEARING_OPTIONS_LANGUAGE_TYPE_LITERAL, HEARING_OPTIONS_LANGUAGE_TYPE);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals(HEARING_OPTIONS_LANGUAGE_TYPE, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getLanguages());
-        assertEquals(YES_LITERAL, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getLanguageInterpreter());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getLanguages()).isEqualTo(HEARING_OPTIONS_LANGUAGE_TYPE);
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getLanguageInterpreter()).isEqualTo(YES_LITERAL);
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenALanguageTypeAndDialectIsEntered_thenBuildAnAppealWithArrangementsWithLanguageInterpreterAndDialectAppended() {
+    void givenALanguageTypeAndDialectIsEntered_thenBuildAnAppealWithArrangementsWithLanguageInterpreterAndDialectAppended() {
 
         pairs.put(HEARING_OPTIONS_LANGUAGE_TYPE_LITERAL, HEARING_OPTIONS_LANGUAGE_TYPE);
         pairs.put(HEARING_OPTIONS_DIALECT_LITERAL, HEARING_OPTIONS_DIALECT_TYPE);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals(HEARING_OPTIONS_LANGUAGE_TYPE + " " + HEARING_OPTIONS_DIALECT_TYPE, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getLanguages());
-        assertEquals(YES_LITERAL, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getLanguageInterpreter());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getLanguages()).isEqualTo(HEARING_OPTIONS_LANGUAGE_TYPE + " " + HEARING_OPTIONS_DIALECT_TYPE);
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getLanguageInterpreter()).isEqualTo(YES_LITERAL);
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenADialectIsEntered_thenBuildAnAppealWithArrangementsWithLanguageTypeSetToDialect() {
+    void givenADialectIsEntered_thenBuildAnAppealWithArrangementsWithLanguageTypeSetToDialect() {
 
         pairs.put(HEARING_OPTIONS_DIALECT_LITERAL, HEARING_OPTIONS_DIALECT_TYPE);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals(HEARING_OPTIONS_DIALECT_TYPE, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getLanguages());
-        assertEquals(YES_LITERAL, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getLanguageInterpreter());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getLanguages()).isEqualTo(HEARING_OPTIONS_DIALECT_TYPE);
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getLanguageInterpreter()).isEqualTo(YES_LITERAL);
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @ParameterizedTest
     @CsvSource({"Yes", "true"})
-    public void givenASignLanguageInterpreterIsTrueAndTypeIsEntered_thenBuildAnAppealWithArrangementsWithSignLanguageInterpreterAndTypeSetToValueEntered(String signLanguageInterpreter) {
+    void givenASignLanguageInterpreterIsTrueAndTypeIsEntered_thenBuildAnAppealWithArrangementsWithSignLanguageInterpreterAndTypeSetToValueEntered(String signLanguageInterpreter) {
 
         pairs.put(HEARING_OPTIONS_SIGN_LANGUAGE_INTERPRETER_LITERAL, signLanguageInterpreter);
         pairs.put(HEARING_OPTIONS_SIGN_LANGUAGE_TYPE_LITERAL, SIGN_LANGUAGE_TYPE);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals("signLanguageInterpreter", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().getFirst());
-        assertEquals(SIGN_LANGUAGE_TYPE, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getSignLanguageType());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().getFirst()).isEqualTo("signLanguageInterpreter");
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getSignLanguageType()).isEqualTo(SIGN_LANGUAGE_TYPE);
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenASignLanguageInterpreterIsTrueAndTypeIsNotEntered_thenBuildAnAppealWithArrangementsWithSignLanguageInterpreterAndTypeSetToDefaultType() {
+    void givenASignLanguageInterpreterIsTrueAndTypeIsNotEntered_thenBuildAnAppealWithArrangementsWithSignLanguageInterpreterAndTypeSetToDefaultType() {
 
         pairs.put(HEARING_OPTIONS_SIGN_LANGUAGE_INTERPRETER_LITERAL, SIGN_LANGUAGE_REQUIRED);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals("signLanguageInterpreter", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().getFirst());
-        assertEquals(DEFAULT_SIGN_LANGUAGE, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getSignLanguageType());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().getFirst()).isEqualTo("signLanguageInterpreter");
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getSignLanguageType()).isEqualTo(DEFAULT_SIGN_LANGUAGE);
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @ParameterizedTest
     @CsvSource({"No", "false"})
-    public void givenASignLanguageInterpreterIsFalse_thenBuildAnAppealWithNoArrangements(String signLanguageInterpreter) {
+    void givenASignLanguageInterpreterIsFalse_thenBuildAnAppealWithNoArrangements(String signLanguageInterpreter) {
 
         pairs.put(HEARING_OPTIONS_SIGN_LANGUAGE_INTERPRETER_LITERAL, signLanguageInterpreter);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals(0, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().size());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements()).isEmpty();
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenASignLanguageInterpreterIsEntered_thenBuildAnAppealWithSignLanguageInterpreter() {
+    void givenASignLanguageInterpreterIsEntered_thenBuildAnAppealWithSignLanguageInterpreter() {
 
         pairs.put(HEARING_OPTIONS_SIGN_LANGUAGE_TYPE_LITERAL, SIGN_LANGUAGE_TYPE);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals("signLanguageInterpreter", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().getFirst());
-        assertEquals(SIGN_LANGUAGE_TYPE, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getSignLanguageType());
-        assertEquals("No", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getLanguageInterpreter());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().getFirst()).isEqualTo("signLanguageInterpreter");
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getSignLanguageType()).isEqualTo(SIGN_LANGUAGE_TYPE);
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getLanguageInterpreter()).isEqualTo("No");
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenASignLanguageAndLanguageIsEntered_thenBuildAnAppealWithSignLanguageAndLanguageRequirements() {
+    void givenASignLanguageAndLanguageIsEntered_thenBuildAnAppealWithSignLanguageAndLanguageRequirements() {
         pairs.put(HEARING_OPTIONS_SIGN_LANGUAGE_TYPE_LITERAL, SIGN_LANGUAGE_TYPE);
         pairs.put(HEARING_OPTIONS_LANGUAGE_TYPE_LITERAL, HEARING_OPTIONS_LANGUAGE_TYPE);
         pairs.put(HEARING_OPTIONS_DIALECT_LITERAL, HEARING_OPTIONS_DIALECT_TYPE);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
-        assertEquals("signLanguageInterpreter", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().getFirst());
-        assertEquals(SIGN_LANGUAGE_TYPE, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getSignLanguageType());
-        assertEquals(HEARING_OPTIONS_LANGUAGE_TYPE + " " + HEARING_OPTIONS_DIALECT_TYPE, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getLanguages());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().getFirst()).isEqualTo("signLanguageInterpreter");
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getSignLanguageType()).isEqualTo(SIGN_LANGUAGE_TYPE);
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getLanguages()).isEqualTo(HEARING_OPTIONS_LANGUAGE_TYPE + " " + HEARING_OPTIONS_DIALECT_TYPE);
     }
 
     @Test
-    public void givenASignLanguageInterpreterAndLanguageInterpreterIsEntered_thenBuildAnAppealWithSignLanguageAndLanguageInterpreter() {
+    void givenASignLanguageInterpreterAndLanguageInterpreterIsEntered_thenBuildAnAppealWithSignLanguageAndLanguageInterpreter() {
         pairs.put(IS_HEARING_TYPE_ORAL_LITERAL, true);
         pairs.put(IS_HEARING_TYPE_PAPER_LITERAL, false);
         pairs.put(HEARING_OPTIONS_LANGUAGE_TYPE_LITERAL, HEARING_OPTIONS_LANGUAGE_TYPE);
@@ -1606,39 +1605,50 @@ public class SscsCaseTransformerTest {
         pairs.put(HEARING_OPTIONS_SIGN_LANGUAGE_INTERPRETER_LITERAL, true);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
-        assertEquals("signLanguageInterpreter", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().getFirst());
-        assertEquals("British Sign Language", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getSignLanguageType());
-        assertEquals(HEARING_OPTIONS_LANGUAGE_TYPE + " " + HEARING_OPTIONS_DIALECT_TYPE, ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getLanguages());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getArrangements().getFirst()).isEqualTo("signLanguageInterpreter");
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getSignLanguageType()).isEqualTo("British Sign Language");
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getLanguages()).isEqualTo(HEARING_OPTIONS_LANGUAGE_TYPE + " " + HEARING_OPTIONS_DIALECT_TYPE);
     }
 
     @Test
-    public void givenACaseIsNotLinked_thenSetLinkedCaseToNo() {
+    void givenACaseIsNotLinked_thenSetLinkedCaseToNo() {
         pairs.put(IS_HEARING_TYPE_ORAL_LITERAL, true);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals("No", result.getTransformedCase().get("linkedCasesBoolean"));
+        assertThat(result.getTransformedCase()).containsEntry("linkedCasesBoolean", "No");
     }
 
     @Test
-    public void givenACaseIsLinked_thenSetLinkedCaseToYesAndPopulateAssociatedCases() {
-        pairs.put("person1_nino", "JT0123456B");
+    void givenACaseIsLinked_thenSetLinkedCaseToYesAndPopulateAssociatedCases() {
+        pairs.put("person1_nino", "JT072319B");
 
         List<SscsCaseDetails> caseDetails = new ArrayList<>();
         caseDetails.add(SscsCaseDetails.builder().id(123L).build());
 
-        given(ccdService.findCaseBy(eq("data.appeal.appellant.identity.nino"), eq("JT0123456B"), any())).willReturn(caseDetails);
+        given(ccdService.findCaseBy(eq("data.appeal.appellant.identity.nino"), eq("JT072319B"), any())).willReturn(caseDetails);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals("Yes", result.getTransformedCase().get("linkedCasesBoolean"));
+        assertThat(result.getTransformedCase()).containsEntry("linkedCasesBoolean", "Yes");
+        assertThat(((CaseLink)((List<?>) result.getTransformedCase().get("associatedCase")).getFirst()).getValue().getCaseReference()).isEqualTo("123");
+    }
 
-        assertEquals("123", ((CaseLink)((List<?>) result.getTransformedCase().get("associatedCase")).getFirst()).getValue().getCaseReference());
+    @ParameterizedTest
+    @ValueSource(strings = {"N", "N/A", "NA", "", " "})
+    void givenAnInvalidNino_thenDoNotSearchForOrLinkAssociatedCases(String invalidNino) {
+        pairs.put("person1_nino", invalidNino);
+
+        CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
+
+        verify(ccdService, never()).findCaseBy(anyString(), anyString(), any());
+
+        assertThat(result.getTransformedCase()).containsEntry("linkedCasesBoolean", "No");
     }
 
     @ParameterizedTest
     @CsvSource({"true", "false"})
-    public void givenACaseAlreadyExistsWithSameNinoBenefitTypeAndMrnDate_thenReturnAWarningWhenWarningsCombined(boolean combineWarnings) {
+    void givenACaseAlreadyExistsWithSameNinoBenefitTypeAndMrnDate_thenReturnAWarningWhenWarningsCombined(boolean combineWarnings) {
 
         pairs.put(PERSON1_VALUE + NINO, APPELLANT_NINO);
         pairs.put(MRN_DATE, MRN_DATE_VALUE);
@@ -1652,46 +1662,46 @@ public class SscsCaseTransformerTest {
 
         String message = "Duplicate case already exists - please reject this exception record";
         if (combineWarnings) {
-            assertEquals(message, result.getWarnings().getFirst());
+            assertThat(result.getWarnings().getFirst()).isEqualTo(message);
         } else {
-            assertEquals(message, result.getErrors().getFirst());
+            assertThat(result.getErrors().getFirst()).isEqualTo(message);
         }
     }
 
     @Test
-    public void givenACaseWithNullOcrData_thenAddErrorToList() {
+    void givenACaseWithNullOcrData_thenAddErrorToList() {
 
         given(sscsJsonExtractor.extractJson(exceptionRecord)).willReturn(ScannedData.builder().ocrCaseData(null).build());
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertTrue(result.getErrors().contains("No OCR data, case cannot be created"));
+        assertThat(result.getErrors()).contains("No OCR data, case cannot be created");
     }
 
     @Test
-    public void givenACaseWithNoOcrData_thenAddErrorToList() {
+    void givenACaseWithNoOcrData_thenAddErrorToList() {
         Map<String, Object> noPairs = ImmutableMap.<String, Object>builder().build();
 
         given(sscsJsonExtractor.extractJson(exceptionRecord)).willReturn(ScannedData.builder().ocrCaseData(noPairs).build());
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertTrue(result.getErrors().contains("No OCR data, case cannot be created"));
+        assertThat(result.getErrors()).contains("No OCR data, case cannot be created");
     }
 
     @Test
-    public void givenACaseWithFailedSchemaValidation_thenAddErrorToList() {
-        ExceptionRecord exceptionRecord = ExceptionRecord.builder().id("123456").ocrDataFields(ocrList).formType(FormType.SSCS1PEU.toString()).build();
+    void givenACaseWithFailedSchemaValidation_thenAddErrorToList() {
+        ExceptionRecord recordException = ExceptionRecord.builder().id("123456").ocrDataFields(ocrList).formType(FormType.SSCS1PEU.toString()).build();
 
-        given(formTypeValidator.validate("123456", exceptionRecord)).willReturn(CaseResponse.builder().errors(ImmutableList.of("NI Number is invalid")).build());
+        given(formTypeValidator.validate("123456", recordException)).willReturn(CaseResponse.builder().errors(List.of("NI Number is invalid")).build());
 
-        CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
+        CaseResponse result = transformer.transformExceptionRecord(recordException, false);
 
-        assertTrue(result.getErrors().contains("NI Number is invalid"));
+        assertThat(result.getErrors()).contains("NI Number is invalid");
     }
 
     @Test
-    public void createCaseWithTodaysCaseCreationDate() {
+    void createCaseWithTodaysCaseCreationDate() {
         pairs.put(BenefitTypeIndicator.PIP.getIndicatorString(), true);
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         String nowDateFormatted = df.format(new Date());
@@ -1700,13 +1710,12 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals(nowDateFormatted, result.getTransformedCase().get("caseCreated"));
-
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getTransformedCase()).containsEntry("caseCreated",  nowDateFormatted);
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenOneDocument_thenBuildACase() {
+    void givenOneDocument_thenBuildACase() {
         List<InputScannedDoc> records = new ArrayList<>();
         InputScannedDoc scannedRecord = buildTestScannedRecord(DocumentLink.builder().documentUrl("www.test.com").build(), "My subtype");
         records.add(scannedRecord);
@@ -1719,22 +1728,21 @@ public class SscsCaseTransformerTest {
         Map<String, Object> transformedCase = result.getTransformedCase();
         @SuppressWarnings("unchecked")
         List<SscsDocument> docs = ((List<SscsDocument>) transformedCase.get("sscsDocument"));
-        assertEquals(LocalDateTime.now().toLocalDate().toString(), docs.getFirst().getValue().getDocumentDateAdded());
-        assertEquals(scannedRecord.getFileName(), docs.getFirst().getValue().getDocumentFileName());
-        assertEquals(scannedRecord.getUrl().getDocumentUrl(), docs.getFirst().getValue().getDocumentLink().getDocumentUrl());
-        assertEquals("appellantEvidence", docs.getFirst().getValue().getDocumentType());
-
-        assertEquals(YES_LITERAL, transformedCase.get("evidencePresent"));
+        assertThat(docs.getFirst().getValue().getDocumentDateAdded()).isEqualTo(LocalDateTime.now().toLocalDate().toString());
+        assertThat(docs.getFirst().getValue().getDocumentFileName()).isEqualTo(scannedRecord.getFileName());
+        assertThat(docs.getFirst().getValue().getDocumentLink().getDocumentUrl()).isEqualTo(scannedRecord.getUrl().getDocumentUrl());
+        assertThat(docs.getFirst().getValue().getDocumentType()).isEqualTo("appellantEvidence");
+        assertThat(result.getTransformedCase()).containsEntry("evidencePresent",  YES_LITERAL);
 
         DateTimeFormatter dtfOut = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String expectedCreatedDate = dtfOut.format(LocalDateTime.now());
-        assertEquals(expectedCreatedDate, transformedCase.get("caseCreated"));
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getTransformedCase()).containsEntry("caseCreated",  expectedCreatedDate);
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenOneDocumentWithAnOpeningDate_thenBuildACase() {
+    void givenOneDocumentWithAnOpeningDate_thenBuildACase() {
         List<InputScannedDoc> records = new ArrayList<>();
         InputScannedDoc scannedRecord = buildTestScannedRecord(DocumentLink.builder().documentUrl("www.test.com").build(), "My subtype");
         records.add(scannedRecord);
@@ -1746,22 +1754,21 @@ public class SscsCaseTransformerTest {
         Map<String, Object> transformedCase = result.getTransformedCase();
         @SuppressWarnings("unchecked")
         List<SscsDocument> docs = ((List<SscsDocument>) transformedCase.get("sscsDocument"));
-        assertEquals(LocalDateTime.now().toLocalDate().toString(), docs.getFirst().getValue().getDocumentDateAdded());
-        assertEquals(scannedRecord.getFileName(), docs.getFirst().getValue().getDocumentFileName());
-        assertEquals(scannedRecord.getUrl().getDocumentUrl(), docs.getFirst().getValue().getDocumentLink().getDocumentUrl());
-        assertEquals("appellantEvidence", docs.getFirst().getValue().getDocumentType());
-
-        assertEquals(YES_LITERAL, transformedCase.get("evidencePresent"));
+        assertThat(docs.getFirst().getValue().getDocumentDateAdded()).isEqualTo(LocalDateTime.now().toLocalDate().toString());
+        assertThat(docs.getFirst().getValue().getDocumentFileName()).isEqualTo(scannedRecord.getFileName());
+        assertThat(docs.getFirst().getValue().getDocumentLink().getDocumentUrl()).isEqualTo(scannedRecord.getUrl().getDocumentUrl());
+        assertThat(docs.getFirst().getValue().getDocumentType()).isEqualTo("appellantEvidence");
+        assertThat(result.getTransformedCase()).containsEntry("evidencePresent",  YES_LITERAL);
 
         DateTimeFormatter dtfOut = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String expectedCreatedDate = dtfOut.format(LocalDateTime.now().minusYears(3));
-        assertEquals(expectedCreatedDate, transformedCase.get("caseCreated"));
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getTransformedCase()).containsEntry("caseCreated",  expectedCreatedDate);
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void should_handle_date_times_with_and_without_milliseconds() {
+    void should_handle_date_times_with_and_without_milliseconds() {
         // given
         List<InputScannedDoc> scannedRecords = Arrays.asList(
             InputScannedDoc.builder()
@@ -1798,7 +1805,7 @@ public class SscsCaseTransformerTest {
 
     @ParameterizedTest
     @CsvSource({"SSCS1, sscs1", "SSCS1PE, sscs1", "SSCS2, sscs2", "SSCS5, sscs5", "bla, appellantEvidence"})
-    public void givenOneSscs1FormAndOneEvidence_thenBuildACaseWithCorrectDocumentTypes(String sscs1Type, String documentType) {
+    void givenOneSscs1FormAndOneEvidence_thenBuildACaseWithCorrectDocumentTypes(String sscs1Type, String documentType) {
         List<InputScannedDoc> records = new ArrayList<>();
         InputScannedDoc scannedRecord1 = buildTestScannedRecord(DocumentLink.builder().documentUrl("http://www.test1.com").build(), sscs1Type);
         InputScannedDoc scannedRecord2 = buildTestScannedRecord(DocumentLink.builder().documentUrl("http://www.test2.com").build(), "My subtype");
@@ -1811,20 +1818,20 @@ public class SscsCaseTransformerTest {
 
         @SuppressWarnings("unchecked")
         List<SscsDocument> docs = ((List<SscsDocument>) result.getTransformedCase().get("sscsDocument"));
-        assertEquals(LocalDateTime.now().toLocalDate().toString(), docs.getFirst().getValue().getDocumentDateAdded());
-        assertEquals(scannedRecord1.getFileName(), docs.getFirst().getValue().getDocumentFileName());
-        assertEquals(scannedRecord1.getUrl().getDocumentUrl(), docs.getFirst().getValue().getDocumentLink().getDocumentUrl());
-        assertEquals(documentType, docs.getFirst().getValue().getDocumentType());
-        assertEquals(LocalDateTime.now().toLocalDate().toString(), docs.get(1).getValue().getDocumentDateAdded());
-        assertEquals(scannedRecord2.getFileName(), docs.get(1).getValue().getDocumentFileName());
-        assertEquals(scannedRecord2.getUrl().getDocumentUrl(), docs.get(1).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals("appellantEvidence", docs.get(1).getValue().getDocumentType());
+        assertThat(docs.getFirst().getValue().getDocumentDateAdded()).isEqualTo(LocalDateTime.now().toLocalDate().toString());
+        assertThat(docs.getFirst().getValue().getDocumentFileName()).isEqualTo(scannedRecord1.getFileName());
+        assertThat(docs.getFirst().getValue().getDocumentLink().getDocumentUrl()).isEqualTo(scannedRecord1.getUrl().getDocumentUrl());
+        assertThat(docs.getFirst().getValue().getDocumentType()).isEqualTo(documentType);
+        assertThat(docs.get(1).getValue().getDocumentDateAdded()).isEqualTo(LocalDateTime.now().toLocalDate().toString());
+        assertThat(docs.get(1).getValue().getDocumentFileName()).isEqualTo(scannedRecord2.getFileName());
+        assertThat(docs.get(1).getValue().getDocumentLink().getDocumentUrl()).isEqualTo(scannedRecord2.getUrl().getDocumentUrl());
+        assertThat(docs.get(1).getValue().getDocumentType()).isEqualTo("appellantEvidence");
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenOneDocumentWithNoDetails_thenShowAnError() {
+    void givenOneDocumentWithNoDetails_thenShowAnError() {
         List<InputScannedDoc> records = new ArrayList<>();
         InputScannedDoc scannedRecord = InputScannedDoc.builder()
             .scannedDate(null)
@@ -1840,11 +1847,11 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertTrue(result.getErrors().contains("File name field must not be empty"));
+        assertThat(result.getErrors()).contains("File name field must not be empty");
     }
 
     @Test
-    public void givenOneDocumentWithNoFileExtension_thenShowAnError() {
+    void givenOneDocumentWithNoFileExtension_thenShowAnError() {
         List<InputScannedDoc> records = new ArrayList<>();
 
         InputScannedDoc scannedRecord = InputScannedDoc.builder()
@@ -1860,11 +1867,11 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertTrue(result.getErrors().contains("Evidence file type 'mrn details' unknown"));
+        assertThat(result.getErrors()).contains("Evidence file type 'mrn details' unknown");
     }
 
     @Test
-    public void givenOneDocumentWithInvalidFileExtension_thenShowAnError() {
+    void givenOneDocumentWithInvalidFileExtension_thenShowAnError() {
         List<InputScannedDoc> records = new ArrayList<>();
 
         InputScannedDoc scannedRecord = InputScannedDoc.builder()
@@ -1880,25 +1887,23 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertTrue(result.getErrors().contains("Evidence file type 'xyz' unknown"));
+        assertThat(result.getErrors()).contains("Evidence file type 'xyz' unknown");
     }
 
     @Test
-    public void givenACaseWithNoDocuments_thenBuildACaseWithNoEvidencePresent() {
+    void givenACaseWithNoDocuments_thenBuildACaseWithNoEvidencePresent() {
         List<InputScannedDoc> records = new ArrayList<>();
 
         given(sscsJsonExtractor.extractJson(exceptionRecord)).willReturn(ScannedData.builder().ocrCaseData(pairs).records(records).build());
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        Map<String, Object> transformedCase = result.getTransformedCase();
-        assertEquals(NO_LITERAL, transformedCase.get("evidencePresent"));
-
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getTransformedCase()).containsEntry("evidencePresent",  NO_LITERAL);
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenAPipCase_thenSetCreatedInGapsFromFieldToReadyToList() {
+    void givenAPipCase_thenSetCreatedInGapsFromFieldToReadyToList() {
         pairs.put("office", "2");
         pairs.put(BenefitTypeIndicator.PIP.getIndicatorString(), true);
         pairs.put(BenefitTypeIndicator.ESA.getIndicatorString(), false);
@@ -1906,13 +1911,13 @@ public class SscsCaseTransformerTest {
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
         String createdInGapsFrom = ((String) result.getTransformedCase().get("createdInGapsFrom"));
-        assertEquals(READY_TO_LIST.getId(), createdInGapsFrom);
+        assertThat(createdInGapsFrom).isEqualTo(READY_TO_LIST.getId());
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenAEsaCase_thenSetCreatedInGapsFromFieldToReadyToList() {
+    void givenAEsaCase_thenSetCreatedInGapsFromFieldToReadyToList() {
         pairs.put("office", "Chesterfield DRT");
         pairs.put(BenefitTypeIndicator.PIP.getIndicatorString(), false);
         pairs.put(BenefitTypeIndicator.ESA.getIndicatorString(), true);
@@ -1920,191 +1925,191 @@ public class SscsCaseTransformerTest {
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
         String createdInGapsFrom = ((String) result.getTransformedCase().get("createdInGapsFrom"));
-        assertEquals(READY_TO_LIST.getId(), createdInGapsFrom);
+        assertThat(createdInGapsFrom).isEqualTo(READY_TO_LIST.getId());
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @ParameterizedTest
     @CsvSource({"(AE)", "AE", "PIP AE", "DWP PIP (AE)"})
-    public void givenAPipAeCase_thenAcceptOfficeWithFuzzyMatching(String pipAe) {
+    void givenAPipAeCase_thenAcceptOfficeWithFuzzyMatching(String pipAe) {
         pairs.put("office", pipAe);
         pairs.put(BenefitTypeIndicator.PIP.getIndicatorString(), true);
         pairs.put(BenefitTypeIndicator.ESA.getIndicatorString(), false);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals("AE", result.getTransformedCase().get("dwpRegionalCentre"));
-        assertEquals("DWP PIP (AE)", ((Appeal) result.getTransformedCase().get("appeal")).getMrnDetails().getDwpIssuingOffice());
+        assertThat(result.getTransformedCase()).containsEntry("dwpRegionalCentre",  "AE");
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getMrnDetails().getDwpIssuingOffice()).isEqualTo("DWP PIP (AE)");
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @ParameterizedTest
     @CsvSource({"PIP (3)", "  PIP 3  ", "PIP 3", "DWP PIP (3)"})
-    public void givenAPipOffice3Case_thenAcceptOfficeWithFuzzyMatching(String pip3) {
+    void givenAPipOffice3Case_thenAcceptOfficeWithFuzzyMatching(String pip3) {
         pairs.put("office", pip3);
         pairs.put(BenefitTypeIndicator.PIP.getIndicatorString(), true);
         pairs.put(BenefitTypeIndicator.ESA.getIndicatorString(), false);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals("Bellevale", result.getTransformedCase().get("dwpRegionalCentre"));
-        assertEquals("DWP PIP (3)", ((Appeal) result.getTransformedCase().get("appeal")).getMrnDetails().getDwpIssuingOffice());
+        assertThat(result.getTransformedCase()).containsEntry("dwpRegionalCentre",  "Bellevale");
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getMrnDetails().getDwpIssuingOffice()).isEqualTo("DWP PIP (3)");
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @ParameterizedTest
     @CsvSource({"Recovery from Estates", "PIP Recovery from Estates"})
-    public void givenAPipOfficeRecoveryEstatesCase_thenAcceptOfficeWithFuzzyMatching(String pipRecoveryEstates) {
+    void givenAPipOfficeRecoveryEstatesCase_thenAcceptOfficeWithFuzzyMatching(String pipRecoveryEstates) {
         pairs.put("office", pipRecoveryEstates);
         pairs.put(BenefitTypeIndicator.PIP.getIndicatorString(), true);
         pairs.put(BenefitTypeIndicator.ESA.getIndicatorString(), false);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals("RfE", result.getTransformedCase().get("dwpRegionalCentre"));
-        assertEquals("PIP Recovery from Estates", ((Appeal) result.getTransformedCase().get("appeal")).getMrnDetails().getDwpIssuingOffice());
+        assertThat(result.getTransformedCase()).containsEntry("dwpRegionalCentre",  "RfE");
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getMrnDetails().getDwpIssuingOffice()).isEqualTo("PIP Recovery from Estates");
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenACaseWithNoReadyToListOffice_thenSetCreatedInGapsFromFieldToReadyToList() {
+    void givenACaseWithNoReadyToListOffice_thenSetCreatedInGapsFromFieldToReadyToList() {
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
         String createdInGapsFrom = ((String) result.getTransformedCase().get("createdInGapsFrom"));
-        assertEquals(READY_TO_LIST.getId(), createdInGapsFrom);
+        assertThat(createdInGapsFrom).isEqualTo(READY_TO_LIST.getId());
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @ParameterizedTest
     @CsvSource({"true", "Yes"})
-    public void givenAgreeLessHearingNoticeIsRequired_thenBuildAnAppealWithAgreeLessHearingNotice(String agreeLessHearingNotice) {
+    void givenAgreeLessHearingNoticeIsRequired_thenBuildAnAppealWithAgreeLessHearingNotice(String agreeLessHearingNotice) {
 
         pairs.put("agree_less_hearing_notice", agreeLessHearingNotice);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals("Yes", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getAgreeLessNotice());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getAgreeLessNotice()).isEqualTo("Yes");
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @ParameterizedTest
     @CsvSource({"false", "No"})
-    public void givenAgreeLessHearingNoticeIsNotRequired_thenBuildAnAppealWithNoAgreeLessHearingNotice(String agreeLessHearingNotice) {
+    void givenAgreeLessHearingNoticeIsNotRequired_thenBuildAnAppealWithNoAgreeLessHearingNotice(String agreeLessHearingNotice) {
 
         pairs.put("agree_less_hearing_notice", agreeLessHearingNotice);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals("No", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getAgreeLessNotice());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getAgreeLessNotice()).isEqualTo("No");
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @ParameterizedTest
     @CsvSource({"true", "Yes"})
-    public void givenTellTribunalAboutDatesIsRequiredAndExcludedDatesProvided_thenBuildAnAppealWithExcludedDates(String tellTribunalAboutDates) {
+    void givenTellTribunalAboutDatesIsRequiredAndExcludedDatesProvided_thenBuildAnAppealWithExcludedDates(String tellTribunalAboutDates) {
 
         pairs.put("tell_tribunal_about_dates", tellTribunalAboutDates);
         pairs.put("hearing_options_exclude_dates", HEARING_OPTIONS_EXCLUDE_DATES);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals("2030-12-01", ((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates().getFirst().getValue().getStart());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates().getFirst().getValue().getStart()).isEqualTo("2030-12-01");
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @ParameterizedTest
     @CsvSource({"true", "Yes"})
-    public void givenTellTribunalAboutDatesIsRequiredAndExcludedDatesIsEmpty_thenProvideWarningToCaseworker(String tellTribunalAboutDates) {
+    void givenTellTribunalAboutDatesIsRequiredAndExcludedDatesIsEmpty_thenProvideWarningToCaseworker(String tellTribunalAboutDates) {
 
         pairs.put("tell_tribunal_about_dates", tellTribunalAboutDates);
         pairs.put("hearing_options_exclude_dates", "");
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals(1, result.getWarnings().size());
-        assertEquals(HEARING_EXCLUDE_DATES_MISSING, result.getWarnings().getFirst());
+        assertThat(result.getWarnings()).hasSize(1);
+        assertThat(result.getWarnings().getFirst()).isEqualTo(HEARING_EXCLUDE_DATES_MISSING);
 
-        assertNull(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates()).isNull();
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @ParameterizedTest
     @CsvSource({"true", "Yes"})
-    public void givenTellTribunalAboutDatesIsRequiredAndExcludedDatesIsNotPresent_thenProvideWarningToCaseworker(String tellTribunalAboutDates) {
+    void givenTellTribunalAboutDatesIsRequiredAndExcludedDatesIsNotPresent_thenProvideWarningToCaseworker(String tellTribunalAboutDates) {
 
         pairs.put("tell_tribunal_about_dates", tellTribunalAboutDates);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals(1, result.getWarnings().size());
-        assertEquals(HEARING_EXCLUDE_DATES_MISSING, result.getWarnings().getFirst());
+        assertThat(result.getWarnings()).hasSize(1);
+        assertThat(result.getWarnings().getFirst()).isEqualTo(HEARING_EXCLUDE_DATES_MISSING);
 
-        assertNull(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates()).isNull();
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @ParameterizedTest
     @CsvSource({"false", "No"})
-    public void givenTellTribunalAboutDatesIsNotRequired_thenBuildAnAppealWithNoExcludedDates(String tellTribunalAboutDates) {
+    void givenTellTribunalAboutDatesIsNotRequired_thenBuildAnAppealWithNoExcludedDates(String tellTribunalAboutDates) {
 
         pairs.put("tell_tribunal_about_dates", tellTribunalAboutDates);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertNull(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingOptions().getExcludeDates()).isNull();
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @ParameterizedTest
     @CsvSource({"Doctor, Dr", "Reverend, Rev"})
-    public void givenTitleIsLong_thenConvertToShortenedVersion(String ocrTitle, String outputTitle) {
+    void givenTitleIsLong_thenConvertToShortenedVersion(String ocrTitle, String outputTitle) {
 
         pairs.put("person1_title", ocrTitle);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals(outputTitle, ((Appeal) result.getTransformedCase().get("appeal")).getAppellant().getName().getTitle());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getAppellant().getName().getTitle()).isEqualTo(outputTitle);
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenAnAppealWithAnErrorAndCombineWarningsTrue_thenMoveErrorsToWarnings() {
+    void givenAnAppealWithAnErrorAndCombineWarningsTrue_thenMoveErrorsToWarnings() {
         pairs.put("person1_dob", "12/99/1987");
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, true);
 
-        assertTrue(result.getWarnings().contains("person1_dob is an invalid date field. Needs to be a valid date and in the format dd/mm/yyyy"));
-        assertEquals(0, result.getErrors().size());
+        assertThat(result.getWarnings()).contains("person1_dob is an invalid date field. Needs to be a valid date and in the format dd/mm/yyyy");
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenATransformForValidationRequestFailsSchemaValidation_thenReturnErrors() {
+    void givenATransformForValidationRequestFailsSchemaValidation_thenReturnErrors() {
         pairs.put("bla", "12/99/1987");
 
-        ExceptionRecord exceptionRecord = ExceptionRecord.builder().id("123456").ocrDataFields(ocrList).formType(FormType.SSCS1PEU.toString()).build();
+        ExceptionRecord recordException = ExceptionRecord.builder().id("123456").ocrDataFields(ocrList).formType(FormType.SSCS1PEU.toString()).build();
 
-        given(formTypeValidator.validate("123456", exceptionRecord)).willReturn(CaseResponse.builder().errors(ImmutableList.of("NI Number is invalid")).build());
+        given(formTypeValidator.validate("123456", recordException)).willReturn(CaseResponse.builder().errors(List.of("NI Number is invalid")).build());
 
-        CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, true);
+        CaseResponse result = transformer.transformExceptionRecord(recordException, true);
 
-        assertEquals("NI Number is invalid", result.getErrors().getFirst());
+        assertThat(result.getErrors().getFirst()).isEqualTo("NI Number is invalid");
     }
 
     @ParameterizedTest
     @CsvSource({"true", "Yes", "false", "No"})
-    public void givenHearingSubtypeDetailsAreProvided_thenBuildAnAppealHearingSubtypeDetails(String hearingSubtypeFlag) {
+    void givenHearingSubtypeDetailsAreProvided_thenBuildAnAppealHearingSubtypeDetails(String hearingSubtypeFlag) {
 
         pairs.put(HEARING_TYPE_TELEPHONE_LITERAL, hearingSubtypeFlag);
         pairs.put(HEARING_TELEPHONE_LITERAL, HEARING_TELEPHONE_NUMBER);
@@ -2114,16 +2119,16 @@ public class SscsCaseTransformerTest {
         String expectedResult = hearingSubtypeFlag.equals("true") || hearingSubtypeFlag.equals("Yes") ? "Yes" : "No";
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
-        assertEquals(expectedResult, ((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeTelephone());
-        assertEquals(HEARING_TELEPHONE_NUMBER, ((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingTelephoneNumber());
-        assertEquals(expectedResult, ((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeVideo());
-        assertEquals(HEARING_VIDEO_EMAIL, ((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingVideoEmail());
-        assertEquals(expectedResult, ((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeFaceToFace());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeTelephone()).isEqualTo(expectedResult);
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingTelephoneNumber()).isEqualTo(HEARING_TELEPHONE_NUMBER);
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeVideo()).isEqualTo(expectedResult);
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingVideoEmail()).isEqualTo(HEARING_VIDEO_EMAIL);
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeFaceToFace()).isEqualTo(expectedResult);
     }
 
     @ParameterizedTest
     @CsvSource({"true", "Yes", "false", "No"})
-    public void givenHearingSubtypeDetailsAreProvided_WithoutHearingTypeTelephone_thenBuildAnAppealHearingSubtypeDetails(String hearingSubtypeFlag) {
+    void givenHearingSubtypeDetailsAreProvided_WithoutHearingTypeTelephone_thenBuildAnAppealHearingSubtypeDetails(String hearingSubtypeFlag) {
 
         pairs.put(HEARING_TELEPHONE_LITERAL, HEARING_TELEPHONE_NUMBER);
         pairs.put(HEARING_TYPE_VIDEO_LITERAL, hearingSubtypeFlag);
@@ -2132,16 +2137,16 @@ public class SscsCaseTransformerTest {
         String expectedResult = hearingSubtypeFlag.equals("true") || hearingSubtypeFlag.equals("Yes") ? "Yes" : "No";
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
-        assertNull(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeTelephone());
-        assertEquals(HEARING_TELEPHONE_NUMBER, ((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingTelephoneNumber());
-        assertEquals(expectedResult, ((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeVideo());
-        assertEquals(HEARING_VIDEO_EMAIL, ((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingVideoEmail());
-        assertEquals(expectedResult, ((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeFaceToFace());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeTelephone()).isNull();
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingTelephoneNumber()).isEqualTo(HEARING_TELEPHONE_NUMBER);
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeVideo()).isEqualTo(expectedResult);
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingVideoEmail()).isEqualTo(HEARING_VIDEO_EMAIL);
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeFaceToFace()).isEqualTo(expectedResult);
     }
 
     @ParameterizedTest
     @CsvSource({"true", "Yes", "false", "No"})
-    public void givenHearingSubtypeDetailsAreProvided_WithoutHearingTypeTelephoneOrHearingTelephone_thenBuildAnAppealHearingSubtypeDetails(String hearingSubtypeFlag) {
+    void givenHearingSubtypeDetailsAreProvided_WithoutHearingTypeTelephoneOrHearingTelephone_thenBuildAnAppealHearingSubtypeDetails(String hearingSubtypeFlag) {
 
         pairs.put(HEARING_TYPE_VIDEO_LITERAL, hearingSubtypeFlag);
         pairs.put(HEARING_VIDEO_EMAIL_LITERAL, HEARING_VIDEO_EMAIL);
@@ -2149,92 +2154,92 @@ public class SscsCaseTransformerTest {
         String expectedResult = hearingSubtypeFlag.equals("true") || hearingSubtypeFlag.equals("Yes") ? "Yes" : "No";
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
-        assertNull(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeTelephone());
-        assertNull(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingTelephoneNumber());
-        assertEquals(expectedResult, ((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeVideo());
-        assertEquals(HEARING_VIDEO_EMAIL, ((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingVideoEmail());
-        assertEquals(expectedResult, ((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeFaceToFace());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeTelephone()).isNull();
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingTelephoneNumber()).isNull();
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeVideo()).isEqualTo(expectedResult);
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingVideoEmail()).isEqualTo(HEARING_VIDEO_EMAIL);
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeFaceToFace()).isEqualTo(expectedResult);
     }
 
     @ParameterizedTest
     @CsvSource({"true, Yes", "Yes, Yes", "false, No", "No, No"})
-    public void givenHearingSubtypeDetailsAreProvided_WithoutHearingTypeTelephoneOrVideoOrHearingTelephone_thenBuildAnAppealHearingSubtypeDetails(String hearingSubtypeFlag, String expectedResult) {
+    void givenHearingSubtypeDetailsAreProvided_WithoutHearingTypeTelephoneOrVideoOrHearingTelephone_thenBuildAnAppealHearingSubtypeDetails(String hearingSubtypeFlag, String expectedResult) {
 
         pairs.put(HEARING_VIDEO_EMAIL_LITERAL, HEARING_VIDEO_EMAIL);
         pairs.put(HEARING_TYPE_FACE_TO_FACE_LITERAL, hearingSubtypeFlag);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertNull(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeTelephone());
-        assertNull(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingTelephoneNumber());
-        assertNull(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeVideo());
-        assertEquals(HEARING_VIDEO_EMAIL, ((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingVideoEmail());
-        assertEquals(expectedResult, ((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeFaceToFace());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeTelephone()).isNull();
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingTelephoneNumber()).isNull();
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeVideo()).isNull();
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingVideoEmail()).isEqualTo(HEARING_VIDEO_EMAIL);
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeFaceToFace()).isEqualTo(expectedResult);
     }
 
     @ParameterizedTest
     @CsvSource({"true", "Yes", "false", "No"})
-    public void givenHearingSubtypeDetailsAreProvided_WithOnlyHearingTypeFaceToFace_thenBuildAnAppealHearingSubtypeDetails(String hearingSubtypeFlag) {
+    void givenHearingSubtypeDetailsAreProvided_WithOnlyHearingTypeFaceToFace_thenBuildAnAppealHearingSubtypeDetails(String hearingSubtypeFlag) {
 
         pairs.put(HEARING_TYPE_FACE_TO_FACE_LITERAL, hearingSubtypeFlag);
         final String expectedResult = hearingSubtypeFlag.equals("true") || hearingSubtypeFlag.equals("Yes") ? "Yes" : "No";
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
-        assertNull(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeTelephone());
-        assertNull(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingTelephoneNumber());
-        assertNull(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeVideo());
-        assertNull(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingVideoEmail());
-        assertEquals(expectedResult, ((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeFaceToFace());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeTelephone()).isNull();
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingTelephoneNumber()).isNull();
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeVideo()).isNull();
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingVideoEmail()).isNull();
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeFaceToFace()).isEqualTo(expectedResult);
 
     }
 
     @Test
-    public void givenHearingSubtypeDetailsAreProvided_WithNoPairs_thenBuildAnAppealHearingSubtypeDetails() {
+    void givenHearingSubtypeDetailsAreProvided_WithNoPairs_thenBuildAnAppealHearingSubtypeDetails() {
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
-        assertNull(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeTelephone());
-        assertNull(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingTelephoneNumber());
-        assertNull(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeVideo());
-        assertNull(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingVideoEmail());
-        assertNull(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeFaceToFace());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeTelephone()).isNull();
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingTelephoneNumber()).isNull();
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeVideo()).isNull();
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingVideoEmail()).isNull();
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getWantsHearingTypeFaceToFace()).isNull();
     }
 
     @Test
-    public void givenInvalidHearingSubtypeDetailsAreProvided_thenShowWarnings() {
+    void givenInvalidHearingSubtypeDetailsAreProvided_thenShowWarnings() {
         pairs.put(HEARING_TYPE_TELEPHONE_LITERAL, "test");
         pairs.put(HEARING_TYPE_VIDEO_LITERAL, "test");
         pairs.put(HEARING_TYPE_FACE_TO_FACE_LITERAL, "test");
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
-        assertEquals(3, result.getErrors().size());
-        assertEquals(HEARING_TYPE_TELEPHONE_LITERAL + " has an invalid value. Should be Yes/No or True/False", result.getErrors().getFirst());
-        assertEquals(HEARING_TYPE_FACE_TO_FACE_LITERAL + " has an invalid value. Should be Yes/No or True/False", result.getErrors().get(1));
-        assertEquals(HEARING_TYPE_VIDEO_LITERAL + " has an invalid value. Should be Yes/No or True/False", result.getErrors().get(2));
+        assertThat(result.getErrors()).hasSize(3);
+        assertThat(result.getErrors().getFirst()).isEqualTo(HEARING_TYPE_TELEPHONE_LITERAL + " has an invalid value. Should be Yes/No or True/False");
+        assertThat(result.getErrors().get(1)).isEqualTo(HEARING_TYPE_FACE_TO_FACE_LITERAL + " has an invalid value. Should be Yes/No or True/False");
+        assertThat(result.getErrors().get(2)).isEqualTo(HEARING_TYPE_VIDEO_LITERAL + " has an invalid value. Should be Yes/No or True/False");
     }
 
     @Test
-    public void givenHearingSubtypeDetailsAreProvidedWithNoHearingTelephoneNumberButWithPerson1Mobile_thenPopulateHearingTelephoneNumberWithPerson1Mobile() {
+    void givenHearingSubtypeDetailsAreProvidedWithNoHearingTelephoneNumberButWithPerson1Mobile_thenPopulateHearingTelephoneNumberWithPerson1Mobile() {
 
         pairs.put(HEARING_TYPE_TELEPHONE_LITERAL, "Yes");
         pairs.put(PERSON1_VALUE + MOBILE, HEARING_TELEPHONE_NUMBER);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals(HEARING_TELEPHONE_NUMBER, ((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingTelephoneNumber());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingTelephoneNumber()).isEqualTo(HEARING_TELEPHONE_NUMBER);
     }
 
     @Test
-    public void givenHearingSubtypeDetailsAreProvidedWithNoHearingTelephoneNumberButWithPerson1Phone_thenPopulateHearingTelephoneNumberWithPerson1Phone() {
+    void givenHearingSubtypeDetailsAreProvidedWithNoHearingTelephoneNumberButWithPerson1Phone_thenPopulateHearingTelephoneNumberWithPerson1Phone() {
 
         pairs.put(HEARING_TYPE_TELEPHONE_LITERAL, "Yes");
         pairs.put(PERSON1_VALUE + PHONE, HEARING_TELEPHONE_NUMBER);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals(HEARING_TELEPHONE_NUMBER, ((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingTelephoneNumber());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingTelephoneNumber()).isEqualTo(HEARING_TELEPHONE_NUMBER);
     }
 
     @Test
-    public void givenHearingSubtypeDetailsAreProvidedWithNoHearingTelephoneNumberButWithPerson1PhoneAndPerson1Mobile_thenPopulateHearingTelephoneNumberWithPerson1Mobile() {
+    void givenHearingSubtypeDetailsAreProvidedWithNoHearingTelephoneNumberButWithPerson1PhoneAndPerson1Mobile_thenPopulateHearingTelephoneNumberWithPerson1Mobile() {
 
         pairs.put(HEARING_TYPE_TELEPHONE_LITERAL, "Yes");
         pairs.put(PERSON1_VALUE + MOBILE, HEARING_TELEPHONE_NUMBER);
@@ -2242,32 +2247,32 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals(HEARING_TELEPHONE_NUMBER, ((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingTelephoneNumber());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingTelephoneNumber()).isEqualTo(HEARING_TELEPHONE_NUMBER);
     }
 
     @Test
-    public void givenHearingSubtypeDetailsAreProvidedWithNoHearingVideoEmailButWithPerson1Email_thenPopulateHearingVideoEmailWithPerson1Email() {
+    void givenHearingSubtypeDetailsAreProvidedWithNoHearingVideoEmailButWithPerson1Email_thenPopulateHearingVideoEmailWithPerson1Email() {
 
         pairs.put(HEARING_TYPE_VIDEO_LITERAL, "Yes");
         pairs.put(PERSON1_VALUE + EMAIL, HEARING_VIDEO_EMAIL);
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals(HEARING_VIDEO_EMAIL, ((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingVideoEmail());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingVideoEmail()).isEqualTo(HEARING_VIDEO_EMAIL);
     }
 
     @Test
-    public void givenAppealGrounds2Provided_thenBuildAnAppealWithAppealReasons() {
+    void givenAppealGrounds2Provided_thenBuildAnAppealWithAppealReasons() {
 
         pairs.put(APPEAL_GROUNDS, null);
         pairs.put(APPEAL_GROUNDS_2, "My appeal grounds");
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
-        assertEquals("My appeal grounds", ((Appeal) result.getTransformedCase().get("appeal")).getAppealReasons().getReasons().getFirst().getValue().getDescription());
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getAppealReasons().getReasons().getFirst().getValue().getDescription()).isEqualTo("My appeal grounds");
     }
 
     @Test
-    public void setProcessingVenue_withGivingPriorityToAppointeeOverAppellant() {
+    void setProcessingVenue_withGivingPriorityToAppointeeOverAppellant() {
         pairs.put("benefit_type_description", BENEFIT_TYPE);
         for (String person : Arrays.asList("person1", "person2")) {
             pairs.put(person + "_address_line1", "10 my street");
@@ -2289,16 +2294,16 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals(PROCESSING_VENUE, result.getTransformedCase().get("processingVenue"));
+        assertThat(result.getTransformedCase()).containsEntry("processingVenue",  PROCESSING_VENUE);
 
         CaseManagementLocation caseManagementLocation = (CaseManagementLocation) result.getTransformedCase().get("caseManagementLocation");
-        assertNotNull(caseManagementLocation);
-        assertEquals("rpcEpimsId", caseManagementLocation.getBaseLocation());
-        assertEquals(REGION_ID, caseManagementLocation.getRegion());
+        assertThat(caseManagementLocation).isNotNull();
+        assertThat(caseManagementLocation.getBaseLocation()).isEqualTo("rpcEpimsId");
+        assertThat(caseManagementLocation.getRegion()).isEqualTo(REGION_ID);
     }
 
     @Test
-    public void setProcessingVenue_fromAppellantAddress() {
+    void setProcessingVenue_fromAppellantAddress() {
         pairs.put("benefit_type_description", BENEFIT_TYPE);
         pairs.put("person1_address_line1", "10 my street");
         pairs.put("person1_address_line2", "line2 address");
@@ -2318,16 +2323,16 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals(PROCESSING_VENUE, result.getTransformedCase().get("processingVenue"));
+        assertThat(result.getTransformedCase()).containsEntry("processingVenue",  PROCESSING_VENUE);
 
         CaseManagementLocation caseManagementLocation = (CaseManagementLocation) result.getTransformedCase().get("caseManagementLocation");
-        assertNotNull(caseManagementLocation);
-        assertEquals("rpcEpimsId", caseManagementLocation.getBaseLocation());
-        assertEquals(REGION_ID, caseManagementLocation.getRegion());
+        assertThat(caseManagementLocation).isNotNull();
+        assertThat(caseManagementLocation.getBaseLocation()).isEqualTo("rpcEpimsId");
+        assertThat(caseManagementLocation.getRegion()).isEqualTo(REGION_ID);
     }
 
     @Test
-    public void setProcessingVenue_isIbcCase() {
+    void setProcessingVenue_isIbcCase() {
         pairs.put(BenefitTypeIndicator.PIP.getIndicatorString(), false);
         pairs.put("benefit_type_description", Benefit.INFECTED_BLOOD_COMPENSATION.getDescription());
         pairs.put("person1_address_line1", "10 my street");
@@ -2348,17 +2353,17 @@ public class SscsCaseTransformerTest {
 
         CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
 
-        assertEquals(PROCESSING_VENUE, result.getTransformedCase().get("processingVenue"));
+        assertThat(result.getTransformedCase()).containsEntry("processingVenue",  PROCESSING_VENUE);
 
         CaseManagementLocation caseManagementLocation = (CaseManagementLocation) result.getTransformedCase().get("caseManagementLocation");
-        assertNotNull(caseManagementLocation);
-        assertEquals("rpcEpimsId", caseManagementLocation.getBaseLocation());
-        assertEquals(REGION_ID, caseManagementLocation.getRegion());
+        assertThat(caseManagementLocation).isNotNull();
+        assertThat(caseManagementLocation.getBaseLocation()).isEqualTo("rpcEpimsId");
+        assertThat(caseManagementLocation.getRegion()).isEqualTo(REGION_ID);
     }
 
     @ParameterizedTest
     @CsvSource({CHILD_MAINTENANCE_NUMBER, "001"})
-    public void givenSscs2FormWithChildMaintenanceNumber_thenCaseDataValueIsSet(String childMaintenance) {
+    void givenSscs2FormWithChildMaintenanceNumber_thenCaseDataValueIsSet(String childMaintenance) {
         pairs.put(BENEFIT_TYPE_OTHER, "Child support");
         pairs.put(PERSON_1_CHILD_MAINTENANCE_NUMBER, childMaintenance);
         pairs.put("person1_title", APPELLANT_TITLE);
@@ -2374,11 +2379,11 @@ public class SscsCaseTransformerTest {
         pairs.put("is_paying_parent", "true");
         CaseResponse result = transformer.transformExceptionRecord(sscs2ExceptionRecord, false);
         assertNoErrorsOrWarnings(result);
-        assertEquals(childMaintenance, result.getTransformedCase().get("childMaintenanceNumber"));
+        assertThat(result.getTransformedCase()).containsEntry("childMaintenanceNumber",  childMaintenance);
     }
 
     @Test
-    public void givenSscs2FormWithOtherPartyNameAndAddressSet_thenCaseDataValueIsSet() {
+    void givenSscs2FormWithOtherPartyNameAndAddressSet_thenCaseDataValueIsSet() {
         pairs.put(BENEFIT_TYPE_OTHER, "Child support");
         pairs.put("other_party_title", OTHER_PARTY_TITLE);
         pairs.put("other_party_first_name", OTHER_PARTY_FIRST_NAME);
@@ -2404,20 +2409,20 @@ public class SscsCaseTransformerTest {
 
         @SuppressWarnings("unchecked")
         OtherParty otherParty = ((List<CcdValue<OtherParty>>) result.getTransformedCase().get("otherParties")).getFirst().getValue();
-        assertEquals(OTHER_PARTY_ID_ONE, otherParty.getId());
+        assertThat(otherParty.getId()).isEqualTo(OTHER_PARTY_ID_ONE);
         Name otherPartyName = otherParty.getName();
-        assertEquals(OTHER_PARTY_TITLE, otherPartyName.getTitle());
-        assertEquals(OTHER_PARTY_FIRST_NAME, otherPartyName.getFirstName());
-        assertEquals(OTHER_PARTY_LAST_NAME, otherPartyName.getLastName());
+        assertThat(otherPartyName.getTitle()).isEqualTo(OTHER_PARTY_TITLE);
+        assertThat(otherPartyName.getFirstName()).isEqualTo(OTHER_PARTY_FIRST_NAME);
+        assertThat(otherPartyName.getLastName()).isEqualTo(OTHER_PARTY_LAST_NAME);
         Address otherPartyAddress = otherParty.getAddress();
-        assertEquals(OTHER_PARTY_ADDRESS_LINE1, otherPartyAddress.getLine1());
-        assertEquals(OTHER_PARTY_ADDRESS_LINE2, otherPartyAddress.getTown());
-        assertEquals(OTHER_PARTY_ADDRESS_LINE3, otherPartyAddress.getCounty());
-        assertEquals(OTHER_PARTY_POSTCODE, otherPartyAddress.getPostcode());
+        assertThat(otherPartyAddress.getLine1()).isEqualTo(OTHER_PARTY_ADDRESS_LINE1);
+        assertThat(otherPartyAddress.getTown()).isEqualTo(OTHER_PARTY_ADDRESS_LINE2);
+        assertThat(otherPartyAddress.getCounty()).isEqualTo(OTHER_PARTY_ADDRESS_LINE3);
+        assertThat(otherPartyAddress.getPostcode()).isEqualTo(OTHER_PARTY_POSTCODE);
     }
 
     @Test
-    public void givenSscs2FormWithoutChildMaintenanceNumberOrOtherPartyNameAndAddress_thenCaseDataValueIsNotSet() {
+    void givenSscs2FormWithoutChildMaintenanceNumberOrOtherPartyNameAndAddress_thenCaseDataValueIsNotSet() {
         pairs.put(BENEFIT_TYPE_OTHER, "Child support");
         pairs.put("person1_title", APPELLANT_TITLE);
         pairs.put("person1_first_name", APPELLANT_FIRST_NAME);
@@ -2432,14 +2437,14 @@ public class SscsCaseTransformerTest {
         pairs.put("is_paying_parent", "true");
         CaseResponse result = transformer.transformExceptionRecord(sscs2ExceptionRecord, false);
         assertNoErrorsOrWarnings(result);
-        assertNull(result.getTransformedCase().get("childMaintenanceNumber"));
+        assertThat(result.getTransformedCase().get("childMaintenanceNumber")).isNull();
         @SuppressWarnings("unchecked")
         List<CcdValue<OtherParty>> otherParties = ((List<CcdValue<OtherParty>>) result.getTransformedCase().get("otherParties"));
-        assertNull(otherParties);
+        assertThat(otherParties).isNull();
     }
 
     @Test
-    public void givenSscs2FormWithIncorrectOtherPartyAddressSelection_thenErrorIsThrown() {
+    void givenSscs2FormWithIncorrectOtherPartyAddressSelection_thenErrorIsThrown() {
         pairs.put(BENEFIT_TYPE_OTHER, "Child support");
         pairs.put("other_party_title", OTHER_PARTY_TITLE);
         pairs.put("other_party_first_name", OTHER_PARTY_FIRST_NAME);
@@ -2457,16 +2462,16 @@ public class SscsCaseTransformerTest {
         pairs.put("person1_mobile", APPELLANT_MOBILE);
         pairs.put("is_paying_parent", "true");
         CaseResponse result = transformer.transformExceptionRecord(sscs2ExceptionRecord, false);
-        assertFalse(result.getErrors().isEmpty());
-        assertEquals("is_other_party_address_known has an invalid value. Should be Yes/No or True/False", result.getErrors().getFirst());
-        assertTrue(result.getWarnings().isEmpty());
+        assertThat(result.getErrors()).isNotEmpty();
+        assertThat(result.getErrors().getFirst()).isEqualTo("is_other_party_address_known has an invalid value. Should be Yes/No or True/False");
+        assertThat(result.getWarnings()).isEmpty();
         @SuppressWarnings("unchecked")
         List<CcdValue<OtherParty>> otherParties = ((List<CcdValue<OtherParty>>) result.getTransformedCase().get("otherParties"));
-        assertNull(otherParties.getFirst().getValue().getAddress());
+        assertThat(otherParties.getFirst().getValue().getAddress()).isNull();
     }
 
     @Test
-    public void givenSscs2FormWithPartyAddressNotSelectedButAddressEntered_thenAddressIsSet() {
+    void givenSscs2FormWithPartyAddressNotSelectedButAddressEntered_thenAddressIsSet() {
         pairs.put(BENEFIT_TYPE_OTHER, "Child support");
         pairs.put("other_party_title", OTHER_PARTY_TITLE);
         pairs.put("other_party_first_name", OTHER_PARTY_FIRST_NAME);
@@ -2489,7 +2494,7 @@ public class SscsCaseTransformerTest {
         assertNoErrorsOrWarnings(result);
         @SuppressWarnings("unchecked")
         List<CcdValue<OtherParty>> otherParties = ((List<CcdValue<OtherParty>>) result.getTransformedCase().get("otherParties"));
-        assertNotNull(otherParties.getFirst().getValue().getAddress());
+        assertThat(otherParties.getFirst().getValue().getAddress()).isNotNull();
     }
 
     @ParameterizedTest
@@ -2498,7 +2503,7 @@ public class SscsCaseTransformerTest {
         "false,true,false,,RECEIVING_PARENT",
         "false,false,true,Guardian,OTHER"
     })
-    public void givenKeyValuePairsWithPerson1_thenBuildAnAppealWithAppellantAndRole(String payingParent, String receivingParent, String other, String description, AppellantRole appellantRole) {
+    void givenKeyValuePairsWithPerson1_thenBuildAnAppealWithAppellantAndRole(String payingParent, String receivingParent, String other, String description, AppellantRole appellantRole) {
         pairs.put(BENEFIT_TYPE_OTHER, "Child support");
         pairs.put("person1_title", APPELLANT_TITLE);
         pairs.put("person1_first_name", APPELLANT_FIRST_NAME);
@@ -2529,7 +2534,7 @@ public class SscsCaseTransformerTest {
             .ignoringFields("id", "appointee.id")
             .isEqualTo(expectedAppellant);
 
-        assertTrue(result.getErrors().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
     }
 
     @ParameterizedTest
@@ -2538,7 +2543,7 @@ public class SscsCaseTransformerTest {
         "true;false;false;any;is_paying_parent and other_party_details have conflicting values",
         "true;false;true;any;is_paying_parent, is_another_party and other_party_details have conflicting values",
     }, delimiter = ';')
-    public void givenKeyValuePairsWithPerson1AndInvalidAppellantRole_thenReturnAnWarnings(String payingParent, String receivingParent, String other, String description, String errorMessage) {
+    void givenKeyValuePairsWithPerson1AndInvalidAppellantRole_thenReturnAnWarnings(String payingParent, String receivingParent, String other, String description, String errorMessage) {
         pairs.put(BENEFIT_TYPE_OTHER, "Child support");
         pairs.put("person1_title", APPELLANT_TITLE);
         pairs.put("person1_first_name", APPELLANT_FIRST_NAME);
@@ -2556,13 +2561,13 @@ public class SscsCaseTransformerTest {
         pairs.put("other_party_details", description);
 
         CaseResponse result = transformer.transformExceptionRecord(sscs2ExceptionRecord, false);
-        assertFalse(result.getWarnings().isEmpty());
-        assertEquals(errorMessage, result.getWarnings().getFirst());
+        assertThat(result.getWarnings()).isNotEmpty();
+        assertThat(result.getWarnings().getFirst()).isEqualTo(errorMessage);
     }
 
     @ParameterizedTest
     @CsvSource({"Yes, Yes, SSCS2", "No, No, SSCS2", "true, Yes, SSCS2", "false, No, SSCS2", "Yes, Yes, SSCS5", "No, No, SSCS5"})
-    public void givenSscs2Or5FormAndConfidentialityRequired_thenCaseDataValueIsSet(String keepHomeAddressConfidential, String expected, FormType formType) {
+    void givenSscs2Or5FormAndConfidentialityRequired_thenCaseDataValueIsSet(String keepHomeAddressConfidential, String expected, FormType formType) {
         if (formType.equals(SSCS2)) {
             pairs.put(BENEFIT_TYPE_OTHER, "Child support");
         } else if (formType.equals(SSCS5)) {
@@ -2581,17 +2586,17 @@ public class SscsCaseTransformerTest {
         pairs.put("keep_home_address_confidential", keepHomeAddressConfidential);
         pairs.put("is_paying_parent", "true");
 
-        ExceptionRecord exceptionRecord = formType.equals(SSCS2) ? sscs2ExceptionRecord : sscs5ExceptionRecord;
-        CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
+        ExceptionRecord recordException = formType.equals(SSCS2) ? sscs2ExceptionRecord : sscs5ExceptionRecord;
+        CaseResponse result = transformer.transformExceptionRecord(recordException, false);
         assertNoErrorsOrWarnings(result);
 
         YesNoUndetermined appellantConfidentialityRequired = ((Appeal) result.getTransformedCase().get("appeal")).getAppellant().getConfidentialityRequirement();
-        assertEquals(expected, appellantConfidentialityRequired.toString());
+        assertThat(appellantConfidentialityRequired).hasToString(expected);
     }
 
     @ParameterizedTest
     @CsvSource({"SSCS2", "SSCS5"})
-    public void givenSscs2Or5FormAndConfidentialityRequiredEmpty_thenCaseDataValueIsNull(FormType formType) {
+    void givenSscs2Or5FormAndConfidentialityRequiredEmpty_thenCaseDataValueIsNull(FormType formType) {
         if (formType.equals(SSCS2)) {
             pairs.put(BENEFIT_TYPE_OTHER, "Child support");
         } else if (formType.equals(SSCS5)) {
@@ -2610,17 +2615,17 @@ public class SscsCaseTransformerTest {
         pairs.put("keep_home_address_confidential", "");
         pairs.put("is_paying_parent", "true");
 
-        ExceptionRecord exceptionRecord = formType.equals(SSCS2) ? sscs2ExceptionRecord : sscs5ExceptionRecord;
-        CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
+        ExceptionRecord recordException = formType.equals(SSCS2) ? sscs2ExceptionRecord : sscs5ExceptionRecord;
+        CaseResponse result = transformer.transformExceptionRecord(recordException, false);
         assertNoErrorsOrWarnings(result);
 
         YesNoUndetermined appellantConfidentialityRequired = ((Appeal) result.getTransformedCase().get("appeal")).getAppellant().getConfidentialityRequirement();
-        assertNull(appellantConfidentialityRequired);
+        assertThat(appellantConfidentialityRequired).isNull();
     }
 
     @ParameterizedTest
     @CsvSource({"SSCS2", "SSCS5"})
-    public void givenSscs2Or5FormAndNoConfidentiality_thenCaseDataValueIsNull(FormType formType) {
+    void givenSscs2Or5FormAndNoConfidentiality_thenCaseDataValueIsNull(FormType formType) {
         if (formType.equals(SSCS2)) {
             pairs.put(BENEFIT_TYPE_OTHER, "Child support");
         } else if (formType.equals(SSCS5)) {
@@ -2638,28 +2643,28 @@ public class SscsCaseTransformerTest {
         pairs.put("person1_mobile", APPELLANT_MOBILE);
         pairs.put("is_paying_parent", "true");
 
-        ExceptionRecord exceptionRecord = formType.equals(SSCS2) ? sscs2ExceptionRecord : sscs5ExceptionRecord;
-        CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
+        ExceptionRecord recordException = formType.equals(SSCS2) ? sscs2ExceptionRecord : sscs5ExceptionRecord;
+        CaseResponse result = transformer.transformExceptionRecord(recordException, false);
         assertNoErrorsOrWarnings(result);
 
         YesNoUndetermined appellantConfidentialityRequired = ((Appeal) result.getTransformedCase().get("appeal")).getAppellant().getConfidentialityRequirement();
-        assertNull(appellantConfidentialityRequired);
+        assertThat(appellantConfidentialityRequired).isNull();
     }
 
     @ParameterizedTest
     @CsvSource({"SSCS2", "SSCS5", "SSCS1", "SSCS1U", "SSCS1PE", "SSCS1PEU"})
-    public void notAValidFormFalse(String formType) {
-        assertFalse(formTypeValidator2.notAValidFormType(formType));
+    void notAValidFormFalse(String formType) {
+        assertThat(formTypeValidator2.notAValidFormType(formType)).isFalse();
     }
 
     @ParameterizedTest
     @CsvSource({"SSCS", "SSCS55", "SSCS11", "UNKNOWN"})
-    public void notAValidFormTrue(String formType) {
-        assertTrue(formTypeValidator2.notAValidFormType(formType));
+    void notAValidFormTrue(String formType) {
+        assertThat(formTypeValidator2.notAValidFormType(formType)).isTrue();
     }
 
     @Test
-    public void givenNullForm_thenThrowError() {
+    void givenNullForm_thenThrowError() {
         pairs.put(IS_BENEFIT_TYPE_TAX_CREDIT, true);
 
         pairs.put("person1_title", APPELLANT_TITLE);
@@ -2674,28 +2679,28 @@ public class SscsCaseTransformerTest {
         pairs.put("person1_mobile", APPELLANT_MOBILE);
         pairs.put("is_paying_parent", "true");
 
-        ExceptionRecord exceptionRecord = ExceptionRecord.builder().ocrDataFields(ocrList).id(null).exceptionRecordId("123456").formType(
+        ExceptionRecord recordException = ExceptionRecord.builder().ocrDataFields(ocrList).id(null).exceptionRecordId("123456").formType(
             null).build();
-        given(sscsJsonExtractor.extractJson(exceptionRecord)).willReturn(ScannedData.builder().ocrCaseData(pairs).build());
-        CaseResponse result = transformer2.transformExceptionRecord(exceptionRecord, false);
+        given(sscsJsonExtractor.extractJson(recordException)).willReturn(ScannedData.builder().ocrCaseData(pairs).build());
+        CaseResponse result = transformer2.transformExceptionRecord(recordException, false);
         assertOneError(result);
     }
 
     @Test
-    public void givenNullFormAndInvalid_thenThrowError() {
+    void givenNullFormAndInvalid_thenThrowError() {
         prepareData("SSCS");
 
-        ExceptionRecord exceptionRecord = ExceptionRecord.builder().ocrDataFields(ocrList).id(null).exceptionRecordId("123456").formType(
+        ExceptionRecord recordException = ExceptionRecord.builder().ocrDataFields(ocrList).id(null).exceptionRecordId("123456").formType(
             null).build();
-        given(sscsJsonExtractor.extractJson(exceptionRecord)).willReturn(ScannedData.builder().ocrCaseData(pairs).build());
+        given(sscsJsonExtractor.extractJson(recordException)).willReturn(ScannedData.builder().ocrCaseData(pairs).build());
 
-        CaseResponse result = transformer2.transformExceptionRecord(exceptionRecord, false);
+        CaseResponse result = transformer2.transformExceptionRecord(recordException, false);
 
         assertOneError(result);
     }
 
     @Test
-    public void givenNullFormWithOcrFormType_thenThrowNoError() {
+    void givenNullFormWithOcrFormType_thenThrowNoError() {
         pairs.put(IS_BENEFIT_TYPE_TAX_CREDIT, true);
 
         pairs.put("person1_title", APPELLANT_TITLE);
@@ -2711,10 +2716,10 @@ public class SscsCaseTransformerTest {
         pairs.put("is_paying_parent", "true");
         pairs.put("form_type", "SSCS5");
 
-        ExceptionRecord exceptionRecord = ExceptionRecord.builder().ocrDataFields(ocrList).id(null).exceptionRecordId("123456").formType(
+        ExceptionRecord recordException = ExceptionRecord.builder().ocrDataFields(ocrList).id(null).exceptionRecordId("123456").formType(
             null).build();
-        given(sscsJsonExtractor.extractJson(exceptionRecord)).willReturn(ScannedData.builder().ocrCaseData(pairs).build());
-        CaseResponse result = transformer2.transformExceptionRecord(exceptionRecord, false);
+        given(sscsJsonExtractor.extractJson(recordException)).willReturn(ScannedData.builder().ocrCaseData(pairs).build());
+        CaseResponse result = transformer2.transformExceptionRecord(recordException, false);
         assertNoErrorsOrWarnings(result);
     }
 
@@ -2736,17 +2741,17 @@ public class SscsCaseTransformerTest {
     }
 
     private void assertOneError(CaseResponse result) {
-        assertError(result, 1);
+        assertError(result);
     }
 
-    private void assertError(CaseResponse result, int errorCount) {
-        assertEquals(errorCount, result.getErrors().size());
-        assertTrue(result.getWarnings().isEmpty());
+    private void assertError(CaseResponse result) {
+        assertThat(result.getErrors()).hasSize(1);
+        assertThat(result.getWarnings()).isEmpty();
     }
 
     private void assertNoErrorsOrWarnings(CaseResponse result) {
-        assertTrue(result.getErrors().isEmpty());
-        assertTrue(result.getWarnings().isEmpty());
+        assertThat(result.getErrors()).isEmpty();
+        assertThat(result.getWarnings()).isEmpty();
     }
 
     @SuppressWarnings("unchecked")
@@ -2764,7 +2769,7 @@ public class SscsCaseTransformerTest {
     private CaseResponse preparingFormTypeCheckingDataAndImplementTransformExceptionRecord(String given, String input, boolean isIncludeDocument) {
         prepareData(input);
 
-        ExceptionRecord exceptionRecord = ExceptionRecord.builder().ocrDataFields(ocrList).id(null).exceptionRecordId("123456").formType(
+        ExceptionRecord recordException = ExceptionRecord.builder().ocrDataFields(ocrList).id(null).exceptionRecordId("123456").formType(
             given).build();
 
         if (isIncludeDocument) {
@@ -2772,14 +2777,14 @@ public class SscsCaseTransformerTest {
             InputScannedDoc scannedRecord = buildTestScannedRecord(DocumentLink.builder().documentUrl("www.test.com").build(), given);
             records.add(scannedRecord);
 
-            given(sscsJsonExtractor.extractJson(exceptionRecord)).willReturn(
+            given(sscsJsonExtractor.extractJson(recordException)).willReturn(
                 ScannedData.builder().ocrCaseData(pairs).records(records).openingDate(LocalDateTime.now().toLocalDate().toString()).build());
         } else {
-            given(sscsJsonExtractor.extractJson(exceptionRecord)).willReturn(ScannedData.builder().ocrCaseData(pairs).build());
+            given(sscsJsonExtractor.extractJson(recordException)).willReturn(ScannedData.builder().ocrCaseData(pairs).build());
         }
 
 
-        return transformer2.transformExceptionRecord(exceptionRecord, false);
+        return transformer2.transformExceptionRecord(recordException, false);
     }
 
     private void checkFormTypeNoThrowError(String given, String input) {
@@ -2788,14 +2793,14 @@ public class SscsCaseTransformerTest {
         assertNoErrorsOrWarnings(result);
     }
 
-    private void checkFormTypeWithOneError(String given, String input) {
-        checkFormTypeWithError(given, input, 1);
+    private void checkFormTypeWithOneError(String given) {
+        checkFormTypeWithError(given);
     }
 
-    private void checkFormTypeWithError(String given, String input, int errorCount) {
-        CaseResponse result = preparingFormTypeCheckingDataAndImplementTransformExceptionRecord(given, input, false);
+    private void checkFormTypeWithError(String given) {
+        CaseResponse result = preparingFormTypeCheckingDataAndImplementTransformExceptionRecord(given, null, false);
 
-        assertError(result, errorCount);
+        assertError(result);
     }
 
     private void checkFormTypeAndDocumentUpdated(String given, String input, String expected) {
@@ -2805,43 +2810,43 @@ public class SscsCaseTransformerTest {
     }
 
     @Test
-    public void givenOtherFormTypeWithInputValidFormType_thenThrowNoError() {
+    void givenOtherFormTypeWithInputValidFormType_thenThrowNoError() {
         checkFormTypeNoThrowError("Other", "SSCS5");
     }
 
     @Test
-    public void givenNullFormTypeWithInputValidFormType_thenThrowNoError() {
+    void givenNullFormTypeWithInputValidFormType_thenThrowNoError() {
         checkFormTypeNoThrowError(null, "SSCS5");
     }
 
     @Test
-    public void givenNullFormAndWithNullFormTypeInput_thenThrowError() {
-        checkFormTypeWithOneError(null, null);
+    void givenNullFormAndWithNullFormTypeInput_thenThrowError() {
+        checkFormTypeWithOneError(null);
     }
 
     @Test
-    public void givenValidFormAndWithNullFormTypeInput_thenThrowNoError() {
+    void givenValidFormAndWithNullFormTypeInput_thenThrowNoError() {
         checkFormTypeNoThrowError("sscs5", null);
     }
 
     @Test
-    public void givenOtherFormAndWithNullFormTypeInput_thenThrowError() {
-        checkFormTypeWithOneError("Other", null);
+    void givenOtherFormAndWithNullFormTypeInput_thenThrowError() {
+        checkFormTypeWithOneError("Other");
     }
 
     @Test
-    public void givenOtherFormAndWithSscs2FormTypeInput_thenDocumentUpdated() {
+    void givenOtherFormAndWithSscs2FormTypeInput_thenDocumentUpdated() {
         checkFormTypeAndDocumentUpdated("Other", "SSCS2", "sscs2");
     }
 
 
     @Test
-    public void givenSscs2FormAndWithSscs5FormTypeInput_thenDocumentUpdated() {
+    void givenSscs2FormAndWithSscs5FormTypeInput_thenDocumentUpdated() {
         checkFormTypeAndDocumentUpdated("sscs2", "sscs5", "sscs5");
     }
 
     @Test
-    public void givenNullFormAndWithSscs5FormTypeInput_thenDocumentUpdated() {
+    void givenNullFormAndWithSscs5FormTypeInput_thenDocumentUpdated() {
         checkFormTypeAndDocumentUpdated(null, "sscs5", "sscs5");
     }
 

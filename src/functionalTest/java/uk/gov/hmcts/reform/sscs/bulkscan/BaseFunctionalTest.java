@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.bulkscan;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -19,6 +21,7 @@ import java.util.Random;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.awaitility.core.ConditionFactory;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -239,5 +242,11 @@ public class BaseFunctionalTest {
             expectedJson = expectedJson.replace(replaceKey, (String) subscriptionFromType.get("tya"));
         }
         return expectedJson;
+    }
+
+    protected static ConditionFactory defaultAwait() {
+        return await()
+            .atMost(30, SECONDS)
+            .pollInterval(2, SECONDS);
     }
 }
