@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.bulkscan.controllers;
 
 import static com.google.common.io.Resources.getResource;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static junit.framework.TestCase.assertEquals;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
@@ -18,6 +19,7 @@ import static uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.USER_ID_HEA
 import com.google.common.io.Resources;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.apache.commons.codec.Charsets;
@@ -46,7 +48,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
 
     private static String loadJson(String fileName) throws IOException {
         URL url = getResource(fileName);
-        return Resources.toString(url, Charsets.toCharset("UTF-8"));
+        return Resources.toString(url, UTF_8);
     }
 
     @Before
