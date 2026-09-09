@@ -326,7 +326,8 @@ public class TransformationFunctionalTest extends BaseFunctionalTest {
         final String nino = "N";
         createCaseWithNino(nino);
 
-        defaultAwait().until(() -> ccdService.findCaseBy("data.appeal.appellant.identity.nino", nino, idamTokens), cases -> !cases.isEmpty() );
+        defaultAwait().until(() -> ccdService.findCaseBy("data.appeal.appellant.identity.nino", nino, idamTokens),
+            cases -> !cases.isEmpty());
 
         String jsonRequest = getJson("exception/all_fields_entered.json");
         jsonRequest = replaceNino(jsonRequest, nino, nino);
@@ -345,7 +346,8 @@ public class TransformationFunctionalTest extends BaseFunctionalTest {
         final String nino = generateRandomNino();
         final SscsCaseDetails caseWithNino = createCaseWithNino(nino);
 
-        defaultAwait().until(() -> ccdService.findCaseBy("data.appeal.appellant.identity.nino", nino, idamTokens), cases -> !cases.isEmpty() );
+        defaultAwait().until(() -> ccdService.findCaseBy("data.appeal.appellant.identity.nino", nino, idamTokens),
+            cases -> !cases.isEmpty());
 
         String jsonRequest = getJson("exception/all_fields_entered.json");
         jsonRequest = replaceNino(jsonRequest, generateRandomNino(), nino);
