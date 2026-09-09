@@ -90,6 +90,7 @@ public class SscsCaseValidator implements CaseValidator {
     @SuppressWarnings("squid:S5843")
     private static final String COUNTY_REGEX =
         "^\\.$|^[a-zA-ZÀ-ž0-9]{1}[a-zA-ZÀ-ž0-9 \\r\\n\\.“”\",’\\?\\!\\[\\]\\(\\)/£:\\\\_+\\-%&;]{1,}$";
+
     private static final String NINO_REGEX = "^(?!BG)(?!GB)(?!NK)(?!KN)(?!TN)(?!NT)(?!ZZ)\\s?(?:[A-CEGHJ-PR-TW-Z]\\s?[A-CEGHJ-NPR-TW-Z])\\s?(?:\\d\\s?){6}([A-D]|\\s)\\s?$";
 
     private final RegionalProcessingCenterService regionalProcessingCenterService;
