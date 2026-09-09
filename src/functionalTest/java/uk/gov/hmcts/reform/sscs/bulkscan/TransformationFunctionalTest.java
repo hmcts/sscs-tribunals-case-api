@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.bulkscan;
 
+import static java.time.ZoneId.systemDefault;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
@@ -9,6 +10,8 @@ import io.restassured.response.Response;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Map;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import lombok.extern.slf4j.Slf4j;
@@ -16,14 +19,18 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application_e2e.yaml")
 @RunWith(JUnitParamsRunner.class)
 @Slf4j
 public class TransformationFunctionalTest extends BaseFunctionalTest {
-    private static final String MRN_DATE_YESTERDAY_YYYY_MM_DD = LocalDate.now().minusDays(1).toString();
-    private static final String MRN_DATE_YESTERDAY_DD_MM_YYYY = LocalDate.now().minusDays(1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    private static final String MRN_DATE_YESTERDAY_YYYY_MM_DD = LocalDate.now(systemDefault()).minusDays(1).toString();
+    private static final String MRN_DATE_YESTERDAY_DD_MM_YYYY = LocalDate.now(systemDefault()).minusDays(1).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    private static final String LINKED_CASES_BOOLEAN = "linkedCasesBoolean";
 
     @Test
     public void transform_appeal_created_case_when_all_fields_entered() throws IOException {
@@ -311,5 +318,62 @@ public class TransformationFunctionalTest extends BaseFunctionalTest {
         jsonRequest = replaceMrnDate(jsonRequest, MRN_DATE_YESTERDAY_DD_MM_YYYY);
 
         verifyResponseIsExpected(expectedJson, transformExceptionRequest(jsonRequest, OK.value()));
+    }
+
+    @Test
+    public void transform_two_exception_records_with_invalid_nino_are_not_associated() throws IOException {
+
+        final String nino = "N";
+        createCaseWithNino(nino);
+
+        defaultAwait().until(() -> ccdService.findCaseBy("data.appeal.appellant.identity.nino", nino, idamTokens), cases -> !cases.isEmpty() );
+
+        String jsonRequest = getJson("exception/all_fields_entered.json");
+        jsonRequest = replaceNino(jsonRequest, nino, nino);
+        jsonRequest = replaceMrnDate(jsonRequest, MRN_DATE_YESTERDAY_DD_MM_YYYY);
+
+        final Response response = transformExceptionRequest(jsonRequest, OK.value());
+        final Map<String, Object> caseData = getCaseData(response);
+
+        assertThat(caseData.get(LINKED_CASES_BOOLEAN)).isEqualTo("No");
+        assertThat(getAssociatedCaseReferences(response)).isEmpty();
+
+    }
+
+    @Test
+    public void transform_exception_record_with_nino_matching_an_existing_case_is_associated() throws IOException {
+        final String nino = generateRandomNino();
+        final SscsCaseDetails caseWithNino = createCaseWithNino(nino);
+
+        defaultAwait().until(() -> ccdService.findCaseBy("data.appeal.appellant.identity.nino", nino, idamTokens), cases -> !cases.isEmpty() );
+
+        String jsonRequest = getJson("exception/all_fields_entered.json");
+        jsonRequest = replaceNino(jsonRequest, generateRandomNino(), nino);
+        jsonRequest = replaceMrnDate(jsonRequest, MRN_DATE_YESTERDAY_DD_MM_YYYY);
+
+        final Response response = transformExceptionRequest(jsonRequest, OK.value());
+        final Map<String, Object> caseData = getCaseData(response);
+
+        assertThat(caseData.get(LINKED_CASES_BOOLEAN)).isEqualTo("Yes");
+        assertThat(getAssociatedCaseReferences(response)).containsExactly(caseWithNino.getId().toString());
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> getCaseData(Response response) {
+        return (Map<String, Object>) response.getBody().jsonPath()
+            .getMap("case_creation_details")
+            .get("case_data");
+    }
+
+    private List<String> getAssociatedCaseReferences(Response response) {
+        return response.getBody().jsonPath()
+            .getList("case_creation_details.case_data.associatedCase.value.CaseReference", String.class);
+    }
+
+    private SscsCaseDetails createCaseWithNino(String nino) {
+        SscsCaseData caseData = CaseDataUtils.buildMinimalCaseData();
+        caseData.getAppeal().getAppellant().getIdentity().setNino(nino);
+        return ccdService.createCase(caseData, "appealCreated",
+            "Bulk Scan appeal created", "Bulk Scan appeal created in test", idamTokens);
     }
 }
