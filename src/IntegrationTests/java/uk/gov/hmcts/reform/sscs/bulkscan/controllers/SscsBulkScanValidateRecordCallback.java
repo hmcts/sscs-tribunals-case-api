@@ -19,10 +19,8 @@ import static uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.USER_ID_HEA
 import com.google.common.io.Resources;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.apache.commons.codec.Charsets;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
