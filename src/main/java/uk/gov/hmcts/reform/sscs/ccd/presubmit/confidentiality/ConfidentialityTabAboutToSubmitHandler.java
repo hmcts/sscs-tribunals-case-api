@@ -16,7 +16,6 @@ import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.updateOtherPartie
 import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -33,16 +32,9 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Slf4j
 public class ConfidentialityTabAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private final boolean cmOtherPartyConfidentialityEnabled;
-
-    public ConfidentialityTabAboutToSubmitHandler(
-        @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
-        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
-    }
-
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        return cmOtherPartyConfidentialityEnabled && (callback.getEvent() == DWP_UPLOAD_RESPONSE
+        return (callback.getEvent() == DWP_UPLOAD_RESPONSE
             || callback.getEvent() == ADD_OTHER_PARTY_DATA
             || callback.getEvent() == UPDATE_OTHER_PARTY_DATA
             || callback.getEvent() == INCOMPLETE_APPLICATION_RECEIVED
@@ -87,7 +79,7 @@ public class ConfidentialityTabAboutToSubmitHandler implements PreSubmitCallback
         final YesNoUndetermined confidentialityRequiredBefore = callback
             .getCaseDetailsBefore()
             .map(CaseDetails::getCaseData)
-            .flatMap(a -> a.getAppellantConfidentiality())
+            .flatMap(SscsCaseData::getAppellantConfidentiality)
             .orElse(null);
         final SscsCaseData currentCaseData = callback.getCaseDetails().getCaseData();
         final YesNoUndetermined confidentialityRequired = currentCaseData.getAppellantConfidentiality().orElse(null);

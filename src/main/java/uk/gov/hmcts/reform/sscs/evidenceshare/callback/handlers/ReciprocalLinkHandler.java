@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ASSOCIATE_CASE;
+import static uk.gov.hmcts.reform.sscs.utility.StringUtils.getMaskedNino;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,7 +74,7 @@ public class ReciprocalLinkHandler implements CallbackHandler<SscsCaseData> {
             List<SscsCaseDetails> matchedByNinoCases = getMatchedCases(nino, idamTokens);
 
             if (matchedByNinoCases.size() > 0) {
-                log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino " + nino);
+                log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino " + getMaskedNino(nino));
 
                 backLinkAssociatedCases(callback.getCaseDetails().getId(), matchedByNinoCases, idamTokens);
             }

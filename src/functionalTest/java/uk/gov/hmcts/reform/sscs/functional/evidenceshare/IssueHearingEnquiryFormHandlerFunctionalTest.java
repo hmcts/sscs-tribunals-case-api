@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
+import static java.time.ZoneId.systemDefault;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -8,7 +10,6 @@ import java.util.List;
 import lombok.SneakyThrows;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.springframework.core.io.ClassPathResource;
 import uk.gov.hmcts.reform.sscs.bulkscan.BaseFunctionalTest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
@@ -26,29 +27,25 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
 
 class IssueHearingEnquiryFormHandlerFunctionalTest extends AbstractFunctionalTest {
 
+    private static final String JOHNNY_CASH = "Johnny Cash";
+
     @Test
     @SneakyThrows
-    @EnabledIfEnvironmentVariable(named = "CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED", matches = "true")
     void shouldIssueHearingEnquiryForm() {
         final SscsCaseDetails caseDetails = createCaseFromEvent(Benefit.CHILD_SUPPORT, EventType.VALID_APPEAL_CREATED,
             sscsCaseData -> BaseFunctionalTest.generateRandomNino());
         assertEventuallyInState(caseDetails.getId(), "awaitOtherPartyData");
         addOtherParties(caseDetails);
         issueHearingEnquiryForm(caseDetails);
-
-        // TODO Re introduce assertion once HEF is stable
-        // assertThatPdfTextIsCorrect(getDocument(caseDetails.getId(), "issueHearingEnquiryForm"), getExpectedContent(caseDetails));
+        assertThatPdfTextIsCorrect(getDocument(caseDetails.getId(), "issueHearingEnquiryForm"), getExpectedContent(caseDetails));
     }
 
     private static @NonNull String getExpectedContent(SscsCaseDetails caseDetails) throws IOException {
-        return new ClassPathResource(
-            "tyanotifications/hearingenquiryform/hearingEnquiryFormExpected.template").getContentAsString(StandardCharsets.UTF_8)
-                                                                                      .replace("${CASE_ID}",
-                                                                                          caseDetails.getId().toString())
-                                                                                      .replace("${TODAY_DATE}", LocalDate
-                                                                                          .now()
-                                                                                          .format(DateTimeFormatter.ofPattern(
-                                                                                              "dd/MM/yyyy")));
+        return new ClassPathResource("tyanotifications/hearingenquiryform/hearingEnquiryFormExpected.template")
+            .getContentAsString(StandardCharsets.UTF_8)
+            .replace("${CASE_ID}", caseDetails.getId().toString())
+            .replace("${TODAY_DATE}",
+                LocalDate.now(systemDefault()).format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
     }
 
     private void issueHearingEnquiryForm(SscsCaseDetails caseDetails) {
@@ -57,14 +54,14 @@ class IssueHearingEnquiryFormHandlerFunctionalTest extends AbstractFunctionalTes
             .getOtherParties()
             .stream()
             .map(CcdValue::getValue)
-            .filter(otherParty -> otherParty.getName().getFullNameNoTitle().equals("Johnny Cash"))
+            .filter(otherParty -> otherParty.getName().getFullNameNoTitle().equals(JOHNNY_CASH))
             .map(OtherParty::getId)
             .findFirst()
             .orElseThrow();
         caseDetails.getData().setOtherPartySelection(List.of(CcdValue.<OtherPartySelectionDetails>builder().value(
             OtherPartySelectionDetails.builder().otherPartiesList(
-                new DynamicList(new DynamicListItem(firstPartyId, "Johnny Cash"),
-                    List.of(new DynamicListItem(firstPartyId, "Johnny Cash")))).build()).build()));
+                new DynamicList(new DynamicListItem(firstPartyId, JOHNNY_CASH),
+                    List.of(new DynamicListItem(firstPartyId, JOHNNY_CASH)))).build()).build()));
         updateCaseEvent(EventType.ISSUE_HEARING_ENQUIRY_FORM, caseDetails);
     }
 

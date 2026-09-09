@@ -21,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -36,6 +37,7 @@ class AddOtherPartyAboutToSubmitEventHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
+    @InjectMocks
     private AddOtherPartyAboutToSubmitEventHandler handler;
 
     @Mock
@@ -57,7 +59,6 @@ class AddOtherPartyAboutToSubmitEventHandlerTest {
 
         @Test
         void shouldThrowExceptionIfCallbackTypeIsNull() {
-            handler = new AddOtherPartyAboutToSubmitEventHandler(true);
             assertThatThrownBy(() -> handler.canHandle(null, callback))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("callbackType must not be null");
@@ -65,7 +66,6 @@ class AddOtherPartyAboutToSubmitEventHandlerTest {
 
         @Test
         void shouldThrowExceptionIfCallbackIsNull() {
-            handler = new AddOtherPartyAboutToSubmitEventHandler(true);
             assertThatThrownBy(() -> handler.canHandle(ABOUT_TO_SUBMIT, null))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("callback must not be null");
@@ -73,20 +73,17 @@ class AddOtherPartyAboutToSubmitEventHandlerTest {
 
         @Test
         void shouldReturnFalseIfCallbackTypeIsNotAboutToSubmit() {
-            handler = new AddOtherPartyAboutToSubmitEventHandler(true);
             assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
         }
 
         @Test
         void shouldReturnFalseIfEventTypeIsNotAddOtherPartyData() {
-            handler = new AddOtherPartyAboutToSubmitEventHandler(true);
             when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
             assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
         }
 
         @Test
         void shouldReturnFalseIfCaseDetailsIsNull() {
-            handler = new AddOtherPartyAboutToSubmitEventHandler(true);
             when(callback.getEvent()).thenReturn(ADD_OTHER_PARTY_DATA);
             when(callback.getCaseDetails()).thenReturn(null);
             assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
@@ -94,7 +91,6 @@ class AddOtherPartyAboutToSubmitEventHandlerTest {
 
         @Test
         void shouldReturnFalseIfCaseDataIsNull() {
-            handler = new AddOtherPartyAboutToSubmitEventHandler(true);
             when(callback.getEvent()).thenReturn(ADD_OTHER_PARTY_DATA);
             when(callback.getCaseDetails()).thenReturn(caseDetails);
             when(caseDetails.getCaseData()).thenReturn(null);
@@ -103,9 +99,8 @@ class AddOtherPartyAboutToSubmitEventHandlerTest {
 
         @ParameterizedTest
         @MethodSource("canHandleTestParameters")
-        void shouldReturnExpectedResultForCanHandle(final boolean cmEnabled, final EventType eventType, final String benefitCode,
+        void shouldReturnExpectedResultForCanHandle(final EventType eventType, final String benefitCode,
             final boolean expected) {
-            handler = new AddOtherPartyAboutToSubmitEventHandler(cmEnabled);
             sscsCaseData.getAppeal().getBenefitType().setCode(benefitCode);
             lenient().when(callback.getEvent()).thenReturn(eventType);
             lenient().when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -115,10 +110,9 @@ class AddOtherPartyAboutToSubmitEventHandlerTest {
         }
 
         private static Stream<Arguments> canHandleTestParameters() {
-            return Stream.of(Arguments.of(true, ADD_OTHER_PARTY_DATA, UC.getShortName(), true),
-                Arguments.of(false, ADD_OTHER_PARTY_DATA, UC.getShortName(), false),
-                Arguments.of(true, ADD_OTHER_PARTY_DATA, CHILD_SUPPORT.getShortName(), false),
-                Arguments.of(true, APPEAL_RECEIVED, UC.getShortName(), false));
+            return Stream.of(Arguments.of(ADD_OTHER_PARTY_DATA, UC.getShortName(), true),
+                Arguments.of(ADD_OTHER_PARTY_DATA, CHILD_SUPPORT.getShortName(), false),
+                Arguments.of(APPEAL_RECEIVED, UC.getShortName(), false));
         }
     }
 
@@ -128,19 +122,10 @@ class AddOtherPartyAboutToSubmitEventHandlerTest {
 
         @BeforeEach
         void setup() {
-            handler = new AddOtherPartyAboutToSubmitEventHandler(true);
             sscsCaseData.getAppeal().getBenefitType().setCode(UC.getShortName());
             lenient().when(callback.getEvent()).thenReturn(ADD_OTHER_PARTY_DATA);
             lenient().when(callback.getCaseDetails()).thenReturn(caseDetails);
             lenient().when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        }
-
-        @Test
-        void shouldThrowExceptionIfCannotHandle() {
-            handler = new AddOtherPartyAboutToSubmitEventHandler(false);
-            assertThatThrownBy(() -> handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Cannot handle callback");
         }
 
         @Test
