@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.config;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
+import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -134,6 +135,28 @@ public class CitizenCcdClient {
         SearchResult searchResult = coreCaseDataApi.searchCases(
                 idamTokens.getIdamOauth2Token(),
                 idamTokens.getServiceAuthorization(),
+                ccdRequestDetails.getCaseTypeId(),
+                searchCriteria);
+        return ofNullable(searchResult).map(SearchResult::getCases).orElse(emptyList());
+    }
+
+    public List<CaseDetails> searchForCitizenBasedOnEmail(IdamTokens idamToken, String email) {
+        SearchSourceBuilder searchBuilder = new SearchSourceBuilder();
+        searchBuilder.query(QueryBuilders
+                        .boolQuery()
+                        .should(matchQuery("data.subscriptions.appellantSubscription.email", email))
+                        .should(matchQuery("data.subscriptions.appointeeSubscription.email", email))
+                        .should(matchQuery("data.subscriptions.representativeSubscription.email", email))
+                        .should(matchQuery("data.subscriptions.jointPartySubscription.email", email))
+                        .should(matchQuery("data.otherParties.value.otherPartySubscription.email", email))
+                        .should(matchQuery("data.otherParties.value.otherPartyAppointeeSubscription.email", email))
+                        .should(matchQuery("data.otherParties.value.otherPartyRepresentativeSubscription.email", email))
+                )
+                .size(MYA_MAX_CASES_PER_PAGE);
+        String searchCriteria = searchBuilder.toString();
+        SearchResult searchResult = coreCaseDataApi.searchCases(
+                idamToken.getIdamOauth2Token(),
+                idamToken.getServiceAuthorization(),
                 ccdRequestDetails.getCaseTypeId(),
                 searchCriteria);
         return ofNullable(searchResult).map(SearchResult::getCases).orElse(emptyList());

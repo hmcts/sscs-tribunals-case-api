@@ -9,7 +9,7 @@ java:
   devmemoryLimits: 2Gi
   devcpuRequests: 150m
   environment:
-    MYA_LINK: http://sscs-cor-frontend-aat.service.core-compute-aat.internal/sign-in?tya=appeal_id
+    MYA_LINK: https://sscs-cor-frontend-pr-1348.preview.platform.hmcts.net/sign-in?tya=appeal_id
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
     CORE_CASE_DATA_API_URL: ${CORE_CASE_DATA_API_URL}
     ROLE_ASSIGNMENT_API_URL: https://am-role-assignment-service-${SERVICE_FQDN}
