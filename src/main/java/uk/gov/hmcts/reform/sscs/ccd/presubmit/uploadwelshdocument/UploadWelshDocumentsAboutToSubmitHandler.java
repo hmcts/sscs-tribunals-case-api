@@ -87,10 +87,10 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
                 }
             });
             if (caseData.getSscsWelshDocuments() != null) {
-                caseData.getSscsWelshDocuments().add(sscsWelshPreviewDocument);
+                caseData.getSscsWelshDocuments().addFirst(sscsWelshPreviewDocument);
             } else {
                 List<SscsWelshDocument> sscsWelshDocumentsList = new ArrayList<>();
-                sscsWelshDocumentsList.add(sscsWelshPreviewDocument);
+                sscsWelshDocumentsList.addFirst(sscsWelshPreviewDocument);
                 caseData.setSscsWelshDocuments(sscsWelshDocumentsList);
             }
             if (!callback.getCaseDetails().getState().equals(State.INTERLOCUTORY_REVIEW_STATE)) {
