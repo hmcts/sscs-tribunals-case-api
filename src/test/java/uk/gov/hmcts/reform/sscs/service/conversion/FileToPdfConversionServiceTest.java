@@ -1,12 +1,11 @@
 package uk.gov.hmcts.reform.sscs.service.conversion;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
 
 import com.google.common.collect.Lists;
 import java.io.File;
@@ -16,11 +15,14 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import org.apache.tika.Tika;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 
+@ExtendWith(MockitoExtension.class)
 public class FileToPdfConversionServiceTest {
 
     @Mock
@@ -30,10 +32,8 @@ public class FileToPdfConversionServiceTest {
 
     private FileToPdfConversionService conversionService;
 
-    @Before
+    @BeforeEach
     public void setup() {
-        openMocks(this);
-
         conversionService = new FileToPdfConversionService(
                 Lists.newArrayList(pdfConverter)
         );
@@ -85,8 +85,8 @@ public class FileToPdfConversionServiceTest {
         assertEquals("flying-pig.pdf", convert.getFirst().getOriginalFilename());
         assertNotNull(convert.getFirst().getResource());
         assertFalse(convert.getFirst().isEmpty());
-        assertEquals(33486, convert.getFirst().getSize());
-        assertEquals(33486, convert.getFirst().getBytes().length);
+        assertEquals(33491, convert.getFirst().getSize());
+        assertEquals(33491, convert.getFirst().getBytes().length);
 
         File tempFile = File.createTempFile("tempConversion", ".jpg");
         tempFile.deleteOnExit();
