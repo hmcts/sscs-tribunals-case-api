@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
+import static java.util.Collections.emptyList;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -52,7 +53,7 @@ public class AssociatedCaseLinkHelper {
     }
 
     protected List<SscsCaseDetails> getMatchedCases(String nino, IdamTokens idamTokens) {
-        return ccdService.findCaseBy("data.appeal.appellant.identity.nino", nino, idamTokens);
+        return isValidNino(nino) ? ccdService.findCaseBy("data.appeal.appellant.identity.nino", nino, idamTokens) : emptyList();
     }
 
     protected SscsCaseData addAssociatedCases(SscsCaseData caseData, List<SscsCaseDetails> matchedByNinoCases) {

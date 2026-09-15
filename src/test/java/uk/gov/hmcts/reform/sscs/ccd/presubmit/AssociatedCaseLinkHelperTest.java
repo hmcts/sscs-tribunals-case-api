@@ -211,8 +211,16 @@ class AssociatedCaseLinkHelperTest {
         given(ccdService.findCaseBy(any(), any(), any())).willReturn(Collections.singletonList(
                 SscsCaseDetails.builder().id(12345678L).build()
         ));
-        List<SscsCaseDetails> matchedCases = associatedCaseLinkHelper.getMatchedCases("ABCDEFG", idamService.getIdamTokens());
+        List<SscsCaseDetails> matchedCases = associatedCaseLinkHelper.getMatchedCases("AB123456C", idamService.getIdamTokens());
 
         assertThat(matchedCases).hasSize(1);
+    }
+
+    @Test
+    void getMatchedCasesReturnsEmptyListWhenNinoIsInvalid() {
+        List<SscsCaseDetails> matchedCases = associatedCaseLinkHelper.getMatchedCases("INVALID1", idamService.getIdamTokens());
+
+        assertThat(matchedCases).isEmpty();
+        verify(ccdService, times(0)).findCaseBy(any(), any(), any());
     }
 }
