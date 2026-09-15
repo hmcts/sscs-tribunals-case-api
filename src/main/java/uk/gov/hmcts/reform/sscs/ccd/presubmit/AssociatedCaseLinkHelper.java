@@ -4,6 +4,7 @@ import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static uk.gov.hmcts.reform.sscs.bulkscan.validators.SscsCaseValidator.isValidNino;
 import static uk.gov.hmcts.reform.sscs.utility.StringUtils.getMaskedNino;
 
 import java.util.*;
@@ -40,7 +41,7 @@ public class AssociatedCaseLinkHelper {
         }
         Identity identity = sscsCaseData.getAppeal().getAppellant().getIdentity();
         final String nino = nonNull(identity) ? identity.getNino() : null;
-        if (isNotEmpty(nino) && isEmpty(previousNino)) {
+        if (isValidNino(nino) && isEmpty(previousNino)) {
             List<SscsCaseDetails> matchedByNinoCases = getMatchedCases(nino, idamService.getIdamTokens());
             if (!matchedByNinoCases.isEmpty()) {
                 log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino " + getMaskedNino(nino));
