@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static java.util.Collections.emptyList;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static uk.gov.hmcts.reform.sscs.bulkscan.validators.SscsCaseValidator.isValidNino;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_TO_INCOMPLETE_APPLICATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_TO_NON_COMPLIANT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_TO_VALID_APPEAL_CREATED;
@@ -233,7 +235,7 @@ public abstract class SubmitAppealServiceBase {
 
     protected List<SscsCaseDetails> getMatchedCases(String nino, IdamTokens idamTokens) {
         log.info("Find matching cases for Nino " + maskNino(nino));
-        return ccdService.findCaseBy("data.appeal.appellant.identity.nino", nino, idamTokens);
+        return isValidNino(nino) ? ccdService.findCaseBy("data.appeal.appellant.identity.nino", nino, idamTokens) : emptyList();
     }
 
     protected Predicate<SscsCaseDetails> createNinoAndBenefitTypeAndMrnDatePredicate(SscsCaseData caseData) {

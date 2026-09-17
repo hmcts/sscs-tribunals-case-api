@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -43,7 +42,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.util.LogCaptureExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class AssociatedCaseLinkHelperTest {
+class AssociatedCaseLinkHelperTest {
 
     @Mock
     private CcdService ccdService;
@@ -84,10 +83,10 @@ public class AssociatedCaseLinkHelperTest {
         SscsCaseData caseData = SscsCaseData.builder().appeal(Appeal.builder().appellant(appellant).build()).ccdCaseId("33333333").build();
         SscsCaseData result = associatedCaseLinkHelper.linkCaseByNino(caseData, previousSscsCaseDataCaseDetails);
 
-        assertEquals(2, result.getAssociatedCase().size());
-        assertEquals("Yes", result.getLinkedCasesBoolean());
-        assertEquals("56765676", result.getAssociatedCase().get(0).getValue().getCaseReference());
-        assertEquals("12345678", result.getAssociatedCase().get(1).getValue().getCaseReference());
+        assertThat(result.getAssociatedCase()).hasSize(2);
+        assertThat(result.getLinkedCasesBoolean()).isEqualTo("Yes");
+        assertThat(result.getAssociatedCase().get(0).getValue().getCaseReference()).isEqualTo("56765676");
+        assertThat(result.getAssociatedCase().get(1).getValue().getCaseReference()).isEqualTo("12345678");
 
         verify(updateCcdCaseService).updateCaseV2(eq(12345678L), eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any(IdamTokens.class), caseDetailsCaptor.capture());
         caseDetailsCaptor.getValue().accept(matchingCase1);
@@ -95,11 +94,11 @@ public class AssociatedCaseLinkHelperTest {
         verify(updateCcdCaseService).updateCaseV2(eq(56765676L), eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any(IdamTokens.class), caseDetailsCaptor.capture());
         caseDetailsCaptor.getValue().accept(matchingCase2);
 
-        assertEquals("Yes", matchingCase1.getData().getLinkedCasesBoolean());
-        assertEquals("33333333", matchingCase1.getData().getAssociatedCase().get(0).getValue().getCaseReference());
+        assertThat(matchingCase1.getData().getLinkedCasesBoolean()).isEqualTo("Yes");
+        assertThat(matchingCase1.getData().getAssociatedCase().getFirst().getValue().getCaseReference()).isEqualTo("33333333");
 
-        assertEquals("Yes", matchingCase2.getData().getLinkedCasesBoolean());
-        assertEquals("33333333", matchingCase2.getData().getAssociatedCase().get(0).getValue().getCaseReference());
+        assertThat(matchingCase2.getData().getLinkedCasesBoolean()).isEqualTo("Yes");
+        assertThat(matchingCase2.getData().getAssociatedCase().getFirst().getValue().getCaseReference()).isEqualTo("33333333");
         logCapture
                 .assertLogContains(getMaskedNino("AB223344B"), Level.INFO)
                 .assertLogDoesNotContain("AB223344B", Level.INFO);
@@ -111,23 +110,32 @@ public class AssociatedCaseLinkHelperTest {
 
         SscsCaseDetails matchingCase1 = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().ccdCaseId("12345678").appeal(Appeal.builder().appellant(appellant).build()).build()).build();
         SscsCaseDetails matchingCase2 = SscsCaseDetails.builder().id(56765676L).data(SscsCaseData.builder().ccdCaseId("56765676").appeal(Appeal.builder().appellant(appellant).build()).build()).build();
-        List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
-        matchedByNinoCases.add(matchingCase1);
-        matchedByNinoCases.add(matchingCase2);
         SscsCaseData previousCaseData  = SscsCaseData.builder().appeal(Appeal.builder().appellant(appellant).build()).ccdCaseId("33333333").build();
         Optional<CaseDetails<SscsCaseData>> previousSscsCaseDataCaseDetails = Optional.of(new CaseDetails<SscsCaseData>(33333333L, "", State.APPEAL_CREATED, previousCaseData, LocalDateTime.now(), "Benefit"));
 
         SscsCaseData caseData = SscsCaseData.builder().appeal(Appeal.builder().appellant(appellant).build()).ccdCaseId("33333333").build();
         SscsCaseData result = associatedCaseLinkHelper.linkCaseByNino(caseData, previousSscsCaseDataCaseDetails);
 
-        assertNull(result.getAssociatedCase());
-        assertNull(result.getLinkedCasesBoolean());
+        assertThat(result.getAssociatedCase()).isNull();
+        assertThat(result.getLinkedCasesBoolean()).isNull();
 
-        assertNull(matchingCase1.getData().getLinkedCasesBoolean());
-        assertNull(matchingCase1.getData().getAssociatedCase());
+        assertThat(matchingCase1.getData().getLinkedCasesBoolean()).isNull();
+        assertThat(matchingCase1.getData().getAssociatedCase()).isNull();
 
-        assertNull(matchingCase2.getData().getLinkedCasesBoolean());
-        assertNull(matchingCase2.getData().getAssociatedCase());
+        assertThat(matchingCase2.getData().getLinkedCasesBoolean()).isNull();
+        assertThat(matchingCase2.getData().getAssociatedCase()).isNull();
+    }
+
+    @Test
+    void shouldNotLinkCaseByNinoIfNinoIsInvalid() {
+        Appellant appellant = Appellant.builder().identity(Identity.builder().nino("INVALID1").build()).build();
+
+        SscsCaseData caseData = SscsCaseData.builder().appeal(Appeal.builder().appellant(appellant).build()).ccdCaseId("33333333").build();
+        SscsCaseData result = associatedCaseLinkHelper.linkCaseByNino(caseData, Optional.empty());
+
+        assertThat(result.getAssociatedCase()).isNull();
+        assertThat(result.getLinkedCasesBoolean()).isNull();
+        verify(ccdService, times(0)).findCaseBy(any(), any(), any());
     }
 
     @Test
@@ -143,16 +151,16 @@ public class AssociatedCaseLinkHelperTest {
         SscsCaseData caseData = SscsCaseData.builder().appeal(Appeal.builder().appellant(appellant).build()).build();
         SscsCaseData result = associatedCaseLinkHelper.linkCaseByNino(caseData, Optional.empty());
 
-        assertEquals(2, result.getAssociatedCase().size());
-        assertEquals("Yes", result.getLinkedCasesBoolean());
-        assertEquals("56765676", result.getAssociatedCase().get(0).getValue().getCaseReference());
-        assertEquals("12345678", result.getAssociatedCase().get(1).getValue().getCaseReference());
+        assertThat(result.getAssociatedCase()).hasSize(2);
+        assertThat(result.getLinkedCasesBoolean()).isEqualTo("Yes");
+        assertThat(result.getAssociatedCase().get(0).getValue().getCaseReference()).isEqualTo("56765676");
+        assertThat(result.getAssociatedCase().get(1).getValue().getCaseReference()).isEqualTo("12345678");
 
-        assertNull(matchingCase1.getData().getLinkedCasesBoolean());
-        assertNull(matchingCase1.getData().getAssociatedCase());
+        assertThat(matchingCase1.getData().getLinkedCasesBoolean()).isNull();
+        assertThat(matchingCase1.getData().getAssociatedCase()).isNull();
 
-        assertNull(matchingCase2.getData().getLinkedCasesBoolean());
-        assertNull(matchingCase2.getData().getAssociatedCase());
+        assertThat(matchingCase2.getData().getLinkedCasesBoolean()).isNull();
+        assertThat(matchingCase2.getData().getAssociatedCase()).isNull();
     }
 
     @Test
@@ -167,10 +175,10 @@ public class AssociatedCaseLinkHelperTest {
                 SscsCaseData.builder().ccdCaseId("33333333").build(),
                 matchedByNinoCases);
 
-        assertEquals(2, caseData.getAssociatedCase().size());
-        assertEquals("Yes", caseData.getLinkedCasesBoolean());
-        assertEquals("56765676", caseData.getAssociatedCase().get(0).getValue().getCaseReference());
-        assertEquals("12345678", caseData.getAssociatedCase().get(1).getValue().getCaseReference());
+        assertThat(caseData.getAssociatedCase()).hasSize(2);
+        assertThat(caseData.getLinkedCasesBoolean()).isEqualTo("Yes");
+        assertThat(caseData.getAssociatedCase().get(0).getValue().getCaseReference()).isEqualTo("56765676");
+        assertThat(caseData.getAssociatedCase().get(1).getValue().getCaseReference()).isEqualTo("12345678");
 
         verify(updateCcdCaseService).updateCaseV2(eq(12345678L), eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any(IdamTokens.class), caseDetailsCaptor.capture());
         caseDetailsCaptor.getValue().accept(matchingCase1);
@@ -178,11 +186,11 @@ public class AssociatedCaseLinkHelperTest {
         verify(updateCcdCaseService).updateCaseV2(eq(56765676L), eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any(IdamTokens.class), caseDetailsCaptor.capture());
         caseDetailsCaptor.getValue().accept(matchingCase2);
 
-        assertEquals("Yes", matchingCase1.getData().getLinkedCasesBoolean());
-        assertEquals("33333333", matchingCase1.getData().getAssociatedCase().get(0).getValue().getCaseReference());
+        assertThat(matchingCase1.getData().getLinkedCasesBoolean()).isEqualTo("Yes");
+        assertThat(matchingCase1.getData().getAssociatedCase().getFirst().getValue().getCaseReference()).isEqualTo("33333333");
 
-        assertEquals("Yes", matchingCase2.getData().getLinkedCasesBoolean());
-        assertEquals("33333333", matchingCase2.getData().getAssociatedCase().get(0).getValue().getCaseReference());
+        assertThat(matchingCase2.getData().getLinkedCasesBoolean()).isEqualTo("Yes");
+        assertThat(matchingCase2.getData().getAssociatedCase().getFirst().getValue().getCaseReference()).isEqualTo("33333333");
     }
 
     @Test
@@ -193,8 +201,8 @@ public class AssociatedCaseLinkHelperTest {
                 SscsCaseData.builder().ccdCaseId("00000000").build(),
                 matchedByNinoCases);
 
-        assertNull(caseData.getAssociatedCase());
-        assertEquals("No", caseData.getLinkedCasesBoolean());
+        assertThat(caseData.getAssociatedCase()).isNull();
+        assertThat(caseData.getLinkedCasesBoolean()).isEqualTo("No");
         verify(ccdService, times(0)).updateCase(any(), any(), eq(ASSOCIATE_CASE.getCcdType()), eq("Associate case"), eq("Associated case added"), any());
     }
 
@@ -203,8 +211,16 @@ public class AssociatedCaseLinkHelperTest {
         given(ccdService.findCaseBy(any(), any(), any())).willReturn(Collections.singletonList(
                 SscsCaseDetails.builder().id(12345678L).build()
         ));
-        List<SscsCaseDetails> matchedCases = associatedCaseLinkHelper.getMatchedCases("ABCDEFG", idamService.getIdamTokens());
+        List<SscsCaseDetails> matchedCases = associatedCaseLinkHelper.getMatchedCases("AB123456C", idamService.getIdamTokens());
 
-        assertEquals(1, matchedCases.size());
+        assertThat(matchedCases).hasSize(1);
+    }
+
+    @Test
+    void getMatchedCasesReturnsEmptyListWhenNinoIsInvalid() {
+        List<SscsCaseDetails> matchedCases = associatedCaseLinkHelper.getMatchedCases("INVALID1", idamService.getIdamTokens());
+
+        assertThat(matchedCases).isEmpty();
+        verify(ccdService, times(0)).findCaseBy(any(), any(), any());
     }
 }
