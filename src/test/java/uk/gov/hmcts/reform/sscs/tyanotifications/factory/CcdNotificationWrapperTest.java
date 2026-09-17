@@ -72,6 +72,12 @@ public class CcdNotificationWrapperTest {
     private static final String PAPER = "paper";
     private static final String ORAL = "oral";
 
+    private static void assertSoftly(Consumer<SoftAssertions> assertions) {
+        SoftAssertions softly = new SoftAssertions();
+        assertions.accept(softly);
+        softly.assertAll();
+    }
+
     @Test
     @Parameters({"paper, PAPER", "oral, ORAL"})
     public void should_returnAccordingAppealHearingType_when_hearingTypeIsPresent(String hearingType,
@@ -79,12 +85,6 @@ public class CcdNotificationWrapperTest {
         ccdNotificationWrapper = buildCcdNotificationWrapper(hearingType);
 
         assertSoftly(softly -> softly.assertThat(ccdNotificationWrapper.getHearingType()).isEqualTo(expected));
-    }
-
-    private static void assertSoftly(Consumer<SoftAssertions> assertions) {
-        SoftAssertions softly = new SoftAssertions();
-        assertions.accept(softly);
-        softly.assertAll();
     }
 
     private CcdNotificationWrapper buildCcdNotificationWrapper(String hearingType) {
