@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadwelshdocument;
 
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
 import java.time.LocalDateTime;
@@ -86,13 +87,9 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
                     setBundleAdditionDetails(sscsWelshPreviewDocument, sscsDocument);
                 }
             });
-            if (caseData.getSscsWelshDocuments() != null) {
-                caseData.getSscsWelshDocuments().addFirst(sscsWelshPreviewDocument);
-            } else {
-                List<SscsWelshDocument> sscsWelshDocumentsList = new ArrayList<>();
-                sscsWelshDocumentsList.addFirst(sscsWelshPreviewDocument);
-                caseData.setSscsWelshDocuments(sscsWelshDocumentsList);
-            }
+
+            addDocumentWithSort(caseData, sscsWelshPreviewDocument);
+
             if (!callback.getCaseDetails().getState().equals(State.INTERLOCUTORY_REVIEW_STATE)) {
                 String documentType = sscsDocumentByTypeAndName
                         .map(doc -> doc.getValue().getDocumentType())
@@ -115,6 +112,12 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
         caseData.setSscsWelshPreviewDocuments(new ArrayList<>());
         caseData.updateTranslationWorkOutstandingFlag();
 
+    }
+
+    private static void addDocumentWithSort(SscsCaseData caseData, SscsWelshDocument sscsWelshPreviewDocument) {
+        List<SscsWelshDocument> sscsWelshDocument = nonNull(caseData.getSscsWelshDocuments()) ? caseData.getSscsWelshDocuments() : new ArrayList<>();
+        sscsWelshDocument.addFirst(sscsWelshPreviewDocument);
+        caseData.setSscsWelshDocuments(sscsWelshDocument);
     }
 
     private void updateTranslationStatusOfSscsDocument(SscsCaseData caseData) {

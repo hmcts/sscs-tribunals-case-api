@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_CASE_ONLY;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_TCW;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -239,6 +240,32 @@ class UploadWelshDocumentsAboutToSubmitHandlerTest {
         assertThat(caseData.getSscsWelshDocuments()).hasSize(2);
         assertThat(caseData.getSscsWelshDocuments().getFirst().getValue().getOriginalDocumentFileName()).isEqualTo(ENGLISH_PDF);
         assertThat(caseData.getSscsWelshDocuments().get(1)).isEqualTo(existingWelshDocument);
+    }
+
+    @Test
+    void shouldSortWelshDocumentsByDateAddedDescendingWhenAddingToExistingList() {
+        final Callback<SscsCaseData> callback = buildCallback(ENGLISH_PDF, null, buildSscsWelshDocuments(DocumentType.SSCS1.getValue()), null, State.VALID_APPEAL);
+
+        final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        caseData.setState(State.VALID_APPEAL);
+
+        final String futureDate = LocalDate.now().plusDays(1).toString();
+        final SscsWelshDocument existingWelshDocument = SscsWelshDocument.builder()
+            .value(SscsWelshDocumentDetails.builder()
+                .documentLink(DocumentLink.builder().documentFilename("existing-welsh.pdf").build())
+                .documentLanguage("welsh")
+                .documentDateAdded(futureDate)
+                .build())
+            .build();
+        final List<SscsWelshDocument> existingWelshDocuments = new ArrayList<>();
+        existingWelshDocuments.add(existingWelshDocument);
+        caseData.setSscsWelshDocuments(existingWelshDocuments);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(caseData.getSscsWelshDocuments()).hasSize(2);
+        assertThat(caseData.getSscsWelshDocuments().getFirst()).isEqualTo(existingWelshDocument);
+        assertThat(caseData.getSscsWelshDocuments().get(1).getValue().getOriginalDocumentFileName()).isEqualTo(ENGLISH_PDF);
     }
 
     @Test
