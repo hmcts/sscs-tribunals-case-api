@@ -19,6 +19,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
@@ -34,8 +35,11 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.AssociateCaseDetails;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.OnlineHearing;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.CitizenTyaNotificationService;
 import uk.gov.hmcts.reform.sscs.util.CaseAssignmentVerifier;
 import uk.gov.hmcts.reform.sscs.utility.AppealNumberGenerator;
+import uk.gov.service.notify.NotificationClientException;
 
 @Slf4j
 @Service
@@ -49,12 +53,17 @@ public class CitizenLoginService {
     private final IdamService idamService;
     private final CaseAssignmentVerifier caseAssignmentVerifier;
     private final OnlineHearingService onlineHearingService;
+    private final CitizenTyaNotificationService citizenTyaNotificationService;
+    @Value("${mya.link}")
+    private String myaLink;
+    private static final String MYA_URL_PLACEHOLDER = "appeal_id";
+
 
 
     public CitizenLoginService(CitizenCcdService citizenCcdService, CcdService ccdService,
                                UpdateCcdCaseService updateCcdCaseService, SscsCcdConvertService sscsCcdConvertService,
                                IdamService idamService, CaseAssignmentVerifier caseAssignmentVerifier,
-                               OnlineHearingService onlineHearingService) {
+                               OnlineHearingService onlineHearingService, CitizenTyaNotificationService citizenTyaNotificationService) {
         this.citizenCcdService = citizenCcdService;
         this.ccdService = ccdService;
         this.updateCcdCaseService = updateCcdCaseService;
@@ -62,6 +71,7 @@ public class CitizenLoginService {
         this.idamService = idamService;
         this.caseAssignmentVerifier = caseAssignmentVerifier;
         this.onlineHearingService = onlineHearingService;
+        this.citizenTyaNotificationService = citizenTyaNotificationService;
     }
 
     public List<OnlineHearing> findCasesForCitizen(IdamTokens idamTokens, String tya) {
@@ -233,5 +243,33 @@ public class CitizenLoginService {
 
         getAllSubscriptionsOnCase(sscsCaseDetails).filter(subscription -> subscription != null && email.equalsIgnoreCase(subscription.getEmail()))
                 .forEach(subscription -> subscription.setLastLoggedIntoMya(lastLoggedIntoMya));
+    }
+
+    public void resendTyaForCitizen(IdamTokens authorisation) {
+        String email = authorisation.getEmail();
+        IdamTokens idamToken = idamService.getIdamTokens();
+        List<CaseDetails> caseDetails = citizenCcdService.searchForCitizensBasedOnEmail(idamToken, email);
+        List<String> tyaCodes = caseDetails.stream()
+                .map(sscsCcdConvertService::getCaseDetails)
+                .flatMap(sscCaseDetails -> getAllSubscriptionsOnCase(sscCaseDetails)
+                        .filter(subscription -> subscription != null
+                                && authorisation.getEmail().equalsIgnoreCase(subscription.getEmail())))
+                .map(Subscription::getTya)
+                .filter(StringUtils::isNotBlank)
+                .map(tya -> myaLink.replace(MYA_URL_PLACEHOLDER, tya))
+                .toList();
+        if (tyaCodes.isEmpty()) {
+            log.info("No TYA references found for user {}", authorisation.getUserId());
+            return;
+        }
+
+        try {
+            citizenTyaNotificationService.sendTyaNumbers(email, tyaCodes);
+        } catch (NotificationClientException e) {
+            throw new NotificationServiceException("resend-tya-" + authorisation.getUserId(), e);
+        }
+
+        log.info("Received resend tya request for: {}", tyaCodes);
+
     }
 }

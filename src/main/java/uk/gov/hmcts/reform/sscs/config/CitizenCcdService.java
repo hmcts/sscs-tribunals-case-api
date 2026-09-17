@@ -65,6 +65,10 @@ public class CitizenCcdService {
         return citizenCcdClient.searchForCitizenAllCasesNonDormant(idamTokens);
     }
 
+    public List<CaseDetails> searchForCitizensBasedOnEmail(IdamTokens idamToken, String email) {
+        return citizenCcdClient.searchForCitizenBasedOnEmail(idamToken, email);
+    }
+
     public SaveCaseResult saveCase(SscsCaseData caseData, IdamTokens idamTokens) {
 
         List<CaseDetails> caseDetailsList = citizenCcdClient.searchForCitizen(idamTokens);
