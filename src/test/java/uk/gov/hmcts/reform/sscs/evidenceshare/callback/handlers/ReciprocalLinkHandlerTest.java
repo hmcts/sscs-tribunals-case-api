@@ -86,14 +86,14 @@ public class ReciprocalLinkHandlerTest {
         handler = new ReciprocalLinkHandler(ccdService, idamService, updateCcdCaseService);
 
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().appellant(
-                Appellant.builder().identity(Identity.builder().nino("AB00000Y").build()).build())
+                Appellant.builder().identity(Identity.builder().nino("AB123456C").build()).build())
             .mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
 
         lenient().when(callback.getCaseDetails()).thenReturn(caseDetails);
         lenient().when(caseDetails.getId()).thenReturn(7656765L);
         lenient().when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        map.put("case.appeal.appellant.identity.nino", "AB00000Y");
+        map.put("case.appeal.appellant.identity.nino", "AB123456C");
     }
 
     @ParameterizedTest
@@ -142,8 +142,8 @@ public class ReciprocalLinkHandlerTest {
         assertEquals("7656765", associatedCase2.getData().getAssociatedCase().get(0).getValue().getCaseReference());
         assertEquals(YES, associatedCase2.getData().getLinkedCasesBoolean());
         logCapture
-                .assertLogContains("Nino " + getMaskedNino("AB00000Y"), Level.INFO)
-                .assertLogDoesNotContain("AB00000Y", Level.INFO);
+                .assertLogContains("Nino " + getMaskedNino("AB123456C"), Level.INFO)
+                .assertLogDoesNotContain("AB123456C", Level.INFO);
     }
 
     @Test
@@ -223,6 +223,19 @@ public class ReciprocalLinkHandlerTest {
         handler.handle(SUBMITTED, callback);
 
         verify(ccdService, times(0)).updateCase(any(), any(), eq(ASSOCIATE_CASE.getCcdType()), eq("Associate case"), eq("Associated case added"), any());
+    }
+
+    @Test
+    void givenInvalidNino_thenDoNotSearchForMatchingCasesOrAddAssociatedCase() {
+        sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().appellant(
+                Appellant.builder().identity(Identity.builder().nino("INVALID1").build()).build())
+            .mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        handler.handle(SUBMITTED, callback);
+
+        verify(ccdService, times(0)).findCaseBy(any(), any(), any());
+        verify(updateCcdCaseService, times(0)).updateCaseV2(any(), any(), any(), any(), any(), any());
     }
 
 }

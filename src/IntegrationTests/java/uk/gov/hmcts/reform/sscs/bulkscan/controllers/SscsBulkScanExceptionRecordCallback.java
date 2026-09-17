@@ -4,6 +4,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.google.common.io.Resources.getResource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.util.Strings.concat;
@@ -15,6 +17,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.sscs.bulkscan.bulkscancore.domain.JourneyClassification.NEW_APPLICATION;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_EXCLUDE_DATES_MISSING;
 import static uk.gov.hmcts.reform.sscs.bulkscan.helper.OcrDataBuilderTest.buildScannedValidationOcrData;
+import static uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.FIND_CASE_EVENT_URL;
 import static uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.SERVICE_AUTHORIZATION_HEADER_KEY;
 import static uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.SERVICE_AUTH_TOKEN;
 import static uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.USER_AUTH_TOKEN;
@@ -104,6 +107,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     private static final String SSCS_2 = "SSCS2";
     private static final String SSCS_1 = "SSCS1";
     private static final String TEST_SERVICE = "test_service";
+    private static final String NINO = "BB000000B";
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -121,8 +125,8 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     @Test
     public void should_handle_callback_and_return_caseid_and_state_case_created_in_exception_record_data()
         throws Exception {
-        checkForLinkedCases();
-        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "ESA");
+        checkForLinkedCases(NINO);
+        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "ESA", NINO);
 
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
@@ -158,8 +162,8 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     //FIXME: delete after bulk scan auto case creation is switch on
     @Test
     public void should_create_non_compliant_case_when_mrn_date_greater_than_13_months() throws Exception {
-        checkForLinkedCases();
-        findCaseByForCaseworker("2017-01-01", "ESA");
+        checkForLinkedCases(NINO);
+        findCaseByForCaseworker("2017-01-01", "ESA", NINO);
 
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
@@ -226,7 +230,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     @Test
     public void should_not_create_duplicate_non_compliant_case_when_mrndate_nino_benefit_code_case_exists() throws Exception {
         // Given
-        checkForLinkedCases();
+        checkForLinkedCases(NINO);
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
@@ -246,6 +250,46 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
             .containsOnly("Duplicate case already exists - please reject this exception record");
 
         verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
+    }
+
+    @Test
+    public void should_not_search_for_or_link_associated_cases_when_nino_is_invalid() {
+
+        Map<String, String> ninosAndExpectedWarnings = Map.of(
+            "N/A", "person1_nino is invalid",
+            "N", "person1_nino is invalid",
+            "", "person1_nino is empty"
+        );
+
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
+
+        for (Map.Entry<String, String> ninoAndExpectedWarning : ninosAndExpectedWarnings.entrySet()) {
+            // Given
+            HttpEntity<ExceptionRecord> request = new HttpEntity<>(
+                exceptionCaseData(caseDataWithMrnDate(MRN_DATE_YESTERDAY_DD_MM_YYYY, ocrList -> {
+                    addAppellant(ocrList);
+                    ocrList.put("person1_nino", ninoAndExpectedWarning.getKey());
+                }, SSCS_1)),
+                httpHeaders()
+            );
+
+            findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "ESA", ninoAndExpectedWarning.getKey());
+
+            // When
+            ResponseEntity<SuccessfulTransformationResponse> result =
+                this.restTemplate
+                    .postForEntity(baseUrl + TRANSFORM_EXCEPTION_RECORD, request, SuccessfulTransformationResponse.class);
+
+            // Then
+            assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+            Map<String, Object> caseData = result.getBody().getCaseCreationDetails().getCaseData();
+            assertThat(caseData.get("linkedCasesBoolean")).isEqualTo("No");
+            assertThat(caseData).doesNotContainKey("associatedCase");
+            assertThat(result.getBody().getWarnings()).contains(ninoAndExpectedWarning.getValue());
+        }
+
+        ccdServer.verify(2, postRequestedFor(urlEqualTo(FIND_CASE_EVENT_URL)));
     }
 
     //FIXME: delete after bulk scan auto case creation is switch on
@@ -313,8 +357,8 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
 
     @Test
     public void auto_scan_should_handle_callback_and_return_caseid_and_state_case_created() throws Exception {
-        checkForLinkedCases();
-        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "ESA");
+        checkForLinkedCases(NINO);
+        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "ESA", NINO);
 
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
@@ -332,8 +376,8 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
 
     @Test
     public void auto_scan_should_handle_callback_and_return_caseid_and_state_case_created_Sscs1U() throws Exception {
-        checkForLinkedCases();
-        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "attendanceAllowance");
+        checkForLinkedCases(NINO);
+        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "attendanceAllowance", NINO);
 
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
@@ -352,8 +396,8 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
 
     @Test
     public void auto_scan_with_appointee_should_handle_callback_and_return_caseid_and_state_case_created() throws Exception {
-        checkForLinkedCases();
-        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "ESA");
+        checkForLinkedCases(NINO);
+        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "ESA", NINO);
 
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
@@ -404,8 +448,8 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
 
     @Test
     public void auto_scan_should_handle_callback_and_return_caseid_and_state_case_created_and_remove_spaces() throws Exception {
-        checkForLinkedCases();
-        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "ESA");
+        checkForLinkedCases(NINO);
+        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "ESA", NINO);
 
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
@@ -448,8 +492,8 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     @Test
     public void should_handle_sscs2_callback_and_return_caseid_and_state_case_created_in_exception_record_data()
         throws Exception {
-        checkForLinkedCases();
-        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, CHILD_SUPPORT);
+        checkForLinkedCases(NINO);
+        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, CHILD_SUPPORT, NINO);
 
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
@@ -471,8 +515,8 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     @Test
     public void should_handle_sscs5_callback_and_return_caseid_and_state_case_created_in_exception_record_data()
         throws Exception {
-        checkForLinkedCases();
-        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "taxFreeChildcare");
+        checkForLinkedCases(NINO);
+        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "taxFreeChildcare", NINO);
 
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
@@ -512,8 +556,8 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
 
     @Test
     public void should_return_warning_list_populated_when_sscs2_missing_data_validation_fails() {
-        checkForLinkedCases();
-        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, CHILD_SUPPORT);
+        checkForLinkedCases(NINO);
+        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, CHILD_SUPPORT, NINO);
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
@@ -536,8 +580,8 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
 
     @Test
     public void should_return_warning_list_populated_when_sscs2_appellant_role_empty() {
-        checkForLinkedCases();
-        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, CHILD_SUPPORT);
+        checkForLinkedCases(NINO);
+        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, CHILD_SUPPORT, NINO);
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
@@ -557,8 +601,8 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
 
     @Test
     public void should_return_no_warning_when_sscs2_appellant_role_empty_ignore_warnings() {
-        checkForLinkedCases();
-        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, CHILD_SUPPORT);
+        checkForLinkedCases(NINO);
+        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, CHILD_SUPPORT, NINO);
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
@@ -577,8 +621,8 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
 
     @Test
     public void should_return_warning_list_populated_when_sscs2_appellant_role_invalid() {
-        checkForLinkedCases();
-        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, CHILD_SUPPORT);
+        checkForLinkedCases(NINO);
+        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, CHILD_SUPPORT, NINO);
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
@@ -598,8 +642,8 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
 
     @Test
     public void should_return_no_warning_sscs2_appellant_role_invalid_ignore_warning() {
-        checkForLinkedCases();
-        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, CHILD_SUPPORT);
+        checkForLinkedCases(NINO);
+        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, CHILD_SUPPORT, NINO);
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
@@ -833,7 +877,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         ocrList.put("person1_phone", "01234567899");
         ocrList.put("person1_mobile", "07411222222");
         ocrList.put("person1_dob", "11/11/1976");
-        ocrList.put("person1_nino", "BB000000B");
+        ocrList.put("person1_nino", NINO);
     }
 
     private void addAppellantAndAppointee(Map<String, Object> ocrList) {
@@ -848,7 +892,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         ocrList.put("person1_phone", "01234567899");
         ocrList.put("person1_mobile", "07411222222");
         ocrList.put("person1_dob", "11/11/1976");
-        ocrList.put("person1_nino", "BB000000B");
+        ocrList.put("person1_nino", NINO);
         ocrList.put("person2_title", "Mr");
         ocrList.put("person2_first_name", "John");
         ocrList.put("person2_last_name", "Smith");
@@ -858,7 +902,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         ocrList.put("person2_address_line4", "Essex");
         ocrList.put("person2_postcode", "CM13 1AQ");
         ocrList.put("person2_dob", "11/11/1976");
-        ocrList.put("person2_nino", "BB000000B");
+        ocrList.put("person2_nino", NINO);
     }
 
     private void addOtherParty(Map<String, Object> ocrList) {
@@ -940,7 +984,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     }
 
     private void findCaseByForCaseworkerReturnCaseDetails() throws Exception {
-        SearchSourceBuilder query = SscsQueryBuilder.findCcdCaseByNinoAndBenefitTypeAndMrnDateQuery("BB000000B", "ESA", "2017-01-01");
+        SearchSourceBuilder query = SscsQueryBuilder.findCcdCaseByNinoAndBenefitTypeAndMrnDateQuery(NINO, "ESA", "2017-01-01");
 
         ccdServer.stubFor(post(concat(uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.FIND_CASE_EVENT_URL)).atPriority(1)
                 .withHeader(AUTHORIZATION, equalTo(USER_AUTH_TOKEN))
