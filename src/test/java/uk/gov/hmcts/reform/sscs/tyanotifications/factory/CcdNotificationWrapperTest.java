@@ -32,6 +32,7 @@ import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -247,6 +248,8 @@ public class CcdNotificationWrapperTest {
     }
 
     private CcdNotificationWrapper buildNotificationWrapperWithOtherParty(NotificationEventType notificationEventType, List<CcdValue<OtherParty>> otherParties) {
+        List<HearingRecordingRequest> releasedHearings = new ArrayList<>();
+        releasedHearings.add(HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder().requestingParty(PartyItemList.OTHER_PARTY.getCode()).build()).build());
         Appointee appointee = Appointee.builder()
             .name(Name.builder().firstName("Ap").lastName("Pointee").build())
             .address(Address.builder().line1("Appointee Line 1").town("Appointee Town").county("Appointee County").postcode("AP9 0IN").build())
@@ -265,6 +268,7 @@ public class CcdNotificationWrapperTest {
                         .build()
                 )
                 .build())
+                .sscsHearingRecordingCaseData(SscsHearingRecordingCaseData.builder().citizenReleasedHearings(releasedHearings).build())
             .build();
         updateOtherPartySelection(caseData);
         return new CcdNotificationWrapper(
@@ -739,6 +743,17 @@ public class CcdNotificationWrapperTest {
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
         Assert.assertEquals(1, subsWithTypeList.size());
         Assert.assertEquals(SubscriptionType.JOINT_PARTY, subsWithTypeList.get(0).getSubscriptionType());
+    }
+
+    @Test
+    public void givenProcessHearingRequestForOtherPartyWithSubscription_shouldSendProcessHearingRequestNotification() {
+        ccdNotificationWrapper = buildNotificationWrapperWithOtherParty(ACTION_HEARING_RECORDING_REQUEST, buildOtherPartyData(false, false, false));
+        List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
+
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(subsWithTypeList).hasSize(1);
+        softly.assertThat(subsWithTypeList.get(0).getSubscriptionType()).isEqualTo(SubscriptionType.OTHER_PARTY);
+        softly.assertAll();
     }
 
     @Test
