@@ -105,7 +105,7 @@ export async function getSSCSServiceToken() {
 }
 
 export async function getIDAMUserID(idamToken) {
-  const idamDetailsPath = '/details';
+  const idamDetailsPath = '/o/userinfo';
 
   let apiContext = await request.newContext({
     // All requests we send go to this API Endpoint.
