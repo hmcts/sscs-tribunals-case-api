@@ -9,4 +9,4 @@
 USER_TOKEN=${1}
 IDAM_API_URL="http://rse-idam-simulator:5062"
 
-curl --silent --show-error -X GET "${IDAM_API_URL}/details" -H "accept: application/json" -H "authorization: Bearer ${USER_TOKEN}" | jq -r .id
+curl --silent --show-error -X GET "${IDAM_API_URL}/o/userinfo" -H "accept: application/json" -H "authorization: Bearer ${USER_TOKEN}" | jq -r .id
