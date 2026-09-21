@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import static java.util.Objects.nonNull;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.isDateInTheFuture;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.isDateInThePast;
 
@@ -15,6 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateOrPeriod;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCasePanelMembersExcluded;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @Component
@@ -82,6 +84,26 @@ public class AdjournCaseMidEventValidationService {
                 errors.add("Duration length cannot be greater than 8");
             }
         }
+        return errors;
+    }
+
+    public Set<String> validateExcludedPanelMembers(SscsCaseData sscsCaseData) {
+        Set<String> errors = new LinkedHashSet<>();
+
+        AdjournCasePanelMembersExcluded panelMembersExcluded =
+                sscsCaseData.getAdjournment().getPanelMembersExcluded();
+        boolean panelMembersEmpty = isEmpty(sscsCaseData.getAdjournment().getPanelMembers());
+
+        log.info("Panel members excluded: {}, empty: {}", panelMembersExcluded, panelMembersEmpty);
+
+        if (AdjournCasePanelMembersExcluded.NO.equals(panelMembersExcluded) && !panelMembersEmpty) {
+            errors.add("Panel members should be empty when panel members are not excluded or reserved");
+        } else if (AdjournCasePanelMembersExcluded.YES.equals(panelMembersExcluded) && panelMembersEmpty) {
+            errors.add("Panel members should not be empty when panel members are excluded");
+        } else if (AdjournCasePanelMembersExcluded.RESERVED.equals(panelMembersExcluded) && panelMembersEmpty) {
+            errors.add("Panel members should not be empty when panel members are reserved");
+        }
+
         return errors;
     }
 

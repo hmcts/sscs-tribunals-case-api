@@ -176,14 +176,12 @@ public class SscsUtil {
         }
     }
 
-    public static PanelMemberExclusions setAdjournmentPanelMembersExclusions(PanelMemberExclusions exclusions,
+    public static void setAdjournmentPanelMembersExclusions(PanelMemberExclusions exclusions,
                                                             List<JudicialUserBase> adjournmentPanelMembers,
                                                             AdjournCasePanelMembersExcluded panelMemberExcluded) {
-        log.info("Adding {} panel members to {} list", adjournmentPanelMembers.size(), panelMemberExcluded);
         if (nonNull(adjournmentPanelMembers)) {
             List<CollectionItem<JudicialUserBase>> panelMembersList = getPanelMembersList(exclusions, panelMemberExcluded);
 
-            log.info("Current {} panel members list size", panelMemberExcluded);
             if (isNull(panelMembersList)) {
                 panelMembersList = new LinkedList<>();
             }
@@ -215,7 +213,6 @@ public class SscsUtil {
                 exclusions.setArePanelMembersReserved(YES);
             }
         }
-        return exclusions;
     }
 
     private static List<CollectionItem<JudicialUserBase>> getPanelMembersList(PanelMemberExclusions exclusions,

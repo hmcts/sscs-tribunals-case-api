@@ -249,26 +249,19 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
     private void updatePanelMembers(SscsCaseData caseData) {
         Adjournment adjournment = caseData.getAdjournment();
         AdjournCasePanelMembersExcluded panelMemberExcluded = adjournment.getPanelMembersExcluded();
-        log.info("Adjourn panel members excluded {}", panelMemberExcluded);
 
         if (nonNull(panelMemberExcluded)) {
-            PanelMemberExclusions existingPanelMemberExclusions = caseData.getSchedulingAndListingFields().getPanelMemberExclusions();
+            PanelMemberExclusions panelMemberExclusions = caseData.getSchedulingAndListingFields().getPanelMemberExclusions();
 
-            if (isNull(existingPanelMemberExclusions)) {
-                log.info("Creating Panel Member Exclusions");
-                existingPanelMemberExclusions = PanelMemberExclusions.builder().build();
-                caseData.getSchedulingAndListingFields().setPanelMemberExclusions(existingPanelMemberExclusions);
-                log.info("Panel Member Exclusions created {}", caseData.getSchedulingAndListingFields().getPanelMemberExclusions());
+            if (isNull(panelMemberExclusions)) {
+                panelMemberExclusions = PanelMemberExclusions.builder().build();
+                caseData.getSchedulingAndListingFields().setPanelMemberExclusions(panelMemberExclusions);
             }
 
             List<JudicialUserBase> membersToExcluded = adjournment.getPanelMembers();
             membersToExcluded.add(adjournment.getSignedInUser());
 
-            log.info("Adjourn before {}", existingPanelMemberExclusions);
-            PanelMemberExclusions panelMemberExclusions = SscsUtil.setAdjournmentPanelMembersExclusions(existingPanelMemberExclusions, membersToExcluded, panelMemberExcluded);
-            log.info("Adjourn after {}", panelMemberExclusions);
-            //caseData.getSchedulingAndListingFields().setPanelMemberExclusions(panelMemberExclusions);
-
+            SscsUtil.setAdjournmentPanelMembersExclusions(panelMemberExclusions, membersToExcluded, panelMemberExcluded);
         }
     }
 

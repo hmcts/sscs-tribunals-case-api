@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateOrPeriod;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCasePanelMembersExcluded;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
@@ -36,6 +37,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 
 @RunWith(JUnitParamsRunner.class)
 public class AdjournCaseMidEventValidationServiceTest {
@@ -174,6 +176,44 @@ public class AdjournCaseMidEventValidationServiceTest {
         sscsCaseData.getAdjournment().setNextHearingListingDuration(duration);
         sscsCaseData.getAdjournment().setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.NON_STANDARD);
         Set<String> errors = adjournCaseMidEventValidationService.validateNextHearingListingDuration(sscsCaseData);
+        assertTrue(errors.isEmpty());
+    }
+
+    @Test
+    void givenPanelMembersExcludedIsNoAndMembersPresent_ThenDisplayAnError() {
+        sscsCaseData.getAdjournment().setPanelMembersExcluded(AdjournCasePanelMembersExcluded.NO);
+        sscsCaseData.getAdjournment().setPanelMember1(JudicialUserBase.builder().idamId("idam-1").build());
+
+        Set<String> errors = adjournCaseMidEventValidationService.validateExcludedPanelMembers(sscsCaseData);
+
+        assertEquals(Set.of("Panel members should be empty when panel members are not excluded or reserved"), errors);
+    }
+
+    @Test
+    void givenPanelMembersExcludedIsYesAndNoMembersPresent_ThenDisplayAnError() {
+        sscsCaseData.getAdjournment().setPanelMembersExcluded(AdjournCasePanelMembersExcluded.YES);
+
+        Set<String> errors = adjournCaseMidEventValidationService.validateExcludedPanelMembers(sscsCaseData);
+
+        assertEquals(Set.of("Panel members should not be empty when panel members are excluded"), errors);
+    }
+
+    @Test
+    void givenPanelMembersExcludedIsReservedAndNoMembersPresent_ThenDisplayAnError() {
+        sscsCaseData.getAdjournment().setPanelMembersExcluded(AdjournCasePanelMembersExcluded.RESERVED);
+
+        Set<String> errors = adjournCaseMidEventValidationService.validateExcludedPanelMembers(sscsCaseData);
+
+        assertEquals(Set.of("Panel members should not be empty when panel members are reserved"), errors);
+    }
+
+    @Test
+    void givenPanelMembersExcludedAndMembersAreConsistent_ThenReturnNoError() {
+        sscsCaseData.getAdjournment().setPanelMembersExcluded(AdjournCasePanelMembersExcluded.YES);
+        sscsCaseData.getAdjournment().setPanelMember1(JudicialUserBase.builder().idamId("idam-1").build());
+
+        Set<String> errors = adjournCaseMidEventValidationService.validateExcludedPanelMembers(sscsCaseData);
+
         assertTrue(errors.isEmpty());
     }
 

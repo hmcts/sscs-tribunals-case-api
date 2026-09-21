@@ -147,6 +147,22 @@ public class CcdMideventCallbackController {
         return ok(adjournCasePreviewService.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, userAuthorisation, false));
     }
 
+    @PostMapping(path = "/ccdMidEventAdjournCasePanelMemberNames", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> ccdMidEventAdjournCasePanelMemberNames(
+            @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
+            @RequestBody String message) {
+        Callback<SscsCaseData> callback = deserializer.deserialize(message);
+        log.info("About to start ccdMidEventAdjournCasePanelMemberNames callback `{}` received for Case ID `{}`", callback.getEvent(),
+                callback.getCaseDetails().getId());
+        authorisationService.authorise(serviceAuthHeader);
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
+        preSubmitCallbackResponse.addErrors(adjournCaseMidEventValidationService.validateSscsCaseDataConstraints(caseData));
+        preSubmitCallbackResponse.addErrors(adjournCaseMidEventValidationService.validateExcludedPanelMembers(caseData));
+        return  ok(preSubmitCallbackResponse);
+    }
+
+
     @PostMapping(path = "/ccdMidEventAdjournCaseDirectionDueDate", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> ccdMidEventAdjournDirectionDueDate(
             @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,

@@ -418,6 +418,32 @@ public class CcdMideventCallbackControllerTest {
     }
 
     @Test
+    public void handleCcdMidEventAdjournCasePanelMemberNames_InvalidMembersReturnsErrors() throws Exception {
+        when(deserializer.deserialize(returnAllDetailsContent())).thenReturn(returnCallback());
+        when(adjournCaseMidEventValidationService.validateSscsCaseDataConstraints(any()))
+                .thenReturn(Set.of("Constraint violation"));
+        when(adjournCaseMidEventValidationService.validateExcludedPanelMembers(any()))
+                .thenReturn(Set.of("Panel members should not be empty when panel members are excluded"));
+
+        mockMvc.perform(post("/ccdMidEventAdjournCasePanelMemberNames")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("ServiceAuthorization", "")
+                        .content(returnAllDetailsContent()))
+                .andExpect(content().json("{\"errors\":[\"Constraint violation\",\"Panel members should not be empty when panel members are excluded\"],\"warnings\":[]}"));
+    }
+
+    @Test
+    public void handleCcdMidEventAdjournCasePanelMemberNames_ValidMembersReturnsNoError() throws Exception {
+        when(deserializer.deserialize(returnAllDetailsContent())).thenReturn(returnCallback());
+
+        mockMvc.perform(post("/ccdMidEventAdjournCasePanelMemberNames")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("ServiceAuthorization", "")
+                        .content(returnAllDetailsContent()))
+                .andExpect(content().json("{'errors':[]}"));
+    }
+
+    @Test
     public void handleCcdMidEventAdjournCaseNextHearing_PastHearingDateReturnsError() throws Exception {
         when(deserializer.deserialize(returnAllDetailsContent())).thenReturn(returnCallback());
         when(adjournCaseMidEventValidationService.checkNextHearingDateInvalid(any()))

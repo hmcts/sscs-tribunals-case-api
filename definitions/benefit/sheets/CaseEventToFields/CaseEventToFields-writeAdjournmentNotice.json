@@ -1,5 +1,6 @@
 [
   {
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEventAdjournCasePanelMemberNames",
     "CaseEventID": "adjournCase",
     "CaseFieldID": "adjournCasePanelMember1",
     "CaseTypeID": "Benefit",
