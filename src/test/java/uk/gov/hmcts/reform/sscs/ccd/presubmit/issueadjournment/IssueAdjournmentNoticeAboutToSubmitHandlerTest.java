@@ -492,6 +492,27 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
             .isEqualTo(YES);
     }
 
+    @Test
+    void givenPanelMembersExcluded_thenSetPanelMemberExclusions() {
+        sscsCaseData.getAdjournment().setPanelMembersExcluded(AdjournCasePanelMembersExcluded.YES);
+        sscsCaseData.getAdjournment().setPanelMember1(JudicialUserBase.builder().idamId("1").build());
+        sscsCaseData.getAdjournment().setPanelMember3(JudicialUserBase.builder().idamId("3").build());
+        sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(NO);
+        sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(NO);
+        setupHearingDurationValues();
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getSchedulingAndListingFields().getPanelMemberExclusions()).isNotNull();
+        assertThat(sscsCaseData.getSchedulingAndListingFields().getPanelMemberExclusions().getExcludedPanelMembers())
+            .extracting(CollectionItem::getId)
+            .containsExactlyInAnyOrder("1", "3");
+        assertThat(sscsCaseData.getSchedulingAndListingFields()
+                .getPanelMemberExclusions().getExcludedPanelMembers()).hasSize(2);
+        assertThat(sscsCaseData.getSchedulingAndListingFields().getPanelMemberExclusions().getArePanelMembersExcluded())
+            .isEqualTo(YES);
+    }
+
     @DisplayName("When we have written an adjournment notice and reserved some panel members, and there are already reserved panel members, "
         + "add them to the existing reserved panel members list")
     @Test
