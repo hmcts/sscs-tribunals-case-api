@@ -123,5 +123,5 @@ export async function getIDAMUserID(idamToken) {
   });
   const body = await response.body();
   // @ts-ignore
-  return JSON.parse(body).id;
+  return JSON.parse(body).uid;
 }
