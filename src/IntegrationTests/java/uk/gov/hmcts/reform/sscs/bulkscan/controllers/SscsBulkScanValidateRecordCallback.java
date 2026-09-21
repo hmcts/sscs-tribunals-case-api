@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.bulkscan.controllers;
 
 import static com.google.common.io.Resources.getResource;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static junit.framework.TestCase.assertEquals;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
@@ -20,7 +21,6 @@ import java.io.IOException;
 import java.net.URL;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.apache.commons.codec.Charsets;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -46,7 +46,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
 
     private static String loadJson(String fileName) throws IOException {
         URL url = getResource(fileName);
-        return Resources.toString(url, Charsets.toCharset("UTF-8"));
+        return Resources.toString(url, UTF_8);
     }
 
     @Before
@@ -59,7 +59,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
         throws Exception {
         // Given
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
-        checkForLinkedCases();
+        checkForLinkedCases("BB000000B");
 
         String validationJson = loadJson("mappings/validation/validate-appeal-created-case-request.json");
 
@@ -88,7 +88,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
         throws Exception {
         // Given
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
-        checkForLinkedCases();
+        checkForLinkedCases("BB000000B");
 
         String validationJson = loadJson("mappings/validation/validate-interloc-appeal-created-case-request.json");
 
@@ -114,7 +114,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
         throws Exception {
         // Given
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
-        checkForLinkedCases();
+        checkForLinkedCases("BB000000B");
 
         String validationJson = loadJson("mappings/validation/sscs2-validate-appeal-created-case-request.json");
 
@@ -399,7 +399,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
         throws Exception {
         // Given
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
-        checkForLinkedCases();
+        checkForLinkedCases("BB000000B");
 
         final String invalidPostcode = "CM13 9HY";
         String validationJson = loadJson("mappings/validation/validate-appeal-created-case-request.json")
@@ -469,7 +469,7 @@ public class SscsBulkScanValidateRecordCallback extends BaseTest {
         throws Exception {
         // Given
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn("test_service");
-        checkForLinkedCases();
+        checkForLinkedCases("BB000000B");
 
         String validationJson = loadJson("mappings/validation/sscs5-validate-appeal-created-case-request.json");
 
