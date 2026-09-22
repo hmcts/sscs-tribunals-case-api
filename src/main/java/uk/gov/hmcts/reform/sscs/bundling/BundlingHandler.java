@@ -3,16 +3,17 @@ package uk.gov.hmcts.reform.sscs.bundling;
 import static java.lang.String.join;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static java.util.Collections.sort;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.counting;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData.sortDocumentsByBundle;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX;
 import static uk.gov.hmcts.reform.sscs.util.ConfidentialityRequestUtil.isAtLeastOneRequestInProgress;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.copyCallbackWithCaseData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +28,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Bundle;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
@@ -98,36 +97,11 @@ public class BundlingHandler {
 
         log.info("Setting the bundleConfiguration on the case {} for case id {}", sscsCaseData.getBundleConfiguration(), callback.getCaseDetails().getId());
 
-        final BundleCallback<SscsCaseData> bundleCallback = new BundleCallback<>(createCallbackWithDocumentsSortedForBundling(callback, sscsCaseData));
-        return sendToBundleService(bundleCallback);
-    }
-
-    private Callback<SscsCaseData> createCallbackWithDocumentsSortedForBundling(final Callback<SscsCaseData> callback, final SscsCaseData sscsCaseData) {
-        final SscsCaseData sortedCaseData = sscsCaseData.toBuilder()
+        final Callback<SscsCaseData> callbackWithSortedDocuments = copyCallbackWithCaseData(callback, caseDataBuilder -> caseDataBuilder
                 .sscsDocument(sortDocumentsByBundle(sscsCaseData.getSscsDocument()))
-                .sscsWelshDocuments(sortDocumentsByBundle(sscsCaseData.getSscsWelshDocuments()))
-                .build();
+                .sscsWelshDocuments(sortDocumentsByBundle(sscsCaseData.getSscsWelshDocuments())));
 
-        final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
-        final CaseDetails<SscsCaseData> sortedCaseDetails = new CaseDetails<>(
-                caseDetails.getId(),
-                caseDetails.getJurisdiction(),
-                caseDetails.getState(),
-                sortedCaseData,
-                caseDetails.getCreatedDate(),
-                caseDetails.getCaseTypeId()
-        );
-
-        return new Callback<>(sortedCaseDetails, callback.getCaseDetailsBefore(), callback.getEvent(), callback.isIgnoreWarnings());
-    }
-
-    private  <T extends AbstractDocument<? extends AbstractDocumentDetails>> List<T> sortDocumentsByBundle(final List<T> documents) {
-        if (isNotEmpty(documents)) {
-            final List<T> sortedDocuments = new ArrayList<>(documents);
-            sort(sortedDocuments);
-            return sortedDocuments;
-        }
-        return documents;
+        return sendToBundleService(new BundleCallback<>(callbackWithSortedDocuments));
     }
 
     @SuppressWarnings("unchecked")
