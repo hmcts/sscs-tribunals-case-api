@@ -74,6 +74,7 @@ public class DeathOfAppellantAboutToSubmitHandler implements PreSubmitCallbackHa
 
         if (null != preSubmitCallbackResponse.getData().getSubscriptions()
             && null != preSubmitCallbackResponse.getData().getSubscriptions().getAppellantSubscription()) {
+            log.info("Setting email and sms subscriptions to No for appellant after recording death of an appellant for case id: {}", callback.getCaseDetails().getId());
             preSubmitCallbackResponse.getData().getSubscriptions().getAppellantSubscription().setSubscribeEmail("No");
             preSubmitCallbackResponse.getData().getSubscriptions().getAppellantSubscription().setSubscribeSms("No");
             preSubmitCallbackResponse.getData().getSubscriptions().getAppellantSubscription().setWantSmsNotifications("No");

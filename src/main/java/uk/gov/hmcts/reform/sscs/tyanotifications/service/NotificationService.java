@@ -173,6 +173,10 @@ public class NotificationService {
             subscriptionTypes);
 
         for (SubscriptionWithType subscriptionWithType : notificationWrapper.getSubscriptionsBasedOnNotificationType()) {
+            if (APPELLANT.equals(subscriptionWithType.getEntity()) && isYes(notificationWrapper.getNewSscsCaseData().getIsAppellantDeceased())) {
+                log.info("Appellant is deceased for case id {}, not sending notification to appellant.", notificationWrapper.getCaseId());
+                continue;
+            }
             if (isSubscriptionValidToSendAfterOverride(notificationWrapper, subscriptionWithType)
                 && isValidNotification(notificationWrapper, subscriptionWithType)) {
                 sendNotification(notificationWrapper, subscriptionWithType);
