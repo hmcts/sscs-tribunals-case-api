@@ -40,10 +40,8 @@ import static uk.gov.hmcts.reform.sscs.util.SscsUtil.updateHearingChannel;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.updateHearingInterpreter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,7 +54,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingVenue;
@@ -65,7 +62,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Correction;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
@@ -102,7 +98,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFinalDecisionCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.StatementOfReasonsActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
@@ -128,33 +123,6 @@ class SscsUtilTest {
                 .isCorrectionFinalDecisionInProgress(YesNo.NO).build()).build();
         caseData = new SscsCaseData();
         caseData.setPostHearing(postHearing);
-    }
-
-    @Test
-    void givenCopyCallbackWithCaseData_thenReturnsNewCallbackWithCustomisedDataAndLeavesOriginalUntouched() {
-        final SscsCaseData originalCaseData = SscsCaseData.builder().ccdCaseId("12345").build();
-        final CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(
-                123L, "SSCS", State.READY_TO_LIST, originalCaseData, LocalDateTime.now(), "Benefit"
-        );
-        final Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), READY_TO_LIST, false);
-
-        final Callback<SscsCaseData> copiedCallback = SscsUtil.copyCallbackWithCaseData(callback,
-                caseDataBuilder -> caseDataBuilder.ccdCaseId("99999"));
-
-        assertThat(copiedCallback).isNotSameAs(callback);
-        assertThat(copiedCallback.getCaseDetails()).isNotSameAs(callback.getCaseDetails());
-        assertThat(copiedCallback.getCaseDetails().getCaseData()).isNotSameAs(originalCaseData);
-        assertThat(copiedCallback.getCaseDetails().getCaseData().getCcdCaseId()).isEqualTo("99999");
-        assertThat(originalCaseData.getCcdCaseId()).isEqualTo("12345");
-
-        assertThat(copiedCallback.getCaseDetails().getId()).isEqualTo(caseDetails.getId());
-        assertThat(copiedCallback.getCaseDetails().getJurisdiction()).isEqualTo(caseDetails.getJurisdiction());
-        assertThat(copiedCallback.getCaseDetails().getState()).isEqualTo(caseDetails.getState());
-        assertThat(copiedCallback.getCaseDetails().getCreatedDate()).isEqualTo(caseDetails.getCreatedDate());
-        assertThat(copiedCallback.getCaseDetails().getCaseTypeId()).isEqualTo(caseDetails.getCaseTypeId());
-        assertThat(copiedCallback.getEvent()).isEqualTo(callback.getEvent());
-        assertThat(copiedCallback.isIgnoreWarnings()).isEqualTo(callback.isIgnoreWarnings());
-        assertThat(copiedCallback.getCaseDetailsBefore()).isEqualTo(callback.getCaseDetailsBefore());
     }
 
     @Test

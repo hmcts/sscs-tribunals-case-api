@@ -8,12 +8,10 @@ import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.counting;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData.sortDocumentsByBundle;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX;
 import static uk.gov.hmcts.reform.sscs.util.ConfidentialityRequestUtil.isAtLeastOneRequestInProgress;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.copyCallbackWithCaseData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,11 +95,10 @@ public class BundlingHandler {
 
         log.info("Setting the bundleConfiguration on the case {} for case id {}", sscsCaseData.getBundleConfiguration(), callback.getCaseDetails().getId());
 
-        final Callback<SscsCaseData> callbackWithSortedDocuments = copyCallbackWithCaseData(callback, caseDataBuilder -> caseDataBuilder
-                .sscsDocument(sortDocumentsByBundle(sscsCaseData.getSscsDocument()))
-                .sscsWelshDocuments(sortDocumentsByBundle(sscsCaseData.getSscsWelshDocuments())));
+        sscsCaseData.setSscsDocumentBundle(sscsCaseData.getSscsDocument());
+        sscsCaseData.setSscsWelshDocumentsBundle(sscsCaseData.getSscsWelshDocuments());
 
-        return sendToBundleService(new BundleCallback<>(callbackWithSortedDocuments));
+        return sendToBundleService(new BundleCallback<>(callback));
     }
 
     @SuppressWarnings("unchecked")

@@ -30,7 +30,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Consumer;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -114,23 +113,6 @@ public class SscsUtil {
 
     public static <T> List<T> mutableEmptyListIfNull(List<T> list) {
         return ofNullable(list).orElse(new ArrayList<>());
-    }
-
-    public static Callback<SscsCaseData> copyCallbackWithCaseData(final Callback<SscsCaseData> callback, final Consumer<SscsCaseData.SscsCaseDataBuilder> caseDataCustomizer) {
-        final SscsCaseData.SscsCaseDataBuilder caseDataBuilder = callback.getCaseDetails().getCaseData().toBuilder();
-        caseDataCustomizer.accept(caseDataBuilder);
-
-        final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
-        final CaseDetails<SscsCaseData> updatedCaseDetails = new CaseDetails<>(
-                caseDetails.getId(),
-                caseDetails.getJurisdiction(),
-                caseDetails.getState(),
-                caseDataBuilder.build(),
-                caseDetails.getCreatedDate(),
-                caseDetails.getCaseTypeId()
-        );
-
-        return new Callback<>(updatedCaseDetails, callback.getCaseDetailsBefore(), callback.getEvent(), callback.isIgnoreWarnings());
     }
 
     public static boolean isSAndLCase(SscsCaseData sscsCaseData) {
