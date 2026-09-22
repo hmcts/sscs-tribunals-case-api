@@ -1,10 +1,7 @@
 package uk.gov.hmcts.reform.sscs.bundling;
 
 import static java.util.stream.Collectors.toList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -21,11 +18,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -53,8 +50,7 @@ import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 import uk.gov.hmcts.reform.sscs.service.bundle.BundleAudioVideoPdfService;
 
-@RunWith(JUnitParamsRunner.class)
-public class BundlingHandlerTest {
+class BundlingHandlerTest {
 
     private BundlingHandler handler;
 
@@ -74,11 +70,10 @@ public class BundlingHandlerTest {
 
     private final ArgumentCaptor<BundleCallback> capture = ArgumentCaptor.forClass(BundleCallback.class);
 
-
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         openMocks(this);
-        DwpDocumentService dwpDocumentService = new DwpDocumentService();
+        final DwpDocumentService dwpDocumentService = new DwpDocumentService();
         handler = new BundlingHandler(serviceRequestExecutor, dwpDocumentService, bundleAudioVideoPdfService, "bundleUrl.com", "bundleEnglishConfig", "bundleWelshConfig",
                 "bundleEnglishEditedConfig", "bundleWelshEditedConfig");
 
@@ -93,59 +88,59 @@ public class BundlingHandlerTest {
         when(serviceRequestExecutor.post(any(), any())).thenReturn(new PreSubmitCallbackResponse<>(sscsCaseData));
     }
 
-    @Test
-    @Parameters({"Yes, bundleWelshConfig", " No, bundleEnglishConfig"})
-    public void givenCaseWithLanguagePreference_thenPopulateConfigFileName(String languagePreference, String expectedConfigFile) {
+    @ParameterizedTest
+    @CsvSource({"Yes, bundleWelshConfig", "No, bundleEnglishConfig"})
+    void givenCaseWithLanguagePreference_thenPopulateConfigFileName(String languagePreference, String expectedConfigFile) {
 
-        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        final List<DwpDocument> dwpDocuments = new ArrayList<>();
         dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().build()).build()).build());
         dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
         caseData.setDwpDocuments(dwpDocuments);
 
         caseData.setLanguagePreferenceWelsh(languagePreference);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
 
-        assertEquals(expectedConfigFile, response.getData().getMultiBundleConfiguration().get(0).getValue());
+        assertThat(response.getData().getMultiBundleConfiguration().get(0).getValue()).isEqualTo(expectedConfigFile);
     }
 
     @Test
-    public void givenEnglishCaseWithEdited_thenPopulateEnglishEditedAndUneditedConfigFileName() {
+    void givenEnglishCaseWithEdited_thenPopulateEnglishEditedAndUneditedConfigFileName() {
         addMandatoryDwpDocuments();
 
         callback.getCaseDetails().getCaseData().setDwpPhme(YES.getValue());
         callback.getCaseDetails().getCaseData().setPhmeGranted(YES);
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(NO.getValue());
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
 
         verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
-        assertEquals(2, response.getData().getMultiBundleConfiguration().size());
-        assertEquals("bundleEnglishEditedConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
-        assertEquals("bundleEnglishConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
-        assertEquals("Benefit", capture.getValue().getCaseTypeId());
-        assertEquals("SSCS", capture.getValue().getJurisdictionId());
+        assertThat(response.getData().getMultiBundleConfiguration()).hasSize(2);
+        assertThat(response.getData().getMultiBundleConfiguration().get(0).getValue()).isEqualTo("bundleEnglishEditedConfig");
+        assertThat(response.getData().getMultiBundleConfiguration().get(1).getValue()).isEqualTo("bundleEnglishConfig");
+        assertThat(capture.getValue().getCaseTypeId()).isEqualTo("Benefit");
+        assertThat(capture.getValue().getJurisdictionId()).isEqualTo("SSCS");
     }
 
     @Test
-    public void givenWelshCaseWithEdited_thenPopulateWelshEditedAndUneditedConfigFileName() {
+    void givenWelshCaseWithEdited_thenPopulateWelshEditedAndUneditedConfigFileName() {
         addMandatoryDwpDocuments();
 
         callback.getCaseDetails().getCaseData().setDwpPhme(YES.getValue());
         callback.getCaseDetails().getCaseData().setPhmeGranted(YES);
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(YES.getValue());
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
 
         verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
-        assertEquals(2, response.getData().getMultiBundleConfiguration().size());
-        assertEquals("bundleWelshEditedConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
-        assertEquals("bundleWelshConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
-        assertEquals("Benefit", capture.getValue().getCaseTypeId());
-        assertEquals("SSCS", capture.getValue().getJurisdictionId());
+        assertThat(response.getData().getMultiBundleConfiguration()).hasSize(2);
+        assertThat(response.getData().getMultiBundleConfiguration().get(0).getValue()).isEqualTo("bundleWelshEditedConfig");
+        assertThat(response.getData().getMultiBundleConfiguration().get(1).getValue()).isEqualTo("bundleWelshConfig");
+        assertThat(capture.getValue().getCaseTypeId()).isEqualTo("Benefit");
+        assertThat(capture.getValue().getJurisdictionId()).isEqualTo("SSCS");
     }
 
-    @Test
-    @Parameters({"Yes, bundleWelshConfig", " No, bundleEnglishConfig"})
-    public void givenCaseWithEditedDwpDocsAndPheNotGranted_thenReturnErrorMessageAndDoNotSendRequestToBundleService(String languagePreference, String expectedConfigFile) {
+    @ParameterizedTest
+    @CsvSource({"Yes, bundleWelshConfig", "No, bundleEnglishConfig"})
+    void givenCaseWithEditedDwpDocsAndPheNotGranted_thenReturnErrorMessageAndDoNotSendRequestToBundleService(String languagePreference, String expectedConfigFile) {
         addMandatoryDwpDocuments();
         addNonEditedSscsDocuments();
         sscsCaseData.setIsConfidentialCase(NO);
@@ -154,62 +149,64 @@ public class BundlingHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpPhme(YES.getValue());
         callback.getCaseDetails().getCaseData().setPhmeGranted(NO);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
 
         verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
-        assertEquals(1, response.getData().getMultiBundleConfiguration().size());
-        assertEquals(expectedConfigFile, response.getData().getMultiBundleConfiguration().get(0).getValue());
-        assertEquals("Benefit", capture.getValue().getCaseTypeId());
-        assertEquals("SSCS", capture.getValue().getJurisdictionId());
+        assertThat(response.getData().getMultiBundleConfiguration()).hasSize(1);
+        assertThat(response.getData().getMultiBundleConfiguration().get(0).getValue()).isEqualTo(expectedConfigFile);
+        assertThat(capture.getValue().getCaseTypeId()).isEqualTo("Benefit");
+        assertThat(capture.getValue().getJurisdictionId()).isEqualTo("SSCS");
     }
 
     @Test
-    public void givenDwpResponseDocumentHasEmptyFileName_thenPopulateFileName() {
+    void givenDwpResponseDocumentHasEmptyFileName_thenPopulateFileName() {
         callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
         callback.getCaseDetails().getCaseData().setDwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().build()).build());
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
 
-        assertEquals(DWP_RESPONSE.getLabel(), response.getData().getDwpDocuments().stream().filter(e -> e.getValue().getDocumentType().equals(DWP_RESPONSE.getValue())).collect(toList()).get(0).getValue().getDocumentFileName());
+        assertThat(response.getData().getDwpDocuments().stream().filter(e -> e.getValue().getDocumentType().equals(DWP_RESPONSE.getValue())).collect(toList()).get(0).getValue().getDocumentFileName())
+                .isEqualTo(DWP_RESPONSE.getLabel());
     }
 
     @Test
-    public void givenDwpEvidenceDocumentHasEmptyFileName_thenPopulateFileName() {
+    void givenDwpEvidenceDocumentHasEmptyFileName_thenPopulateFileName() {
         callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().build()).build());
         callback.getCaseDetails().getCaseData().setDwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
 
-        assertEquals(DWP_EVIDENCE_BUNDLE.getLabel(), response.getData().getDwpDocuments().stream().filter(e -> e.getValue().getDocumentType().equals(DWP_EVIDENCE_BUNDLE.getValue())).collect(toList()).get(0).getValue().getDocumentFileName());
+        assertThat(response.getData().getDwpDocuments().stream().filter(e -> e.getValue().getDocumentType().equals(DWP_EVIDENCE_BUNDLE.getValue())).collect(toList()).get(0).getValue().getDocumentFileName())
+                .isEqualTo(DWP_EVIDENCE_BUNDLE.getLabel());
     }
 
     @Test
-    public void givenSscsDocumentHasEmptyFileName_thenPopulateFileName() {
+    void givenSscsDocumentHasEmptyFileName_thenPopulateFileName() {
 
-        SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName(null).documentLink(
+        final SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName(null).documentLink(
                 DocumentLink.builder().documentFilename("test.com").build()).build()).build();
-        List<SscsDocument> docs = new ArrayList<>();
+        final List<SscsDocument> docs = new ArrayList<>();
 
         docs.add(sscsDocument);
 
         callback.getCaseDetails().getCaseData().setSscsDocument(docs);
 
-        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        final List<DwpDocument> dwpDocuments = new ArrayList<>();
         dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
         dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
         callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
 
-        assertEquals("test.com", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertThat(response.getData().getSscsDocument().get(0).getValue().getDocumentFileName()).isEqualTo("test.com");
     }
 
     @Test
-    public void givenCreateBundleEventWithAudioVideoEvidence_thenTriggerTheExternalCreateBundleEvent() {
-        List<DwpDocument> dwpDocuments = new ArrayList<>();
+    void givenCreateBundleEventWithAudioVideoEvidence_thenTriggerTheExternalCreateBundleEvent() {
+        final List<DwpDocument> dwpDocuments = new ArrayList<>();
         dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
         dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
         callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
 
-        List<SscsDocument> audioVideoEvidences = new ArrayList<>();
+        final List<SscsDocument> audioVideoEvidences = new ArrayList<>();
         audioVideoEvidences.add(SscsDocument.builder().value(SscsDocumentDetails.builder()
                         .documentType("appellantEvidence")
                         .documentDateAdded(LocalDate.now().toString())
@@ -221,42 +218,42 @@ public class BundlingHandlerTest {
 
         verify(bundleAudioVideoPdfService).createAudioVideoPdf(sscsCaseData);
         verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
-        assertEquals("Benefit", capture.getValue().getCaseTypeId());
-        assertEquals("SSCS", capture.getValue().getJurisdictionId());
+        assertThat(capture.getValue().getCaseTypeId()).isEqualTo("Benefit");
+        assertThat(capture.getValue().getJurisdictionId()).isEqualTo("SSCS");
     }
 
     @Test
-    public void givenCaseWithEditedDwpDocsAndPheUnderReview_thenReturnErrorMessageAndDoNotSendRequestToBundleService() {
+    void givenCaseWithEditedDwpDocsAndPheUnderReview_thenReturnErrorMessageAndDoNotSendRequestToBundleService() {
         addMandatoryDwpDocuments();
 
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(NO.getValue());
         callback.getCaseDetails().getCaseData().setDwpPhme(YES.getValue());
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
 
-        String error = response.getErrors().stream()
+        final String error = response.getErrors().stream()
                 .findFirst()
                 .orElse("");
-        assertEquals("There is a pending PHE request on this case", error);
+        assertThat(error).isEqualTo("There is a pending PHE request on this case");
         verifyNoInteractions(serviceRequestExecutor);
     }
 
     @Test
-    public void givenCaseWithEditedDwpDocsAndChildSupport_thenReturnNoError() {
+    void givenCaseWithEditedDwpDocsAndChildSupport_thenReturnNoError() {
         addMandatoryDwpDocuments();
-        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+        final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         sscsCaseData.setLanguagePreferenceWelsh(NO.getValue());
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         sscsCaseData.setBenefitCode("022");
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
 
-        assertEquals(0, response.getErrors().size());
+        assertThat(response.getErrors()).isEmpty();
     }
 
-    @Test
-    @Parameters({"appellant, YES", "appellant, NO", "jointParty, YES", "jointParty, NO"})
-    public void givenCaseWithPendingEnhancedConfidentiality_thenReturnErrorMessage(String party, YesNo pheGranted) {
+    @ParameterizedTest
+    @CsvSource({"appellant, YES", "appellant, NO", "jointParty, YES", "jointParty, NO"})
+    void givenCaseWithPendingEnhancedConfidentiality_thenReturnErrorMessage(String party, YesNo pheGranted) {
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(NO.getValue());
         if (party.equals("appellant")) {
             callback.getCaseDetails().getCaseData().setConfidentialityRequestOutcomeAppellant(getDatedRequestOutcome(RequestOutcome.IN_PROGRESS));
@@ -272,16 +269,15 @@ public class BundlingHandlerTest {
             addMandatoryNonEditedDwpDocuments();
         }
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
 
-        assertThat(response.getErrors().size(), is(1));
-        assertEquals("There is a pending enhanced confidentiality request on this case", response.getErrors().iterator().next());
+        assertThat(response.getErrors()).containsExactly("There is a pending enhanced confidentiality request on this case");
         verifyNoInteractions(serviceRequestExecutor);
     }
 
-    @Test
-    @Parameters({"appellant", "jointParty"})
-    public void givenCaseWithPendingEnhancedConfidentialityAndPendingPhmeRequest_thenReturnTwoErrorMessages(String party) {
+    @ParameterizedTest
+    @ValueSource(strings = {"appellant", "jointParty"})
+    void givenCaseWithPendingEnhancedConfidentialityAndPendingPhmeRequest_thenReturnTwoErrorMessages(String party) {
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(NO.getValue());
         if (party.equals("appellant")) {
             sscsCaseData.setConfidentialityRequestOutcomeAppellant(getDatedRequestOutcome(RequestOutcome.IN_PROGRESS));
@@ -292,11 +288,11 @@ public class BundlingHandlerTest {
 
         addMandatoryDwpDocuments();
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
 
-        assertThat(response.getErrors().size(), is(2));
-        assertEquals("There is a pending PHE request on this case", response.getErrors().toArray()[0]);
-        assertEquals("There is a pending enhanced confidentiality request on this case", response.getErrors().toArray()[1]);
+        assertThat(response.getErrors()).containsExactly(
+                "There is a pending PHE request on this case",
+                "There is a pending enhanced confidentiality request on this case");
         verifyNoInteractions(serviceRequestExecutor);
     }
 
@@ -304,62 +300,62 @@ public class BundlingHandlerTest {
         return DatedRequestOutcome.builder().requestOutcome(outcome).build();
     }
 
-    @Test
-    @Parameters({"No, bundleEnglishEditedConfig, bundleEnglishConfig", "Yes, bundleWelshEditedConfig, bundleWelshConfig"})
-    public void givenEnhancedConfidentialityCaseWithEditedDocuments_thenPopulateEditedAndUneditedConfigFileName(String langPreference, String expectedBundleConfig1, String expectedBundleConfig2) {
+    @ParameterizedTest
+    @CsvSource({"No, bundleEnglishEditedConfig, bundleEnglishConfig", "Yes, bundleWelshEditedConfig, bundleWelshConfig"})
+    void givenEnhancedConfidentialityCaseWithEditedDocuments_thenPopulateEditedAndUneditedConfigFileName(String langPreference, String expectedBundleConfig1, String expectedBundleConfig2) {
         addMandatoryNonEditedDwpDocuments();
         addEditedSscsDocuments();
 
         callback.getCaseDetails().getCaseData().setIsConfidentialCase(YES);
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(langPreference);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
 
         verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
-        assertEquals(2, response.getData().getMultiBundleConfiguration().size());
-        assertEquals(expectedBundleConfig1, response.getData().getMultiBundleConfiguration().get(0).getValue());
-        assertEquals(expectedBundleConfig2, response.getData().getMultiBundleConfiguration().get(1).getValue());
-        assertEquals("Benefit", capture.getValue().getCaseTypeId());
-        assertEquals("SSCS", capture.getValue().getJurisdictionId());
+        assertThat(response.getData().getMultiBundleConfiguration()).hasSize(2);
+        assertThat(response.getData().getMultiBundleConfiguration().get(0).getValue()).isEqualTo(expectedBundleConfig1);
+        assertThat(response.getData().getMultiBundleConfiguration().get(1).getValue()).isEqualTo(expectedBundleConfig2);
+        assertThat(capture.getValue().getCaseTypeId()).isEqualTo("Benefit");
+        assertThat(capture.getValue().getJurisdictionId()).isEqualTo("SSCS");
     }
 
     @Test
-    public void givenChildSupportedCaseWithEditedSscsDocument_thenPopulateEditedAndUneditedConfigFilename() {
+    void givenChildSupportedCaseWithEditedSscsDocument_thenPopulateEditedAndUneditedConfigFilename() {
         addEditedSscsDocuments();
         sscsCaseData.setBenefitCode("022");
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         callback.getCaseDetails().getCaseData().setIsConfidentialCase(YES);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
 
         verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
-        assertEquals(0, response.getWarnings().size());
-        assertEquals(2, response.getData().getMultiBundleConfiguration().size());
-        assertEquals("bundleEnglishEditedConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
-        assertEquals("bundleEnglishConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
-        assertEquals("Benefit", capture.getValue().getCaseTypeId());
-        assertEquals("SSCS", capture.getValue().getJurisdictionId());
+        assertThat(response.getWarnings()).isEmpty();
+        assertThat(response.getData().getMultiBundleConfiguration()).hasSize(2);
+        assertThat(response.getData().getMultiBundleConfiguration().get(0).getValue()).isEqualTo("bundleEnglishEditedConfig");
+        assertThat(response.getData().getMultiBundleConfiguration().get(1).getValue()).isEqualTo("bundleEnglishConfig");
+        assertThat(capture.getValue().getCaseTypeId()).isEqualTo("Benefit");
+        assertThat(capture.getValue().getJurisdictionId()).isEqualTo("SSCS");
     }
 
     @Test
-    public void givenChildSupportedCaseWithEditedDwpEvidenceDocument_thenPopulateEditedAndUneditedConfigFilename() {
+    void givenChildSupportedCaseWithEditedDwpEvidenceDocument_thenPopulateEditedAndUneditedConfigFilename() {
         addMandatoryDwpEvidenceDocuments();
         sscsCaseData.setBenefitCode("022");
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         callback.getCaseDetails().getCaseData().setIsConfidentialCase(YES);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
 
         verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
-        assertEquals(0, response.getWarnings().size());
-        assertEquals(2, response.getData().getMultiBundleConfiguration().size());
-        assertEquals("bundleEnglishEditedConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
-        assertEquals("bundleEnglishConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
-        assertEquals("Benefit", capture.getValue().getCaseTypeId());
-        assertEquals("SSCS", capture.getValue().getJurisdictionId());
+        assertThat(response.getWarnings()).isEmpty();
+        assertThat(response.getData().getMultiBundleConfiguration()).hasSize(2);
+        assertThat(response.getData().getMultiBundleConfiguration().get(0).getValue()).isEqualTo("bundleEnglishEditedConfig");
+        assertThat(response.getData().getMultiBundleConfiguration().get(1).getValue()).isEqualTo("bundleEnglishConfig");
+        assertThat(capture.getValue().getCaseTypeId()).isEqualTo("Benefit");
+        assertThat(capture.getValue().getJurisdictionId()).isEqualTo("SSCS");
     }
 
     @Test
-    public void givenChildSupportedCaseWithNonEditedDocuments_thenPopulateOnlyUneditedConfigFilename() {
+    void givenChildSupportedCaseWithNonEditedDocuments_thenPopulateOnlyUneditedConfigFilename() {
         addMandatoryNonEditedDwpDocuments();
         addMandatoryNonEditedDwpEvidenceDocuments();
         addNonEditedSscsDocuments();
@@ -367,58 +363,57 @@ public class BundlingHandlerTest {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         callback.getCaseDetails().getCaseData().setIsConfidentialCase(YES);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
 
         verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
-        assertEquals(0, response.getWarnings().size());
-        assertEquals(1, response.getData().getMultiBundleConfiguration().size());
-        assertEquals("bundleEnglishConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
-        assertEquals("Benefit", capture.getValue().getCaseTypeId());
-        assertEquals("SSCS", capture.getValue().getJurisdictionId());
+        assertThat(response.getWarnings()).isEmpty();
+        assertThat(response.getData().getMultiBundleConfiguration()).hasSize(1);
+        assertThat(response.getData().getMultiBundleConfiguration().get(0).getValue()).isEqualTo("bundleEnglishConfig");
+        assertThat(capture.getValue().getCaseTypeId()).isEqualTo("Benefit");
+        assertThat(capture.getValue().getJurisdictionId()).isEqualTo("SSCS");
     }
 
     @Test
-    public void givenChildSupportedCaseWithEditedDwpDocument_thenPopulateEditedAndUneditedConfigFilename() {
+    void givenChildSupportedCaseWithEditedDwpDocument_thenPopulateEditedAndUneditedConfigFilename() {
         addMandatoryDwpDocuments();
         sscsCaseData.setBenefitCode("022");
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         callback.getCaseDetails().getCaseData().setIsConfidentialCase(YES);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
 
         verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
-        assertEquals(0, response.getWarnings().size());
-        assertEquals(2, response.getData().getMultiBundleConfiguration().size());
-        assertEquals("bundleEnglishEditedConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
-        assertEquals("bundleEnglishConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
-        assertEquals("Benefit", capture.getValue().getCaseTypeId());
-        assertEquals("SSCS", capture.getValue().getJurisdictionId());
+        assertThat(response.getWarnings()).isEmpty();
+        assertThat(response.getData().getMultiBundleConfiguration()).hasSize(2);
+        assertThat(response.getData().getMultiBundleConfiguration().get(0).getValue()).isEqualTo("bundleEnglishEditedConfig");
+        assertThat(response.getData().getMultiBundleConfiguration().get(1).getValue()).isEqualTo("bundleEnglishConfig");
+        assertThat(capture.getValue().getCaseTypeId()).isEqualTo("Benefit");
+        assertThat(capture.getValue().getJurisdictionId()).isEqualTo("SSCS");
     }
 
-
     @Test
-    public void givenPhmeGrantedAndEnhancedConfidentiality_thenPopulateEditedAndUneditedConfigFilename() {
+    void givenPhmeGrantedAndEnhancedConfidentiality_thenPopulateEditedAndUneditedConfigFilename() {
         addMandatoryDwpDocuments();
         addEditedSscsDocuments();
         sscsCaseData.setDwpPhme(YES.getValue());
         sscsCaseData.setPhmeGranted(YES);
         callback.getCaseDetails().getCaseData().setIsConfidentialCase(YES);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
 
         verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
-        assertEquals(0, response.getWarnings().size());
-        assertEquals(2, response.getData().getMultiBundleConfiguration().size());
-        assertEquals("bundleEnglishEditedConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
-        assertEquals("bundleEnglishConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
-        assertEquals("Benefit", capture.getValue().getCaseTypeId());
-        assertEquals("SSCS", capture.getValue().getJurisdictionId());
+        assertThat(response.getWarnings()).isEmpty();
+        assertThat(response.getData().getMultiBundleConfiguration()).hasSize(2);
+        assertThat(response.getData().getMultiBundleConfiguration().get(0).getValue()).isEqualTo("bundleEnglishEditedConfig");
+        assertThat(response.getData().getMultiBundleConfiguration().get(1).getValue()).isEqualTo("bundleEnglishConfig");
+        assertThat(capture.getValue().getCaseTypeId()).isEqualTo("Benefit");
+        assertThat(capture.getValue().getJurisdictionId()).isEqualTo("SSCS");
     }
 
     @Test
-    public void givenDocumentsWithSameAddition_thenShowWarning() {
+    void givenDocumentsWithSameAddition_thenShowWarning() {
 
-        List<SscsDocument> documents = new ArrayList<>();
+        final List<SscsDocument> documents = new ArrayList<>();
         documents.add(
                 SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("test.pdf").editedDocumentLink(DocumentLink.builder().documentFilename("test.pdf").build()).bundleAddition("A").build()).build()
         );
@@ -430,157 +425,145 @@ public class BundlingHandlerTest {
         );
 
         sscsCaseData.setSscsDocument(documents);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
 
-        assertEquals(1, response.getWarnings().size());
-        assertEquals("Some documents in this Bundle contain the same addition letter. Are you sure you want to proceed?", response.getWarnings().toArray()[0]);
+        assertThat(response.getWarnings()).containsExactly("Some documents in this Bundle contain the same addition letter. Are you sure you want to proceed?");
     }
 
     @Test
-    public void givenSscsDocumentsNotInBundleOrder_thenSendsSortedCopyToBundleServiceButLeavesCaseDataOrderUnchanged() {
-        SscsDocument documentB = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("b.pdf").bundleAddition("B").build()).build();
-        SscsDocument documentA = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("a.pdf").bundleAddition("A").build()).build();
-        List<SscsDocument> displayOrderDocuments = new ArrayList<>(List.of(documentB, documentA));
-        callback.getCaseDetails().getCaseData().setSscsDocument(displayOrderDocuments);
+    void givenSscsDocumentsNotInBundleOrder_thenSortsIntoBundleOrderBeforeSendingToBundleService() {
+        final SscsDocument documentB = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("b.pdf").bundleAddition("B").build()).build();
+        final SscsDocument documentA = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("a.pdf").bundleAddition("A").build()).build();
+        callback.getCaseDetails().getCaseData().setSscsDocument(new ArrayList<>(List.of(documentB, documentA)));
 
         handler.handle(callback);
 
         verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
-        SscsCaseData bundlePayloadCaseData = (SscsCaseData) capture.getValue().getCaseDetails().getCaseData();
-        List<String> bundlePayloadFileNames = bundlePayloadCaseData.getSscsDocument().stream()
+        final SscsCaseData bundlePayloadCaseData = (SscsCaseData) capture.getValue().getCaseDetails().getCaseData();
+        final List<String> bundlePayloadFileNames = bundlePayloadCaseData.getSscsDocument().stream()
                 .map(document -> document.getValue().getDocumentFileName())
                 .collect(toList());
-        assertEquals(List.of("a.pdf", "b.pdf"), bundlePayloadFileNames);
 
-        List<String> caseDataFileNames = callback.getCaseDetails().getCaseData().getSscsDocument().stream()
-                .map(document -> document.getValue().getDocumentFileName())
-                .collect(toList());
-        assertEquals(List.of("b.pdf", "a.pdf"), caseDataFileNames);
+        assertThat(bundlePayloadFileNames).containsExactly("a.pdf", "b.pdf");
     }
 
     @Test
-    public void givenSscsWelshDocumentsNotInBundleOrder_thenSendsSortedCopyToBundleServiceButLeavesCaseDataOrderUnchanged() {
-        SscsWelshDocument documentB = SscsWelshDocument.builder().value(SscsWelshDocumentDetails.builder().documentFileName("b.pdf").bundleAddition("B").build()).build();
-        SscsWelshDocument documentA = SscsWelshDocument.builder().value(SscsWelshDocumentDetails.builder().documentFileName("a.pdf").bundleAddition("A").build()).build();
-        List<SscsWelshDocument> displayOrderDocuments = new ArrayList<>(List.of(documentB, documentA));
-        callback.getCaseDetails().getCaseData().setSscsWelshDocuments(displayOrderDocuments);
+    void givenSscsWelshDocumentsNotInBundleOrder_thenSortsIntoBundleOrderBeforeSendingToBundleService() {
+        final SscsWelshDocument documentB = SscsWelshDocument.builder().value(SscsWelshDocumentDetails.builder().documentFileName("b.pdf").bundleAddition("B").build()).build();
+        final SscsWelshDocument documentA = SscsWelshDocument.builder().value(SscsWelshDocumentDetails.builder().documentFileName("a.pdf").bundleAddition("A").build()).build();
+        callback.getCaseDetails().getCaseData().setSscsWelshDocuments(new ArrayList<>(List.of(documentB, documentA)));
 
         handler.handle(callback);
 
         verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
-        SscsCaseData bundlePayloadCaseData = (SscsCaseData) capture.getValue().getCaseDetails().getCaseData();
-        List<String> bundlePayloadFileNames = bundlePayloadCaseData.getSscsWelshDocuments().stream()
+        final SscsCaseData bundlePayloadCaseData = (SscsCaseData) capture.getValue().getCaseDetails().getCaseData();
+        final List<String> bundlePayloadFileNames = bundlePayloadCaseData.getSscsWelshDocuments().stream()
                 .map(document -> document.getValue().getDocumentFileName())
                 .collect(toList());
-        assertEquals(List.of("a.pdf", "b.pdf"), bundlePayloadFileNames);
 
-        List<String> caseDataFileNames = callback.getCaseDetails().getCaseData().getSscsWelshDocuments().stream()
-                .map(document -> document.getValue().getDocumentFileName())
-                .collect(toList());
-        assertEquals(List.of("b.pdf", "a.pdf"), caseDataFileNames);
+        assertThat(bundlePayloadFileNames).containsExactly("a.pdf", "b.pdf");
     }
 
-    @Test
-    @Parameters({"Yes, bundleWelshConfig", "No, bundleEnglishConfig"})
-    public void givenEnhancedConfidentialityCaseWithNoEditedDocs_thenPopulateUneditedConfigFileName(String langPreference, String expectedBundleName) {
+    @ParameterizedTest
+    @CsvSource({"Yes, bundleWelshConfig", "No, bundleEnglishConfig"})
+    void givenEnhancedConfidentialityCaseWithNoEditedDocs_thenPopulateUneditedConfigFileName(String langPreference, String expectedBundleName) {
         addMandatoryNonEditedDwpDocuments();
 
         callback.getCaseDetails().getCaseData().setIsConfidentialCase(YES);
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(langPreference);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
 
         verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
-        assertEquals(1, response.getData().getMultiBundleConfiguration().size());
-        assertEquals(expectedBundleName, response.getData().getMultiBundleConfiguration().get(0).getValue());
-        assertEquals("Benefit", capture.getValue().getCaseTypeId());
-        assertEquals("SSCS", capture.getValue().getJurisdictionId());
+        assertThat(response.getData().getMultiBundleConfiguration()).hasSize(1);
+        assertThat(response.getData().getMultiBundleConfiguration().get(0).getValue()).isEqualTo(expectedBundleName);
+        assertThat(capture.getValue().getCaseTypeId()).isEqualTo("Benefit");
+        assertThat(capture.getValue().getJurisdictionId()).isEqualTo("SSCS");
     }
 
-    @Test
-    @Parameters({"Yes, bundleWelshConfig", "No, bundleEnglishConfig"})
-    public void givenEnhancedConfidentialityCaseAndPhmeGrantedWithNoEditedDocs_thenPopulateUneditedConfigFileName(String langPreference, String expectedBundleName) {
+    @ParameterizedTest
+    @CsvSource({"Yes, bundleWelshConfig", "No, bundleEnglishConfig"})
+    void givenEnhancedConfidentialityCaseAndPhmeGrantedWithNoEditedDocs_thenPopulateUneditedConfigFileName(String langPreference, String expectedBundleName) {
         addMandatoryNonEditedDwpDocuments();
         addNonEditedSscsDocuments();
         callback.getCaseDetails().getCaseData().setPhmeGranted(YES);
         callback.getCaseDetails().getCaseData().setIsConfidentialCase(YES);
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(langPreference);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
 
         verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
-        assertEquals(1, response.getData().getMultiBundleConfiguration().size());
-        assertEquals(expectedBundleName, response.getData().getMultiBundleConfiguration().get(0).getValue());
-        assertEquals("Benefit", capture.getValue().getCaseTypeId());
-        assertEquals("SSCS", capture.getValue().getJurisdictionId());
+        assertThat(response.getData().getMultiBundleConfiguration()).hasSize(1);
+        assertThat(response.getData().getMultiBundleConfiguration().get(0).getValue()).isEqualTo(expectedBundleName);
+        assertThat(capture.getValue().getCaseTypeId()).isEqualTo("Benefit");
+        assertThat(capture.getValue().getJurisdictionId()).isEqualTo("SSCS");
     }
 
     private void addEditedSscsDocuments() {
-        SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("test.pdf").editedDocumentLink(DocumentLink.builder().documentFilename("test.pdf").build()).build()).build();
+        final SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("test.pdf").editedDocumentLink(DocumentLink.builder().documentFilename("test.pdf").build()).build()).build();
         sscsCaseData.setSscsDocument(Collections.singletonList(sscsDocument));
     }
 
     private void addNonEditedSscsDocuments() {
-        SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("test.pdf").build()).build();
+        final SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("test.pdf").build()).build();
         sscsCaseData.setSscsDocument(Collections.singletonList(sscsDocument));
     }
 
     @Test
-    public void givenCaseWithPreviouslyCreatedBundles_thenClearAllBundles() {
+    void givenCaseWithPreviouslyCreatedBundles_thenClearAllBundles() {
         addMandatoryDwpDocuments();
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh(NO.getValue());
         callback.getCaseDetails().getCaseData().setPhmeGranted(YES);
 
-        List<Bundle> bundles = new ArrayList<>();
+        final List<Bundle> bundles = new ArrayList<>();
         bundles.add(Bundle.builder().value(BundleDetails.builder().id("1").build()).build());
         callback.getCaseDetails().getCaseData().setCaseBundles(bundles);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
 
         verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
-        assertNull(response.getData().getCaseBundles());
-        assertEquals("1", response.getData().getHistoricalBundles().get(0).getValue().getId());
-        assertEquals("Benefit", capture.getValue().getCaseTypeId());
-        assertEquals("SSCS", capture.getValue().getJurisdictionId());
+        assertThat(response.getData().getCaseBundles()).isNull();
+        assertThat(response.getData().getHistoricalBundles().get(0).getValue().getId()).isEqualTo("1");
+        assertThat(capture.getValue().getCaseTypeId()).isEqualTo("Benefit");
+        assertThat(capture.getValue().getJurisdictionId()).isEqualTo("SSCS");
     }
 
     @Test
-    public void givenCaseWithHistoricalBundles_addExistingBundleToHistoricalBundles() {
+    void givenCaseWithHistoricalBundles_addExistingBundleToHistoricalBundles() {
 
-        List<Bundle> existingBundles = new ArrayList<>();
+        final List<Bundle> existingBundles = new ArrayList<>();
         existingBundles.add(Bundle.builder().value(BundleDetails.builder().description("3").build()).build());
         callback.getCaseDetails().getCaseData().setCaseBundles(existingBundles);
 
-        List<Bundle> historicalBundles = new ArrayList<>();
+        final List<Bundle> historicalBundles = new ArrayList<>();
         historicalBundles.add(Bundle.builder().value(BundleDetails.builder().description("2").build()).build());
         historicalBundles.add(Bundle.builder().value(BundleDetails.builder().description("1").build()).build());
         callback.getCaseDetails().getCaseData().setHistoricalBundles(historicalBundles);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
 
         verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
-        assertEquals(3, response.getData().getHistoricalBundles().size());
+        assertThat(response.getData().getHistoricalBundles()).hasSize(3);
     }
 
-
     private void addMandatoryDwpDocuments() {
-        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        final List<DwpDocument> dwpDocuments = new ArrayList<>();
         dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
         callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
     }
 
     private void addMandatoryDwpEvidenceDocuments() {
-        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        final List<DwpDocument> dwpDocuments = new ArrayList<>();
         dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).editedDocumentLink(DocumentLink.builder().build()).build()).build());
         callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
     }
 
     private void addMandatoryNonEditedDwpDocuments() {
-        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        final List<DwpDocument> dwpDocuments = new ArrayList<>();
         dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_RESPONSE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
         callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
     }
 
     private void addMandatoryNonEditedDwpEvidenceDocuments() {
-        List<DwpDocument> dwpDocuments = new ArrayList<>();
+        final List<DwpDocument> dwpDocuments = new ArrayList<>();
         dwpDocuments.add(DwpDocument.builder().value(DwpDocumentDetails.builder().documentType(DWP_EVIDENCE_BUNDLE.getValue()).documentLink(DocumentLink.builder().documentFilename("Testing").build()).build()).build());
         callback.getCaseDetails().getCaseData().setDwpDocuments(dwpDocuments);
     }
