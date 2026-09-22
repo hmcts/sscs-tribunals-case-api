@@ -45,8 +45,7 @@ public class PostponementRequestService {
     }
 
     private void addToSscsDocuments(SscsCaseData sscsCaseData, SscsDocument sscsDocument) {
-        sscsCaseData.getSscsDocument().addFirst(sscsDocument);
-        sscsCaseData.setSscsDocument(sscsCaseData.getSscsDocument());
+        sscsCaseData.getSscsDocument().add(sscsDocument);
     }
 
     private void clearTransientFields(SscsCaseData sscsCaseData) {

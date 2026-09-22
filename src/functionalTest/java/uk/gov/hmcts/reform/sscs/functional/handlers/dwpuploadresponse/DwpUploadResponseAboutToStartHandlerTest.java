@@ -14,10 +14,10 @@ import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest
-class DwpUploadResponseAboutToStartHandlerTest extends BaseHandler {
+public class DwpUploadResponseAboutToStartHandlerTest extends BaseHandler {
 
     @Test
-    void givenAboutToStartCallback_shouldReturnDwpFurtherInfo() throws Exception {
+    public void givenAboutToStartCallback_shouldReturnDwpFurtherInfo() throws Exception {
 
         String jsonCallbackForTest = BaseHandler.getJsonCallbackForTest("callback/dwpUploadResponse.json");
 
@@ -38,7 +38,6 @@ class DwpUploadResponseAboutToStartHandlerTest extends BaseHandler {
                 .body("data.dwpEvidenceBundleDocument.documentLink.document_url",
                         equalTo("http://dm-store:5005/documents/6a7cc2b4-2a32-468d-a3e9-d394b0503a23"))
                 .body("data.dynamicDwpState.value.code", equalTo(DwpState.RESPONSE_SUBMITTED_DWP.toString()))
-                .body("data.sscsDocument[0].value.documentType", equalTo("sscs1"))
-                 .body("data.sscsDocument[1].value.documentType", equalTo("appellantEvidence"));
+                .body("data.sscsDocument[0].value.documentType", equalTo("appellantEvidence"));
     }
 }

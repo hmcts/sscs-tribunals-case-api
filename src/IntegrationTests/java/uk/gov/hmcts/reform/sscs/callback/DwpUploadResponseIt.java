@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.callback;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.PHE_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
@@ -54,18 +56,18 @@ public class DwpUploadResponseIt extends AbstractEventIt {
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
-        assertThat(result.getData().getIssueCode()).isEqualTo("US");
-        assertThat(result.getData().getBenefitCode()).isEqualTo("001");
-        assertThat(result.getData().getCaseCode()).isEqualTo("001US");
-        assertThat(result.getData().getSscsDocument()).hasSize(2);
-        assertThat(result.getData().getSscsDocument().getFirst().getValue().getDocumentType()).isEqualTo("sscs1");
-        assertThat(result.getData().getSscsDocument().getLast().getValue().getDocumentType()).isEqualTo("appellantEvidence");
-        assertThat(result.getData().getSscsDocument().get(1).getValue().getPartyUploaded()).isNull();
-        assertThat(result.getData().getDwpState()).isEqualTo(DwpState.RESPONSE_SUBMITTED_DWP);
-        assertThat(result.getData().getAudioVideoEvidence()).hasSize(1);
-        assertThat(result.getData().getAudioVideoEvidence().getLast().getValue().getRip1Document()).isNull();
-        assertThat(result.getData().getInterlocReviewState()).isEqualTo(REVIEW_BY_TCW);
-        assertThat(result.getData().getInterlocReferralReason()).isEqualTo(REVIEW_AUDIO_VIDEO_EVIDENCE);
+        assertEquals("US", result.getData().getIssueCode());
+        assertEquals("001", result.getData().getBenefitCode());
+        assertEquals("001US", result.getData().getCaseCode());
+        assertEquals(2, result.getData().getSscsDocument().size());
+        assertEquals("sscs1", result.getData().getSscsDocument().get(1).getValue().getDocumentType());
+        assertEquals("appellantEvidence", result.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertNull(result.getData().getSscsDocument().get(1).getValue().getPartyUploaded());
+        assertEquals(DwpState.RESPONSE_SUBMITTED_DWP, result.getData().getDwpState());
+        assertEquals(1, result.getData().getAudioVideoEvidence().size());
+        assertNull(result.getData().getAudioVideoEvidence().get(0).getValue().getRip1Document());
+        assertEquals(REVIEW_BY_TCW, result.getData().getInterlocReviewState());
+        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE, result.getData().getInterlocReferralReason());
 
     }
 
@@ -78,16 +80,16 @@ public class DwpUploadResponseIt extends AbstractEventIt {
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
-        assertThat(result.getData().getIssueCode()).isEqualTo("CC");
-        assertThat(result.getData().getBenefitCode()).isEqualTo("003");
-        assertThat(result.getData().getCaseCode()).isEqualTo("003CC");
-        assertThat(result.getData().getSscsDocument()).hasSize(2);
-        assertThat(result.getData().getSscsDocument().getFirst().getValue().getDocumentType()).isEqualTo("sscs1");
-        assertThat(result.getData().getSscsDocument().getLast().getValue().getDocumentType()).isEqualTo("appellantEvidence");
-        assertThat(result.getData().getAudioVideoEvidence()).hasSize(1);
-        assertThat(result.getData().getAudioVideoEvidence().getLast().getValue().getRip1Document()).isNull();
-        assertThat(result.getData().getInterlocReviewState()).isEqualTo(REVIEW_BY_TCW);
-        assertThat(result.getData().getInterlocReferralReason()).isEqualTo(REVIEW_AUDIO_VIDEO_EVIDENCE);
+        assertEquals("CC", result.getData().getIssueCode());
+        assertEquals("003", result.getData().getBenefitCode());
+        assertEquals("003CC", result.getData().getCaseCode());
+        assertEquals(2, result.getData().getSscsDocument().size());
+        assertEquals("sscs1", result.getData().getSscsDocument().get(1).getValue().getDocumentType());
+        assertEquals("appellantEvidence", result.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertEquals(1, result.getData().getAudioVideoEvidence().size());
+        assertNull(result.getData().getAudioVideoEvidence().get(0).getValue().getRip1Document());
+        assertEquals(REVIEW_BY_TCW, result.getData().getInterlocReviewState());
+        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE, result.getData().getInterlocReferralReason());
     }
 
     @Test
@@ -102,11 +104,11 @@ public class DwpUploadResponseIt extends AbstractEventIt {
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
-        assertThat(result.getData().getAudioVideoEvidence()).hasSize(2);
-        assertThat(result.getData().getAudioVideoEvidence().get(0).getValue().getRip1Document()).isNotNull();
-        assertThat(result.getData().getAudioVideoEvidence().get(1).getValue().getRip1Document()).isNotNull();
-        assertThat(result.getData().getInterlocReferralReason()).isEqualTo(PHE_REQUEST);
-        assertThat(result.getData().getInterlocReviewState()).isNull();
+        assertEquals(2, result.getData().getAudioVideoEvidence().size());
+        assertNotNull(result.getData().getAudioVideoEvidence().get(0).getValue().getRip1Document());
+        assertNotNull(result.getData().getAudioVideoEvidence().get(1).getValue().getRip1Document());
+        assertEquals(PHE_REQUEST, result.getData().getInterlocReferralReason());
+        assertEquals(null, result.getData().getInterlocReviewState());
     }
 
     @Test
@@ -117,7 +119,7 @@ public class DwpUploadResponseIt extends AbstractEventIt {
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
-        assertThat(result.getErrors()).hasSize(1);
+        assertEquals(1, result.getErrors().size());
     }
 
 }
