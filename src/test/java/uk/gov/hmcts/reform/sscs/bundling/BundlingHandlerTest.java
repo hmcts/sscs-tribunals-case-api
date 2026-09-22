@@ -46,6 +46,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
@@ -122,7 +124,6 @@ public class BundlingHandlerTest {
         assertEquals("bundleEnglishConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
         assertEquals("Benefit", capture.getValue().getCaseTypeId());
         assertEquals("SSCS", capture.getValue().getJurisdictionId());
-        assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
 
     @Test
@@ -140,7 +141,6 @@ public class BundlingHandlerTest {
         assertEquals("bundleWelshConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
         assertEquals("Benefit", capture.getValue().getCaseTypeId());
         assertEquals("SSCS", capture.getValue().getJurisdictionId());
-        assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
 
     @Test
@@ -161,7 +161,6 @@ public class BundlingHandlerTest {
         assertEquals(expectedConfigFile, response.getData().getMultiBundleConfiguration().get(0).getValue());
         assertEquals("Benefit", capture.getValue().getCaseTypeId());
         assertEquals("SSCS", capture.getValue().getJurisdictionId());
-        assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
 
     @Test
@@ -224,7 +223,6 @@ public class BundlingHandlerTest {
         verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
         assertEquals("Benefit", capture.getValue().getCaseTypeId());
         assertEquals("SSCS", capture.getValue().getJurisdictionId());
-        assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
 
     @Test
@@ -322,7 +320,6 @@ public class BundlingHandlerTest {
         assertEquals(expectedBundleConfig2, response.getData().getMultiBundleConfiguration().get(1).getValue());
         assertEquals("Benefit", capture.getValue().getCaseTypeId());
         assertEquals("SSCS", capture.getValue().getJurisdictionId());
-        assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
 
     @Test
@@ -341,7 +338,6 @@ public class BundlingHandlerTest {
         assertEquals("bundleEnglishConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
         assertEquals("Benefit", capture.getValue().getCaseTypeId());
         assertEquals("SSCS", capture.getValue().getJurisdictionId());
-        assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
 
     @Test
@@ -360,7 +356,6 @@ public class BundlingHandlerTest {
         assertEquals("bundleEnglishConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
         assertEquals("Benefit", capture.getValue().getCaseTypeId());
         assertEquals("SSCS", capture.getValue().getJurisdictionId());
-        assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
 
     @Test
@@ -380,7 +375,6 @@ public class BundlingHandlerTest {
         assertEquals("bundleEnglishConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
         assertEquals("Benefit", capture.getValue().getCaseTypeId());
         assertEquals("SSCS", capture.getValue().getJurisdictionId());
-        assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
 
     @Test
@@ -399,7 +393,6 @@ public class BundlingHandlerTest {
         assertEquals("bundleEnglishConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
         assertEquals("Benefit", capture.getValue().getCaseTypeId());
         assertEquals("SSCS", capture.getValue().getJurisdictionId());
-        assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
 
 
@@ -420,7 +413,6 @@ public class BundlingHandlerTest {
         assertEquals("bundleEnglishConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
         assertEquals("Benefit", capture.getValue().getCaseTypeId());
         assertEquals("SSCS", capture.getValue().getJurisdictionId());
-        assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
 
     @Test
@@ -445,6 +437,50 @@ public class BundlingHandlerTest {
     }
 
     @Test
+    public void givenSscsDocumentsNotInBundleOrder_thenSendsSortedCopyToBundleServiceButLeavesCaseDataOrderUnchanged() {
+        SscsDocument documentB = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("b.pdf").bundleAddition("B").build()).build();
+        SscsDocument documentA = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("a.pdf").bundleAddition("A").build()).build();
+        List<SscsDocument> displayOrderDocuments = new ArrayList<>(List.of(documentB, documentA));
+        callback.getCaseDetails().getCaseData().setSscsDocument(displayOrderDocuments);
+
+        handler.handle(callback);
+
+        verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
+        SscsCaseData bundlePayloadCaseData = (SscsCaseData) capture.getValue().getCaseDetails().getCaseData();
+        List<String> bundlePayloadFileNames = bundlePayloadCaseData.getSscsDocument().stream()
+                .map(document -> document.getValue().getDocumentFileName())
+                .collect(toList());
+        assertEquals(List.of("a.pdf", "b.pdf"), bundlePayloadFileNames);
+
+        List<String> caseDataFileNames = callback.getCaseDetails().getCaseData().getSscsDocument().stream()
+                .map(document -> document.getValue().getDocumentFileName())
+                .collect(toList());
+        assertEquals(List.of("b.pdf", "a.pdf"), caseDataFileNames);
+    }
+
+    @Test
+    public void givenSscsWelshDocumentsNotInBundleOrder_thenSendsSortedCopyToBundleServiceButLeavesCaseDataOrderUnchanged() {
+        SscsWelshDocument documentB = SscsWelshDocument.builder().value(SscsWelshDocumentDetails.builder().documentFileName("b.pdf").bundleAddition("B").build()).build();
+        SscsWelshDocument documentA = SscsWelshDocument.builder().value(SscsWelshDocumentDetails.builder().documentFileName("a.pdf").bundleAddition("A").build()).build();
+        List<SscsWelshDocument> displayOrderDocuments = new ArrayList<>(List.of(documentB, documentA));
+        callback.getCaseDetails().getCaseData().setSscsWelshDocuments(displayOrderDocuments);
+
+        handler.handle(callback);
+
+        verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
+        SscsCaseData bundlePayloadCaseData = (SscsCaseData) capture.getValue().getCaseDetails().getCaseData();
+        List<String> bundlePayloadFileNames = bundlePayloadCaseData.getSscsWelshDocuments().stream()
+                .map(document -> document.getValue().getDocumentFileName())
+                .collect(toList());
+        assertEquals(List.of("a.pdf", "b.pdf"), bundlePayloadFileNames);
+
+        List<String> caseDataFileNames = callback.getCaseDetails().getCaseData().getSscsWelshDocuments().stream()
+                .map(document -> document.getValue().getDocumentFileName())
+                .collect(toList());
+        assertEquals(List.of("b.pdf", "a.pdf"), caseDataFileNames);
+    }
+
+    @Test
     @Parameters({"Yes, bundleWelshConfig", "No, bundleEnglishConfig"})
     public void givenEnhancedConfidentialityCaseWithNoEditedDocs_thenPopulateUneditedConfigFileName(String langPreference, String expectedBundleName) {
         addMandatoryNonEditedDwpDocuments();
@@ -458,7 +494,6 @@ public class BundlingHandlerTest {
         assertEquals(expectedBundleName, response.getData().getMultiBundleConfiguration().get(0).getValue());
         assertEquals("Benefit", capture.getValue().getCaseTypeId());
         assertEquals("SSCS", capture.getValue().getJurisdictionId());
-        assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
 
     @Test
@@ -476,7 +511,6 @@ public class BundlingHandlerTest {
         assertEquals(expectedBundleName, response.getData().getMultiBundleConfiguration().get(0).getValue());
         assertEquals("Benefit", capture.getValue().getCaseTypeId());
         assertEquals("SSCS", capture.getValue().getJurisdictionId());
-        assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
 
     private void addEditedSscsDocuments() {
@@ -506,7 +540,6 @@ public class BundlingHandlerTest {
         assertEquals("1", response.getData().getHistoricalBundles().get(0).getValue().getId());
         assertEquals("Benefit", capture.getValue().getCaseTypeId());
         assertEquals("SSCS", capture.getValue().getJurisdictionId());
-        assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
 
     @Test
