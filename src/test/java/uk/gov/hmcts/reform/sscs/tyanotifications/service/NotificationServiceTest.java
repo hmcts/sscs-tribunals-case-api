@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -771,81 +770,6 @@ public class NotificationServiceTest {
         verify(factory, never()).create(any(), any());
         verify(notificationHandler, never()).sendNotification(any(), any(), any(), any());
         verifyNoErrorsLogged(mockAppender, captorLoggingEvent);
-    }
-
-    @Test
-    public void doNotSendNotificationToDeceasedAppellantButStillNotifiesOtherSubscriptionTypes() {
-        sscsCaseData.setIsAppellantDeceased(YesNo.YES);
-        sscsCaseData.getAppeal().setRep(Representative.builder()
-            .hasRepresentative("yes")
-            .address(Address.builder().line1("test").postcode("Bla").build())
-            .build());
-        sscsCaseData.setSubscriptions(Subscriptions.builder()
-            .appellantSubscription(Subscription.builder()
-                .tya(APPEAL_NUMBER)
-                .email("test@email.com")
-                .mobile(MOBILE_NUMBER_1)
-                .subscribeEmail(YES)
-                .subscribeSms(YES)
-                .wantSmsNotifications(YES)
-                .build())
-            .representativeSubscription(Subscription.builder()
-                .tya(APPEAL_NUMBER)
-                .email("rep@email.com")
-                .mobile(MOBILE_NUMBER_2)
-                .subscribeEmail(YES)
-                .subscribeSms(YES)
-                .wantSmsNotifications(YES)
-                .build())
-            .build());
-
-        NotificationSscsCaseDataWrapper wrapper = NotificationSscsCaseDataWrapper
-            .builder()
-            .newSscsCaseData(sscsCaseData)
-            .oldSscsCaseData(sscsCaseData)
-            .notificationEventType(APPEAL_WITHDRAWN)
-            .build();
-        ccdNotificationWrapper = new CcdNotificationWrapper(wrapper);
-
-        Notification notification = new Notification(
-            Template.builder().emailTemplateId(EMAIL_TEMPLATE_ID).build(),
-            Destination.builder().email("rep@email.com").build(), new HashMap<>(), new Reference(), null);
-        when(factory.create(any(), eq(getSubscriptionWithTypeRep(ccdNotificationWrapper)))).thenReturn(notification);
-        when(notificationValidService.isNotificationStillValidToSend(any(), any())).thenReturn(true);
-        when(notificationValidService.isHearingTypeValidToSendNotification(any(), any())).thenReturn(true);
-
-        notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
-
-        assertSoftly(softly -> {
-            softly.assertThatCode(() -> verify(factory, never()).create(any(), eq(getSubscriptionWithType(ccdNotificationWrapper))))
-                .doesNotThrowAnyException();
-            softly.assertThatCode(() -> verify(factory, times(1)).create(any(), eq(getSubscriptionWithTypeRep(ccdNotificationWrapper))))
-                .doesNotThrowAnyException();
-            softly.assertThatCode(() -> verifyNoErrorsLogged(mockAppender, captorLoggingEvent))
-                .doesNotThrowAnyException();
-        });
-    }
-
-    @Test
-    @Parameters({"No", "null"})
-    public void sendNotificationToAppellantWhenNotDeceased(@Nullable String isAppellantDeceased) {
-        sscsCaseData.setIsAppellantDeceased(getYesNoFromString(isAppellantDeceased));
-
-        Notification notification = new Notification(
-            Template.builder().emailTemplateId(EMAIL_TEMPLATE_ID).build(),
-            Destination.builder().email("test@email.com").build(), new HashMap<>(), new Reference(), null);
-        when(factory.create(ccdNotificationWrapper, getSubscriptionWithType(ccdNotificationWrapper))).thenReturn(notification);
-        when(notificationValidService.isNotificationStillValidToSend(any(), any())).thenReturn(true);
-        when(notificationValidService.isHearingTypeValidToSendNotification(any(), any())).thenReturn(true);
-
-        notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
-
-        assertSoftly(softly -> {
-            softly.assertThatCode(() -> verify(factory, times(1)).create(ccdNotificationWrapper, getSubscriptionWithType(ccdNotificationWrapper)))
-                .doesNotThrowAnyException();
-            softly.assertThatCode(() -> verifyNoErrorsLogged(mockAppender, captorLoggingEvent))
-                .doesNotThrowAnyException();
-        });
     }
 
     @Test

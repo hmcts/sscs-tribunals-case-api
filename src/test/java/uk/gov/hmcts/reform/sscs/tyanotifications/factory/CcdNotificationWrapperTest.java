@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.factory;
 
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
@@ -31,6 +32,7 @@ import java.util.Arrays;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import junitparams.converters.Nullable;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Test;
@@ -313,6 +315,37 @@ public class CcdNotificationWrapperTest {
         Assert.assertEquals(2, subsWithTypeList.size());
         Assert.assertEquals(SubscriptionType.APPELLANT, subsWithTypeList.get(0).getSubscriptionType());
         Assert.assertEquals(SubscriptionType.REPRESENTATIVE, subsWithTypeList.get(1).getSubscriptionType());
+    }
+
+    @Test
+    public void givenAppellantDeceased_shouldExcludeAppellantButKeepRepFromSubscriptionTypeList() {
+        ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventTypeWithRep(APPEAL_WITHDRAWN);
+        ccdNotificationWrapper.getNewSscsCaseData().setIsAppellantDeceased(YES);
+
+        List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
+
+        assertSoftly(softly -> {
+            softly.assertThat(subsWithTypeList).hasSize(1);
+            softly.assertThat(subsWithTypeList)
+                .extracting(SubscriptionWithType::getSubscriptionType)
+                .containsExactly(SubscriptionType.REPRESENTATIVE);
+        });
+    }
+
+    @Test
+    @Parameters({"NO", "null"})
+    public void givenAppellantNotDeceased_shouldIncludeAppellantInSubscriptionTypeList(@Nullable YesNo isAppellantDeceased) {
+        ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventTypeWithRep(APPEAL_WITHDRAWN);
+        ccdNotificationWrapper.getNewSscsCaseData().setIsAppellantDeceased(isAppellantDeceased);
+
+        List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
+
+        assertSoftly(softly -> {
+            softly.assertThat(subsWithTypeList).hasSize(2);
+            softly.assertThat(subsWithTypeList)
+                .extracting(SubscriptionWithType::getSubscriptionType)
+                .containsExactly(SubscriptionType.APPELLANT, SubscriptionType.REPRESENTATIVE);
+        });
     }
 
     @Test
