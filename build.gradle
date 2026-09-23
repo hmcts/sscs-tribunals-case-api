@@ -6,7 +6,7 @@ plugins {
     id 'pmd'
     id 'org.sonarqube' version '7.3.1.8318'
     id 'jacoco'
-    id 'org.springframework.boot' version '3.5.15'
+    id 'org.springframework.boot' version '3.5.16'
     id 'uk.gov.hmcts.java' version '0.12.70'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'com.gorylenko.gradle-git-properties' version '2.5.0'
@@ -322,7 +322,7 @@ dependencyManagement {
 
 ext {
     // CVE-2026-59878, CVE-2026-61487
-    set('activemq.version', '6.2.9')
+    set('activemq.version', '6.3.2')
     set('netty.version', '4.2.18.Final')
     set('log4j2.version', '2.26.1')
     set('commons-lang3.version', '3.20.0')
