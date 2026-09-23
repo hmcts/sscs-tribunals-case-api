@@ -741,6 +741,38 @@ public class NotificationServiceTest {
     }
 
     @Test
+    public void doNotSendNotificationToDeceasedAppellant() {
+        sscsCaseData.setIsAppellantDeceased(YesNo.YES);
+        sscsCaseData.setSubscriptions(Subscriptions.builder()
+            .appellantSubscription(Subscription.builder()
+                .tya(APPEAL_NUMBER)
+                .email("test@email.com")
+                .mobile(MOBILE_NUMBER_1)
+                .subscribeEmail(YES)
+                .subscribeSms(YES)
+                .wantSmsNotifications(YES)
+                .build())
+            .build());
+
+        NotificationSscsCaseDataWrapper wrapper = NotificationSscsCaseDataWrapper
+            .builder()
+            .newSscsCaseData(sscsCaseData)
+            .oldSscsCaseData(sscsCaseData)
+            .notificationEventType(APPEAL_WITHDRAWN)
+            .build();
+        ccdNotificationWrapper = new CcdNotificationWrapper(wrapper);
+
+        when(notificationValidService.isNotificationStillValidToSend(any(), any())).thenReturn(true);
+        when(notificationValidService.isHearingTypeValidToSendNotification(any(), any())).thenReturn(true);
+
+        notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
+
+        verify(factory, never()).create(any(), any());
+        verify(notificationHandler, never()).sendNotification(any(), any(), any(), any());
+        verifyNoErrorsLogged(mockAppender, captorLoggingEvent);
+    }
+
+    @Test
     public void createsReminders() {
 
         Notification notification = new Notification(
@@ -922,8 +954,8 @@ public class NotificationServiceTest {
         List<ILoggingEvent> logEvents = (List<ILoggingEvent>) captorLoggingEvent.getAllValues();
         assertThat(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage()
                 .contains("email=" + getMaskedEmail(NEW_TEST_EMAIL_COM) + ", mobile=" + getMaskedPhone(MOBILE_NUMBER_1) + ",")).count()).isEqualTo(1);
-        //assertThat(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage().contains(NEW_TEST_EMAIL_COM))).isEmpty();
-        //assertThat(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage().contains(MOBILE_NUMBER_2))).isEmpty();
+        assertThat(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage().contains(NEW_TEST_EMAIL_COM))).isEmpty();
+        assertThat(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage().contains(MOBILE_NUMBER_2))).isEmpty();
     }
 
     @Test
@@ -1003,8 +1035,8 @@ public class NotificationServiceTest {
         List<ILoggingEvent> logEvents = (List<ILoggingEvent>) captorLoggingEvent.getAllValues();
         assertThat(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage()
                 .contains("email=" + getMaskedEmail(SAME_TEST_EMAIL_COM) + ", mobile=" + getMaskedPhone(MOBILE_NUMBER_1) + ",")).count()).isEqualTo(1);
-        //assertThat(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage().contains(SAME_TEST_EMAIL_COM))).isEmpty();
-        //assertThat(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage().contains(MOBILE_NUMBER_1))).isEmpty();
+        assertThat(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage().contains(SAME_TEST_EMAIL_COM))).isEmpty();
+        assertThat(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage().contains(MOBILE_NUMBER_1))).isEmpty();
     }
 
     @Test
