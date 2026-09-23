@@ -24,11 +24,14 @@ import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.awaitility.core.ConditionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIf;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.TestConstructor;
 import org.springframework.test.context.TestConstructor.AutowireMode;
@@ -52,8 +55,10 @@ import uk.gov.hmcts.reform.sscs.service.hmc.topic.ProcessHmcMessageServiceV2;
 @TestPropertySource(locations = "classpath:config/application_functional.properties", properties = "logging.level.uk.gov.hmcts.reform.sscs.functional.evidenceshare.IssueFinalDecisionCancelListingFunctionalTest=DEBUG")
 @TestConstructor(autowireMode = AutowireMode.ALL)
 @RequiredArgsConstructor
+@EnabledIf("isDeployedToLocalhost")
 class IssueFinalDecisionCancelListingFunctionalTest extends AbstractFunctionalTest {
 
+    private static final Set<String> LOCAL_HOSTS = Set.of("localhost", "127.0.0.1");
     private static final String CASE_DATA_JSON = "handlers/issuefinaldecision/readyToListWriteFinalDecisionCaseData.json";
     private static final String EVIDENCE_DOCUMENT_PDF = "evidence-document.pdf";
     private static final String PREVIEW_DOCUMENT_TYPE = "PREVIEW_DOCUMENT";
@@ -68,6 +73,11 @@ class IssueFinalDecisionCancelListingFunctionalTest extends AbstractFunctionalTe
     private String hmcUrl;
 
     private WireMock hmcWireMock;
+
+    static boolean isDeployedToLocalhost() {
+        final String testUrl = System.getenv("TEST_URL");
+        return StringUtils.isBlank(testUrl) || LOCAL_HOSTS.contains(URI.create(testUrl).getHost());
+    }
 
     @BeforeEach
     void setUpHmcWireMock() {

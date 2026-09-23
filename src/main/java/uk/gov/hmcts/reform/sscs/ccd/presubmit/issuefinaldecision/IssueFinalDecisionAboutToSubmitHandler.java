@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
+import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.hasHearingButNotScheduled;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.hasHearingScheduledInTheFuture;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.clearPostponementTransientFields;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isSAndLCase;
@@ -152,8 +153,9 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             && isValidCaseState(getStatePriorToEvent(callback), List.of(State.HEARING, READY_TO_LIST))
             && isSAndLCase(callback.getCaseDetails().getCaseData());
 
-    private boolean isReadyToListWithJudgeOnlyPanelMember(State state, SscsCaseData sscsCaseData) {
-        return READY_TO_LIST == state && nonNull(sscsCaseData.getPanelMemberComposition()) && sscsCaseData.getPanelMemberComposition().isJudgeOnly();
+    private boolean isReadyToListWithJudgeOnlyPanelMember(State priorState, SscsCaseData sscsCaseData) {
+        return READY_TO_LIST == priorState && hasHearingButNotScheduled(sscsCaseData) && nonNull(
+            sscsCaseData.getPanelMemberComposition()) && sscsCaseData.getPanelMemberComposition().isJudgeOnly();
     }
 
     private void calculateOutcomeCode(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {

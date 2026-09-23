@@ -26,11 +26,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -45,6 +47,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InternalCaseDocumentData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
@@ -599,7 +602,8 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         when(caseDetailsBefore.getState()).thenReturn(stateBefore);
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
         when(caseDetails.getState()).thenReturn(stateBefore);
-        callback.getCaseDetails().getCaseData().setPanelMemberComposition(panelMemberComposition);
+        sscsCaseData.setState(stateBefore);
+        sscsCaseData.setPanelMemberComposition(panelMemberComposition);
     }
 
     private static PanelMemberComposition judgeOnlyComposition() {
@@ -610,39 +614,69 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         return PanelMemberComposition.builder().panelCompositionJudge("84").panelCompositionMemberMedical1("58").build();
     }
 
-    @Test
-    void givenAnIssueFinalDecisionEventForReadyToListCaseWithNoHearings_ThenSendHearingCancellationRequest() {
-        prepareCaseInStateBeforeIssuingFinalDecision(State.READY_TO_LIST, judgeOnlyComposition());
-        callback.getCaseDetails().getCaseData().setHearings(null);
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).isEmpty();
-        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
+    private static Stream<PanelMemberComposition> judgeOnlyCompositions() {
+        return Stream.of(
+            judgeOnlyComposition(),
+            PanelMemberComposition.builder().districtTribunalJudge("74").build());
     }
 
-    @Test
-    void givenAnIssueFinalDecisionEventForReadyToListCaseWithPastHearingOnly_ThenSendHearingCancellationRequest() {
-        prepareCaseInStateBeforeIssuingFinalDecision(State.READY_TO_LIST, judgeOnlyComposition());
-        final HearingDetails hearingDetails = HearingDetails.builder()
+    private static Stream<PanelMemberComposition> nonJudgeOnlyCompositions() {
+        return Stream.of(
+            judgeAndMedicalMemberComposition(),
+            PanelMemberComposition.builder().panelCompositionJudge("84").panelCompositionMemberMedical2("58").build(),
+            PanelMemberComposition.builder().panelCompositionJudge("84")
+                .panelCompositionDisabilityAndFqMember(List.of("44")).build(),
+            PanelMemberComposition.builder().build());
+    }
+
+    private static Hearing awaitingListingHearing(final HearingStatus hearingStatus) {
+        return Hearing.builder()
+            .value(HearingDetails.builder().hearingId("2").hearingStatus(hearingStatus).build())
+            .build();
+    }
+
+    private static Hearing pastHearing() {
+        return Hearing.builder()
+            .value(HearingDetails.builder()
                 .hearingDate(LocalDate.now().minusDays(5).toString())
                 .start(LocalDateTime.now().minusDays(5))
-                .hearingId(String.valueOf(1))
+                .hearingId("1")
                 .venue(Venue.builder().name("Venue 1").build())
                 .time("12:00")
-                .build();
-        callback.getCaseDetails().getCaseData().setHearings(List.of(Hearing.builder().value(hearingDetails).build()));
+                .hearingStatus(HearingStatus.LISTED)
+                .build())
+            .build();
+    }
+
+    @ParameterizedTest
+    @MethodSource("judgeOnlyCompositions")
+    void givenJudgeOnlyReadyToListCaseAwaitingListing_whenIssueFinalDecision_thenSendHearingCancellationRequest(
+        final PanelMemberComposition panelMemberComposition) {
+        prepareCaseInStateBeforeIssuingFinalDecision(State.READY_TO_LIST, panelMemberComposition);
+        sscsCaseData.setHearings(List.of(awaitingListingHearing(HearingStatus.AWAITING_LISTING)));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
-        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
+        assertThat(response.getData().getState()).isEqualTo(State.READY_TO_LIST);
+        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(), CancellationReason.OTHER);
     }
 
     @Test
-    void givenAnIssueFinalDecisionEventForReadyToListCaseWithNoHearingsAndNonJudgeOnlyPanel_ThenDoNotSendHearingCancellationRequest() {
-        prepareCaseInStateBeforeIssuingFinalDecision(State.READY_TO_LIST, judgeAndMedicalMemberComposition());
-        callback.getCaseDetails().getCaseData().setHearings(null);
+    void givenJudgeOnlyReadyToListCaseWithPastAndAwaitingListingHearings_whenIssueFinalDecision_thenSendHearingCancellationRequest() {
+        prepareCaseInStateBeforeIssuingFinalDecision(State.READY_TO_LIST, judgeOnlyComposition());
+        sscsCaseData.setHearings(List.of(pastHearing(), awaitingListingHearing(HearingStatus.AWAITING_LISTING)));
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(), CancellationReason.OTHER);
+    }
+
+    @Test
+    void givenJudgeOnlyReadyToListCaseWithNoHearings_whenIssueFinalDecision_thenDoNotSendHearingCancellationRequest() {
+        prepareCaseInStateBeforeIssuingFinalDecision(State.READY_TO_LIST, judgeOnlyComposition());
+        sscsCaseData.setHearings(null);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -651,9 +685,57 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenAnIssueFinalDecisionEventForReadyToListCaseWithNoHearingsAndNoPanelComposition_ThenDoNotSendHearingCancellationRequest() {
+    void givenJudgeOnlyReadyToListCaseWithPastHearingOnly_whenIssueFinalDecision_thenDoNotSendHearingCancellationRequest() {
+        prepareCaseInStateBeforeIssuingFinalDecision(State.READY_TO_LIST, judgeOnlyComposition());
+        sscsCaseData.setHearings(List.of(pastHearing()));
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        verifyNoInteractions(hearingMessageHelper);
+    }
+
+    @Test
+    void givenJudgeOnlyReadyToListCaseWithCancelledListingRequest_whenIssueFinalDecision_thenDoNotSendHearingCancellationRequest() {
+        prepareCaseInStateBeforeIssuingFinalDecision(State.READY_TO_LIST, judgeOnlyComposition());
+        sscsCaseData.setHearings(List.of(awaitingListingHearing(HearingStatus.CANCELLED)));
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        verifyNoInteractions(hearingMessageHelper);
+    }
+
+    @ParameterizedTest
+    @MethodSource("nonJudgeOnlyCompositions")
+    void givenNonJudgeOnlyReadyToListCaseAwaitingListing_whenIssueFinalDecision_thenDoNotSendHearingCancellationRequest(
+        final PanelMemberComposition panelMemberComposition) {
+        prepareCaseInStateBeforeIssuingFinalDecision(State.READY_TO_LIST, panelMemberComposition);
+        sscsCaseData.setHearings(List.of(awaitingListingHearing(HearingStatus.AWAITING_LISTING)));
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        verifyNoInteractions(hearingMessageHelper);
+    }
+
+    @Test
+    void givenReadyToListCaseAwaitingListingWithNoPanelComposition_whenIssueFinalDecision_thenDoNotSendHearingCancellationRequest() {
         prepareCaseInStateBeforeIssuingFinalDecision(State.READY_TO_LIST, null);
-        callback.getCaseDetails().getCaseData().setHearings(null);
+        sscsCaseData.setHearings(List.of(awaitingListingHearing(HearingStatus.AWAITING_LISTING)));
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        verifyNoInteractions(hearingMessageHelper);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = State.class, names = {"HEARING", "WITH_DWP", "RESPONSE_RECEIVED", "UNKNOWN"})
+    void givenJudgeOnlyCaseAwaitingListingNotInReadyToList_whenIssueFinalDecision_thenDoNotSendHearingCancellationRequest(
+        final State stateBefore) {
+        prepareCaseInStateBeforeIssuingFinalDecision(stateBefore, judgeOnlyComposition());
+        sscsCaseData.setHearings(List.of(awaitingListingHearing(HearingStatus.AWAITING_LISTING)));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -662,14 +744,59 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenAnIssueFinalDecisionEventForHearingStateCaseWithNoHearings_ThenDoNotSendHearingCancellationRequest() {
-        prepareCaseInStateBeforeIssuingFinalDecision(State.HEARING, judgeOnlyComposition());
-        callback.getCaseDetails().getCaseData().setHearings(null);
+    void givenJudgeOnlyCaseAwaitingListingWithNoCaseDetailsBefore_whenIssueFinalDecision_thenDoNotSendHearingCancellationRequest() {
+        prepareCaseInStateBeforeIssuingFinalDecision(State.READY_TO_LIST, judgeOnlyComposition());
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.empty());
+        sscsCaseData.setHearings(List.of(awaitingListingHearing(HearingStatus.AWAITING_LISTING)));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
         verifyNoInteractions(hearingMessageHelper);
+    }
+
+    @Test
+    void givenJudgeOnlyReadyToListCaseAwaitingListingAndScheduleListingDisabled_whenIssueFinalDecision_thenDoNotSendHearingCancellationRequest() {
+        prepareCaseInStateBeforeIssuingFinalDecision(State.READY_TO_LIST, judgeOnlyComposition());
+        handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, userDetailsService,
+                validator, hearingMessageHelper, venueDataLoader, false);
+        sscsCaseData.setHearings(List.of(awaitingListingHearing(HearingStatus.AWAITING_LISTING)));
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        verifyNoInteractions(hearingMessageHelper);
+    }
+
+    @Test
+    void givenJudgeOnlyReadyToListCaseAwaitingListingOnGapsRoute_whenIssueFinalDecision_thenDoNotSendHearingCancellationRequest() {
+        prepareCaseInStateBeforeIssuingFinalDecision(State.READY_TO_LIST, judgeOnlyComposition());
+        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.GAPS);
+        sscsCaseData.setHearings(List.of(awaitingListingHearing(HearingStatus.AWAITING_LISTING)));
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        verifyNoInteractions(hearingMessageHelper);
+    }
+
+    @Test
+    void givenNonJudgeOnlyReadyToListCaseWithFutureHearing_whenIssueFinalDecision_thenSendHearingCancellationRequest() {
+        prepareCaseInStateBeforeIssuingFinalDecision(State.READY_TO_LIST, judgeAndMedicalMemberComposition());
+        final HearingDetails hearingDetails = HearingDetails.builder()
+                .hearingDate(LocalDate.now().plusDays(5).toString())
+                .start(LocalDateTime.now().plusDays(5))
+                .hearingId("1")
+                .venue(Venue.builder().name("Venue 1").build())
+                .time("12:00")
+                .hearingStatus(HearingStatus.LISTED)
+                .build();
+        sscsCaseData.setHearings(List.of(Hearing.builder().value(hearingDetails).build()));
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(), CancellationReason.OTHER);
     }
 
     @Test

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getUpdatedDirectionDueDate;
+import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.hasHearingButNotScheduled;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.hasHearingScheduledInTheFuture;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.validateHearingOptionsAndExcludeDates;
 
@@ -156,6 +157,72 @@ public class SscsHelperTest {
         sscsCaseData.setHearings(List.of(hearing));
 
         assertThat(hasHearingScheduledInTheFuture(sscsCaseData)).isEqualTo(expectedResult);
+    }
+
+    @Test
+    void givenNoHearings_whenCheckingForHearingButNotScheduled_thenReturnFalse() {
+        sscsCaseData.setHearings(null);
+
+        assertThat(hasHearingButNotScheduled(sscsCaseData)).isFalse();
+    }
+
+    @Test
+    void givenEmptyHearings_whenCheckingForHearingButNotScheduled_thenReturnFalse() {
+        sscsCaseData.setHearings(List.of());
+
+        assertThat(hasHearingButNotScheduled(sscsCaseData)).isFalse();
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+        "AWAITING_LISTING, true",
+        "null, true",
+        "CANCELLED, false"
+    }, nullValues = "null")
+    void givenHearingWithNoDateOrTime_whenCheckingForHearingButNotScheduled_thenReturnTrueUnlessCancelled(
+        final HearingStatus hearingStatus, final boolean expectedResult) {
+        sscsCaseData.setHearings(List.of(unscheduledHearing(hearingStatus)));
+
+        assertThat(hasHearingButNotScheduled(sscsCaseData)).isEqualTo(expectedResult);
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+        "2030-01-01, 10:00",
+        "2030-01-01, null",
+        "null, 10:00"
+    }, nullValues = "null")
+    void givenHearingWithDateOrTime_whenCheckingForHearingButNotScheduled_thenReturnFalse(final String hearingDate,
+                                                                                         final String time) {
+        final HearingDetails hearingDetails = HearingDetails.builder()
+            .hearingId("1")
+            .hearingDate(hearingDate)
+            .time(time)
+            .hearingStatus(HearingStatus.LISTED)
+            .build();
+        sscsCaseData.setHearings(List.of(Hearing.builder().value(hearingDetails).build()));
+
+        assertThat(hasHearingButNotScheduled(sscsCaseData)).isFalse();
+    }
+
+    @Test
+    void givenScheduledAndUnscheduledHearings_whenCheckingForHearingButNotScheduled_thenReturnTrue() {
+        final HearingDetails scheduledHearingDetails = HearingDetails.builder()
+            .hearingId("1")
+            .hearingDate(NOW.minusDays(10).toString())
+            .time("10:00")
+            .hearingStatus(HearingStatus.LISTED)
+            .build();
+        sscsCaseData.setHearings(List.of(Hearing.builder().value(scheduledHearingDetails).build(),
+            unscheduledHearing(HearingStatus.AWAITING_LISTING)));
+
+        assertThat(hasHearingButNotScheduled(sscsCaseData)).isTrue();
+    }
+
+    private static Hearing unscheduledHearing(final HearingStatus hearingStatus) {
+        return Hearing.builder()
+            .value(HearingDetails.builder().hearingId("2").hearingStatus(hearingStatus).build())
+            .build();
     }
 
     @Test
