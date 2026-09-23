@@ -9,6 +9,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.hasHearingScheduledInTheFuture;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.clearPostponementTransientFields;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isSAndLCase;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isValidCaseState;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
@@ -17,6 +19,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -116,7 +119,8 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         clearPostponementTransientFields(sscsCaseData);
 
         if (eligibleForHearingsCancel.test(callback)
-                && (hasHearingScheduledInTheFuture(sscsCaseData) || isReadyToListWithJudgeOnlyPanelMember(caseDetails, sscsCaseData))) {
+                && (hasHearingScheduledInTheFuture(sscsCaseData) || isReadyToListWithJudgeOnlyPanelMember(
+            getStatePriorToEvent(callback), sscsCaseData))) {
             log.info("Issue Final Decision: HearingRoute ListAssist Case ({}). Sending cancellation message",
                     sscsCaseData.getCcdCaseId());
             hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(),
@@ -130,6 +134,11 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         return preSubmitCallbackResponse;
     }
 
+    private static @NonNull State getStatePriorToEvent(Callback<SscsCaseData> callback) {
+        return callback.getCaseDetailsBefore().map(
+            CaseDetails::getState).orElse(State.UNKNOWN);
+    }
+
     private void verifyPreviewDocument(SscsCaseData sscsCaseData,
                                        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
 
@@ -140,12 +149,11 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
     }
 
     private final Predicate<Callback<SscsCaseData>> eligibleForHearingsCancel = callback -> isScheduleListingEnabled
-            && SscsUtil.isValidCaseState(callback.getCaseDetailsBefore().map(CaseDetails::getState)
-                    .orElse(State.UNKNOWN), List.of(State.HEARING, READY_TO_LIST))
-            && SscsUtil.isSAndLCase(callback.getCaseDetails().getCaseData());
+            && isValidCaseState(getStatePriorToEvent(callback), List.of(State.HEARING, READY_TO_LIST))
+            && isSAndLCase(callback.getCaseDetails().getCaseData());
 
-    private boolean isReadyToListWithJudgeOnlyPanelMember(CaseDetails<SscsCaseData> caseDetails, SscsCaseData sscsCaseData) {
-        return READY_TO_LIST == caseDetails.getState() && nonNull(sscsCaseData.getPanelMemberComposition()) && sscsCaseData.getPanelMemberComposition().isJudgeOnly();
+    private boolean isReadyToListWithJudgeOnlyPanelMember(State state, SscsCaseData sscsCaseData) {
+        return READY_TO_LIST == state && nonNull(sscsCaseData.getPanelMemberComposition()) && sscsCaseData.getPanelMemberComposition().isJudgeOnly();
     }
 
     private void calculateOutcomeCode(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {

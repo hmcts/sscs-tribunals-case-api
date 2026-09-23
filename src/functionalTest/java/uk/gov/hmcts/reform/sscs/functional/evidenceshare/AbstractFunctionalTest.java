@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
 import static io.restassured.RestAssured.baseURI;
+import static java.time.ZoneId.systemDefault;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.nonNull;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -25,6 +26,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -34,6 +36,7 @@ import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.awaitility.core.ConditionFactory;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -300,5 +303,9 @@ abstract class AbstractFunctionalTest {
         );
         caseDetails.getData().setSscsDocument(sscsCaseDocs);
         updateCaseEvent(UPLOAD_DOCUMENT, caseDetails);
+    }
+
+    static @NonNull LocalDate today() {
+        return LocalDate.now(systemDefault());
     }
 }

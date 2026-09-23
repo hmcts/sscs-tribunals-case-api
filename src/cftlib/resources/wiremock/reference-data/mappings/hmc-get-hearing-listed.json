@@ -1,0 +1,36 @@
+{
+  "priority": 1,
+  "scenarioName": "hmc-hearing",
+  "requiredScenarioState": "Started",
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/hearing/[0-9]+"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "requestDetails": {
+        "hearingRequestID": "{{request.pathSegments.[1]}}",
+        "versionNumber": 1,
+        "status": "LISTED"
+      },
+      "hearingDetails": {},
+      "caseDetails": {},
+      "partyDetails": [],
+      "hearingResponse": {
+        "listingStatus": "FIXED",
+        "hearingDaySchedule": [
+          {
+            "hearingStartDateTime": "{{now offset='30 days' format='yyyy-MM-dd'}}T10:00:00",
+            "hearingEndDateTime": "{{now offset='30 days' format='yyyy-MM-dd'}}T11:30:00",
+            "hearingVenueId": "372653"
+          }
+        ]
+      }
+    },
+    "transformers": ["response-template"]
+  }
+}
