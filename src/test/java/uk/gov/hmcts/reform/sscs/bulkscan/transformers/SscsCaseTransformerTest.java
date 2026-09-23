@@ -557,11 +557,11 @@ class SscsCaseTransformerTest {
     @CsvSource({"person1", "person2", "representative"})
     void canHandleAddressWithoutAddressLine4(String personType) {
         Address expectedAddress = Address.builder()
-                                         .line1("10 my street")
-                                         .town("town")
-                                         .county("county")
-                                         .postcode(APPELLANT_POSTCODE)
-                                         .build();
+            .line1("10 my street")
+            .town("town")
+            .county("county")
+            .postcode(APPELLANT_POSTCODE)
+            .build();
         for (String person : Arrays.asList("person1", personType)) {
             pairs.put(person + "_address_line1", expectedAddress.getLine1());
             pairs.put(person + "_address_line2", expectedAddress.getTown());
@@ -581,11 +581,11 @@ class SscsCaseTransformerTest {
     @CsvSource({"person1", "person2", "representative"})
     void givenAddressLine3IsBlankAndAddressLine4IsNotPresent_thenAddressLine3PopulatedWithDot(String personType) {
         Address expectedAddress = Address.builder()
-                                         .line1("10 my street")
-                                         .town("town")
-                                         .county(".")
-                                         .postcode(APPELLANT_POSTCODE)
-                                         .build();
+            .line1("10 my street")
+            .town("town")
+            .county(".")
+            .postcode(APPELLANT_POSTCODE)
+            .build();
         for (String person : Arrays.asList("person1", personType)) {
             pairs.remove(person + "_address_line4");
             pairs.put(person + "_address_line1", expectedAddress.getLine1());
@@ -605,11 +605,11 @@ class SscsCaseTransformerTest {
     @CsvSource({"person1", "person2", "representative"})
     void givenAddressLine3IsNullAndAddressLine4IsNotPresent_thenAddressLine3PopulatedWithDot(String personType) {
         Address expectedAddress = Address.builder()
-                                         .line1("10 my street")
-                                         .town("town")
-                                         .county(".")
-                                         .postcode(APPELLANT_POSTCODE)
-                                         .build();
+            .line1("10 my street")
+            .town("town")
+            .county(".")
+            .postcode(APPELLANT_POSTCODE)
+            .build();
         for (String person : Arrays.asList("person1", personType)) {
             pairs.remove(person + "_address_line4");
             pairs.put(person + "_address_line1", expectedAddress.getLine1());
@@ -629,11 +629,11 @@ class SscsCaseTransformerTest {
     @CsvSource({"person1", "person2", "representative"})
     void givenAddressLine2And3AreNullAndAddressLine4IsNotPresent_thenAddressLine3NotPopulatedWithDot(String personType) {
         Address expectedAddress = Address.builder()
-                                         .line1("10 my street")
-                                         .town(null)
-                                         .county(null)
-                                         .postcode(APPELLANT_POSTCODE)
-                                         .build();
+            .line1("10 my street")
+            .town(null)
+            .county(null)
+            .postcode(APPELLANT_POSTCODE)
+            .build();
         for (String person : Arrays.asList("person1", personType)) {
             pairs.remove(person + "_address_line4");
             pairs.put(person + "_address_line1", expectedAddress.getLine1());
@@ -653,12 +653,12 @@ class SscsCaseTransformerTest {
     @CsvSource({"person1", "person2", "representative"})
     void givenAddressLine3IsBlankAndAddressLine4IsPresent_thenAddressLine3NotPopulatedWithDot(String personType) {
         Address expectedAddress = Address.builder()
-                                         .line1("10 my street")
-                                         .line2("line2 address")
-                                         .town(null)
-                                         .county("county")
-                                         .postcode(APPELLANT_POSTCODE)
-                                         .build();
+            .line1("10 my street")
+            .line2("line2 address")
+            .town(null)
+            .county("county")
+            .postcode(APPELLANT_POSTCODE)
+            .build();
         for (String person : Arrays.asList("person1", personType)) {
             pairs.put(person + "_address_line1", expectedAddress.getLine1());
             pairs.put(person + "_address_line2", expectedAddress.getLine2());
@@ -697,13 +697,13 @@ class SscsCaseTransformerTest {
         Subscriptions subscriptions = (Subscriptions) result.getTransformedCase().get("subscriptions");
 
         Subscription expectedSubscription = Subscription.builder()
-                                                        .wantSmsNotifications(subscribeSms)
-                                                        .subscribeSms(subscribeSms)
-                                                        .mobile(APPELLANT_MOBILE)
-                                                        .email(APPELLANT_EMAIL)
-                                                        .subscribeEmail(YES_LITERAL)
-                                                        .tya(subscriptions.getAppellantSubscription().getTya())
-                                                        .build();
+            .wantSmsNotifications(subscribeSms)
+            .subscribeSms(subscribeSms)
+            .mobile(APPELLANT_MOBILE)
+            .email(APPELLANT_EMAIL)
+            .subscribeEmail(YES_LITERAL)
+            .tya(subscriptions.getAppellantSubscription().getTya())
+            .build();
 
         assertThat(subscriptions.getAppellantSubscription()).isEqualTo(expectedSubscription);
     }
@@ -728,12 +728,12 @@ class SscsCaseTransformerTest {
         Subscriptions subscriptions = (Subscriptions) result.getTransformedCase().get("subscriptions");
 
         Subscription expectedSubscription = Subscription.builder()
-                                                        .wantSmsNotifications(subscribeSms)
-                                                        .subscribeSms(subscribeSms)
-                                                        .mobile(APPELLANT_MOBILE)
-                                                        .subscribeEmail(NO_LITERAL)
-                                                        .tya(subscriptions.getAppellantSubscription().getTya())
-                                                        .build();
+            .wantSmsNotifications(subscribeSms)
+            .subscribeSms(subscribeSms)
+            .mobile(APPELLANT_MOBILE)
+            .subscribeEmail(NO_LITERAL)
+            .tya(subscriptions.getAppellantSubscription().getTya())
+            .build();
 
         assertThat(subscriptions.getAppellantSubscription()).isEqualTo(expectedSubscription);
     }
@@ -1115,8 +1115,8 @@ class SscsCaseTransformerTest {
     @Test
     void givenContradictingPaperAndOralCaseValues_thenAddErrorToList() {
         Map<String, Object> contradictingPairs = ImmutableMap.<String, Object>builder()
-                                                             .put(IS_HEARING_TYPE_ORAL_LITERAL, "true")
-                                                             .put(IS_HEARING_TYPE_PAPER_LITERAL, "true").build();
+            .put(IS_HEARING_TYPE_ORAL_LITERAL, "true")
+            .put(IS_HEARING_TYPE_PAPER_LITERAL, "true").build();
 
         given(sscsJsonExtractor.extractJson(exceptionRecord)).willReturn(ScannedData.builder().ocrCaseData(contradictingPairs).build());
 
@@ -1180,8 +1180,8 @@ class SscsCaseTransformerTest {
     @Test
     void givenBooleanValueIsRandomText_thenSetHearingTypeToNull() {
         Map<String, Object> textBooleanValueMap = ImmutableMap.<String, Object>builder()
-                                                              .put("is_hearing_type_oral", "I am a text value")
-                                                              .put("is_hearing_type_paper", "true").build();
+            .put("is_hearing_type_oral", "I am a text value")
+            .put("is_hearing_type_paper", "true").build();
 
         given(sscsJsonExtractor.extractJson(exceptionRecord)).willReturn(ScannedData.builder().ocrCaseData(textBooleanValueMap).build());
 
@@ -1772,19 +1772,19 @@ class SscsCaseTransformerTest {
         // given
         List<InputScannedDoc> scannedRecords = Arrays.asList(
             InputScannedDoc.builder()
-                           .scannedDate(LocalDateTime.now().minusDays(1)) // no millis
-                           .controlNumber("123")
-                           .url(DocumentLink.builder().documentUrl("www.test.com").build())
-                           .fileName("mrn.jpg")
-                           .type("Testing")
-                           .subtype("My subtype").build(),
+                .scannedDate(LocalDateTime.now().minusDays(1)) // no millis
+                .controlNumber("123")
+                .url(DocumentLink.builder().documentUrl("www.test.com").build())
+                .fileName("mrn.jpg")
+                .type("Testing")
+                .subtype("My subtype").build(),
             InputScannedDoc.builder()
-                           .scannedDate(LocalDateTime.now()) // with millis
-                           .controlNumber("567")
-                           .url(DocumentLink.builder().documentUrl("www.test.com").build())
-                           .fileName("mrn.jpg")
-                           .type("Testing")
-                           .subtype("My subtype").build()
+                .scannedDate(LocalDateTime.now()) // with millis
+                .controlNumber("567")
+                .url(DocumentLink.builder().documentUrl("www.test.com").build())
+                .fileName("mrn.jpg")
+                .type("Testing")
+                .subtype("My subtype").build()
         );
         given(sscsJsonExtractor.extractJson(exceptionRecord)).willReturn(ScannedData.builder().ocrCaseData(pairs).records(scannedRecords).build());
 
@@ -1834,12 +1834,12 @@ class SscsCaseTransformerTest {
     void givenOneDocumentWithNoDetails_thenShowAnError() {
         List<InputScannedDoc> records = new ArrayList<>();
         InputScannedDoc scannedRecord = InputScannedDoc.builder()
-                                                       .scannedDate(null)
-                                                       .controlNumber(null)
-                                                       .url(null)
-                                                       .fileName(null)
-                                                       .type(null)
-                                                       .subtype(null).build();
+            .scannedDate(null)
+            .controlNumber(null)
+            .url(null)
+            .fileName(null)
+            .type(null)
+            .subtype(null).build();
 
         records.add(scannedRecord);
 
@@ -1855,12 +1855,12 @@ class SscsCaseTransformerTest {
         List<InputScannedDoc> records = new ArrayList<>();
 
         InputScannedDoc scannedRecord = InputScannedDoc.builder()
-                                                       .scannedDate(LocalDateTime.now())
-                                                       .controlNumber("123")
-                                                       .url(DocumentLink.builder().documentUrl("www.test.com").build())
-                                                       .fileName("mrn details")
-                                                       .type("Testing")
-                                                       .subtype("My subtype").build();
+            .scannedDate(LocalDateTime.now())
+            .controlNumber("123")
+            .url(DocumentLink.builder().documentUrl("www.test.com").build())
+            .fileName("mrn details")
+            .type("Testing")
+            .subtype("My subtype").build();
         records.add(scannedRecord);
 
         given(sscsJsonExtractor.extractJson(exceptionRecord)).willReturn(ScannedData.builder().ocrCaseData(pairs).records(records).build());
@@ -1875,12 +1875,12 @@ class SscsCaseTransformerTest {
         List<InputScannedDoc> records = new ArrayList<>();
 
         InputScannedDoc scannedRecord = InputScannedDoc.builder()
-                                                       .scannedDate(LocalDateTime.now())
-                                                       .controlNumber("123")
-                                                       .url(DocumentLink.builder().documentUrl("www.test.com").build())
-                                                       .fileName("mrn_details.xyz")
-                                                       .type("Testing")
-                                                       .subtype("My subtype").build();
+            .scannedDate(LocalDateTime.now())
+            .controlNumber("123")
+            .url(DocumentLink.builder().documentUrl("www.test.com").build())
+            .fileName("mrn_details.xyz")
+            .type("Testing")
+            .subtype("My subtype").build();
         records.add(scannedRecord);
 
         given(sscsJsonExtractor.extractJson(exceptionRecord)).willReturn(ScannedData.builder().ocrCaseData(pairs).records(records).build());
@@ -2284,7 +2284,7 @@ class SscsCaseTransformerTest {
         pairs.put("person2_postcode", APPELLANT_POSTCODE);
 
         RegionalProcessingCenter rpc = RegionalProcessingCenter.builder()
-                                                               .epimsId("rpcEpimsId").build();
+            .epimsId("rpcEpimsId").build();
 
         when(regionalProcessingCenterService.getByPostcode(eq(APPOINTEE_POSTCODE), anyBoolean())).thenReturn(rpc);
         when(appealPostcodeHelper.resolvePostCodeOrPort(any())).thenReturn(APPOINTEE_POSTCODE);
@@ -2312,7 +2312,7 @@ class SscsCaseTransformerTest {
         pairs.put("person1_postcode", APPELLANT_POSTCODE);
 
         RegionalProcessingCenter rpc = RegionalProcessingCenter.builder()
-                                                               .epimsId("rpcEpimsId").build();
+            .epimsId("rpcEpimsId").build();
 
         when(regionalProcessingCenterService.getByPostcode(APPELLANT_POSTCODE, false)).thenReturn(rpc);
 
@@ -2342,7 +2342,7 @@ class SscsCaseTransformerTest {
         pairs.put("person1_postcode", APPELLANT_POSTCODE);
 
         RegionalProcessingCenter rpc = RegionalProcessingCenter.builder()
-                                                               .epimsId("rpcEpimsId").build();
+            .epimsId("rpcEpimsId").build();
 
         when(regionalProcessingCenterService.getByPostcode(APPELLANT_POSTCODE, true)).thenReturn(rpc);
 
@@ -2870,35 +2870,35 @@ class SscsCaseTransformerTest {
         hearingSupportArrangements.add("hearingLoop");
 
         return Appeal.builder()
-                     .benefitType(BenefitType.builder().code(BENEFIT_TYPE).description(BENEFIT_TYPE_DESCRIPTION).build())
-                     .appellant(appellant)
-                     .appealReasons(AppealReasons.builder().reasons(Collections.singletonList(AppealReason.builder().value(AppealReasonDetails.builder().description(APPEAL_REASON).build()).build())).build())
-                     .rep(Representative.builder().hasRepresentative(YES_LITERAL).name(repName).address(repAddress).contact(repContact).organisation(REPRESENTATIVE_NAME).build())
-                     .mrnDetails(MrnDetails.builder().mrnDate(formatDate(MRN_DATE_VALUE)).dwpIssuingOffice("DWP PIP (5)").mrnLateReason(APPEAL_LATE_REASON).build())
-                     .hearingType(HEARING_TYPE_ORAL)
-                     .hearingSubtype(hearingSubtype)
-                     .hearingOptions(HearingOptions.builder()
-                                                   .scheduleHearing(YES_LITERAL)
-                                                   .excludeDates(excludedDates)
-                                                   .agreeLessNotice(YES_LITERAL)
-                                                   .arrangements(hearingSupportArrangements)
-                                                   .languageInterpreter(YES_LITERAL)
-                                                   .languages(HEARING_OPTIONS_LANGUAGE_TYPE)
-                                                   .wantsToAttend(YES_LITERAL)
-                                                   .wantsSupport(YES_LITERAL).build())
-                     .signer(SIGNATURE_NAME)
-                     .receivedVia("Paper")
-                     .build();
+            .benefitType(BenefitType.builder().code(BENEFIT_TYPE).description(BENEFIT_TYPE_DESCRIPTION).build())
+            .appellant(appellant)
+            .appealReasons(AppealReasons.builder().reasons(Collections.singletonList(AppealReason.builder().value(AppealReasonDetails.builder().description(APPEAL_REASON).build()).build())).build())
+            .rep(Representative.builder().hasRepresentative(YES_LITERAL).name(repName).address(repAddress).contact(repContact).organisation(REPRESENTATIVE_NAME).build())
+            .mrnDetails(MrnDetails.builder().mrnDate(formatDate(MRN_DATE_VALUE)).dwpIssuingOffice("DWP PIP (5)").mrnLateReason(APPEAL_LATE_REASON).build())
+            .hearingType(HEARING_TYPE_ORAL)
+            .hearingSubtype(hearingSubtype)
+            .hearingOptions(HearingOptions.builder()
+                .scheduleHearing(YES_LITERAL)
+                .excludeDates(excludedDates)
+                .agreeLessNotice(YES_LITERAL)
+                .arrangements(hearingSupportArrangements)
+                .languageInterpreter(YES_LITERAL)
+                .languages(HEARING_OPTIONS_LANGUAGE_TYPE)
+                .wantsToAttend(YES_LITERAL)
+                .wantsSupport(YES_LITERAL).build())
+            .signer(SIGNATURE_NAME)
+            .receivedVia("Paper")
+            .build();
     }
 
     private InputScannedDoc buildTestScannedRecord(DocumentLink link, String subType) {
         return InputScannedDoc.builder()
-                              .scannedDate(LocalDateTime.now())
-                              .controlNumber("123")
-                              .url(link)
-                              .fileName("mrn.jpg")
-                              .type("Form")
-                              .subtype(subType).build();
+            .scannedDate(LocalDateTime.now())
+            .controlNumber("123")
+            .url(link)
+            .fileName("mrn.jpg")
+            .type("Form")
+            .subtype(subType).build();
     }
 
     private String formatDate(String date) {
