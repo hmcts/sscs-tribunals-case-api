@@ -175,6 +175,7 @@ public class NotificationService {
         for (SubscriptionWithType subscriptionWithType : notificationWrapper.getSubscriptionsBasedOnNotificationType()) {
             log.info("Checking that notification event is valid for deceased appellant for case id {} and subscription type {}, is appellant deceased? {}",
                 notificationWrapper.getCaseId(), subscriptionWithType.getSubscriptionType(), notificationWrapper.getNewSscsCaseData().getIsAppellantDeceased());
+            log.info("{}", notificationWrapper.getNewSscsCaseData());
             log.info("Checking other data: {}", nonNull(notificationWrapper.getOldSscsCaseData()) ? notificationWrapper.getOldSscsCaseData().getIsAppellantDeceased() : null);
             if (APPELLANT.equals(subscriptionWithType.getEntity()) && isYes(notificationWrapper.getNewSscsCaseData().getIsAppellantDeceased())) {
                 log.info("Appellant is deceased for case id {}, not sending notification to appellant.", notificationWrapper.getCaseId());
