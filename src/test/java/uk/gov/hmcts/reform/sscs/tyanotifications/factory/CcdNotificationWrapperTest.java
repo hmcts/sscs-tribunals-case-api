@@ -30,11 +30,13 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
@@ -76,13 +78,19 @@ public class CcdNotificationWrapperTest {
     private static final String PAPER = "paper";
     private static final String ORAL = "oral";
 
+    private static void assertSoftly(Consumer<SoftAssertions> assertions) {
+        SoftAssertions softly = new SoftAssertions();
+        assertions.accept(softly);
+        softly.assertAll();
+    }
+
     @Test
     @Parameters({"paper, PAPER", "oral, ORAL"})
     public void should_returnAccordingAppealHearingType_when_hearingTypeIsPresent(String hearingType,
                                                                                   AppealHearingType expected) {
         ccdNotificationWrapper = buildCcdNotificationWrapper(hearingType);
 
-        assertThat(ccdNotificationWrapper.getHearingType(), is(expected));
+        assertSoftly(softly -> softly.assertThat(ccdNotificationWrapper.getHearingType()).isEqualTo(expected));
     }
 
     private CcdNotificationWrapper buildCcdNotificationWrapper(String hearingType) {
@@ -249,6 +257,8 @@ public class CcdNotificationWrapperTest {
     }
 
     private CcdNotificationWrapper buildNotificationWrapperWithOtherParty(NotificationEventType notificationEventType, List<CcdValue<OtherParty>> otherParties) {
+        List<HearingRecordingRequest> releasedHearings = new ArrayList<>();
+        releasedHearings.add(HearingRecordingRequest.builder().value(HearingRecordingRequestDetails.builder().requestingParty(PartyItemList.OTHER_PARTY.getCode()).build()).build());
         Appointee appointee = Appointee.builder()
             .name(Name.builder().firstName("Ap").lastName("Pointee").build())
             .address(Address.builder().line1("Appointee Line 1").town("Appointee Town").county("Appointee County").postcode("AP9 0IN").build())
@@ -267,6 +277,7 @@ public class CcdNotificationWrapperTest {
                         .build()
                 )
                 .build())
+                .sscsHearingRecordingCaseData(SscsHearingRecordingCaseData.builder().citizenReleasedHearings(releasedHearings).build())
             .build();
         updateOtherPartySelection(caseData);
         return new CcdNotificationWrapper(
@@ -312,9 +323,11 @@ public class CcdNotificationWrapperTest {
     public void givenSubscriptions_shouldGetAppellantAndRepSubscriptionTypeList(NotificationEventType notificationEventType) {
         ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventTypeWithRep(notificationEventType);
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(2, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.APPELLANT, subsWithTypeList.get(0).getSubscriptionType());
-        Assert.assertEquals(SubscriptionType.REPRESENTATIVE, subsWithTypeList.get(1).getSubscriptionType());
+        assertSoftly(softly -> {
+            softly.assertThat(subsWithTypeList).hasSize(2);
+            softly.assertThat(subsWithTypeList.get(0).getSubscriptionType()).isEqualTo(SubscriptionType.APPELLANT);
+            softly.assertThat(subsWithTypeList.get(1).getSubscriptionType()).isEqualTo(SubscriptionType.REPRESENTATIVE);
+        });
     }
 
     @Test
@@ -353,9 +366,11 @@ public class CcdNotificationWrapperTest {
     public void givenSubscriptions_shouldGetAppointeeAndRepSubscriptionTypeList(NotificationEventType notificationEventType) {
         ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventTypeWithAppointeeAndRep(notificationEventType);
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(2, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.APPOINTEE, subsWithTypeList.get(0).getSubscriptionType());
-        Assert.assertEquals(SubscriptionType.REPRESENTATIVE, subsWithTypeList.get(1).getSubscriptionType());
+        assertSoftly(softly -> {
+            softly.assertThat(subsWithTypeList).hasSize(2);
+            softly.assertThat(subsWithTypeList.get(0).getSubscriptionType()).isEqualTo(SubscriptionType.APPOINTEE);
+            softly.assertThat(subsWithTypeList.get(1).getSubscriptionType()).isEqualTo(SubscriptionType.REPRESENTATIVE);
+        });
     }
 
     @Test
@@ -366,8 +381,10 @@ public class CcdNotificationWrapperTest {
     public void givenSubscriptions_shouldGetSubscriptionTypeListWithAppointee(NotificationEventType notificationEventType, String hearingType) {
         ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventTypeWithAppointeeAndJointParty(notificationEventType, hearingType);
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(1, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.APPOINTEE, subsWithTypeList.get(0).getSubscriptionType());
+        assertSoftly(softly -> {
+            softly.assertThat(subsWithTypeList).hasSize(1);
+            softly.assertThat(subsWithTypeList.get(0).getSubscriptionType()).isEqualTo(SubscriptionType.APPOINTEE);
+        });
     }
 
     @Test
@@ -381,9 +398,11 @@ public class CcdNotificationWrapperTest {
     public void givenSubscriptions_shouldGetSubscriptionTypeListWithAppointeeAndJointParty(NotificationEventType notificationEventType, String hearingType) {
         ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventTypeWithAppointeeAndJointParty(notificationEventType, hearingType);
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(2, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.APPOINTEE, subsWithTypeList.get(0).getSubscriptionType());
-        Assert.assertEquals(SubscriptionType.JOINT_PARTY, subsWithTypeList.get(1).getSubscriptionType());
+        assertSoftly(softly -> {
+            softly.assertThat(subsWithTypeList).hasSize(2);
+            softly.assertThat(subsWithTypeList.get(0).getSubscriptionType()).isEqualTo(SubscriptionType.APPOINTEE);
+            softly.assertThat(subsWithTypeList.get(1).getSubscriptionType()).isEqualTo(SubscriptionType.JOINT_PARTY);
+        });
     }
 
     @Test
@@ -427,8 +446,10 @@ public class CcdNotificationWrapperTest {
         sscsCaseData.setSendDirectionNoticeToJointParty(hasJointParty);
 
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(requiredMembers.size(), subsWithTypeList.size());
-        subsWithTypeList.forEach(o -> Assert.assertTrue(requiredMembers.contains(o.getSubscriptionType())));
+        assertSoftly(softly -> {
+            softly.assertThat(subsWithTypeList).hasSize(requiredMembers.size());
+            subsWithTypeList.forEach(o -> softly.assertThat(requiredMembers).contains(o.getSubscriptionType()));
+        });
     }
 
     // SSCSCI-2659: on Issue Direction Notice, only the selected other party(ies) should be notified.
@@ -451,9 +472,9 @@ public class CcdNotificationWrapperTest {
 
         List<SubscriptionWithType> subs = ccdNotificationWrapper.getOtherPartySubscriptions(caseData, eventType);
 
-        Assertions.assertThat(subs)
+        assertSoftly(softly -> softly.assertThat(subs)
             .extracting(SubscriptionWithType::getPartyId)
-            .containsExactly("1");
+            .containsExactly("1"));
     }
 
     @Test
@@ -467,9 +488,9 @@ public class CcdNotificationWrapperTest {
 
         List<SubscriptionWithType> subs = ccdNotificationWrapper.getOtherPartySubscriptions(caseData, DIRECTION_ISSUED);
 
-        Assertions.assertThat(subs)
+        assertSoftly(softly -> softly.assertThat(subs)
             .extracting(SubscriptionWithType::getPartyId)
-            .containsExactlyInAnyOrder("1", "2");
+            .containsExactlyInAnyOrder("1", "2"));
     }
 
 
@@ -481,9 +502,9 @@ public class CcdNotificationWrapperTest {
 
         List<SubscriptionWithType> subs = ccdNotificationWrapper.getOtherPartySubscriptions(caseData, UPDATE_OTHER_PARTY_DATA);
 
-        Assertions.assertThat(subs)
+        assertSoftly(softly -> softly.assertThat(subs)
             .extracting(SubscriptionWithType::getPartyId)
-            .contains("1");
+            .contains("1"));
     }
 
     @Test
@@ -496,7 +517,7 @@ public class CcdNotificationWrapperTest {
 
         List<SubscriptionWithType> subs = ccdNotificationWrapper.getOtherPartySubscriptions(caseData, DIRECTION_ISSUED);
 
-        Assertions.assertThat(subs).isEmpty();
+        assertSoftly(softly -> softly.assertThat(subs).isEmpty());
     }
 
     @Test
@@ -510,9 +531,9 @@ public class CcdNotificationWrapperTest {
 
         List<SubscriptionWithType> subs = ccdNotificationWrapper.getOtherPartySubscriptions(caseData, DIRECTION_ISSUED);
 
-        Assertions.assertThat(subs)
+        assertSoftly(softly -> softly.assertThat(subs)
             .extracting(SubscriptionWithType::getPartyId)
-            .containsExactly("2");
+            .containsExactly("2"));
     }
 
     @Test
@@ -527,9 +548,9 @@ public class CcdNotificationWrapperTest {
 
         List<SubscriptionWithType> subs = ccdNotificationWrapper.getOtherPartySubscriptions(caseData, DIRECTION_ISSUED);
 
-        Assertions.assertThat(subs)
+        assertSoftly(softly -> softly.assertThat(subs)
             .extracting(SubscriptionWithType::getPartyId)
-            .containsExactly("3");
+            .containsExactly("3"));
     }
 
     @Test
@@ -548,9 +569,9 @@ public class CcdNotificationWrapperTest {
 
         List<SubscriptionWithType> subs = ccdNotificationWrapper.getOtherPartySubscriptions(caseData, DIRECTION_ISSUED);
 
-        Assertions.assertThat(subs)
+        assertSoftly(softly -> softly.assertThat(subs)
             .extracting(SubscriptionWithType::getPartyId)
-            .contains("2");
+            .contains("2"));
     }
 
     private CcdValue<OtherParty> buildOtherParty(String id, String appointeeId, String repId) {
@@ -663,9 +684,11 @@ public class CcdNotificationWrapperTest {
         ccdNotificationWrapper.getNewSscsCaseData().setConfidentialityRequestOutcomeAppellant(DatedRequestOutcome.builder().requestOutcome(RequestOutcome.GRANTED).build());
         ccdNotificationWrapper.getNewSscsCaseData().setConfidentialityRequestOutcomeJointParty(DatedRequestOutcome.builder().requestOutcome(RequestOutcome.GRANTED).build());
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(2, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.APPELLANT, subsWithTypeList.get(0).getSubscriptionType());
-        Assert.assertEquals(SubscriptionType.JOINT_PARTY, subsWithTypeList.get(1).getSubscriptionType());
+        assertSoftly(softly -> {
+            softly.assertThat(subsWithTypeList).hasSize(2);
+            softly.assertThat(subsWithTypeList.get(0).getSubscriptionType()).isEqualTo(SubscriptionType.APPELLANT);
+            softly.assertThat(subsWithTypeList.get(1).getSubscriptionType()).isEqualTo(SubscriptionType.JOINT_PARTY);
+        });
     }
 
     @Test
@@ -674,8 +697,10 @@ public class CcdNotificationWrapperTest {
         ccdNotificationWrapper.getNewSscsCaseData().setConfidentialityRequestOutcomeAppellant(DatedRequestOutcome.builder().requestOutcome(RequestOutcome.GRANTED).build());
         ccdNotificationWrapper.getNewSscsCaseData().setConfidentialityRequestOutcomeJointParty(null);
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(1, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.APPELLANT, subsWithTypeList.get(0).getSubscriptionType());
+        assertSoftly(softly -> {
+            softly.assertThat(subsWithTypeList).hasSize(1);
+            softly.assertThat(subsWithTypeList.get(0).getSubscriptionType()).isEqualTo(SubscriptionType.APPELLANT);
+        });
     }
 
     @Test
@@ -684,8 +709,10 @@ public class CcdNotificationWrapperTest {
         ccdNotificationWrapper.getNewSscsCaseData().setConfidentialityRequestOutcomeAppellant(null);
         ccdNotificationWrapper.getNewSscsCaseData().setConfidentialityRequestOutcomeJointParty(DatedRequestOutcome.builder().requestOutcome(RequestOutcome.GRANTED).build());
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(1, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.JOINT_PARTY, subsWithTypeList.get(0).getSubscriptionType());
+        assertSoftly(softly -> {
+            softly.assertThat(subsWithTypeList).hasSize(1);
+            softly.assertThat(subsWithTypeList.get(0).getSubscriptionType()).isEqualTo(SubscriptionType.JOINT_PARTY);
+        });
     }
 
     @Test
@@ -696,8 +723,10 @@ public class CcdNotificationWrapperTest {
         ccdNotificationWrapper.getNewSscsCaseData().setConfidentialityRequestOutcomeAppellant(DatedRequestOutcome.builder().requestOutcome(RequestOutcome.GRANTED).build());
         ccdNotificationWrapper.getNewSscsCaseData().setConfidentialityRequestOutcomeJointParty(DatedRequestOutcome.builder().requestOutcome(RequestOutcome.GRANTED).build());
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(1, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.JOINT_PARTY, subsWithTypeList.get(0).getSubscriptionType());
+        assertSoftly(softly -> {
+            softly.assertThat(subsWithTypeList).hasSize(1);
+            softly.assertThat(subsWithTypeList.get(0).getSubscriptionType()).isEqualTo(SubscriptionType.JOINT_PARTY);
+        });
     }
 
     @Test
@@ -705,8 +734,10 @@ public class CcdNotificationWrapperTest {
     public void givenSubscriptions_shouldGetSubscriptionTypeListWithAppellant(NotificationEventType notificationEventType) {
         ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventType(notificationEventType);
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(1, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.APPELLANT, subsWithTypeList.get(0).getSubscriptionType());
+        assertSoftly(softly -> {
+            softly.assertThat(subsWithTypeList).hasSize(1);
+            softly.assertThat(subsWithTypeList.get(0).getSubscriptionType()).isEqualTo(SubscriptionType.APPELLANT);
+        });
     }
 
     @Test
@@ -717,9 +748,11 @@ public class CcdNotificationWrapperTest {
     public void givenSubscriptions_shouldGetSubscriptionTypeListWithAppointeeAndJointPartyDirection(NotificationEventType notificationEventType, String hearingType, DirectionType directionType) {
         ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventTypeWithAppointeeAndJointParty(notificationEventType, hearingType, directionType);
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(2, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.APPOINTEE, subsWithTypeList.get(0).getSubscriptionType());
-        Assert.assertEquals(SubscriptionType.JOINT_PARTY, subsWithTypeList.get(1).getSubscriptionType());
+        assertSoftly(softly -> {
+            softly.assertThat(subsWithTypeList).hasSize(2);
+            softly.assertThat(subsWithTypeList.get(0).getSubscriptionType()).isEqualTo(SubscriptionType.APPOINTEE);
+            softly.assertThat(subsWithTypeList.get(1).getSubscriptionType()).isEqualTo(SubscriptionType.JOINT_PARTY);
+        });
     }
 
     @Test
@@ -727,8 +760,10 @@ public class CcdNotificationWrapperTest {
         ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventTypeWithAppointeeAndJointParty(REQUEST_FOR_INFORMATION, ORAL);
         ccdNotificationWrapper.getNewSscsCaseData().setInformationFromPartySelected(new DynamicList(new DynamicListItem(PartyItemList.APPELLANT.getCode(), PartyItemList.APPELLANT.getLabel()), new ArrayList<>()));
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(1, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.APPOINTEE, subsWithTypeList.get(0).getSubscriptionType());
+        assertSoftly(softly -> {
+            softly.assertThat(subsWithTypeList).hasSize(1);
+            softly.assertThat(subsWithTypeList.get(0).getSubscriptionType()).isEqualTo(SubscriptionType.APPOINTEE);
+        });
     }
 
     @Test
@@ -736,8 +771,10 @@ public class CcdNotificationWrapperTest {
         ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventType(REQUEST_FOR_INFORMATION);
         ccdNotificationWrapper.getNewSscsCaseData().setInformationFromPartySelected(new DynamicList(new DynamicListItem(PartyItemList.APPELLANT.getCode(), PartyItemList.APPELLANT.getLabel()), new ArrayList<>()));
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(1, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.APPELLANT, subsWithTypeList.get(0).getSubscriptionType());
+        assertSoftly(softly -> {
+            softly.assertThat(subsWithTypeList).hasSize(1);
+            softly.assertThat(subsWithTypeList.get(0).getSubscriptionType()).isEqualTo(SubscriptionType.APPELLANT);
+        });
     }
 
     @Test
@@ -745,8 +782,10 @@ public class CcdNotificationWrapperTest {
         ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventTypeWithRep(REQUEST_FOR_INFORMATION);
         ccdNotificationWrapper.getNewSscsCaseData().setInformationFromPartySelected(new DynamicList(new DynamicListItem(PartyItemList.REPRESENTATIVE.getCode(), PartyItemList.REPRESENTATIVE.getLabel()), new ArrayList<>()));
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(1, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.REPRESENTATIVE, subsWithTypeList.get(0).getSubscriptionType());
+        assertSoftly(softly -> {
+            softly.assertThat(subsWithTypeList).hasSize(1);
+            softly.assertThat(subsWithTypeList.get(0).getSubscriptionType()).isEqualTo(SubscriptionType.REPRESENTATIVE);
+        });
     }
 
     @Test
@@ -754,75 +793,92 @@ public class CcdNotificationWrapperTest {
         ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventTypeWithAppointeeAndJointParty(REQUEST_FOR_INFORMATION, PAPER);
         ccdNotificationWrapper.getNewSscsCaseData().setInformationFromPartySelected(new DynamicList(new DynamicListItem(PartyItemList.JOINT_PARTY.getCode(), PartyItemList.JOINT_PARTY.getLabel()), new ArrayList<>()));
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(1, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.JOINT_PARTY, subsWithTypeList.get(0).getSubscriptionType());
+        assertSoftly(softly -> {
+            softly.assertThat(subsWithTypeList).hasSize(1);
+            softly.assertThat(subsWithTypeList.get(0).getSubscriptionType()).isEqualTo(SubscriptionType.JOINT_PARTY);
+        });
     }
 
     @Test
     public void givenProcessHearingRequestForRepWithSubscription_shouldSendProcessHearingRequestNotification() {
         ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventTypeWithRep(ACTION_HEARING_RECORDING_REQUEST);
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(1, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.REPRESENTATIVE, subsWithTypeList.get(0).getSubscriptionType());
+        assertSoftly(softly -> {
+            softly.assertThat(subsWithTypeList).hasSize(1);
+            softly.assertThat(subsWithTypeList.get(0).getSubscriptionType()).isEqualTo(SubscriptionType.REPRESENTATIVE);
+        });
     }
 
     @Test
     public void givenProcessHearingRequestForJointPartyWithSubscription_shouldSendProcessHearingRequestNotification() {
         ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventTypeWithJointParty(ACTION_HEARING_RECORDING_REQUEST, null);
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertEquals(1, subsWithTypeList.size());
-        Assert.assertEquals(SubscriptionType.JOINT_PARTY, subsWithTypeList.get(0).getSubscriptionType());
+        assertSoftly(softly -> {
+            softly.assertThat(subsWithTypeList).hasSize(1);
+            softly.assertThat(subsWithTypeList.get(0).getSubscriptionType()).isEqualTo(SubscriptionType.JOINT_PARTY);
+        });
+    }
+
+    @Test
+    public void givenProcessHearingRequestForOtherPartyWithSubscription_shouldSendProcessHearingRequestNotification() {
+        ccdNotificationWrapper = buildNotificationWrapperWithOtherParty(ACTION_HEARING_RECORDING_REQUEST, buildOtherPartyData(false, false, false));
+        List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
+
+        assertSoftly(softly -> {
+            softly.assertThat(subsWithTypeList).hasSize(1);
+            softly.assertThat(subsWithTypeList.get(0).getSubscriptionType()).isEqualTo(SubscriptionType.OTHER_PARTY);
+        });
     }
 
     @Test
     public void givenProcessHearingRequestForNoPartyWithSubscription_shouldNotSendProcessHearingRequestNotification() {
         ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventType(ACTION_HEARING_RECORDING_REQUEST, null, null, false);
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assert.assertTrue(subsWithTypeList.isEmpty());
+        assertSoftly(softly -> softly.assertThat(subsWithTypeList).isEmpty());
     }
 
     @Test
     public void givenNoOtherPartyInTheCase_thenReturnEmptySubscription() {
         ccdNotificationWrapper = buildNotificationWrapperWithOtherParty(UPDATE_OTHER_PARTY_DATA, null);
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getOtherPartySubscriptions(ccdNotificationWrapper.getNewSscsCaseData(), ccdNotificationWrapper.getNotificationType());
-        Assert.assertTrue(subsWithTypeList.isEmpty());
+        assertSoftly(softly -> softly.assertThat(subsWithTypeList).isEmpty());
     }
 
     @Test
     public void givenUpdateOtherPartyDataEventAndSendNotificationFlagIsNotSetInOtherParty_thenReturnEmptySubscription() {
         ccdNotificationWrapper = buildNotificationWrapperWithOtherParty(UPDATE_OTHER_PARTY_DATA, buildOtherPartyData(false, true, true));
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getOtherPartySubscriptions(ccdNotificationWrapper.getNewSscsCaseData(), ccdNotificationWrapper.getNotificationType());
-        Assert.assertTrue(subsWithTypeList.isEmpty());
+        assertSoftly(softly -> softly.assertThat(subsWithTypeList).isEmpty());
     }
 
     @Test
     public void givenUpdateOtherPartyDataEventAndSendNotificationFlagIsSetInOtherPartyWithAppointee_thenReturnAllOtherPartySubscription() {
         ccdNotificationWrapper = buildNotificationWrapperWithOtherParty(UPDATE_OTHER_PARTY_DATA, buildOtherPartyData(true, true, true));
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getOtherPartySubscriptions(ccdNotificationWrapper.getNewSscsCaseData(), ccdNotificationWrapper.getNotificationType());
-        Assertions.assertThat(subsWithTypeList)
+        assertSoftly(softly -> softly.assertThat(subsWithTypeList)
             .hasSize(2)
             .extracting(SubscriptionWithType::getPartyId)
-            .containsOnly("2", "3");
+            .containsOnly("2", "3"));
     }
 
     @Test
     public void givenUpdateOtherPartyDataEventAndSendNotificationFlagIsSetInOtherPartyWithNoAppointee_thenReturnAllOtherPartySubscription() {
         ccdNotificationWrapper = buildNotificationWrapperWithOtherParty(UPDATE_OTHER_PARTY_DATA, buildOtherPartyData(true, false, true));
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getOtherPartySubscriptions(ccdNotificationWrapper.getNewSscsCaseData(), ccdNotificationWrapper.getNotificationType());
-        Assertions.assertThat(subsWithTypeList)
+        assertSoftly(softly -> softly.assertThat(subsWithTypeList)
             .hasSize(2)
             .extracting(SubscriptionWithType::getPartyId)
-            .containsOnly("1", "3");
+            .containsOnly("1", "3"));
     }
 
     @Test
     public void givenUpdateOtherPartyDataEventAndSendNotificationFlagIsSetInOtherPartyWithNoAppointee_thenReturnAllOtherPartySubscription2() {
         ccdNotificationWrapper = buildNotificationWrapperWithOtherParty(UPDATE_OTHER_PARTY_DATA, buildOtherPartyData(true, true, true));
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getOtherPartySubscriptions(ccdNotificationWrapper.getNewSscsCaseData(), ccdNotificationWrapper.getNotificationType());
-        Assertions.assertThat(subsWithTypeList)
+        assertSoftly(softly -> softly.assertThat(subsWithTypeList)
             .hasSize(2)
             .extracting(SubscriptionWithType::getPartyId)
-            .containsOnly("2", "3");
+            .containsOnly("2", "3"));
     }
 
     @Test
@@ -864,10 +920,10 @@ public class CcdNotificationWrapperTest {
         ccdNotificationWrapper.getNewSscsCaseData().setInformationFromPartySelected(new DynamicList(new DynamicListItem(PartyItemList.APPELLANT.getCode(), PartyItemList.APPELLANT.getLabel()), new ArrayList<>()));
 
         List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
-        Assertions.assertThat(subsWithTypeList)
+        assertSoftly(softly -> softly.assertThat(subsWithTypeList)
             .hasSize(2)
             .extracting(SubscriptionWithType::getPartyId)
-            .contains("1");
+            .contains("1"));
     }
 
     @SuppressWarnings({"unused"})
