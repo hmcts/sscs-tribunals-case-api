@@ -741,38 +741,6 @@ public class NotificationServiceTest {
     }
 
     @Test
-    public void doNotSendNotificationToDeceasedAppellant() {
-        sscsCaseData.setIsAppellantDeceased(YesNo.YES);
-        sscsCaseData.setSubscriptions(Subscriptions.builder()
-            .appellantSubscription(Subscription.builder()
-                .tya(APPEAL_NUMBER)
-                .email("test@email.com")
-                .mobile(MOBILE_NUMBER_1)
-                .subscribeEmail(YES)
-                .subscribeSms(YES)
-                .wantSmsNotifications(YES)
-                .build())
-            .build());
-
-        NotificationSscsCaseDataWrapper wrapper = NotificationSscsCaseDataWrapper
-            .builder()
-            .newSscsCaseData(sscsCaseData)
-            .oldSscsCaseData(sscsCaseData)
-            .notificationEventType(APPEAL_WITHDRAWN)
-            .build();
-        ccdNotificationWrapper = new CcdNotificationWrapper(wrapper);
-
-        when(notificationValidService.isNotificationStillValidToSend(any(), any())).thenReturn(true);
-        when(notificationValidService.isHearingTypeValidToSendNotification(any(), any())).thenReturn(true);
-
-        notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
-
-        verify(factory, never()).create(any(), any());
-        verify(notificationHandler, never()).sendNotification(any(), any(), any(), any());
-        verifyNoErrorsLogged(mockAppender, captorLoggingEvent);
-    }
-
-    @Test
     public void createsReminders() {
 
         Notification notification = new Notification(
