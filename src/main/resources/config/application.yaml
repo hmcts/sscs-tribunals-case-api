@@ -1153,6 +1153,8 @@ notification:
                         docmosisId: TB-SCS-LET-ENG-Hearing-Booked-v2.docx
                     other_party:
                         docmosisId: TB-SCS-LET-ENG-Hearing-Booked-v2.docx
+        resendTya:
+            emailId: d10c8311-d53f-4b01-87de-777ddc98ddcc
     welsh:
         adminCorrectionHeader:
             appellant:
