@@ -571,6 +571,7 @@ export class UploadResponse extends BaseStep {
     
     await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
     await this.stepsHelper.setCaseAsUrgentHelper();
+     await this.homePage.signOut();
 
     // As DWP caseworker upload response with further info
     await this.loginUserWithCaseId(
