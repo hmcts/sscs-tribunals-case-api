@@ -11,6 +11,7 @@ SSCS_SYSTEM_USER_TOKEN=$(${BASEDIR}/utils/idam-lease-user-token.sh $IDAM_SSCS_SY
 SYSTEM_USER_ID=$(curl --silent --show-error -X GET "${IDAM_API_BASE_URL}/details" -H "accept: application/json" -H "authorization: Bearer ${SSCS_SYSTEM_USER_TOKEN}" | jq -r .id)
 
 echo -e "\nCreating role assignment: \n User: ${SYSTEM_USER_ID}"
+echo "\nNew endpoint response:\n $(curl --silent --show-error -X GET "${IDAM_API_BASE_URL}/o/userinfo" -H "accept: application/json" -H "authorization: Bearer ${SSCS_SYSTEM_USER_TOKEN}" | jq -r .)"
 
 if [ "$environment" = "preview" ]; then
     RAS_URL="https://am-role-assignment-service-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
