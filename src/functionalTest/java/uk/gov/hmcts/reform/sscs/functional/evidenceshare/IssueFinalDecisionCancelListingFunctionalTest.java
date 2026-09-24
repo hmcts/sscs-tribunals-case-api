@@ -76,6 +76,7 @@ class IssueFinalDecisionCancelListingFunctionalTest extends AbstractFunctionalTe
 
     static boolean isDeployedToLocalhost() {
         final String testUrl = System.getenv("TEST_URL");
+        log.info("Test URL: {}", testUrl);
         return StringUtils.isBlank(testUrl) || LOCAL_HOSTS.contains(URI.create(testUrl).getHost());
     }
 
