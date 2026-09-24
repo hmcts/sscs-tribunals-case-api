@@ -603,7 +603,7 @@ ccd:
         ADMINWEB_ELASTIC_CASE_TYPES_URL: http://${SERVICE_NAME}-ccd-definition-store/elastic-support/case-types
         IDAM_ADMIN_WEB_SERVICE_KEY: ${ADMIN_S2S_KEY}
         IDAM_OAUTH2_AW_CLIENT_SECRET: ${ADMIN_WEB_IDAM_SECRET}
-        SESSION_KEYS: ${SESSION_KEYS}
+        SESSION_KEYS: '${SESSION_KEYS}'
         ALLOW_CONFIG_MUTATIONS: true
       keyVaults: [ ]
 
