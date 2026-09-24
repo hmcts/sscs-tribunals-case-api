@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import junitparams.converters.Nullable;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -321,6 +322,37 @@ public class CcdNotificationWrapperTest {
             softly.assertThat(subsWithTypeList).hasSize(2);
             softly.assertThat(subsWithTypeList.get(0).getSubscriptionType()).isEqualTo(SubscriptionType.APPELLANT);
             softly.assertThat(subsWithTypeList.get(1).getSubscriptionType()).isEqualTo(SubscriptionType.REPRESENTATIVE);
+        });
+    }
+
+    @Test
+    public void givenAppellantDeceased_shouldExcludeAppellantButKeepRepFromSubscriptionTypeList() {
+        ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventTypeWithRep(APPEAL_WITHDRAWN);
+        ccdNotificationWrapper.getNewSscsCaseData().setIsAppellantDeceased(YES);
+
+        List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
+
+        assertSoftly(softly -> {
+            softly.assertThat(subsWithTypeList).hasSize(1);
+            softly.assertThat(subsWithTypeList)
+                .extracting(SubscriptionWithType::getSubscriptionType)
+                .containsExactly(SubscriptionType.REPRESENTATIVE);
+        });
+    }
+
+    @Test
+    @Parameters({"NO", "null"})
+    public void givenAppellantNotDeceased_shouldIncludeAppellantInSubscriptionTypeList(@Nullable YesNo isAppellantDeceased) {
+        ccdNotificationWrapper = buildCcdNotificationWrapperBasedOnEventTypeWithRep(APPEAL_WITHDRAWN);
+        ccdNotificationWrapper.getNewSscsCaseData().setIsAppellantDeceased(isAppellantDeceased);
+
+        List<SubscriptionWithType> subsWithTypeList = ccdNotificationWrapper.getSubscriptionsBasedOnNotificationType();
+
+        assertSoftly(softly -> {
+            softly.assertThat(subsWithTypeList).hasSize(2);
+            softly.assertThat(subsWithTypeList)
+                .extracting(SubscriptionWithType::getSubscriptionType)
+                .containsExactly(SubscriptionType.APPELLANT, SubscriptionType.REPRESENTATIVE);
         });
     }
 
