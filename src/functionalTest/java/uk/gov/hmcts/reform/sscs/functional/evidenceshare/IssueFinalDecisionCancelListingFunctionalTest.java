@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,12 +42,11 @@ import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.hmc.topic.ProcessHmcMessageServiceV2;
 
 @Slf4j
-@TestPropertySource(locations = "classpath:config/application_functional.properties", properties = "logging.level.uk.gov.hmcts.reform.sscs.functional.evidenceshare.IssueFinalDecisionCancelListingFunctionalTest=DEBUG")
+@TestPropertySource(locations = "classpath:config/application_functional.properties")
 @TestConstructor(autowireMode = AutowireMode.ALL)
 @RequiredArgsConstructor
 class IssueFinalDecisionCancelListingFunctionalTest extends AbstractFunctionalTest {
 
-    private static final Set<String> LOCAL_HOSTS = Set.of("localhost", "127.0.0.1");
     private static final String CASE_DATA_JSON = "handlers/issuefinaldecision/readyToListWriteFinalDecisionCaseData.json";
     private static final String EVIDENCE_DOCUMENT_PDF = "evidence-document.pdf";
     private static final String PREVIEW_DOCUMENT_TYPE = "PREVIEW_DOCUMENT";
@@ -75,28 +73,26 @@ class IssueFinalDecisionCancelListingFunctionalTest extends AbstractFunctionalTe
 
         final String hearingId = createCaseAwaitingListing();
 
-        log.debug("Case {}: setting a judge-only panel so the Ready to List judge-only rule applies", ccdCaseId);
-        final SscsCaseDetails judgeOnlyCase = updatePanelMemberComposition(
-            PanelMemberComposition.builder().panelCompositionJudge(TRIBUNAL_JUDGE.getReference()).build());
+        log.info("Case {}: setting a judge-only panel so the Ready to List judge-only rule applies", ccdCaseId);
+        final SscsCaseDetails judgeOnlyCase = updatePanelMemberComposition(judgeOnlyPanel());
         assertThat(judgeOnlyCase.getData().getPanelMemberComposition().isJudgeOnly()).isTrue();
 
         issueFinalDecision(judgeOnlyCase);
 
         awaitCancellationRequested(hearingId);
-
     }
 
     @Test
     void givenCaseWithBookedHearingInTheFuture_whenIssueFinalDecision_thenHearingIsCancelled() throws IOException, MessageProcessingException {
         final String hearingId = createCaseAwaitingListing();
 
-        log.debug("Case {}: setting a full panel so only the future hearing rule can trigger the cancellation", ccdCaseId);
+        log.info("Case {}: setting a full panel so only the future hearing rule can trigger the cancellation", ccdCaseId);
         final SscsCaseDetails panelCase = updatePanelMemberComposition(fullPanel());
         assertThat(panelCase.getData().getPanelMemberComposition().isJudgeOnly()).isFalse();
 
-        sendHmcMessage(hearingId, HmcStatus.LISTED, ListingStatus.FIXED);
+        sendHmcMessageToBookHearing(hearingId);
 
-        log.debug("Case {}: waiting for hearing {} to be booked with a venue and a future date", ccdCaseId, hearingId);
+        log.info("Case {}: waiting for hearing {} to be booked with a venue and a future date", ccdCaseId, hearingId);
         defaultAwait().untilAsserted(() -> {
             final SscsCaseDetails bookedCase = findCaseById(ccdCaseId);
             assertThat(bookedCase.getState()).isEqualTo(State.HEARING.getId());
@@ -106,13 +102,16 @@ class IssueFinalDecisionCancelListingFunctionalTest extends AbstractFunctionalTe
             assertThat(LocalDate.parse(bookedHearing.getValue().getHearingDate())).isAfter(today());
         });
         final Hearing bookedHearing = findHearing(findCaseById(ccdCaseId), hearingId);
-        log.debug("Case {}: hearing {} booked for {} at {}", ccdCaseId, hearingId, bookedHearing.getValue().getHearingDate(),
+        log.info("Case {}: hearing {} booked for {} at {}", ccdCaseId, hearingId, bookedHearing.getValue().getHearingDate(),
             bookedHearing.getValue().getVenue().getName());
 
         issueFinalDecision(findCaseById(ccdCaseId));
 
         awaitCancellationRequested(hearingId);
+    }
 
+    private static PanelMemberComposition judgeOnlyPanel() {
+        return PanelMemberComposition.builder().panelCompositionJudge(TRIBUNAL_JUDGE.getReference()).build();
     }
 
     private static PanelMemberComposition fullPanel() {
@@ -125,17 +124,20 @@ class IssueFinalDecisionCancelListingFunctionalTest extends AbstractFunctionalTe
     }
 
     private String createCaseAwaitingListing() throws IOException {
+
         final SscsCaseDetails createdCase = ccdService.createCase(
             buildCaseData(CASE_DATA_JSON, data -> uploadCaseDocument(EVIDENCE_DOCUMENT_PDF, PREVIEW_DOCUMENT_TYPE, data)),
             CREATE_RESPONSE_RECEIVED_TEST_CASE.getCcdType(), "Issue final decision cancel listing",
             "Issue final decision cancel listing functional test", getIdamTokens());
         ccdCaseId = String.valueOf(createdCase.getId());
-        log.debug("Case {}: created in state {}", ccdCaseId, createdCase.getState());
+        log.info("Case {}: created in state {}", ccdCaseId, createdCase.getState());
 
         final String hearingId = ccdCaseId;
 
-        log.debug("Case {}: firing {} to send a listing request to HMC", ccdCaseId, READY_TO_LIST.getCcdType());
+
+        log.info("Case {}: firing {} to send a listing request to HMC", ccdCaseId, READY_TO_LIST.getCcdType());
         updateCaseEvent(READY_TO_LIST, findCaseById(ccdCaseId));
+
 
         awaitListingRequestCreated(hearingId);
 
@@ -144,7 +146,7 @@ class IssueFinalDecisionCancelListingFunctionalTest extends AbstractFunctionalTe
         final Hearing awaitingListingHearing = findHearing(awaitingListingCase, hearingId);
         assertThat(awaitingListingHearing.getValue().getStart()).isNull();
         assertThat(awaitingListingHearing.getValue().getVenue()).isNull();
-        log.debug("Case {}: in state {} with listing request {} awaiting listing (no date or venue)", ccdCaseId,
+        log.info("Case {}: in state {} with listing request {} awaiting listing (no date or venue)", ccdCaseId,
             awaitingListingCase.getState(), hearingId);
 
         return hearingId;
@@ -153,53 +155,54 @@ class IssueFinalDecisionCancelListingFunctionalTest extends AbstractFunctionalTe
     private SscsCaseDetails updatePanelMemberComposition(final PanelMemberComposition panelMemberComposition) {
         final SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
         caseDetails.getData().setPanelMemberComposition(panelMemberComposition);
-        updateCaseEvent(UPDATE_CASE_ONLY, caseDetails);
+        updateCaseEvent(UPDATE_CASE_ONLY, caseDetails, "update panel member composition functional test",
+            "is judge only panel composition: %s".formatted(panelMemberComposition.isJudgeOnly()));
         final SscsCaseDetails updatedCase = findCaseById(ccdCaseId);
-        log.debug("Case {}: panel member composition is now {} (judge only: {})", ccdCaseId,
+        log.info("Case {}: panel member composition is now {} (judge only: {})", ccdCaseId,
             updatedCase.getData().getPanelMemberComposition(), updatedCase.getData().getPanelMemberComposition().isJudgeOnly());
         return updatedCase;
     }
 
     private void issueFinalDecision(final SscsCaseDetails caseDetails) {
-        log.debug("Case {}: firing {} from state {}", ccdCaseId, ISSUE_FINAL_DECISION.getCcdType(), caseDetails.getState());
-        updateCaseEvent(ISSUE_FINAL_DECISION, caseDetails);
-        log.debug("Case {}: {} completed, case is now in state {}", ccdCaseId, ISSUE_FINAL_DECISION.getCcdType(),
+        log.info("Case {}: firing {} from state {}", ccdCaseId, ISSUE_FINAL_DECISION.getCcdType(), caseDetails.getState());
+        updateCaseEvent(ISSUE_FINAL_DECISION, caseDetails, "issue final decision functional test", "issue final decision event");
+        log.info("Case {}: {} completed, case is now in state {}", ccdCaseId, ISSUE_FINAL_DECISION.getCcdType(),
             findCaseById(ccdCaseId).getState());
     }
 
-    private void sendHmcMessage(final String hearingId, final HmcStatus hmcStatus,
-        final ListingStatus listingStatus) throws MessageProcessingException {
-        log.debug("Case {}: simulating HMC topic message for hearing {} with status {} and listing status {}", ccdCaseId,
-            hearingId, hmcStatus, listingStatus);
-        processHmcMessageServiceV2.processEventMessage(buildHmcMessage(hearingId, hmcStatus, listingStatus));
+    private void sendHmcMessageToBookHearing(final String hearingId) throws MessageProcessingException {
+        log.info("Case {}: simulating HMC topic message for hearing {} with status {} and listing status {}", ccdCaseId,
+            hearingId, HmcStatus.LISTED, ListingStatus.FIXED);
+        processHmcMessageServiceV2.processEventMessage(buildHmcMessage(hearingId));
     }
 
-    private HmcMessage buildHmcMessage(final String hearingId, final HmcStatus hmcStatus, final ListingStatus listingStatus) {
+    private HmcMessage buildHmcMessage(final String hearingId) {
         return HmcMessage
             .builder()
             .hmctsServiceCode(SSCS_SERVICE_CODE)
             .caseId(Long.valueOf(ccdCaseId))
             .hearingId(hearingId)
-            .hearingUpdate(HearingUpdate.builder().hmcStatus(hmcStatus).listingStatus(listingStatus).build())
+            .hearingUpdate(HearingUpdate.builder().hmcStatus(HmcStatus.LISTED).listingStatus(ListingStatus.FIXED).build())
             .build();
     }
 
     private void awaitListingRequestCreated(final String hearingId) {
-        log.debug("Case {}: waiting for listing request {} to be added to the case", ccdCaseId, hearingId);
+        log.info("Case {}: waiting for listing request {} to be added to the case", ccdCaseId, hearingId);
         defaultAwait().untilAsserted(() -> assertThat(findCaseById(ccdCaseId).getData().getHearings())
             .isNotEmpty()
             .anySatisfy(hearing -> assertThat(hearing.getValue().getHearingId()).isEqualTo(hearingId)));
-        log.debug("Case {}: listing request {} added to the case", ccdCaseId, hearingId);
+        log.info("Case {}: listing request {} added to the case", ccdCaseId, hearingId);
     }
 
     private void awaitCancellationRequested(final String hearingId) throws JsonProcessingException {
         final String otherCancellationReason = mapper.writeValueAsString(CancellationReason.OTHER);
-        log.debug("Case {}: waiting for HMC to receive DELETE {}/{} with reason {}", ccdCaseId, HEARING_ENDPOINT, hearingId,
+        log.info("Case {}: waiting for HMC to receive DELETE {}/{} with reason {}", ccdCaseId, HEARING_ENDPOINT, hearingId,
             otherCancellationReason);
         defaultAwait().untilAsserted(() -> assertThat(hmcWireMock.find(
             deleteRequestedFor(urlEqualTo(HEARING_ENDPOINT + "/" + hearingId)).withRequestBody(
                 containing(otherCancellationReason)))).hasSize(1));
-        log.debug("Case {}: HMC received the cancellation request for hearing {}", ccdCaseId, hearingId);
+        log.info("Case {}: HMC received the cancellation request for hearing {}", ccdCaseId, hearingId);
     }
+
 
 }

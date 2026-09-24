@@ -180,11 +180,15 @@ abstract class AbstractFunctionalTest {
     }
 
     void updateCaseEvent(EventType eventType, SscsCaseDetails caseDetails) {
+        updateCaseEvent(eventType, caseDetails, "Evidence share update case test",
+            "Evidence share service pushed case update for functional test");
+    }
+
+    void updateCaseEvent(EventType eventType, SscsCaseDetails caseDetails, String summary, String description) {
         idamTokens = getIdamTokens();
 
-        ccdService.updateCase(caseDetails.getData(), caseDetails.getId(),
-            eventType.getCcdType(), "Evidence share update case test",
-            "Evidence share service pushed case update for functional test", getIdamTokens());
+        ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), eventType.getCcdType(), summary, description,
+            getIdamTokens());
     }
 
     SscsCaseDetails findCaseById(String ccdCaseId) {

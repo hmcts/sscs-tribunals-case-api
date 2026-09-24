@@ -1,0 +1,30 @@
+{
+  "priority": 1,
+  "scenarioName": "hmc-hearing",
+  "requiredScenarioState": "Cancelled",
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/hearing/[0-9]+"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "requestDetails": {
+        "hearingRequestID": "{{request.pathSegments.[1]}}",
+        "versionNumber": 2,
+        "status": "CANCELLED",
+        "cancellationReasonCodes": ["other"]
+      },
+      "hearingDetails": {},
+      "caseDetails": {},
+      "partyDetails": [],
+      "hearingResponse": {
+        "listingStatus": "CNCL"
+      }
+    },
+    "transformers": ["response-template"]
+  }
+}
