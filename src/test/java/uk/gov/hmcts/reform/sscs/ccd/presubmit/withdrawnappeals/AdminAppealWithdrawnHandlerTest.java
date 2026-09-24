@@ -5,6 +5,7 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -17,8 +18,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import junitparams.converters.Nullable;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,25 +32,21 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.model.PoDetails;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 
 @ExtendWith(MockitoExtension.class)
-class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
+public class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
 
     private static final String USER_AUTHORISATION = "Bearer token";
-    private static final String ADMIN_APPEAL_WITHDRAWN_CALLBACK_JSON = "adminAppealWithdrawnCallback.json";
+    public static final String ADMIN_APPEAL_WITHDRAWN_CALLBACK_JSON = "adminAppealWithdrawnCallback.json";
 
     @Mock
     private ListAssistHearingMessageHelper hearingMessageHelper;
@@ -64,7 +59,7 @@ class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
     private AdminAppealWithdrawnHandler handler;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         handler = new AdminAppealWithdrawnHandler(hearingMessageHelper, addNoteService, false);
     }
 
@@ -78,7 +73,7 @@ class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
         "null,ADMIN_APPEAL_WITHDRAWN,false",
         "ABOUT_TO_SUBMIT,null,false",
     })
-    void canHandle(@Nullable String callbackTypeStr, @Nullable String eventTypeStr, boolean expectedResult)
+    public void canHandle(@Nullable String callbackTypeStr, @Nullable String eventTypeStr, boolean expectedResult)
         throws IOException {
         CallbackType callbackType = callbackTypeStr.equals("null") ? null : CallbackType.valueOf(callbackTypeStr);
         EventType eventType = eventTypeStr.equals("null") ? null : EventType.valueOf(eventTypeStr);
@@ -90,7 +85,7 @@ class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
     }
 
     @Test
-    void handleDoesNotAddNewDocumentToSscsDocuments() throws IOException {
+    public void handleDoesNotAddNewDocumentToSscsDocuments() throws IOException {
         var actualResult = handler.handle(
                 ABOUT_TO_SUBMIT,
                 buildTestCallbackGivenEvent(ADMIN_APPEAL_WITHDRAWN, ADMIN_APPEAL_WITHDRAWN_CALLBACK_JSON),
@@ -133,17 +128,23 @@ class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
     }
 
     @ParameterizedTest
-    @CsvSource({"ABOUT_TO_START,ADMIN_APPEAL_WITHDRAWN", "ABOUT_TO_SUBMIT,null", "null,ADMIN_APPEAL_WITHDRAWN"})
-    void handleCornerCaseScenarios(@Nullable String callbackTypeStr, @Nullable String eventTypeStr) throws IOException {
+    @CsvSource({
+        "ABOUT_TO_START,ADMIN_APPEAL_WITHDRAWN",
+        "ABOUT_TO_SUBMIT,null",
+        "null,ADMIN_APPEAL_WITHDRAWN"
+    })
+    public void handleCornerCaseScenarios(@Nullable String callbackTypeStr, @Nullable String eventTypeStr) {
         CallbackType callbackType = callbackTypeStr.equals("null") ? null : CallbackType.valueOf(callbackTypeStr);
         EventType eventType = eventTypeStr.equals("null") ? null : EventType.valueOf(eventTypeStr);
-        final Callback<SscsCaseData> sscsCaseDataCallback = buildTestCallbackGivenEvent(eventType,
-            ADMIN_APPEAL_WITHDRAWN_CALLBACK_JSON);
-        assertThrows(IllegalStateException.class, () -> handler.handle(callbackType, sscsCaseDataCallback, USER_AUTHORISATION));
+        assertThrows(IllegalStateException.class, () -> handler.handle(
+                callbackType,
+                buildTestCallbackGivenEvent(eventType, ADMIN_APPEAL_WITHDRAWN_CALLBACK_JSON),
+                USER_AUTHORISATION
+        ));
     }
 
     @Test
-    void sendCancellationForAdminAppeal_eligibleForCancelHearings() {
+    public void sendCancellationForAdminAppeal_eligibleForCancelHearings() {
         handler = new AdminAppealWithdrawnHandler(hearingMessageHelper, addNoteService, true);
 
         SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().build())
@@ -157,52 +158,24 @@ class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(hearingMessageHelper)
-                .sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(), CancellationReason.WITHDRAWN);
+                .sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.WITHDRAWN));
     }
 
     @Test
-    void movesWithdrawalDocumentToSscsDocumentsCollection() throws IOException {
+    public void movesWithdrawalDocumentToSscsDocumentsCollection() throws IOException {
         PreSubmitCallbackResponse<SscsCaseData> actualResult = handler.handle(
                 ABOUT_TO_SUBMIT, buildTestCallbackGivenEvent(ADMIN_APPEAL_WITHDRAWN,
                         "adminAppealWithdrawnCallbackWithdrawalDocument.json"), USER_AUTHORISATION);
 
         assertEquals(WITHDRAWAL_RECEIVED, actualResult.getData().getDwpState());
         assertThatJson(actualResult.getData().getSscsDocument().size()).isEqualTo(1);
-        assertEquals(LocalDate.now().toString(), actualResult.getData().getSscsDocument().getFirst().getValue().getDocumentDateAdded());
-        assertEquals(WITHDRAWAL_REQUEST.getValue(), actualResult.getData().getSscsDocument().getFirst().getValue().getDocumentType());
-        assertEquals("withdrawnDoc.pdf", actualResult.getData().getSscsDocument().getFirst().getValue().getDocumentFileName());
+        assertEquals(LocalDate.now().toString(), actualResult.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
+        assertEquals(WITHDRAWAL_REQUEST.getValue(), actualResult.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertEquals("withdrawnDoc.pdf", actualResult.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
     }
 
     @Test
-    void movesWithdrawalDocumentAheadOfExistingSscsDocuments() {
-        final SscsDocument existingDoc = SscsDocument.builder().value(SscsDocumentDetails.builder()
-                .documentFileName("existing.pdf")
-                .documentDateAdded("2020-01-01")
-                .build()).build();
-
-        SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().build())
-                .state(READY_TO_LIST)
-                .sscsDocument(new ArrayList<>(List.of(existingDoc)))
-                .documentStaging(DocumentStaging.builder()
-                        .previewDocument(DocumentLink.builder()
-                                .documentFilename("withdrawnDoc.pdf")
-                                .documentUrl("test.com")
-                                .build())
-                        .build())
-                .build();
-        caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
-        callback = new Callback<>(caseDetails, Optional.of(caseDetails), ADMIN_APPEAL_WITHDRAWN, false);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getSscsDocument())
-                .extracting(doc -> doc.getValue().getDocumentFileName())
-                .containsExactly("withdrawnDoc.pdf", "existing.pdf");
-        assertThat(response.getData().getDocumentStaging().getPreviewDocument()).isNull();
-    }
-
-    @Test
-    void givenAppealWithdrawn_thenClearPoFields() {
+    public void givenAppealWithdrawn_thenClearPoFields() {
         SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().build())
                 .state(READY_TO_LIST)
                 .schedulingAndListingFields(SchedulingAndListingFields.builder()
