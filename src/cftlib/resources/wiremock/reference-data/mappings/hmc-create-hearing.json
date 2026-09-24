@@ -1,0 +1,21 @@
+{
+  "priority": 1,
+  "scenarioName": "hmc-hearing",
+  "newScenarioState": "Started",
+  "request": {
+    "method": "POST",
+    "url": "/hearing"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "hearingRequestId": "{{jsonPath request.body '$.caseDetails.caseRef'}}",
+      "status": "HEARING_REQUESTED",
+      "versionNumber": 1
+    },
+    "transformers": ["response-template"]
+  }
+}

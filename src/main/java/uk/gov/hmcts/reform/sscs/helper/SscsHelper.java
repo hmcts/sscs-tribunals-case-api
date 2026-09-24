@@ -123,6 +123,16 @@ public class SscsHelper {
         return futureHearing.isPresent();
     }
 
+    public static boolean hasHearingButNotScheduled(SscsCaseData caseData) {
+        Optional<Hearing> anyNonCancelledHearingWithNoScheduledDate = ofNullable(caseData.getHearings())
+            .orElse(Collections.emptyList())
+            .stream()
+            .filter(hearing -> isNull(hearing.getValue().getHearingDate()) && isNull(hearing.getValue().getTime()))
+            .filter(hearing -> !CANCELLED.equals(hearing.getValue().getHearingStatus()))
+            .findFirst();
+        return anyNonCancelledHearingWithNoScheduledDate.isPresent();
+    }
+
     public static String isScottishCase(RegionalProcessingCenter rpc) {
         String isScotCase = isNull(rpc) || isNull(rpc.getName())
                 || !rpc.getName().equalsIgnoreCase("GLASGOW") ? "No" : "Yes";

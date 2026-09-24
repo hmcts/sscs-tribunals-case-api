@@ -1,0 +1,218 @@
+{
+  "appeal": {
+    "rep": {
+      "name": {
+        "title": "Mrs",
+        "lastName": "Davies",
+        "firstName": "Ginny"
+      },
+      "address": {
+        "town": "Town",
+        "line1": "123 Hairy Lane",
+        "line2": "Off Hairy Park",
+        "county": "County",
+        "postcode": "TS2 2ST"
+      },
+      "contact": {
+        "email": "hmctspentet32@mailinator.com",
+        "mobile": "07398785051"
+      },
+      "organisation": "HP Ltd",
+      "hasRepresentative": "Yes"
+    },
+    "appellant": {
+      "name": {
+        "title": "Mr",
+        "lastName": "J@hn",
+        "firstName": "Te$ter"
+      },
+      "address": {
+        "town": "Hairyfield",
+        "line1": "123 Hairy Lane",
+        "line2": "Off Hairy Park",
+        "county": "Kent",
+        "postcode": "CF24 0AD"
+      },
+      "identity": {
+        "dob": "1995-03-26",
+        "nino": "NINO_TO_BE_REPLACED"
+      },
+      "appointee": {
+        "name": {
+          "title": "Mrs",
+          "lastName": "Bloggs",
+          "firstName": "Mary"
+        },
+        "address": {
+          "town": "Another Town",
+          "line1": "999 Another Street",
+          "county": "Newcastle",
+          "postcode": "CF24 1AD"
+        },
+        "contact": {
+          "email": "hmctspentet2@mailinator.com",
+          "mobile": "07398785050"
+        },
+        "identity": {
+          "dob": "1991-03-31"
+        }
+      },
+      "isAppointee": "No"
+    },
+    "mrnDetails": {
+      "mrnDate": "MRN_DATE_TO_BE_REPLACED",
+      "dwpIssuingOffice": "DWP PIP (5)"
+    },
+    "benefitType": {
+      "code": "PIP",
+      "description": "Personal Independence Payment"
+    },
+    "hearingType": "oral",
+    "receivedVia": "Online",
+    "appealReasons": {
+      "reasons": [
+        {
+          "value": {
+            "reason": "aaaaaaaaaa",
+            "description": "aaaaaaaaaa"
+          }
+        },
+        {
+          "value": {
+            "reason": "bbbbbbbbbb",
+            "description": "bbbbbbbbbb"
+          }
+        },
+        {
+          "value": {
+            "reason": "cccccccccc",
+            "description": "cccccccccc"
+          }
+        }
+      ],
+      "otherReasons": "Another reason"
+    },
+    "hearingOptions": {
+      "other": "Yes, this...",
+      "languages": "Dutch",
+      "arrangements": [
+        "hearingLoop"
+      ],
+      "wantsSupport": "Yes",
+      "languagesList": {
+        "value": {
+          "code": "nld",
+          "label": "Dutch"
+        },
+        "list_items": [
+          {
+            "code": "nld",
+            "label": "Dutch"
+          }
+        ]
+      },
+      "wantsToAttend": "Yes",
+      "languageInterpreter": "Yes"
+    }
+  },
+  "region": "CARDIFF",
+  "ogdType": "DWP",
+  "caseCode": "002CC",
+  "dwpState": "responseSubmittedDwp",
+  "issueCode": "CC",
+  "correction": {
+    "isCorrectionFinalDecisionInProgress": "No"
+  },
+  "benefitCode": "002",
+  "caseCreated": "CASE_CREATED_TO_BE_REPLACED",
+  "hearingRoute": "listAssist",
+  "dateSentToDwp": "CASE_CREATED_TO_BE_REPLACED",
+  "hmctsDwpState": "sentToDwp",
+  "subscriptions": {
+    "appellantSubscription": {
+      "email": "hmctspentet12@mailinator.com",
+      "subscribeSms": "Yes",
+      "subscribeEmail": "Yes",
+      "wantSmsNotifications": "Yes"
+    },
+    "representativeSubscription": {
+      "email": "hmctspentet32@mailinator.com",
+      "mobile": "+447398785051",
+      "subscribeSms": "Yes",
+      "subscribeEmail": "Yes",
+      "wantSmsNotifications": "Yes"
+    }
+  },
+  "caseNamePublic": "Te$ter J@hn",
+  "dwpFurtherInfo": "No",
+  "isScottishCase": "No",
+  "dwpResponseDate": "CASE_CREATED_TO_BE_REPLACED",
+  "evidencePresent": "No",
+  "processingVenue": "Cardiff",
+  "createdInGapsFrom": "readyToList",
+  "dwpRegionalCentre": "Springburn",
+  "preWorkAllocation": "Yes",
+  "CaseAccessCategory": "personalIndependencePayment",
+  "linkedCasesBoolean": "No",
+  "caseNameHmctsInternal": "Te$ter J@hn",
+  "dwpIsOfficerAttending": "No",
+  "poAttendanceConfirmed": "No",
+  "caseManagementCategory": {
+    "value": {
+      "code": "PIP",
+      "label": "Personal Independence Payment"
+    },
+    "list_items": [
+      {
+        "code": "PIP",
+        "label": "Personal Independence Payment"
+      }
+    ]
+  },
+  "caseManagementLocation": {
+    "region": "7",
+    "baseLocation": "372653"
+  },
+  "caseNameHmctsRestricted": "Te$ter J@hn",
+  "languagePreferenceWelsh": "No",
+  "finalDecisionIdamSurname": "sscs superuser",
+  "regionalProcessingCenter": {
+    "city": "CARDIFF",
+    "name": "CARDIFF",
+    "email": "Cardiff_SYA_Respon@justice.gov.uk",
+    "epimsId": "372653",
+    "address1": "HM Courts & Tribunals Service",
+    "address2": "Social Security & Child Support Appeals",
+    "address3": "Eastgate House",
+    "address4": "Newport Road",
+    "postcode": "CF24 0AB",
+    "faxNumber": "0870 739 4438",
+    "phoneNumber": "0300 123 1142",
+    "hearingRoute": "listAssist"
+  },
+  "tribunalDirectPoToAttend": "No",
+  "writeFinalDecisionReasons": [
+    {
+      "value": "Test reasons"
+    }
+  ],
+  "finalDecisionGeneratedDate": "CASE_CREATED_TO_BE_REPLACED",
+  "hasUnprocessedAudioVideoEvidence": "No",
+  "writeFinalDecisionGeneratedDate": "CASE_CREATED_TO_BE_REPLACED",
+  "writeFinalDecisionTypeOfHearing": "faceToFace",
+  "writeFinalDecisionDateOfDecision": "2026-07-12",
+  "writeFinalDecisionGenerateNotice": "Yes",
+  "writeFinalDecisionPreviewDocument": {
+    "document_url": "PREVIEW_DOCUMENT_PLACEHOLDER",
+    "document_filename": "Draft Decision Notice.pdf",
+    "document_binary_url": "PREVIEW_DOCUMENT_BINARY_PLACEHOLDER",
+    "document_hash": "PREVIEW_DOCUMENT_HASH_PLACEHOLDER"
+  },
+  "writeFinalDecisionAllowedOrRefused": "allowed",
+  "writeFinalDecisionIsDescriptorFlow": "No",
+  "writeFinalDecisionDetailsOfDecision": "Test summary",
+  "writeFinalDecisionPageSectionReference": "B1",
+  "showFinalDecisionNoticeSummaryOfOutcomePage": "Yes",
+  "writeFinalDecisionAppellantAttendedQuestion": "No",
+  "writeFinalDecisionPresentingOfficerAttendedQuestion": "No"
+}
