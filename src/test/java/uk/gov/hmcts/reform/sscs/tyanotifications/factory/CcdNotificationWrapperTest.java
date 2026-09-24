@@ -1,8 +1,5 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.factory;
 
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ACTION_HEARING_RECORDING_REQUEST;
@@ -34,8 +31,6 @@ import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.assertj.core.api.Assertions;
-import org.junit.Assert;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
