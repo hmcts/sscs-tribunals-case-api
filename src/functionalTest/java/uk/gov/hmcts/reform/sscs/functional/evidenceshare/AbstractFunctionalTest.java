@@ -14,6 +14,7 @@ import static org.awaitility.Awaitility.await;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
 import static uk.gov.hmcts.reform.sscs.bulkscan.BaseFunctionalTest.generateRandomNino;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_TEST_CASE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DOCUMENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler.getJsonCallbackForTest;
@@ -42,7 +43,6 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.awaitility.core.ConditionFactory;
 import org.jspecify.annotations.NonNull;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -50,7 +50,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.ProfileValueSourceConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
@@ -69,7 +68,6 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @ProfileValueSourceConfiguration(EnvironmentProfileValueSource.class)
 abstract class AbstractFunctionalTest {
@@ -327,6 +325,15 @@ abstract class AbstractFunctionalTest {
         );
         caseDetails.getData().setSscsDocument(sscsCaseDocs);
         updateCaseEvent(UPLOAD_DOCUMENT, caseDetails);
+    }
+
+    void createTestCase(String caseDataJson, UnaryOperator<SscsCaseData> sscsCaseDataUnaryOperator) throws IOException {
+        final SscsCaseDetails createdCase = ccdService.createCase(
+            buildCaseData(caseDataJson, sscsCaseDataUnaryOperator),
+            CREATE_TEST_CASE.getCcdType(), "Functional test",
+            "Test case for functional testing", getIdamTokens());
+        ccdCaseId = String.valueOf(createdCase.getId());
+        log.info("Case {}: created in state {}", ccdCaseId, createdCase.getState());
     }
 
     SscsCaseData buildCaseData(String caseDataJsonFile, UnaryOperator<SscsCaseData> caseDataModifier) throws IOException {

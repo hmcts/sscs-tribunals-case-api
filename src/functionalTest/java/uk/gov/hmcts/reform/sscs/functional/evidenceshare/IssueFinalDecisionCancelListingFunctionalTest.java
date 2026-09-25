@@ -4,7 +4,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.deleteRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_RESPONSE_RECEIVED_TEST_CASE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FINAL_DECISION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_CASE_ONLY;
@@ -127,12 +126,7 @@ class IssueFinalDecisionCancelListingFunctionalTest extends AbstractFunctionalTe
 
     private String createCaseAwaitingListing() throws IOException {
 
-        final SscsCaseDetails createdCase = ccdService.createCase(
-            buildCaseData(CASE_DATA_JSON, data -> uploadCaseDocument(EVIDENCE_DOCUMENT_PDF, PREVIEW_DOCUMENT_TYPE, data)),
-            CREATE_RESPONSE_RECEIVED_TEST_CASE.getCcdType(), "Issue final decision cancel listing",
-            "Issue final decision cancel listing functional test", getIdamTokens());
-        ccdCaseId = String.valueOf(createdCase.getId());
-        log.info("Case {}: created in state {}", ccdCaseId, createdCase.getState());
+        createTestCase(CASE_DATA_JSON, data -> uploadCaseDocument(EVIDENCE_DOCUMENT_PDF, PREVIEW_DOCUMENT_TYPE, data));
 
         log.info("Case {}: firing {} to send a listing request to HMC", ccdCaseId, READY_TO_LIST.getCcdType());
         updateCaseEvent(READY_TO_LIST, findCaseById(ccdCaseId), "Sending to READY_TO_LIST functional test",
