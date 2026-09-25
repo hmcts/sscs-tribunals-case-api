@@ -325,6 +325,8 @@ xui-webapp:
           - mc-idam-client-secret
           - system-user-name
           - system-user-password
+          - appinsights-instrumentationkey-mc
+          - appinsights-connection-string-mc
 
 global:
   ccdApiGatewayIngress: http://${SERVICE_NAME}-ccd-api-gw
