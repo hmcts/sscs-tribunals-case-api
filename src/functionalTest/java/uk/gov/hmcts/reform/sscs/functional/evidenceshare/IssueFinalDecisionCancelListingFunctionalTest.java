@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.containing;
-import static com.github.tomakehurst.wiremock.client.WireMock.deleteRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static uk.gov.hmcts.reform.sscs.bulkscan.BaseFunctionalTest.generateRandomNino;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_TEST_CASE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FINAL_DECISION;
@@ -14,17 +14,17 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.TRIBUNAL_MEMBE
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.TRIBUNAL_MEMBER_MEDICAL;
 import static uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler.getJsonCallbackForTest;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.github.tomakehurst.wiremock.client.WireMock;
 import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeEach;
+import org.apache.commons.lang3.StringUtils;
+import org.awaitility.core.ConditionFactory;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Value;
+import org.junit.jupiter.api.condition.EnabledIf;
 import org.springframework.test.context.TestConstructor;
 import org.springframework.test.context.TestConstructor.AutowireMode;
 import org.springframework.test.context.TestPropertySource;
@@ -38,7 +38,7 @@ import uk.gov.hmcts.reform.sscs.model.hmc.message.HearingUpdate;
 import uk.gov.hmcts.reform.sscs.model.hmc.message.HmcMessage;
 import uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus;
 import uk.gov.hmcts.reform.sscs.model.hmc.reference.ListingStatus;
-import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
+import uk.gov.hmcts.reform.sscs.service.HmcHearingApiService;
 import uk.gov.hmcts.reform.sscs.service.hmc.topic.ProcessHmcMessageServiceV2;
 
 @Slf4j
@@ -50,20 +50,16 @@ class IssueFinalDecisionCancelListingFunctionalTest extends AbstractFunctionalTe
     private static final String CASE_DATA_JSON = "handlers/issuefinaldecision/readyToListWriteFinalDecisionCaseData.json";
     private static final String EVIDENCE_DOCUMENT_PDF = "evidence-document.pdf";
     private static final String PREVIEW_DOCUMENT_TYPE = "PREVIEW_DOCUMENT";
-    private static final String HEARING_ENDPOINT = "/hearing";
     private static final String SSCS_SERVICE_CODE = "BBA3";
+    private static final Set<String> LOCAL_HOSTS = Set.of("localhost", "127.0.0.1");
 
     private final ProcessHmcMessageServiceV2 processHmcMessageServiceV2;
+    private final HmcHearingApiService hmcHearingApiService;
 
-    @Value("${hmc.url}")
-    private String hmcUrl;
-
-    private WireMock hmcWireMock;
-
-    @BeforeEach
-    void setUpHmcWireMock() {
-        final URI hmcUri = URI.create(hmcUrl);
-        hmcWireMock = new WireMock(hmcUri.getHost(), hmcUri.getPort());
+    static boolean isDeployedToLocalhost() {
+        final String testUrl = System.getenv("TEST_URL");
+        log.info("Test URL: {}", testUrl);
+        return StringUtils.isBlank(testUrl) || LOCAL_HOSTS.contains(URI.create(testUrl).getHost());
     }
 
     @Test
@@ -76,10 +72,11 @@ class IssueFinalDecisionCancelListingFunctionalTest extends AbstractFunctionalTe
         assertThat(judgeOnlyCase.getData().getPanelMemberComposition().isJudgeOnly()).isTrue();
 
         issueFinalDecision(judgeOnlyCase);
-        awaitCancellationRequested(hearingId);
+        awaitHearingCancelled(hearingId);
     }
 
     @Test
+    @EnabledIf("isDeployedToLocalhost")
     void givenCaseWithBookedHearingInTheFuture_whenIssueFinalDecision_thenHearingIsCancelled() throws IOException, MessageProcessingException {
         final String hearingId = createCaseAwaitingListing();
 
@@ -97,7 +94,7 @@ class IssueFinalDecisionCancelListingFunctionalTest extends AbstractFunctionalTe
 
         issueFinalDecision(findCaseById(ccdCaseId));
 
-        awaitCancellationRequested(hearingId);
+        awaitHearingCancelled(hearingId);
     }
 
     private static PanelMemberComposition judgeOnlyPanel() {
@@ -178,16 +175,25 @@ class IssueFinalDecisionCancelListingFunctionalTest extends AbstractFunctionalTe
     private void sendHmcResponseMessageToBookHearing(final String hearingId) throws MessageProcessingException {
         log.info("Case {}: simulating HMC topic message for hearing {} with status {} and listing status {}", ccdCaseId,
             hearingId, HmcStatus.LISTED, ListingStatus.FIXED);
-        processHmcMessageServiceV2.processEventMessage(buildHmcMessage(hearingId));
+        processHmcMessageServiceV2.processEventMessage(buildHmcMessage(hearingId, HmcStatus.LISTED, ListingStatus.FIXED));
     }
 
-    private HmcMessage buildHmcMessage(final String hearingId) {
+    private void sendHmcResponseMessageOnceHearingCancelled(final String hearingId) throws MessageProcessingException {
+        log.info("Case {}: waiting for HMC to report hearing {} as {}", ccdCaseId, hearingId, HmcStatus.CANCELLED);
+        defaultAwait().untilAsserted(() -> assertThat(
+            hmcHearingApiService.getHearingRequest(hearingId).getRequestDetails().getStatus()).isEqualTo(HmcStatus.CANCELLED));
+        log.info("Case {}: simulating HMC topic message for hearing {} with status {} and listing status {}", ccdCaseId,
+            hearingId, HmcStatus.CANCELLED, ListingStatus.CNCL);
+        processHmcMessageServiceV2.processEventMessage(buildHmcMessage(hearingId, HmcStatus.CANCELLED, ListingStatus.CNCL));
+    }
+
+    private HmcMessage buildHmcMessage(final String hearingId, final HmcStatus hmcStatus, final ListingStatus listingStatus) {
         return HmcMessage
             .builder()
             .hmctsServiceCode(SSCS_SERVICE_CODE)
             .caseId(Long.valueOf(ccdCaseId))
             .hearingId(hearingId)
-            .hearingUpdate(HearingUpdate.builder().hmcStatus(HmcStatus.LISTED).listingStatus(ListingStatus.FIXED).build())
+            .hearingUpdate(HearingUpdate.builder().hmcStatus(hmcStatus).listingStatus(listingStatus).build())
             .build();
     }
 
@@ -203,14 +209,18 @@ class IssueFinalDecisionCancelListingFunctionalTest extends AbstractFunctionalTe
         return hearingId;
     }
 
-    private void awaitCancellationRequested(final String hearingId) throws JsonProcessingException {
-        String otherCancellationReason = CancellationReason.OTHER.getHmcReference();
-        log.info("Case {}: waiting for HMC to receive DELETE {}/{} with reason {}", ccdCaseId, HEARING_ENDPOINT, hearingId,
-            otherCancellationReason);
-        defaultAwait().untilAsserted(() -> assertThat(hmcWireMock.find(
-            deleteRequestedFor(urlEqualTo(HEARING_ENDPOINT + "/" + hearingId)).withRequestBody(
-                containing(otherCancellationReason)))).hasSize(1));
-        log.info("Case {}: HMC received the cancellation request for hearing {}", ccdCaseId, hearingId);
+    private void awaitHearingCancelled(final String hearingId) throws MessageProcessingException {
+        if (isDeployedToLocalhost()) {
+            sendHmcResponseMessageOnceHearingCancelled(hearingId);
+        }
+        log.info("Case {}: waiting for hearing {} to be {} on the case", ccdCaseId, hearingId, HearingStatus.CANCELLED);
+        hmcAwait().untilAsserted(() -> assertThat(
+            findHearing(findCaseById(ccdCaseId), hearingId).getValue().getHearingStatus()).isEqualTo(HearingStatus.CANCELLED));
+        log.info("Case {}: hearing {} is {} on the case", ccdCaseId, hearingId, HearingStatus.CANCELLED);
+    }
+
+    private static ConditionFactory hmcAwait() {
+        return await().atMost(5, MINUTES).pollInterval(10, SECONDS);
     }
 
 }
