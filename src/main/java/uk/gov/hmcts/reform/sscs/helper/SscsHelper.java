@@ -123,7 +123,7 @@ public class SscsHelper {
         return futureHearing.isPresent();
     }
 
-    public static boolean hasHearingButNotScheduled(SscsCaseData caseData) {
+    public static boolean hearingNotBooked(SscsCaseData caseData) {
         Optional<Hearing> anyNonCancelledHearingWithNoScheduledDate = ofNullable(caseData.getHearings())
             .orElse(Collections.emptyList())
             .stream()

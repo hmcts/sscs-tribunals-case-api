@@ -12,7 +12,7 @@
       "Content-Type": "application/json"
     },
     "jsonBody": {
-      "hearingRequestId": "{{jsonPath request.body '$.caseDetails.caseRef'}}",
+      "hearingRequestId": "2{{randomValue length=9 type='NUMERIC'}}",
       "status": "HEARING_REQUESTED",
       "versionNumber": 1
     },

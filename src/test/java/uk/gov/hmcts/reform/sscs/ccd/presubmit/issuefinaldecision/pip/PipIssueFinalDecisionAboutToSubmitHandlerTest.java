@@ -586,68 +586,6 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
     }
 
-    private void prepareCaseInStateBeforeIssuingFinalDecision(final State stateBefore,
-                                                              final PanelMemberComposition panelMemberComposition) {
-        handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, userDetailsService,
-                validator, hearingMessageHelper, venueDataLoader, true);
-        final DocumentLink docLink = DocumentLink.builder()
-                .documentUrl("bla.com")
-                .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
-                .build();
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
-
-        final CaseDetails<SscsCaseData> caseDetailsBefore = mock(CaseDetails.class);
-        when(caseDetailsBefore.getState()).thenReturn(stateBefore);
-        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
-        when(caseDetails.getState()).thenReturn(stateBefore);
-        sscsCaseData.setState(stateBefore);
-        sscsCaseData.setPanelMemberComposition(panelMemberComposition);
-    }
-
-    private static PanelMemberComposition judgeOnlyComposition() {
-        return PanelMemberComposition.builder().panelCompositionJudge("84").build();
-    }
-
-    private static PanelMemberComposition judgeAndMedicalMemberComposition() {
-        return PanelMemberComposition.builder().panelCompositionJudge("84").panelCompositionMemberMedical1("58").build();
-    }
-
-    private static Stream<PanelMemberComposition> judgeOnlyCompositions() {
-        return Stream.of(
-            judgeOnlyComposition(),
-            PanelMemberComposition.builder().districtTribunalJudge("74").build());
-    }
-
-    private static Stream<PanelMemberComposition> nonJudgeOnlyCompositions() {
-        return Stream.of(
-            judgeAndMedicalMemberComposition(),
-            PanelMemberComposition.builder().panelCompositionJudge("84").panelCompositionMemberMedical2("58").build(),
-            PanelMemberComposition.builder().panelCompositionJudge("84")
-                .panelCompositionDisabilityAndFqMember(List.of("44")).build(),
-            PanelMemberComposition.builder().build());
-    }
-
-    private static Hearing awaitingListingHearing(final HearingStatus hearingStatus) {
-        return Hearing.builder()
-            .value(HearingDetails.builder().hearingId("2").hearingStatus(hearingStatus).build())
-            .build();
-    }
-
-    private static Hearing pastHearing() {
-        return Hearing.builder()
-            .value(HearingDetails.builder()
-                .hearingDate(LocalDate.now().minusDays(5).toString())
-                .start(LocalDateTime.now().minusDays(5))
-                .hearingId("1")
-                .venue(Venue.builder().name("Venue 1").build())
-                .time("12:00")
-                .hearingStatus(HearingStatus.LISTED)
-                .build())
-            .build();
-    }
-
     @ParameterizedTest
     @MethodSource("judgeOnlyCompositions")
     void givenJudgeOnlyReadyToListCaseAwaitingListing_whenIssueFinalDecision_thenSendHearingCancellationRequest(
@@ -759,7 +697,7 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
     void givenJudgeOnlyReadyToListCaseAwaitingListingAndScheduleListingDisabled_whenIssueFinalDecision_thenDoNotSendHearingCancellationRequest() {
         prepareCaseInStateBeforeIssuingFinalDecision(State.READY_TO_LIST, judgeOnlyComposition());
         handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, userDetailsService,
-                validator, hearingMessageHelper, venueDataLoader, false);
+            validator, hearingMessageHelper, venueDataLoader, false);
         sscsCaseData.setHearings(List.of(awaitingListingHearing(HearingStatus.AWAITING_LISTING)));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -784,13 +722,13 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
     void givenNonJudgeOnlyReadyToListCaseWithFutureHearing_whenIssueFinalDecision_thenSendHearingCancellationRequest() {
         prepareCaseInStateBeforeIssuingFinalDecision(State.READY_TO_LIST, judgeAndMedicalMemberComposition());
         final HearingDetails hearingDetails = HearingDetails.builder()
-                .hearingDate(LocalDate.now().plusDays(5).toString())
-                .start(LocalDateTime.now().plusDays(5))
-                .hearingId("1")
-                .venue(Venue.builder().name("Venue 1").build())
-                .time("12:00")
-                .hearingStatus(HearingStatus.LISTED)
-                .build();
+                                                            .hearingDate(LocalDate.now().plusDays(5).toString())
+                                                            .start(LocalDateTime.now().plusDays(5))
+                                                            .hearingId("1")
+                                                            .venue(Venue.builder().name("Venue 1").build())
+                                                            .time("12:00")
+                                                            .hearingStatus(HearingStatus.LISTED)
+                                                            .build();
         sscsCaseData.setHearings(List.of(Hearing.builder().value(hearingDetails).build()));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -801,18 +739,30 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
 
     @Test
     void givenWriteFinalDecisionPostHearingsEnabledAndNoIssueFinalDate_shouldUpdateFinalCaseData() {
-        final String filename = String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
+        final String filename = String.format("Decision Notice issued on %s.pdf",
+            LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
         final DocumentLink docLink = DocumentLink.builder()
-                .documentUrl("bla.com")
-                .documentFilename(filename)
-                .build();
+                                                 .documentUrl("bla.com")
+                                                 .documentFilename(filename)
+                                                 .build();
         ReflectionTestUtils.setField(handler, "isPostHearingsEnabled", true);
-        final SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
+        final SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback
+            .getCaseDetails()
+            .getCaseData()
+            .getSscsFinalDecisionCaseData();
         sscsFinalDecisionCaseData.setWriteFinalDecisionPreviewDocument(docLink);
         sscsFinalDecisionCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice(YES);
-        callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("same");
-        callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("same");
+        callback
+            .getCaseDetails()
+            .getCaseData()
+            .getSscsPipCaseData()
+            .setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("same");
+        callback
+            .getCaseDetails()
+            .getCaseData()
+            .getSscsPipCaseData()
+            .setPipWriteFinalDecisionComparedToDwpMobilityQuestion("same");
         sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionIssuedDate(null);
         when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn("judge name");
 
@@ -823,6 +773,69 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getFinalDecisionIssuedDate()).isEqualTo(LocalDate.now());
         assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getFinalDecisionJudge()).isEqualTo("judge name");
         assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getFinalDecisionHeldAt()).isEqualTo("In chambers");
+    }
+
+    private static PanelMemberComposition judgeOnlyComposition() {
+        return PanelMemberComposition.builder().panelCompositionJudge("84").build();
+    }
+
+    private static PanelMemberComposition judgeAndMedicalMemberComposition() {
+        return PanelMemberComposition.builder().panelCompositionJudge("84").panelCompositionMemberMedical1("58").build();
+    }
+
+    private static Stream<PanelMemberComposition> judgeOnlyCompositions() {
+        return Stream.of(
+            judgeOnlyComposition(),
+            PanelMemberComposition.builder().districtTribunalJudge("74").build());
+    }
+
+    private static Stream<PanelMemberComposition> nonJudgeOnlyCompositions() {
+        return Stream.of(
+            judgeAndMedicalMemberComposition(),
+            PanelMemberComposition.builder().panelCompositionJudge("84").panelCompositionMemberMedical2("58").build(),
+            PanelMemberComposition.builder().panelCompositionJudge("84")
+                                  .panelCompositionDisabilityAndFqMember(List.of("44")).build(),
+            PanelMemberComposition.builder().build());
+    }
+
+    private static Hearing awaitingListingHearing(final HearingStatus hearingStatus) {
+        return Hearing.builder()
+                      .value(HearingDetails.builder().hearingId("2").hearingStatus(hearingStatus).build())
+                      .build();
+    }
+
+    private static Hearing pastHearing() {
+        return Hearing.builder()
+                      .value(HearingDetails.builder()
+                                           .hearingDate(LocalDate.now().minusDays(5).toString())
+                                           .start(LocalDateTime.now().minusDays(5))
+                                           .hearingId("1")
+                                           .venue(Venue.builder().name("Venue 1").build())
+                                           .time("12:00")
+                                           .hearingStatus(HearingStatus.LISTED)
+                                           .build())
+                      .build();
+    }
+
+    private void prepareCaseInStateBeforeIssuingFinalDecision(final State stateBefore,
+        final PanelMemberComposition panelMemberComposition) {
+        handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, userDetailsService,
+            validator, hearingMessageHelper, venueDataLoader, true);
+        final DocumentLink docLink = DocumentLink.builder()
+                                                 .documentUrl("bla.com")
+                                                 .documentFilename(String.format("Decision Notice issued on %s.pdf",
+                                                     LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+                                                 .build();
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
+
+        final CaseDetails<SscsCaseData> caseDetailsBefore = mock(CaseDetails.class);
+        when(caseDetailsBefore.getState()).thenReturn(stateBefore);
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+        when(caseDetails.getState()).thenReturn(stateBefore);
+        sscsCaseData.setState(stateBefore);
+        sscsCaseData.setPanelMemberComposition(panelMemberComposition);
     }
 
     private SscsDocument buildSscsDocumentWithDocumentType(final String documentType) {
