@@ -33,5 +33,6 @@
         <cve>CVE-2026-47888</cve>
         <cve>CVE-2026-47889</cve>
         <cve>CVE-2026-41707</cve>
+        <cve>CVE-2025-7962</cve>
     </suppress>
 </suppressions>
