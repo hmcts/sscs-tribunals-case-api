@@ -32,6 +32,12 @@ export class CreateBundle extends BaseStep {
       'Yes'
     );
     await this.checkYourAnswersPage.confirmSubmission();
+
+    //Add additional documents to the case
+    await this.stepsHelper.setCaseAsUrgentHelper();
+    await this.stepsHelper.addAdditionalEvidence();
+
+
     await this.homePage.chooseEvent('Create a bundle');
     await this.createBundlePage.verifyPageContent();
     await this.createBundlePage.confirmSubmission();
@@ -54,35 +60,56 @@ export class CreateBundle extends BaseStep {
       `${bundleTestData.folderNameVal}`,
       0
     );
-    await this.bundlesTab.verifyTableElementByIndex(
+    
+    await this.bundlesTab.verifyBundleTableElementByIndex(
       bundleTestData.docName,
       `${bundleTestData.folderOneDocVal} ${formattedDate}`,
-      0
+      1
     );
-    await this.bundlesTab.verifyTableElementByIndex(
+    await this.bundlesTab.verifyBundleTableElementByIndex(
       bundleTestData.sourceDoc,
       `${bundleTestData.folderOneSourceVal} ${formattedDate}.pdf`,
-      0
+      1
     );
-    await this.bundlesTab.verifyTableElementByIndex(
+    await this.bundlesTab.verifyBundleTableElementByIndex(
       bundleTestData.docName,
       `${bundleTestData.folderTwoDocVal} ${formattedDate}`,
-      1
+      2
     );
-    await this.bundlesTab.verifyTableElementByIndex(
+
+    await this.bundlesTab.verifyBundleTableElementByIndex(
       bundleTestData.sourceDoc,
       `${bundleTestData.folderTwoSourceVal} ${formattedDate}.pdf`,
-      1
+      2
     );
-    await this.bundlesTab.verifyTableElementByIndex(
-      bundleTestData.sourceDoc,
-      `${bundleTestData.folderTwoSourceVal} ${formattedDate}.pdf`,
-      1
-    );
+
+    // Verify the additional documents added to the case are present in the bundle
     await this.bundlesTab.verifyTableElementByIndex(
       bundleTestData.folderName,
       `${bundleTestData.bundleFolderTwoVal}`,
       0
+    );
+
+    await this.bundlesTab.verifyBundleTableElementByIndex(
+      bundleTestData.docName,
+      `${bundleTestData.addtDoc1Val}`,
+      1
+    );
+    await this.bundlesTab.verifyBundleTableElementByIndex(
+      bundleTestData.sourceDoc,
+      `${bundleTestData.addtFile1Val}`,
+      1
+    );
+
+    await this.bundlesTab.verifyBundleTableElementByIndex(
+      bundleTestData.docName,
+      `${bundleTestData.addtDoc2Val}`,
+      2
+    );
+    await this.bundlesTab.verifyBundleTableElementByIndex(
+      bundleTestData.sourceDoc,
+      `${bundleTestData.addtFile2Val}`,
+      2
     );
 
     await this.bundlesTab.verifyBundlesTabContentByKeyValueForASpan(
