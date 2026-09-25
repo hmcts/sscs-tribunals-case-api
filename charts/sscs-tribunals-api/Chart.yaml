@@ -109,7 +109,7 @@ dependencies:
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: wa.enabled
   - name: ccd-message-publisher
-    version: ~0.1.20
+    version: 0.1.25
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: wa.enabled
   - name: sscs-cron-trigger
