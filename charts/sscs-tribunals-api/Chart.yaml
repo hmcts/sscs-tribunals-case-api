@@ -4,7 +4,7 @@ home: https://github.com/hmcts/sscs-tribunals-case-api
 version: 0.0.235
 description: SSCS Tribunals Case API
 annotations:
-  hmcts.github.io/skip-publish: postgresql,java,job,xui-webapp,ccd,sscs-tribunals-frontend,hmcts-redis,em-ccdorc,em-stitching,ccd-case-document-am-api,servicebus,aac-manage-case-assignment,am-org-role-mapping-service,camunda-bpm,wa-task-management-api,wa-task-monitor,wa-case-event-handler,wa-workflow-api,wa-task-batch-service,wa-message-cron-service,ccd-message-publisher,sscs-cron-trigger,ccd-def-cleanup
+  hmcts.github.io/skip-publish: postgresql,job,xui-webapp,ccd,sscs-tribunals-frontend,hmcts-redis,em-ccdorc,em-stitching,ccd-case-document-am-api,servicebus,aac-manage-case-assignment,am-org-role-mapping-service,camunda-bpm,wa-task-management-api,wa-task-monitor,wa-case-event-handler,wa-workflow-api,wa-task-batch-service,wa-message-cron-service,ccd-message-publisher,sscs-cron-trigger,ccd-def-cleanup
 maintainers:
   - name: HMCTS SSCS Team
 dependencies:
