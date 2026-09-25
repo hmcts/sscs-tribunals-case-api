@@ -333,7 +333,7 @@ ext {
 
 def versions = [
         springboot     : springBoot.class.package.implementationVersion,
-        springsecurity : '6.5.11',
+        springsecurity : '7.1.1',
         jackson        : '2.22.1',
         lombok         : '1.18.38',
         commonsio      : '2.19.0',
