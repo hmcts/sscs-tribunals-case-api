@@ -1,11 +1,8 @@
 package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
 import static io.restassured.RestAssured.baseURI;
-import static java.time.ZoneId.systemDefault;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.nonNull;
-import static java.util.Optional.ofNullable;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
@@ -14,12 +11,9 @@ import static org.awaitility.Awaitility.await;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
 import static uk.gov.hmcts.reform.sscs.bulkscan.BaseFunctionalTest.generateRandomNino;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_TEST_CASE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DOCUMENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
-import static uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler.getJsonCallbackForTest;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,18 +25,15 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.function.UnaryOperator;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.awaitility.core.ConditionFactory;
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -56,7 +47,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Correspondence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
@@ -170,6 +160,16 @@ abstract class AbstractFunctionalTest {
             consumer.accept(caseData);
         }
 
+        return createCase(caseData, eventType);
+    }
+
+    SscsCaseDetails createCaseFromJson(final String caseDataJson, final EventType eventType) throws IOException {
+        idamTokens = getIdamTokens();
+
+        return createCase(mapper.readValue(caseDataJson, SscsCaseData.class), eventType);
+    }
+
+    private SscsCaseDetails createCase(final SscsCaseData caseData, final EventType eventType) {
         final SscsCaseDetails caseDetails = ccdService.createCase(caseData, eventType.getCcdType(),
             "Evidence share service created case",
             "Evidence share service case created for functional test", idamTokens);
@@ -178,15 +178,11 @@ abstract class AbstractFunctionalTest {
     }
 
     void updateCaseEvent(EventType eventType, SscsCaseDetails caseDetails) {
-        updateCaseEvent(eventType, caseDetails, "Evidence share update case test",
-            "Evidence share service pushed case update for functional test");
-    }
-
-    void updateCaseEvent(EventType eventType, SscsCaseDetails caseDetails, String summary, String description) {
         idamTokens = getIdamTokens();
 
-        ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), eventType.getCcdType(), summary, description,
-            getIdamTokens());
+        ccdService.updateCase(caseDetails.getData(), caseDetails.getId(),
+            eventType.getCcdType(), "Evidence share update case test",
+            "Evidence share service pushed case update for functional test", getIdamTokens());
     }
 
     SscsCaseDetails findCaseById(String ccdCaseId) {
@@ -218,22 +214,8 @@ abstract class AbstractFunctionalTest {
         return json;
     }
 
-    SscsCaseData uploadCaseDocument(String name, String type, SscsCaseData sscsCaseData) {
-        try {
-            String json = uploadCaseDocument(name, type, mapper.writeValueAsString(sscsCaseData));
-            return mapper.readValue(json, SscsCaseData.class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    String uploadCaseDocument(String name, String type, String json) {
-        final UploadResponse upload;
-        try {
-            upload = uploadDocToDocMgmtStore(name);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    String uploadCaseDocument(String name, String type, String json) throws IOException {
+        UploadResponse upload = uploadDocToDocMgmtStore(name);
 
         String location = upload.getDocuments().getFirst().links.self.href;
         log.info("Document created {} for {}", location, name);
@@ -325,38 +307,5 @@ abstract class AbstractFunctionalTest {
         );
         caseDetails.getData().setSscsDocument(sscsCaseDocs);
         updateCaseEvent(UPLOAD_DOCUMENT, caseDetails);
-    }
-
-    void createTestCase(String caseDataJson, UnaryOperator<SscsCaseData> sscsCaseDataUnaryOperator) throws IOException {
-        final SscsCaseDetails createdCase = ccdService.createCase(
-            buildCaseData(caseDataJson, sscsCaseDataUnaryOperator),
-            CREATE_TEST_CASE.getCcdType(), "Functional test",
-            "Test case for functional testing", getIdamTokens());
-        ccdCaseId = String.valueOf(createdCase.getId());
-        log.info("Case {}: created in state {}", ccdCaseId, createdCase.getState());
-    }
-
-    SscsCaseData buildCaseData(String caseDataJsonFile, UnaryOperator<SscsCaseData> caseDataModifier) throws IOException {
-        final String caseCreated = today().toString();
-        final String json = getJsonCallbackForTest(caseDataJsonFile)
-            .replace("NINO_TO_BE_REPLACED", generateRandomNino())
-            .replace("MRN_DATE_TO_BE_REPLACED", today().minusDays(14).toString())
-            .replace("CASE_CREATED_TO_BE_REPLACED", caseCreated);
-
-        final SscsCaseData sscsCaseData = mapper.readValue(json, SscsCaseData.class);
-        return caseDataModifier.apply(sscsCaseData);
-    }
-
-    Hearing findHearing(final SscsCaseDetails caseDetails, final String hearingId) {
-        return ofNullable(caseDetails.getData().getHearings())
-            .orElse(emptyList())
-            .stream()
-            .filter(hearing -> hearingId.equals(hearing.getValue().getHearingId()))
-            .findFirst()
-            .orElseThrow();
-    }
-
-    static @NonNull LocalDate today() {
-        return LocalDate.now(systemDefault());
     }
 }

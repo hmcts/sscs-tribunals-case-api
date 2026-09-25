@@ -4,12 +4,15 @@ import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.deleteRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.sscs.bulkscan.BaseFunctionalTest.generateRandomNino;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_TEST_CASE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FINAL_DECISION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_CASE_ONLY;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.TRIBUNAL_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.TRIBUNAL_MEMBER_DISABILITY;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.TRIBUNAL_MEMBER_MEDICAL;
+import static uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler.getJsonCallbackForTest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.tomakehurst.wiremock.client.WireMock;
@@ -30,7 +33,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.exception.MessageProcessingException;
 import uk.gov.hmcts.reform.sscs.model.hmc.message.HearingUpdate;
 import uk.gov.hmcts.reform.sscs.model.hmc.message.HmcMessage;
@@ -51,7 +53,6 @@ class IssueFinalDecisionCancelListingFunctionalTest extends AbstractFunctionalTe
     private static final String HEARING_ENDPOINT = "/hearing";
     private static final String SSCS_SERVICE_CODE = "BBA3";
 
-    private final CcdService ccdService;
     private final ProcessHmcMessageServiceV2 processHmcMessageServiceV2;
 
     @Value("${hmc.url}")
@@ -120,17 +121,17 @@ class IssueFinalDecisionCancelListingFunctionalTest extends AbstractFunctionalTe
             final Hearing bookedHearing = findHearing(bookedCase, hearingId);
             assertThat(bookedHearing.getValue().getHearingStatus()).isEqualTo(HearingStatus.LISTED);
             assertThat(bookedHearing.getValue().getVenue()).isNotNull();
-            assertThat(LocalDate.parse(bookedHearing.getValue().getHearingDate())).isAfter(today());
+            assertThat(LocalDate.parse(bookedHearing.getValue().getHearingDate())).isAfter(LocalDate.now());
         });
     }
 
     private String createCaseAwaitingListing() throws IOException {
 
-        createTestCase(CASE_DATA_JSON, data -> uploadCaseDocument(EVIDENCE_DOCUMENT_PDF, PREVIEW_DOCUMENT_TYPE, data));
+        createCaseFromJson(uploadCaseDocument(EVIDENCE_DOCUMENT_PDF, PREVIEW_DOCUMENT_TYPE, loadCaseDataJson()), CREATE_TEST_CASE);
+        log.info("Case {}: created", ccdCaseId);
 
         log.info("Case {}: firing {} to send a listing request to HMC", ccdCaseId, READY_TO_LIST.getCcdType());
-        updateCaseEvent(READY_TO_LIST, findCaseById(ccdCaseId), "Sending to READY_TO_LIST functional test",
-            "Sending to READY_TO_LIST and add hearing");
+        updateCaseEvent(READY_TO_LIST, findCaseById(ccdCaseId));
 
         final String hearingId = awaitListingRequestCreated();
 
@@ -142,11 +143,25 @@ class IssueFinalDecisionCancelListingFunctionalTest extends AbstractFunctionalTe
         return hearingId;
     }
 
+    private static String loadCaseDataJson() throws IOException {
+        final LocalDate today = LocalDate.now();
+        return getJsonCallbackForTest(CASE_DATA_JSON)
+            .replace("NINO_TO_BE_REPLACED", generateRandomNino())
+            .replace("MRN_DATE_TO_BE_REPLACED", today.minusDays(14).toString())
+            .replace("CASE_CREATED_TO_BE_REPLACED", today.toString());
+    }
+
+    private static Hearing findHearing(final SscsCaseDetails caseDetails, final String hearingId) {
+        return caseDetails.getData().getHearings().stream()
+            .filter(hearing -> hearingId.equals(hearing.getValue().getHearingId()))
+            .findFirst()
+            .orElseThrow();
+    }
+
     private SscsCaseDetails updatePanelMemberComposition(final PanelMemberComposition panelMemberComposition) {
         final SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
         caseDetails.getData().setPanelMemberComposition(panelMemberComposition);
-        updateCaseEvent(UPDATE_CASE_ONLY, caseDetails, "update panel member composition functional test",
-            "is judge only panel composition: %s".formatted(panelMemberComposition.isJudgeOnly()));
+        updateCaseEvent(UPDATE_CASE_ONLY, caseDetails);
         final SscsCaseDetails updatedCase = findCaseById(ccdCaseId);
         log.info("Case {}: panel member composition is now {} (judge only: {})", ccdCaseId,
             updatedCase.getData().getPanelMemberComposition(), updatedCase.getData().getPanelMemberComposition().isJudgeOnly());
@@ -155,7 +170,7 @@ class IssueFinalDecisionCancelListingFunctionalTest extends AbstractFunctionalTe
 
     private void issueFinalDecision(final SscsCaseDetails caseDetails) {
         log.info("Case {}: firing {} from state {}", ccdCaseId, ISSUE_FINAL_DECISION.getCcdType(), caseDetails.getState());
-        updateCaseEvent(ISSUE_FINAL_DECISION, caseDetails, "issue final decision functional test", "issue final decision event");
+        updateCaseEvent(ISSUE_FINAL_DECISION, caseDetails);
         log.info("Case {}: {} completed, case is now in state {}", ccdCaseId, ISSUE_FINAL_DECISION.getCcdType(),
             findCaseById(ccdCaseId).getState());
     }
