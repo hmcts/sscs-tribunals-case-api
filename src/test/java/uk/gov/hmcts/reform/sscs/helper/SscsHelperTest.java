@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getUpdatedDirectionDueDate;
+import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.hasHearingNotYetScheduled;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.hasHearingScheduledInTheFuture;
-import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.hearingNotBooked;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.validateHearingOptionsAndExcludeDates;
 
 import java.time.LocalDate;
@@ -163,14 +163,14 @@ public class SscsHelperTest {
     void givenNoHearings_whenCheckingForHearingButNotScheduled_thenReturnFalse() {
         sscsCaseData.setHearings(null);
 
-        assertThat(hearingNotBooked(sscsCaseData)).isFalse();
+        assertThat(hasHearingNotYetScheduled(sscsCaseData)).isFalse();
     }
 
     @Test
     void givenEmptyHearings_whenCheckingForHearingButNotScheduled_thenReturnFalse() {
         sscsCaseData.setHearings(List.of());
 
-        assertThat(hearingNotBooked(sscsCaseData)).isFalse();
+        assertThat(hasHearingNotYetScheduled(sscsCaseData)).isFalse();
     }
 
     @ParameterizedTest
@@ -183,7 +183,7 @@ public class SscsHelperTest {
         final HearingStatus hearingStatus, final boolean expectedResult) {
         sscsCaseData.setHearings(List.of(unscheduledHearing(hearingStatus)));
 
-        assertThat(hearingNotBooked(sscsCaseData)).isEqualTo(expectedResult);
+        assertThat(hasHearingNotYetScheduled(sscsCaseData)).isEqualTo(expectedResult);
     }
 
     @ParameterizedTest
@@ -202,7 +202,7 @@ public class SscsHelperTest {
             .build();
         sscsCaseData.setHearings(List.of(Hearing.builder().value(hearingDetails).build()));
 
-        assertThat(hearingNotBooked(sscsCaseData)).isFalse();
+        assertThat(hasHearingNotYetScheduled(sscsCaseData)).isFalse();
     }
 
     @Test
@@ -216,7 +216,7 @@ public class SscsHelperTest {
         sscsCaseData.setHearings(List.of(Hearing.builder().value(scheduledHearingDetails).build(),
             unscheduledHearing(HearingStatus.AWAITING_LISTING)));
 
-        assertThat(hearingNotBooked(sscsCaseData)).isTrue();
+        assertThat(hasHearingNotYetScheduled(sscsCaseData)).isTrue();
     }
 
     private static Hearing unscheduledHearing(final HearingStatus hearingStatus) {
