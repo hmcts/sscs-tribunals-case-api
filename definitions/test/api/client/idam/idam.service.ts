@@ -109,13 +109,13 @@ export async function getIDAMUserID(idamToken) {
 
   let apiContext = await request.newContext({
     // All requests we send go to this API Endpoint.
-    baseURL: urls.idamUrl,
+    baseURL: urls.idamOidcUrl,
     extraHTTPHeaders: {
       'content-type': 'application/json'
     }
   });
 
-  const response = await apiContext.get(`${urls.idamUrl}${idamDetailsPath}`, {
+  const response = await apiContext.get(`${urls.idamOidcUrl}${idamDetailsPath}`, {
     headers: {
       Authorization: `Bearer ${idamToken}`,
       'content-type': 'application/json'
