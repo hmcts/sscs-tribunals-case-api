@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static uk.gov.hmcts.reform.sscs.bulkscan.BaseFunctionalTest.generateRandomNino;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_TEST_CASE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FINAL_DECISION;
@@ -14,6 +17,7 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.awaitility.core.ConditionFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIf;
 import org.springframework.test.context.TestConstructor;
@@ -175,9 +179,13 @@ class IssueFinalDecisionCancelListingFunctionalTest extends AbstractFunctionalTe
             sendHmcResponseMessageOnceHearingCancelled(hearingId);
         }
         log.info("Case {}: waiting for hearing {} to be {} on the case", ccdCaseId, hearingId, HearingStatus.CANCELLED);
-        defaultAwait().untilAsserted(() -> assertThat(
+        hmcAwait().untilAsserted(() -> assertThat(
             findHearing(findCaseById(ccdCaseId), hearingId).getValue().getHearingStatus()).isEqualTo(HearingStatus.CANCELLED));
         log.info("Case {}: hearing {} is {} on the case", ccdCaseId, hearingId, HearingStatus.CANCELLED);
+    }
+
+    private static ConditionFactory hmcAwait() {
+        return await().atMost(5, MINUTES).pollInterval(10, SECONDS);
     }
 
 }
