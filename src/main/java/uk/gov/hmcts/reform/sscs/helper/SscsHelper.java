@@ -124,11 +124,10 @@ public class SscsHelper {
         return futureHearing.isPresent();
     }
 
-    public static boolean hasHearingNotYetScheduled(SscsCaseData caseData) {
+    public static boolean hasHearingAtAwaitingListing(SscsCaseData caseData) {
         Optional<Hearing> anyNonCancelledHearingWithNoScheduledDate = ofNullable(caseData.getHearings())
             .orElse(Collections.emptyList())
             .stream()
-            .filter(hearing -> isNull(hearing.getValue().getHearingDate()) && isNull(hearing.getValue().getTime()))
             .filter(hearing -> AWAITING_LISTING.equals(hearing.getValue().getHearingStatus()))
             .findFirst();
         return anyNonCancelledHearingWithNoScheduledDate.isPresent();
