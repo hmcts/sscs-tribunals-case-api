@@ -176,10 +176,15 @@ public class SscsHelperTest {
     @ParameterizedTest
     @CsvSource(value = {
         "AWAITING_LISTING, true",
-        "null, true",
-        "CANCELLED, false"
+        "null, false",
+        "LISTED, false",
+        "EXCEPTION, false",
+        "CANCELLED, false",
+        "AWAITING_ACTUALS, false",
+        "COMPLETED, false",
+        "ADJOURNED, false"
     }, nullValues = "null")
-    void givenHearingWithNoDateOrTime_whenCheckingForHearingButNotScheduled_thenReturnTrueUnlessCancelled(
+    void givenHearingWithNoDateOrTime_whenCheckingForHearingButNotScheduled_thenReturnTrueOnlyIfAwaitingListing(
         final HearingStatus hearingStatus, final boolean expectedResult) {
         sscsCaseData.setHearings(List.of(unscheduledHearing(hearingStatus)));
 
