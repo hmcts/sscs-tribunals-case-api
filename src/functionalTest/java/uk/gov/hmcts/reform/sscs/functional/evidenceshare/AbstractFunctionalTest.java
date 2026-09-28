@@ -34,6 +34,7 @@ import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.awaitility.core.ConditionFactory;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,6 +42,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.ProfileValueSourceConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
@@ -58,6 +60,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
 
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @ProfileValueSourceConfiguration(EnvironmentProfileValueSource.class)
 abstract class AbstractFunctionalTest {
@@ -160,16 +163,6 @@ abstract class AbstractFunctionalTest {
             consumer.accept(caseData);
         }
 
-        return createCase(caseData, eventType);
-    }
-
-    SscsCaseDetails createCaseFromJson(final String caseDataJson, final EventType eventType) throws IOException {
-        idamTokens = getIdamTokens();
-
-        return createCase(mapper.readValue(caseDataJson, SscsCaseData.class), eventType);
-    }
-
-    private SscsCaseDetails createCase(final SscsCaseData caseData, final EventType eventType) {
         final SscsCaseDetails caseDetails = ccdService.createCase(caseData, eventType.getCcdType(),
             "Evidence share service created case",
             "Evidence share service case created for functional test", idamTokens);
