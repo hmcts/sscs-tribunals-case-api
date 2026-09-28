@@ -23,6 +23,11 @@ spring:
             max-request-size: ${MAX_REQUEST_SIZE:10MB}
     lifecycle:
         timeout-per-shutdown-phase: 120s
+    security:
+        oauth2:
+            resourceserver:
+                jwt:
+                    issuer-uri: https://hmcts-access.service.gov.uk/o | ${IDAM_OIDC_URL}/o
 
     datasource:
         driverClassName: org.postgresql.Driver
