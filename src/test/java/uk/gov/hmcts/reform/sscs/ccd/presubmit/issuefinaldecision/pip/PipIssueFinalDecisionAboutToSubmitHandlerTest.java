@@ -76,8 +76,6 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private IssueFinalDecisionAboutToSubmitHandler handler;
 
-    private PipDecisionNoticeOutcomeService pipDecisionNoticeOutcomeService;
-
     private DecisionNoticeService decisionNoticeService;
 
     @Mock
@@ -100,8 +98,6 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
-    private SscsDocument document;
-
     protected static Validator validator = Validation.byDefaultProvider()
             .configure()
             .messageInterpolator(new ParameterMessageInterpolator())
@@ -111,7 +107,8 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
     @BeforeEach
     void setUp() throws IOException {
         openMocks(this);
-        pipDecisionNoticeOutcomeService = new PipDecisionNoticeOutcomeService(new PipDecisionNoticeQuestionService());
+        PipDecisionNoticeOutcomeService pipDecisionNoticeOutcomeService = new PipDecisionNoticeOutcomeService(
+            new PipDecisionNoticeQuestionService());
 
         decisionNoticeService = new DecisionNoticeService(new ArrayList<>(), Arrays.asList(pipDecisionNoticeOutcomeService), new ArrayList<>());
 
@@ -144,7 +141,7 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
                 .writeFinalDecisionEndDateType("")
                 .writeFinalDecisionEndDate("")
                 .writeFinalDecisionDateOfDecision("")
-                .writeFinalDecisionReasons(Arrays.asList(new CollectionItem(null, "")))
+                .writeFinalDecisionReasons(List.of(new CollectionItem<>(null, "")))
                 .writeFinalDecisionPageSectionReference("")
                 .writeFinalDecisionAnythingElse("something else")
                 .writeFinalDecisionPreviewDocument(DocumentLink.builder().build())
@@ -195,7 +192,8 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
 
     @Test
     void givenAnIssueFinalDecisionEventRemoveDraftDecisionNotice() {
-        final DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
+        final DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern(
+            "dd-MM-yyyy")))).build();
         final SscsFinalDecisionCaseData finalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
         finalDecisionCaseData.setWriteFinalDecisionPreviewDocument(docLink);
         finalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -215,7 +213,8 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
 
     @Test
     void givenAnIssueFinalDecisionEventWhenDocumentTypeIsNullThenRemoveDraftDecisionNotice() {
-        final DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
+        final DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern(
+            "dd-MM-yyyy")))).build();
         final SscsFinalDecisionCaseData finalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
         finalDecisionCaseData.setWriteFinalDecisionPreviewDocument(docLink);
         finalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -235,7 +234,8 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
 
     @Test
     void givenAnIssueFinalDecisionEventForYesYesFlowWhenComparedToDwpQuestionComparedRatesAreNull_ThenDisplayAnError() {
-        final DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
+        final DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern(
+            "dd-MM-yyyy")))).build();
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused(null);
@@ -294,7 +294,8 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
 
     @Test
     void givenAnIssueFinalDecisionEventForNoYesFlowWhenComparedToDwpQuestionComparedRatesAreNull_ThenDisplayAnError() {
-        final DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
+        final DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern(
+            "dd-MM-yyyy")))).build();
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("no");
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused(null);
@@ -349,7 +350,8 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
 
     @Test
     void givenAnIssueFinalDecisionEventForYesNoFlowWhenComparedToDwpQuestionComparedRatesAreNotNullButApprovalNotSet_ThenDisplayAnError() {
-        final DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
+        final DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern(
+            "dd-MM-yyyy")))).build();
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused(null);
@@ -405,7 +407,8 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
     @Test
     void givenIssueFinalDecisionEventWithWelshAppeal_thenTranslationIsRequired() {
         sscsCaseData.setLanguagePreferenceWelsh(YES.getValue());
-        final DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
+        final DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern(
+            "dd-MM-yyyy")))).build();
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
@@ -475,7 +478,8 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
                 validator, hearingMessageHelper, venueDataLoader, true);
         final DocumentLink docLink = DocumentLink.builder()
                 .documentUrl("bla.com")
-                .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+                .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern(
+                    "dd-MM-yyyy"))))
                 .build();
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
@@ -484,7 +488,7 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors()).isEmpty();
-        verify(hearingMessageHelper, times(0)).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
+        verify(hearingMessageHelper, times(0)).sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(), CancellationReason.OTHER);
     }
 
     @Test
@@ -493,7 +497,8 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
                 validator, hearingMessageHelper, venueDataLoader, true);
         final DocumentLink docLink = DocumentLink.builder()
                 .documentUrl("bla.com")
-                .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+                .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern(
+                    "dd-MM-yyyy"))))
                 .build();
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
@@ -520,7 +525,7 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setHearings(List.of(hearing1, hearing2));
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors()).isEmpty();
-        verify(hearingMessageHelper, times(0)).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
+        verify(hearingMessageHelper, times(0)).sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(), CancellationReason.OTHER);
     }
 
     @Test
@@ -529,7 +534,8 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
                 validator, hearingMessageHelper, venueDataLoader, true);
         final DocumentLink docLink = DocumentLink.builder()
                 .documentUrl("bla.com")
-                .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+                .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern(
+                    "dd-MM-yyyy"))))
                 .build();
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
@@ -556,7 +562,7 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setHearings(List.of(hearing1, hearing2));
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors()).isEmpty();
-        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
+        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(), CancellationReason.OTHER);
     }
 
     @Test
@@ -565,7 +571,8 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
                 validator, hearingMessageHelper, venueDataLoader, true);
         final DocumentLink docLink = DocumentLink.builder()
                 .documentUrl("bla.com")
-                .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+                .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern(
+                    "dd-MM-yyyy"))))
                 .build();
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
@@ -583,7 +590,7 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setHearings(List.of(hearing));
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors()).isEmpty();
-        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
+        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(), CancellationReason.OTHER);
     }
 
     @ParameterizedTest
@@ -645,32 +652,8 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("nonJudgeOnlyCompositions")
-    void givenNonJudgeOnlyReadyToListCaseAwaitingListing_whenIssueFinalDecision_thenDoNotSendHearingCancellationRequest(
-        final PanelMemberComposition panelMemberComposition) {
-        prepareCaseInStateBeforeIssuingFinalDecision(State.READY_TO_LIST, panelMemberComposition);
-        sscsCaseData.setHearings(List.of(awaitingListingHearing(HearingStatus.AWAITING_LISTING)));
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).isEmpty();
-        verifyNoInteractions(hearingMessageHelper);
-    }
-
-    @Test
-    void givenReadyToListCaseAwaitingListingWithNoPanelComposition_whenIssueFinalDecision_thenDoNotSendHearingCancellationRequest() {
-        prepareCaseInStateBeforeIssuingFinalDecision(State.READY_TO_LIST, null);
-        sscsCaseData.setHearings(List.of(awaitingListingHearing(HearingStatus.AWAITING_LISTING)));
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).isEmpty();
-        verifyNoInteractions(hearingMessageHelper);
-    }
-
-    @ParameterizedTest
     @EnumSource(value = State.class, names = {"HEARING", "WITH_DWP", "RESPONSE_RECEIVED", "UNKNOWN"})
-    void givenJudgeOnlyCaseAwaitingListingNotInReadyToList_whenIssueFinalDecision_thenDoNotSendHearingCancellationRequest(
+    void givenCaseAwaitingListingNotInReadyToList_whenIssueFinalDecision_thenDoNotSendHearingCancellationRequest(
         final State stateBefore) {
         prepareCaseInStateBeforeIssuingFinalDecision(stateBefore, judgeOnlyComposition());
         sscsCaseData.setHearings(List.of(awaitingListingHearing(HearingStatus.AWAITING_LISTING)));
@@ -682,7 +665,7 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenJudgeOnlyCaseAwaitingListingWithNoCaseDetailsBefore_whenIssueFinalDecision_thenDoNotSendHearingCancellationRequest() {
+    void givenCaseAwaitingListingWithNoCaseDetailsBefore_whenIssueFinalDecision_thenDoNotSendHearingCancellationRequest() {
         prepareCaseInStateBeforeIssuingFinalDecision(State.READY_TO_LIST, judgeOnlyComposition());
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.empty());
         sscsCaseData.setHearings(List.of(awaitingListingHearing(HearingStatus.AWAITING_LISTING)));
@@ -694,7 +677,7 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenJudgeOnlyReadyToListCaseAwaitingListingAndScheduleListingDisabled_whenIssueFinalDecision_thenDoNotSendHearingCancellationRequest() {
+    void givenReadyToListCaseAwaitingListingAndScheduleListingDisabled_whenIssueFinalDecision_thenDoNotSendHearingCancellationRequest() {
         prepareCaseInStateBeforeIssuingFinalDecision(State.READY_TO_LIST, judgeOnlyComposition());
         handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, userDetailsService,
             validator, hearingMessageHelper, venueDataLoader, false);
@@ -707,7 +690,7 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenJudgeOnlyReadyToListCaseAwaitingListingOnGapsRoute_whenIssueFinalDecision_thenDoNotSendHearingCancellationRequest() {
+    void givenReadyToListCaseAwaitingListingOnGapsRoute_whenIssueFinalDecision_thenDoNotSendHearingCancellationRequest() {
         prepareCaseInStateBeforeIssuingFinalDecision(State.READY_TO_LIST, judgeOnlyComposition());
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.GAPS);
         sscsCaseData.setHearings(List.of(awaitingListingHearing(HearingStatus.AWAITING_LISTING)));
@@ -719,28 +702,9 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenNonJudgeOnlyReadyToListCaseWithFutureHearing_whenIssueFinalDecision_thenSendHearingCancellationRequest() {
-        prepareCaseInStateBeforeIssuingFinalDecision(State.READY_TO_LIST, judgeAndMedicalMemberComposition());
-        final HearingDetails hearingDetails = HearingDetails.builder()
-                                                            .hearingDate(LocalDate.now().plusDays(5).toString())
-                                                            .start(LocalDateTime.now().plusDays(5))
-                                                            .hearingId("1")
-                                                            .venue(Venue.builder().name("Venue 1").build())
-                                                            .time("12:00")
-                                                            .hearingStatus(HearingStatus.LISTED)
-                                                            .build();
-        sscsCaseData.setHearings(List.of(Hearing.builder().value(hearingDetails).build()));
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).isEmpty();
-        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(), CancellationReason.OTHER);
-    }
-
-    @Test
     void givenWriteFinalDecisionPostHearingsEnabledAndNoIssueFinalDate_shouldUpdateFinalCaseData() {
         final String filename = String.format("Decision Notice issued on %s.pdf",
-            LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
+            LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
         final DocumentLink docLink = DocumentLink.builder()
                                                  .documentUrl("bla.com")
                                                  .documentFilename(filename)
@@ -779,23 +743,10 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         return PanelMemberComposition.builder().panelCompositionJudge("84").build();
     }
 
-    private static PanelMemberComposition judgeAndMedicalMemberComposition() {
-        return PanelMemberComposition.builder().panelCompositionJudge("84").panelCompositionMemberMedical1("58").build();
-    }
-
     private static Stream<PanelMemberComposition> judgeOnlyCompositions() {
         return Stream.of(
             judgeOnlyComposition(),
             PanelMemberComposition.builder().districtTribunalJudge("74").build());
-    }
-
-    private static Stream<PanelMemberComposition> nonJudgeOnlyCompositions() {
-        return Stream.of(
-            judgeAndMedicalMemberComposition(),
-            PanelMemberComposition.builder().panelCompositionJudge("84").panelCompositionMemberMedical2("58").build(),
-            PanelMemberComposition.builder().panelCompositionJudge("84")
-                                  .panelCompositionDisabilityAndFqMember(List.of("44")).build(),
-            PanelMemberComposition.builder().build());
     }
 
     private static Hearing awaitingListingHearing(final HearingStatus hearingStatus) {
@@ -824,7 +775,7 @@ class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         final DocumentLink docLink = DocumentLink.builder()
                                                  .documentUrl("bla.com")
                                                  .documentFilename(String.format("Decision Notice issued on %s.pdf",
-                                                     LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+                                                     LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
                                                  .build();
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");

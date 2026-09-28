@@ -1,28 +1,19 @@
 package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
-import static java.util.concurrent.TimeUnit.MINUTES;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 import static uk.gov.hmcts.reform.sscs.bulkscan.BaseFunctionalTest.generateRandomNino;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_TEST_CASE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FINAL_DECISION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_CASE_ONLY;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.TRIBUNAL_JUDGE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.TRIBUNAL_MEMBER_DISABILITY;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberType.TRIBUNAL_MEMBER_MEDICAL;
 import static uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler.getJsonCallbackForTest;
 
 import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.awaitility.core.ConditionFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIf;
 import org.springframework.test.context.TestConstructor;
@@ -30,7 +21,6 @@ import org.springframework.test.context.TestConstructor.AutowireMode;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingStatus;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberComposition;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.exception.MessageProcessingException;
@@ -66,23 +56,17 @@ class IssueFinalDecisionCancelListingFunctionalTest extends AbstractFunctionalTe
     void givenJudgeOnlyCaseAwaitingListingInReadyToList_whenIssueFinalDecision_thenListingRequestIsCancelled() throws IOException, MessageProcessingException {
 
         final String hearingId = createCaseAwaitingListing();
+        final SscsCaseDetails caseById = findCaseById(ccdCaseId);
 
-        log.info("Case {}: setting a judge-only panel so the Ready to List judge-only rule applies", ccdCaseId);
-        final SscsCaseDetails judgeOnlyCase = updatePanelMemberComposition(judgeOnlyPanel());
-        assertThat(judgeOnlyCase.getData().getPanelMemberComposition().isJudgeOnly()).isTrue();
-
-        issueFinalDecision(judgeOnlyCase);
+        issueFinalDecision(caseById);
         awaitHearingCancelled(hearingId);
     }
 
     @Test
     @EnabledIf("isDeployedToLocalhost")
     void givenCaseWithBookedHearingInTheFuture_whenIssueFinalDecision_thenHearingIsCancelled() throws IOException, MessageProcessingException {
-        final String hearingId = createCaseAwaitingListing();
 
-        log.info("Case {}: setting a full panel so only the future hearing rule can trigger the cancellation", ccdCaseId);
-        final SscsCaseDetails panelCase = updatePanelMemberComposition(fullPanel());
-        assertThat(panelCase.getData().getPanelMemberComposition().isJudgeOnly()).isFalse();
+        final String hearingId = createCaseAwaitingListing();
 
         sendHmcResponseMessageToBookHearing(hearingId);
 
@@ -95,19 +79,6 @@ class IssueFinalDecisionCancelListingFunctionalTest extends AbstractFunctionalTe
         issueFinalDecision(findCaseById(ccdCaseId));
 
         awaitHearingCancelled(hearingId);
-    }
-
-    private static PanelMemberComposition judgeOnlyPanel() {
-        return PanelMemberComposition.builder().panelCompositionJudge(TRIBUNAL_JUDGE.getReference()).build();
-    }
-
-    private static PanelMemberComposition fullPanel() {
-        return PanelMemberComposition
-            .builder()
-            .panelCompositionJudge(TRIBUNAL_JUDGE.getReference())
-            .panelCompositionMemberMedical1(TRIBUNAL_MEMBER_MEDICAL.getReference())
-            .panelCompositionDisabilityAndFqMember(List.of(TRIBUNAL_MEMBER_DISABILITY.getReference()))
-            .build();
     }
 
     private void assertThatHearingBooked(String hearingId) {
@@ -153,16 +124,6 @@ class IssueFinalDecisionCancelListingFunctionalTest extends AbstractFunctionalTe
             .filter(hearing -> hearingId.equals(hearing.getValue().getHearingId()))
             .findFirst()
             .orElseThrow();
-    }
-
-    private SscsCaseDetails updatePanelMemberComposition(final PanelMemberComposition panelMemberComposition) {
-        final SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
-        caseDetails.getData().setPanelMemberComposition(panelMemberComposition);
-        updateCaseEvent(UPDATE_CASE_ONLY, caseDetails);
-        final SscsCaseDetails updatedCase = findCaseById(ccdCaseId);
-        log.info("Case {}: panel member composition is now {} (judge only: {})", ccdCaseId,
-            updatedCase.getData().getPanelMemberComposition(), updatedCase.getData().getPanelMemberComposition().isJudgeOnly());
-        return updatedCase;
     }
 
     private void issueFinalDecision(final SscsCaseDetails caseDetails) {
@@ -214,13 +175,9 @@ class IssueFinalDecisionCancelListingFunctionalTest extends AbstractFunctionalTe
             sendHmcResponseMessageOnceHearingCancelled(hearingId);
         }
         log.info("Case {}: waiting for hearing {} to be {} on the case", ccdCaseId, hearingId, HearingStatus.CANCELLED);
-        hmcAwait().untilAsserted(() -> assertThat(
+        defaultAwait().untilAsserted(() -> assertThat(
             findHearing(findCaseById(ccdCaseId), hearingId).getValue().getHearingStatus()).isEqualTo(HearingStatus.CANCELLED));
         log.info("Case {}: hearing {} is {} on the case", ccdCaseId, hearingId, HearingStatus.CANCELLED);
-    }
-
-    private static ConditionFactory hmcAwait() {
-        return await().atMost(5, MINUTES).pollInterval(10, SECONDS);
     }
 
 }
