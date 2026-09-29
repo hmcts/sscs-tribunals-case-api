@@ -283,7 +283,10 @@ public class CcdNotificationWrapper implements NotificationWrapper {
             || isValidProcessHearingRequestEventForParty(newSscsCaseData, oldSscsCaseData, notificationEventType, PartyItemList.APPELLANT)
             || isValidRequestForInformationEventForParty(newSscsCaseData, notificationEventType, PartyItemList.APPELLANT)
             || !EVENTS_MAYBE_INVALID_FOR_APPELLANT.contains(notificationEventType);
-        return canSendBasedOnConfidentiality(newSscsCaseData, notificationEventType, ConfidentialityPartyMembers.APPELLANT_OR_APPOINTEE.getCode()) && isValid;
+        boolean isAppellantDeceased = YesNo.YES.equals(newSscsCaseData.getIsAppellantDeceased());
+        return canSendBasedOnConfidentiality(newSscsCaseData, notificationEventType, ConfidentialityPartyMembers.APPELLANT_OR_APPOINTEE.getCode())
+            && isValid
+            && !isAppellantDeceased;
     }
 
     private boolean isValidProcessHearingRequestEventForParty(SscsCaseData newSscsCaseData, SscsCaseData oldSscsCaseData, NotificationEventType notificationEventType, PartyItemList partyItemList) {
