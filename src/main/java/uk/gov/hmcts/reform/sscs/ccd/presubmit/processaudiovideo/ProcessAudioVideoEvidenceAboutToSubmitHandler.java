@@ -168,7 +168,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
             caseData.setDwpDocuments(dwpDocuments);
 
             if (caseData.getSscsDocument() != null) {
-                sscsDocuments.addAll(caseData.getSscsDocument());
+                sscsDocuments.addAll(0, caseData.getSscsDocument());
             }
 
             caseData.setSscsDocument(sscsDocuments);
