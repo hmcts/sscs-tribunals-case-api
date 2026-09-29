@@ -78,7 +78,43 @@ public class SaveCorrespondenceAsyncServiceTest {
 
     @Test
     public void recoverWillConsumeThrowable() {
-        service.getBackendResponseFallback(new NotificationClientException("400 BadRequestError"));
+        service.recoverDefault(new NotificationClientException("400 BadRequestError"));
+    }
+
+    @Test
+    public void recoverWillConsumeThrowableForSaveLetter() {
+        correspondence = Correspondence.builder().value(CorrespondenceDetails.builder()
+                .correspondenceType(CorrespondenceType.Letter).to("Mr Blobby").build())
+                .build();
+
+        service.recoverSaveLetter(new NotificationClientException("500 ServerError"),
+                notificationClient, NOTIFICATION_ID, correspondence, CCD_ID);
+
+        verify(ccdNotificationsPdfService).notifyFailedToRetrieveCorrespondence(Long.valueOf(CCD_ID), NOTIFICATION_ID, CorrespondenceType.Letter);
+    }
+
+    @Test
+    public void recoverWillConsumeThrowableForEmailOrSms() {
+        SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId(CCD_ID).build();
+        correspondence = Correspondence.builder().value(CorrespondenceDetails.builder()
+                .correspondenceType(CorrespondenceType.Email).to("Mr Blobby").build())
+                .build();
+
+        service.recoverSaveEmailOrSms(new NotificationClientException("500 ServerError"), NOTIFICATION_ID, correspondence, sscsCaseData);
+
+        verify(ccdNotificationsPdfService).notifyFailedToRetrieveCorrespondence(Long.valueOf(CCD_ID), NOTIFICATION_ID, CorrespondenceType.Email);
+    }
+
+    @Test
+    public void recoverWillConsumeThrowableForSaveLettersToReasonableAdjustment() {
+        correspondence = Correspondence.builder().value(CorrespondenceDetails.builder()
+                .correspondenceType(CorrespondenceType.Letter).to("Mr Blobby").build())
+                .build();
+
+        service.recoverSaveLettersToReasonableAdjustment(new NotificationClientException("500 ServerError"),
+                new byte[]{}, correspondence, CCD_ID, SubscriptionType.APPELLANT);
+
+        verify(ccdNotificationsPdfService).notifyFailedToRetrieveCorrespondence(Long.valueOf(CCD_ID), null, CorrespondenceType.Letter);
     }
 
     @ParameterizedTest
@@ -99,7 +135,7 @@ public class SaveCorrespondenceAsyncServiceTest {
                 .correspondenceType(CorrespondenceType.Email).to("Mr Blobby").build())
                 .build();
 
-        service.saveEmailOrSms(correspondence, sscsCaseData);
+        service.saveEmailOrSms(NOTIFICATION_ID, correspondence, sscsCaseData);
 
         verify(ccdNotificationsPdfService).mergeCorrespondenceIntoCcdV2(any(Long.class), eq(correspondence));
     }

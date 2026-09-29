@@ -311,7 +311,7 @@ public class NotificationSenderTest {
             .eventType(APPEAL_RECEIVED.getId())
             .sentOn("this field is ignored")
             .build()).build();
-        verify(saveCorrespondenceAsyncService).saveEmailOrSms(argThat((Correspondence arg) ->
+        verify(saveCorrespondenceAsyncService).saveEmailOrSms(anyString(), argThat((Correspondence arg) ->
                 reflectionEquals(arg.getValue(), expected.getValue(), "sentOn")), eq(SSCS_CASE_DATA));
     }
 
@@ -339,6 +339,7 @@ public class NotificationSenderTest {
         String smsNumber = "07999999000";
         when(notificationClient.sendSms(templateId, smsNumber, personalisation, reference, "Sender"))
             .thenReturn(sendSmsResponse);
+        when(sendSmsResponse.getNotificationId()).thenReturn(UUID.randomUUID());
 
         notificationSender.sendSms(
                 templateId, smsNumber, personalisation, reference, "Sender", APPEAL_RECEIVED, SSCS_CASE_DATA
@@ -357,6 +358,7 @@ public class NotificationSenderTest {
             .sentOn("this field is ignored")
             .build()).build();
         verify(saveCorrespondenceAsyncService).saveEmailOrSms(
+                anyString(),
                 argThat(arg -> reflectionEquals(arg.getValue(), expected.getValue(), "sentOn")),
                 eq(SSCS_CASE_DATA)
         );
