@@ -5,7 +5,6 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingStatus.AWAITING_LISTING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingStatus.CANCELLED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INCOMPLETE_APPLICATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INCOMPLETE_APPLICATION_INFORMATION_REQUESTED;
@@ -26,7 +25,15 @@ import java.util.Optional;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
 @Slf4j
 public class SscsHelper {
@@ -124,11 +131,12 @@ public class SscsHelper {
         return futureHearing.isPresent();
     }
 
-    public static boolean hasHearingAtAwaitingListing(SscsCaseData caseData) {
+    public static boolean hasHearingNotYetScheduled(SscsCaseData caseData) {
         Optional<Hearing> anyNonCancelledHearingWithNoScheduledDate = ofNullable(caseData.getHearings())
             .orElse(Collections.emptyList())
             .stream()
-            .filter(hearing -> AWAITING_LISTING.equals(hearing.getValue().getHearingStatus()))
+            .filter(hearing -> isNull(hearing.getValue().getHearingDate()) && isNull(hearing.getValue().getTime()))
+            .filter(hearing -> !CANCELLED.equals(hearing.getValue().getHearingStatus()))
             .findFirst();
         return anyNonCancelledHearingWithNoScheduledDate.isPresent();
     }

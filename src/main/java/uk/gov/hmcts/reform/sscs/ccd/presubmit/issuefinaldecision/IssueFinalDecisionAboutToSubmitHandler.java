@@ -9,7 +9,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
-import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.hasHearingAtAwaitingListing;
+import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.hasHearingNotYetScheduled;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.hasHearingScheduledInTheFuture;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.clearPostponementTransientFields;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isSAndLCase;
@@ -167,7 +167,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             && isSAndLCase(callback.getCaseDetails().getCaseData());
 
     private boolean isReadyToListWithUnScheduledHearing(State priorState, SscsCaseData sscsCaseData) {
-        return READY_TO_LIST == priorState && hasHearingAtAwaitingListing(sscsCaseData);
+        return READY_TO_LIST == priorState && hasHearingNotYetScheduled(sscsCaseData);
     }
 
     private void calculateOutcomeCode(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
