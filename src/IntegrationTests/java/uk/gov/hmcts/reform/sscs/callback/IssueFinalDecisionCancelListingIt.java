@@ -46,7 +46,7 @@ import uk.gov.hmcts.reform.sscs.service.hmc.topic.HearingRequestHandler;
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("integration")
-@TestPropertySource(locations = "classpath:config/application_it.properties", properties = "feature.snl.enabled=true")
+@TestPropertySource(locations = "classpath:config/application_it.properties")
 class IssueFinalDecisionCancelListingIt extends AbstractEventIt {
 
     private static final String CALLBACK_JSON = "callback/issueFinalDecisionDescriptorCallback.json";
