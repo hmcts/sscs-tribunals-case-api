@@ -31,17 +31,11 @@ import uk.gov.service.notify.NotificationClientException;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@TestPropertySource(locations = "classpath:config/application_es_it.properties", properties = {
-    "letter-async.maxAttempts=3",
-    "letter-async.delay=1",
-    "letter-async.multiplier=1",
-    "letter-async.maxDelay=1",
-    "letter-async.initialDelay=0"
-})
+@TestPropertySource(locations = "classpath:config/application_it.properties")
 public class SaveCorrespondenceAsyncServiceIt {
 
     private static final String NOTIFICATION_ID = "123";
-    private static final String CCD_ID = "82828";
+    private static final String CCD_ID = "1776543211234";
 
     @Autowired
     private SaveCorrespondenceAsyncService saveCorrespondenceAsyncService;
@@ -56,7 +50,7 @@ public class SaveCorrespondenceAsyncServiceIt {
         correspondence = Correspondence.builder()
             .value(CorrespondenceDetails.builder()
                 .correspondenceType(CorrespondenceType.Letter)
-                .to("Mr Blobby")
+                .to("Mr Tester")
                 .build())
             .build();
     }
@@ -89,7 +83,7 @@ public class SaveCorrespondenceAsyncServiceIt {
 
     @Test
     public void retriesSaveLettersToReasonableAdjustmentAndRecoversAfterConfiguredMaxAttemptsAreExceeded() {
-        doThrow(new RuntimeException("boom")).when(ccdNotificationsPdfService)
+        doThrow(new RuntimeException("500 ServerError")).when(ccdNotificationsPdfService)
             .mergeReasonableAdjustmentsCorrespondenceIntoCcdV2(any(byte[].class), any(), any(), any());
 
         saveCorrespondenceAsyncService.saveLettersToReasonableAdjustment(new byte[]{}, correspondence, CCD_ID, SubscriptionType.APPELLANT);
@@ -105,16 +99,16 @@ public class SaveCorrespondenceAsyncServiceIt {
 
     @Test
     public void retriesSaveEmailOrSmsAndRecoversAfterMaxAttemptsAreExceeded() {
-        doThrow(new RuntimeException("boom")).when(ccdNotificationsPdfService)
+        doThrow(new RuntimeException("500 ServerError")).when(ccdNotificationsPdfService)
             .mergeCorrespondenceIntoCcdV2(any(), any());
         SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId(CCD_ID).build();
         Correspondence emailCorrespondence = Correspondence.builder()
-            .value(CorrespondenceDetails.builder().correspondenceType(CorrespondenceType.Email).to("Mr Blobby").build())
+            .value(CorrespondenceDetails.builder().correspondenceType(CorrespondenceType.Email).to("Mr Tester").build())
             .build();
 
         saveCorrespondenceAsyncService.saveEmailOrSms(NOTIFICATION_ID, emailCorrespondence, sscsCaseData);
 
-        verify(ccdNotificationsPdfService, times(5))
+        verify(ccdNotificationsPdfService, times(3))
             .mergeCorrespondenceIntoCcdV2(eq(Long.valueOf(CCD_ID)), eq(emailCorrespondence));
         verify(ccdNotificationsPdfService)
             .notifyFailedToRetrieveCorrespondence(Long.valueOf(CCD_ID), NOTIFICATION_ID, CorrespondenceType.Email);

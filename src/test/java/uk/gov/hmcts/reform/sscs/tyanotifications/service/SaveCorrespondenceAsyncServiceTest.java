@@ -84,7 +84,7 @@ public class SaveCorrespondenceAsyncServiceTest {
     @Test
     public void recoverWillConsumeThrowableForSaveLetter() {
         correspondence = Correspondence.builder().value(CorrespondenceDetails.builder()
-                .correspondenceType(CorrespondenceType.Letter).to("Mr Blobby").build())
+                .correspondenceType(CorrespondenceType.Letter).to("Mr Tester").build())
                 .build();
 
         service.recoverSaveLetter(new NotificationClientException("500 ServerError"),
@@ -97,7 +97,7 @@ public class SaveCorrespondenceAsyncServiceTest {
     public void recoverWillConsumeThrowableForEmailOrSms() {
         SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId(CCD_ID).build();
         correspondence = Correspondence.builder().value(CorrespondenceDetails.builder()
-                .correspondenceType(CorrespondenceType.Email).to("Mr Blobby").build())
+                .correspondenceType(CorrespondenceType.Email).to("Mr Tester").build())
                 .build();
 
         service.recoverSaveEmailOrSms(new NotificationClientException("500 ServerError"), NOTIFICATION_ID, correspondence, sscsCaseData);
@@ -108,7 +108,7 @@ public class SaveCorrespondenceAsyncServiceTest {
     @Test
     public void recoverWillConsumeThrowableForSaveLettersToReasonableAdjustment() {
         correspondence = Correspondence.builder().value(CorrespondenceDetails.builder()
-                .correspondenceType(CorrespondenceType.Letter).to("Mr Blobby").build())
+                .correspondenceType(CorrespondenceType.Letter).to("Mr Tester").build())
                 .build();
 
         service.recoverSaveLettersToReasonableAdjustment(new NotificationClientException("500 ServerError"),
