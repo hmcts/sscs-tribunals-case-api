@@ -72,7 +72,9 @@ public class SaveCorrespondenceAsyncService {
     }
 
     @Async
-    @Retryable(recover = "recoverSaveLettersToReasonableAdjustment", maxAttemptsExpression = "#{@letterAsyncConfigProperties.maxAttempts}", backoff = @Backoff(delayExpression = "#{@letterAsyncConfigProperties.delay}", multiplierExpression = "#{@letterAsyncConfigProperties.multiplier}", random = true))
+    @Retryable(recover = "recoverSaveLettersToReasonableAdjustment", maxAttemptsExpression = "#{@letterAsyncConfigProperties.maxAttempts}",
+            backoff = @Backoff(delayExpression = "#{@letterAsyncConfigProperties.delay}", multiplierExpression = "#{@letterAsyncConfigProperties.multiplier}",
+                    maxDelayExpression = "#{@letterAsyncConfigProperties.maxDelay}", random = true))
     public void saveLettersToReasonableAdjustment(final byte[] pdfForLetter, Correspondence correspondence, String ccdCaseId,
                                                   SubscriptionType subscriptionType) {
         log.info("Using notification letter correspondence V2 to upload reasonable adjustments correspondence for {} ",
@@ -91,11 +93,8 @@ public class SaveCorrespondenceAsyncService {
         ccdNotificationsPdfService.notifyFailedToRetrieveCorrespondence(valueOf(ccdCaseId), null, correspondence.getValue().getCorrespondenceType());
     }
 
-    @Retryable(recover = "recoverSaveEmailOrSms", maxAttempts = 1, backoff = @Backoff(delay = 1, multiplier = 1, maxDelay = 1, random = true))
+    @Retryable
     public void saveEmailOrSms(final String notificationId, final Correspondence correspondence, final SscsCaseData sscsCaseData) {
-        if (true) {
-            throw new RuntimeException("TEMP: forcing failure for manual recover test");
-        }
         int retry = (RetrySynchronizationManager.getContext() != null) ? RetrySynchronizationManager.getContext().getRetryCount() + 1 : 1;
         log.info("Retry number {} : to upload {} correspondence for notification id {}, case reference {}",
             retry, correspondence.getValue().getCorrespondenceType().name(), notificationId, sscsCaseData.getCcdCaseId());

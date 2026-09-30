@@ -7,7 +7,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -130,7 +129,6 @@ public class SaveCorrespondenceAsyncServiceTest {
     }
 
     @Test
-    @Disabled
     public void willSaveEmailOrSmsDirectlyIntoCcd() {
         SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId(CCD_ID).build();
         correspondence = Correspondence.builder().value(CorrespondenceDetails.builder()

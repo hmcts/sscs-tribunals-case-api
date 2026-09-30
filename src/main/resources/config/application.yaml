@@ -1891,11 +1891,11 @@ feature.elinksV2.enabled: false
 
 
 letter-async:
-    maxAttempts: ${LETTER_ASYNC_MAX_ATTEMPTS:1}
-    delay: ${LETTER_ASYNC_DELAY:1}
-    multiplier: ${LETTER_ASYNC_MULTIPLIER:1}
-    maxDelay: ${LETTER_ASYNC_MAX_DELAY:1}
-    initialDelay: ${LETTER_ASYNC_INITIAL_DELAY:1}
+    maxAttempts: ${LETTER_ASYNC_MAX_ATTEMPTS:10}
+    delay: ${LETTER_ASYNC_DELAY:10000}
+    multiplier: ${LETTER_ASYNC_MULTIPLIER:2}
+    maxDelay: ${LETTER_ASYNC_MAX_DELAY:180000}
+    initialDelay: ${LETTER_ASYNC_INITIAL_DELAY:5000}
 
 retry:
     max: 3
