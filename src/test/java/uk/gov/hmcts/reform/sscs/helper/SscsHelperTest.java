@@ -33,13 +33,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Venue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
 
-public class SscsHelperTest {
+class SscsHelperTest {
 
-    public static final LocalDate NOW = LocalDate.now();
+    private static final LocalDate NOW = LocalDate.now();
     private SscsCaseData sscsCaseData;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         sscsCaseData = SscsCaseData.builder()
                 .ccdCaseId("ccdId")
                 .otherParties(Arrays.asList(buildOtherParty(), buildOtherParty()))
@@ -61,28 +61,28 @@ public class SscsHelperTest {
     }
 
     @Test
-    public void givenNoResponseDueDate_WhenOtherPartyIsAdded_ThenSetResponseDueDateTo14DaysInTheFuture() {
+    void givenNoResponseDueDate_WhenOtherPartyIsAdded_ThenSetResponseDueDateTo14DaysInTheFuture() {
         sscsCaseData.setDirectionDueDate(null);
 
         assertThat(getUpdatedDirectionDueDate(sscsCaseData)).isEqualTo(NOW.plusDays(14).toString());
     }
 
     @Test
-    public void givenResponseDueDateIsSet_WhenOtherPartyIsAdded_IfDueDateIsMoreThan14DaysOld_ThenDoNotUpdateDate() {
+    void givenResponseDueDateIsSet_WhenOtherPartyIsAdded_IfDueDateIsMoreThan14DaysOld_ThenDoNotUpdateDate() {
         sscsCaseData.setDirectionDueDate(NOW.plusDays(21).toString());
 
         assertThat(getUpdatedDirectionDueDate(sscsCaseData)).isEqualTo(NOW.plusDays(21).toString());
     }
 
     @Test
-    public void givenResponseDueDateIsSet_WhenOtherPartyIsAdded_IfDueDateIsNotMoreThan14DaysOld_ThenReSetDueDateTo14DaysInTheFuture() {
+    void givenResponseDueDateIsSet_WhenOtherPartyIsAdded_IfDueDateIsNotMoreThan14DaysOld_ThenReSetDueDateTo14DaysInTheFuture() {
         sscsCaseData.setDirectionDueDate(NOW.plusDays(2).toString());
 
         assertThat(getUpdatedDirectionDueDate(sscsCaseData)).isEqualTo(NOW.plusDays(14).toString());
     }
 
     @Test
-    public void givenResponseDueDateIsSet_IfDueDateIsMoreThan14DaysOld_ThenDoNotUpdateDate() {
+    void givenResponseDueDateIsSet_IfDueDateIsMoreThan14DaysOld_ThenDoNotUpdateDate() {
         sscsCaseData.setDirectionDueDate(NOW.plusDays(21).toString());
         sscsCaseData.setOtherParties(null);
 
@@ -90,7 +90,7 @@ public class SscsHelperTest {
     }
 
     @Test
-    public void givenResponseDueDateIsSet_IfDueDateIsNotMoreThan14DaysOld_ThenReSetDueDateTo14DaysInTheFuture() {
+    void givenResponseDueDateIsSet_IfDueDateIsNotMoreThan14DaysOld_ThenReSetDueDateTo14DaysInTheFuture() {
         sscsCaseData.setDirectionDueDate(NOW.plusDays(2).toString());
         sscsCaseData.setOtherParties(null);
 
@@ -98,15 +98,15 @@ public class SscsHelperTest {
     }
 
     @Test
-    public void givenResponseDueDateIsEmpty_WithNoOtherParty_ThenDoNotUpdateDueDate() {
+    void givenResponseDueDateIsEmpty_WithNoOtherParty_ThenDoNotUpdateDueDate() {
         sscsCaseData.setDirectionDueDate("");
         sscsCaseData.setOtherParties(null);
 
-        assertThat(getUpdatedDirectionDueDate(sscsCaseData)).isEqualTo("");
+        assertThat(getUpdatedDirectionDueDate(sscsCaseData)).isEmpty();
     }
 
     @Test
-    public void givenThereAreSomeHearingsInTheFuture_WhenTheHearingDataIsInvalid_ThenReturnFalse() {
+    void givenThereAreSomeHearingsInTheFuture_WhenTheHearingDataIsInvalid_ThenReturnFalse() {
         HearingDetails hearingDetails1 = HearingDetails.builder()
             .hearingDate("")
             .start(LocalDateTime.now().plusDays(5))
@@ -142,7 +142,7 @@ public class SscsHelperTest {
         "AWAITING_LISTING, true",
         "CANCELLED, false"
     })
-    public void givenANonCancelledHearingsInTheFuture_ThenReturnTrue(HearingStatus hearingStatus,
+    void givenANonCancelledHearingsInTheFuture_ThenReturnTrue(HearingStatus hearingStatus,
                                                                      boolean expectedResult) {
         HearingDetails hearingDetails = HearingDetails.builder()
             .hearingDate(LocalDate.now().plusDays(5).toString())
@@ -176,8 +176,9 @@ public class SscsHelperTest {
     @ParameterizedTest
     @CsvSource(value = {
         "AWAITING_LISTING, true",
-        "null, true",
-        "CANCELLED, false"
+        "null, false",
+        "CANCELLED, false",
+        "EXCEPTION, false"
     }, nullValues = "null")
     void givenHearingWithNoDateOrTime_whenCheckingForHearingButNotScheduled_thenReturnTrueUnlessCancelled(
         final HearingStatus hearingStatus, final boolean expectedResult) {
@@ -226,7 +227,7 @@ public class SscsHelperTest {
     }
 
     @Test
-    public void givenAnyCaseWhenExcludeDatesAreNotProvided_thenThrowError() {
+    void givenAnyCaseWhenExcludeDatesAreNotProvided_thenThrowError() {
         CcdValue<OtherParty> otherParty = buildOtherParty();
 
         Set<String> errors =
@@ -234,12 +235,11 @@ public class SscsHelperTest {
 
         assertEquals(2, errors.size());
 
-        assertThat(errors).contains("Add a start date for unavailable dates");
-        assertThat(errors).contains("Add an end date for unavailable dates");
+        assertThat(errors).contains("Add a start date for unavailable dates").contains("Add an end date for unavailable dates");
     }
 
     @Test
-    public void givenAnyCaseWhenExcludeDatesAreNotEmpty_thenThrowError() {
+    void givenAnyCaseWhenExcludeDatesAreNotEmpty_thenThrowError() {
         CcdValue<OtherParty> otherParty = buildOtherParty();
         otherParty.getValue().getHearingOptions().setExcludeDates(List.of(
                 ExcludeDate.builder().value(DateRange.builder().start("").end("").build()).build(),
@@ -252,12 +252,12 @@ public class SscsHelperTest {
 
         assertEquals(2, errors.size());
 
-        assertThat(errors).contains("Add a start date for unavailable dates");
-        assertThat(errors).contains("Add an end date for unavailable dates");
+        assertThat(errors).contains("Add a start date for unavailable dates")
+                          .contains("Add an end date for unavailable dates");
     }
 
     @Test
-    public void givenAnyCaseWhenExcludeStartDateIsNotProvided_thenThrowError() {
+    void givenAnyCaseWhenExcludeStartDateIsNotProvided_thenThrowError() {
         CcdValue<OtherParty> otherParty = buildOtherParty();
         otherParty.getValue().getHearingOptions().setExcludeDates(List.of(
                 ExcludeDate.builder().value(DateRange.builder().start("").end("2023-01-01").build()).build(),
@@ -274,7 +274,7 @@ public class SscsHelperTest {
     }
 
     @Test
-    public void givenAnyCaseWhenExcludeEndDateIsNotProvided_thenThrowError() {
+    void givenAnyCaseWhenExcludeEndDateIsNotProvided_thenThrowError() {
         CcdValue<OtherParty> otherParty = buildOtherParty();
         otherParty.getValue().getHearingOptions().setExcludeDates(List.of(
                 ExcludeDate.builder().value(DateRange.builder().start("2023-01-01").end("").build()).build(),
@@ -290,7 +290,7 @@ public class SscsHelperTest {
     }
 
     @Test
-    public void givenAnyCaseWhenExcludeStartDateIsAfterEndDate_thenThrowError() {
+    void givenAnyCaseWhenExcludeStartDateIsAfterEndDate_thenThrowError() {
         CcdValue<OtherParty> otherParty = buildOtherParty();
         otherParty.getValue().getHearingOptions().setExcludeDates(List.of(
                 ExcludeDate.builder().value(DateRange.builder().start("2023-01-01").end("2023-01-01").build()).build(),

@@ -6,6 +6,7 @@ import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingStatus.CANCELLED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingStatus.EXCEPTION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INCOMPLETE_APPLICATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INCOMPLETE_APPLICATION_INFORMATION_REQUESTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
@@ -37,6 +38,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
 @Slf4j
 public class SscsHelper {
+
+    private static final List<uk.gov.hmcts.reform.sscs.ccd.domain.HearingStatus> NON_LIVE_HEARING_STATUSES = List.of(
+        CANCELLED, EXCEPTION);
 
     private SscsHelper() {
     }
@@ -136,7 +140,8 @@ public class SscsHelper {
             .orElse(Collections.emptyList())
             .stream()
             .filter(hearing -> isNull(hearing.getValue().getHearingDate()) && isNull(hearing.getValue().getTime()))
-            .filter(hearing -> !CANCELLED.equals(hearing.getValue().getHearingStatus()))
+            .filter(hearing -> nonNull(hearing.getValue().getHearingStatus()))
+            .filter(hearing -> !NON_LIVE_HEARING_STATUSES.contains(hearing.getValue().getHearingStatus()))
             .findFirst();
         return anyNonCancelledHearingWithNoScheduledDate.isPresent();
     }
