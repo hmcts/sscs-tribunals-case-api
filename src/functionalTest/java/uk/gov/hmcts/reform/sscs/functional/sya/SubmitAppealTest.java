@@ -4,6 +4,7 @@ import static io.restassured.RestAssured.baseURI;
 import static java.time.ZoneId.systemDefault;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.sscs.bulkscan.BaseFunctionalTest.generateRandomNino;
 import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTHORISATION_HEADER;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_NON_SAVE_AND_RETURN_CCD;
@@ -178,7 +179,7 @@ class SubmitAppealTest {
 
     @Test
     void appealShouldCreateDuplicateAndLinked() {
-        String nino = submitHelper.getRandomNino();
+        String nino = generateRandomNino();
         LocalDate mrnDate = LocalDate.now();
         log.info("Generated NINO: {} and MRN date: {}", nino, mrnDate);
 

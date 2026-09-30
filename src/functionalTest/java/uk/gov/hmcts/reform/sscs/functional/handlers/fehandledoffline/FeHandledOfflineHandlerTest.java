@@ -15,10 +15,10 @@ import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest
-public class FeHandledOfflineHandlerTest extends BaseHandler {
+class FeHandledOfflineHandlerTest extends BaseHandler {
 
     @Test
-    public void givenAboutToSubmitCallback_shouldClearHmctsDwpStateAndSetEvidenceIssuedToYes() throws Exception {
+    void givenAboutToSubmitCallback_shouldClearHmctsDwpStateAndSetEvidenceIssuedToYes() throws Exception {
         RestAssured.given()
             .contentType(ContentType.JSON)
             .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
@@ -29,14 +29,14 @@ public class FeHandledOfflineHandlerTest extends BaseHandler {
             .statusCode(HttpStatus.SC_OK)
             .log().body(true)
             .assertThat().body("data.hmctsDwpState", is(nullValue()))
-            .assertThat().body("data.sscsDocument[0].value.documentType", equalTo("Other document"))
-            .assertThat().body("data.sscsDocument[0].value.evidenceIssued", is("Yes"))
-            .assertThat().body("data.sscsDocument[1].value.documentType", equalTo("representativeEvidence"))
+            .assertThat().body("data.sscsDocument[0].value.documentType", equalTo("dl16"))
+            .assertThat().body("data.sscsDocument[1].value.documentType", equalTo("Other document"))
             .assertThat().body("data.sscsDocument[1].value.evidenceIssued", is("Yes"))
-            .assertThat().body("data.sscsDocument[2].value.documentType", equalTo("appellantEvidence"))
+            .assertThat().body("data.sscsDocument[2].value.documentType", equalTo("representativeEvidence"))
             .assertThat().body("data.sscsDocument[2].value.evidenceIssued", is("Yes"))
-            .assertThat().body("data.sscsDocument[3].value.documentType", equalTo("dl16"))
-            .assertThat().body("data.sscsDocument[3].value.evidenceIssued", is(nullValue()));
+            .assertThat().body("data.sscsDocument[3].value.documentType", equalTo("appellantEvidence"))
+            .assertThat().body("data.sscsDocument[3].value.evidenceIssued", is("Yes"))
+;
     }
 
 }

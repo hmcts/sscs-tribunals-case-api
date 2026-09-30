@@ -16,6 +16,10 @@
   "folderTwoDocVal": "FTA evidence received on",
   "folderTwoSourceVal": "FTA evidence received on",
   "bundleFolderTwoVal": "Further additions",
+  "addtDoc1Val": "Addition A - Urgent hearing request received on 21-01-2021",
+  "addtDoc2Val": "Addition B - Appellant evidence received on 21-01-2021",
+  "addtFile1Val": "testfile1.pdf",
+  "addtFile2Val": "testfile2.pdf",
   "stitchStatusDone": "DONE",
   "stitchVal": "SscsBundle",
   "editedStitchVal": "EditedSscsBundle"

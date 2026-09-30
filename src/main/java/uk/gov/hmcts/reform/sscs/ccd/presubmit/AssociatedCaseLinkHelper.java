@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
+import static java.util.Collections.emptyList;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static uk.gov.hmcts.reform.sscs.bulkscan.validators.SscsCaseValidator.isValidNino;
 import static uk.gov.hmcts.reform.sscs.utility.StringUtils.getMaskedNino;
 
 import java.util.*;
@@ -40,7 +42,7 @@ public class AssociatedCaseLinkHelper {
         }
         Identity identity = sscsCaseData.getAppeal().getAppellant().getIdentity();
         final String nino = nonNull(identity) ? identity.getNino() : null;
-        if (isNotEmpty(nino) && isEmpty(previousNino)) {
+        if (isValidNino(nino) && isEmpty(previousNino)) {
             List<SscsCaseDetails> matchedByNinoCases = getMatchedCases(nino, idamService.getIdamTokens());
             if (!matchedByNinoCases.isEmpty()) {
                 log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino " + getMaskedNino(nino));
@@ -51,7 +53,7 @@ public class AssociatedCaseLinkHelper {
     }
 
     protected List<SscsCaseDetails> getMatchedCases(String nino, IdamTokens idamTokens) {
-        return ccdService.findCaseBy("data.appeal.appellant.identity.nino", nino, idamTokens);
+        return isValidNino(nino) ? ccdService.findCaseBy("data.appeal.appellant.identity.nino", nino, idamTokens) : emptyList();
     }
 
     protected SscsCaseData addAssociatedCases(SscsCaseData caseData, List<SscsCaseDetails> matchedByNinoCases) {
