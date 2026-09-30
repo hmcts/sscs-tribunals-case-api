@@ -93,6 +93,9 @@ public class SaveCorrespondenceAsyncService {
 
     @Retryable(recover = "recoverSaveEmailOrSms", maxAttempts = 1, backoff = @Backoff(delay = 1, multiplier = 1, maxDelay = 1, random = true))
     public void saveEmailOrSms(final String notificationId, final Correspondence correspondence, final SscsCaseData sscsCaseData) {
+        if (true) {
+            throw new RuntimeException("TEMP: forcing failure for manual recover test");
+        }
         int retry = (RetrySynchronizationManager.getContext() != null) ? RetrySynchronizationManager.getContext().getRetryCount() + 1 : 1;
         log.info("Retry number {} : to upload {} correspondence for notification id {}, case reference {}",
             retry, correspondence.getValue().getCorrespondenceType().name(), notificationId, sscsCaseData.getCcdCaseId());
