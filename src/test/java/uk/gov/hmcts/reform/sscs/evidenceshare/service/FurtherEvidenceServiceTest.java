@@ -90,10 +90,10 @@ public class FurtherEvidenceServiceTest {
     private List<Pdf> pdfList;
     private List<PdfDocument> pdfDocumentList;
 
-    private final String furtherEvidenceOriginalSenderTemplateName = "TB-SCS-GNO-ENG-00068-v2.doc";
+    private final String furtherEvidenceOriginalSenderTemplateName = "TB-SCS-GNO-ENG-00068-v3.doc";
     private final String furtherEvidenceOriginalSenderWelshTemplateName = "TB-SCS-GNO-WEL-00469-v2.docx";
     private final String furtherEvidenceOriginalSenderDocName = "609-97-template (original sender)";
-    private final String furtherEvidenceOtherPartiesTemplateName = "TB-SCS-GNO-ENG-00069.doc";
+    private final String furtherEvidenceOtherPartiesTemplateName = "TB-SCS-GNO-ENG-00069-v2.doc";
     private final String furtherEvidenceOtherPartiesWelshTemplateName = "TB-SCS-GNO-WEL-00470.docx";
     private final String furtherEvidenceOtherPartiesDocName = "609-98-template (other parties)";
     private final String furtherEvidenceOtherPartiesDwpDocName = "609-98-template (DWP)";
@@ -110,10 +110,10 @@ public class FurtherEvidenceServiceTest {
         nameMap.put("name", "TB-SCS-GNO-ENG-00011.doc");
         englishDocs.put(DocumentType.DL16.getValue(), nameMap);
         nameMap = new HashMap<>();
-        nameMap.put("name", "TB-SCS-GNO-ENG-00068-v2.doc");
+        nameMap.put("name", "TB-SCS-GNO-ENG-00068-v3.doc");
         englishDocs.put("d609-97", nameMap);
         nameMap = new HashMap<>();
-        nameMap.put("name", "TB-SCS-GNO-ENG-00069.doc");
+        nameMap.put("name", "TB-SCS-GNO-ENG-00069-v2.doc");
         englishDocs.put("d609-98", nameMap);
 
         Map<String, Map<String, String>> welshDocs = new HashMap<>();
