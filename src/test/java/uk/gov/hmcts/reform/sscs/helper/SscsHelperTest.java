@@ -176,7 +176,7 @@ class SscsHelperTest {
     @ParameterizedTest
     @CsvSource(value = {
         "AWAITING_LISTING, true",
-        "null, false",
+        "null, true",
         "CANCELLED, false",
         "EXCEPTION, false"
     }, nullValues = "null")

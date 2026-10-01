@@ -39,9 +39,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 @Slf4j
 public class SscsHelper {
 
-    private static final List<uk.gov.hmcts.reform.sscs.ccd.domain.HearingStatus> NON_LIVE_HEARING_STATUSES = List.of(
-        CANCELLED, EXCEPTION);
-
     private SscsHelper() {
     }
 
@@ -140,8 +137,8 @@ public class SscsHelper {
             .orElse(Collections.emptyList())
             .stream()
             .filter(hearing -> isNull(hearing.getValue().getHearingDate()) && isNull(hearing.getValue().getTime()))
-            .filter(hearing -> nonNull(hearing.getValue().getHearingStatus()))
-            .filter(hearing -> !NON_LIVE_HEARING_STATUSES.contains(hearing.getValue().getHearingStatus()))
+            .filter(hearing -> CANCELLED != hearing.getValue().getHearingStatus())
+            .filter(hearing -> EXCEPTION != hearing.getValue().getHearingStatus())
             .findFirst();
         return anyNonCancelledHearingWithNoScheduledDate.isPresent();
     }
