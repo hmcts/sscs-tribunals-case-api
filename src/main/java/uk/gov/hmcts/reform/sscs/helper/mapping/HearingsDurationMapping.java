@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 @Slf4j
 public final class HearingsDurationMapping {
-    public static final int DURATION_SESSIONS_MULTIPLIER = 165;
+    public static final int DURATION_SESSIONS_MULTIPLIER = 150;
     public static final int DURATION_DEFAULT = 60;
     public static final int MIN_HEARING_DURATION = 30;
     public static final int MIN_HEARING_SESSION_DURATION = 1;
