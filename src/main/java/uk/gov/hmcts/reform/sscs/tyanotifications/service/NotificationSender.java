@@ -91,7 +91,7 @@ public class NotificationSender {
         if (saveCorrespondence && sendEmailResponse != null) {
             final Correspondence correspondence =
                     getEmailCorrespondence(sendEmailResponse, emailAddress, notificationEventType);
-            saveCorrespondenceAsyncService.saveEmailOrSms(sendEmailResponse.getNotificationId().toString(), correspondence, sscsCaseData);
+            saveCorrespondenceAsyncService.saveEmailOrSms(String.valueOf(sendEmailResponse.getNotificationId()), correspondence, sscsCaseData);
             log.info("Uploaded correspondence email into ccd for case id {}.", sscsCaseData.getCcdCaseId());
         }
 
@@ -139,7 +139,7 @@ public class NotificationSender {
         if (saveCorrespondence && sendSmsResponse != null) {
             final Correspondence correspondence =
                     getSmsCorrespondence(sendSmsResponse, phoneNumber, notificationEventType);
-            saveCorrespondenceAsyncService.saveEmailOrSms(sendSmsResponse.getNotificationId().toString(), correspondence, sscsCaseData);
+            saveCorrespondenceAsyncService.saveEmailOrSms(String.valueOf(sendSmsResponse.getNotificationId()), correspondence, sscsCaseData);
             log.info("Uploaded correspondence sms into ccd for case id {}.", sscsCaseData.getCcdCaseId());
         }
 
