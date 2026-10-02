@@ -3,12 +3,15 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ch.qos.logback.classic.Level;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -21,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.model.LetterType;
 import uk.gov.hmcts.reform.sscs.service.CcdNotificationsPdfService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType;
+import uk.gov.hmcts.reform.sscs.util.LogCaptureExtension;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
@@ -37,6 +41,10 @@ public class SaveCorrespondenceAsyncServiceTest {
 
     @Mock
     private NotificationClient notificationClient;
+
+    @RegisterExtension
+    private final LogCaptureExtension logCapture =
+            new LogCaptureExtension(SaveCorrespondenceAsyncService.class);
 
     @BeforeEach
     public void setup() {
@@ -77,11 +85,6 @@ public class SaveCorrespondenceAsyncServiceTest {
     }
 
     @Test
-    public void recoverWillConsumeThrowable() {
-        service.recoverDefault(new NotificationClientException("400 BadRequestError"));
-    }
-
-    @Test
     public void recoverWillConsumeThrowableForSaveLetter() {
         correspondence = Correspondence.builder().value(CorrespondenceDetails.builder()
                 .correspondenceType(CorrespondenceType.Letter).to("Mr Tester").build())
@@ -102,7 +105,10 @@ public class SaveCorrespondenceAsyncServiceTest {
 
         service.recoverSaveEmailOrSms(new NotificationClientException("500 ServerError"), NOTIFICATION_ID, correspondence, sscsCaseData);
 
-        verify(ccdNotificationsPdfService).notifyFailedToRetrieveCorrespondence(Long.valueOf(CCD_ID), NOTIFICATION_ID, CorrespondenceType.Email);
+        verify(ccdNotificationsPdfService, times(0)).notifyFailedToRetrieveCorrespondence(Long.valueOf(CCD_ID), NOTIFICATION_ID, CorrespondenceType.Email);
+        logCapture.assertLogContains("Failed saving Email correspondence into ccd for case id " + CCD_ID + " after retries exhausted, notification id " + NOTIFICATION_ID + ", "
+                + "notification was sent but will not appear on the Notifications Sent tab.", Level.ERROR);
+
     }
 
     @Test

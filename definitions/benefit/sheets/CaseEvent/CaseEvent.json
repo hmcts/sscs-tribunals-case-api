@@ -1048,7 +1048,7 @@
     "Publish": "N"
   },
   {
-    "LiveFrom": "29/09/2026",
+    "LiveFrom": "02/10/2026",
     "CaseTypeID": "Benefit",
     "ID": "failedToRetrieveCorrespondence",
     "Name": "Correspondence unavailable",

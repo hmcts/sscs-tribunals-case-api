@@ -9,15 +9,17 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ch.qos.logback.classic.Level;
 import java.time.Duration;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Correspondence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorrespondenceDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorrespondenceType;
@@ -26,13 +28,14 @@ import uk.gov.hmcts.reform.sscs.model.LetterType;
 import uk.gov.hmcts.reform.sscs.service.CcdNotificationsPdfService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.SaveCorrespondenceAsyncService;
+import uk.gov.hmcts.reform.sscs.util.LogCaptureExtension;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @TestPropertySource(locations = "classpath:config/application_it.properties")
-public class SaveCorrespondenceAsyncServiceIt {
+class SaveCorrespondenceAsyncServiceIt {
 
     private static final String NOTIFICATION_ID = "123";
     private static final String CCD_ID = "1776543211234";
@@ -43,10 +46,13 @@ public class SaveCorrespondenceAsyncServiceIt {
     @MockitoBean
     private CcdNotificationsPdfService ccdNotificationsPdfService;
 
+    @RegisterExtension
+    private final LogCaptureExtension logCapture = new LogCaptureExtension(SaveCorrespondenceAsyncService.class);
+
     private Correspondence correspondence;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         correspondence = Correspondence.builder()
             .value(CorrespondenceDetails.builder()
                 .correspondenceType(CorrespondenceType.Letter)
@@ -56,7 +62,7 @@ public class SaveCorrespondenceAsyncServiceIt {
     }
 
     @Test
-    public void retriesSaveLetterAndRecoversAfterConfiguredMaxAttemptsAreExceeded() throws NotificationClientException {
+    void retriesSaveLetterAndRecoversAfterConfiguredMaxAttemptsAreExceeded() throws NotificationClientException {
         NotificationClient client = mock(NotificationClient.class);
         when(client.getPdfForLetter(NOTIFICATION_ID)).thenThrow(new NotificationClientException("500 ServerError"));
 
@@ -71,7 +77,26 @@ public class SaveCorrespondenceAsyncServiceIt {
     }
 
     @Test
-    public void savesLettersToReasonableAdjustmentSuccessfully() {
+    void retriesSaveLetterAndRecoversWhenPdfRetrievedButCcdMergeFails() throws NotificationClientException {
+        byte[] pdf = "%PDF bytes".getBytes();
+        NotificationClient client = mock(NotificationClient.class);
+        when(client.getPdfForLetter(NOTIFICATION_ID)).thenReturn(pdf);
+        doThrow(new RuntimeException("500")).when(ccdNotificationsPdfService)
+            .mergeLetterCorrespondenceIntoCcdV2(any(byte[].class), any(), any());
+
+        saveCorrespondenceAsyncService.saveLetter(client, NOTIFICATION_ID, correspondence, CCD_ID);
+
+        await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
+            verify(client, times(3)).getPdfForLetter(NOTIFICATION_ID);
+            verify(ccdNotificationsPdfService, times(3))
+                .mergeLetterCorrespondenceIntoCcdV2(eq(pdf), eq(Long.valueOf(CCD_ID)), eq(correspondence));
+            verify(ccdNotificationsPdfService)
+                .notifyFailedToRetrieveCorrespondence(Long.valueOf(CCD_ID), NOTIFICATION_ID, CorrespondenceType.Letter);
+        });
+    }
+
+    @Test
+    void savesLettersToReasonableAdjustmentSuccessfully() {
         byte[] bytes = "%PDF bytes".getBytes();
 
         saveCorrespondenceAsyncService.saveLettersToReasonableAdjustment(bytes, correspondence, CCD_ID, SubscriptionType.APPELLANT);
@@ -82,7 +107,7 @@ public class SaveCorrespondenceAsyncServiceIt {
     }
 
     @Test
-    public void retriesSaveLettersToReasonableAdjustmentAndRecoversAfterConfiguredMaxAttemptsAreExceeded() {
+    void retriesSaveLettersToReasonableAdjustmentAndRecoversAfterConfiguredMaxAttemptsAreExceeded() {
         doThrow(new RuntimeException("500 ServerError")).when(ccdNotificationsPdfService)
             .mergeReasonableAdjustmentsCorrespondenceIntoCcdV2(any(byte[].class), any(), any(), any());
 
@@ -98,7 +123,7 @@ public class SaveCorrespondenceAsyncServiceIt {
     }
 
     @Test
-    public void retriesSaveEmailOrSmsAndRecoversAfterMaxAttemptsAreExceeded() {
+    void retriesSaveEmailOrSmsAndRecoversAfterMaxAttemptsAreExceeded() {
         doThrow(new RuntimeException("500 ServerError")).when(ccdNotificationsPdfService)
             .mergeCorrespondenceIntoCcdV2(any(), any());
         SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId(CCD_ID).build();
@@ -110,7 +135,7 @@ public class SaveCorrespondenceAsyncServiceIt {
 
         verify(ccdNotificationsPdfService, times(3))
             .mergeCorrespondenceIntoCcdV2(eq(Long.valueOf(CCD_ID)), eq(emailCorrespondence));
-        verify(ccdNotificationsPdfService)
-            .notifyFailedToRetrieveCorrespondence(Long.valueOf(CCD_ID), NOTIFICATION_ID, CorrespondenceType.Email);
+        logCapture.assertLogContains("Failed saving Email correspondence into ccd for case id " + CCD_ID
+            + " after retries exhausted, notification id " + NOTIFICATION_ID, Level.ERROR);
     }
 }

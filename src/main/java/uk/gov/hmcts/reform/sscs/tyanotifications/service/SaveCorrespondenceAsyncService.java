@@ -93,7 +93,7 @@ public class SaveCorrespondenceAsyncService {
         ccdNotificationsPdfService.notifyFailedToRetrieveCorrespondence(valueOf(ccdCaseId), null, correspondence.getValue().getCorrespondenceType());
     }
 
-    @Retryable
+    @Retryable(recover = "recoverSaveEmailOrSms")
     public void saveEmailOrSms(final String notificationId, final Correspondence correspondence, final SscsCaseData sscsCaseData) {
         int retry = (RetrySynchronizationManager.getContext() != null) ? RetrySynchronizationManager.getContext().getRetryCount() + 1 : 1;
         log.info("Retry number {} : to upload {} correspondence for notification id {}, case reference {}",
@@ -108,13 +108,6 @@ public class SaveCorrespondenceAsyncService {
         log.error("Failed saving {} correspondence into ccd for case id {} after retries exhausted, notification id {}, "
                         + "notification was sent but will not appear on the Notifications Sent tab.",
                 correspondence.getValue().getCorrespondenceType(), sscsCaseData.getCcdCaseId(), notificationId, e);
-        ccdNotificationsPdfService.notifyFailedToRetrieveCorrespondence(valueOf(sscsCaseData.getCcdCaseId()), notificationId, correspondence.getValue().getCorrespondenceType());
-    }
-
-    @Recover
-    @SuppressWarnings({"unused"})
-    public void recoverDefault(Throwable e) {
-        log.error("Failed saving correspondence.", e);
     }
 
     @Recover
