@@ -89,10 +89,10 @@ public class NotificationSender {
                 getSendEmailResponse(templateId, emailAddress, personalisation, reference, client);
 
         if (saveCorrespondence && sendEmailResponse != null) {
+            log.info("Getting correspondence email for case id {}.", sscsCaseData.getCcdCaseId());
             final Correspondence correspondence =
                     getEmailCorrespondence(sendEmailResponse, emailAddress, notificationEventType);
             saveCorrespondenceAsyncService.saveEmailOrSms(String.valueOf(sendEmailResponse.getNotificationId()), correspondence, sscsCaseData);
-            log.info("Uploaded correspondence email into ccd for case id {}.", sscsCaseData.getCcdCaseId());
         }
 
         log.info("Email Notification send for case id : {}, Gov notify id: {} ", sscsCaseData.getCcdCaseId(),

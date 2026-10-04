@@ -117,7 +117,7 @@ public class SaveCorrespondenceAsyncService {
     }
 
     @Async
-    @Retryable(recover = "recoverSaveEmailOrSms")
+    @Retryable(recover = "recoverSaveEmailOrSms", maxAttempts = 5, backoff = @Backoff(delay = 1000, multiplier = 2, maxDelay = 10000, random = true))
     public void saveEmailOrSms(final String notificationId, final Correspondence correspondence, final SscsCaseData sscsCaseData) {
         int retry = (RetrySynchronizationManager.getContext() != null) ? RetrySynchronizationManager.getContext().getRetryCount() + 1 : 1;
         log.info("Retry number {} : to upload {} correspondence for notification id {}, case reference {}",

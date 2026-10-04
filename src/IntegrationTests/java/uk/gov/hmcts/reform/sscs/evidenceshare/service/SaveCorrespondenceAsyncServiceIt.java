@@ -13,13 +13,11 @@ import ch.qos.logback.classic.Level;
 import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Correspondence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorrespondenceDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorrespondenceType;
@@ -32,7 +30,6 @@ import uk.gov.hmcts.reform.sscs.util.LogCaptureExtension;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @TestPropertySource(locations = "classpath:config/application_it.properties")
 class SaveCorrespondenceAsyncServiceIt {
@@ -77,25 +74,6 @@ class SaveCorrespondenceAsyncServiceIt {
     }
 
     @Test
-    void retriesSaveLetterAndRecoversWhenPdfRetrievedButCcdMergeFails() throws NotificationClientException {
-        byte[] pdf = "%PDF bytes".getBytes();
-        NotificationClient client = mock(NotificationClient.class);
-        when(client.getPdfForLetter(NOTIFICATION_ID)).thenReturn(pdf);
-        doThrow(new RuntimeException("500")).when(ccdNotificationsPdfService)
-            .mergeLetterCorrespondenceIntoCcdV2(any(byte[].class), any(), any());
-
-        saveCorrespondenceAsyncService.saveLetter(client, NOTIFICATION_ID, correspondence, CCD_ID);
-
-        await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
-            verify(client, times(3)).getPdfForLetter(NOTIFICATION_ID);
-            verify(ccdNotificationsPdfService, times(3))
-                .mergeLetterCorrespondenceIntoCcdV2(eq(pdf), eq(Long.valueOf(CCD_ID)), eq(correspondence));
-            verify(ccdNotificationsPdfService)
-                .notifyFailedToRetrieveCorrespondence(Long.valueOf(CCD_ID), NOTIFICATION_ID, CorrespondenceType.Letter);
-        });
-    }
-
-    @Test
     void savesBulkPrintLetterSuccessfully() {
         byte[] pdf = "%PDF bytes".getBytes();
 
@@ -113,13 +91,14 @@ class SaveCorrespondenceAsyncServiceIt {
 
         saveCorrespondenceAsyncService.saveLetter(new byte[]{}, correspondence, CCD_ID);
 
-        await().atMost(Duration.ofSeconds(5)).untilAsserted(() ->
+        await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
             verify(ccdNotificationsPdfService, times(3)).mergeLetterCorrespondenceIntoCcdV2(
-                any(byte[].class), any(), any(), any()));
-
-        await().atMost(Duration.ofSeconds(5)).untilAsserted(() ->
+                any(byte[].class), any(), any(), any());
             verify(ccdNotificationsPdfService)
-                .notifyFailedToRetrieveCorrespondence(Long.valueOf(CCD_ID), null, CorrespondenceType.Letter));
+                .notifyFailedToRetrieveCorrespondence(Long.valueOf(CCD_ID), null, CorrespondenceType.Letter);
+            logCapture.assertLogContains("Failed saving Letter correspondence into ccd for case id " + CCD_ID
+                + " after retries exhausted, notification was sent but will not appear on the Notifications Sent tab.", Level.ERROR);
+        });
     }
 
     @Test

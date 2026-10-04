@@ -96,6 +96,18 @@ public class SaveCorrespondenceAsyncServiceTest {
     }
 
     @Test
+    public void recoverWillConsumeThrowableForSaveBulkPrintLetter() {
+        correspondence = Correspondence.builder().value(CorrespondenceDetails.builder()
+                .correspondenceType(CorrespondenceType.Letter).to("Mr Tester").build())
+                .build();
+
+        service.recoverSaveBulkPrintLetter(new RuntimeException("500 ServerError"),
+                new byte[]{}, correspondence, CCD_ID);
+
+        verify(ccdNotificationsPdfService).notifyFailedToRetrieveCorrespondence(Long.valueOf(CCD_ID), null, CorrespondenceType.Letter);
+    }
+
+    @Test
     public void recoverWillConsumeThrowableForEmailOrSms() {
         SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId(CCD_ID).build();
         correspondence = Correspondence.builder().value(CorrespondenceDetails.builder()
