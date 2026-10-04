@@ -65,10 +65,33 @@ public class SaveCorrespondenceAsyncService {
         }
     }
 
+    @Async
+    @Retryable(recover = "recoverSaveBulkPrintLetter", maxAttemptsExpression = "#{@letterAsyncConfigProperties.maxAttempts}",
+            backoff = @Backoff(delayExpression = "#{@letterAsyncConfigProperties.delay}", multiplierExpression = "#{@letterAsyncConfigProperties.multiplier}",
+                    maxDelayExpression = "#{@letterAsyncConfigProperties.maxDelay}", random = true))
     public void saveLetter(byte[] pdfForLetter, Correspondence correspondence, String ccdCaseId) {
         log.info("Using mergeLetterCorrespondenceV2 to upload BulkPrint sent letter correspondence for {} ", ccdCaseId);
         ccdNotificationsPdfService
                 .mergeLetterCorrespondenceIntoCcdV2(pdfForLetter, valueOf(ccdCaseId), correspondence, "Bulk Print");
+    }
+
+    @Recover
+    @SuppressWarnings({"unused"})
+    public void recoverSaveLetter(Throwable e, NotificationClient client, String notificationId,
+                                  Correspondence correspondence, String ccdCaseId) {
+        log.error("Failed to get letter pdf from gov.notify or save it into ccd for notification id {} and case id {} "
+                        + "after retries exhausted, notification was sent but will not appear on the Notifications Sent tab.",
+                notificationId, ccdCaseId, e);
+        ccdNotificationsPdfService.notifyFailedToRetrieveCorrespondence(valueOf(ccdCaseId), notificationId, correspondence.getValue().getCorrespondenceType());
+    }
+
+    @Recover
+    @SuppressWarnings({"unused"})
+    public void recoverSaveBulkPrintLetter(Throwable e, byte[] pdfForLetter, Correspondence correspondence, String ccdCaseId) {
+        log.error("Failed saving {} correspondence into ccd for case id {} after retries exhausted, "
+                        + "notification was sent but will not appear on the Notifications Sent tab.",
+                correspondence.getValue().getCorrespondenceType(), ccdCaseId, e);
+        ccdNotificationsPdfService.notifyFailedToRetrieveCorrespondence(valueOf(ccdCaseId), null, correspondence.getValue().getCorrespondenceType());
     }
 
     @Async
@@ -93,6 +116,7 @@ public class SaveCorrespondenceAsyncService {
         ccdNotificationsPdfService.notifyFailedToRetrieveCorrespondence(valueOf(ccdCaseId), null, correspondence.getValue().getCorrespondenceType());
     }
 
+    @Async
     @Retryable(recover = "recoverSaveEmailOrSms")
     public void saveEmailOrSms(final String notificationId, final Correspondence correspondence, final SscsCaseData sscsCaseData) {
         int retry = (RetrySynchronizationManager.getContext() != null) ? RetrySynchronizationManager.getContext().getRetryCount() + 1 : 1;
@@ -108,15 +132,6 @@ public class SaveCorrespondenceAsyncService {
         log.error("Failed saving {} correspondence into ccd for case id {} after retries exhausted, notification id {}, "
                         + "notification was sent but will not appear on the Notifications Sent tab.",
                 correspondence.getValue().getCorrespondenceType(), sscsCaseData.getCcdCaseId(), notificationId, e);
-    }
-
-    @Recover
-    @SuppressWarnings({"unused"})
-    public void recoverSaveLetter(Throwable e, NotificationClient client, String notificationId,
-                                            Correspondence correspondence, String ccdCaseId) {
-        log.error("Failed to get letter pdf from gov.notify or save it into ccd for notification id {} and case id {} "
-                + "after retries exhausted, notification was sent but will not appear on the Notifications Sent tab.",
-            notificationId, ccdCaseId, e);
-        ccdNotificationsPdfService.notifyFailedToRetrieveCorrespondence(valueOf(ccdCaseId), notificationId, correspondence.getValue().getCorrespondenceType());
+        ccdNotificationsPdfService.notifyFailedToRetrieveCorrespondence(valueOf(sscsCaseData.getCcdCaseId()), notificationId, correspondence.getValue().getCorrespondenceType());
     }
 }

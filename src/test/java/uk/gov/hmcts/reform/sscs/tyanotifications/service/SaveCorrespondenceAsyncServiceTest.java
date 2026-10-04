@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -105,7 +104,7 @@ public class SaveCorrespondenceAsyncServiceTest {
 
         service.recoverSaveEmailOrSms(new NotificationClientException("500 ServerError"), NOTIFICATION_ID, correspondence, sscsCaseData);
 
-        verify(ccdNotificationsPdfService, times(0)).notifyFailedToRetrieveCorrespondence(Long.valueOf(CCD_ID), NOTIFICATION_ID, CorrespondenceType.Email);
+        verify(ccdNotificationsPdfService).notifyFailedToRetrieveCorrespondence(Long.valueOf(CCD_ID), NOTIFICATION_ID, CorrespondenceType.Email);
         logCapture.assertLogContains("Failed saving Email correspondence into ccd for case id " + CCD_ID + " after retries exhausted, notification id " + NOTIFICATION_ID + ", "
                 + "notification was sent but will not appear on the Notifications Sent tab.", Level.ERROR);
 

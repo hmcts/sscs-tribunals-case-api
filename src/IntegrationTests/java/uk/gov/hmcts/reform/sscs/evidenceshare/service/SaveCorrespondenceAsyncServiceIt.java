@@ -96,6 +96,33 @@ class SaveCorrespondenceAsyncServiceIt {
     }
 
     @Test
+    void savesBulkPrintLetterSuccessfully() {
+        byte[] pdf = "%PDF bytes".getBytes();
+
+        saveCorrespondenceAsyncService.saveLetter(pdf, correspondence, CCD_ID);
+
+        await().atMost(Duration.ofSeconds(5)).untilAsserted(() ->
+            verify(ccdNotificationsPdfService).mergeLetterCorrespondenceIntoCcdV2(
+                eq(pdf), eq(Long.valueOf(CCD_ID)), eq(correspondence), eq("Bulk Print")));
+    }
+
+    @Test
+    void retriesSaveBulkPrintLetterAndRecoversAfterConfiguredMaxAttemptsAreExceeded() {
+        doThrow(new RuntimeException("500 ServerError")).when(ccdNotificationsPdfService)
+            .mergeLetterCorrespondenceIntoCcdV2(any(byte[].class), any(), any(), any());
+
+        saveCorrespondenceAsyncService.saveLetter(new byte[]{}, correspondence, CCD_ID);
+
+        await().atMost(Duration.ofSeconds(5)).untilAsserted(() ->
+            verify(ccdNotificationsPdfService, times(3)).mergeLetterCorrespondenceIntoCcdV2(
+                any(byte[].class), any(), any(), any()));
+
+        await().atMost(Duration.ofSeconds(5)).untilAsserted(() ->
+            verify(ccdNotificationsPdfService)
+                .notifyFailedToRetrieveCorrespondence(Long.valueOf(CCD_ID), null, CorrespondenceType.Letter));
+    }
+
+    @Test
     void savesLettersToReasonableAdjustmentSuccessfully() {
         byte[] bytes = "%PDF bytes".getBytes();
 
@@ -133,9 +160,13 @@ class SaveCorrespondenceAsyncServiceIt {
 
         saveCorrespondenceAsyncService.saveEmailOrSms(NOTIFICATION_ID, emailCorrespondence, sscsCaseData);
 
-        verify(ccdNotificationsPdfService, times(3))
-            .mergeCorrespondenceIntoCcdV2(eq(Long.valueOf(CCD_ID)), eq(emailCorrespondence));
-        logCapture.assertLogContains("Failed saving Email correspondence into ccd for case id " + CCD_ID
-            + " after retries exhausted, notification id " + NOTIFICATION_ID, Level.ERROR);
+        await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
+            verify(ccdNotificationsPdfService, times(3))
+                .mergeCorrespondenceIntoCcdV2(eq(Long.valueOf(CCD_ID)), eq(emailCorrespondence));
+            verify(ccdNotificationsPdfService)
+                .notifyFailedToRetrieveCorrespondence(Long.valueOf(CCD_ID), NOTIFICATION_ID, CorrespondenceType.Email);
+            logCapture.assertLogContains("Failed saving Email correspondence into ccd for case id " + CCD_ID
+                + " after retries exhausted, notification id " + NOTIFICATION_ID, Level.ERROR);
+        });
     }
 }
