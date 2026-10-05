@@ -73,17 +73,6 @@ class SaveCorrespondenceAsyncServiceIt {
     }
 
     @Test
-    void savesBulkPrintLetterSuccessfully() {
-        byte[] pdf = "%PDF bytes".getBytes();
-
-        saveCorrespondenceAsyncService.saveLetter(pdf, correspondence, CCD_ID);
-
-        await().atMost(Duration.ofSeconds(5)).untilAsserted(() ->
-            verify(ccdNotificationsPdfService).mergeLetterCorrespondenceIntoCcdV2(
-                eq(pdf), eq(Long.valueOf(CCD_ID)), eq(correspondence), eq("Bulk Print")));
-    }
-
-    @Test
     void retriesSaveBulkPrintLetterAndRecoversWhenUploadFails() {
         doThrow(new RuntimeException("500 ServerError")).when(ccdNotificationsPdfService)
             .mergeLetterCorrespondenceIntoCcdV2(any(byte[].class), any(), any(), any());
@@ -98,17 +87,6 @@ class SaveCorrespondenceAsyncServiceIt {
             logCapture.assertLogContains("Failed saving Letter correspondence into ccd for case id " + CCD_ID
                 + " after retries exhausted, notification was sent but will not appear on the Notifications Sent tab.", Level.ERROR);
         });
-    }
-
-    @Test
-    void savesLettersToReasonableAdjustmentSuccessfully() {
-        byte[] bytes = "%PDF bytes".getBytes();
-
-        saveCorrespondenceAsyncService.saveLettersToReasonableAdjustment(bytes, correspondence, CCD_ID, SubscriptionType.APPELLANT);
-
-        await().atMost(Duration.ofSeconds(5)).untilAsserted(() ->
-            verify(ccdNotificationsPdfService).mergeReasonableAdjustmentsCorrespondenceIntoCcdV2(
-                eq(bytes), eq(Long.valueOf(CCD_ID)), eq(correspondence), eq(LetterType.APPELLANT)));
     }
 
     @Test

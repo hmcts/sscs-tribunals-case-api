@@ -35,7 +35,7 @@ public class SaveCorrespondenceAsyncService {
 
     @Async
     @Retryable(recover = "recoverSaveLetter", maxAttemptsExpression = "#{@letterAsyncConfigProperties.maxAttempts}", backoff = @Backoff(delayExpression = "#{@letterAsyncConfigProperties.delay}", multiplierExpression = "#{@letterAsyncConfigProperties.multiplier}", random = true, maxDelayExpression = "#{@letterAsyncConfigProperties.maxDelay}"))
-    // Note: mergeLetterCorrespondenceIntoCcdV2 catches CcdException internally, so CCD update failures are not retried or recovered
+    // mergeLetterCorrespondenceIntoCcdV2 catches CcdException internally, so CCD update failures are not retried or recovered
     public void saveLetter(NotificationClient client, String notificationId, Correspondence correspondence,
                            String ccdCaseId) throws NotificationClientException {
 
@@ -70,7 +70,7 @@ public class SaveCorrespondenceAsyncService {
     @Retryable(recover = "recoverSaveBulkPrintLetter", maxAttemptsExpression = "#{@letterAsyncConfigProperties.maxAttempts}",
             backoff = @Backoff(delayExpression = "#{@letterAsyncConfigProperties.delay}", multiplierExpression = "#{@letterAsyncConfigProperties.multiplier}",
                     maxDelayExpression = "#{@letterAsyncConfigProperties.maxDelay}", random = true))
-    // Note: mergeLetterCorrespondenceIntoCcdV2 catches CcdException internally, so CCD update failures are not retried or recovered
+    // mergeLetterCorrespondenceIntoCcdV2 catches CcdException internally, so CCD update failures are not retried or recovered
     public void saveLetter(byte[] pdfForLetter, Correspondence correspondence, String ccdCaseId) {
         log.info("Using mergeLetterCorrespondenceV2 to upload BulkPrint sent letter correspondence for {} ", ccdCaseId);
         ccdNotificationsPdfService
@@ -100,7 +100,7 @@ public class SaveCorrespondenceAsyncService {
     @Retryable(recover = "recoverSaveLettersToReasonableAdjustment", maxAttemptsExpression = "#{@letterAsyncConfigProperties.maxAttempts}",
             backoff = @Backoff(delayExpression = "#{@letterAsyncConfigProperties.delay}", multiplierExpression = "#{@letterAsyncConfigProperties.multiplier}",
                     maxDelayExpression = "#{@letterAsyncConfigProperties.maxDelay}", random = true))
-    // Note: mergeReasonableAdjustmentsCorrespondenceIntoCcdV2 catches CcdException internally, so CCD update failures are not retried or recovered
+    // mergeReasonableAdjustmentsCorrespondenceIntoCcdV2 catches CcdException internally, so CCD update failures are not retried or recovered
     public void saveLettersToReasonableAdjustment(final byte[] pdfForLetter, Correspondence correspondence, String ccdCaseId,
                                                   SubscriptionType subscriptionType) {
         log.info("Using notification letter correspondence V2 to upload reasonable adjustments correspondence for {} ",
@@ -123,7 +123,7 @@ public class SaveCorrespondenceAsyncService {
     @Retryable(recover = "recoverSaveEmailOrSms", maxAttemptsExpression = "#{@letterAsyncConfigProperties.emailMaxAttempts}",
             backoff = @Backoff(delayExpression = "#{@letterAsyncConfigProperties.emailDelay}", multiplierExpression = "#{@letterAsyncConfigProperties.emailMultiplier}",
                     maxDelayExpression = "#{@letterAsyncConfigProperties.emailMaxDelay}", random = true))
-    // Note: mergeCorrespondenceIntoCcdV2 catches CcdException internally, so CCD update failures are not retried or recovered
+    // mergeCorrespondenceIntoCcdV2 catches CcdException internally, so CCD update failures are not retried or recovered
     public void saveEmailOrSms(final String notificationId, final Correspondence correspondence, final SscsCaseData sscsCaseData) {
         int retry = (RetrySynchronizationManager.getContext() != null) ? RetrySynchronizationManager.getContext().getRetryCount() + 1 : 1;
         log.info("Retry number {} : to upload {} correspondence for notification id {}, case reference {}",
