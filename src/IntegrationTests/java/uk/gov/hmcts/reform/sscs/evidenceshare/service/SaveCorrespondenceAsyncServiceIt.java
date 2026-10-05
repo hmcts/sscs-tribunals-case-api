@@ -59,7 +59,7 @@ class SaveCorrespondenceAsyncServiceIt {
     }
 
     @Test
-    void retriesSaveLetterAndRecoversWhenUploadFails() throws NotificationClientException {
+    void retriesSaveLetterAndRecoversWhenPdfRetrievalFails() throws NotificationClientException {
         NotificationClient client = mock(NotificationClient.class);
         when(client.getPdfForLetter(NOTIFICATION_ID)).thenThrow(new NotificationClientException("500 ServerError"));
 
