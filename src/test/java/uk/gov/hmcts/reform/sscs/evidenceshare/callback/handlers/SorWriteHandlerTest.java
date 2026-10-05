@@ -20,6 +20,7 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLette
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderHelper.buildJointParty;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderHelper.buildOtherParty;
 
+import ch.qos.logback.classic.Level;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -52,6 +54,7 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.service.CoverLetterService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.SorPlaceholderService;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
+import uk.gov.hmcts.reform.sscs.util.LogCaptureExtension;
 
 @ExtendWith(MockitoExtension.class)
 @Slf4j
@@ -73,6 +76,10 @@ public class SorWriteHandlerTest {
 
     @Captor
     ArgumentCaptor<String> argumentCaptor;
+
+    @RegisterExtension
+    private final LogCaptureExtension logCapture =
+            new LogCaptureExtension(SorWriteHandler.class);
 
     @BeforeEach
     public void setup() {
@@ -170,6 +177,14 @@ public class SorWriteHandlerTest {
         Assertions.assertEquals(argumentCaptor.getAllValues(), List.of(
             caseData.getAppeal().getAppellant().getAppointee().getName().getFullNameNoTitle(),
             jointParty.getName().getFullNameNoTitle()));
+
+        logCapture
+                .assertLogDoesNotContain("Joint", Level.INFO)
+                .assertLogDoesNotContain("Party", Level.INFO)
+                .assertLogDoesNotContain("JP address line 1", Level.INFO)
+                .assertLogDoesNotContain("JP address line 2", Level.INFO)
+                .assertLogDoesNotContain("London", Level.INFO)
+                .assertLogDoesNotContain("T4 4JP", Level.INFO);
     }
 
     @Ignore

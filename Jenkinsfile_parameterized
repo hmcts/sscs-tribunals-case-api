@@ -1,5 +1,5 @@
 #!groovy
-@Library("Infrastructure") _
+@Library("Infrastructure@2.4.9") _
 
 properties([
   parameters([
@@ -15,6 +15,7 @@ properties([
 
 List<LinkedHashMap<String, Object>> secrets = [
         secret('idam-api', 'IDAM_API_URL'),
+        secret('idam-web-public', 'IDAM_OIDC_URL'),
         secret('idam-oauth-user', 'IDAM_OAUTH2_CLIENT_ID'),
         secret('ccd-api', 'CORE_CASE_DATA_API_URL'),
         secret('idam-redirect', 'IDAM_OAUTH2_REDIRECT_URL'),

@@ -67,7 +67,7 @@
           "role": {
             "name": "Paying parent"
           },
-          "confidentialityRequired": "Yes",
+          "confidentialityRequirement": "Yes",
           "isAddressSameAsAppointee": "Yes"
         },
         "benefitType": {
@@ -226,7 +226,7 @@
             "role": {
               "name": "Receiving parent"
             },
-            "confidentialityRequired": "No",
+            "confidentialityRequirement": "No",
             "confidentialityRequiredConfirmedDate": "2026-03-10T16:35:05.721959",
             "unacceptableCustomerBehaviour": "No",
             "hearingOptions": {
@@ -306,7 +306,7 @@
             "role": {
               "name": "Receiving parent"
             },
-            "confidentialityRequired": "No",
+            "confidentialityRequirement": "No",
             "confidentialityRequiredConfirmedDate": "2026-03-10T16:35:22.09551",
             "unacceptableCustomerBehaviour": "No",
             "hearingOptions": {

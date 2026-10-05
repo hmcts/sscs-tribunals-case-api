@@ -18,8 +18,10 @@ java:
     CCD_UI_BASE_URL: https://${SERVICE_NAME}-case-management-web
     IDAM_S2S_AUTH: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
+    IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
     IDAM_OAUTH2_REDIRECT_URL: ${IDAM_OAUTH2_REDIRECT_URL}
     IDAM_API_JWK_URL: https://idam-api.aat.platform.hmcts.net/jwks
+    IDAM_OIDC_JWK_URL: ${IDAM_OIDC_URL}/o/jwks
     MANAGE_CASE_UI_BASE_URL: https://${SERVICE_NAME}-xui
     IDAM_OAUTH2_CLIENT_ID: ${IDAM_OAUTH2_CLIENT_ID}
     IDAM_OAUTH2_CLIENT_SECRET: ${IDAM_OAUTH2_CLIENT_SECRET}
@@ -65,7 +67,6 @@ java:
     SCOTTISH_PO_BOX_ENABLED: true
     TRIBUNAL_INTERNAL_DOCUMENTS_ENABLED: true
     IBC_NI_POSTCODES_FEATURE: true
-    CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED: true
   secrets:
     JOB_SCHEDULER_DB_PASSWORD:
       secretRef: postgres
@@ -326,6 +327,8 @@ xui-webapp:
           - mc-idam-client-secret
           - system-user-name
           - system-user-password
+          - appinsights-instrumentationkey-mc
+          - appinsights-connection-string-mc
 
 global:
   ccdApiGatewayIngress: http://${SERVICE_NAME}-ccd-api-gw
@@ -604,6 +607,7 @@ ccd:
         ADMINWEB_ELASTIC_CASE_TYPES_URL: http://${SERVICE_NAME}-ccd-definition-store/elastic-support/case-types
         IDAM_ADMIN_WEB_SERVICE_KEY: ${ADMIN_S2S_KEY}
         IDAM_OAUTH2_AW_CLIENT_SECRET: ${ADMIN_WEB_IDAM_SECRET}
+        SESSION_KEYS: '${SESSION_KEYS}'
         ALLOW_CONFIG_MUTATIONS: true
       keyVaults: [ ]
 
@@ -739,7 +743,7 @@ sscs-tribunals-frontend:
       ALLOW_CONFIG_MUTATIONS: true
       TRIBUNALS_CASE_API_URL: http://${SERVICE_NAME}-java
       UPLOAD_EVIDENCE_URL: http://${SERVICE_NAME}-java/evidence/upload
-      SERVICES_IDAM_LOGIN_URL: https://idam-web-public.aat.platform.hmcts.net/login
+      SERVICES_IDAM_LOGIN_URL: https://idam-web-public.aat.platform.hmcts.net/o/authorize
       SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
       UV_THREADPOOL_SIZE: 64

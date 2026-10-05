@@ -1,7 +1,13 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedEmail;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPhone;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedValue;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +29,7 @@ public class HmcHearingApiService {
 
     private final HmcHearingApi hmcHearingApi;
     private final IdamService idamService;
+    private final ObjectMapper objectMapper;
     @Value("${hmc.deployment-id}")
     private String hmctsDeploymentId;
     @Value("${role-assignment.api.url:#{null}}")
@@ -51,7 +58,7 @@ public class HmcHearingApiService {
                 roleAssignmentUrl,
                 dataStoreUrl,
                 hearingPayload.getCaseDetails().getCaseId(),
-                hearingPayload);
+                getMaskedHearingPayload(hearingPayload));
         return hmcHearingApi.createHearingRequest(
                 getIdamTokens().getIdamOauth2Token(),
                 getIdamTokens().getServiceAuthorization(),
@@ -67,7 +74,7 @@ public class HmcHearingApiService {
                 roleAssignmentUrl,
                 dataStoreUrl,
                 hearingId,
-                hearingPayload);
+                getMaskedHearingPayload(hearingPayload));
         return hmcHearingApi.updateHearingRequest(
                 getIdamTokens().getIdamOauth2Token(),
                 getIdamTokens().getServiceAuthorization(),
@@ -109,5 +116,39 @@ public class HmcHearingApiService {
 
     private IdamTokens getIdamTokens() {
         return idamService.getIdamTokens();
+    }
+
+    private String getMaskedHearingPayload(HearingRequestPayload hearingPayload) {
+        HearingRequestPayload copyOfHearingRequestPayload = objectMapper.convertValue(hearingPayload, HearingRequestPayload.class);
+
+        if (nonNull(copyOfHearingRequestPayload.getCaseDetails())) {
+            copyOfHearingRequestPayload.getCaseDetails().setHmctsInternalCaseName(getMaskedValue(copyOfHearingRequestPayload.getCaseDetails().getHmctsInternalCaseName()));
+            copyOfHearingRequestPayload.getCaseDetails().setPublicCaseName(getMaskedValue(copyOfHearingRequestPayload.getCaseDetails().getPublicCaseName()));
+        }
+
+        if (nonNull(copyOfHearingRequestPayload.getHearingDetails())) {
+            copyOfHearingRequestPayload.getHearingDetails().setListingComments(getMaskedValue(copyOfHearingRequestPayload.getHearingDetails().getListingComments()));
+        }
+
+        if (nonNull(copyOfHearingRequestPayload.getPartiesDetails())) {
+            copyOfHearingRequestPayload.getPartiesDetails().forEach(party -> {
+                if (nonNull(party.getIndividualDetails())) {
+                    party.getIndividualDetails().setFirstName(getMaskedValue(party.getIndividualDetails().getFirstName()));
+                    party.getIndividualDetails().setLastName(getMaskedValue(party.getIndividualDetails().getLastName()));
+                    party.getIndividualDetails().setHearingChannelEmail(
+                            nonNull(party.getIndividualDetails().getHearingChannelEmail())
+                                    ? party.getIndividualDetails().getHearingChannelEmail().stream()
+                                    .map(email -> getMaskedEmail(email))
+                                    .collect(Collectors.toList()) : null);
+                    party.getIndividualDetails().setHearingChannelPhone(
+                            nonNull(party.getIndividualDetails().getHearingChannelPhone())
+                                    ? party.getIndividualDetails().getHearingChannelPhone().stream()
+                                    .map(phone -> getMaskedPhone(phone))
+                                    .collect(Collectors.toList()) : null);
+                }
+            });
+        }
+
+        return copyOfHearingRequestPayload.toString();
     }
 }

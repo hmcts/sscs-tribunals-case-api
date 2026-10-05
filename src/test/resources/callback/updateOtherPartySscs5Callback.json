@@ -193,7 +193,6 @@
             }
           },
           "isAppointee": "No",
-          "confidentialityRequired": null,
           "isAddressSameAsAppointee": "No"
         },
         "mrnDetails": {
@@ -275,7 +274,7 @@
       "otherParties": [
         {
           "value": {
-            "confidentialityRequired": "Yes",
+            "confidentialityRequirement": "Yes",
             "unacceptableCustomerBehaviour": "Yes",
             "sendNewOtherPartyNotification": "Yes",
             "isAppointee": "Yes",
@@ -392,7 +391,7 @@
         },
         {
           "value": {
-            "confidentialityRequired": "No",
+            "confidentialityRequirement": "No",
             "unacceptableCustomerBehaviour": "Yes",
             "sendNewOtherPartyNotification": null,
             "isAppointee": null,
@@ -757,7 +756,7 @@
                 }
               },
               "isAppointee": "PUBLIC",
-              "confidentialityRequired": "PUBLIC",
+              "confidentialityRequirement": "PUBLIC",
               "isAddressSameAsAppointee": "PUBLIC"
             }
           },
@@ -861,7 +860,7 @@
         "value": [
           {
             "value": {
-              "confidentialityRequired": "PUBLIC",
+              "confidentialityRequirement": "PUBLIC",
               "unacceptableCustomerBehaviour": "PUBLIC",
               "isAppointee": "PUBLIC",
               "id": "PUBLIC",
@@ -1019,7 +1018,7 @@
           },
           {
             "value": {
-              "confidentialityRequired": "PUBLIC",
+              "confidentialityRequirement": "PUBLIC",
               "unacceptableCustomerBehaviour": "PUBLIC",
               "isAppointee": "PUBLIC",
               "id": "PUBLIC",
@@ -1444,7 +1443,7 @@
                 }
               },
               "isAppointee": "PUBLIC",
-              "confidentialityRequired": "PUBLIC",
+              "confidentialityRequirement": "PUBLIC",
               "isAddressSameAsAppointee": "PUBLIC"
             }
           },
@@ -1548,7 +1547,7 @@
         "value": [
           {
             "value": {
-              "confidentialityRequired": "PUBLIC",
+              "confidentialityRequirement": "PUBLIC",
               "unacceptableCustomerBehaviour": "PUBLIC",
               "isAppointee": "PUBLIC",
               "id": "PUBLIC",
@@ -1712,7 +1711,7 @@
           },
           {
             "value": {
-              "confidentialityRequired": "PUBLIC",
+              "confidentialityRequirement": "PUBLIC",
               "unacceptableCustomerBehaviour": "PUBLIC",
               "isAppointee": "PUBLIC",
               "id": "PUBLIC",
@@ -2103,7 +2102,6 @@
             }
           },
           "isAppointee": "No",
-          "confidentialityRequired": null,
           "isAddressSameAsAppointee": "No"
         },
         "mrnDetails": {
@@ -2185,7 +2183,7 @@
       "otherParties": [
         {
           "value": {
-            "confidentialityRequired": "Yes",
+            "confidentialityRequirement": "Yes",
             "unacceptableCustomerBehaviour": "Yes",
             "sendNewOtherPartyNotification": "Yes",
             "isAppointee": "Yes",
@@ -2302,7 +2300,7 @@
         },
         {
           "value": {
-            "confidentialityRequired": "No",
+            "confidentialityRequirement": "No",
             "unacceptableCustomerBehaviour": "Yes",
             "sendNewOtherPartyNotification": null,
             "isAppointee": null,
@@ -2665,7 +2663,7 @@
                 "classification": "PUBLIC"
               },
               "isAppointee": "PUBLIC",
-              "confidentialityRequired": "PUBLIC",
+              "confidentialityRequirement": "PUBLIC",
               "isAddressSameAsAppointee": "PUBLIC"
             },
             "classification": "PUBLIC"
@@ -2903,7 +2901,7 @@
                 "value": {},
                 "classification": "PUBLIC"
               },
-              "confidentialityRequired": "PUBLIC",
+              "confidentialityRequirement": "PUBLIC",
               "unacceptableCustomerBehaviour": "PUBLIC"
             }
           }
@@ -3183,7 +3181,7 @@
                 "classification": "PUBLIC"
               },
               "isAppointee": "PUBLIC",
-              "confidentialityRequired": "PUBLIC",
+              "confidentialityRequirement": "PUBLIC",
               "isAddressSameAsAppointee": "PUBLIC"
             },
             "classification": "PUBLIC"
@@ -3421,7 +3419,7 @@
                 "value": {},
                 "classification": "PUBLIC"
               },
-              "confidentialityRequired": "PUBLIC",
+              "confidentialityRequirement": "PUBLIC",
               "unacceptableCustomerBehaviour": "PUBLIC"
             }
           }

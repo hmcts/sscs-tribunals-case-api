@@ -84,8 +84,8 @@ public abstract class BaseTest {
         ccdServer.stop();
     }
 
-    protected void findCaseByForCaseworker(String mrnDate, String benefitType) {
-        SearchSourceBuilder query = SscsQueryBuilder.findCcdCaseByNinoAndBenefitTypeAndMrnDateQuery("BB000000B", benefitType, mrnDate);
+    protected void findCaseByForCaseworker(String mrnDate, String benefitType, String nino) {
+        SearchSourceBuilder query = SscsQueryBuilder.findCcdCaseByNinoAndBenefitTypeAndMrnDateQuery(nino, benefitType, mrnDate);
 
         ccdServer.stubFor(post(concat(uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.FIND_CASE_EVENT_URL)).atPriority(1)
             .withHeader(AUTHORIZATION, equalTo(USER_AUTH_TOKEN))
@@ -98,8 +98,8 @@ public abstract class BaseTest {
                 .withBody("{\"total\":0,\"cases\":[]}")));
     }
 
-    protected void checkForLinkedCases() {
-        SearchSourceBuilder query = SscsQueryBuilder.findCaseBySingleField("data.appeal.appellant.identity.nino", "BB000000B");
+    protected void checkForLinkedCases(String nino) {
+        SearchSourceBuilder query = SscsQueryBuilder.findCaseBySingleField("data.appeal.appellant.identity.nino", nino);
 
         ccdServer.stubFor(post(concat(uk.gov.hmcts.reform.sscs.bulkscan.helper.TestConstants.FIND_CASE_EVENT_URL)).atPriority(1)
             .withHeader(AUTHORIZATION, equalTo(idamTokens.getIdamOauth2Token()))

@@ -7,7 +7,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -27,21 +26,14 @@ public class RequestOtherPartyDataHandler implements CallbackHandler<SscsCaseDat
 
     private final UpdateCcdCaseService updateCcdCaseService;
     private final IdamService idamService;
-    private final boolean cmOtherPartyConfidentialityEnabled;
 
-    public RequestOtherPartyDataHandler(UpdateCcdCaseService updateCcdCaseService, IdamService idamService,
-                                        @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
+    public RequestOtherPartyDataHandler(UpdateCcdCaseService updateCcdCaseService, IdamService idamService) {
         this.updateCcdCaseService = updateCcdCaseService;
         this.idamService = idamService;
-        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        if (!cmOtherPartyConfidentialityEnabled) {
-            return false;
-        }
-
         if (callbackType != CallbackType.SUBMITTED) {
             return false;
         }

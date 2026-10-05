@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -58,6 +57,8 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.UPDATE_OTHER_PARTY_DATA;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.VALID_APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.getSubscription;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedEmail;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPhone;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -73,10 +74,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.io.IOUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -106,6 +110,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartyOption;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartyOptionDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartySelectionDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReasonableAdjustmentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReasonableAdjustments;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
@@ -122,6 +127,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType;
@@ -139,6 +145,7 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationFactory;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis.PdfLetterService;
 
+@Slf4j
 @RunWith(JUnitParamsRunner.class)
 public class NotificationServiceTest {
 
@@ -179,6 +186,7 @@ public class NotificationServiceTest {
                                                           .subscribeSms(YES).wantSmsNotifications(YES)
                                                           .build();
     private NotificationService notificationService;
+    private AutoCloseable mocks;
     @Mock
     private NotificationSender notificationSender;
     @Mock
@@ -256,9 +264,9 @@ public class NotificationServiceTest {
                                                  .address(Address.builder().line1("line 1").postcode("TS4 4ST").build())
                                                  .build();
         SscsCaseData sscsCaseData = getSscsCaseDataBuilder(appellant, null, sscsDocument)
-            .otherParties(List.of(otherParty1, otherParty2).stream()
-                              .map(CcdValue::new)
-                              .collect(toList()))
+            .otherParties(Stream.of(otherParty1, otherParty2)
+                                .map(CcdValue::new)
+                                .toList())
             .functionalTest(YesNo.YES)
             .build();
         return buildBaseWrapperWithCaseData(sscsCaseData, eventType);
@@ -394,20 +402,20 @@ public class NotificationServiceTest {
                            .sscsDocument(new ArrayList<>(singletonList(sscsDocument)));
     }
 
-    static void verifyNoErrorsLogged(Appender<ILoggingEvent> mockAppender, ArgumentCaptor captorLoggingEvent) {
+    static void verifyNoErrorsLogged(Appender<ILoggingEvent> mockAppender, ArgumentCaptor<ILoggingEvent> captorLoggingEvent) {
         verify(mockAppender, atLeast(0)).doAppend(
-            (ILoggingEvent) captorLoggingEvent.capture()
+            captorLoggingEvent.capture()
         );
-        List<ILoggingEvent> logEvents = (List<ILoggingEvent>) captorLoggingEvent.getAllValues();
+        List<ILoggingEvent> logEvents = captorLoggingEvent.getAllValues();
         assertTrue(logEvents.stream().noneMatch(e -> e.getLevel().equals(Level.ERROR)));
     }
 
-    static void verifyExpectedLogMessage(Appender<ILoggingEvent> mockAppender, ArgumentCaptor captorLoggingEvent,
+    static void verifyExpectedLogMessage(Appender<ILoggingEvent> mockAppender, ArgumentCaptor<ILoggingEvent> captorLoggingEvent,
         String ccdCaseId, String errorMessage, Level logLevel) {
         verify(mockAppender, atLeastOnce()).doAppend(
-            (ILoggingEvent) captorLoggingEvent.capture()
+            captorLoggingEvent.capture()
         );
-        List<ILoggingEvent> logEvents = (List<ILoggingEvent>) captorLoggingEvent.getAllValues();
+        List<ILoggingEvent> logEvents = captorLoggingEvent.getAllValues();
         assertFalse(logEvents.stream().noneMatch(e -> e.getLevel().equals(logLevel)));
         assertEquals(1, logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage().contains(errorMessage)).count());
         assertTrue(logEvents.stream().anyMatch(logEvent -> logEvent.getFormattedMessage().contains(ccdCaseId)));
@@ -415,7 +423,7 @@ public class NotificationServiceTest {
 
     @Before
     public void setup() {
-        openMocks(this);
+        mocks = openMocks(this);
 
         notificationService = getNotificationService();
 
@@ -449,6 +457,11 @@ public class NotificationServiceTest {
 
         Logger logger = (Logger) LoggerFactory.getLogger(NotificationService.class.getName());
         logger.addAppender(mockAppender);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        mocks.close();
     }
 
     @Test
@@ -906,6 +919,11 @@ public class NotificationServiceTest {
             any(NotificationHandler.SendNotification.class));
 
         verifyNoErrorsLogged(mockAppender, captorLoggingEvent);
+        List<ILoggingEvent> logEvents = (List<ILoggingEvent>) captorLoggingEvent.getAllValues();
+        assertThat(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage()
+                .contains("email=" + getMaskedEmail(NEW_TEST_EMAIL_COM) + ", mobile=" + getMaskedPhone(MOBILE_NUMBER_1) + ",")).count()).isEqualTo(1);
+        assertThat(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage().contains(NEW_TEST_EMAIL_COM))).isEmpty();
+        assertThat(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage().contains(MOBILE_NUMBER_2))).isEmpty();
     }
 
     @Test
@@ -982,6 +1000,11 @@ public class NotificationServiceTest {
             any(NotificationHandler.SendNotification.class));
 
         verifyNoErrorsLogged(mockAppender, captorLoggingEvent);
+        List<ILoggingEvent> logEvents = (List<ILoggingEvent>) captorLoggingEvent.getAllValues();
+        assertThat(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage()
+                .contains("email=" + getMaskedEmail(SAME_TEST_EMAIL_COM) + ", mobile=" + getMaskedPhone(MOBILE_NUMBER_1) + ",")).count()).isEqualTo(1);
+        assertThat(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage().contains(SAME_TEST_EMAIL_COM))).isEmpty();
+        assertThat(logEvents.stream().filter(logEvent -> logEvent.getFormattedMessage().contains(MOBILE_NUMBER_1))).isEmpty();
     }
 
     @Test
@@ -1071,7 +1094,7 @@ public class NotificationServiceTest {
 
         notificationService = new NotificationService(factory, reminderService,
             notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService,
-            false, false
+            false
         );
 
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
@@ -1245,8 +1268,7 @@ public class NotificationServiceTest {
 
         notificationService = new NotificationService(factory, reminderService,
             notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService,
-            true, false
-        );
+            true);
 
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
 
@@ -1390,6 +1412,8 @@ public class NotificationServiceTest {
             .willReturn(true);
 
         given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(getCoversheet());
+
+        updateOtherPartySelection(ccdNotificationWrapper.getNewSscsCaseData());
 
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
 
@@ -2683,7 +2707,7 @@ public class NotificationServiceTest {
             notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
         final NotificationService cmConfidentialityService = new NotificationService(
             factory, reminderService, notificationValidService, notificationHandler,
-            outOfHoursCalculator, notificationConfig, sendNotificationService, false, true);
+            outOfHoursCalculator, notificationConfig, sendNotificationService, false);
 
         final SscsCaseData.SscsCaseDataBuilder baseBuilder = getSscsCaseDataBuilder(
             APPELLANT_WITH_ADDRESS, null,
@@ -2715,7 +2739,7 @@ public class NotificationServiceTest {
     public void givenCmConfidentialityEnabledAndOtherPartiesUnchangedById_thenDoNotTriggerOtherPartyAddedToAppeal() throws IOException {
         final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
         final NotificationService cmConfidentialityService = new NotificationService(factory, reminderService,
-            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, true);
+            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false);
 
         ccdNotificationWrapper = buildBaseWrapperOtherParty(UPDATE_OTHER_PARTY_DATA, APPELLANT_WITH_ADDRESS, SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build());
 
@@ -2734,7 +2758,7 @@ public class NotificationServiceTest {
     public void givenCmConfidentialityEnabledAndUpdateOtherPartyDataWithSingleOtherParty_thenDoNotTriggerOtherPartyAddedToAppeal() throws IOException {
         final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
         final NotificationService cmConfidentialityService = new NotificationService(factory, reminderService,
-            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, true);
+            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false);
 
         final OtherParty singleOtherParty = OtherParty.builder()
                                                       .id("1")
@@ -2780,7 +2804,7 @@ public class NotificationServiceTest {
     public void givenCmConfidentialityEnabledAndUpdateOtherPartyDataWithNoOtherParties_thenDoNotTriggerOtherPartyAddedToAppeal() {
         final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
         final NotificationService cmConfidentialityService = new NotificationService(factory, reminderService,
-            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, true);
+            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false);
 
         final SscsCaseData sscsCaseDataNoOtherParties = getSscsCaseDataBuilder(APPELLANT_WITH_ADDRESS, null, SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build())
             .otherParties(null)
@@ -2881,25 +2905,6 @@ public class NotificationServiceTest {
     }
 
     @Test
-    public void givenAddOtherPartyDataAndFeatureFlagDisabled_willProceedWithNotification() {
-        ccdNotificationWrapper = buildBaseWrapper(ADD_OTHER_PARTY_DATA, APPELLANT_WITH_ADDRESS, null, null);
-        ccdNotificationWrapper.getSscsCaseDataWrapper().setState(State.WITH_DWP);
-
-        final Notification notification = new Notification(
-            Template.builder().docmosisTemplateId(LETTER_TEMPLATE_ID).build(),
-            Destination.builder().build(),
-            new HashMap<>(), new Reference(), null);
-        given(factory.create(any(NotificationWrapper.class), any(SubscriptionWithType.class))).willReturn(notification);
-        given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(new byte[]{1});
-
-        notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
-
-        then(notificationHandler).should(times(1)).sendNotification(
-            eq(ccdNotificationWrapper), any(), eq(LETTER),
-            any(NotificationHandler.SendNotification.class));
-    }
-
-    @Test
     public void givenNonAddOtherPartyDataEventAndFeatureFlagEnabled_willNotBeBlockedByThisCondition() {
         ccdNotificationWrapper = buildBaseWrapper(APPEAL_WITHDRAWN, APPELLANT_WITH_ADDRESS, null, null);
         ccdNotificationWrapper.getNewSscsCaseData().getAppeal().getBenefitType().setCode(Benefit.UC.getShortName());
@@ -2912,7 +2917,7 @@ public class NotificationServiceTest {
             new HashMap<>(), new Reference(), null);
         given(factory.create(any(NotificationWrapper.class), any(SubscriptionWithType.class))).willReturn(notification);
 
-        getNotificationServiceWithCmOtherPartyConfidentialityEnabled()
+        getNotificationService()
             .manageNotificationAndSubscription(ccdNotificationWrapper, false);
 
         then(notificationHandler).should(atLeastOnce()).sendNotification(
@@ -2925,7 +2930,7 @@ public class NotificationServiceTest {
         ccdNotificationWrapper = buildBaseWrapper(ADD_OTHER_PARTY_DATA, APPELLANT_WITH_ADDRESS, null, null);
         ccdNotificationWrapper.getSscsCaseDataWrapper().setState(State.AWAIT_CONFIDENTIALITY_REQUIREMENTS);
 
-        getNotificationServiceWithCmOtherPartyConfidentialityEnabled()
+        getNotificationService()
             .manageNotificationAndSubscription(ccdNotificationWrapper, false);
 
         verifyNoInteractions(notificationValidService);
@@ -2938,7 +2943,7 @@ public class NotificationServiceTest {
         ccdNotificationWrapper.getNewSscsCaseData().getAppeal().getBenefitType().setCode(Benefit.UC.getShortName());
         ccdNotificationWrapper.getSscsCaseDataWrapper().setState(State.WITH_DWP);
 
-        getNotificationServiceWithCmOtherPartyConfidentialityEnabled()
+        getNotificationService()
             .manageNotificationAndSubscription(ccdNotificationWrapper, false);
 
         verifyNoInteractions(notificationValidService);
@@ -2958,7 +2963,7 @@ public class NotificationServiceTest {
         given(factory.create(any(NotificationWrapper.class), any(SubscriptionWithType.class))).willReturn(notification);
         given(pdfLetterService.generateLetter(any(), any(), any())).willReturn(new byte[]{1});
 
-        getNotificationServiceWithCmOtherPartyConfidentialityEnabled()
+        getNotificationService()
             .manageNotificationAndSubscription(ccdNotificationWrapper, false);
 
         then(notificationHandler).should(times(1)).sendNotification(
@@ -3039,8 +3044,7 @@ public class NotificationServiceTest {
 
         final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
         final NotificationService serviceWithCmEnabled = new NotificationService(factory, reminderService,
-            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, true
-        );
+            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false);
 
         serviceWithCmEnabled.manageNotificationAndSubscription(wrapper, false);
 
@@ -3050,13 +3054,12 @@ public class NotificationServiceTest {
 
     @Test
     @Parameters({
-        "false, CHILD_SUPPORT, APPEAL_TO_PROCEED",
-        "true, PIP, APPEAL_TO_PROCEED",
-        "true, PIP, PROVIDE_INFORMATION",
-        "true, CHILD_SUPPORT, PROVIDE_INFORMATION"
+        "PIP, APPEAL_TO_PROCEED",
+        "PIP, PROVIDE_INFORMATION",
+        "CHILD_SUPPORT, PROVIDE_INFORMATION"
     })
     public void givenDirectionIssuedWithVariousScenarios_thenSendAppropriateNumberOfNotifications(
-        boolean cmFeatureEnabled, String benefitCode, String directionType) {
+        String benefitCode, String directionType) {
 
         final SscsCaseData.SscsCaseDataBuilder caseDataBuilder = getSscsCaseDataBuilder(
             APPELLANT_WITH_ADDRESS,
@@ -3091,8 +3094,7 @@ public class NotificationServiceTest {
 
         final NotificationService service = new NotificationService(
             factory, reminderService, notificationValidService, notificationHandler,
-            outOfHoursCalculator, notificationConfig, sendNotificationService, false, cmFeatureEnabled
-        );
+            outOfHoursCalculator, notificationConfig, sendNotificationService, false);
 
         service.manageNotificationAndSubscription(wrapper, false);
 
@@ -3122,8 +3124,7 @@ public class NotificationServiceTest {
 
         final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
         final NotificationService serviceWithCmEnabled = new NotificationService(factory, reminderService,
-            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false, true
-        );
+            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService, false);
 
         serviceWithCmEnabled.manageNotificationAndSubscription(wrapper, false);
 
@@ -3133,13 +3134,12 @@ public class NotificationServiceTest {
 
     @Test
     @Parameters({
-        "false, CHILD_SUPPORT, APPEAL_TO_PROCEED",
-        "true, PIP, APPEAL_TO_PROCEED",
-        "true, PIP, PROVIDE_INFORMATION",
-        "true, CHILD_SUPPORT, PROVIDE_INFORMATION"
+        "PIP, APPEAL_TO_PROCEED",
+        "PIP, PROVIDE_INFORMATION",
+        "CHILD_SUPPORT, PROVIDE_INFORMATION"
     })
     public void givenDirectionIssuedWelshWithVariousScenarios_thenSendOnlyOneNotification(
-        boolean cmFeatureEnabled, String benefitCode, String directionType) {
+        String benefitCode, String directionType) {
 
         final SscsCaseData.SscsCaseDataBuilder caseDataBuilder = getSscsCaseDataBuilder(
             APPELLANT_WITH_ADDRESS,
@@ -3174,8 +3174,7 @@ public class NotificationServiceTest {
 
         final NotificationService service = new NotificationService(
             factory, reminderService, notificationValidService, notificationHandler,
-            outOfHoursCalculator, notificationConfig, sendNotificationService, false, cmFeatureEnabled
-        );
+            outOfHoursCalculator, notificationConfig, sendNotificationService, false);
 
         service.manageNotificationAndSubscription(wrapper, false);
 
@@ -3184,15 +3183,12 @@ public class NotificationServiceTest {
 
     @Test
     @Parameters({
-        "ADMIN_SEND_TO_VALID_APPEAL, true",
-        "INTERLOC_VALID_APPEAL, true",
-        "VALID_APPEAL, true",
-        "ADMIN_SEND_TO_VALID_APPEAL, false",
-        "INTERLOC_VALID_APPEAL, false",
-        "VALID_APPEAL, false"
+        "ADMIN_SEND_TO_VALID_APPEAL",
+        "INTERLOC_VALID_APPEAL",
+        "VALID_APPEAL"
     })
-    public void givenValidAppealEventNotification_whenCmEnabledOrDisabledAndNotChildSupport_shouldNotSendNotification(
-        final NotificationEventType eventType, boolean cmEnabled) {
+    public void givenValidAppealEventNotification_whenNotChildSupport_shouldNotSendNotification(
+        final NotificationEventType eventType) {
         final SscsCaseData caseData = getSscsCaseDataBuilder(APPELLANT_WITH_ADDRESS, null, null).build();
         final CcdNotificationWrapper wrapper = buildBaseWrapperWithCaseData(caseData, eventType);
 
@@ -3200,8 +3196,7 @@ public class NotificationServiceTest {
             notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
         final NotificationService service = new NotificationService(
             factory, reminderService, notificationValidService, notificationHandler,
-            outOfHoursCalculator, notificationConfig, sendNotificationService, false, cmEnabled
-        );
+            outOfHoursCalculator, notificationConfig, sendNotificationService, false);
 
         service.manageNotificationAndSubscription(wrapper, false);
 
@@ -3239,8 +3234,7 @@ public class NotificationServiceTest {
             notificationSender, notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
         final NotificationService service = new NotificationService(
             factory, reminderService, notificationValidService, notificationHandler,
-            outOfHoursCalculator, notificationConfig, sendNotificationService, false, true
-        );
+            outOfHoursCalculator, notificationConfig, sendNotificationService, false);
 
         service.manageNotificationAndSubscription(wrapper, false);
 
@@ -3277,13 +3271,12 @@ public class NotificationServiceTest {
         return null;
     }
 
-    private NotificationService getNotificationServiceWithCmOtherPartyConfidentialityEnabled() {
+    private NotificationService getNotificationService() {
         final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender,
             notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
         return new NotificationService(factory, reminderService,
             notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService,
-            false, true
-        );
+            false);
     }
 
     private static SscsCaseData.SscsCaseDataBuilder getSscsCaseDataBuilderSettingInformationFromAppellant(String informationFromAppellant) {
@@ -3323,17 +3316,37 @@ public class NotificationServiceTest {
                            .informationFromAppellant(informationFromAppellant);
     }
 
-    private NotificationService getNotificationService() {
-        final SendNotificationService sendNotificationService = new SendNotificationService(notificationSender,
-            notificationHandler, notificationValidService, pdfLetterService, pdfStoreService);
-        return new NotificationService(factory, reminderService,
-            notificationValidService, notificationHandler, outOfHoursCalculator, notificationConfig, sendNotificationService,
-            false, false
-        );
-    }
-
     private byte[] getCoversheet() throws IOException {
         return IOUtils.toByteArray(
             Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("pdf/direction-notice-coversheet-sample.pdf")));
+    }
+
+    private void updateOtherPartySelection(SscsCaseData caseData) {
+        if (caseData.getOtherParties() != null) {
+            List<String> codes = new ArrayList<>();
+            for (CcdValue<OtherParty> op : caseData.getOtherParties()) {
+                if (op.getValue().getId() != null) {
+                    codes.add(PartyItemList.OTHER_PARTY.getCode() + op.getValue().getId());
+                }
+                if (op.getValue().getAppointee() != null && op.getValue().getAppointee().getId() != null) {
+                    codes.add(PartyItemList.OTHER_PARTY.getCode() + op.getValue().getAppointee().getId());
+                }
+                if (op.getValue().getRep() != null && op.getValue().getRep().getId() != null) {
+                    codes.add(PartyItemList.OTHER_PARTY_REPRESENTATIVE.getCode() + op.getValue().getRep().getId());
+                }
+            }
+            if (!codes.isEmpty()) {
+                caseData.setOtherPartySelection(otherPartySelection(codes.toArray(new String[0])));
+            }
+        }
+    }
+
+    private List<CcdValue<OtherPartySelectionDetails>> otherPartySelection(String... codes) {
+        List<CcdValue<OtherPartySelectionDetails>> selection = new ArrayList<>();
+        for (String code : codes) {
+            DynamicListItem item = new DynamicListItem(code, code);
+            selection.add(new CcdValue<>(new OtherPartySelectionDetails(new DynamicList(item, List.of(item)))));
+        }
+        return selection;
     }
 }

@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -36,18 +35,15 @@ public class IssueHearingEnquiryFormHandler implements CallbackHandler<SscsCaseD
     private final HearingEnquiryFormPlaceholderService hearingEnquiryFormPlaceholderService;
     private final BulkPrintService bulkPrintService;
     private final CoverLetterService coverLetterService;
-    private final boolean cmOtherPartyConfidentialityEnabled;
     private final DocmosisTemplateConfig docmosisTemplateConfig;
 
 
     public IssueHearingEnquiryFormHandler(BulkPrintService bulkPrintService,
         HearingEnquiryFormPlaceholderService hearingEnquiryFormPlaceholderService, CoverLetterService coverLetterService,
-        DocmosisTemplateConfig docmosisTemplateConfig,
-        @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
+        DocmosisTemplateConfig docmosisTemplateConfig) {
         this.bulkPrintService = bulkPrintService;
         this.coverLetterService = coverLetterService;
         this.docmosisTemplateConfig = docmosisTemplateConfig;
-        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
         this.hearingEnquiryFormPlaceholderService = hearingEnquiryFormPlaceholderService;
     }
 
@@ -58,7 +54,7 @@ public class IssueHearingEnquiryFormHandler implements CallbackHandler<SscsCaseD
         log.info("IssueHearingEnquiryFormHandler canHandle method called for caseId {} and callbackType {} and event {}",
             callback.getCaseDetails().getId(), callbackType, callback.getEvent());
 
-        return cmOtherPartyConfidentialityEnabled && callbackType.equals(CallbackType.SUBMITTED) && (callback.getEvent()
+        return callbackType.equals(CallbackType.SUBMITTED) && (callback.getEvent()
             == ISSUE_HEARING_ENQUIRY_FORM);
     }
 

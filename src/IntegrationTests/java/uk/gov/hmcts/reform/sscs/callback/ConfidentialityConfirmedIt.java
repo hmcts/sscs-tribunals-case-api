@@ -7,14 +7,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@TestPropertySource(properties = "feature.cm-other-party-confidentiality.enabled=true")
 public class ConfidentialityConfirmedIt extends AbstractEventIt {
 
     @Before

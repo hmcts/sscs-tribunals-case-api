@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -39,7 +38,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
@@ -61,7 +59,7 @@ import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 
 @ExtendWith(MockitoExtension.class)
-public class HmctsResponseReviewedAboutToSubmitHandlerTest {
+class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
@@ -81,7 +79,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     private HmctsResponseReviewedAboutToSubmitHandler handler;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         sscsCaseData = SscsCaseData.builder()
                 .ccdCaseId("ccdId")
                 .appeal(Appeal.builder().build())
@@ -97,11 +95,11 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
                 new CaseDetails<>(1234L, "SSCS", RESPONSE_RECEIVED, sscsCaseDataBefore, now(), "Benefit");
         callback = new Callback<>(caseDetails, Optional.of(caseDetailsBefore), HMCTS_RESPONSE_REVIEWED, false);
 
-        handler = new HmctsResponseReviewedAboutToSubmitHandler(dwpDocumentService, panelCompService, addNoteService, true);
+        handler = new HmctsResponseReviewedAboutToSubmitHandler(dwpDocumentService, panelCompService, addNoteService);
     }
 
     @Test
-    public void givenANonHmctsResponseReviewedEvent_thenReturnFalse() {
+    void givenANonHmctsResponseReviewedEvent_thenReturnFalse() {
         callback = new Callback<>(caseDetails, Optional.of(caseDetailsBefore), APPEAL_RECEIVED, false);
 
         assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
@@ -109,12 +107,12 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
     @ParameterizedTest
     @CsvSource({"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
-    public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
+    void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
     }
 
     @Test
-    public void givenHmctsResponseReviewedEventWithNoDwpResponseDate_thenSetCaseCodeAndDefaultDwpResponseDateToToday() {
+    void givenHmctsResponseReviewedEventWithNoDwpResponseDate_thenSetCaseCodeAndDefaultDwpResponseDateToToday() {
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("002CC", response.getData().getCaseCode());
@@ -122,7 +120,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAHmctsResponseReviewedEventWithDwpResponseDate_thenSetCaseCodeAndUseProvidedDwpResponseDate() {
+    void givenAHmctsResponseReviewedEventWithDwpResponseDate_thenSetCaseCodeAndUseProvidedDwpResponseDate() {
         callback.getCaseDetails().getCaseData()
                 .setDwpResponseDate(LocalDate.now().minusDays(1).toString());
 
@@ -133,7 +131,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAHmctsResponseReviewedWithEmptyBenefitCode_displayAnError() {
+    void givenAHmctsResponseReviewedWithEmptyBenefitCode_displayAnError() {
         callback.getCaseDetails().getCaseData().setBenefitCode(null);
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -145,7 +143,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAHmctsResponseReviewedWithEmptyIssueCode_displayAnError() {
+    void givenAHmctsResponseReviewedWithEmptyIssueCode_displayAnError() {
         callback.getCaseDetails().getCaseData().setIssueCode(null);
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -157,7 +155,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAHmctsResponseReviewedWithIssueCodeSetToDD_displayAnError() {
+    void givenAHmctsResponseReviewedWithIssueCodeSetToDD_displayAnError() {
         callback.getCaseDetails().getCaseData().setIssueCode("DD");
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -191,17 +189,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenChildSupportConfidentialityAndFlagOff_thenNoMustSelectPartyError() {
-        handler = new HmctsResponseReviewedAboutToSubmitHandler(dwpDocumentService, panelCompService, addNoteService, false);
-        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
-        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
-        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(null);
-
-        Assertions.assertThat(handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION).getErrors()).isEmpty();
-    }
-
-    @Test
-    public void givenAUcCaseWithSingleElementSelected_thenSetCaseCodeToUs() {
+    void givenAUcCaseWithSingleElementSelected_thenSetCaseCodeToUs() {
         List<String> elementList = new ArrayList<>();
         elementList.add("testElement");
         sscsCaseData.setIssueCode("DD");
@@ -217,7 +205,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAUcCaseWithMultipleElementSelected_thenSetCaseCodeToUm() {
+    void givenAUcCaseWithMultipleElementSelected_thenSetCaseCodeToUm() {
         List<String> elementList = new ArrayList<>();
         elementList.add("testElement");
         elementList.add("testElement2");
@@ -234,7 +222,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenUcbSelectedAndNoUcbDocument_displayAnError() {
+    void givenUcbSelectedAndNoUcbDocument_displayAnError() {
         sscsCaseData.setDwpUcb(YES.getValue());
         sscsCaseData.setDwpUcbEvidenceDocument(null);
 
@@ -245,7 +233,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenUcbSelectedIsNo_thenTheFieldsAreCleared() {
+    void givenUcbSelectedIsNo_thenTheFieldsAreCleared() {
         sscsCaseData.setDwpUcb(NO.getValue());
         sscsCaseData.setDwpUcbEvidenceDocument(
             DocumentLink.builder().documentUrl("121").documentFilename("1.pdf").build());
@@ -259,7 +247,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenUcbSelectedAndUploadedUcbDoc_thenNoErrors() {
+    void givenUcbSelectedAndUploadedUcbDoc_thenNoErrors() {
         sscsCaseData.setDwpUcb(YES.getValue());
         sscsCaseData.setDwpUcbEvidenceDocument(
             DocumentLink.builder().documentUrl("11").documentFilename("file.pdf").build());
@@ -273,7 +261,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenIbcaCase_thenTheIbcaOnlyFieldsAreCleared() {
+    void givenIbcaCase_thenTheIbcaOnlyFieldsAreCleared() {
         sscsCaseData.setBenefitCode("093");
         sscsCaseData.setBenefitCodeIbcaOnly("093");
         sscsCaseData.setIssueCodeIbcaOnly("SP");
@@ -288,14 +276,14 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void throwsExceptionIfItCannotHandleTheAppeal() {
+    void throwsExceptionIfItCannotHandleTheAppeal() {
         callback = new Callback<>(caseDetails, Optional.of(caseDetailsBefore), APPEAL_RECEIVED, false);
 
         assertThrows(IllegalStateException.class, () -> handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION));
     }
 
     @Test
-    public void givenDwpDocumentIsUpdated_thenDwpCollectionIsUpdated() {
+    void givenDwpDocumentIsUpdated_thenDwpCollectionIsUpdated() {
         DwpDocument dwpResponseDocument = DwpDocument.builder().value(DwpDocumentDetails.builder()
                 .documentLink(DocumentLink.builder().documentFilename("response.pdf")
                     .documentBinaryUrl("/responsebinaryurl").documentUrl("/responseurl").build())
@@ -350,7 +338,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenChildSupportCaseAndCaseCodeIsChangedToNonChildSupportCodeAndCaseHasOtherParty_thenShowError() {
+    void givenChildSupportCaseAndCaseCodeIsChangedToNonChildSupportCodeAndCaseHasOtherParty_thenShowError() {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         sscsCaseData.setBenefitCode("001");
         sscsCaseDataBefore.setBenefitCode("022");
@@ -369,7 +357,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenChildSupportCaseAndCaseCodeIsChangedToNonChildSupportCodeAndCaseHasNoOtherParty_thenShowWarning() {
+    void givenChildSupportCaseAndCaseCodeIsChangedToNonChildSupportCodeAndCaseHasNoOtherParty_thenShowWarning() {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         sscsCaseData.setBenefitCode("001");
         sscsCaseDataBefore.setBenefitCode("022");
@@ -384,7 +372,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
     @ParameterizedTest
     @CsvSource({"022", "023", "024", "025", "026", "028"})
-    public void givenChildSupportCaseAndCaseCodeIsSetToChildSupportCode_thenNoWarningOrErrorIsShown(
+    void givenChildSupportCaseAndCaseCodeIsSetToChildSupportCode_thenNoWarningOrErrorIsShown(
         String childSupportBenefitCode) {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         sscsCaseData.setBenefitCode(childSupportBenefitCode);
@@ -397,7 +385,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenChildSupportCaseAndCaseCodeIsAlreadyANonChildSupportCase_thenShowErrorOrWarning() {
+    void givenChildSupportCaseAndCaseCodeIsAlreadyANonChildSupportCase_thenShowErrorOrWarning() {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         sscsCaseData.setBenefitCode("001");
         sscsCaseDataBefore.setBenefitCode("001");
@@ -409,7 +397,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenChildSupportCaseAndReferralReasonPhe_thenErrorIsShown() {
+    void givenChildSupportCaseAndReferralReasonPhe_thenErrorIsShown() {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         sscsCaseData.setBenefitCode("022");
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.PHE_REQUEST);
@@ -424,7 +412,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
     @ParameterizedTest
     @CsvSource({"015", "016", "030", "034", "050", "053", "054", "055", "057", "058"})
-    public void givenSscs5CaseAndCaseCodeIsSetToSscs5Code_thenNoErrorIsShown(String sscs5BenefitCode) {
+    void givenSscs5CaseAndCaseCodeIsSetToSscs5Code_thenNoErrorIsShown(String sscs5BenefitCode) {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childBenefit").build());
         sscsCaseData.setBenefitCode(sscs5BenefitCode);
         sscsCaseDataBefore.setBenefitCode("022");
@@ -437,7 +425,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
     @ParameterizedTest
     @CsvSource({"015", "016", "030", "034", "050", "053", "054", "055", "057", "058"})
-    public void givenSscs5CaseAndCaseCodeIsChangedToNonSscs5_thenShowError(String sscs5BenefitCode) {
+    void givenSscs5CaseAndCaseCodeIsChangedToNonSscs5_thenShowError(String sscs5BenefitCode) {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("thirtyHoursFreeChildcare").build());
         sscsCaseData.setBenefitCode("001");
         sscsCaseDataBefore.setBenefitCode(sscs5BenefitCode);
@@ -452,7 +440,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
     @ParameterizedTest
     @CsvSource({"015", "016", "030", "034", "050", "053", "054", "055", "057", "058"})
-    public void givenNonSscs5CaseAndCaseCodeIsSetToSscs5Code_thenErrorIsShown(String sscs5BenefitCode) {
+    void givenNonSscs5CaseAndCaseCodeIsSetToSscs5Code_thenErrorIsShown(String sscs5BenefitCode) {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("ESA").build());
         sscsCaseData.setBenefitCode(sscs5BenefitCode);
         sscsCaseDataBefore.setBenefitCode("051");
@@ -466,7 +454,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void shouldResetPanelComposition() {
+    void shouldResetPanelComposition() {
         var panelComposition = new PanelMemberComposition(List.of("84"));
         when(panelCompService.resetPanelCompositionIfStale(sscsCaseData, Optional.of(caseDetailsBefore)))
                 .thenReturn(panelComposition);
@@ -485,22 +473,21 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
         "OTHER",
         "NO_RESPONSE_TO_DIRECTION"
     })
-    public void ifEventIsResponseReviewed_AddInterlocReferralReasonToNote(InterlocReferralReason value) {
+    void ifEventIsResponseReviewed_AddInterlocReferralReasonToNote(InterlocReferralReason value) {
         sscsCaseData.setTempNoteDetail("Here is my note");
         sscsCaseData.setInterlocReferralReason(value);
         sscsCaseData.setSelectWhoReviewsCase(getWhoReviewsCaseDynamicList());
         callback = new Callback<>(caseDetails, Optional.of(caseDetails), HMCTS_RESPONSE_REVIEWED, false);
 
-        PreSubmitCallbackResponse<SscsCaseData> response =
-                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(addNoteService,times(1)).addNote(eq(USER_AUTHORISATION), eq(sscsCaseData),
-                eq(String.format("Referred to interloc for review by judge - %s - Here is my note",
-                        value.getDescription())));
+        verify(addNoteService,times(1)).addNote(USER_AUTHORISATION, sscsCaseData,
+                String.format("Referred to interloc for review by judge - %s - Here is my note",
+                        value.getDescription()));
     }
 
     @Test
-    public void testInterlocReferralReasonIsNoneAndResponseReviewedEvent_thenNoNoteIsAdded() {
+    void testInterlocReferralReasonIsNoneAndResponseReviewedEvent_thenNoNoteIsAdded() {
         sscsCaseData.setTempNoteDetail(null);
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.NONE);
         sscsCaseData.setSelectWhoReviewsCase(getWhoReviewsCaseDynamicList());
@@ -509,11 +496,11 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(addNoteService,times(1))
-                .addNote(eq(USER_AUTHORISATION), eq(sscsCaseData), eq(null));
+                .addNote(USER_AUTHORISATION, sscsCaseData, null);
     }
 
     @Test
-    public void testTempNoteFilledIsNullAndResponseReviewedEvent_thenNoteIsAdded() {
+    void testTempNoteFilledIsNullAndResponseReviewedEvent_thenNoteIsAdded() {
         sscsCaseData.setTempNoteDetail(null);
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.OVER_300_PAGES);
         sscsCaseData.setSelectWhoReviewsCase(getWhoReviewsCaseDynamicList());
@@ -521,19 +508,19 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(addNoteService,times(1)).addNote(eq(USER_AUTHORISATION), eq(sscsCaseData),
-                eq("Referred to interloc for review by judge - Over 300 pages"));
+        verify(addNoteService,times(1)).addNote(USER_AUTHORISATION, sscsCaseData,
+                "Referred to interloc for review by judge - Over 300 pages");
     }
 
     @Test
-    public void givenListAssistCase_thenSetIgnoreWarningsToYes() {
+    void givenListAssistCase_thenSetIgnoreWarningsToYes() {
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(YES, response.getData().getIgnoreCallbackWarnings());
     }
 
     @Test
-    public void givenGapsCase_thenSetIgnoreWarningsIsNotSet() {
+    void givenGapsCase_thenSetIgnoreWarningsIsNotSet() {
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.GAPS);
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertNull(response.getData().getIgnoreCallbackWarnings());

@@ -79,7 +79,7 @@ class ValidSendToInterlocAboutToSubmitHandlerTest {
         caseDetails = new CaseDetails<>(123L, "SSCS", READY_TO_LIST, sscsCaseData, now(), "Benefit");
         callback = new Callback<>(caseDetails, Optional.of(caseDetails), VALID_SEND_TO_INTERLOC, false);
 
-        handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService, false);
+        handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService);
     }
 
     @ParameterizedTest
@@ -223,7 +223,7 @@ class ValidSendToInterlocAboutToSubmitHandlerTest {
     @ParameterizedTest
     @EnumSource(value = Benefit.class, names = {"UC","CHILD_SUPPORT"})
     void givenCmConfidentialityEnabledAndConfidentialityReferralAndMissingSelectedParty_thenReturnError(Benefit benefit) {
-        handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService, true);
+        handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService);
         sscsCaseData = sscsCaseData.toBuilder()
             .interlocReferralReason(InterlocReferralReason.CONFIDENTIALITY)
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefit.getShortName()).build()).build())
@@ -238,7 +238,7 @@ class ValidSendToInterlocAboutToSubmitHandlerTest {
 
     @Test
     void givenCmConfidentialityEnabledAndConfidentialityReferralAndUnsupportedBenefitType_thenDoNotReturnError() {
-        handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService, true);
+        handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService);
         sscsCaseData = sscsCaseData.toBuilder()
                                    .interlocReferralReason(InterlocReferralReason.CONFIDENTIALITY)
                                    .appeal(Appeal.builder().benefitType(BenefitType.builder().code(PIP.getShortName()).build()).build())
@@ -253,7 +253,7 @@ class ValidSendToInterlocAboutToSubmitHandlerTest {
 
     @Test
     void givenCmConfidentialityEnabledAndNotConfidentialityReferal_thenDoNotReturnError() {
-        handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService, true);
+        handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService);
         sscsCaseData = sscsCaseData.toBuilder()
                                    .interlocReferralReason(InterlocReferralReason.NO_MRN)
                                    .appeal(Appeal.builder().benefitType(BenefitType.builder().code(CHILD_SUPPORT.getShortName()).build()).build())
@@ -268,7 +268,7 @@ class ValidSendToInterlocAboutToSubmitHandlerTest {
 
     @Test
     void givenCmConfidentialityEnabledAndConfidentialityReferralAndPartySelected_thenSucceed() {
-        handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService, true);
+        handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService);
         sscsCaseData = sscsCaseData.toBuilder()
             .interlocReferralReason(InterlocReferralReason.CONFIDENTIALITY)
             .build();
@@ -286,7 +286,7 @@ class ValidSendToInterlocAboutToSubmitHandlerTest {
 
     @Test
     void givenCmConfidentialityEnabledAndNonConfidentialityReferral_thenNoPartyCheckRequired() {
-        handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService, true);
+        handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService);
         sscsCaseData = sscsCaseData.toBuilder()
             .interlocReferralReason(InterlocReferralReason.COMPLEX_CASE)
             .build();
@@ -310,7 +310,7 @@ class ValidSendToInterlocAboutToSubmitHandlerTest {
     @ParameterizedTest
     @MethodSource("missingSelectionScenarios")
     void givenConfidentialityReferral_whenSelectionMissing_thenReturnsMustSelectPartyError(DynamicList selectedParty) {
-        handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService, true);
+        handler = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService);
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
         sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(selectedParty);
@@ -339,18 +339,6 @@ class ValidSendToInterlocAboutToSubmitHandlerTest {
         sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(null);
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).isEmpty();
-    }
-
-    @Test
-    void givenConfidentialityReferralAndChildSupport_whenFlagOffAndSelectionMissing_thenDoesNotReturnMustSelectPartyError() {
-        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
-        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.CONFIDENTIALITY);
-        sscsCaseData.getExtendedSscsCaseData().setSelectedConfidentialityParty(null);
-        var handlerWithFlagOff = new ValidSendToInterlocAboutToSubmitHandler(postponementRequestService, addNoteService, false);
-
-        var response = handlerWithFlagOff.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
     }

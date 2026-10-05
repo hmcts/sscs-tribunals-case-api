@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
@@ -156,5 +157,10 @@ public class UcWriteFinalDecisionPreviewDecisionService extends WriteFinalDecisi
         builder.supportGroupOnly(caseData.isSupportGroupOnlyAppeal());
         builder.severeCriteriaApplies(caseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply() == null ? null : caseData.getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply().toBoolean());
         builder.ucCapabilityAssessmentStartDate(Optional.ofNullable(caseData.getSscsUcCaseData().getUcWriteFinalDecisionWorkCapabilityAssessmentStartDate()).map(LocalDate::parse).orElse(null));
+    }
+
+    @Override
+    protected void sanitizeData(SscsCaseData caseData, EventType eventType) {
+        //No data sanitization required.
     }
 }

@@ -1,8 +1,12 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -12,7 +16,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
+import static uk.gov.hmcts.reform.sscs.utility.StringUtils.getMaskedNino;
 
+import ch.qos.logback.classic.Level;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -22,17 +28,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.Reason;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaAppellant;
@@ -71,23 +77,20 @@ import uk.gov.hmcts.reform.sscs.model.draft.SessionTextReminders;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionTheHearing;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealServiceBase;
 import uk.gov.hmcts.reform.sscs.service.v2.SubmitAppealService;
+import uk.gov.hmcts.reform.sscs.util.LogCaptureExtension;
 
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class SyaControllerTestV2 {
 
-    // being: it needed to run springRunner and junitParamsRunner
-    @ClassRule
-    public static final SpringClassRule SCR = new SpringClassRule();
-
-    @Rule
-    public final SpringMethodRule springMethodRule = new SpringMethodRule();
-    // end
-
+    private static final String TEST_NINO = "AB877533C";
 
     private MockMvc mockMvc;
 
-    @MockitoBean
+    @Mock
     private SubmitAppealService submitAppealServiceV2;
+
+    @RegisterExtension
+    private final LogCaptureExtension logCapture = new LogCaptureExtension(SyaController.class);
 
     private SubmitAppealServiceBase submitAppealServiceBase;
 
@@ -98,16 +101,16 @@ public class SyaControllerTestV2 {
     }
 
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         controller = new SyaController(submitAppealServiceV2);
         submitAppealServiceBase = submitAppealServiceV2;
         mockMvc = standaloneSetup(controller).build();
     }
 
     @Test
-    public void shouldReturnHttpStatusCode201ForTheSubmittedAppeal() throws Exception {
-        when(submitAppealServiceBase.submitAppeal(any(SyaCaseWrapper.class), any(String.class))).thenReturn(1L);
+    void shouldReturnHttpStatusCode201ForTheSubmittedAppealAndMaskNino() throws Exception {
+        when(submitAppealServiceBase.submitAppeal(any(SyaCaseWrapper.class), nullable(String.class))).thenReturn(1L);
 
         String json = getSyaCaseWrapperJson("json/sya.json");
 
@@ -115,10 +118,13 @@ public class SyaControllerTestV2 {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isCreated());
+
+        logCapture.assertLogContains("Appeal with Nino - " + getMaskedNino(TEST_NINO), Level.INFO)
+                .assertLogDoesNotContain(TEST_NINO, Level.INFO);
     }
 
     @Test
-    public void shouldReturnHttpStatusCode201ForTheSubmittedDraft() throws Exception {
+    void shouldReturnHttpStatusCode201ForTheSubmittedDraft() throws Exception {
         mockSubmitAppealService(submitAppealServiceBase,  1L, SaveCaseOperation.CREATE);
 
         String json = getSyaCaseWrapperJson("json/sya.json");
@@ -131,7 +137,7 @@ public class SyaControllerTestV2 {
     }
 
     @Test
-    public void shouldReturnHttpStatusCode201ForTheSubmittedDraftWhenForceCreateTrue() throws Exception {
+    void shouldReturnHttpStatusCode201ForTheSubmittedDraftWhenForceCreateTrue() throws Exception {
         mockSubmitAppealService(submitAppealServiceBase,  1L, SaveCaseOperation.CREATE);
 
         String json = getSyaCaseWrapperJson("json/sya.json");
@@ -144,7 +150,7 @@ public class SyaControllerTestV2 {
     }
 
     @Test
-    public void shouldReturnHttpStatusCode201ForTheSubmittedDraftWhenForceCreateNotTrue() throws Exception {
+    void shouldReturnHttpStatusCode201ForTheSubmittedDraftWhenForceCreateNotTrue() throws Exception {
         mockSubmitAppealService(submitAppealServiceBase,  1L, SaveCaseOperation.CREATE);
 
         String json = getSyaCaseWrapperJson("json/sya.json");
@@ -157,7 +163,7 @@ public class SyaControllerTestV2 {
     }
 
     @Test
-    public void shouldReturnHttpStatusCode200ForTheUpdatedDraft() throws Exception {
+    void shouldReturnHttpStatusCode200ForTheUpdatedDraft() throws Exception {
         mockSubmitAppealServiceUpdateDraftAppeal(submitAppealServiceBase, 1L, SaveCaseOperation.UPDATE);
 
         String json = getSyaCaseWrapperJson("json/sya_with_ccdId.json");
@@ -170,7 +176,7 @@ public class SyaControllerTestV2 {
     }
 
     @Test
-    public void shouldReturnHttpStatusCode400ForInvalidAuthDraftUpdate() throws Exception {
+    void shouldReturnHttpStatusCode400ForInvalidAuthDraftUpdate() throws Exception {
         mockSubmitAppealServiceUpdateDraftAppeal(submitAppealServiceBase, 1L, SaveCaseOperation.UPDATE);
 
         String json = getSyaCaseWrapperJson("json/sya_with_ccdId.json");
@@ -182,7 +188,7 @@ public class SyaControllerTestV2 {
     }
 
     @Test
-    public void shouldReturnHttpStatusCode204ForInvalidCcdIdDraftUpdate() throws Exception {
+    void shouldReturnHttpStatusCode204ForInvalidCcdIdDraftUpdate() throws Exception {
         mockSubmitAppealServiceUpdateDraftAppeal(submitAppealServiceBase,  1L, SaveCaseOperation.UPDATE);
 
         String json = getSyaCaseWrapperJson("json/sya.json");
@@ -195,7 +201,7 @@ public class SyaControllerTestV2 {
     }
 
     @Test
-    public void shouldReturnHttpStatusCode200ForArchivedDraft() throws Exception {
+    void shouldReturnHttpStatusCode200ForArchivedDraft() throws Exception {
         mockSubmitAppealArchiveDraftAppeal(submitAppealServiceBase,  1L, SaveCaseOperation.ARCHIVE);
 
         String json = getSyaCaseWrapperJson("json/sya_with_ccdId.json");
@@ -208,7 +214,7 @@ public class SyaControllerTestV2 {
     }
 
     @Test
-    public void shouldReturnHttpStatusCode400ForInvalidAuthArchivedDraft() throws Exception {
+    void shouldReturnHttpStatusCode400ForInvalidAuthArchivedDraft() throws Exception {
         mockSubmitAppealArchiveDraftAppeal(submitAppealServiceBase,  1L, SaveCaseOperation.ARCHIVE);
 
         String json = getSyaCaseWrapperJson("json/sya_with_ccdId.json");
@@ -220,7 +226,7 @@ public class SyaControllerTestV2 {
     }
 
     @Test
-    public void shouldReturnHttpStatusCode204ForInvalidDataArchivedDraft() throws Exception {
+    void shouldReturnHttpStatusCode204ForInvalidDataArchivedDraft() throws Exception {
         mockSubmitAppealArchiveDraftAppeal(submitAppealServiceBase,  1L, SaveCaseOperation.ARCHIVE);
 
         String json = getSyaCaseWrapperJson("json/sya.json");
@@ -232,9 +238,9 @@ public class SyaControllerTestV2 {
                 .andExpect(status().isNoContent());
     }
 
-    @Test
-    @Parameters(method = "generateInvalidScenariosPut")
-    public void givenParameterIsNotValid_whenPutDraftIsCalled_shouldReturn204Response(String payload, String token)
+    @ParameterizedTest
+    @MethodSource("generateInvalidScenariosPut")
+    void givenParameterIsNotValid_whenPutDraftIsCalled_shouldReturn204Response(String payload, String token)
             throws Exception {
         mockMvc.perform(put("/drafts")
                         .header("Authorization", token)
@@ -243,9 +249,9 @@ public class SyaControllerTestV2 {
                 .andExpect(status().isNoContent());
     }
 
-    @Test
-    @Parameters(method = "generateInvalidScenariosPost")
-    public void givenParameterIsNotValid_whenPostDraftIsCalled_shouldReturn204Response(String payload, String token)
+    @ParameterizedTest
+    @MethodSource("generateInvalidScenariosPost")
+    void givenParameterIsNotValid_whenPostDraftIsCalled_shouldReturn204Response(String payload, String token)
             throws Exception {
         mockMvc.perform(post("/drafts")
                         .header("Authorization", token)
@@ -254,9 +260,9 @@ public class SyaControllerTestV2 {
                 .andExpect(status().isNoContent());
     }
 
-    @Test
-    @Parameters(method = "generateInvalidScenariosDelete")
-    public void givenParameterIsNotValid_whenArchiveDraftIsCalled_shouldReturn204Response(String payload, String token)
+    @ParameterizedTest
+    @MethodSource("generateInvalidScenariosDelete")
+    void givenParameterIsNotValid_whenArchiveDraftIsCalled_shouldReturn204Response(String payload, String token)
             throws Exception {
         mockMvc.perform(delete("/drafts/555")
                         .header("Authorization", token)
@@ -265,7 +271,7 @@ public class SyaControllerTestV2 {
                 .andExpect(status().isNoContent());
     }
 
-    private Object[] generateInvalidScenariosPut() throws Exception {
+    private static Stream<Arguments> generateInvalidScenariosPut() throws Exception {
 
         String validPayload = getSyaCaseWrapperJson("json/sya.json");
 
@@ -284,15 +290,15 @@ public class SyaControllerTestV2 {
         String validUserToken = "Bearer myToken";
         String invalidUserToken = "";
 
-        return new Object[]{
-            new Object[]{emptyPayload, validUserToken},
-            new Object[]{noBenefitCode, validUserToken},
-            new Object[]{emptyBenefitCode, validUserToken},
-            new Object[]{validPayload, invalidUserToken}
-        };
+        return Stream.of(
+                arguments(emptyPayload, validUserToken),
+                arguments(noBenefitCode, validUserToken),
+                arguments(emptyBenefitCode, validUserToken),
+                arguments(validPayload, invalidUserToken)
+        );
     }
 
-    private Object[] generateInvalidScenariosPost() throws Exception {
+    private static Stream<Arguments> generateInvalidScenariosPost() throws Exception {
 
         String validPayload = getSyaCaseWrapperJson("json/sya_with_ccdId.json");
 
@@ -319,16 +325,16 @@ public class SyaControllerTestV2 {
         String validUserToken = "Bearer myToken";
         String invalidUserToken = "";
 
-        return new Object[]{
-            new Object[]{emptyPayload, validUserToken},
-            new Object[]{noBenefitCode, validUserToken},
-            new Object[]{emptyBenefitCode, validUserToken},
-            new Object[]{validPayload, invalidUserToken},
-            new Object[]{emptyCcdId, validUserToken}
-        };
+        return Stream.of(
+                arguments(emptyPayload, validUserToken),
+                arguments(noBenefitCode, validUserToken),
+                arguments(emptyBenefitCode, validUserToken),
+                arguments(validPayload, invalidUserToken),
+                arguments(emptyCcdId, validUserToken)
+        );
     }
 
-    private Object[] generateInvalidScenariosDelete() throws Exception {
+    private static Stream<Arguments> generateInvalidScenariosDelete() throws Exception {
 
         String validPayload = getSyaCaseWrapperJson("json/sya_with_ccdId.json");
 
@@ -342,15 +348,15 @@ public class SyaControllerTestV2 {
         String validUserToken = "Bearer myToken";
         String invalidUserToken = "";
 
-        return new Object[]{
-            new Object[]{emptyPayload, validUserToken},
-            new Object[]{validPayload, invalidUserToken},
-            new Object[]{emptyCcdId, validUserToken}
-        };
+        return Stream.of(
+                arguments(emptyPayload, validUserToken),
+                arguments(validPayload, invalidUserToken),
+                arguments(emptyCcdId, validUserToken)
+        );
     }
 
     @Test
-    public void shouldHandleErrorWhileSubmitAppeal() throws Exception {
+    void shouldHandleErrorWhileSubmitAppeal() throws Exception {
         doThrow(new PdfGenerationException("malformed html template", new Exception()))
                 .when(submitAppealServiceBase).submitAppeal(any(SyaCaseWrapper.class), any());
         String json = getSyaCaseWrapperJson("json/sya.json");
@@ -363,7 +369,7 @@ public class SyaControllerTestV2 {
     }
 
     @Test
-    public void givenGetDraftIsCalled_shouldReturn200AndTheDraft() throws Exception {
+    void givenGetDraftIsCalled_shouldReturn200AndTheDraft() throws Exception {
         SessionDraft sessionDraft = SessionDraft.builder()
                 .benefitType(new SessionBenefitType("Personal Independence Payment (PIP)"))
                 .postcode(new SessionPostcodeChecker("AP1 4NT"))
@@ -456,7 +462,7 @@ public class SyaControllerTestV2 {
     }
 
     @Test
-    public void givenGetDraftWithRepIsCalled_shouldReturn200AndTheDraft() throws Exception {
+    void givenGetDraftWithRepIsCalled_shouldReturn200AndTheDraft() throws Exception {
         SessionDraft sessionDraft = SessionDraft.builder()
                 .benefitType(new SessionBenefitType("Personal Independence Payment (PIP)"))
                 .postcode(new SessionPostcodeChecker("AP1 4NT"))
@@ -558,7 +564,7 @@ public class SyaControllerTestV2 {
     }
 
     @Test
-    public void givenGetDraftWithAppointeeIsCalled_shouldReturn200AndTheDraft() throws Exception {
+    void givenGetDraftWithAppointeeIsCalled_shouldReturn200AndTheDraft() throws Exception {
         SessionDraft sessionDraft = SessionDraft.builder()
                 .benefitType(new SessionBenefitType("Personal Independence Payment (PIP)"))
                 .postcode(new SessionPostcodeChecker("AP1 4NT"))
@@ -616,7 +622,7 @@ public class SyaControllerTestV2 {
     }
 
     @Test
-    public void getDraftWillReturn204WhenNoneExistForTheUser() throws Exception {
+    void getDraftWillReturn204WhenNoneExistForTheUser() throws Exception {
         when(submitAppealServiceBase.getDraftAppeal(any())).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/drafts")
@@ -626,7 +632,7 @@ public class SyaControllerTestV2 {
     }
 
     @Test
-    public void givenGetDraftsIsCalled_shouldReturn200AndTheDraft() throws Exception {
+    void givenGetDraftsIsCalled_shouldReturn200AndTheDraft() throws Exception {
 
         SessionDraft sessionDraft = SessionDraft.builder()
                 .benefitType(new SessionBenefitType("Personal Independence Payment (PIP)"))
@@ -666,7 +672,7 @@ public class SyaControllerTestV2 {
     }
 
     @Test
-    public void getDraftsWillReturn204WhenNoneExistForTheUser() throws Exception {
+    void getDraftsWillReturn204WhenNoneExistForTheUser() throws Exception {
         when(submitAppealServiceBase.getDraftAppeals(any())).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/drafts/all")
@@ -675,8 +681,8 @@ public class SyaControllerTestV2 {
                 .andExpect(status().isNoContent());
     }
 
-    @Test(expected = NullPointerException.class)
-    public void testLoggingMethodNullBenefitType() throws Exception {
+    @Test
+    void testLoggingMethodNullBenefitType() {
         SyaAppellant appellant = new SyaAppellant();
         appellant.setTitle("Mr");
         appellant.setLastName("Lastname");
@@ -697,22 +703,36 @@ public class SyaControllerTestV2 {
         reasons.setReasons(Collections.singletonList(reason));
         caseWithNullBenefitCode.setReasonsForAppealing(reasons);
 
-        controller.createAppeals(null, caseWithNullBenefitCode);
+        assertThrows(NullPointerException.class, () -> controller.createAppeals(null, caseWithNullBenefitCode));
     }
 
-    @Test(expected = NullPointerException.class)
-    public void testLoggingMethodNullNino() throws Exception {
+    @Test
+    void logBadRequestShouldLogMaskedNino() {
+        SyaAppellant appellant = new SyaAppellant();
+        appellant.setNino(TEST_NINO);
+
+        SyaCaseWrapper caseWrapper = new SyaCaseWrapper();
+        caseWrapper.setAppellant(appellant);
+        caseWrapper.setBenefitType(new SyaBenefitType("Personal Independence Payment", "PIP"));
+
+        SyaController.logBadRequest(caseWrapper);
+
+        logCapture.assertLogContains("Nino " + getMaskedNino(TEST_NINO), Level.INFO)
+                .assertLogDoesNotContain(TEST_NINO, Level.INFO);
+    }
+
+    @Test
+    void testLoggingMethodNullNino() {
         SyaCaseWrapper caseWithNullNino = new SyaCaseWrapper();
         caseWithNullNino.setBenefitType(new SyaBenefitType("Universal Credit", "UC"));
         caseWithNullNino.setCcdCaseId("123456");
 
-        controller.createAppeals(null, caseWithNullNino);
-
+        assertThrows(NullPointerException.class, () -> controller.createAppeals(null, caseWithNullNino));
     }
 
 
-    private String getSyaCaseWrapperJson(String resourcePath) throws IOException, URISyntaxException {
-        URL resource = getClass().getClassLoader().getResource(resourcePath);
+    private static String getSyaCaseWrapperJson(String resourcePath) throws IOException, URISyntaxException {
+        URL resource = SyaControllerTestV2.class.getClassLoader().getResource(resourcePath);
         return String.join("\n", Files.readAllLines(Paths.get(Objects.requireNonNull(resource).toURI())));
     }
 
@@ -725,8 +745,8 @@ public class SyaControllerTestV2 {
                         .build()));
     }
 
-    public void mockSubmitAppealServiceUpdateDraftAppeal(SubmitAppealServiceBase submitAppealServiceBase, Long caseId, SaveCaseOperation saveCaseOperation) {
-        when(submitAppealServiceBase.updateDraftAppeal(any(), any()))
+    void mockSubmitAppealServiceUpdateDraftAppeal(SubmitAppealServiceBase submitAppealServiceBase, Long caseId, SaveCaseOperation saveCaseOperation) {
+        lenient().when(submitAppealServiceBase.updateDraftAppeal(any(), any()))
                 .thenReturn(Optional.of(SaveCaseResult.builder()
                         .caseDetailsId(caseId)
                         .saveCaseOperation(saveCaseOperation)
@@ -734,7 +754,7 @@ public class SyaControllerTestV2 {
     }
 
     void mockSubmitAppealArchiveDraftAppeal(SubmitAppealServiceBase submitAppealServiceBase, Long caseId, SaveCaseOperation saveCaseOperation) {
-        when(submitAppealServiceBase.archiveDraftAppeal(any(), any(), any()))
+        lenient().when(submitAppealServiceBase.archiveDraftAppeal(any(), any(), any()))
                 .thenReturn(Optional.of(SaveCaseResult.builder()
                         .caseDetailsId(caseId)
                         .saveCaseOperation(saveCaseOperation)

@@ -7,7 +7,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -19,21 +18,12 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Service
 @Slf4j
 class AddOtherPartyMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-
-    private final boolean cmOtherPartyConfidentialityEnabled;
-
-    public AddOtherPartyMidEventHandler(
-        @Value("${feature.cm-other-party-confidentiality.enabled}") final boolean cmOtherPartyConfidentialityEnabled) {
-        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
-    }
-
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callbackType, "callbackType must not be null");
         requireNonNull(callback, "callback must not be null");
 
-        if (!cmOtherPartyConfidentialityEnabled
-            || callbackType != CallbackType.MID_EVENT
+        if (callbackType != CallbackType.MID_EVENT
             || callback.getEvent() != EventType.ADD_OTHER_PARTY_DATA
             || isNull(
             callback.getCaseDetails().getCaseData().getOtherParties())) {
@@ -41,7 +31,7 @@ class AddOtherPartyMidEventHandler implements PreSubmitCallbackHandler<SscsCaseD
         }
 
         return callback.getCaseDetails().getCaseData().isBenefitType(CHILD_SUPPORT) || callback.getCaseDetails().getCaseData()
-            .isBenefitType(UC);
+                                                                                               .isBenefitType(UC);
     }
 
     @Override

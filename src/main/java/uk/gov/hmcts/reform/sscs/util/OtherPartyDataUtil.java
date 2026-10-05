@@ -7,14 +7,13 @@ import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsType.SSCS2;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsType.SSCS5;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.ccd.predicates.BenefitTypeConfidentialityPredicate.isValidBenefitTypeForConfidentiality;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDateTime;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,7 +27,6 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Entity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
@@ -36,15 +34,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
 
 public class OtherPartyDataUtil {
-
-    private static final Set<String> VALID_CONFIDENTIALITY_BENEFITS =
-        Arrays.stream(Benefit.values())
-            .filter(benefit ->
-                SSCS2.equals(benefit.getSscsType()) || SSCS5.equals(benefit.getSscsType()))
-            .map(Benefit::getShortName)
-            .collect(toSet());
 
     private OtherPartyDataUtil() {
     }
@@ -103,49 +95,44 @@ public class OtherPartyDataUtil {
     }
 
     public static YesNo isConfidential(final SscsCaseData sscsCaseData) {
-        return isConfidential(sscsCaseData, false);
+        return isConfidential(sscsCaseData,List.of());
     }
 
-    public static YesNo isConfidential(final SscsCaseData sscsCaseData, final boolean cmOtherPartyConfidentialityEnabled) {
-        var appeal = sscsCaseData.getAppeal();
-        if (isValidBenefitTypeForConfidentiality(appeal.getBenefitType(), cmOtherPartyConfidentialityEnabled)) {
-            if ((appeal.getAppellant() != null
-                && appeal.getAppellant().getConfidentialityRequired() != null
-                && isYes(appeal.getAppellant().getConfidentialityRequired()))
-                || otherPartyHasConfidentiality(sscsCaseData)) {
-                return YES;
-            }
+    public static YesNo isConfidential(final SscsCaseData sscsCaseData,
+        final List<Benefit> additionalBenefits) {
+        if (sscsCaseData == null || sscsCaseData.getAppeal() == null) {
+            return null;
+        }
+        if (!isValidBenefitTypeForConfidentiality(sscsCaseData.getAppeal().getBenefitType(),
+            additionalBenefits)) {
+            return null;
+        }
+        final YesNoUndetermined appellantConfidentiality = sscsCaseData.getAppellantConfidentiality().orElse(null);
+        if (appellantConfidentiality == YesNoUndetermined.YES || otherPartyHasConfidentiality(sscsCaseData)) {
+            return YesNo.YES;
+        }
+        if (appellantConfidentiality == YesNoUndetermined.NO && allOtherPartiesDoNotWantConfidentiality(sscsCaseData)) {
+            return YesNo.NO;
         }
         return null;
-    }
-
-    public static boolean isValidBenefitTypeForConfidentiality(final BenefitType benefitType) {
-        return isValidBenefitTypeForConfidentiality(benefitType, false);
-    }
-
-    public static boolean isValidBenefitTypeForConfidentiality(
-        final BenefitType benefitType,
-        final boolean cmOtherPartyConfidentialityEnabled) {
-
-        if (benefitType == null) {
-            return false;
-        }
-
-        String benefitCode = benefitType.getCode();
-
-        return VALID_CONFIDENTIALITY_BENEFITS.contains(benefitCode)
-            || (cmOtherPartyConfidentialityEnabled
-            && Benefit.UC.getShortName().equals(benefitCode));
     }
 
     public static boolean isOtherPartyPresent(SscsCaseData sscsCaseData) {
         return sscsCaseData.getOtherParties() != null && !sscsCaseData.getOtherParties().isEmpty();
     }
 
+    private static boolean allOtherPartiesDoNotWantConfidentiality(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getOtherParties() != null) {
+            return sscsCaseData.getOtherParties().stream()
+                               .allMatch(op -> YesNoUndetermined.isNo(op.getValue().getConfidentialityRequirement()));
+        }
+        return true;
+    }
+
     private static boolean otherPartyHasConfidentiality(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getOtherParties() != null) {
             return sscsCaseData.getOtherParties().stream()
-                    .anyMatch(op -> isYes(op.getValue().getConfidentialityRequired()));
+                    .anyMatch(op -> YesNoUndetermined.isYes(op.getValue().getConfidentialityRequirement()));
         }
         return false;
     }
@@ -293,31 +280,31 @@ public class OtherPartyDataUtil {
         if (isEmpty(currentOtherParties)) {
             return;
         }
-        final Map<String, YesNo> confidentialityBefore = buildConfidentialityMap(previousOtherParties);
+        final Map<String, YesNoUndetermined> confidentialityBefore = buildConfidentialityMap(previousOtherParties);
         currentOtherParties.stream()
             .filter(Objects::nonNull)
             .map(CcdValue::getValue)
             .filter(Objects::nonNull)
             .forEach(current -> {
-                final YesNo priorConfidentiality = confidentialityBefore.get(current.getId());
-                if (nonNull(current.getConfidentialityRequired())
+                final YesNoUndetermined priorConfidentiality = confidentialityBefore.get(current.getId());
+                if (nonNull(current.getConfidentialityRequirement())
                     && (priorConfidentiality == null
-                        || !Objects.equals(priorConfidentiality, current.getConfidentialityRequired()))) {
+                        || !Objects.equals(priorConfidentiality, current.getConfidentialityRequirement()))) {
                     current.setConfidentialityRequiredChangedDate(getLocalDateTime());
                 }
             });
     }
 
-    private static Map<String, YesNo> buildConfidentialityMap(final List<CcdValue<OtherParty>> otherParties) {
+    private static Map<String, YesNoUndetermined> buildConfidentialityMap(final List<CcdValue<OtherParty>> otherParties) {
         if (isEmpty(otherParties)) {
             return Collections.emptyMap();
         }
-        final Map<String, YesNo> byId = new HashMap<>();
+        final Map<String, YesNoUndetermined> byId = new HashMap<>();
         otherParties.stream()
             .filter(Objects::nonNull)
             .map(CcdValue::getValue)
             .filter(Objects::nonNull)
-            .forEach(prior -> byId.put(prior.getId(), prior.getConfidentialityRequired()));
+            .forEach(prior -> byId.put(prior.getId(), prior.getConfidentialityRequirement()));
         return byId;
     }
 

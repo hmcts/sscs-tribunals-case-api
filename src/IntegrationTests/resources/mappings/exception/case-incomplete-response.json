@@ -40,7 +40,6 @@
             "dob": null,
             "nino": null
           },
-          "confidentialityRequired": null,
           "isAppointee": "No",
           "appointee": null,
           "isAddressSameAsAppointee": null,

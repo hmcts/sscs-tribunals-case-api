@@ -31,6 +31,8 @@ public abstract class IssueNoticeHandler extends IssueDocumentHandler {
 
     protected abstract void setGeneratedDateIfRequired(SscsCaseData caseData, EventType eventType);
 
+    protected abstract void sanitizeData(SscsCaseData caseData, EventType eventType);
+
     public PreSubmitCallbackResponse<SscsCaseData> preview(Callback<SscsCaseData> callback, DocumentType documentType, String userAuthorisation, boolean showIssueDate) {
         return preview(callback, documentType, userAuthorisation, showIssueDate, false, false);
     }
@@ -42,6 +44,7 @@ public abstract class IssueNoticeHandler extends IssueDocumentHandler {
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
         setGeneratedDateIfRequired(sscsCaseData, callback.getEvent());
+        sanitizeData(sscsCaseData, callback.getEvent());
 
         try {
             String templateIdString = templateId.apply(sscsCaseData.getLanguagePreference());

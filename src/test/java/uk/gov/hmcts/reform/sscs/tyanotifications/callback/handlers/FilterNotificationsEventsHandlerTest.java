@@ -9,7 +9,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.MockitoAnnotations.openMocks;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
@@ -173,14 +172,6 @@ public class FilterNotificationsEventsHandlerTest {
         newCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
 
         willHandle(callback);
-    }
-
-    @Test
-    public void wontHandleForGapsHearingRoutes() {
-        callback.setNotificationEventType(HEARING_BOOKED);
-        newCaseData.getSchedulingAndListingFields().setHearingRoute(GAPS);
-
-        willNotHandle(callback);
     }
 
     @Test

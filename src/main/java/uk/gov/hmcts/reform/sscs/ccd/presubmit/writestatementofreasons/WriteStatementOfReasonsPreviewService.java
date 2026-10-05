@@ -114,4 +114,9 @@ public class WriteStatementOfReasonsPreviewService extends IssueNoticeHandler {
     protected void setGeneratedDateIfRequired(SscsCaseData caseData, EventType eventType) {
         //Don't need to set anything for the generated date
     }
+
+    @Override
+    protected void sanitizeData(SscsCaseData caseData, EventType eventType) {
+        //No data sanitization required.
+    }
 }

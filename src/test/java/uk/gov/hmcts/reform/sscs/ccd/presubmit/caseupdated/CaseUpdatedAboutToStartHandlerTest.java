@@ -13,8 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
@@ -38,7 +36,6 @@ import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 class CaseUpdatedAboutToStartHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
@@ -63,7 +60,7 @@ class CaseUpdatedAboutToStartHandlerTest {
 
     @BeforeEach
     public void setUp() {
-        handler = new CaseUpdatedAboutToStartHandler(dynamicListLanguageUtil, verbalLanguagesService, signLanguagesService, false);
+        handler = new CaseUpdatedAboutToStartHandler(dynamicListLanguageUtil, verbalLanguagesService, signLanguagesService);
 
         when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -251,7 +248,6 @@ class CaseUpdatedAboutToStartHandlerTest {
 
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
         given(dynamicListLanguageUtil.generateInterpreterLanguageFields(any())).willReturn(list);
-        given(dynamicListLanguageUtil.getLanguageDynamicListItem(any())).willReturn(item);
         given(verbalLanguagesService.getVerbalLanguage(any())).willReturn(null);
         given(signLanguagesService.getSignLanguage(any())).willReturn(null);
 

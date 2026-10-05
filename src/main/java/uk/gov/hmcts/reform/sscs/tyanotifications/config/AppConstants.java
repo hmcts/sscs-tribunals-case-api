@@ -39,6 +39,9 @@ public final class AppConstants {
     public static final String IBCA_FULL_NAME_WELSH = "Awdurdod Iawndal Gwaed Heintiedig";
     public static final String IBCA_FIRST_TIER_AGENCY_GROUP = "Infected Blood Compensation Authority";
     public static final String IBCA_FIRST_TIER_AGENCY_GROUP_WELSH = "Awdurdod Iawndal Gwaed Heintiedig";
+    public static final String TOMORROW_WELSH = "yfory";
+    public static final String IN_WELSH = "ymhen ";
+    public static final String DAYS_WELSH = " ddiwrnod";
 
 
     public static final String SSCS5 = "sscs5";

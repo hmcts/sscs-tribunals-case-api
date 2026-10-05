@@ -76,6 +76,7 @@ import org.quartz.SchedulerException;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DatedRequestOutcome;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -1022,7 +1023,7 @@ class NotificationsIt extends NotificationsItBase {
                 HEARING_REMINDER,
                 "oral",
                 LIST_ASSIST_ROUTE,
-                Collections.singletonList("07bebee4-f07a-4a0d-9c50-65be30dc72a5"),
+                Collections.singletonList("78d2e987-02de-4875-ae43-1139a5c868ff"),
                 Collections.singletonList("18960596-1983-4da8-8b5c-dc1c851bb19b"),
                 Collections.emptyList(),
                 "yes",
@@ -4651,7 +4652,7 @@ class NotificationsIt extends NotificationsItBase {
                 HEARING_REMINDER,
                 "oral",
                 LIST_ASSIST_ROUTE,
-                Collections.singletonList("07bebee4-f07a-4a0d-9c50-65be30dc72a5"),
+                Collections.singletonList("78d2e987-02de-4875-ae43-1139a5c868ff"),
                 Collections.singletonList("18960596-1983-4da8-8b5c-dc1c851bb19b"),
                 Collections.emptyList(),
                 "yes",
@@ -4665,7 +4666,7 @@ class NotificationsIt extends NotificationsItBase {
                 HEARING_REMINDER,
                 "oral",
                 LIST_ASSIST_ROUTE,
-                Collections.singletonList("07bebee4-f07a-4a0d-9c50-65be30dc72a5"),
+                Collections.singletonList("78d2e987-02de-4875-ae43-1139a5c868ff"),
                 Collections.emptyList(),
                 Collections.emptyList(),
                 "yes",
@@ -5229,8 +5230,8 @@ class NotificationsIt extends NotificationsItBase {
         updatedJson = updateEmbeddedJson(updatedJson, benefitType, "case_details", "case_data", "appeal", "benefitType",
             "code");
         updatedJson = updateEmbeddedJson(updatedJson,
-            List.of(CcdValue.<OtherParty>builder().value(OtherParty.builder().build()).build(),
-                CcdValue.<OtherParty>builder().value(OtherParty.builder().build()).build()), "case_details", "case_data",
+            List.of(CcdValue.<OtherParty>builder().value(OtherParty.builder().name(Name.builder().firstName("Bob").lastName("Builder").build()).build()).build(),
+                CcdValue.<OtherParty>builder().value(OtherParty.builder().name(Name.builder().firstName("Jack").lastName("Hammer").build()).build()).build()), "case_details", "case_data",
             "otherParties");
 
         getResponse(getRequestWithAuthHeader(updatedJson));

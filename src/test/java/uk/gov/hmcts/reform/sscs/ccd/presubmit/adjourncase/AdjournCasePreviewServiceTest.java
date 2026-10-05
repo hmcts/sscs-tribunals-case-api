@@ -376,7 +376,7 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
+    @EnumSource(value = AdjournCaseTypeOfHearing.class, mode = EnumSource.Mode.EXCLUDE, names = {"PAPER"})
     void willSetPreviewFileWithInterpreterDescription_WhenInterpreterRequiredAndLanguageIsSet(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
@@ -405,7 +405,7 @@ class AdjournCasePreviewServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
+    @EnumSource(value = AdjournCaseTypeOfHearing.class, mode = EnumSource.Mode.EXCLUDE, names = {"PAPER"})
     void willNotSetPreviewFileButWillDisplayError_WithInterpreterDescription_WhenInterpreterRequiredAndLanguageIsNotSet(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
@@ -1457,6 +1457,21 @@ class AdjournCasePreviewServiceTest {
         assertThat(templateBody.getAdjournCaseTemplateBody().getNextHearingVenue()).isEqualTo(GAP_VENUE_NAME);
     }
 
+    @Test
+    void previewSanitizesDataByClearingStaleNextHearingVenueSelected() {
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
+        when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
+        when(generateFile.assemble(any())).thenReturn(URL);
+
+        adjournment.setNextHearingVenue(SAME_VENUE);
+        adjournment.setNextHearingVenueSelected(new DynamicList(new DynamicListItem("123", ""), List.of()));
+
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+
+        assertThat(sscsCaseData.getAdjournment().getNextHearingVenueSelected()).isNull();
+    }
+
     @ParameterizedTest
     @EnumSource(value = AdjournCaseTypeOfHearing.class, names = {"FACE_TO_FACE"})
     void givenCaseWithSelectedVenueSetForFaceToFace_thenCorrectlySetTheVenueToBeTheNewVenue(AdjournCaseTypeOfHearing nextHearingType) {
@@ -1479,29 +1494,6 @@ class AdjournCasePreviewServiceTest {
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
         assertThat(templateBody.getAdjournCaseTemplateBody().getNextHearingVenue()).isEqualTo(GAP_VENUE_NAME);
-    }
-
-    @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class, names = {"TELEPHONE", "VIDEO", "PAPER"})
-    void givenCaseWithSelectedVenueSetForNonFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(AdjournCaseTypeOfHearing nextHearingType) {
-        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
-        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
-        when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
-
-        adjournment.setTypeOfNextHearing(nextHearingType);
-
-        DynamicListItem item = new DynamicListItem("123", "");
-        DynamicList list = new DynamicList(item, List.of());
-
-        adjournment.setNextHearingVenue(SOMEWHERE_ELSE);
-        adjournment.setNextHearingVenueSelected(list);
-
-        final PreSubmitCallbackResponse<SscsCaseData> response =
-            service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
-
-        String error = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false).getErrors().stream().findFirst().orElse("");
-        assertThat(error).isEqualTo("adjournCaseNextHearingVenueSelected field should not be set");
-        assertThat(response.getData().getAdjournment().getPreviewDocument()).isNull();
     }
 
     @ParameterizedTest
@@ -1556,24 +1548,6 @@ class AdjournCasePreviewServiceTest {
         adjournment.setNextHearingVenueSelected(list);
 
         checkDocumentIsNotCreatedAndReturnsError("A next hearing venue of somewhere else has been specified but no venue has been selected");
-    }
-
-    @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class, names = {"TELEPHONE", "VIDEO", "PAPER"})
-    void givenCaseWithSelectedVenueSetIncorrectlyForNonFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(AdjournCaseTypeOfHearing nextHearingType) {
-        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
-        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
-        when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
-
-        adjournment.setTypeOfNextHearing(nextHearingType);
-
-        DynamicListItem listItem = new DynamicListItem("someUnknownVenueId", "");
-        DynamicList list = new DynamicList(listItem, List.of(listItem));
-
-        adjournment.setNextHearingVenue(SOMEWHERE_ELSE);
-        adjournment.setNextHearingVenueSelected(list);
-
-        checkDocumentIsNotCreatedAndReturnsError("adjournCaseNextHearingVenueSelected field should not be set");
     }
 
     @ParameterizedTest
