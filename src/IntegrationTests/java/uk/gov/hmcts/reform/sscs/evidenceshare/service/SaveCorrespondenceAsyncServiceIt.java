@@ -59,18 +59,17 @@ class SaveCorrespondenceAsyncServiceIt {
     }
 
     @Test
-    void retriesSaveLetterAndRecoversAfterConfiguredMaxAttemptsAreExceeded() throws NotificationClientException {
+    void retriesSaveLetterAndRecoversWhenUploadFails() throws NotificationClientException {
         NotificationClient client = mock(NotificationClient.class);
         when(client.getPdfForLetter(NOTIFICATION_ID)).thenThrow(new NotificationClientException("500 ServerError"));
 
         saveCorrespondenceAsyncService.saveLetter(client, NOTIFICATION_ID, correspondence, CCD_ID);
 
-        await().atMost(Duration.ofSeconds(5)).untilAsserted(() ->
-            verify(client, times(3)).getPdfForLetter(NOTIFICATION_ID));
-
-        await().atMost(Duration.ofSeconds(5)).untilAsserted(() ->
+        await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
+            verify(client, times(3)).getPdfForLetter(NOTIFICATION_ID);
             verify(ccdNotificationsPdfService)
-                .notifyFailedToRetrieveCorrespondence(Long.valueOf(CCD_ID), NOTIFICATION_ID, CorrespondenceType.Letter));
+                    .notifyFailedToRetrieveCorrespondence(Long.valueOf(CCD_ID), NOTIFICATION_ID, CorrespondenceType.Letter);
+        });
     }
 
     @Test
@@ -85,7 +84,7 @@ class SaveCorrespondenceAsyncServiceIt {
     }
 
     @Test
-    void retriesSaveBulkPrintLetterAndRecoversAfterConfiguredMaxAttemptsAreExceeded() {
+    void retriesSaveBulkPrintLetterAndRecoversWhenUploadFails() {
         doThrow(new RuntimeException("500 ServerError")).when(ccdNotificationsPdfService)
             .mergeLetterCorrespondenceIntoCcdV2(any(byte[].class), any(), any(), any());
 
@@ -113,23 +112,22 @@ class SaveCorrespondenceAsyncServiceIt {
     }
 
     @Test
-    void retriesSaveLettersToReasonableAdjustmentAndRecoversAfterConfiguredMaxAttemptsAreExceeded() {
+    void retriesSaveLettersToReasonableAdjustmentAndRecoversWhenUploadFails() {
         doThrow(new RuntimeException("500 ServerError")).when(ccdNotificationsPdfService)
             .mergeReasonableAdjustmentsCorrespondenceIntoCcdV2(any(byte[].class), any(), any(), any());
 
         saveCorrespondenceAsyncService.saveLettersToReasonableAdjustment(new byte[]{}, correspondence, CCD_ID, SubscriptionType.APPELLANT);
 
-        await().atMost(Duration.ofSeconds(5)).untilAsserted(() ->
+        await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
             verify(ccdNotificationsPdfService, times(3)).mergeReasonableAdjustmentsCorrespondenceIntoCcdV2(
-                any(byte[].class), any(), any(), any()));
-
-        await().atMost(Duration.ofSeconds(5)).untilAsserted(() ->
+                any(byte[].class), any(), any(), any());
             verify(ccdNotificationsPdfService)
-                .notifyFailedToRetrieveCorrespondence(Long.valueOf(CCD_ID), null, CorrespondenceType.Letter));
+                .notifyFailedToRetrieveCorrespondence(Long.valueOf(CCD_ID), null, CorrespondenceType.Letter);
+        });
     }
 
     @Test
-    void retriesSaveEmailOrSmsAndRecoversAfterMaxAttemptsAreExceeded() {
+    void retriesSaveEmailOrSmsAndRecoversWhenUploadFails() {
         doThrow(new RuntimeException("500 ServerError")).when(ccdNotificationsPdfService)
             .mergeCorrespondenceIntoCcdV2(any(), any());
         SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId(CCD_ID).build();
