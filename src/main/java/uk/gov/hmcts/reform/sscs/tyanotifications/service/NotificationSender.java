@@ -139,7 +139,7 @@ public class NotificationSender {
         if (saveCorrespondence && sendSmsResponse != null) {
             final Correspondence correspondence =
                     getSmsCorrespondence(sendSmsResponse, phoneNumber, notificationEventType);
-            log.info("Submitted correspondence sms for upload for case id {}", sscsCaseData.getCcdCaseId());
+            log.info("Submitted sms correspondence for upload for case id {}", sscsCaseData.getCcdCaseId());
             saveCorrespondenceAsyncService.saveEmailOrSms(String.valueOf(sendSmsResponse.getNotificationId()), correspondence, sscsCaseData);
         }
 
