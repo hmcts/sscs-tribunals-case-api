@@ -1,31 +1,15 @@
 
 buildscript {
-    repositories {
-        maven {
-            url = uri('https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1')
-        }
+    def e2eTaskNames = [
+            'runE2eTests',
+            'runE2eTestsNightly',
+            'runAccessibilityTestsNightly'
+    ]
 
-        maven {
-            url = uri('https://plugins.gradle.org/m2/')
-        }
-
-        mavenCentral()
-    }
-
-    /*
-     * E2E tasks are intentionally lightweight.
-     *
-     * Jenkins invokes these directly:
-     *   ./gradlew runE2eTests
-     *   ./gradlew runE2eTestsNightly
-     *   ./gradlew runAccessibilityTestsNightly
-     *
-     * These tasks only need Gradle's Exec task and Yarn.
-     * Do not load the third-party Gradle plugin classpaths for E2E.
-     */
     def isE2eBuild = gradle.startParameter.taskNames.any { taskName ->
-        taskName.contains('runE2eTests') ||
-                taskName.contains('runAccessibilityTestsNightly')
+        e2eTaskNames.any { e2eTask ->
+            taskName == e2eTask || taskName.endsWith(":${e2eTask}")
+        }
     }
 
     if (!isE2eBuild) {
