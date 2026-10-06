@@ -1,8 +1,8 @@
-buildscript {
-    def isIntegrationBuild = gradle.startParameter.taskNames.any {
-        it == 'integration' || it.endsWith(':integration')
-    }
+def isIntegrationBuild = gradle.startParameter.taskNames.any {
+    it == 'integration' || it.endsWith(':integration')
+}
 
+buildscript {
     repositories {
         if (isIntegrationBuild) {
             mavenCentral()
