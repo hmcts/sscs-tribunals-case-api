@@ -14,18 +14,12 @@ def isJenkinsBuild = System.getenv('JENKINS_URL') != null ||
         System.getenv('JENKINS_HOME') != null
 
 buildscript {
-    def e2eTaskNames = [
-            'runE2eTests',
-            'runE2eTestsNightly',
-            'runAccessibilityTestsNightly'
-    ]
-
-    def e2eBuild = gradle.startParameter.taskNames.any { taskName ->
+    def e2eBuildForBuildscript = gradle.startParameter.taskNames.any { taskName ->
         e2eTaskNames.contains(taskName.tokenize(':').last())
     }
 
     repositories {
-        if (!e2eBuild) {
+        if (!e2eBuildForBuildscript) {
             mavenLocal()
             mavenCentral()
             gradlePluginPortal()
@@ -41,7 +35,7 @@ buildscript {
     }
 
     dependencies {
-        if (!e2eBuild) {
+        if (!e2eBuildForBuildscript) {
             classpath 'org.springframework.boot:spring-boot-gradle-plugin:3.5.15'
             classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:7.3.1.8318'
             classpath 'uk.gov.hmcts.reform:gradle-java-plugin:0.12.70'
@@ -55,6 +49,7 @@ buildscript {
         }
     }
 }
+
 group = 'uk.gov.hmcts.reform'
 version = '1.0.0'
 
@@ -71,7 +66,7 @@ if (!isE2eBuild) {
     apply plugin: 'org.owasp.dependencycheck'
     apply plugin: 'au.com.dius.pact'
     apply plugin: 'com.github.hmcts.rse-cft-lib'
-    apply plugin: info.solidsoft.gradle.pitest.PitestPlugin
+    apply plugin: 'info.solidsoft.gradle.pitest'
 
     gitProperties {
         gitPropertiesDir = new File("${project.rootDir}/src/main/resources/uk/gov/hmcts/reform/sscs")
@@ -247,8 +242,6 @@ if (!isE2eBuild) {
 
     // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
     dependencyCheck {
-        // Specifies if the build should be failed if a CVSS score above a specified level is identified.
-        // range of 7-10 fails the build, anything lower and it doesn't fail the build
         failBuildOnCVSS =
                 System.getProperty('dependencyCheck.failBuild', 'true') == 'true' ? 7.0 : 11
 
@@ -258,6 +251,17 @@ if (!isE2eBuild) {
         analyzers.ossIndex.enabled = false
     }
 
+    /*
+     * Jenkins init.gradle sets:
+     *
+     * dependencyResolutionManagement {
+     *     repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+     * }
+     *
+     * and supplies the HMCTS Artifactory repository.
+     *
+     * Therefore don't declare project repositories when running under Jenkins.
+     */
     if (!isJenkinsBuild) {
         repositories {
             mavenLocal()
