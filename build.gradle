@@ -1,26 +1,31 @@
 import java.nio.charset.StandardCharsets
 
+def e2eTaskNames = [
+        'runE2eTests',
+        'runE2eTestsNightly',
+        'runAccessibilityTestsNightly'
+]
+
 def isE2eBuild = gradle.startParameter.taskNames.any { taskName ->
-    taskName == 'runE2eTests' ||
-            taskName == 'runE2eTestsNightly' ||
-            taskName == 'runAccessibilityTestsNightly'
+    e2eTaskNames.contains(taskName.tokenize(':').last())
 }
 
 def isJenkinsBuild = System.getenv('JENKINS_URL') != null ||
         System.getenv('JENKINS_HOME') != null
 
 buildscript {
+    def e2eTaskNames = [
+            'runE2eTests',
+            'runE2eTestsNightly',
+            'runAccessibilityTestsNightly'
+    ]
+
     def e2eBuild = gradle.startParameter.taskNames.any { taskName ->
-        taskName == 'runE2eTests' ||
-                taskName == 'runE2eTestsNightly' ||
-                taskName == 'runAccessibilityTestsNightly'
+        e2eTaskNames.contains(taskName.tokenize(':').last())
     }
 
-    def jenkinsBuild = System.getenv('JENKINS_URL') != null ||
-            System.getenv('JENKINS_HOME') != null
-
     repositories {
-        if (!e2eBuild && !jenkinsBuild) {
+        if (!e2eBuild) {
             mavenLocal()
             mavenCentral()
             gradlePluginPortal()
@@ -50,7 +55,6 @@ buildscript {
         }
     }
 }
-
 group = 'uk.gov.hmcts.reform'
 version = '1.0.0'
 
