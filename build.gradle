@@ -86,7 +86,7 @@ if (!isE2e) {
     apply plugin: 'org.owasp.dependencycheck'
     apply plugin: 'au.com.dius.pact'
     apply plugin: 'com.github.hmcts.rse-cft-lib'
-    apply plugin: 'info.solidsoft.gradle.pitest'
+    apply plugin: 'info.solidsoft.pitest'
 
     gitProperties {
         gitPropertiesDir = new File("${project.rootDir}/src/main/resources/uk/gov/hmcts/reform/sscs")
