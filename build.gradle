@@ -1,10 +1,10 @@
-def isIntegrationBuild = gradle.startParameter.taskNames.any {
+ext.isIntegrationBuild = gradle.startParameter.taskNames.any {
     it == 'integration' || it.endsWith(':integration')
 }
 
 buildscript {
     repositories {
-        if (isIntegrationBuild) {
+        if (project.ext.isIntegrationBuild) {
             mavenCentral()
             gradlePluginPortal()
         }
@@ -14,7 +14,7 @@ buildscript {
         classpath 'org.springframework.boot:spring-boot-gradle-plugin:3.5.16'
         classpath 'io.spring.gradle:dependency-management-plugin:1.1.7'
 
-        if (!isIntegrationBuild) {
+        if (!project.ext.isIntegrationBuild) {
             classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:7.3.1.8318'
             classpath 'uk.gov.hmcts.reform:gradle-java-plugin:0.12.70'
             classpath 'com.gorylenko.gradle-git-properties:gradle-git-properties:2.5.0'
@@ -58,7 +58,7 @@ if (!isE2e) {
     apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
 
-    if (!isIntegrationBuild) {
+    if (!project.ext.isIntegrationBuild) {
         apply plugin: 'org.sonarqube'
         apply plugin: 'uk.gov.hmcts.java'
         apply plugin: 'com.gorylenko.gradle-git-properties'
