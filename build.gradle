@@ -195,17 +195,23 @@ dependencyCheck {
     analyzers.ossIndex.enabled = false
 }
 
-repositories {
+def runningIntegration = gradle.startParameter.taskNames.any {
+    it == 'integration' || it.endsWith(':integration')
+}
 
-    if (gradle.startParameter.taskNames.any { it.contains('integrationTest') }) {
-        mavenCentral()
-    }
+repositories {
     maven {
         url 'https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1'
     }
-    // Requires authentication, if it gets here the library cannot be found!
-    maven {
-        url 'https://repo.spring.io/libs-milestone'
+
+    if (!runningIntegration) {
+        maven {
+            url 'https://repo.spring.io/libs-milestone'
+        }
+    }
+
+    if (runningIntegration) {
+        mavenCentral()
     }
 }
 
