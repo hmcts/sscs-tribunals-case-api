@@ -195,7 +195,9 @@ dependencyCheck {
     analyzers.ossIndex.enabled = false
 }
 
-def runningIntegration = gradle.startParameter.taskNames.any {
+def requestedTasks = gradle.startParameter.taskNames
+
+def isIntegration = requestedTasks.any {
     it == 'integration' || it.endsWith(':integration')
 }
 
@@ -204,13 +206,11 @@ repositories {
         url 'https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1'
     }
 
-    if (!runningIntegration) {
-        maven {
-            url 'https://repo.spring.io/libs-milestone'
-        }
+    maven {
+        url 'https://repo.spring.io/libs-milestone'
     }
 
-    if (runningIntegration) {
+    if (isIntegration) {
         mavenCentral()
     }
 }
