@@ -1,3 +1,4 @@
+
 buildscript {
     repositories {
         maven {
@@ -9,16 +10,20 @@ buildscript {
         }
     }
 
-    def e2eTaskNames = [
-            'runE2eTests',
-            'runE2eTestsNightly',
-            'runAccessibilityTestsNightly'
-    ]
-
+    /*
+     * E2E tasks are intentionally lightweight.
+     *
+     * Jenkins invokes these directly:
+     *   ./gradlew runE2eTests
+     *   ./gradlew runE2eTestsNightly
+     *   ./gradlew runAccessibilityTestsNightly
+     *
+     * These tasks only need Gradle's Exec task and Yarn.
+     * Do not load the third-party Gradle plugin classpaths for E2E.
+     */
     def isE2eBuild = gradle.startParameter.taskNames.any { taskName ->
-        e2eTaskNames.any { e2eTask ->
-            taskName == e2eTask || taskName.endsWith(":${e2eTask}")
-        }
+        taskName.contains('runE2eTests') ||
+                taskName.contains('runAccessibilityTestsNightly')
     }
 
     if (!isE2eBuild) {
@@ -39,16 +44,15 @@ buildscript {
 
 import java.nio.charset.StandardCharsets
 
-def e2eTaskNames = [
-        'runE2eTests',
-        'runE2eTestsNightly',
-        'runAccessibilityTestsNightly'
-]
-
+/*
+ * Keep this detection in sync with the buildscript detection above.
+ *
+ * Integration tests are NOT E2E and therefore use the full build
+ * configuration and all required Gradle plugins.
+ */
 def isE2e = gradle.startParameter.taskNames.any { taskName ->
-    e2eTaskNames.any { e2eTask ->
-        taskName == e2eTask || taskName.endsWith(":${e2eTask}")
-    }
+    taskName.contains('runE2eTests') ||
+            taskName.contains('runAccessibilityTestsNightly')
 }
 
 /*
@@ -63,6 +67,13 @@ static def getCheckedOutGitCommitHash() {
 
 if (!isE2e) {
 
+    /*
+     * Full build plugins.
+     *
+     * These are deliberately skipped for E2E builds so that the E2E
+     * Jenkins job does not resolve unnecessary plugin implementation
+     * dependencies from Maven Central.
+     */
     apply plugin: 'application'
     apply plugin: 'pmd'
     apply plugin: 'org.sonarqube'
@@ -248,7 +259,6 @@ if (!isE2e) {
         }
     }
 
-    // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
     dependencyCheck {
         failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild', 'true') == 'true' ? 7.0 : 11
         suppressionFile = 'config/owasp/suppressions.xml'
@@ -257,6 +267,17 @@ if (!isE2e) {
         analyzers.ossIndex.enabled = false
     }
 
+    /*
+     * Repository policy:
+     *
+     * Normal build/test:
+     *   HMCTS Artifactory only
+     *
+     * Integration:
+     *   HMCTS Artifactory + Maven Central
+     *
+     * E2E never reaches this block.
+     */
     def requestedTasks = gradle.startParameter.taskNames
 
     def isIntegration = requestedTasks.any {
