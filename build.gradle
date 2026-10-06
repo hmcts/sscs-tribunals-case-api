@@ -1,28 +1,38 @@
+import uk.gov.hmcts.rse.AuthMode
+import java.nio.charset.StandardCharsets
 
+def isE2e = gradle.startParameter.taskNames.any { taskName ->
+    taskName.contains('runE2eTests') ||
+            taskName.contains('runAccessibilityTestsNightly')
+}
 
+/*
+ * The original plugins {} block has been replaced with buildscript/apply plugin
+ * so that E2E tasks do not need to resolve the Java/third-party Gradle plugins.
+ *
+ * Normal builds and integration continue to load exactly the same plugins.
+ */
 buildscript {
-    def isIntegrationBuild = gradle.startParameter.taskNames.any {
-        it == 'integration' || it.endsWith(':integration')
-    }
-
     repositories {
-        if (isIntegrationBuild) {
+        if (!isE2e) {
+            mavenLocal()
             mavenCentral()
             gradlePluginPortal()
+
+            maven {
+                url 'https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1'
+            }
+
+            maven {
+                url 'https://repo.spring.io/libs-milestone'
+            }
         }
     }
 
     dependencies {
-        classpath 'org.springframework.boot:spring-boot-gradle-plugin:3.5.16'
-        classpath 'io.spring.gradle:dependency-management-plugin:1.1.7'
-
-        /*
-         * These plugins are not required to compile/run integration tests.
-         *
-         * They are deliberately not loaded for integration builds so that
-         * the integration build can resolve its dependencies from Maven Central.
-         */
-        if (!isIntegrationBuild) {
+        if (!isE2e) {
+            classpath 'org.springframework.boot:spring-boot-gradle-plugin:3.5.16'
+            classpath 'io.spring.gradle:dependency-management-plugin:1.1.7'
             classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:7.3.1.8318'
             classpath 'uk.gov.hmcts.reform:gradle-java-plugin:0.12.70'
             classpath 'com.gorylenko.gradle-git-properties:gradle-git-properties:2.5.0'
@@ -35,58 +45,29 @@ buildscript {
     }
 }
 
-import java.nio.charset.StandardCharsets
-
-/*
- * Keep this detection in sync with the buildscript detection above.
- */
-def isIntegrationBuild = gradle.startParameter.taskNames.any {
-    it == 'integration' || it.endsWith(':integration')
-}
-
-/*
- * E2E builds intentionally avoid the normal Java/Spring build configuration.
- */
-def isE2e = gradle.startParameter.taskNames.any { taskName ->
-    taskName.contains('runE2eTests') ||
-            taskName.contains('runAccessibilityTestsNightly')
-}
-
-/*
- * This method MUST remain outside conditional closures.
- */
-static def getCheckedOutGitCommitHash() {
-    'git rev-parse --verify --short HEAD'.execute().text.trim()
-}
-
-
-/*
- * ========================================================================
- * Normal Java/Spring build
- * ========================================================================
- *
- * E2E tasks intentionally do not enter this block.
- */
 if (!isE2e) {
-
     apply plugin: 'application'
     apply plugin: 'pmd'
+    apply plugin: 'org.sonarqube'
     apply plugin: 'jacoco'
     apply plugin: 'org.springframework.boot'
+    apply plugin: 'uk.gov.hmcts.java'
     apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'com.gorylenko.gradle-git-properties'
+    apply plugin: 'com.github.ben-manes.versions'
+    apply plugin: 'org.owasp.dependencycheck'
+    apply plugin: 'au.com.dius.pact'
+    apply plugin: 'com.github.hmcts.rse-cft-lib'
+    apply plugin: 'info.solidsoft.pitest'
+}
 
-    /*
-     * These plugins are deliberately excluded from integration builds.
-     */
-    if (!isIntegrationBuild) {
-        apply plugin: 'org.sonarqube'
-        apply plugin: 'uk.gov.hmcts.java'
-        apply plugin: 'com.gorylenko.gradle-git-properties'
-        apply plugin: 'com.github.ben-manes.versions'
-        apply plugin: 'org.owasp.dependencycheck'
-        apply plugin: 'au.com.dius.pact'
-        apply plugin: 'com.github.hmcts.rse-cft-lib'
-        apply plugin: 'info.solidsoft.pitest'
+if (!isE2e) {
+
+    gitProperties {
+        gitPropertiesDir = new File("${project.rootDir}/src/main/resources/uk/gov/hmcts/reform/sscs")
+        keys = ['git.commit.id', 'git.commit.time']
+        dateFormat = "yyyy-MM-dd'T'HH:mmZ"
+        dateFormatTimeZone = "GMT"
     }
 
     group = 'uk.gov.hmcts.reform'
@@ -99,7 +80,7 @@ if (!isE2e) {
     }
 
     compileJava {
-        options.compilerArgs << '-parameters' << '-Xlint:deprecation' << '-Xlint:unchecked'
+        options.compilerArgs << '-parameters' << '-Xlint:deprecation' << "-Xlint:unchecked"
     }
 
     compileTestJava {
@@ -113,10 +94,6 @@ if (!isE2e) {
     application {
         mainClass.set('uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication')
 
-        /*
-         * Required for Azure Windows Server where the default character
-         * encoding may otherwise be windows-1252.
-         */
         applicationDefaultJvmArgs = ["-Dfile.encoding=UTF-8"]
     }
 
@@ -172,13 +149,9 @@ if (!isE2e) {
     }
 
     tasks.register('integration', Test) {
-        group = 'Verification'
-        description = 'Runs integration tests'
-
         jvmArgs = ['-Xms1024m', '-Xmx2048m']
         maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
         forkEvery = 10
-
         setTestClassesDirs(sourceSets.integrationTest.output.classesDirs)
         setClasspath(sourceSets.integrationTest.runtimeClasspath)
     }
@@ -186,39 +159,30 @@ if (!isE2e) {
     tasks.register('functional', Test) {
         group = 'Functional Tests'
         description = 'Executes non-destructive functional tests in AAT against a running CCD and notification service'
-
         setTestClassesDirs(sourceSets.functionalTest.output.classesDirs)
         setClasspath(sourceSets.functionalTest.runtimeClasspath)
-
         include "uk/gov/hmcts/reform/sscs/functional/**"
         include "uk/gov/hmcts/reform/sscs/controllers/**"
         include "uk/gov/hmcts/reform/sscs/bulkscan/**"
-        include "uk/gov/hmcts/reform/sscs/smoke/**"
         exclude "uk/gov/hmcts/reform/sscs/smoke/**"
-
         maxParallelForks = Runtime.runtime.availableProcessors()
     }
 
     tasks.register('verifyNotifications', Test) {
         group = 'Notifications verification Tests'
         description = 'Simulates CCD callbacks to generate notifications, then retrieves pdfs from Gov.Notify'
-
         setTestClassesDirs(sourceSets.functionalTest.output.classesDirs)
         setClasspath(sourceSets.functionalTest.runtimeClasspath)
-
         include "uk/gov/hmcts/reform/sscs/notifications/**"
         exclude "uk/gov/hmcts/reform/sscs/smoke/**"
-
         maxParallelForks = Runtime.runtime.availableProcessors()
     }
 
     tasks.register('smoke', Test) {
         group = 'verification'
         description = 'Executes non-destructive smoke tests against a running Tribunal Case API'
-
         setTestClassesDirs(sourceSets.functionalTest.output.classesDirs)
         setClasspath(sourceSets.functionalTest.runtimeClasspath)
-
         include "uk/gov/hmcts/reform/sscs/smoke/**"
         exclude "uk/gov/hmcts/reform/sscs/functional/**"
     }
@@ -226,9 +190,7 @@ if (!isE2e) {
     tasks.register('contract', Test) {
         description = "Runs the consumer Pact tests"
         group = 'Verification'
-
         useJUnitPlatform()
-
         testClassesDirs = sourceSets.contractTest.output.classesDirs
         classpath = sourceSets.contractTest.runtimeClasspath
     }
@@ -245,287 +207,146 @@ if (!isE2e) {
 
     jacocoTestReport {
         executionData(test, integration)
-
         reports {
             xml.required = true
             csv.required = false
-            xml.outputLocation = layout.buildDirectory.file(
-                    "reports/jacoco/test/jacocoTestReport.xml"
-            )
+            xml.outputLocation = layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml")
         }
     }
 
-    /*
-     * ====================================================================
-     * Normal-build-only plugin configuration
-     * ====================================================================
-     *
-     * None of the following extensions/tasks exist during integration
-     * builds because their plugins are not loaded.
-     */
-    if (!isIntegrationBuild) {
-
-        gitProperties {
-            gitPropertiesDir = new File(
-                    "${project.rootDir}/src/main/resources/uk/gov/hmcts/reform/sscs"
-            )
-            keys = ['git.commit.id', 'git.commit.time']
-            dateFormat = "yyyy-MM-dd'T'HH:mmZ"
-            dateFormatTimeZone = "GMT"
-        }
-
-        dependencyUpdates.resolutionStrategy = {
-            componentSelection { rules ->
-                rules.all {
-                    def isNonStable = { String version ->
-                        def stableKeyword = ['RELEASE', 'FINAL', 'GA'].any {
-                            qualifier -> version.toUpperCase().contains(qualifier)
-                        }
-
-                        def regex = /^[0-9,.v-]+(-r)?$/
-
-                        return !stableKeyword && !(version ==~ regex)
+    dependencyUpdates.resolutionStrategy = {
+        componentSelection { rules ->
+            rules.all {
+                def isNonStable = { String version ->
+                    def stableKeyword = ['RELEASE', 'FINAL', 'GA'].any {
+                        qualifier -> version.toUpperCase().contains(qualifier)
                     }
-
-                    if (isNonStable(candidate.version) && !isNonStable(currentVersion)) {
-                        selection.reject('Release candidate')
-                    }
+                    def regex = /^[0-9,.v-]+(-r)?$/
+                    return !stableKeyword && !(version ==~ regex)
                 }
-            }
-        }
 
-        dependencyCheck {
-            failBuildOnCVSS =
-                    System.getProperty('dependencyCheck.failBuild', 'true') == 'true'
-                            ? 7.0
-                            : 11
-
-            suppressionFile = 'config/owasp/suppressions.xml'
-            nvd.validForHours = 24
-            analyzers.retirejs.enabled = false
-            analyzers.ossIndex.enabled = false
-        }
-
-        project.tasks.named('pitest') {
-            group = "Verification"
-        }
-
-        pitest {
-            targetClasses = ['uk.gov.hmcts.reform.sscs.*']
-
-            excludedClasses = [
-                    'uk.gov.hmcts.reform.sscs.config.*',
-                    'uk.gov.hmcts.reform.sscs.bulkscancore.domain.*',
-                    'uk.gov.hmcts.reform.sscs.domain.*',
-                    'uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication'
-            ]
-
-            threads = 10
-            outputFormats = ['XML', 'HTML']
-            timestampedReports = false
-            mutationThreshold = 90
-        }
-
-        project.tasks.named('sonarqube') {
-            dependsOn test, jacocoTestReport
-        }
-
-        sonarqube {
-            properties {
-                property "sonar.projectName", "SSCS - Tribunals Case Api"
-                property "sonar.projectKey", "SSCSTCA"
-                property "sonar.coverage.jacoco.xmlReportPaths",
-                        "${jacocoTestReport.reports.xml.outputLocation}"
-
-                property "sonar.exclusions",
-                        "**/CreateCaseException.java," +
-                                "src/main/java/uk/gov/hmcts/reform/sscs/domain/**," +
-                                "src/main/java/uk/gov/hmcts/reform/sscs/evidenceshare/domain/**," +
-                                "src/main/java/uk/gov/hmcts/reform/sscs/TribunalsCaseApiApplication.java," +
-                                "src/main/java/uk/gov/hmcts/reform/sscs/email/Email.java," +
-                                "src/main/java/uk/gov/hmcts/reform/sscs/config/**/*.java," +
-                                "src/main/java/uk/gov/hmcts/reform/sscs/model/**/*.java," +
-                                "src/main/java/uk/gov/hmcts/reform/sscs/evidenceshare/model/**/*.java," +
-                                "src/main/java/uk/gov/hmcts/reform/sscs/service/EvidenceUploadService.java," +
-                                "src/main/java/uk/gov/hmcts/reform/sscs/service/OnlineHearingService.java," +
-                                "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/data/EvidenceDescriptionPdfData.java," +
-                                "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/StoreAppellantStatementService.java," +
-                                "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/StorePdfService.java," +
-                                "src/main/java/uk/gov/hmcts/reform/sscs/service/servicebus/SessionAwareServiceBusMessagingService.java," +
-                                "src/main/java/uk/gov/hmcts/reform/sscs/service/coversheet/PdfCoverSheet.java," +
-                                "src/main/java/uk/gov/hmcts/reform/sscs/service/HmcHearingApiService.java," +
-                                "src/main/java/uk/gov/hmcts/reform/sscs/controllers/CreateCaseController.java," +
-                                "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/data/PdfData.java," +
-                                "src/main/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/writefinaldecision/esa/EsaWriteFinalDecisionMidEventValidationHandler.java," +
-                                "src/main/java/uk/gov/hmcts/reform/sscs/evidenceshare/config/**," +
-                                "src/main/java/uk/gov/hmcts/reform/sscs/service/servicebus/messaging/**," +
-                                "src/main/java/uk/gov/hmcts/reform/sscs/docmosis/domain/**," +
-                                "src/main/java/uk/gov/hmcts/reform/sscs/docmosis/config/**," +
-                                "src/main/java/uk/gov/hmcts/reform/sscs/EnvironmentPropertiesPrinter.java," +
-                                "src/main/java/uk/gov/hmcts/reform/sscs/controller/FunctionalTestController.java," +
-                                "src/main/java/uk/gov/hmcts/reform/sscs/tyanotifications/utils/GetAllTemplatesFromNotify.java," +
-                                "src/main/java/uk/gov/hmcts/reform/sscs/bulkscan/domain/**," +
-                                "src/main/java/uk/gov/hmcts/reform/sscs/bulkscan/bulkscancore/domain/**,"
-
-                property "sonar.host.url",
-                        "https://sonar.reform.hmcts.net/"
-            }
-        }
-
-        tasks.register('installLocalGitHook', Copy) {
-            from new File(rootProject.rootDir, 'config/git/pre-commit')
-            into { new File(rootProject.rootDir, '.git/hooks') }
-            fileMode 0775
-        }
-
-        generateGitProperties.dependsOn installLocalGitHook
-        compileJava.dependsOn installLocalGitHook
-
-        tasks.register('runGitPreCommitTasks') {
-            dependsOn 'pmdMain'
-            dependsOn 'pmdTest'
-            dependsOn 'checkstyleMain'
-            dependsOn 'checkstyleTest'
-        }
-
-        /*
-         * Pact configuration.
-         */
-        project.ext {
-            pacticipant = 'sscs_tribunalsCaseApi'
-            pacticipantVersion = getCheckedOutGitCommitHash()
-        }
-
-        pact {
-            broker {
-                pactBrokerUrl =
-                        System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
-            }
-
-            publish {
-                pactDirectory = 'pacts'
-                tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
-                version = project.pacticipantVersion
-            }
-        }
-
-        tasks.register('runAndPublishConsumerPactTests', Test) {
-            logger.lifecycle("Runs pact Tests")
-            testClassesDirs = sourceSets.contractTest.output.classesDirs
-            classpath = sourceSets.contractTest.runtimeClasspath
-        }
-
-        runAndPublishConsumerPactTests.dependsOn contract
-        runAndPublishConsumerPactTests.finalizedBy pactPublish
-
-        /*
-         * RSE / CCD configuration.
-         */
-        tasks.register('generateXls', Exec) {
-            commandLine project.file('./bin/create-xlsx.sh').path, 'benefit', 'dev', 'local'
-        }
-
-        bootWithCCD {
-            group 'application'
-            dependsOn generateXls
-
-            def authModeClass =
-                    project.buildscript.classLoader.loadClass(
-                            'uk.gov.hmcts.rse.AuthMode'
-                    )
-
-            authMode = authModeClass.getEnumConstants()
-                    .find { it.name() == 'Local' }
-
-            doFirst() {
-                if (!project.file('./.aat-env').exists()) {
-                    new ByteArrayOutputStream().withStream { os ->
-                        exec {
-                            commandLine 'az', 'keyvault', 'secret', 'show',
-                                    '--vault-name', 'sscs-aat',
-                                    '-o', 'tsv',
-                                    '--query', 'value',
-                                    '--name', 'sscs-tribunals-case-api-dot-env'
-
-                            standardOutput = os
-                        }
-
-                        project.file('./.aat-env').write(
-                                new String(
-                                        os.toString()
-                                                .replace('\n', '')
-                                                .decodeBase64(),
-                                        StandardCharsets.UTF_8
-                                )
-                        )
-                    }
-                }
-            }
-
-            project.file('./.aat-env').readLines().each() {
-                def index = it.indexOf("=")
-                def key = it.substring(0, index)
-                def value = it.substring(index + 1)
-
-                environment key, value
-            }
-        }
-
-        /*
-         * Extra CCD logging.
-         *
-         * Uncomment to launch with debug:
-         *
-         * jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006']
-         *
-         * Uncomment for CCD callback logging:
-         *
-         * environment 'LOG_CALLBACK_DETAILS', '*'
-         */
-
-        def fileLogger = [onOutput: {
-            File logfile = new File('gradle-build.log')
-            logfile << it
-        }] as StandardOutputListener
-
-        logging.addStandardOutputListener(fileLogger)
-
-        gradle.taskGraph.whenReady { taskGraph ->
-            taskGraph.allTasks.each { Task t ->
-                t.doFirst {
-                    logging.addStandardOutputListener(fileLogger)
+                if (isNonStable(candidate.version) && !isNonStable(currentVersion)) {
+                    selection.reject('Release candidate')
                 }
             }
         }
     }
 
-    /*
-     * Repository policy:
-     *
-     * Normal build:
-     *   HMCTS Artifactory is supplied by the Jenkins init script.
-     *
-     * Integration:
-     *   Maven Central.
-     *
-     * E2E:
-     *   This block is never evaluated.
-     */
+    dependencyCheck {
+        failBuildOnCVSS =
+                System.getProperty('dependencyCheck.failBuild', 'true') == 'true' ? 7.0 : 11
+
+        suppressionFile = 'config/owasp/suppressions.xml'
+        nvd.validForHours = 24
+        analyzers.retirejs.enabled = false
+        analyzers.ossIndex.enabled = false
+    }
+
     repositories {
-        if (isIntegrationBuild) {
-            mavenCentral()
+        mavenLocal()
+        mavenCentral()
+
+        maven {
+            url 'https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1'
+        }
+
+        maven {
+            url 'https://repo.spring.io/libs-milestone'
+        }
+    }
+
+    project.tasks.named('pitest') {
+        group = "Verification"
+    }
+
+    pitest {
+        targetClasses = ['uk.gov.hmcts.reform.sscs.*']
+
+        excludedClasses = [
+                'uk.gov.hmcts.reform.sscs.config.*',
+                'uk.gov.hmcts.reform.sscs.bulkscancore.domain.*',
+                'uk.gov.hmcts.reform.sscs.domain.*',
+                'uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication'
+        ]
+
+        threads = 10
+        outputFormats = ['XML', 'HTML']
+        timestampedReports = false
+        mutationThreshold = 90
+    }
+
+    processResources.dependsOn(generateGitProperties)
+
+    project.tasks.named('sonarqube') {
+        dependsOn test, jacocoTestReport
+    }
+
+    checkstyleMain.shouldRunAfter(compileJava)
+    test.shouldRunAfter(checkstyleTest)
+
+    sonarqube {
+        properties {
+            property "sonar.projectName", "SSCS - Tribunals Case Api"
+            property "sonar.projectKey", "SSCSTCA"
+            property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.outputLocation}"
+
+            property "sonar.exclusions",
+                    "**/CreateCaseException.java," +
+                            "src/main/java/uk/gov/hmcts/reform/sscs/domain/**," +
+                            "src/main/java/uk/gov/hmcts/reform/sscs/evidenceshare/domain/**," +
+                            "src/main/java/uk/gov/hmcts/reform/sscs/TribunalsCaseApiApplication.java," +
+                            "src/main/java/uk/gov/hmcts/reform/sscs/email/Email.java," +
+                            "src/main/java/uk/gov/hmcts/reform/sscs/config/**/*.java," +
+                            "src/main/java/uk/gov/hmcts/reform/sscs/model/**/*.java," +
+                            "src/main/java/uk/gov/hmcts/reform/sscs/evidenceshare/model/**/*.java," +
+                            "src/main/java/uk/gov/hmcts/reform/sscs/service/EvidenceUploadService.java," +
+                            "src/main/java/uk/gov/hmcts/reform/sscs/service/OnlineHearingService.java," +
+                            "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/data/EvidenceDescriptionPdfData.java," +
+                            "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/StoreAppellantStatementService.java," +
+                            "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/StorePdfService.java," +
+                            "src/main/java/uk/gov/hmcts/reform/sscs/service/servicebus/SessionAwareServiceBusMessagingService.java," +
+                            "src/main/java/uk/gov/hmcts/reform/sscs/service/coversheet/PdfCoverSheet.java," +
+                            "src/main/java/uk/gov/hmcts/reform/sscs/service/HmcHearingApiService.java," +
+                            "src/main/java/uk/gov/hmcts/reform/sscs/controllers/CreateCaseController.java," +
+                            "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/data/PdfData.java," +
+                            "src/main/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/writefinaldecision/esa/EsaWriteFinalDecisionMidEventValidationHandler.java," +
+                            "src/main/java/uk/gov/hmcts/reform/sscs/evidenceshare/config/**," +
+                            "src/main/java/uk/gov/hmcts/reform/sscs/service/servicebus/messaging/**," +
+                            "src/main/java/uk/gov/hmcts/reform/sscs/docmosis/domain/**," +
+                            "src/main/java/uk/gov/hmcts/reform/sscs/docmosis/config/**," +
+                            "src/main/java/uk/gov/hmcts/reform/sscs/EnvironmentPropertiesPrinter.java," +
+                            "src/main/java/uk/gov/hmcts/reform/sscs/controller/FunctionalTestController.java," +
+                            "src/main/java/uk/gov/hmcts/reform/sscs/tyanotifications/utils/GetAllTemplatesFromNotify.java," +
+                            "src/main/java/uk/gov/hmcts/reform/sscs/bulkscan/domain/**," +
+                            "src/main/java/uk/gov/hmcts/reform/sscs/bulkscan/bulkscancore/domain/**,"
+
+            property "sonar.host.url", "https://sonar.reform.hmcts.net/"
         }
     }
 
     configurations {
         integrationTestImplementation.extendsFrom(testImplementation)
         integrationTestRuntimeOnly.extendsFrom(testRuntimeOnly)
-
         functionalTestImplementation.extendsFrom(testImplementation)
         functionalTestRuntimeOnly.extendsFrom(testRuntimeOnly)
-
         contractTestImplementation.extendsFrom(testImplementation)
         contractTestRuntimeOnly.extendsFrom(testRuntimeOnly)
+    }
+
+    tasks.register('installLocalGitHook', Copy) {
+        from new File(rootProject.rootDir, 'config/git/pre-commit')
+        into { new File(rootProject.rootDir, '.git/hooks') }
+        fileMode 0775
+    }
+
+    generateGitProperties.dependsOn installLocalGitHook
+    compileJava.dependsOn installLocalGitHook
+
+    tasks.register('runGitPreCommitTasks') {
+        dependsOn 'pmdMain'
+        dependsOn 'pmdTest'
+        dependsOn 'checkstyleMain'
+        dependsOn 'checkstyleTest'
     }
 
     dependencyManagement {
@@ -534,7 +355,6 @@ if (!isE2e) {
                 mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2025.0.2'
             }
 
-            // CVE-2023-36415, CVE-2024-35255
             dependency group: 'com.azure',
                     name: 'azure-identity',
                     version: '1.18.3'
@@ -543,9 +363,6 @@ if (!isE2e) {
                     name: 'msal4j',
                     version: '1.24.1'
 
-            // CVE-2026-66274, CVE-2026-66273, CVE-2026-63140,
-            // CVE-2026-66276, CVE-2026-66275, CVE-2026-66277,
-            // CVE-2026-66257
             dependency group: 'org.apache.qpid',
                     name: 'proton-j',
                     version: '0.35.0'
@@ -554,7 +371,6 @@ if (!isE2e) {
                     name: 'httpclient5',
                     version: '5.6.4'
 
-            // CVE-2026-54399, CVE-2026-54428
             dependencySet(
                     group: 'org.apache.httpcomponents.core5',
                     version: '5.4.3'
@@ -566,7 +382,6 @@ if (!isE2e) {
     }
 
     ext {
-        // CVE-2026-59878, CVE-2026-61487
         set('activemq.version', '6.3.2')
         set('netty.version', '4.2.18.Final')
         set('log4j2.version', '2.26.1')
@@ -586,9 +401,6 @@ if (!isE2e) {
     ]
 
     dependencies {
-
-        integrationTestImplementation(sourceSets.test.output)
-        functionalTestImplementation(sourceSets.test.output)
 
         implementation group: 'org.springframework.boot',
                 name: 'spring-boot-autoconfigure',
@@ -708,16 +520,17 @@ if (!isE2e) {
 
         implementation group: 'com.github.hmcts',
                 name: 'befta-fw',
-                version: '9.2.6', {
-            exclude group: 'org.apache.commons', module: 'commons-compress'
-            exclude group: 'com.google.guava', module: 'guava'
-            exclude group: 'org.apache.poi', module: 'poi-ooxml'
-            exclude group: 'org.apache.poi', module: 'poi'
-            exclude group: 'com.launchdarkly', module: 'launchdarkly-java-server-sdk'
-            exclude group: 'org.codehaus.groovy', module: 'groovy-xml'
-            exclude group: 'io.cucumber', module: 'cucumber-core'
-            exclude group: 'io.cucumber', module: 'cucumber-java'
-        }
+                version: '9.2.6',
+                {
+                    exclude group: 'org.apache.commons', module: 'commons-compress'
+                    exclude group: 'com.google.guava', module: 'guava'
+                    exclude group: 'org.apache.poi', module: 'poi-ooxml'
+                    exclude group: 'org.apache.poi', module: 'poi'
+                    exclude group: 'com.launchdarkly', module: 'launchdarkly-java-server-sdk'
+                    exclude group: 'org.codehaus.groovy', module: 'groovy-xml'
+                    exclude group: 'io.cucumber', module: 'cucumber-core'
+                    exclude group: 'io.cucumber', module: 'cucumber-java'
+                }
 
         implementation platform(
                 group: 'io.cucumber',
@@ -929,12 +742,16 @@ if (!isE2e) {
                 name: 'fuzzywuzzy',
                 version: '1.4.0'
 
+        contractTestImplementation sourceSets.main.runtimeClasspath
+        contractTestImplementation sourceSets.test.runtimeClasspath
+
+        cftlibImplementation group: 'org.springframework.boot',
+                name: 'spring-boot-devtools',
+                version: versions.springboot
+
         testImplementation group: 'org.springframework.boot',
                 name: 'spring-boot-starter-quartz',
                 version: versions.springboot
-
-        contractTestImplementation sourceSets.main.runtimeClasspath
-        contractTestImplementation sourceSets.test.runtimeClasspath
 
         contractTestImplementation group: 'org.springframework.boot',
                 name: 'spring-boot-starter-test',
@@ -942,9 +759,10 @@ if (!isE2e) {
 
         testImplementation group: 'org.springframework.boot',
                 name: 'spring-boot-starter-test',
-                version: versions.springboot, {
-            exclude group: 'com.vaadin.external.google', module: 'android-json'
-        }
+                version: versions.springboot,
+                {
+                    exclude group: 'com.vaadin.external.google', module: 'android-json'
+                }
 
         testImplementation group: 'io.rest-assured',
                 name: 'json-path',
@@ -957,6 +775,42 @@ if (!isE2e) {
         testImplementation group: 'io.rest-assured',
                 name: 'xml-path',
                 version: '5.5.5'
+
+        testImplementation group: 'com.github.hmcts',
+                name: 'fortify-client',
+                version: '1.4.10',
+                classifier: 'all',
+                {
+                    exclude group: 'commons-io', module: 'commons-io'
+                }
+
+        testImplementation group: 'org.apache.httpcomponents.client5',
+                name: 'httpclient5-fluent',
+                version: '5.6.3'
+
+        testImplementation group: 'net.javacrumbs.json-unit',
+                name: 'json-unit',
+                version: '4.1.1'
+
+        testImplementation group: 'net.javacrumbs.json-unit',
+                name: 'json-unit-assertj',
+                version: '4.1.1'
+
+        testImplementation group: 'org.assertj',
+                name: 'assertj-core',
+                version: '3.27.7'
+
+        testImplementation group: 'org.awaitility',
+                name: 'awaitility',
+                version: '4.3.0'
+
+        testImplementation group: 'org.mockito',
+                name: 'mockito-core',
+                version: '5.21.0'
+
+        testImplementation group: 'org.mockito',
+                name: 'mockito-junit-jupiter',
+                version: '5.21.0'
 
         testImplementation group: 'com.github.tomakehurst',
                 name: 'wiremock-standalone',
@@ -992,33 +846,25 @@ if (!isE2e) {
         testRuntimeOnly group: 'org.junit.jupiter',
                 name: 'junit-jupiter-engine'
 
-        testImplementation group: 'net.javacrumbs.json-unit',
-                name: 'json-unit',
-                version: '4.1.1'
+        contractTestImplementation group: 'au.com.dius.pact.consumer',
+                name: 'junit5',
+                version: '4.6.19'
 
-        testImplementation group: 'net.javacrumbs.json-unit',
-                name: 'json-unit-assertj',
-                version: '4.1.1'
+        contractTestRuntimeOnly group: 'au.com.dius.pact.consumer',
+                name: 'junit5',
+                version: '4.6.19'
 
-        testImplementation group: 'org.assertj',
-                name: 'assertj-core',
-                version: '3.27.7'
+        testImplementation group: 'info.solidsoft.gradle.pitest',
+                name: 'gradle-pitest-plugin',
+                version: pitest.pitestVersion.get()
 
-        testImplementation group: 'org.awaitility',
-                name: 'awaitility',
-                version: '4.3.0'
+        testImplementation group: 'org.codehaus.sonar-plugins',
+                name: 'sonar-pitest-plugin',
+                version: '0.5'
 
-        testImplementation group: 'org.mockito',
-                name: 'mockito-core',
-                version: '5.21.0'
-
-        testImplementation group: 'org.mockito',
-                name: 'mockito-junit-jupiter',
-                version: '5.21.0'
-
-        testImplementation group: 'org.apache.httpcomponents.client5',
-                name: 'httpclient5-fluent',
-                version: '5.6.3'
+        testImplementation group: 'org.pitest',
+                name: 'pitest',
+                version: '1.20.1'
 
         testImplementation group: 'com.typesafe',
                 name: 'config',
@@ -1032,86 +878,9 @@ if (!isE2e) {
                 name: 'rerunner-jupiter',
                 version: '2.1.6'
 
-        /*
-         * Pact dependencies are only needed for normal/contract builds.
-         */
-        if (!isIntegrationBuild) {
-            contractTestImplementation group: 'au.com.dius.pact.consumer',
-                    name: 'junit5',
-                    version: '4.6.19'
-
-            contractTestRuntimeOnly group: 'au.com.dius.pact.consumer',
-                    name: 'junit5',
-                    version: '4.6.19'
-        }
-
-        /*
-         * Plugin-provided configurations.
-         *
-         * These configurations do not exist during integration builds.
-         */
-        if (!isIntegrationBuild) {
-            cftlibImplementation group: 'org.springframework.boot',
-                    name: 'spring-boot-devtools',
-                    version: versions.springboot
-
-            cftlibAnnotationProcessor group: 'org.projectlombok',
-                    name: 'lombok',
-                    version: versions.lombok
-
-            functionalTestAnnotationProcessor group: 'org.projectlombok',
-                    name: 'lombok',
-                    version: versions.lombok
-
-            functionalTestImplementation group: 'org.projectlombok',
-                    name: 'lombok',
-                    version: versions.lombok
-
-            integrationTestAnnotationProcessor group: 'org.projectlombok',
-                    name: 'lombok',
-                    version: versions.lombok
-
-            testAnnotationProcessor group: 'org.projectlombok',
-                    name: 'lombok',
-                    version: versions.lombok
-
-            contractTestImplementation sourceSets.main.runtimeClasspath
-            contractTestImplementation sourceSets.test.runtimeClasspath
-
-            testImplementation group: 'com.github.hmcts',
-                    name: 'fortify-client',
-                    version: '1.4.10',
-                    classifier: 'all', {
-                exclude group: 'commons-io', module: 'commons-io'
-            }
-
-            testImplementation group: 'info.solidsoft.gradle.pitest',
-                    name: 'gradle-pitest-plugin',
-                    version: pitest.pitestVersion.get()
-
-            testImplementation group: 'org.codehaus.sonar-plugins',
-                    name: 'sonar-pitest-plugin',
-                    version: '0.5'
-
-            testImplementation group: 'org.pitest',
-                    name: 'pitest',
-                    version: '1.20.1'
-        }
-
-        /*
-         * These are ordinary Lombok/test dependencies and do not depend
-         * on the skipped plugins.
-         */
-        testAnnotationProcessor group: 'org.projectlombok',
+        cftlibAnnotationProcessor group: 'org.projectlombok',
                 name: 'lombok',
                 version: versions.lombok
-
-        testImplementation group: 'org.projectlombok',
-                name: 'lombok',
-                version: versions.lombok
-
-        integrationTestImplementation sourceSets.main.runtimeClasspath
-        integrationTestImplementation sourceSets.test.runtimeClasspath
 
         functionalTestAnnotationProcessor group: 'org.projectlombok',
                 name: 'lombok',
@@ -1124,6 +893,17 @@ if (!isE2e) {
         integrationTestAnnotationProcessor group: 'org.projectlombok',
                 name: 'lombok',
                 version: versions.lombok
+
+        testAnnotationProcessor group: 'org.projectlombok',
+                name: 'lombok',
+                version: versions.lombok
+
+        testImplementation group: 'org.projectlombok',
+                name: 'lombok',
+                version: versions.lombok
+
+        integrationTestImplementation sourceSets.main.runtimeClasspath
+        integrationTestImplementation sourceSets.test.runtimeClasspath
     }
 
     bootJar {
@@ -1135,36 +915,124 @@ if (!isE2e) {
         }
     }
 
-    /*
-     * Configuration inheritance is required by the test source sets and
-     * does not depend on the optional HMCTS plugins.
-     */
-    configurations {
-        integrationTestImplementation.extendsFrom(testImplementation)
-        integrationTestRuntimeOnly.extendsFrom(testRuntimeOnly)
+    project.ext {
+        pacticipant = 'sscs_tribunalsCaseApi'
+        pacticipantVersion = getCheckedOutGitCommitHash()
+    }
 
-        functionalTestImplementation.extendsFrom(testImplementation)
-        functionalTestRuntimeOnly.extendsFrom(testRuntimeOnly)
+    tasks.register('runAndPublishConsumerPactTests', Test) {
+        logger.lifecycle("Runs pact Tests")
+        testClassesDirs = sourceSets.contractTest.output.classesDirs
+        classpath = sourceSets.contractTest.runtimeClasspath
+    }
 
-        contractTestImplementation.extendsFrom(testImplementation)
-        contractTestRuntimeOnly.extendsFrom(testRuntimeOnly)
+    pact {
+        broker {
+            pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
+        }
+
+        publish {
+            pactDirectory = 'pacts'
+            tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
+            version = project.pacticipantVersion
+        }
+    }
+
+    runAndPublishConsumerPactTests.dependsOn contract
+    runAndPublishConsumerPactTests.finalizedBy pactPublish
+
+    static def getCheckedOutGitCommitHash() {
+        'git rev-parse --verify --short HEAD'.execute().text.trim()
+    }
+
+    run {
+        def debug = System.getProperty("debug")
+
+        if (debug == 'true') {
+            jvmArgs = [
+                    '-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006'
+            ]
+        }
+    }
+
+    tasks.register('generateXls', Exec) {
+        commandLine project.file('./bin/create-xlsx.sh').path, 'benefit', 'dev', 'local'
+    }
+
+    bootWithCCD {
+        group 'application'
+        dependsOn generateXls
+        authMode = AuthMode.Local
+
+        doFirst() {
+            if (!project.file('./.aat-env').exists()) {
+                new ByteArrayOutputStream().withStream { os ->
+                    exec {
+                        commandLine 'az',
+                                'keyvault',
+                                'secret',
+                                'show',
+                                '--vault-name',
+                                'sscs-aat',
+                                '-o',
+                                'tsv',
+                                '--query',
+                                'value',
+                                '--name',
+                                'sscs-tribunals-case-api-dot-env'
+
+                        standardOutput = os
+                    }
+
+                    project.file('./.aat-env').write(
+                            new String(
+                                    os.toString()
+                                            .replace('\n', '')
+                                            .decodeBase64(),
+                                    StandardCharsets.UTF_8
+                            )
+                    )
+                }
+            }
+
+            project.file('./.aat-env').readLines().each() {
+                def index = it.indexOf("=")
+                def key = it.substring(0, index)
+                def value = it.substring(index + 1)
+                environment key, value
+            }
+        }
+
+        def fileLogger = [
+                onOutput: {
+                    File logfile = new File('gradle-build.log')
+                    logfile << it
+                }
+        ] as StandardOutputListener
+
+        logging.addStandardOutputListener(fileLogger)
+
+        gradle.taskGraph.whenReady { taskGraph ->
+            taskGraph.allTasks.each { Task t ->
+                t.doFirst {
+                    logging.addStandardOutputListener(fileLogger)
+                }
+            }
+        }
+    }
+
+    tasks.register('highLevelDataSetup', JavaExec) {
+        mainClass = "uk.gov.hmcts.reform.sscs.config.HighLevelDataSetupApp"
+        classpath += sourceSets.main.runtimeClasspath
+        jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
     }
 }
 
 
 /*
- * ========================================================================
- * E2E support
- * ========================================================================
+ * E2E tasks intentionally remain outside the !isE2e block.
  *
- * These tasks intentionally remain outside the normal Java configuration.
- *
- * When an E2E task is requested:
- *   - no third-party Gradle plugins are loaded
- *   - no Java/Spring configuration is evaluated
- *   - no project dependencies are resolved
- *   - mavenCentral() is not configured by the normal build block
- *   - only the Yarn E2E tests are installed/executed
+ * These are the only tasks that should be configured for an E2E invocation.
  */
 
 tasks.register('yarnInstall', Exec) {
@@ -1190,12 +1058,6 @@ tasks.register('runAccessibilityTestsNightly', Exec) {
     commandLine 'yarn', 'test:accessibility'
 }
 
-
-/*
- * ========================================================================
- * Job scheduler configuration
- * ========================================================================
- */
 
 def dbHost = System.env.JOB_SCHEDULER_DB_HOST ?: "localhost"
 def dbPort = System.env.JOB_SCHEDULER_DB_PORT ?: 5432
