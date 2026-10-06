@@ -2,14 +2,30 @@ import uk.gov.hmcts.rse.AuthMode
 import java.nio.charset.StandardCharsets
 
 
+def isJenkinsBuild = System.getenv('JENKINS_URL') != null ||
+        System.getenv('JENKINS_HOME') != null
+
+def isE2eBuild = gradle.startParameter.taskNames.any { taskName ->
+    taskName.contains('runE2eTests') ||
+            taskName.contains('runAccessibilityTestsNightly')
+}
+
+
+/*
+ * Buildscript dependencies
+ *
+ * On GitHub Actions we need to provide the repositories ourselves.
+ *
+ * On Jenkins the HMCTS init.gradle replaces/configures the buildscript
+ * repositories with HMCTS Artifactory, so we deliberately do not declare
+ * repositories here.
+ *
+ * For E2E there are no buildscript dependencies at all.
+ */
 buildscript {
-    def isE2eBuild = gradle.startParameter.taskNames.any { taskName ->
-        taskName.contains('runE2eTests') ||
-                taskName.contains('runAccessibilityTestsNightly')
-    }
 
     repositories {
-        if (!isE2eBuild) {
+        if (!isJenkinsBuild && !isE2eBuild) {
             mavenLocal()
             mavenCentral()
             gradlePluginPortal()
@@ -40,16 +56,11 @@ buildscript {
     }
 }
 
-def isE2e = gradle.startParameter.taskNames.any { taskName ->
-    taskName.contains('runE2eTests') ||
-            taskName.contains('runAccessibilityTestsNightly')
-}
-
 
 /*
  * Normal Java/application build only.
  */
-if (!isE2e) {
+if (!isE2eBuild) {
 
     apply plugin: 'application'
     apply plugin: 'pmd'
@@ -274,6 +285,11 @@ if (!isE2e) {
 
     /*
      * Application repositories
+     *
+     * GitHub Actions uses these repositories.
+     *
+     * On Jenkins, init.gradle uses PREFER_SETTINGS and supplies the
+     * HMCTS Artifactory repository instead.
      */
     repositories {
         mavenLocal()
