@@ -1,4 +1,3 @@
-
 buildscript {
     def isIntegrationBuild = gradle.startParameter.taskNames.any {
         it == 'integration' || it.endsWith(':integration')
@@ -7,10 +6,6 @@ buildscript {
     repositories {
         if (isIntegrationBuild) {
             mavenCentral()
-        } else {
-            maven {
-                url = uri('https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1')
-            }
         }
     }
 
@@ -177,6 +172,7 @@ if (!isE2e) {
         include "uk/gov/hmcts/reform/sscs/functional/**"
         include "uk/gov/hmcts/reform/sscs/controllers/**"
         include "uk/gov/hmcts/reform/sscs/bulkscan/**"
+        include "uk/gov/hmcts/reform/sscs/smoke/**"
         exclude "uk/gov/hmcts/reform/sscs/smoke/**"
         maxParallelForks = Runtime.runtime.availableProcessors()
     }
@@ -234,6 +230,7 @@ if (!isE2e) {
                     def stableKeyword = ['RELEASE', 'FINAL', 'GA'].any {
                         qualifier -> version.toUpperCase().contains(qualifier)
                     }
+
                     def regex = /^[0-9,.v-]+(-r)?$/
                     return !stableKeyword && !(version ==~ regex)
                 }
@@ -257,10 +254,10 @@ if (!isE2e) {
      * Repository policy:
      *
      * Normal build/test:
-     *   HMCTS Artifactory only
+     *   HMCTS Artifactory is supplied by the Jenkins init script.
      *
      * Integration:
-     *   HMCTS Artifactory + Maven Central
+     *   Maven Central.
      *
      * E2E never reaches this block.
      */
@@ -271,10 +268,6 @@ if (!isE2e) {
     }
 
     repositories {
-        maven {
-            url 'https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1'
-        }
-
         if (isIntegration) {
             mavenCentral()
         }
@@ -660,63 +653,64 @@ if (!isE2e) {
                                 '-o', 'tsv',
                                 '--query', 'value',
                                 '--name', 'sscs-tribunals-case-api-dot-env'
-                        standardOutput = os
                     }
-
-                    project.file('./.aat-env').write(
-                            new String(
-                                    os.toString()
-                                            .replace('\n', '')
-                                            .decodeBase64(),
-                                    StandardCharsets.UTF_8
-                            )
-                    )
+                    standardOutput = os
                 }
-            }
 
-            project.file('./.aat-env').readLines().each() {
-                def index = it.indexOf("=")
-                def key = it.substring(0, index)
-                def value = it.substring(index + 1)
-                environment key, value
+                project.file('./.aat-env').write(
+                        new String(
+                                os.toString()
+                                        .replace('\n', '')
+                                        .decodeBase64(),
+                                StandardCharsets.UTF_8
+                        )
+                )
             }
         }
 
-        // ---Debug-----
-        // Uncomment to launch with debug
-        // jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006']
-
-        // ---Extra ccd logging----
-        // Uncomment for ccd callback logging
-        // environment 'LOG_CALLBACK_DETAILS', '*'
-
-        def fileLogger = [onOutput: {
-            File logfile = new File('gradle-build.log')
-            logfile << it
-        }] as StandardOutputListener
-
-        logging.addStandardOutputListener(fileLogger)
-
-        gradle.taskGraph.whenReady { taskGraph ->
-            taskGraph.allTasks.each { Task t ->
-                t.doFirst {
-                    logging.addStandardOutputListener(fileLogger)
-                }
-            }
+        project.file('./.aat-env').readLines().each() {
+            def index = it.indexOf("=")
+            def key = it.substring(0, index)
+            def value = it.substring(index + 1)
+            environment key, value
         }
     }
 
-    tasks.register('highLevelDataSetup', JavaExec) {
-        mainClass = "uk.gov.hmcts.reform.sscs.config.HighLevelDataSetupApp"
-        classpath += sourceSets.main.runtimeClasspath
-        jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
-    }
+    // ---Debug-----
+    // Uncomment to launch with debug
+    // jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006']
 
-    def dbHost = System.env.JOB_SCHEDULER_DB_HOST ?: "localhost"
-    def dbPort = System.env.JOB_SCHEDULER_DB_PORT ?: 5432
-    def dbName = System.env.JOB_SCHEDULER_DB_NAME ?: "sscsjobscheduler"
-    def dbUser = System.env.JOB_SCHEDULER_DB_USERNAME ?: "sscsjobscheduler"
-    def dbPass = System.env.JOB_SCHEDULER_DB_PASSWORD ?: "sscsjobscheduler"
+    // ---Extra ccd logging----
+    // Uncomment for ccd callback logging
+    // environment 'LOG_CALLBACK_DETAILS', '*'
+
+    def fileLogger = [onOutput: {
+        File logfile = new File('gradle-build.log')
+        logfile << it
+    }] as StandardOutputListener
+
+    logging.addStandardOutputListener(fileLogger)
+
+    gradle.taskGraph.whenReady { taskGraph ->
+        taskGraph.allTasks.each { Task t ->
+            t.doFirst {
+                logging.addStandardOutputListener(fileLogger)
+            }
+        }
+    }
+}
+
+tasks.register('highLevelDataSetup', JavaExec) {
+    mainClass = "uk.gov.hmcts.reform.sscs.config.HighLevelDataSetupApp"
+    classpath += sourceSets.main.runtimeClasspath
+    jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
+}
+
+def dbHost = System.env.JOB_SCHEDULER_DB_HOST ?: "localhost"
+def dbPort = System.env.JOB_SCHEDULER_DB_PORT ?: 5432
+def dbName = System.env.JOB_SCHEDULER_DB_NAME ?: "sscsjobscheduler"
+def dbUser = System.env.JOB_SCHEDULER_DB_USERNAME ?: "sscsjobscheduler"
+def dbPass = System.env.JOB_SCHEDULER_DB_PASSWORD ?: "sscsjobscheduler"
 }
 
 /*
