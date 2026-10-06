@@ -51,6 +51,16 @@ def isE2e = gradle.startParameter.taskNames.any { taskName ->
     }
 }
 
+/*
+ * This method MUST remain outside the !isE2e block.
+ *
+ * Groovy does not allow a static method declaration inside the
+ * conditional closure used below.
+ */
+static def getCheckedOutGitCommitHash() {
+    'git rev-parse --verify --short HEAD'.execute().text.trim()
+}
+
 if (!isE2e) {
 
     apply plugin: 'application'
@@ -404,6 +414,9 @@ if (!isE2e) {
     ]
 
     dependencies {
+        integrationTestImplementation(sourceSets.test.output)
+        functionalTestImplementation(sourceSets.test.output)
+
         implementation group: 'org.springframework.boot', name: 'spring-boot-autoconfigure', version: versions.springboot
         implementation group: 'org.springframework.boot', name: 'spring-boot-starter', version: versions.springboot
         implementation group: 'org.springframework.boot', name: 'spring-boot-starter-activemq', version: versions.springboot
@@ -614,10 +627,6 @@ if (!isE2e) {
     runAndPublishConsumerPactTests.dependsOn contract
     runAndPublishConsumerPactTests.finalizedBy pactPublish
 
-    static def getCheckedOutGitCommitHash() {
-        'git rev-parse --verify --short HEAD'.execute().text.trim()
-    }
-
     run {
         def debug = System.getProperty("debug")
 
@@ -636,10 +645,8 @@ if (!isE2e) {
 
         // Avoid a compile-time dependency on the RSE AuthMode class.
         // This block is only evaluated for non-E2E builds.
-        authMode = Enum.valueOf(
-                Class.forName('uk.gov.hmcts.rse.AuthMode'),
-                'Local'
-        )
+        def authModeClass = project.buildscript.classLoader.loadClass('uk.gov.hmcts.rse.AuthMode')
+        authMode = authModeClass.getEnumConstants().find { it.name() == 'Local' }
 
         doFirst() {
             if (!project.file('./.aat-env').exists()) {
