@@ -1176,11 +1176,11 @@
     "Publish": "N"
   },
   {
-    "LiveFrom": "01/01/2018",
+    "LiveFrom": "07/10/2026",
     "CaseTypeID": "Benefit",
     "ID": "resendHearingBooked",
     "Name": "Resend Hearing booked",
-    "Description": "Notification about a hearing being booked",
+    "Description": "Resend notification about a hearing being booked",
     "DisplayOrder": 1000,
     "PreConditionState(s)": "*",
     "PostConditionState": "*",

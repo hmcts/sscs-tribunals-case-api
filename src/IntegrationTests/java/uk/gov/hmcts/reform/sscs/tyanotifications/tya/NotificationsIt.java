@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.tya;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.atLeast;
@@ -5277,6 +5278,45 @@ class NotificationsIt extends NotificationsItBase {
         getResponse(getRequestWithAuthHeader(updatedJson));
 
         verify(notificationClient, atLeastOnce()).sendPrecompiledLetterWithInputStream(any(), any());
+    }
+
+    @Test
+    void shouldSendNotificationForResendHearingBookedForAnOralHearing() throws Exception {
+        json = updateEmbeddedJson(json, "resendHearingBooked", "event_id");
+        json = updateEmbeddedJson(json, "Yes", "case_details", "case_data", "subscriptions", "representativeSubscription", "subscribeEmail");
+        json = json.replace("2018-01-12", LocalDate.now().plusDays(2).toString());
+
+        HttpServletResponse response = getResponse(getRequestWithAuthHeader(json));
+
+        assertSoftly(softly -> {
+            softly.assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+            softly.assertThatCode(() -> verify(notificationClient, times(2)).sendPrecompiledLetterWithInputStream(any(), any()))
+                    .doesNotThrowAnyException();
+            softly.assertThatCode(() -> verify(notificationClient, times(2)).sendEmail(any(), any(), any(), any()))
+                    .doesNotThrowAnyException();
+            softly.assertThatCode(() -> verify(notificationClient, times(2)).sendSms(any(), any(), any(), any(), any()))
+                    .doesNotThrowAnyException();
+        });
+    }
+
+    @Test
+    void shouldNotSendNotificationForResendHearingBookedForAPaperHearing() throws Exception {
+        json = updateEmbeddedJson(json, "No", "case_details", "case_data", "appeal", "hearingOptions", "wantsToAttend");
+        json = updateEmbeddedJson(json, "paper", "case_details", "case_data", "appeal", "hearingType");
+        json = updateEmbeddedJson(json, "resendHearingBooked", "event_id");
+        json = json.replace("2018-01-12", LocalDate.now().plusDays(2).toString());
+
+        HttpServletResponse response = getResponse(getRequestWithAuthHeader(json));
+
+        assertSoftly(softly -> {
+            softly.assertThatCode(() -> verify(notificationClient, never()).sendPrecompiledLetterWithInputStream(any(), any()))
+                    .doesNotThrowAnyException();
+            softly.assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+            softly.assertThatCode(() -> verify(notificationClient, never()).sendEmail(any(), any(), any(), any()))
+                    .doesNotThrowAnyException();
+            softly.assertThatCode(() -> verify(notificationClient, never()).sendSms(any(), any(), any(), any(), any()))
+                    .doesNotThrowAnyException();
+        });
     }
 
 }
