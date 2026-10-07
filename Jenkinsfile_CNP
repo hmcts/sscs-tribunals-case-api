@@ -4,12 +4,15 @@
 
 import uk.gov.hmcts.contino.AppPipelineDsl
 import uk.gov.hmcts.contino.GithubAPI
+import uk.gov.hmcts.contino.GradleBuilder
 
 def type = "java"
 def product = "sscs"
 def component = "tribunals-api"
 def dmnBranch = "master"
 def waStandaloneBranch = "master"
+
+GradleBuilder gradleBuilder = new GradleBuilder(this, product)
 
 def secrets = [
         'sscs-${env}': [
@@ -279,7 +282,7 @@ def setPreviewEnvVars() {
 def runE2eTests() {
     stage('Playwright tests') {
         try {
-            gradleBuilder.gradle('runE2eTests') 
+            gradleBuilder.gradle('runE2eTests')
         } catch (Error) {
             unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
         } finally {
