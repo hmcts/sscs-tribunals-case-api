@@ -217,13 +217,13 @@ withPipeline(type, product, component) {
         if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "run-notification-tests").size() > 0) {
             runNotificationTests()
         }
-        runE2eTests()
+        runE2eTests(gradleBuilder)
     }
 
     afterSuccess('smoketest:aat') {
         sh './bin/add-hearing-role-assignments-system-user.sh aat'
 
-        runE2eTests()
+        runE2eTests(gradleBuilder)
     }
 }
 
@@ -279,7 +279,7 @@ def setPreviewEnvVars() {
     env.USE_IDENTITY = 'true'
 }
 
-def runE2eTests() {
+def runE2eTests(GradleBuilder gradleBuilder) {
     stage('Playwright tests') {
         try {
             gradleBuilder.gradle('runE2eTests')
