@@ -195,6 +195,12 @@ dependencyCheck {
     analyzers.ossIndex.enabled = false
 }
 
+def isIntegrationBuild = gradle.startParameter.taskNames.any {
+    it.tokenize(':').last() in [
+            'integration'
+    ]
+}
+
 repositories {
 
     maven {
@@ -203,6 +209,10 @@ repositories {
     // Requires authentication, if it gets here the library cannot be found!
     maven {
         url 'https://repo.spring.io/libs-milestone'
+    }
+    
+    if(isIntegrationBuild){
+        mavenCentral()
     }
 }
 
