@@ -1178,6 +1178,20 @@
   {
     "LiveFrom": "01/01/2018",
     "CaseTypeID": "Benefit",
+    "ID": "resendHearingBooked",
+    "Name": "Resend Hearing booked",
+    "Description": "Notification about a hearing being booked",
+    "DisplayOrder": 1000,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
+    "ShowEventNotes": "Y",
+    "SecurityClassification": "Public",
+    "Publish": "N"
+  },
+  {
+    "LiveFrom": "01/01/2018",
+    "CaseTypeID": "Benefit",
     "ID": "hearingHoldingReminder",
     "Name": "Hearing Holding Reminder",
     "Description": "Holding email when hearing not booked",
