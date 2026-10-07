@@ -1,9 +1,19 @@
 pluginManagement {
+    def isE2eBuild = gradle.startParameter.taskNames.any {
+        it.tokenize(':').last() in [
+                'runE2eTests',
+                'runE2eTestsNightly',
+                'runAccessibilityTestsNightly'
+        ]
+    }
+
     repositories {
         maven {
             url = uri('https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1')
         }
 
-        gradlePluginPortal()
+        if (!isE2eBuild) {
+            gradlePluginPortal()
+        }
     }
 }
