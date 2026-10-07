@@ -279,7 +279,7 @@ def setPreviewEnvVars() {
 def runE2eTests() {
     stage('Playwright tests') {
         try {
-            sh './gradlew runE2eTests'
+            gradleBuilder.gradle('runE2eTests') 
         } catch (Error) {
             unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
         } finally {
