@@ -289,7 +289,7 @@ idam:
     api:
         url: ${IDAM_API_URL:http://localhost:5062}
     oidc:
-        url: ${IDAM_OIDC_URL:http://localhost:5062}/o
+        url: ${IDAM_OIDC_URL:http://localhost:5062}
         use_oidc_api: true
     client:
         id: ${IDAM_OAUTH2_CLIENT_ID:sscs}
