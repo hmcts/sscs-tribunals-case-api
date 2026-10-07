@@ -287,7 +287,10 @@ feature:
 
 idam:
     api:
-        url: ${IDAM_OIDC_URL:http://localhost:5062}
+        url: ${IDAM_API_URL:http://localhost:5062}
+    oidc:
+        url: ${IDAM_OIDC_URL:http://localhost:5062}/o
+        use_oidc_api: true
     client:
         id: ${IDAM_OAUTH2_CLIENT_ID:sscs}
         redirect_uri: ${IDAM_OAUTH2_REDIRECT_URL:https://localhost:3000/authenticated}
