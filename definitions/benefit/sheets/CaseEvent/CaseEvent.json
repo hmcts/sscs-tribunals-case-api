@@ -1769,7 +1769,7 @@
     "LiveFrom": "07/10/2026",
     "CaseTypeID": "Benefit",
     "ID": "resendHearingBooked",
-    "Name": "Resend hearing booked",
+    "Name": "Resent hearing booked",
     "Description": "Resent hearing booked details",
     "DisplayOrder": 1335,
     "PreConditionState(s)": "*",
