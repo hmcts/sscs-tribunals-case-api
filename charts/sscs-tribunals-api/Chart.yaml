@@ -1,7 +1,7 @@
 apiVersion: v2
 name: sscs-tribunals-api
 home: https://github.com/hmcts/sscs-tribunals-case-api
-version: 0.0.236
+version: 0.1.0
 description: SSCS Tribunals Case API
 annotations:
   hmcts.github.io/skip-publish: postgresql,job,xui-webapp,ccd,sscs-tribunals-frontend,hmcts-redis,em-ccdorc,em-stitching,ccd-case-document-am-api,servicebus,aac-manage-case-assignment,am-org-role-mapping-service,camunda-bpm,wa-task-management-api,wa-task-monitor,wa-case-event-handler,wa-workflow-api,wa-initiation-batch,wa-reconfiguration-batch,wa-termination-batch,wa-message-cron-service,ccd-message-publisher,sscs-cron-trigger,ccd-def-cleanup
@@ -9,15 +9,15 @@ maintainers:
   - name: HMCTS SSCS Team
 dependencies:
   - name: postgresql
-    version: 1.1.1
+    version: 1.1.3
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: postgresql.enabled
   - name: java
-    version: 5.3.0
+    version: 6.1.1
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: java.enabled
   - name: job
-    version: 2.2.1
+    version: 2.2.2
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: job.enabled
   - name: xui-webapp
@@ -51,11 +51,7 @@ dependencies:
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: ccd-case-document-am-api.enabled
   - name: servicebus
-    version: 1.2.2
-    repository: 'oci://hmctsprod.azurecr.io/helm'
-    condition: servicebus.enabled
-  - name: servicebus
-    version: 1.2.2
+    version: 1.3.0
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: servicebus.enabled
     alias: hmcsb
