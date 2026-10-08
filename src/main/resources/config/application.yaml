@@ -1816,22 +1816,6 @@ notification:
                 other_party:
                     emailId: c7047e95-42ac-4d6a-91d9-c8f31f2685b8
                     smsId: 5e7444fe-860c-4623-b5c5-b23af1ddbb0b
-            resendHearingBooked:
-                appellant:
-                    emailId: aca83c9c-05c0-49d5-8ded-e581a0107408
-                    smsId: a51a7435-dffe-4455-9183-5c6f4f13bee3
-                representative:
-                    emailId: c7047e95-42ac-4d6a-91d9-c8f31f2685b8
-                    smsId: 5e7444fe-860c-4623-b5c5-b23af1ddbb0b
-                appointee:
-                    emailId: aca83c9c-05c0-49d5-8ded-e581a0107408
-                    smsId: a51a7435-dffe-4455-9183-5c6f4f13bee3
-                joint_party:
-                    emailId: aca83c9c-05c0-49d5-8ded-e581a0107408
-                    smsId: a51a7435-dffe-4455-9183-5c6f4f13bee3
-                other_party:
-                    emailId: c7047e95-42ac-4d6a-91d9-c8f31f2685b8
-                    smsId: 5e7444fe-860c-4623-b5c5-b23af1ddbb0b
             hearingReminder:
                 appellant:
                     emailId: e6969b5d-cd8c-4ff8-ab76-faaed6f388c3
@@ -1862,17 +1846,6 @@ notification:
                     other_party:
                         emailId: d5bc541b-78c8-4a65-8e55-cfb20ccfed43
                 hearingBooked:
-                    appellant:
-                        docmosisId: TB-SCS-LET-WEL-Hearing-Booked-v3.docx
-                    representative:
-                        docmosisId: TB-SCS-LET-WEL-Hearing-Booked-v3.docx
-                    appointee:
-                        docmosisId: TB-SCS-LET-WEL-Hearing-Booked-v3.docx
-                    joint_party:
-                        docmosisId: TB-SCS-LET-WEL-Hearing-Booked-v3.docx
-                    other_party:
-                        docmosisId: TB-SCS-LET-WEL-Hearing-Booked-v3.docx
-                resendHearingBooked:
                     appellant:
                         docmosisId: TB-SCS-LET-WEL-Hearing-Booked-v3.docx
                     representative:
