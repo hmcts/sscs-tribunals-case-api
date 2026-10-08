@@ -1176,20 +1176,6 @@
     "Publish": "N"
   },
   {
-    "LiveFrom": "07/10/2026",
-    "CaseTypeID": "Benefit",
-    "ID": "resendHearingBooked",
-    "Name": "Resend Hearing booked",
-    "Description": "Resend notification about a hearing being booked",
-    "DisplayOrder": 1000,
-    "PreConditionState(s)": "*",
-    "PostConditionState": "*",
-    "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
-    "ShowEventNotes": "Y",
-    "SecurityClassification": "Public",
-    "Publish": "N"
-  },
-  {
     "LiveFrom": "01/01/2018",
     "CaseTypeID": "Benefit",
     "ID": "hearingHoldingReminder",
@@ -1778,6 +1764,20 @@
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
     "Publish": "${CCD_DEF_PUBLISH}"
+  },
+  {
+    "LiveFrom": "07/10/2026",
+    "CaseTypeID": "Benefit",
+    "ID": "resendHearingBooked",
+    "Name": "Resend Hearing booked",
+    "Description": "Resent Hearing booked details",
+    "DisplayOrder": 1335,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
+    "ShowEventNotes": "Y",
+    "SecurityClassification": "Public",
+    "Publish": "N"
   },
   {
     "LiveFrom": "01/01/2018",

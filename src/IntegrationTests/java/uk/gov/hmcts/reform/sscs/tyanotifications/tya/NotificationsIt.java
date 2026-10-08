@@ -5300,6 +5300,23 @@ class NotificationsIt extends NotificationsItBase {
     }
 
     @Test
+    void shouldNotSendNotificationForResendHearingBookedForAnOralHearingInThePast() throws Exception {
+        json = updateEmbeddedJson(json, "resendHearingBooked", "event_id");
+        json = updateEmbeddedJson(json, "Yes", "case_details", "case_data", "subscriptions", "representativeSubscription", "subscribeEmail");
+        json = json.replace("2018-01-12", LocalDate.now().minusDays(2).toString());
+
+        HttpServletResponse response = getResponse(getRequestWithAuthHeader(json));
+
+        assertSoftly(softly -> {
+            softly.assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+            softly.assertThatCode(() -> verify(notificationClient, never()).sendEmail(any(), any(), any(), any()))
+                    .doesNotThrowAnyException();
+            softly.assertThatCode(() -> verify(notificationClient, never()).sendSms(any(), any(), any(), any(), any()))
+                    .doesNotThrowAnyException();
+        });
+    }
+
+    @Test
     void shouldNotSendNotificationForResendHearingBookedForAPaperHearing() throws Exception {
         json = updateEmbeddedJson(json, "No", "case_details", "case_data", "appeal", "hearingOptions", "wantsToAttend");
         json = updateEmbeddedJson(json, "paper", "case_details", "case_data", "appeal", "hearingType");

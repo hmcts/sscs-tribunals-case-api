@@ -1129,7 +1129,6 @@ notification:
                 other_party:
                     emailId: a56e67cb-6b4b-41e3-8f4c-cd1cdb6809c1
                     smsId: e04c548d-1ba9-40b5-bf9b-ea5e7bbadbac
-
             hearingReminder:
                 appellant:
                     emailId: 78d2e987-02de-4875-ae43-1139a5c868ff
