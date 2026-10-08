@@ -1,15 +1,18 @@
 #!groovy
 
-@Library("Infrastructure@2.10.0")
+@Library("Infrastructure@2.12.1")
 
 import uk.gov.hmcts.contino.AppPipelineDsl
 import uk.gov.hmcts.contino.GithubAPI
+import uk.gov.hmcts.contino.GradleBuilder
 
 def type = "java"
 def product = "sscs"
 def component = "tribunals-api"
 def dmnBranch = "master"
 def waStandaloneBranch = "master"
+
+GradleBuilder gradleBuilder = new GradleBuilder(this, product)
 
 def secrets = [
         'sscs-${env}': [
@@ -214,13 +217,13 @@ withPipeline(type, product, component) {
         if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "run-notification-tests").size() > 0) {
             runNotificationTests()
         }
-        runE2eTests()
+        runE2eTests(gradleBuilder)
     }
 
     afterSuccess('smoketest:aat') {
         sh './bin/add-hearing-role-assignments-system-user.sh aat'
 
-        runE2eTests()
+        runE2eTests(gradleBuilder)
     }
 }
 
@@ -276,10 +279,10 @@ def setPreviewEnvVars() {
     env.USE_IDENTITY = 'true'
 }
 
-def runE2eTests() {
+def runE2eTests(GradleBuilder gradleBuilder) {
     stage('Playwright tests') {
         try {
-            sh './gradlew runE2eTests'
+            gradleBuilder.gradle('runE2eTests')
         } catch (Error) {
             unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
         } finally {
