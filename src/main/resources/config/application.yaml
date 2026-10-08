@@ -1896,6 +1896,10 @@ letter-async:
     multiplier: ${LETTER_ASYNC_MULTIPLIER:2}
     maxDelay: ${LETTER_ASYNC_MAX_DELAY:180000}
     initialDelay: ${LETTER_ASYNC_INITIAL_DELAY:5000}
+    emailMaxAttempts: ${LETTER_ASYNC_EMAIL_MAX_ATTEMPTS:5}
+    emailDelay: ${LETTER_ASYNC_EMAIL_DELAY:1000}
+    emailMultiplier: ${LETTER_ASYNC_EMAIL_MULTIPLIER:2}
+    emailMaxDelay: ${LETTER_ASYNC_EMAIL_MAX_DELAY:10000}
 
 retry:
     max: 3

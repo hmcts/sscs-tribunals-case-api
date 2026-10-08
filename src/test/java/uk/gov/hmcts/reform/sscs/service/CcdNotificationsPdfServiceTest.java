@@ -691,6 +691,55 @@ public class CcdNotificationsPdfServiceTest {
         assertEquals("Testurl", sscsCaseDetails.getData().getReasonableAdjustmentsLetters().getAppellant().get(1).getValue().getDocumentLink().getDocumentUrl());
     }
 
+    @Test
+    @Parameters({"Letter", "Email", "Sms"})
+    public void notifyFailedToRetrieveCorrespondenceTriggersFailedToRetrieveCorrespondenceEvent(CorrespondenceType correspondenceType) {
+        Long caseId = Long.valueOf(caseData.getCcdCaseId());
+
+        service.notifyFailedToRetrieveCorrespondence(caseId, "notification-id-123", correspondenceType);
+
+        verify(updateCcdCaseService).triggerCaseEventV2(
+                eq(caseId),
+                eq(EventType.FAILED_TO_RETRIEVE_CORRESPONDENCE.getCcdType()),
+                eq("Failed to retrieve correspondence"),
+                eq("Failed to save " + correspondenceType + " correspondence to case for notification id notification-id-123"),
+                any());
+    }
+
+    @Test
+    public void notifyFailedToRetrieveCorrespondenceWithNoNotificationIdOmitsItFromDescription() {
+        Long caseId = Long.valueOf(caseData.getCcdCaseId());
+
+        service.notifyFailedToRetrieveCorrespondence(caseId, null, CorrespondenceType.Letter);
+
+        verify(updateCcdCaseService).triggerCaseEventV2(
+                eq(caseId),
+                eq(EventType.FAILED_TO_RETRIEVE_CORRESPONDENCE.getCcdType()),
+                eq("Failed to retrieve correspondence"),
+                eq("Failed to save Letter correspondence to case"),
+                any());
+    }
+
+    @Test
+    public void notifyFailedToRetrieveCorrespondenceDoesNotThrowExceptionWhenCaseUpdateFails() {
+        Long caseId = Long.valueOf(caseData.getCcdCaseId());
+        doThrow(new CcdException("some error when updating case")).when(updateCcdCaseService).triggerCaseEventV2(
+                eq(caseId),
+                eq(EventType.FAILED_TO_RETRIEVE_CORRESPONDENCE.getCcdType()),
+                any(),
+                any(),
+                any());
+
+        service.notifyFailedToRetrieveCorrespondence(caseId, "notification-id-123", CorrespondenceType.Letter);
+
+        verify(updateCcdCaseService).triggerCaseEventV2(
+                eq(caseId),
+                eq(EventType.FAILED_TO_RETRIEVE_CORRESPONDENCE.getCcdType()),
+                eq("Failed to retrieve correspondence"),
+                eq("Failed to save Letter correspondence to case for notification id notification-id-123"),
+                any());
+    }
+
     private List<Correspondence> findLettersToCaptureByParty(ReasonableAdjustmentsLetters reasonableAdjustmentsLetters, LetterType letterType) {
         if (LetterType.APPELLANT.equals(letterType)) {
             return reasonableAdjustmentsLetters.getAppellant();

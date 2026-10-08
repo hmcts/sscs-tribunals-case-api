@@ -393,6 +393,8 @@
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "evidenceReminder", "AccessProfile": "caseworker-sscs-judge", "CRUD": "R"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "evidenceReminder", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "evidenceReminder", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
+  {"LiveFrom": "02/10/2026", "CaseTypeID": "Benefit", "CaseEventID": "failedToRetrieveCorrespondence", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
+  {"LiveFrom": "02/10/2026", "CaseTypeID": "Benefit", "CaseEventID": "failedToRetrieveCorrespondence", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"},
   {"LiveFrom": "25/06/2019", "CaseTypeID": "Benefit", "CaseEventID": "feNoAction", "AccessProfile": "caseworker-sscs-dwpresponsewriter", "CRUD": "CRUD"},
   {"LiveFrom": "25/06/2019", "CaseTypeID": "Benefit", "CaseEventID": "feNoAction", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "feNoAction", "AccessProfile": "caseworker-sscs", "CRUD": "R"},

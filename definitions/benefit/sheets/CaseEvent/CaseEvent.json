@@ -1048,6 +1048,19 @@
     "Publish": "N"
   },
   {
+    "LiveFrom": "02/10/2026",
+    "CaseTypeID": "Benefit",
+    "ID": "failedToRetrieveCorrespondence",
+    "Name": "Correspondence unavailable",
+    "Description": "System failed to save correspondence",
+    "DisplayOrder": 770,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "ShowEventNotes": "Y",
+    "SecurityClassification": "Public",
+    "Publish": "N"
+  },
+  {
     "LiveFrom": "01/01/2018",
     "CaseTypeID": "Benefit",
     "ID": "furtherEvidenceHandledOffline",
