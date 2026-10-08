@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.tya;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.atLeast;
@@ -5288,15 +5287,10 @@ class NotificationsIt extends NotificationsItBase {
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json));
 
-        assertSoftly(softly -> {
-            softly.assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-            softly.assertThatCode(() -> verify(notificationClient, times(2)).sendPrecompiledLetterWithInputStream(any(), any()))
-                    .doesNotThrowAnyException();
-            softly.assertThatCode(() -> verify(notificationClient, times(2)).sendEmail(any(), any(), any(), any()))
-                    .doesNotThrowAnyException();
-            softly.assertThatCode(() -> verify(notificationClient, times(2)).sendSms(any(), any(), any(), any(), any()))
-                    .doesNotThrowAnyException();
-        });
+        assertHttpStatus(response, HttpStatus.OK);
+        verify(notificationClient, times(2)).sendPrecompiledLetterWithInputStream(any(), any());
+        verify(notificationClient, times(2)).sendEmail(any(), any(), any(), any());
+        verify(notificationClient, times(2)).sendSms(any(), any(), any(), any(), any());
     }
 
     @Test
@@ -5307,13 +5301,9 @@ class NotificationsIt extends NotificationsItBase {
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json));
 
-        assertSoftly(softly -> {
-            softly.assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-            softly.assertThatCode(() -> verify(notificationClient, never()).sendEmail(any(), any(), any(), any()))
-                    .doesNotThrowAnyException();
-            softly.assertThatCode(() -> verify(notificationClient, never()).sendSms(any(), any(), any(), any(), any()))
-                    .doesNotThrowAnyException();
-        });
+        assertHttpStatus(response, HttpStatus.OK);
+        verify(notificationClient, never()).sendEmail(any(), any(), any(), any());
+        verify(notificationClient, never()).sendSms(any(), any(), any(), any(), any());
     }
 
     @Test
@@ -5325,15 +5315,10 @@ class NotificationsIt extends NotificationsItBase {
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json));
 
-        assertSoftly(softly -> {
-            softly.assertThatCode(() -> verify(notificationClient, never()).sendPrecompiledLetterWithInputStream(any(), any()))
-                    .doesNotThrowAnyException();
-            softly.assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-            softly.assertThatCode(() -> verify(notificationClient, never()).sendEmail(any(), any(), any(), any()))
-                    .doesNotThrowAnyException();
-            softly.assertThatCode(() -> verify(notificationClient, never()).sendSms(any(), any(), any(), any(), any()))
-                    .doesNotThrowAnyException();
-        });
+        assertHttpStatus(response, HttpStatus.OK);
+        verify(notificationClient, never()).sendPrecompiledLetterWithInputStream(any(), any());
+        verify(notificationClient, never()).sendEmail(any(), any(), any(), any());
+        verify(notificationClient, never()).sendSms(any(), any(), any(), any(), any());
     }
 
 }
