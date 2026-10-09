@@ -4,6 +4,7 @@ import static java.util.Objects.nonNull;
 import static org.slf4j.LoggerFactory.getLogger;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.HEARING_BOOKED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.HEARING_REMINDER;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.RESEND_HEARING_BOOKED;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.reform.sscs.jobscheduler.model.Job;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobScheduler;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 
 @Component
@@ -44,9 +46,10 @@ public class HearingReminder implements ReminderHandler {
     }
 
     public boolean canHandle(NotificationWrapper wrapper) {
-        return wrapper
-            .getNotificationType()
-            .equals(HEARING_BOOKED) && isAllowedForHearingType(wrapper.getHearingType());
+        NotificationEventType type = wrapper.getNotificationType();
+
+        return (type == HEARING_BOOKED || type == RESEND_HEARING_BOOKED)
+                && isAllowedForHearingType(wrapper.getHearingType());
     }
 
     private boolean isAllowedForHearingType(AppealHearingType hearingType) {

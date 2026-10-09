@@ -1766,6 +1766,20 @@
     "Publish": "${CCD_DEF_PUBLISH}"
   },
   {
+    "LiveFrom": "07/10/2026",
+    "CaseTypeID": "Benefit",
+    "ID": "resendHearingBooked",
+    "Name": "Resend hearing booked",
+    "Description": "Resending hearing booked details",
+    "DisplayOrder": 1335,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
+    "ShowEventNotes": "Y",
+    "SecurityClassification": "Public",
+    "Publish": "N"
+  },
+  {
     "LiveFrom": "01/01/2018",
     "CaseTypeID": "Benefit",
     "ID": "responseReceived",
