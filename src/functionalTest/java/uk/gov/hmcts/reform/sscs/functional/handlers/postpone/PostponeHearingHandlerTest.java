@@ -13,6 +13,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.restassured.http.ContentType;
 import java.util.Optional;
+import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -61,9 +62,12 @@ public class PostponeHearingHandlerTest extends BaseHandler {
             .header("Authorization", idamTokens.getIdamOauth2Token())
             .header("ServiceAuthorization", idamTokens.getServiceAuthorization())
             .body(body).relaxedHTTPSValidation()
+            .expect()
+            .statusCode(200)
             .when()
             .post("/ccdSubmittedEvent/")
             .then()
+            .statusCode(HttpStatus.SC_OK)
             .log().all(true)
             .extract().body().asString();
 
