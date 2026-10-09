@@ -1774,6 +1774,7 @@
     "DisplayOrder": 1335,
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
+    "EventEnablingCondition": "appeal.benefitType.code=\"DoNotShow\"",
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public",
