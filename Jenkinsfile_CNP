@@ -144,6 +144,8 @@ withPipeline(type, product, component) {
     env.TEST_DOCUMENT_MANAGEMENT_URL = "http://dm-store-aat.service.core-compute-aat.internal"
     env.PACT_BROKER_FULL_URL = "https://pact-broker.platform.hmcts.net"
     env.CCD_DEF_PROD_LIKE = 'false'
+    env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
+    env.IDAM_OIDC_URL = "https://idam-web-public.aat.platform.hmcts.net"
 
     onMaster() {
         setAatEnvVars();
