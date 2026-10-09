@@ -21,7 +21,6 @@ env.NONPROD_ENVIRONMENT_NAME = (params.UI_URL_TO_TEST.contains('demo') && params
 
 def secrets = [
         'sscs-${env}': [
-                secret('idam-api', 'IDAM_API_URL'),
                 secret('idam-oauth-user', 'IDAM_OAUTH2_CLIENT_ID'),
                 secret('ccd-api', 'CORE_CASE_DATA_API_URL'),
                 secret('idam-redirect', 'IDAM_OAUTH2_REDIRECT_URL'),

@@ -105,17 +105,17 @@ export async function getSSCSServiceToken() {
 }
 
 export async function getIDAMUserID(idamToken) {
-  const idamDetailsPath = '/details';
+  const idamDetailsPath = '/o/userinfo';
 
   let apiContext = await request.newContext({
     // All requests we send go to this API Endpoint.
-    baseURL: urls.idamUrl,
+    baseURL: urls.idamOidcUrl,
     extraHTTPHeaders: {
       'content-type': 'application/json'
     }
   });
 
-  const response = await apiContext.get(`${urls.idamUrl}${idamDetailsPath}`, {
+  const response = await apiContext.get(`${urls.idamOidcUrl}${idamDetailsPath}`, {
     headers: {
       Authorization: `Bearer ${idamToken}`,
       'content-type': 'application/json'
@@ -123,5 +123,5 @@ export async function getIDAMUserID(idamToken) {
   });
   const body = await response.body();
   // @ts-ignore
-  return JSON.parse(body).id;
+  return JSON.parse(body).uid;
 }

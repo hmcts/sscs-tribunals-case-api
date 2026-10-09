@@ -16,7 +16,6 @@ GradleBuilder gradleBuilder = new GradleBuilder(this, product)
 
 def secrets = [
         'sscs-${env}': [
-                secret('idam-api', 'IDAM_API_URL'),
                 secret('idam-oauth-user', 'IDAM_OAUTH2_CLIENT_ID'),
                 secret('idam-redirect', 'IDAM_OAUTH2_REDIRECT_URL'),
                 secret('idam-sscs-systemupdate-user', 'IDAM_SSCS_SYSTEMUPDATE_USER'),
@@ -145,6 +144,8 @@ withPipeline(type, product, component) {
     env.TEST_DOCUMENT_MANAGEMENT_URL = "http://dm-store-aat.service.core-compute-aat.internal"
     env.PACT_BROKER_FULL_URL = "https://pact-broker.platform.hmcts.net"
     env.CCD_DEF_PROD_LIKE = 'false'
+    env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
+    env.IDAM_OIDC_URL = "https://idam-web-public.aat.platform.hmcts.net"
 
     onMaster() {
         setAatEnvVars();
