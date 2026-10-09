@@ -16,8 +16,6 @@ GradleBuilder gradleBuilder = new GradleBuilder(this, product)
 
 def secrets = [
         'sscs-${env}': [
-                secret('idam-api', 'IDAM_API_URL'),
-                secret('idam-web-public', 'IDAM_OIDC_URL'),
                 secret('idam-oauth-user', 'IDAM_OAUTH2_CLIENT_ID'),
                 secret('idam-redirect', 'IDAM_OAUTH2_REDIRECT_URL'),
                 secret('idam-sscs-systemupdate-user', 'IDAM_SSCS_SYSTEMUPDATE_USER'),
