@@ -23,6 +23,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
+import uk.gov.hmcts.reform.idam.client.OidcApi;
 import uk.gov.hmcts.reform.sscs.jobscheduler.model.Job;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobExecutor;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobPayloadDeserializer;
@@ -55,6 +56,9 @@ public class ApplicationTest {
 
     @MockitoBean
     private IdamApi idamApi;
+
+    @MockitoBean
+    private OidcApi oidcApi;
 
     @MockitoBean
     private JobPayloadSerializer<TestPayload> jobPayloadSerializer;
