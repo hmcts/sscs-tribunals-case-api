@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.jobscheduler;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.after;
@@ -10,9 +9,9 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 
 import java.time.ZonedDateTime;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.impl.matchers.GroupMatcher;
@@ -21,7 +20,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.idam.client.IdamApi;
 import uk.gov.hmcts.reform.idam.client.OidcApi;
 import uk.gov.hmcts.reform.sscs.jobscheduler.model.Job;
@@ -36,7 +35,7 @@ import uk.gov.hmcts.reform.sscs.jobscheduler.services.quartz.JobClassMapping;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.quartz.JobMapper;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.quartz.JobMapping;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = SpringBootContextRoot.class)
 @ActiveProfiles("integration")
 public class ApplicationTest {
@@ -77,7 +76,7 @@ public class ApplicationTest {
 
     TestPayload testPayload = new TestPayload();
 
-    @Before
+    @BeforeEach
     public void setUp() {
 
         jobService.start();
@@ -98,7 +97,7 @@ public class ApplicationTest {
     @Test
     public void jobIsScheduledAndExecutesInTheFuture() {
 
-        assertTrue("Job scheduler is empty at start", getScheduledJobCount() == 0);
+        assertEquals(0, getScheduledJobCount(), "Job scheduler is empty at start");
 
         String jobGroup = "test-job-group";
         String jobName = "test-job-name";
@@ -114,7 +113,7 @@ public class ApplicationTest {
 
         assertNotNull(jobId);
 
-        assertTrue("Job was scheduled into Quartz", getScheduledJobCount() == 1);
+        assertEquals(1, getScheduledJobCount(), "Job was scheduled into Quartz");
 
         // job is executed
         verify(jobExecutor, timeout(10000)).execute(
@@ -128,7 +127,7 @@ public class ApplicationTest {
     @Test
     public void jobIsScheduledAndThenRemovedByGroup() {
 
-        assertTrue("Job scheduler is empty at start", getScheduledJobCount() == 0);
+        assertEquals(0, getScheduledJobCount(), "Job scheduler is empty at start");
 
         String jobGroup = "test-job-group";
         String jobName = "test-job-name";
@@ -155,11 +154,11 @@ public class ApplicationTest {
 
         assertNotNull(jobId2);
 
-        assertTrue("Jobs were scheduled into Quartz", getScheduledJobCount() == 2);
+        assertEquals(2, getScheduledJobCount(), "Jobs were scheduled into Quartz");
 
         jobRemover.removeGroup(jobGroup);
 
-        assertTrue("Jobs were removed from Quartz after execution", getScheduledJobCount() == 0);
+        assertEquals(0, getScheduledJobCount(), "Jobs were removed from Quartz after execution");
 
         // jobs are /never/ executed
         verify(jobExecutor, after(10000).never()).execute(
@@ -180,7 +179,7 @@ public class ApplicationTest {
     @Test
     public void jobIsScheduledAndThenRemovedById() {
 
-        assertTrue("Job scheduler is empty at start", getScheduledJobCount() == 0);
+        assertEquals(0, getScheduledJobCount(), "Job scheduler is empty at start");
 
         String jobGroup = "test-job-group";
         String jobName = "test-job-name";
@@ -196,11 +195,11 @@ public class ApplicationTest {
 
         assertNotNull(jobId);
 
-        assertTrue("Job was scheduled into Quartz", getScheduledJobCount() == 1);
+        assertEquals(1, getScheduledJobCount(), "Job was scheduled into Quartz");
 
         jobRemover.remove(jobId, jobGroup);
 
-        assertTrue("Job was removed from Quartz after execution", getScheduledJobCount() == 0);
+        assertEquals(0, getScheduledJobCount(), "Job was removed from Quartz after execution");
 
         // job is /never/ executed
         verify(jobExecutor, after(10000).never()).execute(
