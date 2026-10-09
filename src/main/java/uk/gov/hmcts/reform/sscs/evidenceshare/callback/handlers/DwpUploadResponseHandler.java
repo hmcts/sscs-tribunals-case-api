@@ -13,6 +13,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.HandlerUtils.isANewJointParty;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,7 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
 
     private final IdamService idamService;
     private final UpdateCcdCaseService updateCcdCaseService;
+    private final List<Issue> issueCodes = List.of(Issue.LT, Issue.HT, Issue.OC, Issue.OI, Issue.OS, Issue.OX);
 
     @Autowired
     public DwpUploadResponseHandler(UpdateCcdCaseService updateCcdCaseService,
@@ -63,8 +65,12 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
         final BenefitType benefitType = sscsCaseData.getAppeal().getBenefitType();
-
-        if (equalsIgnoreCase(benefitType.getCode(), Benefit.CHILD_SUPPORT.getShortName())
+        final String issueCode = sscsCaseData.getIssueCode();
+        if (issueCodes.stream().anyMatch(code -> equalsIgnoreCase(code.toString(), issueCode))
+                || equalsIgnoreCase(benefitType.getCode(), Benefit.UC.getShortName()) && equalsIgnoreCase(issueCode, "UM")) {
+            triggerDwpResponseReceived(callback.getCaseDetails().getId(), "Response received",
+                    "Update to response received as an Admin has to review the case");
+        } else if (equalsIgnoreCase(benefitType.getCode(), Benefit.CHILD_SUPPORT.getShortName())
             || isPotentiallyHarmfulEvidenceOrHasEditedEvidenceBundle(sscsCaseData)) {
             triggerDwpResponseReceived(callback.getCaseDetails().getId(), "Response received",
                 "Update to response received as an Admin has to review the case");
