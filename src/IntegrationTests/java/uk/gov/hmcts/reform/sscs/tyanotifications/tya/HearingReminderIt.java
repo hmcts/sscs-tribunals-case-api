@@ -11,9 +11,9 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -25,7 +25,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -46,7 +45,6 @@ import uk.gov.service.notify.SendEmailResponse;
 import uk.gov.service.notify.SendLetterResponse;
 import uk.gov.service.notify.SendSmsResponse;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("integration")
 @AutoConfigureMockMvc
@@ -96,7 +94,7 @@ public class HearingReminderIt {
     @MockitoBean
     private IdamService idamService;
 
-    @Before
+    @BeforeEach
     public void setup() throws NotificationClientException {
         controller = new NotificationController(notificationService, authorisationService, ccdService, deserializer, idamService);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
@@ -124,8 +122,9 @@ public class HearingReminderIt {
         when(outOfHoursCalculator.isItOutOfHours()).thenReturn(false);
     }
 
-    @Test
-    public void shouldScheduleHearingReminderThenRemoveWhenPostponed() throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = {"hearingBooked", "resendHearingBooked"})
+    void shouldScheduleHearingReminderThenRemoveWhenPostponed(String event) throws Exception {
 
         ReflectionTestUtils.setField(notificationService, "covid19Feature", false);
 
@@ -137,7 +136,7 @@ public class HearingReminderIt {
 
         IntegrationTestHelper.assertScheduledJobCount(quartzScheduler, "Job scheduler is empty at start", 0);
 
-        sendEvent("hearingBooked");
+        sendEvent(event);
 
         IntegrationTestHelper.assertScheduledJobCount(quartzScheduler, "Hearing reminders scheduled", "hearingReminder", 2);
 
