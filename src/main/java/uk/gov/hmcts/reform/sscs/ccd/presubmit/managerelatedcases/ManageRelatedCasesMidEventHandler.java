@@ -30,6 +30,8 @@ public class ManageRelatedCasesMidEventHandler implements PreSubmitCallbackHandl
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
         String userAuthorisation) {
 
+        canHandle(callbackType, callback);
+
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 

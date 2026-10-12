@@ -58,9 +58,9 @@ public class ManageRelatedCasesAboutToSubmitHandler implements PreSubmitCallback
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         associateCases(sscsCaseData, caseDetails);
-        if (callback.getCaseDetailsBefore().isPresent()) {
-            removeUnassociatedCases(callback.getCaseDetailsBefore().get().getCaseData(), sscsCaseData);
-        }
+        callback
+            .getCaseDetailsBefore()
+            .ifPresent(caseDetailsBefore -> removeUnassociatedCases(caseDetailsBefore.getCaseData(), sscsCaseData));
         return preSubmitCallbackResponse;
     }
 
@@ -93,8 +93,8 @@ public class ManageRelatedCasesAboutToSubmitHandler implements PreSubmitCallback
     private void removeUnassociatedCases(final SscsCaseData caseDataBefore, final SscsCaseData caseDataAfter) {
         if (isNotEmpty(caseDataBefore.getAssociatedCase())) {
             final List<CaseLink> afterCaseLinks = ofNullable(caseDataAfter.getAssociatedCase()).orElse(emptyList());
-            final List<SscsCaseDetails> removedCases = caseDataBefore
-                .getAssociatedCase()
+            final List<SscsCaseDetails> removedCases = ofNullable(caseDataBefore.getAssociatedCase())
+                .orElse(emptyList())
                 .stream()
                 .filter(caseLink -> !afterCaseLinks.contains(caseLink))
                 .map(caseLink -> ccdService.getByCaseId(Long.parseLong(caseLink.getValue().getCaseReference()),
@@ -105,6 +105,7 @@ public class ManageRelatedCasesAboutToSubmitHandler implements PreSubmitCallback
                 associatedCaseLinkHelper.removeLinkToOtherAssociatedCases(removedCases, caseDataAfter.getCcdCaseId());
             }
         }
+
     }
 
 }
