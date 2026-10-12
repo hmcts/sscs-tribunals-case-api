@@ -71,6 +71,7 @@ public enum NotificationEventType {
     REISSUE_DOCUMENT(EventType.REISSUE_DOCUMENT, true, true, true, true, false, 0),
     REQUEST_FOR_INFORMATION(EventType.REQUEST_FOR_INFORMATION, true, true, true, false, false, 0),
     RESEND_APPEAL_CREATED(EventType.RESEND_APPEAL_CREATED, true, true, false, true, false, 0),
+    RESEND_HEARING_BOOKED(EventType.RESEND_HEARING_BOOKED, true, false, false, false, false, 0),
     REVIEW_AND_SET_ASIDE(EventType.REVIEW_AND_SET_ASIDE, true, true, true, true, false, 0),
     REVIEW_CONFIDENTIALITY_REQUEST(EventType.REVIEW_CONFIDENTIALITY_REQUEST, true, true, true, false, false, 0),
     SET_ASIDE_GRANTED(EventType.SET_ASIDE_GRANTED, true, true, true, true, false, 0),
