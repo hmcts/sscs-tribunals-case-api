@@ -33,7 +33,8 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
 
     private final IdamService idamService;
     private final UpdateCcdCaseService updateCcdCaseService;
-    private final List<Issue> issueCodes = List.of(Issue.LT, Issue.HT, Issue.OC, Issue.OI, Issue.OS, Issue.OX);
+    private final List<Issue> responseReceivedIssueCodes
+            = List.of(Issue.LT, Issue.HT, Issue.OC, Issue.OI, Issue.OS, Issue.OX, Issue.UM);
 
     @Autowired
     public DwpUploadResponseHandler(UpdateCcdCaseService updateCcdCaseService,
@@ -66,8 +67,7 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
         final BenefitType benefitType = sscsCaseData.getAppeal().getBenefitType();
         final String issueCode = sscsCaseData.getIssueCode();
-        if (issueCodes.stream().anyMatch(code -> equalsIgnoreCase(code.toString(), issueCode))
-                || equalsIgnoreCase(benefitType.getCode(), Benefit.UC.getShortName()) && equalsIgnoreCase(issueCode, "UM")) {
+        if (responseReceivedIssueCodes.stream().anyMatch(code -> equalsIgnoreCase(code.toString(), issueCode))) {
             triggerDwpResponseReceived(callback.getCaseDetails().getId(), "Response received",
                     "Update to response received as an Admin has to review the case");
         } else if (equalsIgnoreCase(benefitType.getCode(), Benefit.CHILD_SUPPORT.getShortName())
