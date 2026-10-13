@@ -83,7 +83,7 @@ class SaveCorrespondenceAsyncServiceIt {
                 any(byte[].class), any(), any(), any());
             verify(ccdNotificationsPdfService)
                 .notifyFailedToRetrieveCorrespondence(Long.valueOf(CCD_ID), null, CorrespondenceType.Letter);
-            logCapture.assertLogContains("Failed saving Letter correspondence into ccd for case id " + CCD_ID
+            logCapture.assertLogContains("Failed saving bulk print Letter correspondence into ccd for case id " + CCD_ID
                 + " after retries exhausted, notification was sent but will not appear on the Notifications Sent tab.", Level.ERROR);
         });
     }
