@@ -358,7 +358,7 @@ public class NotificationService {
             return false;
         }
 
-        if (HEARING_BOOKED.equals(notificationType)
+        if ((HEARING_BOOKED.equals(notificationType) || RESEND_HEARING_BOOKED.equals(notificationType))
             && DwpState.FINAL_DECISION_ISSUED.equals(notificationWrapper.getNewSscsCaseData().getDwpState())) {
             log.info("Cannot complete notification {} as the notification has been fired in error for caseId {}.",
                 notificationType.getId(), notificationWrapper.getCaseId());

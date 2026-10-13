@@ -5279,4 +5279,46 @@ class NotificationsIt extends NotificationsItBase {
         verify(notificationClient, atLeastOnce()).sendPrecompiledLetterWithInputStream(any(), any());
     }
 
+    @Test
+    void shouldSendNotificationForResendHearingBookedForAnOralHearing() throws Exception {
+        json = updateEmbeddedJson(json, "resendHearingBooked", "event_id");
+        json = updateEmbeddedJson(json, "Yes", "case_details", "case_data", "subscriptions", "representativeSubscription", "subscribeEmail");
+        json = json.replace("2018-01-12", LocalDate.now().plusDays(2).toString());
+
+        HttpServletResponse response = getResponse(getRequestWithAuthHeader(json));
+
+        assertHttpStatus(response, HttpStatus.OK);
+        verify(notificationClient, times(2)).sendPrecompiledLetterWithInputStream(any(), any());
+        verify(notificationClient, times(2)).sendEmail(any(), any(), any(), any());
+        verify(notificationClient, times(2)).sendSms(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void shouldNotSendNotificationForResendHearingBookedForAnOralHearingInThePast() throws Exception {
+        json = updateEmbeddedJson(json, "resendHearingBooked", "event_id");
+        json = updateEmbeddedJson(json, "Yes", "case_details", "case_data", "subscriptions", "representativeSubscription", "subscribeEmail");
+        json = json.replace("2018-01-12", LocalDate.now().minusDays(2).toString());
+
+        HttpServletResponse response = getResponse(getRequestWithAuthHeader(json));
+
+        assertHttpStatus(response, HttpStatus.OK);
+        verify(notificationClient, never()).sendEmail(any(), any(), any(), any());
+        verify(notificationClient, never()).sendSms(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void shouldNotSendNotificationForResendHearingBookedForAPaperHearing() throws Exception {
+        json = updateEmbeddedJson(json, "No", "case_details", "case_data", "appeal", "hearingOptions", "wantsToAttend");
+        json = updateEmbeddedJson(json, "paper", "case_details", "case_data", "appeal", "hearingType");
+        json = updateEmbeddedJson(json, "resendHearingBooked", "event_id");
+        json = json.replace("2018-01-12", LocalDate.now().plusDays(2).toString());
+
+        HttpServletResponse response = getResponse(getRequestWithAuthHeader(json));
+
+        assertHttpStatus(response, HttpStatus.OK);
+        verify(notificationClient, never()).sendPrecompiledLetterWithInputStream(any(), any());
+        verify(notificationClient, never()).sendEmail(any(), any(), any(), any());
+        verify(notificationClient, never()).sendSms(any(), any(), any(), any(), any());
+    }
+
 }
