@@ -10,11 +10,13 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_I
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.createUploadResponse;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
+import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
+import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,6 +35,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
@@ -53,9 +57,14 @@ public class DirectionIssuedIt extends AbstractEventIt {
     @MockitoBean
     private GenerateFile generateFile;
 
+    @MockitoBean
+    private IdamService idamService;
+
     @Before
     public void setup() throws IOException {
         setup("callback/directionIssuedForPreview.json");
+        when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+            .roles(List.of(SUPER_USER.getValue())).build());
     }
 
     @Test
@@ -135,11 +144,11 @@ public class DirectionIssuedIt extends AbstractEventIt {
         assertNull(result.getData().getExtensionNextEventDl());
         assertNull(result.getData().getReinstatementOutcome());
         assertEquals(4, result.getData().getSscsDocument().size());
-        assertEquals(DocumentType.DIRECTION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
-        assertEquals("some location", result.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals("Addition B - Directions Notice issued on 09-02-2018.pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
-        assertEquals("B", result.getData().getSscsDocument().get(0).getValue().getBundleAddition());
-        assertEquals("some location", result.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
+        assertEquals(DocumentType.DIRECTION_NOTICE.getValue(), result.getData().getSscsDocument().getLast().getValue().getDocumentType());
+        assertEquals("some location", result.getData().getSscsDocument().getLast().getValue().getDocumentLink().getDocumentUrl());
+        assertEquals("Addition B - Directions Notice issued on 09-02-2018.pdf", result.getData().getSscsDocument().getLast().getValue().getDocumentFileName());
+        assertEquals("B", result.getData().getSscsDocument().getLast().getValue().getBundleAddition());
+        assertEquals("some location", result.getData().getSscsDocument().getLast().getValue().getDocumentLink().getDocumentUrl());
         assertEquals(DwpState.DIRECTION_ACTION_REQUIRED, result.getData().getDwpState());
         assertEquals(AWAITING_INFORMATION, result.getData().getInterlocReviewState());
     }
@@ -160,7 +169,7 @@ public class DirectionIssuedIt extends AbstractEventIt {
 
         assertEquals("granted", result.getData().getReinstatementOutcome().getValue());
         assertEquals(State.VALID_APPEAL, result.getData().getState());
-        assertEquals(DocumentType.DIRECTION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertEquals(DocumentType.DIRECTION_NOTICE.getValue(), result.getData().getSscsDocument().getLast().getValue().getDocumentType());
     }
 
 }

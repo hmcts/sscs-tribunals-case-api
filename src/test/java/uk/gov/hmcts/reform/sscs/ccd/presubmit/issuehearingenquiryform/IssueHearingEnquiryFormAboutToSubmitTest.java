@@ -39,7 +39,7 @@ class IssueHearingEnquiryFormAboutToSubmitTest {
 
     @BeforeEach
     void setUp() {
-        handler = new IssueHearingEnquiryFormAboutToSubmit(true);
+        handler = new IssueHearingEnquiryFormAboutToSubmit();
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").build();
     }
 
@@ -53,15 +53,6 @@ class IssueHearingEnquiryFormAboutToSubmitTest {
             boolean result = handler.canHandle(ABOUT_TO_SUBMIT, callback);
 
             assertThat(result).isTrue();
-        }
-
-        @Test
-        void shouldReturnFalseWhenCmOtherPartyConfidentialityDisabled() {
-            handler = new IssueHearingEnquiryFormAboutToSubmit(false);
-
-            boolean result = handler.canHandle(ABOUT_TO_SUBMIT, callback);
-
-            assertThat(result).isFalse();
         }
 
         @ParameterizedTest

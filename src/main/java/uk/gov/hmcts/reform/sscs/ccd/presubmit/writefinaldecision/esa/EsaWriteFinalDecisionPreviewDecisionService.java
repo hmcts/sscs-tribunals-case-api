@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -37,16 +36,14 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
 
     private EsaDecisionNoticeQuestionService esaDecisionNoticeQuestionService;
     private VenueDataLoader venueDataLoader;
-    private final boolean isSevereConditionsEnabled;
 
     @Autowired
     public EsaWriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, UserDetailsService userDetailsService,
                                                        EsaDecisionNoticeQuestionService decisionNoticeQuestionService, EsaDecisionNoticeOutcomeService outcomeService,
-                                                       DocumentConfiguration documentConfiguration, VenueDataLoader venueDataLoader, @Value("${feature.severeConditions.enabled}") boolean isSevereConditionsEnabled) {
+                                                       DocumentConfiguration documentConfiguration, VenueDataLoader venueDataLoader) {
         super(generateFile, userDetailsService, decisionNoticeQuestionService, outcomeService, documentConfiguration, venueDataLoader);
         this.esaDecisionNoticeQuestionService = decisionNoticeQuestionService;
         this.venueDataLoader = venueDataLoader;
-        this.isSevereConditionsEnabled = isSevereConditionsEnabled;
     }
 
     @Override
@@ -159,9 +156,7 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
         builder.regulation29Applicable(caseData.getSscsEsaCaseData().getDoesRegulation29Apply() == null ? null : caseData.getSscsEsaCaseData().getDoesRegulation29Apply().toBoolean());
         builder.regulation35Applicable(caseData.getSscsEsaCaseData().getDoesRegulation35Apply() == null ? null : caseData.getSscsEsaCaseData().getDoesRegulation35Apply().toBoolean());
         builder.supportGroupOnly(caseData.isSupportGroupOnlyAppeal());
-        if (isSevereConditionsEnabled) {
-            builder.severeCriteriaApplies(caseData.getExtendedSscsCaseData().getEsaWriteFinalDecisionSevereCriteriaApply() == null ? null : YesNo.isYes(caseData.getExtendedSscsCaseData().getEsaWriteFinalDecisionSevereCriteriaApply()));
-        }
+        builder.severeCriteriaApplies(caseData.getExtendedSscsCaseData().getEsaWriteFinalDecisionSevereCriteriaApply() == null ? null : YesNo.isYes(caseData.getExtendedSscsCaseData().getEsaWriteFinalDecisionSevereCriteriaApply()));
         builder.esaRegulationsYear(nonNull(caseData.getSscsEsaCaseData().getWhichEsaRegulationsApply()) ? caseData.getSscsEsaCaseData().getWhichEsaRegulationsApply() : null);
     }
 

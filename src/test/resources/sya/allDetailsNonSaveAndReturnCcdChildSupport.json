@@ -74,7 +74,6 @@
       },
       "isAppointee": "No",
       "role": {},
-      "confidentialityRequired": null,
       "isAddressSameAsAppointee": "No",
       "appointee": {
         "name": {
@@ -245,6 +244,7 @@
     }
   },
   "evidencePresent": "No",
+  "hasUndeterminedPartyConfidentiality":"Yes",
   "sscsDocument": [],
   "dwpRegionalCentre": "Child Support",
   "pcqId": "12345678",
@@ -280,5 +280,5 @@
   "poAttendanceConfirmed": "No",
   "tribunalDirectPoToAttend": "No",
   "hearingRoute": "gaps",
-  "linkedCasesBoolean":"No"
+  "linkedCasesBoolean": "No"
 }

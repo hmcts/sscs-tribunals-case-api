@@ -1,15 +1,18 @@
 #!groovy
 
-@Library("Infrastructure")
+@Library("Infrastructure@2.12.1")
 
 import uk.gov.hmcts.contino.AppPipelineDsl
 import uk.gov.hmcts.contino.GithubAPI
+import uk.gov.hmcts.contino.GradleBuilder
 
 def type = "java"
 def product = "sscs"
 def component = "tribunals-api"
 def dmnBranch = "master"
 def waStandaloneBranch = "master"
+
+GradleBuilder gradleBuilder = new GradleBuilder(this, product)
 
 def secrets = [
         'sscs-${env}': [
@@ -92,7 +95,9 @@ def secrets = [
                 secret('ccd-admin-web-oauth2-client-secret', 'ADMIN_WEB_IDAM_SECRET'),
                 secret('idam-data-store-system-user-password', 'IDAM_DATA_STORE_SYSTEM_USER_PASSWORD'),
                 secret('idam-data-store-system-user-username', 'IDAM_DATA_STORE_SYSTEM_USER_USERNAME'),
-                secret('idam-data-store-client-secret', 'IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET')
+                secret('idam-data-store-client-secret', 'IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET'),
+                secret('session-keys', 'SESSION_KEYS')
+
         ],
         'wa-${env}'  : [
                 secret('app-insights-connection-string', 'WA_INSIGHT_CONNECTION_STRING'),
@@ -134,7 +139,7 @@ withPipeline(type, product, component) {
     enableHighLevelDataSetup()
     loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')
-    syncBranchesWithMaster(['demo', 'ithc', 'perftest'])
+    syncBranchesWithMaster(['ithc', 'perftest'])
 
     env.DOCUMENT_MANAGEMENT_URL = "http://dm-store-aat.service.core-compute-aat.internal"
     env.TEST_DOCUMENT_MANAGEMENT_URL = "http://dm-store-aat.service.core-compute-aat.internal"
@@ -172,14 +177,17 @@ withPipeline(type, product, component) {
     onDemo {
         env.ENVIRONMENT = "demo"
         env.WORK_ALLOCATION_FEATURE_ENABLED = 'false'
+        env.USE_IDENTITY = 'true'
     }
     onPerftest {
         env.ENVIRONMENT = "perftest"
         env.WORK_ALLOCATION_FEATURE_ENABLED = 'false'
+        env.USE_IDENTITY = 'true'
     }
     onIthc {
         env.ENVIRONMENT = "ithc"
         env.WORK_ALLOCATION_FEATURE_ENABLED = 'false'
+        env.USE_IDENTITY = 'true'
     }
     afterAlways('functionalTest:aat') {
         env.ENVIRONMENT = "prod"
@@ -209,13 +217,13 @@ withPipeline(type, product, component) {
         if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "run-notification-tests").size() > 0) {
             runNotificationTests()
         }
-        runE2eTests()
+        runE2eTests(gradleBuilder)
     }
 
     afterSuccess('smoketest:aat') {
         sh './bin/add-hearing-role-assignments-system-user.sh aat'
 
-        runE2eTests()
+        runE2eTests(gradleBuilder)
     }
 }
 
@@ -231,15 +239,15 @@ def runNotificationTests() {
 
 def generateDefinitions() {
     if (env.CCD_DEF_PROD_LIKE == 'true') {
-        sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT} ${env.WORK_ALLOCATION_FEATURE_ENABLED} prod"
+        sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT} ${env.USE_IDENTITY} ${env.WORK_ALLOCATION_FEATURE_ENABLED} prod"
         echo "Generate prod-like CCD definition"
     } else {
-        sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT} ${env.WORK_ALLOCATION_FEATURE_ENABLED}"
+        sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT} ${env.USE_IDENTITY} ${env.WORK_ALLOCATION_FEATURE_ENABLED}"
     }
 
     steps.archiveArtifacts artifacts: "definitions/benefit/*.xlsx"
 
-    sh "./bin/create-xlsx.sh bulkscan tag ${env.ENVIRONMENT}"
+    sh "./bin/create-xlsx.sh bulkscan tag ${env.ENVIRONMENT} ${env.USE_IDENTITY}"
     steps.archiveArtifacts artifacts: "definitions/bulkscan/*.xlsx"
 }
 
@@ -254,7 +262,7 @@ def setAatEnvVars() {
     env.EM_STITCHING_API_URL = "http://em-stitching-aat.service.core-compute-aat.internal"
     env.ENVIRONMENT = "aat"
     env.WORK_ALLOCATION_FEATURE_ENABLED = 'false'
-    env.CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED = true
+    env.USE_IDENTITY = 'true'
 }
 
 def setPreviewEnvVars() {
@@ -268,13 +276,13 @@ def setPreviewEnvVars() {
     env.CASE_DOCUMENT_AM_URL = "https://ccd-case-document-am-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.EM_STITCHING_API_URL = "https://em-stitching-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.ENVIRONMENT = "pr"
-    env.CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED = true
+    env.USE_IDENTITY = 'true'
 }
 
-def runE2eTests() {
+def runE2eTests(GradleBuilder gradleBuilder) {
     stage('Playwright tests') {
         try {
-            sh './gradlew runE2eTests'
+            gradleBuilder.gradle('runE2eTests')
         } catch (Error) {
             unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
         } finally {

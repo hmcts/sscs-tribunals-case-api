@@ -1,0 +1,8 @@
+{
+  "EventName": "Issue hearing enquiry form",
+  "SelectPartyDropdownLabel": "Other party",
+  "AddDocumentsRadioLabel": "Do you want to add any documents?",
+  "SelectDocumentDropdownLabel": "Document",
+  "AddDocumentsYesLabel": "Yes",
+  "AddDocumentsNoLabel": "No"
+}

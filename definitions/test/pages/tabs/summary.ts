@@ -2,6 +2,7 @@ import { expect, Page } from '@playwright/test';
 import { WebAction } from '../../common/web.action';
 import dateUtilsComponent from '../../utils/DateUtilsComponent';
 import logger from '../../utils/loggerUtil';
+import { HomePage } from '../common/homePage';
 
 let webAction: WebAction;
 const currentDate: Date = new Date();
@@ -103,6 +104,32 @@ export class Summary {
     logger.debug(`New formatted date is ####### ${formattedDueDate}`);
     await this.verifyPageContentByKeyValue(reqField, formattedDueDate);
   }
+
+
+  async waitForSummaryState(expectedState: string) {
+    const homePage = new HomePage(this.page);
+    for (let attempt = 0; attempt < 8; attempt++) {
+      await homePage.navigateToTab('Summary');
+      const summaryState = await this.page
+        .locator('#summaryState')
+        .textContent()
+        .catch(() => '');
+
+      if (summaryState?.includes(expectedState)) {
+        return;
+      }
+
+      await homePage.delay(5000);
+      await homePage.reloadPage();
+    }
+
+    await homePage.navigateToTab('Summary');
+    await this.verifyPageSectionByKeyValue(
+      'Appeal status',
+      expectedState
+    );
+  }
+
 
   /*async verifyPresenceOfText(fieldValue: string): Promise<void>{
         await webActions.verifyTextVisibility(fieldValue);

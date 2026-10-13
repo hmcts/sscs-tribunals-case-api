@@ -129,11 +129,11 @@ public class DecisionIssuedIt extends AbstractEventIt {
         assertNull(result.getData().getDocumentStaging().getDateAdded());
         assertNull(result.getData().getExtensionNextEventDl());
         assertEquals(4, result.getData().getSscsDocument().size());
-        assertEquals(DocumentType.DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
-        assertEquals("some location", result.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals("Addition B - Decision Notice issued on 09-02-2018.pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
-        assertEquals("B", result.getData().getSscsDocument().get(0).getValue().getBundleAddition());
-        assertEquals("some location", result.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
+        assertEquals(DocumentType.DECISION_NOTICE.getValue(), result.getData().getSscsDocument().getLast().getValue().getDocumentType());
+        assertEquals("some location", result.getData().getSscsDocument().getLast().getValue().getDocumentLink().getDocumentUrl());
+        assertEquals("Addition B - Decision Notice issued on 09-02-2018.pdf", result.getData().getSscsDocument().getLast().getValue().getDocumentFileName());
+        assertEquals("B", result.getData().getSscsDocument().getLast().getValue().getBundleAddition());
+        assertEquals("some location", result.getData().getSscsDocument().getLast().getValue().getDocumentLink().getDocumentUrl());
         assertEquals(STRUCK_OUT, result.getData().getDwpState());
         assertEquals("nonCompliantAppealStruckout", result.getData().getOutcome());
     }

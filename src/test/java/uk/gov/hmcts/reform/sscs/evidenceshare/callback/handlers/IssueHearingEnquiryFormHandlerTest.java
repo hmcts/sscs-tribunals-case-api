@@ -88,16 +88,16 @@ class IssueHearingEnquiryFormHandlerTest {
     @BeforeEach
     void setUp() {
         handler = new IssueHearingEnquiryFormHandler(bulkPrintService, hearingEnquiryFormPlaceholderService, coverLetterService,
-            buildTemplateConfig(), true);
+            buildTemplateConfig());
 
     }
 
     @ParameterizedTest
     @MethodSource("canHandleScenarios")
-    void shouldReturnExpectedCanHandleResult(CallbackType callbackType, EventType eventType, boolean featureEnabled,
+    void shouldReturnExpectedCanHandleResult(CallbackType callbackType, EventType eventType,
         boolean expected) {
         final IssueHearingEnquiryFormHandler testHandler = new IssueHearingEnquiryFormHandler(bulkPrintService,
-            hearingEnquiryFormPlaceholderService, coverLetterService, buildTemplateConfig(), featureEnabled);
+            hearingEnquiryFormPlaceholderService, coverLetterService, buildTemplateConfig());
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(SscsCaseData.builder().build(), READY_TO_LIST,
             eventType);
 
@@ -160,7 +160,7 @@ class IssueHearingEnquiryFormHandlerTest {
         verify(coverLetterService, times(2)).generateCoverLetterRetry(any(), templateNameCaptor.capture(),
             letterNameCaptor.capture(), eq(placeholders), eq(1));
         verify(coverLetterService).generateCoverSheet("hearing-enquiry-form-cover.docx", "coversheet", placeholders);
-        verify(bulkPrintService).sendToBulkPrint(anyLong(), eq(caseData), sentPdfsCaptor.capture(),
+        verify(bulkPrintService).sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(anyLong(), eq(caseData), sentPdfsCaptor.capture(),
             eq(ISSUE_HEARING_ENQUIRY_FORM), eq("Other Person"));
 
         assertThat(templateNameCaptor.getAllValues()).containsExactlyInAnyOrder("hearing-enquiry-form-letter.docx",
@@ -195,7 +195,7 @@ class IssueHearingEnquiryFormHandlerTest {
         handler.handle(SUBMITTED, callback);
 
         verify(coverLetterService).getSelectedDocuments(caseData);
-        verify(bulkPrintService).sendToBulkPrint(anyLong(), eq(caseData), sentPdfsCaptor.capture(),
+        verify(bulkPrintService).sendLetterToBulkPrintAndSaveAllDocumentsIntoCcdNotification(anyLong(), eq(caseData), sentPdfsCaptor.capture(),
             eq(ISSUE_HEARING_ENQUIRY_FORM), eq("Other Person"));
 
         List<Pdf> sentPdfs = sentPdfsCaptor.getValue();
@@ -263,10 +263,9 @@ class IssueHearingEnquiryFormHandlerTest {
     }
 
     private static Stream<Arguments> canHandleScenarios() {
-        return Stream.of(Arguments.of(SUBMITTED, ISSUE_HEARING_ENQUIRY_FORM, true, true),
-            Arguments.of(MID_EVENT, ISSUE_HEARING_ENQUIRY_FORM, true, false),
-            Arguments.of(SUBMITTED, APPEAL_RECEIVED, true, false),
-            Arguments.of(SUBMITTED, ISSUE_HEARING_ENQUIRY_FORM, false, false));
+        return Stream.of(Arguments.of(SUBMITTED, ISSUE_HEARING_ENQUIRY_FORM, true),
+            Arguments.of(MID_EVENT, ISSUE_HEARING_ENQUIRY_FORM, false),
+            Arguments.of(SUBMITTED, APPEAL_RECEIVED, false));
     }
 
     private SscsCaseData baseCaseData() {

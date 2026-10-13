@@ -35,6 +35,7 @@ public class RefDataClientTest {
     @Rule
     public JUnitSoftAssertions softly = new JUnitSoftAssertions();
     public static final String SSCS_COURT_TYPE_ID = "31";
+    public static final String SSCS_SERVICE_CODE = "BBA3";
     public static final String OPEN = "Open";
 
     @Autowired
@@ -71,7 +72,7 @@ public class RefDataClientTest {
         for (String epimsId : epimsIds) {
             try {
                 List<CourtVenue> sscsCourtVenues = refDataApi.courtVenueByEpimsId(oauth2Token,
-                        serviceToken, epimsId).stream().filter(venue -> SSCS_COURT_TYPE_ID.equals(venue.getCourtTypeId())
+                        serviceToken, SSCS_SERVICE_CODE, epimsId).stream().filter(venue -> SSCS_COURT_TYPE_ID.equals(venue.getCourtTypeId())
                         && OPEN.equalsIgnoreCase(venue.getCourtStatus()))
                     .collect(Collectors.toList());
 

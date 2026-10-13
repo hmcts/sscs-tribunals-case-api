@@ -1,7 +1,6 @@
 import { Page } from '@playwright/test';
 import { BaseStep } from './base';
 import { credentials } from '../../config/config';
-import { SendToInterlocPage } from '../../pages/send.to.interloc.page';
 import sendToInterlocData from '../../pages/content/send.to.interloc_en.json';
 import eventTestData from '../../pages/content/event.name.event.description_en.json';
 
@@ -18,21 +17,20 @@ export class SendToInterloc extends BaseStep {
   }
 
   async performSendToInterloc(caseId: string) {
-    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
+    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
     await this.homePage.chooseEvent('Send to interloc');
 
-    const sendToInterlocPage = new SendToInterlocPage(this.page);
-    await sendToInterlocPage.verifyPageContent();
-    await sendToInterlocPage.selectHearingType(
+    await this.sendToInterlocPage.verifyPageContent();
+    await this.sendToInterlocPage.selectHearingType(
       sendToInterlocData.sendToInterlocHearingSelectValue
     );
-    await sendToInterlocPage.selectCaseReview(
+    await this.sendToInterlocPage.selectCaseReview(
       sendToInterlocData.sendToInterlocCaseReviewSelectValue
     );
-    await sendToInterlocPage.selectReasonReferred(
+    await this.sendToInterlocPage.selectReasonReferred(
       sendToInterlocData.sendToInterlocReasonReferredValue
     );
-    await sendToInterlocPage.confirmSubmission();
+    await this.sendToInterlocPage.confirmSubmission();
 
     await this.eventNameAndDescriptionPage.verifyPageContent(
       'Send to interloc'
@@ -53,23 +51,22 @@ export class SendToInterloc extends BaseStep {
   async performSendToInterlocReferralReasonOver300Pages(caseId: string) {
     await this.loginUserWithCaseId(
       credentials.amTribunalCaseWorker,
-      true,
+      false,
       caseId
     );
     await this.homePage.chooseEvent('Send to interloc');
 
-    const sendToInterlocPage = new SendToInterlocPage(this.page);
-    await sendToInterlocPage.verifyPageContent();
-    await sendToInterlocPage.selectHearingType(
+    await this.sendToInterlocPage.verifyPageContent();
+    await this.sendToInterlocPage.selectHearingType(
       sendToInterlocData.sendToInterlocHearingSelectValue
     );
-    await sendToInterlocPage.selectCaseReview(
+    await this.sendToInterlocPage.selectCaseReview(
       sendToInterlocData.sendToInterlocCaseReviewSelectValue
     );
-    await sendToInterlocPage.selectReasonReferred(
+    await this.sendToInterlocPage.selectReasonReferred(
       sendToInterlocData.sendToInterlocReferralReasonOver300Pages
     );
-    await sendToInterlocPage.confirmSubmission();
+    await this.sendToInterlocPage.confirmSubmission();
 
     await this.eventNameAndDescriptionPage.verifyPageContent(
       'Send to interloc'
@@ -88,21 +85,20 @@ export class SendToInterloc extends BaseStep {
   }
 
   async performSendToInterlocReferralReasonComplexCase(caseId: string) {
-    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
+    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
     await this.homePage.chooseEvent('Send to interloc');
 
-    const sendToInterlocPage = new SendToInterlocPage(this.page);
-    await sendToInterlocPage.verifyPageContent();
-    await sendToInterlocPage.selectHearingType(
+    await this.sendToInterlocPage.verifyPageContent();
+    await this.sendToInterlocPage.selectHearingType(
       sendToInterlocData.sendToInterlocHearingSelectValue
     );
-    await sendToInterlocPage.selectCaseReview(
+    await this.sendToInterlocPage.selectCaseReview(
       sendToInterlocData.sendToInterlocCaseReviewSelectValueJudge
     );
-    await sendToInterlocPage.selectReasonReferred(
+    await this.sendToInterlocPage.selectReasonReferred(
       sendToInterlocData.sendToInterlocReferralReasonComplexCase
     );
-    await sendToInterlocPage.confirmSubmission();
+    await this.sendToInterlocPage.confirmSubmission();
 
     await this.eventNameAndDescriptionPage.verifyPageContent(
       'Send to interloc'
@@ -121,21 +117,20 @@ export class SendToInterloc extends BaseStep {
   }
 
   async performSendToInterlocJudge(caseId: string) {
-    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
+    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
     await this.homePage.chooseEvent('Send to interloc');
 
-    const sendToInterlocPage = new SendToInterlocPage(this.page);
-    await sendToInterlocPage.verifyPageContent();
-    await sendToInterlocPage.selectHearingType(
+    await this.sendToInterlocPage.verifyPageContent();
+    await this.sendToInterlocPage.selectHearingType(
       sendToInterlocData.sendToInterlocHearingSelectValue
     );
-    await sendToInterlocPage.selectCaseReview(
+    await this.sendToInterlocPage.selectCaseReview(
       sendToInterlocData.sendToInterlocCaseReviewSelectValueJudge
     );
-    await sendToInterlocPage.selectReasonReferred(
+    await this.sendToInterlocPage.selectReasonReferred(
       sendToInterlocData.sendToInterlocReasonReferredValue
     );
-    await sendToInterlocPage.confirmSubmission();
+    await this.sendToInterlocPage.confirmSubmission();
 
     await this.eventNameAndDescriptionPage.verifyPageContent(
       'Send to interloc'
@@ -154,48 +149,46 @@ export class SendToInterloc extends BaseStep {
   }
 
   async verifyConfidentialityReferralReasons(caseId: string, user) {
-    await this.loginUserWithCaseId(user, true, caseId);
+    await this.loginUserWithCaseId(user, false, caseId);
     await this.homePage.chooseEvent('Send to interloc');
 
-    const sendToInterlocPage = new SendToInterlocPage(this.page);
-    await sendToInterlocPage.verifyPageContent();
-    await sendToInterlocPage.selectHearingType(
+    await this.sendToInterlocPage.verifyPageContent();
+    await this.sendToInterlocPage.selectHearingType(
       sendToInterlocData.sendToInterlocHearingSelectValue
     );
-    await sendToInterlocPage.selectCaseReview(
+    await this.sendToInterlocPage.selectCaseReview(
       sendToInterlocData.sendToInterlocCaseReviewSelectValue
     );
-    await sendToInterlocPage.verifyReasonReferredOptions([
+    await this.sendToInterlocPage.verifyReasonReferredOptions([
       sendToInterlocData.sendToInterlocConfidentialityReasonValue,
       sendToInterlocData.sendToInterlocReviewConfidentialityRequestValue
     ]);
-    await sendToInterlocPage.selectReasonReferred(
+    await this.sendToInterlocPage.selectReasonReferred(
       sendToInterlocData.sendToInterlocConfidentialityReasonValue
     );
-    await sendToInterlocPage.verifySelectedReasonReferred(
+    await this.sendToInterlocPage.verifySelectedReasonReferred(
       sendToInterlocData.sendToInterlocConfidentialityReasonValue
     );
   }
 
   async submitConfidentialityReferralAndVerifySummary(caseId: string, user) {
-    await this.loginUserWithCaseId(user, true, caseId);
+    await this.loginUserWithCaseId(user, false, caseId);
     await this.homePage.chooseEvent('Send to interloc');
 
-    const sendToInterlocPage = new SendToInterlocPage(this.page);
-    await sendToInterlocPage.verifyPageContent();
-    await sendToInterlocPage.selectHearingType(
+    await this.sendToInterlocPage.verifyPageContent();
+    await this.sendToInterlocPage.selectHearingType(
       sendToInterlocData.sendToInterlocHearingSelectValue
     );
-    await sendToInterlocPage.selectCaseReview(
-      sendToInterlocData.sendToInterlocCaseReviewSelectValue
+    await this.sendToInterlocPage.selectCaseReview(
+      sendToInterlocData.sendToInterlocCaseReviewSelectValueJudge
     );
-    await sendToInterlocPage.selectReasonReferred(
+    await this.sendToInterlocPage.selectReasonReferred(
       sendToInterlocData.sendToInterlocConfidentialityReasonValue
     );
 
-    await sendToInterlocPage.selectSelectedParty();
+    await this.sendToInterlocPage.selectSelectedParty(1);
 
-    await sendToInterlocPage.confirmSubmission();
+    await this.sendToInterlocPage.confirmSubmission();
 
     await this.eventNameAndDescriptionPage.verifyPageContent(
       'Send to interloc'
@@ -210,31 +203,41 @@ export class SendToInterloc extends BaseStep {
       sendToInterlocData.sendToInterlocReasonReferredFieldLabel,
       sendToInterlocData.sendToInterlocConfidentialityReasonValue
     );
-     await this.summaryTab.verifyPageContentByKeyValue(
+    await this.summaryTab.verifyPageContentByKeyValue(
       sendToInterlocData.sendToInterLocSelectPartyFieldLabel,
       sendToInterlocData.sendToInterlocPartyConfidentialityValue_2
     );
+
+    await this.homePage.navigateToTab('History');
+    await this.historyTab.verifyHistoryPageEventLink('Send to interloc');
+    await this.historyTab.verifyPageContentByKeyValue(
+      'Event',
+      'Send to interloc'
+    );
+    await this.historyTab.verifyInterlocReviewState('Review by Judge');
   }
 
-  async submitConfidentialityReferralChildSupportAndVerifySummary(caseId: string, user) {
-    await this.loginUserWithCaseId(user, true, caseId);
+  async submitConfidentialityReferralChildSupportAndVerifySummary(
+    caseId: string,
+    user
+  ) {
+    await this.loginUserWithCaseId(user, false, caseId);
     await this.homePage.chooseEvent('Send to interloc');
 
-    const sendToInterlocPage = new SendToInterlocPage(this.page);
-    await sendToInterlocPage.verifyPageContent();
-    await sendToInterlocPage.selectHearingType(
+    await this.sendToInterlocPage.verifyPageContent();
+    await this.sendToInterlocPage.selectHearingType(
       sendToInterlocData.sendToInterlocHearingSelectValue
     );
-    await sendToInterlocPage.selectCaseReview(
+    await this.sendToInterlocPage.selectCaseReview(
       sendToInterlocData.sendToInterlocCaseReviewSelectValue
     );
-    await sendToInterlocPage.selectReasonReferred(
+    await this.sendToInterlocPage.selectReasonReferred(
       sendToInterlocData.sendToInterlocConfidentialityReasonValue
     );
-    await sendToInterlocPage.selectPartyConfidentiality(
+    await this.sendToInterlocPage.selectPartyConfidentiality(
       sendToInterlocData.sendToInterlocPartyConfidentialityValue
     );
-    await sendToInterlocPage.confirmSubmission();
+    await this.sendToInterlocPage.confirmSubmission();
 
     await this.eventNameAndDescriptionPage.verifyPageContent(
       'Send to interloc'
@@ -257,7 +260,7 @@ export class SendToInterloc extends BaseStep {
   }
 
   async verifyPreValidConfidentialityReferralReasons(caseId: string, user) {
-    await this.loginUserWithCaseId(user, true, caseId);
+    await this.loginUserWithCaseId(user, false, caseId);
     await this.homePage.chooseEvent('Send to interloc - pre-valid');
 
     await this.sendToInterlocPrevalidPage.verifyPageContentForTheInterlocReferralPage();

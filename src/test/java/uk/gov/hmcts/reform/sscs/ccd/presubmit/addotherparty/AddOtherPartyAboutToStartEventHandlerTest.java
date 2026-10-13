@@ -23,6 +23,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -38,6 +39,7 @@ class AddOtherPartyAboutToStartEventHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
+    @InjectMocks
     private AddOtherPartyAboutToStartEventHandler handler;
 
     @Mock
@@ -59,30 +61,24 @@ class AddOtherPartyAboutToStartEventHandlerTest {
 
         @Test
         void shouldThrowExceptionIfCallbackTypeIsNull() {
-            handler = new AddOtherPartyAboutToStartEventHandler(true);
             assertThatThrownBy(() -> handler.canHandle(null, callback)).isInstanceOf(NullPointerException.class)
-                .hasMessage("callbackType must not be null");
+                                                                       .hasMessage("callbackType must not be null");
         }
 
         @Test
         void shouldThrowExceptionIfCallbackIsNull() {
-            handler = new AddOtherPartyAboutToStartEventHandler(true);
             assertThatThrownBy(() -> handler.canHandle(ABOUT_TO_START, null)).isInstanceOf(NullPointerException.class)
-                .hasMessage("callback must not be null");
+                                                                             .hasMessage("callback must not be null");
         }
 
         @Test
         void shouldReturnFalseIfCallbackTypeIsNotAboutToStart() {
-            handler = new AddOtherPartyAboutToStartEventHandler(true);
-
             assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
         }
 
         @Test
         void shouldReturnFalseIfEventTypeIsNotAddOtherPartyData() {
             when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
-
-            handler = new AddOtherPartyAboutToStartEventHandler(true);
 
             assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
         }
@@ -91,8 +87,6 @@ class AddOtherPartyAboutToStartEventHandlerTest {
         void shouldReturnFalseIfCaseDetailsIsNull() {
             when(callback.getEvent()).thenReturn(ADD_OTHER_PARTY_DATA);
             when(callback.getCaseDetails()).thenReturn(null);
-
-            handler = new AddOtherPartyAboutToStartEventHandler(true);
 
             assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
         }
@@ -103,15 +97,12 @@ class AddOtherPartyAboutToStartEventHandlerTest {
             when(callback.getCaseDetails()).thenReturn(caseDetails);
             when(caseDetails.getCaseData()).thenReturn(null);
 
-            handler = new AddOtherPartyAboutToStartEventHandler(true);
-
             assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
         }
 
         @ParameterizedTest
         @MethodSource("canHandleTestParameters")
-        void shouldReturnExpectedResultForCanHandle(boolean cmEnabled, EventType eventType, String benefitCode, boolean expected) {
-            handler = new AddOtherPartyAboutToStartEventHandler(cmEnabled);
+        void shouldReturnExpectedResultForCanHandle(EventType eventType, String benefitCode, boolean expected) {
             sscsCaseData.getAppeal().getBenefitType().setCode(benefitCode);
             lenient().when(callback.getEvent()).thenReturn(eventType);
             lenient().when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -122,32 +113,16 @@ class AddOtherPartyAboutToStartEventHandlerTest {
 
         private static Stream<Arguments> canHandleTestParameters() {
             return Stream.of(
-                Arguments.of(true, ADD_OTHER_PARTY_DATA, CHILD_SUPPORT.getShortName(), true),
-                Arguments.of(true, ADD_OTHER_PARTY_DATA, UC.getShortName(), true),
-                Arguments.of(false, ADD_OTHER_PARTY_DATA, CHILD_SUPPORT.getShortName(), false),
-                Arguments.of(false, ADD_OTHER_PARTY_DATA, UC.getShortName(), false),
-                Arguments.of(true, ADD_OTHER_PARTY_DATA, "ESA", false),
-                Arguments.of(true, APPEAL_RECEIVED, CHILD_SUPPORT.getShortName(), false));
+                Arguments.of(ADD_OTHER_PARTY_DATA, CHILD_SUPPORT.getShortName(), true),
+                Arguments.of(ADD_OTHER_PARTY_DATA, UC.getShortName(), true),
+                Arguments.of(ADD_OTHER_PARTY_DATA, "ESA", false),
+                Arguments.of(APPEAL_RECEIVED, CHILD_SUPPORT.getShortName(), false));
         }
     }
 
     @Nested
     @DisplayName("handle")
     class Handle {
-
-        @BeforeEach
-        void setup() {
-            handler = new AddOtherPartyAboutToStartEventHandler(true);
-        }
-
-        @Test
-        void shouldThrowExceptionIfCannotHandle() {
-            configureCallback(WITH_DWP);
-            handler = new AddOtherPartyAboutToStartEventHandler(false);
-
-            assertThatThrownBy(() -> handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION)).isInstanceOf(
-                IllegalStateException.class).hasMessage("Cannot handle callback");
-        }
 
         @ParameterizedTest
         @MethodSource("successfulHandleTestParameters")

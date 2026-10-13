@@ -11,7 +11,6 @@ import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPrese
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -38,17 +37,12 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
     private final VerbalLanguagesService verbalLanguagesService;
     private final SignLanguagesService signLanguagesService;
 
-    private final boolean cmOtherPartyConfidentialityEnabled;
-
     CaseUpdatedAboutToStartHandler(DynamicListLanguageUtil utils,
                                    VerbalLanguagesService verbalLanguagesService,
-                                   SignLanguagesService signLanguagesService,
-                                   @Value("${feature.cm-other-party-confidentiality.enabled}")
-                                   boolean cmOtherPartyConfidentialityEnabled) {
+                                   SignLanguagesService signLanguagesService) {
         this.utils = utils;
         this.verbalLanguagesService = verbalLanguagesService;
         this.signLanguagesService = signLanguagesService;
-        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
 
     @Override
@@ -91,7 +85,7 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
             setupUkPortsOfEntry(sscsCaseData);
         }
 
-        if (cmOtherPartyConfidentialityEnabled && sscsCaseData.isBenefitType(UC)) {
+        if (sscsCaseData.isBenefitType(UC)) {
             sscsCaseData.getAppeal()
                 .setIsOtherPartyAddedForChildMaintUCCase(isOtherPartyPresent(sscsCaseData) ? YES : NO);
         }

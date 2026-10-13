@@ -70,7 +70,7 @@ export class ValidateAppeal extends BaseStep {
     caseId: string,
     role: 'caseworker' | 'superuser'
   ) {
-    await this.loginUserWithCaseId(this.getUser(role), true, caseId);
+    await this.loginUserWithCaseId(this.getUser(role), false, caseId);
 
     await this.homePage.chooseEvent('Update to case data');
     await this.page
@@ -89,7 +89,7 @@ export class ValidateAppeal extends BaseStep {
       .getByLabel('Year')
       .fill('2026');
     await this.page
-      .locator('#appeal_appellant_confidentialityRequired_No')
+      .locator('#appeal_appellant_confidentialityRequirement-No')
       .evaluate((element: HTMLInputElement) => {
         element.click();
         element.checked = true;

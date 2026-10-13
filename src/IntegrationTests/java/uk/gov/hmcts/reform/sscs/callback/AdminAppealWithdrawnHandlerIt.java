@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.callback;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.WITHDRAWAL_REQUEST;
@@ -27,10 +27,11 @@ public class AdminAppealWithdrawnHandlerIt extends AbstractEventIt {
     @MockitoBean
     private IdamClient idamClient;
 
+    @Override
     @Before
     public void setup() throws IOException {
         given(idamClient.getUserInfo(anyString())).willReturn(UserInfo.builder()
-                .givenName("Jason").familyName("Hart").build());
+                                                                      .givenName("Jason").familyName("Hart").build());
 
         setup("callback/adminAppealWithdrawn.json");
     }
@@ -40,11 +41,11 @@ public class AdminAppealWithdrawnHandlerIt extends AbstractEventIt {
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
-        assertEquals(4, result.getData().getSscsDocument().size());
-        assertEquals(WITHDRAWAL_REQUEST.getValue(), result.getData().getSscsDocument().get(3).getValue().getDocumentType());
-        assertEquals(WITHDRAWAL_RECEIVED, result.getData().getDwpState());
-        assertEquals(1, result.getData().getAppealNotePad().getNotesCollection().size());
-        assertEquals("withdrawal note added", result.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());
+        assertThat(result.getData().getSscsDocument()).hasSize(4);
+        assertThat(result.getData().getSscsDocument().getFirst().getValue().getDocumentType()).isEqualTo(WITHDRAWAL_REQUEST.getValue());
+        assertThat(result.getData().getDwpState()).isEqualTo(WITHDRAWAL_RECEIVED);
+        assertThat(result.getData().getAppealNotePad().getNotesCollection()).hasSize(1);
+        assertThat(result.getData().getAppealNotePad().getNotesCollection().getFirst().getValue().getNoteDetail()).isEqualTo("withdrawal note added");
     }
 
 

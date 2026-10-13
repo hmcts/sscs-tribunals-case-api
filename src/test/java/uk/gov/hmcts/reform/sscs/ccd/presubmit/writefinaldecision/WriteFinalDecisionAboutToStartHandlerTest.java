@@ -22,7 +22,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -109,7 +108,7 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("");
 
-        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, false, false);
+        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, false);
     }
 
     @ParameterizedTest
@@ -158,7 +157,7 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
         when(caseDetails.getState()).thenReturn(state);
         when(userDetailsService.getUserRoles(USER_AUTHORISATION)).thenReturn(List.of(UserRole.SALARIED_JUDGE.getValue()));
 
-        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true, false);
+        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertEquals(response.getErrors().size(), 0);
@@ -178,7 +177,7 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
 
     @Test
     public void givenStateIsDormantAndIsntSalariedJudge_thenThrowError() {
-        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true, false);
+        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
@@ -193,7 +192,7 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
 
     @Test
     public void givenStateIsDormantAndSalariedJudge_thenNoErrors() {
-        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true, false);
+        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
@@ -211,7 +210,7 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
     @ParameterizedTest
     @EnumSource(names = {"POST_HEARING", "DORMANT_APPEAL_STATE"})
     public void givenAWriteFinalDecisionEventForCorrectionWithPostHearingsEnabled_thenKeepData(State state) {
-        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true, false);
+        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
@@ -224,7 +223,7 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
 
     @Test
     public void givenAWriteFinalDecisionEventNotForCorrectionWithPostHearingsEnabled_thenDeleteData() {
-        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true, false);
+        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
@@ -283,7 +282,7 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
     @Test
     public void giveCorrectionInProgressAndDecisionIsUploaded_thenClearUploadedDecision() {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(NO);
-        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true, false);
+        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
@@ -293,10 +292,9 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
         assertNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {false, true})
-    public void givenSevereConditionsEnabledOrDisabled_thenClearSevereConditionsFieldsAccordingly(boolean isSevereConditionsEnabled) {
-        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true, isSevereConditionsEnabled);
+    @Test
+    public void givenSevereConditionsFieldsAreSet_thenClearSevereConditionsFields() {
+        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true);
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionHasSVIssueCode(YES);
         sscsCaseData.getExtendedSscsCaseData().setWriteFinalDecisionSevereCriteriaApply(YES);
         sscsCaseData.getExtendedSscsCaseData().setEsaWriteFinalDecisionSevereCriteriaApply(YES);
@@ -308,19 +306,11 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        if (isSevereConditionsEnabled) {
-            assertThat(response.getData().getSscsUcCaseData().getUcWriteFinalDecisionHasSVIssueCode()).isNull();
-            assertThat(response.getData().getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply()).isNull();
-            assertThat(response.getData().getExtendedSscsCaseData().getEsaWriteFinalDecisionSevereCriteriaApply()).isNull();
-            assertThat(response.getData().getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo()).isNull();
-            assertThat(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecisionIsAfterSvDate()).isNull();
-        } else {
-            assertThat(response.getData().getSscsUcCaseData().getUcWriteFinalDecisionHasSVIssueCode()).isEqualTo(YES);
-            assertThat(response.getData().getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply()).isEqualTo(YES);
-            assertThat(response.getData().getExtendedSscsCaseData().getEsaWriteFinalDecisionSevereCriteriaApply()).isEqualTo(YES);
-            assertThat(response.getData().getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo()).isEqualTo(YES);
-            assertThat(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecisionIsAfterSvDate()).isEqualTo(YES);
-        }
+        assertThat(response.getData().getSscsUcCaseData().getUcWriteFinalDecisionHasSVIssueCode()).isNull();
+        assertThat(response.getData().getExtendedSscsCaseData().getWriteFinalDecisionSevereCriteriaApply()).isNull();
+        assertThat(response.getData().getExtendedSscsCaseData().getEsaWriteFinalDecisionSevereCriteriaApply()).isNull();
+        assertThat(response.getData().getExtendedSscsCaseData().getWriteFinalDecisionSevereYesNo()).isNull();
+        assertThat(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecisionIsAfterSvDate()).isNull();
     }
 
     private void assertDataRetained(PreSubmitCallbackResponse<SscsCaseData> response) {

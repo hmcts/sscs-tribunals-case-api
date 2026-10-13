@@ -154,7 +154,7 @@ export class UpdateNotListable extends BaseStep {
 
   async performUpdateNotListableDirectionNotFulfilledAbateTCW(caseId: string) {
     //Trigger Not listable event:
-    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
+    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
     await this.homePage.chooseEvent('Not listable');
     await this.notListablePage.verifyPageContent(); //Verifying Heading and Caption for event
 
@@ -189,7 +189,7 @@ export class UpdateNotListable extends BaseStep {
     caseId: string
   ) {
     //Trigger Not listable event:
-    await this.loginUserWithCaseId(credentials.amCaseWorker, true, caseId);
+    await this.loginUserWithCaseId(credentials.amCaseWorker, false, caseId);
     await this.homePage.chooseEvent('Not listable');
     await this.notListablePage.verifyPageContent(); //Verifying Heading and Caption for event
 

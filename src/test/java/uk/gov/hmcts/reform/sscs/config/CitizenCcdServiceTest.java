@@ -267,4 +267,10 @@ public class CitizenCcdServiceTest {
 
         verify(citizenCcdClient).addUserToCase(eq(IDAM_TOKENS), eq(IDAM_TOKENS.getUserId()), eq(caseId));
     }
+
+    @Test
+    public void shouldCallCitizenCcdClientWhenSearchForCitizenAllCasesNonDormant() {
+        citizenCcdService.searchForCitizenAllCasesNonDormant(IDAM_TOKENS);
+        verify(citizenCcdClient).searchForCitizenAllCasesNonDormant(IDAM_TOKENS);
+    }
 }

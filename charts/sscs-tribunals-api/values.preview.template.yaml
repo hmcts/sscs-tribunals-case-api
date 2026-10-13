@@ -39,7 +39,6 @@ java:
     POST_HEARINGS_B_FEATURE: true
     GAPS_SWITCHOVER_FEATURE: true
     ELASTIC_SEARCH_FEATURE: true
-    SEVERE_CONDITIONS_FEATURE: true
     ELINKS_V2_FEATURE_ENABLED: true
     DELETED_REDACTED_DOC_ENABLED: true
     TESTING_SUPPORT_ENABLED: true
@@ -49,7 +48,6 @@ java:
     ROBOTICS_EMAIL_TO: "fake"
     ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
     ROBOTICS_EMAIL_PIP_AE_TO: "fake3"
-    ISSUE_GENERIC_LETTER: true
     COH_URL: "http://coh-cor-aat.service.core-compute-aat.internal"
     ONLINE_HEARING_LINK: "https://sscs-cor-frontend-aat.service.core-compute-aat.internal"
     JOB_SCHEDULER_DB_NAME: "{{ tpl .Values.global.databaseNamePrefix $}}sscs-job-scheduler"
@@ -67,7 +65,6 @@ java:
     SCOTTISH_PO_BOX_ENABLED: true
     TRIBUNAL_INTERNAL_DOCUMENTS_ENABLED: true
     IBC_NI_POSTCODES_FEATURE: true
-    CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED: true
   secrets:
     JOB_SCHEDULER_DB_PASSWORD:
       secretRef: postgres
@@ -192,7 +189,7 @@ em-ccdorc:
     devcpuRequests: 50m
     devcpuLimits: 250m
     environment:
-      IDAM_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
+      IDAM_WEB_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
       OPEN_ID_API_BASE_URI: https://idam-web-public.aat.platform.hmcts.net/o
       S2S_BASE_URI: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
       EM_STITCHING_API_URL: ${EM_STITCHING_API_URL}
@@ -201,6 +198,9 @@ em-ccdorc:
       CALLBACK_HTTP_SCHEME: https
       CALLBACK_DOMAIN: em-ccdorc-${SERVICE_FQDN}
       LOGGING_LEVEL_UK_GOV_HMCTS_REFORM_EM: DEBUG
+      IDAM_SECURITY_ALLOWED_ISSUERS_0: https://idam-web-public.aat.platform.hmcts.net/o
+      IDAM_SECURITY_ALLOWED_ISSUERS_1: https://hmcts-access.aat.platform.hmcts.net/o
+      IDAM_SECURITY_ALLOWED_ISSUERS_2: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts
     keyVaults:
       em-ccdorc:
         resourceGroup: em-ccdorc
@@ -224,7 +224,7 @@ em-stitching:
       SPRING_DATASOURCE_OPTIONS: "?ssl=disable"
       SPRING_DATASOURCE_PORT: 5432
       SPRING_DATASOURCE_USERNAME: "{{ tpl .Values.global.postgresUsername $}}"
-      IDAM_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
+      IDAM_WEB_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
       OPEN_ID_API_BASE_URI: https://idam-web-public.aat.platform.hmcts.net/o
       S2S_BASE_URI: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
       DM_STORE_APP_URL: http://dm-store-aat.service.core-compute-aat.internal
@@ -233,6 +233,9 @@ em-stitching:
       RUN_DB_MIGRATION_ON_STARTUP: true
       FLYWAY_POSTGRESQL_TRANSACTIONAL_LOCK: false
       LOGGING_LEVEL_UK_GOV_HMCTS_REFORM_EM: DEBUG
+      IDAM_SECURITY_ALLOWED_ISSUERS_0: https://idam-web-public.aat.platform.hmcts.net/o
+      IDAM_SECURITY_ALLOWED_ISSUERS_1: https://hmcts-access.aat.platform.hmcts.net/o
+      IDAM_SECURITY_ALLOWED_ISSUERS_2: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts
     secrets:
       SPRING_DATASOURCE_PASSWORD:
         secretRef: postgres
@@ -322,6 +325,8 @@ xui-webapp:
           - mc-idam-client-secret
           - system-user-name
           - system-user-password
+          - appinsights-instrumentationkey-mc
+          - appinsights-connection-string-mc
 
 global:
   ccdApiGatewayIngress: http://${SERVICE_NAME}-ccd-api-gw
@@ -600,6 +605,7 @@ ccd:
         ADMINWEB_ELASTIC_CASE_TYPES_URL: http://${SERVICE_NAME}-ccd-definition-store/elastic-support/case-types
         IDAM_ADMIN_WEB_SERVICE_KEY: ${ADMIN_S2S_KEY}
         IDAM_OAUTH2_AW_CLIENT_SECRET: ${ADMIN_WEB_IDAM_SECRET}
+        SESSION_KEYS: '${SESSION_KEYS}'
         ALLOW_CONFIG_MUTATIONS: true
       keyVaults: [ ]
 

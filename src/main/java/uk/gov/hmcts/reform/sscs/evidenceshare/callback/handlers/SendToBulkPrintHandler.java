@@ -78,16 +78,13 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
 
     private final int dwpResponseDueDaysChildSupport;
 
-    private final boolean cmOtherPartyConfidentialityEnabled;
-
     @Autowired
     public SendToBulkPrintHandler(DocumentManagementServiceWrapper documentManagementServiceWrapper,
                                   DocumentRequestFactory documentRequestFactory, PdfStoreService pdfStoreService,
                                   PrintService bulkPrintService, EvidenceShareConfig evidenceShareConfig,
                                   UpdateCcdCaseService updateCcdCaseService, IdamService idamService,
                                   @Value("${dwp.response.due.days}") int dwpResponseDueDays,
-                                  @Value("${dwp.response.due.days-child-support}") int dwpResponseDueDaysChildSupport,
-                                  @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
+                                  @Value("${dwp.response.due.days-child-support}") int dwpResponseDueDaysChildSupport) {
         this.dispatchPriority = DispatchPriority.LATE;
         this.documentManagementServiceWrapper = documentManagementServiceWrapper;
         this.documentRequestFactory = documentRequestFactory;
@@ -98,7 +95,6 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
         this.idamService = idamService;
         this.dwpResponseDueDays = dwpResponseDueDays;
         this.dwpResponseDueDaysChildSupport = dwpResponseDueDaysChildSupport;
-        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
 
     @Override
@@ -135,11 +131,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
             updateCaseToFlagError(caseData, "Send to FTA Error event has been triggered from Evidence Share service");
         }
 
-        if (cmOtherPartyConfidentialityEnabled) {
-            updateCaseToSentToDwp(callback, caseData, bulkPrintInfo);
-        } else {
-            updateCaseToSentToDwp(caseData, bulkPrintInfo);
-        }
+        updateCaseToSentToDwp(callback, caseData, bulkPrintInfo);
     }
 
     @Override

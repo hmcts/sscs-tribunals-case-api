@@ -2,12 +2,12 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -27,12 +27,10 @@ public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
     private final UpdateCcdCaseService updateCcdCaseService;
 
     private final IdamService idamService;
-    private final boolean cmOtherPartyConfidentialityEnabled;
 
     @Autowired
     public AppealReceivedHandler(UpdateCcdCaseService updateCcdCaseService,
-                                 IdamService idamService, @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
-        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
+                                 IdamService idamService) {
         this.dispatchPriority = DispatchPriority.LATEST;
         this.updateCcdCaseService = updateCcdCaseService;
         this.idamService = idamService;
@@ -47,18 +45,16 @@ public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
             .getId()
             .equals(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom());
 
-        if (cmOtherPartyConfidentialityEnabled && submittedAndReadToList && callback
-            .getCaseDetails()
-            .getCaseData()
-            .isBenefitType(CHILD_SUPPORT)) {
+        if (submittedAndReadToList && callback.getCaseDetails().getCaseData().isBenefitType(CHILD_SUPPORT)) {
             return callback.getEvent() == EventType.CONFIDENTIALITY_CONFIRMED;
         }
 
-        return submittedAndReadToList
-            && (callback.getEvent() == EventType.VALID_APPEAL_CREATED
+        return submittedAndReadToList && (callback.getEvent() == EventType.VALID_APPEAL_CREATED
             || callback.getEvent() == EventType.DRAFT_TO_VALID_APPEAL_CREATED
             || callback.getEvent() == EventType.VALID_APPEAL
-            || callback.getEvent() == EventType.INTERLOC_VALID_APPEAL);
+            || callback.getEvent() == EventType.INTERLOC_VALID_APPEAL
+            || (callback.getCaseDetails().getCaseData().isBenefitType(UC)
+            && callback.getEvent() == EventType.CONFIDENTIALITY_CONFIRMED));
     }
 
     @Override

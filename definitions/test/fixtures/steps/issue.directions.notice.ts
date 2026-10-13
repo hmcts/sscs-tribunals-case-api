@@ -68,7 +68,7 @@ export class IssueDirectionsNotice extends BaseStep {
   }
 
   async validateChildSupportInterlocReviewPreValidAppeal(caseId: string, user) {
-    await this.loginUserWithCaseId(user, true, caseId);
+    await this.loginUserWithCaseId(user, false, caseId);
     await expect(this.page.locator('#summaryState')).toContainText(
       'Interlocutory Review - Pre-Valid'
     );

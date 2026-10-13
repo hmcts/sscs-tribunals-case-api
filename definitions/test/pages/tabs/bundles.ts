@@ -68,6 +68,28 @@ export class Bundles {
     await expect(locator).toBeVisible();
   }
 
+  async verifyBundleTableElementByIndex(
+    fieldLabel: string,
+    fieldValue: string,
+    index: number
+  ): Promise<void> {
+    let locator;
+    if(fieldLabel === 'Document Name' || fieldLabel === 'Folder Name') {
+      locator = this.page
+      .locator(
+        `//*[normalize-space()="Folder Documents ${index}"]/..//*[normalize-space()="${fieldLabel}"]/..//span//span[normalize-space()="${fieldValue}"]`
+      );
+    } else if(fieldLabel === 'Source Document') {
+      locator = this.page
+      .locator(
+        `//*[normalize-space()="Folder Documents ${index}"]/..//*[normalize-space()="${fieldLabel}"]/..//span//button[normalize-space()="${fieldValue}"]`
+      );
+    } else{
+      throw new Error(`Unsupported field label: ${fieldLabel}`);
+    }
+    await expect(locator).toBeVisible();
+  }
+
   async verifyBundlesTabContentByKeyValueForASpanRegEx(
     fieldLabel: string,
     fieldValueRegex: string

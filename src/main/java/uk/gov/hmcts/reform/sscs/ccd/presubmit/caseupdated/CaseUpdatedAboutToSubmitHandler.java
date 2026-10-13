@@ -8,6 +8,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.isScottishCase;
@@ -16,6 +17,7 @@ import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SYSTEM_USER;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isConfidential;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPostcode;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleBenefitType;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleIbcaCase;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.resolvePostCode;
@@ -28,7 +30,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -99,8 +100,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private static final String LAST_NAME = "Last Name";
 
-    private final boolean cmOtherPartyConfidentialityEnabled;
-
     @SuppressWarnings("squid:S107")
     CaseUpdatedAboutToSubmitHandler(RegionalProcessingCenterService regionalProcessingCenterService,
                                     AssociatedCaseLinkHelper associatedCaseLinkHelper,
@@ -110,8 +109,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                                     RefDataService refDataService,
                                     VenueService venueService,
                                     HearingDurationsService hearingDurationsService,
-                                    PanelCompositionService panelCompositionService,
-                                    @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
+                                    PanelCompositionService panelCompositionService) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.associatedCaseLinkHelper = associatedCaseLinkHelper;
         this.airLookupService = airLookupService;
@@ -121,7 +119,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         this.hearingDurationsService = hearingDurationsService;
         this.panelCompositionService = panelCompositionService;
         this.venueService = venueService;
-        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
 
     @Override
@@ -185,7 +182,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             }
         }
 
-        sscsCaseData.setIsConfidentialCase(isConfidential(sscsCaseData, cmOtherPartyConfidentialityEnabled));
+        sscsCaseData.setIsConfidentialCase(isConfidential(sscsCaseData, List.of(UC)));
         updateCaseName(callback, sscsCaseData);
         updateCaseCategoriesIfBenefitTypeUpdated(callback, sscsCaseData, preSubmitCallbackResponse);
         updateLanguage(sscsCaseData);
@@ -440,7 +437,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private void updateProcessingVenueIfRequired(CaseDetails<SscsCaseData> caseDetails, String rpcEpimsId) {
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
         String postCode = resolvePostCode(sscsCaseData);
-        log.info("Checking whether processing venue requires updating for post code {}, case {}", postCode, caseDetails.getId());
+        log.info("Checking whether processing venue requires updating for post code {}, case {}", getMaskedPostcode(postCode), caseDetails.getId());
 
         String venue = airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType());
 

@@ -34,7 +34,7 @@ class NonCompliantSendToInterlocAboutToStartHandlerTest {
         CaseDetails<SscsCaseData> caseDetails =
                 new CaseDetails<>(1234L, "SSCS", State.WITH_DWP, caseData, now(), "Benefit");
         callback = new Callback<>(caseDetails, Optional.of(caseDetails), NON_COMPLIANT_SEND_TO_INTERLOC, false);
-        handler = new NonCompliantSendToInterlocAboutToStartHandler(false);
+        handler = new NonCompliantSendToInterlocAboutToStartHandler();
     }
 
     @Test
@@ -50,16 +50,8 @@ class NonCompliantSendToInterlocAboutToStartHandlerTest {
     }
 
     @Test
-    void clearsDefaultSelectionForChildSupport() {
-        callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
-
-        final var response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty()).isNull();
-    }
-
-    @Test
     void givenFlagEnabled_doesNotSetSelectionForNonChildSupport() {
-        handler = new NonCompliantSendToInterlocAboutToStartHandler(true);
+        handler = new NonCompliantSendToInterlocAboutToStartHandler();
 
         final var response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         assertThat(response.getData().getExtendedSscsCaseData().getSelectedConfidentialityParty()).isNull();
@@ -68,7 +60,7 @@ class NonCompliantSendToInterlocAboutToStartHandlerTest {
     @ParameterizedTest
     @EnumSource(value = Benefit.class, names = {"UC", "CHILD_SUPPORT"})
     void givenFlagEnabled_setsEmptyDefaultSelectionForChildSupport(Benefit benefit) {
-        handler = new NonCompliantSendToInterlocAboutToStartHandler(true);
+        handler = new NonCompliantSendToInterlocAboutToStartHandler();
         callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(benefit.getShortName()).build());
 
         final var response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);

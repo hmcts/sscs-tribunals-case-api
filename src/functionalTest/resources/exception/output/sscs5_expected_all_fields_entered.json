@@ -50,7 +50,7 @@
           },
           "isAddressSameAsAppointee": null,
           "isAppointee": "No",
-          "confidentialityRequired": "Yes",
+          "confidentialityRequirement": "Yes",
           "appointee": null,
           "name": {
             "firstName": "Frederick",

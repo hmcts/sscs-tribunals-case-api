@@ -9,6 +9,7 @@
   "confDocType": "Confidentiality request",
   "reinstatementDocType": "Reinstatement request",
   "testfileone": "testfile1.pdf",
+  "testfileTwo": "testfile2.pdf",
   "encrytpedFile": "test-encrypted-file.pdf",
   "corruptedFile": "test-corrupted-file.pdf",
   "otherDocType": "Other",

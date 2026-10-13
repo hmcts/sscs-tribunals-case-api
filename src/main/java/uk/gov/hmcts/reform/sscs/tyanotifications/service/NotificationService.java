@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
@@ -16,6 +16,8 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.getSubscription;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.isOkToSendNotification;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationValidService.isMandatoryLetterEventType;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedEmail;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPhone;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isBenefitTypeChildSupportOrUc;
 
 import java.time.ZonedDateTime;
@@ -23,7 +25,6 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,8 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.*;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationFactory;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
+import uk.gov.hmcts.reform.sscs.util.predicates.AdditionalOtherPartyAddedPredicate;
+import uk.gov.hmcts.reform.sscs.util.predicates.FirstOtherPartyAddedPredicate;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
 @Service
@@ -44,7 +47,6 @@ public class NotificationService {
     private static final String READY_TO_LIST = "readyToList";
     private static final EnumSet<NotificationEventType> SEND_TO_VALID_APPEAL = EnumSet.of(ADMIN_SEND_TO_VALID_APPEAL,
         INTERLOC_VALID_APPEAL, VALID_APPEAL);
-    private static final int MINIMUM_NUMBER_OTHER_PARTIES = 2;
 
     private final NotificationFactory notificationFactory;
     private final ReminderService reminderService;
@@ -54,7 +56,8 @@ public class NotificationService {
     private final NotificationConfig notificationConfig;
     private final SendNotificationService sendNotificationService;
     private final boolean covid19Feature;
-    private final boolean cmOtherPartyConfidentialityEnabled;
+    private final AdditionalOtherPartyAddedPredicate additionalOtherPartyAddedPredicate;
+    private final FirstOtherPartyAddedPredicate firstOtherPartyAddedPredicate;
 
     @SuppressWarnings("squid:S107")
     @Autowired
@@ -66,8 +69,7 @@ public class NotificationService {
         OutOfHoursCalculator outOfHoursCalculator,
         NotificationConfig notificationConfig,
         SendNotificationService sendNotificationService,
-        @Value("${feature.covid19}") boolean covid19Feature,
-        @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
+        @Value("${feature.covid19}") boolean covid19Feature) {
 
         this.notificationFactory = notificationFactory;
         this.reminderService = reminderService;
@@ -77,7 +79,8 @@ public class NotificationService {
         this.notificationConfig = notificationConfig;
         this.sendNotificationService = sendNotificationService;
         this.covid19Feature = covid19Feature;
-        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
+        this.additionalOtherPartyAddedPredicate = new AdditionalOtherPartyAddedPredicate();
+        this.firstOtherPartyAddedPredicate = new FirstOtherPartyAddedPredicate();
     }
 
     public void manageNotificationAndSubscription(NotificationWrapper notificationWrapper, boolean fromReminderService) {
@@ -128,15 +131,13 @@ public class NotificationService {
             log.info("Trigger second notification event for {}", OTHER_PARTY_ADDED_TO_APPEAL.getId());
             notificationWrapper.getSscsCaseDataWrapper().setNotificationEventType(OTHER_PARTY_ADDED_TO_APPEAL);
             sendNotificationPerSubscription(notificationWrapper);
-        } else if (cmOtherPartyConfidentialityEnabled
-            && notificationWrapper.getNotificationType().equals(DIRECTION_ISSUED)
+        } else if (notificationWrapper.getNotificationType().equals(DIRECTION_ISSUED)
             && notificationWrapper.getSscsCaseDataWrapper().getNewSscsCaseData().isBenefitType(CHILD_SUPPORT)
             && isAppealToProceed(notificationWrapper)) {
             log.info("Trigger second notification event for {} with {}", DIRECTION_ISSUED.getId(), DirectionType.APPEAL_TO_PROCEED.getLabel());
             notificationWrapper.getSscsCaseDataWrapper().setNotificationEventType(NOTIFY_APPELLANT_VALID_APPEAL);
             sendNotificationPerSubscription(notificationWrapper);
-        } else if (cmOtherPartyConfidentialityEnabled
-            && notificationWrapper.getNotificationType().equals(DIRECTION_ISSUED_WELSH)
+        } else if (notificationWrapper.getNotificationType().equals(DIRECTION_ISSUED_WELSH)
             && notificationWrapper.getSscsCaseDataWrapper().getNewSscsCaseData().isBenefitType(CHILD_SUPPORT)
             && isAppealToProceed(notificationWrapper)) {
             log.info("Trigger second notification event for {} with {}", DIRECTION_ISSUED_WELSH.getId(), DirectionType.APPEAL_TO_PROCEED.getLabel());
@@ -146,23 +147,14 @@ public class NotificationService {
     }
 
     private boolean shouldNotifyAppellantAboutAdditionalOtherParty(final NotificationWrapper notificationWrapper) {
-        if (!cmOtherPartyConfidentialityEnabled
-            || !isBenefitTypeChildSupportOrUc(notificationWrapper.getNewSscsCaseData())
-            || !notificationWrapper.getNotificationType().equals(UPDATE_OTHER_PARTY_DATA)
-            || emptyIfNull(notificationWrapper.getNewSscsCaseData().getOtherParties()).size() < MINIMUM_NUMBER_OTHER_PARTIES) {
+        if (!notificationWrapper.getNotificationType().equals(UPDATE_OTHER_PARTY_DATA)) {
             return false;
         }
-        final Set<String> newParties = getUniqueOtherPartyIds(notificationWrapper.getNewSscsCaseData().getOtherParties());
-        final Set<String> previousParties = getUniqueOtherPartyIds(
-            Optional.ofNullable(notificationWrapper.getOldSscsCaseData()).map(SscsCaseData::getOtherParties).orElse(emptyList()));
-        return !newParties.equals(previousParties);
-    }
-
-    private Set<String> getUniqueOtherPartyIds(final List<CcdValue<OtherParty>> otherParties) {
-        return emptyIfNull(otherParties).stream()
-            .map(CcdValue::getValue)
-            .map(Entity::getId)
-            .collect(Collectors.toSet());
+        return (notificationWrapper.getNewSscsCaseData().isBenefitType(UC) && firstOtherPartyAddedPredicate.test(
+            notificationWrapper.getNewSscsCaseData(), notificationWrapper.getOldSscsCaseData()))
+            || (isBenefitTypeChildSupportOrUc(notificationWrapper.getNewSscsCaseData())
+            && additionalOtherPartyAddedPredicate.test(notificationWrapper.getNewSscsCaseData(),
+            notificationWrapper.getOldSscsCaseData()));
     }
 
     private void sendNotificationPerSubscription(NotificationWrapper notificationWrapper) {
@@ -173,7 +165,7 @@ public class NotificationService {
                 Optional.ofNullable(sub.getEntity()).map(Object::getClass).orElse(null),
                 sub.getPartyId(),
                 sub.getSubscriptionType(),
-                sub.getSubscription()))
+                getMaskedSubscription(sub.getSubscription())))
             .collect(Collectors.joining("\n", "\n", ""));
         log.info("Processing for the Notification Type {} and Case Id {} the following subscriptions: {}",
             notificationWrapper.getNotificationType(),
@@ -181,6 +173,7 @@ public class NotificationService {
             subscriptionTypes);
 
         for (SubscriptionWithType subscriptionWithType : notificationWrapper.getSubscriptionsBasedOnNotificationType()) {
+
             if (isSubscriptionValidToSendAfterOverride(notificationWrapper, subscriptionWithType)
                 && isValidNotification(notificationWrapper, subscriptionWithType)) {
                 sendNotification(notificationWrapper, subscriptionWithType);
@@ -365,7 +358,7 @@ public class NotificationService {
             return false;
         }
 
-        if (HEARING_BOOKED.equals(notificationType)
+        if ((HEARING_BOOKED.equals(notificationType) || RESEND_HEARING_BOOKED.equals(notificationType))
             && DwpState.FINAL_DECISION_ISSUED.equals(notificationWrapper.getNewSscsCaseData().getDwpState())) {
             log.info("Cannot complete notification {} as the notification has been fired in error for caseId {}.",
                 notificationType.getId(), notificationWrapper.getCaseId());
@@ -444,7 +437,7 @@ public class NotificationService {
             }
         }
 
-        if (cmOtherPartyConfidentialityEnabled && ADD_OTHER_PARTY_DATA.equals(notificationType) && (!notificationWrapper.getNewSscsCaseData().isBenefitType(UC)
+        if (ADD_OTHER_PARTY_DATA.equals(notificationType) && (!notificationWrapper.getNewSscsCaseData().isBenefitType(UC)
             || State.AWAIT_CONFIDENTIALITY_REQUIREMENTS != notificationWrapper.getSscsCaseDataWrapper().getState())) {
             log.debug(
                 "Cannot complete notification {} as benefit type is not UC or state is not awaiting confidentiality requirements for caseId {}.",
@@ -453,9 +446,7 @@ public class NotificationService {
         }
 
         boolean validAppealPostState = SEND_TO_VALID_APPEAL.contains(notificationType);
-        if ((cmOtherPartyConfidentialityEnabled && validAppealPostState && !notificationWrapper
-            .getNewSscsCaseData()
-            .isBenefitType(CHILD_SUPPORT)) || (!cmOtherPartyConfidentialityEnabled && validAppealPostState)) {
+        if ((validAppealPostState && !notificationWrapper.getNewSscsCaseData().isBenefitType(CHILD_SUPPORT))) {
             return false;
         }
 
@@ -499,5 +490,22 @@ public class NotificationService {
     private boolean isDigitalCase(final NotificationWrapper notificationWrapper) {
         return READY_TO_LIST
             .equals(notificationWrapper.getSscsCaseDataWrapper().getNewSscsCaseData().getCreatedInGapsFrom());
+    }
+
+    private Subscription getMaskedSubscription(Subscription subscription) {
+        if (isNull(subscription)) {
+            return null;
+        }
+
+        return Subscription.builder()
+                .wantSmsNotifications(subscription.getWantSmsNotifications())
+                .tya(subscription.getTya())
+                .email(getMaskedEmail(subscription.getEmail()))
+                .mobile(getMaskedPhone(subscription.getMobile()))
+                .subscribeEmail(subscription.getSubscribeEmail())
+                .subscribeSms(subscription.getSubscribeSms())
+                .reason(subscription.getReason())
+                .lastLoggedIntoMya(subscription.getLastLoggedIntoMya())
+                .build();
     }
 }

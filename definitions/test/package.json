@@ -31,7 +31,7 @@
   "devDependencies": {
     "@faker-js/faker": "7.6.0",
     "@hmcts/eslint-config": "^1.4.0",
-    "@playwright/test": "^1.50.1",
+    "@playwright/test": "^1.60.0",
     "@types/node": "^20.17.17",
     "chai": "^4.5.0",
     "eslint": "^8.57.1",
@@ -40,7 +40,7 @@
     "lodash": "^4.17.21",
     "mocha": "^10.8.2",
     "otp": "^1.1.2",
-    "playwright-core": "^1.50.1",
+    "playwright-core": "^1.60.0",
     "pre-commit": "^1.2.2",
     "prettier": "^3.4.2",
     "pretty-quick": "^4.0.0",

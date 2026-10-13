@@ -3,18 +3,17 @@ package uk.gov.hmcts.reform.sscs.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.assertj.core.groups.Tuple;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
@@ -34,22 +33,22 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 
-@RunWith(JUnitParamsRunner.class)
-public class PostponementRequestServiceTest {
+class PostponementRequestServiceTest {
 
     private static final LocalDateTime HEARING_DATE_TIME = LocalDateTime.of(2023, 12, 1, 1, 0);
     private static final LocalDateTime EXCLUDED_DATE_TIME = LocalDateTime.of(2024, 11, 2, 1, 0);
-    public static final String DOCUMENT_FILENAME = "example.pdf";
+    private static final String DOCUMENT_FILENAME = "example.pdf";
     private final PostponementRequestService postponementRequestService = new PostponementRequestService();
 
     private SscsCaseData caseData;
 
     private PreSubmitCallbackResponse<SscsCaseData> response;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
 
         caseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().build())
             .directionDueDate("01/02/2020")
@@ -78,9 +77,9 @@ public class PostponementRequestServiceTest {
         response = new PreSubmitCallbackResponse<>(caseData);
     }
 
-    @Test
-    @Parameters({"REP", "APPELLANT", "APPOINTEE"})
-    public void testProcessPostponementRequest(UploadParty uploadParty) {
+    @ParameterizedTest
+    @EnumSource(value = UploadParty.class, names = {"REP", "APPELLANT", "APPOINTEE"})
+    void testProcessPostponementRequest(UploadParty uploadParty) {
         DynamicListItem value = new DynamicListItem(uploadParty.getValue(), uploadParty.getLabel());
         DynamicList originalSender = new DynamicList(value, Collections.singletonList(value));
         caseData.setOriginalSender(originalSender);
@@ -99,10 +98,29 @@ public class PostponementRequestServiceTest {
             .containsExactly(tuple(DocumentType.POSTPONEMENT_REQUEST.getValue(), DOCUMENT_FILENAME, uploadParty.getLabel()));
     }
 
+    @Test
+    void testProcessPostponementRequestSortsNewDocumentAheadOfOlderExistingDocument() {
+        final SscsDocument olderExistingDoc = SscsDocument.builder().value(
+            SscsDocumentDetails.builder()
+                .documentFileName("old.pdf")
+                .documentDateAdded(LocalDate.now().minusDays(1).toString())
+                .build()).build();
+        caseData.setSscsDocument(new ArrayList<>(List.of(olderExistingDoc)));
+
+        final DynamicListItem value = new DynamicListItem(UploadParty.APPELLANT.getValue(), UploadParty.APPELLANT.getLabel());
+        caseData.setOriginalSender(new DynamicList(value, Collections.singletonList(value)));
+
+        postponementRequestService.processPostponementRequest(caseData, UploadParty.APPELLANT, Optional.of(UploadParty.APPELLANT));
+
+        assertThat(caseData.getSscsDocument())
+            .extracting(doc -> doc.getValue().getDocumentFileName())
+            .containsExactly(DOCUMENT_FILENAME, "old.pdf");
+    }
+
     @DisplayName("When case has a hearing and no existing excluded dates addCurrentHearingToExcludeDates adds the "
         + "hearing date to the list correctly")
     @Test
-    public void testAddCurrentHearingToExcludeDates() {
+    void testAddCurrentHearingToExcludeDates() {
         postponementRequestService.addCurrentHearingToExcludeDates(response);
 
         String expected = HEARING_DATE_TIME.toLocalDate().toString();
@@ -111,13 +129,13 @@ public class PostponementRequestServiceTest {
             .hasSize(1)
             .extracting(ExcludeDate::getValue)
             .extracting("start", "end")
-            .containsExactlyInAnyOrder(Tuple.tuple(expected, expected));
+            .containsExactlyInAnyOrder(tuple(expected, expected));
     }
 
     @DisplayName("When case has a hearing and has existing excluded dates addCurrentHearingToExcludeDates adds the "
         + "hearing date to the list correctly without affecting the other excluded dates")
     @Test
-    public void testAddCurrentHearingToExcludeDatesExistingDates() {
+    void testAddCurrentHearingToExcludeDatesExistingDates() {
         String excludedExisting = EXCLUDED_DATE_TIME.toLocalDate().toString();
         List<ExcludeDate> excludeDate = new ArrayList<>(List.of(
             ExcludeDate.builder().value(DateRange.builder()
@@ -136,14 +154,14 @@ public class PostponementRequestServiceTest {
             .extracting(ExcludeDate::getValue)
             .extracting("start", "end")
             .containsExactlyInAnyOrder(
-                Tuple.tuple(expected, expected),
-                Tuple.tuple(excludedExisting, excludedExisting));
+                tuple(expected, expected),
+                tuple(excludedExisting, excludedExisting));
     }
 
     @DisplayName("When case has no hearing addCurrentHearingToExcludeDates adds the correct error message without "
         + "changing the excluded list")
     @Test
-    public void testAddCurrentHearingToExcludeDatesNoHearing() {
+    void testAddCurrentHearingToExcludeDatesNoHearing() {
         String excludedExisting = EXCLUDED_DATE_TIME.toLocalDate().toString();
         List<ExcludeDate> excludeDate =  new ArrayList<>(List.of(
             ExcludeDate.builder().value(DateRange.builder()
@@ -165,6 +183,6 @@ public class PostponementRequestServiceTest {
             .hasSize(1)
             .extracting(ExcludeDate::getValue)
             .extracting("start", "end")
-            .containsExactlyInAnyOrder(Tuple.tuple(excludedExisting, excludedExisting));
+            .containsExactlyInAnyOrder(tuple(excludedExisting, excludedExisting));
     }
 }

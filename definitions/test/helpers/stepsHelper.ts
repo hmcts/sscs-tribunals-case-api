@@ -68,6 +68,19 @@ export class StepsHelper {
     await this.eventNameAndDescriptionPage.confirmSubmission();
 
     await this.summaryTab.verifyPageContentByKeyValue('Urgent case', 'Yes');
-    await this.homePage.signOut();
+  }
+
+  async addAdditionalEvidence() {
+
+    await this.homePage.chooseEvent(actionFurtherEvidenceTestdata.eventName);
+    await this.actionFurtherEvidencePage.submitActionFurtherEvidence(
+      actionFurtherEvidenceTestdata.sender,
+      actionFurtherEvidenceTestdata.otherDocType,
+      actionFurtherEvidenceTestdata.testfileTwo
+    );
+    await this.eventNameAndDescriptionPage.verifyPageContent(
+      actionFurtherEvidenceTestdata.eventName
+    );
+    await this.eventNameAndDescriptionPage.confirmSubmission();
   }
 }

@@ -35,7 +35,7 @@
         {
           "id": "1",
           "value": {
-            "confidentialityRequired": null
+            "confidentialityRequirement": null
           }
         }
       ]
