@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.managerelatedcases;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import java.util.ArrayList;
@@ -55,13 +56,14 @@ public class ManageRelatedCasesAboutToSubmitHandler implements PreSubmitCallback
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-
         associateCases(sscsCaseData, caseDetails);
         callback
             .getCaseDetailsBefore()
             .ifPresent(caseDetailsBefore -> removeUnassociatedCases(caseDetailsBefore.getCaseData(), sscsCaseData));
-        return preSubmitCallbackResponse;
+        if (isEmpty(sscsCaseData.getAssociatedCase())) {
+            sscsCaseData.setAssociatedCase(null);
+        }
+        return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
     private void associateCases(SscsCaseData sscsCaseData, CaseDetails<SscsCaseData> caseDetails) {

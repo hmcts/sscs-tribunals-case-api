@@ -195,9 +195,10 @@ class ManageRelatedCasesAboutToSubmitHandlerTest {
         sscsCaseDataA.setAssociatedCase(caseLinks("3"));
         sscsCaseDataC.setAssociatedCase(caseLinks("1"));
 
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(associatedCaseLinkHelper).removeLinkToOtherAssociatedCases(List.of(sscsCaseDetailsB), "1");
+        assertThat(response.getData().getAssociatedCase()).isEqualTo(caseLinks("3"));
     }
 
     @Test
@@ -206,9 +207,10 @@ class ManageRelatedCasesAboutToSubmitHandlerTest {
         sscsCaseDataBeforeA.setAssociatedCase(caseLinks("2", "3"));
         sscsCaseDataA.setAssociatedCase(null);
 
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(associatedCaseLinkHelper).removeLinkToOtherAssociatedCases(List.of(sscsCaseDetailsB, sscsCaseDetailsC), "1");
+        assertThat(response.getData().getAssociatedCase()).isNull();
     }
 
     @Test
@@ -217,9 +219,22 @@ class ManageRelatedCasesAboutToSubmitHandlerTest {
         sscsCaseDataBeforeA.setAssociatedCase(caseLinks("2", "4"));
         sscsCaseDataA.setAssociatedCase(new ArrayList<>());
 
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(associatedCaseLinkHelper).removeLinkToOtherAssociatedCases(List.of(sscsCaseDetailsB), "1");
+        assertThat(response.getData().getAssociatedCase()).isNull();
+    }
+
+    @Test
+    void givenAllCasesRemovedAndAssociatedCasesEmpty_thenAssociatedCasesSetToNull() {
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBeforeA));
+        sscsCaseDataBeforeA.setAssociatedCase(caseLinks("2"));
+        sscsCaseDataA.setAssociatedCase(new ArrayList<>());
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getAssociatedCase()).isNull();
+        assertThat(response.getErrors()).isEmpty();
     }
 
     @Test
