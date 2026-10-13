@@ -88,7 +88,7 @@ public class SaveCorrespondenceAsyncService {
     @Recover
     @SuppressWarnings({"unused"})
     public void recoverSaveBulkPrintLetter(Throwable e, byte[] pdfForLetter, Correspondence correspondence, String ccdCaseId) {
-        log.error("Failed saving {} correspondence into ccd for case id {} after retries exhausted, "
+        log.error("Failed saving bulk print {} correspondence into ccd for case id {} after retries exhausted, "
                         + "notification was sent but will not appear on the Notifications Sent tab.",
                 correspondence.getValue().getCorrespondenceType(), ccdCaseId, e);
         ccdNotificationsPdfService.notifyFailedToRetrieveCorrespondence(valueOf(ccdCaseId), null, correspondence.getValue().getCorrespondenceType());
@@ -110,7 +110,7 @@ public class SaveCorrespondenceAsyncService {
     @SuppressWarnings({"unused"})
     public void recoverSaveLettersToReasonableAdjustment(Throwable e, byte[] pdfForLetter, Correspondence correspondence,
                                             String ccdCaseId, SubscriptionType subscriptionType) {
-        log.error("Failed saving {} correspondence into ccd for case id {} after retries exhausted, "
+        log.error("Failed saving reasonable adjustments {} correspondence into ccd for case id {} after retries exhausted, "
                         + "notification was sent but will not appear on the Notifications Sent tab.",
                 correspondence.getValue().getCorrespondenceType(), ccdCaseId, e);
         ccdNotificationsPdfService.notifyFailedToRetrieveCorrespondence(valueOf(ccdCaseId), null, correspondence.getValue().getCorrespondenceType());
