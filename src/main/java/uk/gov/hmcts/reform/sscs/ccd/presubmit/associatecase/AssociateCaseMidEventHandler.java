@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.managerelatedcases;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.associatecase;
 
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
-public class ManageRelatedCasesMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class AssociateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {

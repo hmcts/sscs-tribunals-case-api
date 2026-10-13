@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.managerelatedcases;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.associatecase;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.lenient;
@@ -27,7 +27,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @ExtendWith(MockitoExtension.class)
-class ManageRelatedCasesMidEventHandlerTest {
+class AssociateCaseMidEventHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final String SET_TO_NO_ERROR = "Set Has related appeal(s) to 'No'";
@@ -39,13 +39,13 @@ class ManageRelatedCasesMidEventHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
-    private ManageRelatedCasesMidEventHandler handler;
+    private AssociateCaseMidEventHandler handler;
 
     private SscsCaseData sscsCaseData;
 
     @BeforeEach
     void setUp() {
-        handler = new ManageRelatedCasesMidEventHandler();
+        handler = new AssociateCaseMidEventHandler();
         sscsCaseData = SscsCaseData.builder().ccdCaseId("1").build();
 
         lenient().when(callback.getEvent()).thenReturn(EventType.ASSOCIATE_CASE);

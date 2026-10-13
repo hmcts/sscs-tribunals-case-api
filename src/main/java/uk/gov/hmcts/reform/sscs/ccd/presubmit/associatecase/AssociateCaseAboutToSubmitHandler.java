@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.managerelatedcases;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.associatecase;
 
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
@@ -25,14 +25,14 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @Service
-public class ManageRelatedCasesAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class AssociateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final CcdService ccdService;
     private final AssociatedCaseLinkHelper associatedCaseLinkHelper;
     private final IdamService idamService;
 
     @Autowired
-    public ManageRelatedCasesAboutToSubmitHandler(CcdService ccdService, AssociatedCaseLinkHelper associatedCaseLinkHelper,
+    public AssociateCaseAboutToSubmitHandler(CcdService ccdService, AssociatedCaseLinkHelper associatedCaseLinkHelper,
         IdamService idamService) {
         this.ccdService = ccdService;
         this.associatedCaseLinkHelper = associatedCaseLinkHelper;
@@ -60,9 +60,7 @@ public class ManageRelatedCasesAboutToSubmitHandler implements PreSubmitCallback
         callback
             .getCaseDetailsBefore()
             .ifPresent(caseDetailsBefore -> removeUnassociatedCases(caseDetailsBefore.getCaseData(), sscsCaseData));
-        if (isEmpty(sscsCaseData.getAssociatedCase())) {
-            sscsCaseData.setAssociatedCase(null);
-        }
+
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
@@ -89,6 +87,9 @@ public class ManageRelatedCasesAboutToSubmitHandler implements PreSubmitCallback
         }
         if (!cases.isEmpty()) {
             associatedCaseLinkHelper.addLinkToOtherAssociatedCasesV2Enabled(cases, caseDetails.getCaseData().getCcdCaseId());
+        }
+        if (isEmpty(sscsCaseData.getAssociatedCase())) {
+            sscsCaseData.setAssociatedCase(null);
         }
     }
 
