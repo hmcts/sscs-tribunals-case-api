@@ -227,8 +227,8 @@ public class CcdNotificationsPdfServiceTest {
 
         when(pdfStoreService.store(any(), any(), eq(CorrespondenceType.Email.name()))).thenReturn(sscsDocuments);
 
-        //service.mergeLetterCorrespondenceIntoCcdV2(bytes, caseId, correspondence);
-        //verifyCaseDataUpdatedWithCorrespondence();
+        service.mergeLetterCorrespondenceIntoCcdV2(bytes, caseId, correspondence);
+        verifyCaseDataUpdatedWithCorrespondence();
     }
 
     @Test
@@ -249,8 +249,8 @@ public class CcdNotificationsPdfServiceTest {
         doThrow(new CcdException("some error when updating case"))
                 .when(updateCcdCaseService).updateCaseV2(eq(caseId), eq(EventType.NOTIFICATION_SENT.getCcdType()), eq("Notification sent"), eq("Notification sent via Gov Notify"), any(), any(Consumer.class));
 
-        //service.mergeLetterCorrespondenceIntoCcdV2(bytes, caseId, correspondence);
-        //verifyCaseDataUpdatedWithCorrespondence();
+        service.mergeLetterCorrespondenceIntoCcdV2(bytes, caseId, correspondence);
+        verifyCaseDataUpdatedWithCorrespondence();
     }
 
     @Test

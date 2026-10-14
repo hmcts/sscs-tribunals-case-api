@@ -147,18 +147,17 @@ public class CcdNotificationsPdfService {
 
         String description = String.format("Notification sent via %s", senderType);
         log.info("Updating ccd case using v2 for {} with event {}", ccdCaseId, EventType.NOTIFICATION_SENT.getCcdType());
-        throw(new RuntimeException("Test exception for retry logic"));
-        //        try {
-        //            updateCcdCaseService.updateCaseV2(ccdCaseId,
-        //                EventType.NOTIFICATION_SENT.getCcdType(),
-        //                NOTIFICATION_SENT,
-        //                description,
-        //                idamService.getIdamTokens(),
-        //                caseDataConsumer);
-        //        } catch (CcdException ccdEx) {
-        //            log.error(FAILED_TO_UPDATE_CCD_CASE_USING_V_2_BUT_CARRYING_ON_WITH_EVENT,
-        //                    ccdCaseId, EventType.NOTIFICATION_SENT.getCcdType(), ccdEx);
-        //}
+        try {
+            updateCcdCaseService.updateCaseV2(ccdCaseId,
+                EventType.NOTIFICATION_SENT.getCcdType(),
+                NOTIFICATION_SENT,
+                description,
+                idamService.getIdamTokens(),
+                caseDataConsumer);
+        } catch (CcdException ccdEx) {
+            log.error(FAILED_TO_UPDATE_CCD_CASE_USING_V_2_BUT_CARRYING_ON_WITH_EVENT,
+                    ccdCaseId, EventType.NOTIFICATION_SENT.getCcdType(), ccdEx);
+        }
     }
 
     public void notifyFailedToRetrieveCorrespondence(Long ccdCaseId, String notificationId, CorrespondenceType correspondenceType) {
