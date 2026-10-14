@@ -90,7 +90,7 @@ class AssociateCaseAboutToSubmitHandlerTest {
         lenient().when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     void givenAboutToSubmitAndAssociateCaseEvent_thenReturnTrue() {
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isTrue();
     }
@@ -101,14 +101,14 @@ class AssociateCaseAboutToSubmitHandlerTest {
         assertThat(handler.canHandle(callbackType, callback)).isFalse();
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     void givenANonAssociateCaseEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
 
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     void throwsExceptionIfItCannotHandleTheAppeal() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
 
@@ -117,7 +117,7 @@ class AssociateCaseAboutToSubmitHandlerTest {
             .hasMessage("Cannot handle associate case about to submit callback");
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     void givenCaseAWithLinkedCaseB_andCaseBHasNoLink_thenCallAssociatedCaseLinkHelper() {
         sscsCaseDataA.setAssociatedCase(caseLinks("2"));
 
@@ -128,7 +128,7 @@ class AssociateCaseAboutToSubmitHandlerTest {
         assertThat(response.getErrors()).isEmpty();
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     void givenCaseAWithLinkedCaseB_andCaseBLinkedOnlyToAnotherCase_thenCallAssociatedCaseLinkHelper() {
         sscsCaseDataA.setAssociatedCase(caseLinks("2"));
         sscsCaseDataB.setAssociatedCase(caseLinks("3"));
@@ -138,7 +138,7 @@ class AssociateCaseAboutToSubmitHandlerTest {
         verify(associatedCaseLinkHelper).addLinkToOtherAssociatedCasesV2Enabled(List.of(sscsCaseDetailsB), "1");
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     void givenCaseAWithLinkedCaseB_butCaseBHasLink_thenDoNotCallAssociatedCaseLinkHelper() {
         sscsCaseDataA.setAssociatedCase(caseLinks("2"));
         sscsCaseDataB.setAssociatedCase(caseLinks("1"));
@@ -148,7 +148,7 @@ class AssociateCaseAboutToSubmitHandlerTest {
         verify(associatedCaseLinkHelper, never()).addLinkToOtherAssociatedCasesV2Enabled(any(), any());
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     void givenCaseAWithLinkedCaseThatCannotBeRetrieved_thenDoNotCallAssociatedCaseLinkHelper() {
         sscsCaseDataA.setAssociatedCase(caseLinks("4"));
 
@@ -157,7 +157,7 @@ class AssociateCaseAboutToSubmitHandlerTest {
         verify(associatedCaseLinkHelper, never()).addLinkToOtherAssociatedCasesV2Enabled(any(), any());
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     void givenCaseAWithNullAssociatedCases_thenDoNotRetrieveOrLinkAnyCases() {
         sscsCaseDataA.setAssociatedCase(null);
 
@@ -167,7 +167,7 @@ class AssociateCaseAboutToSubmitHandlerTest {
         verify(associatedCaseLinkHelper, never()).addLinkToOtherAssociatedCasesV2Enabled(any(), any());
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     void givenNoCaseDetailsBefore_thenDoNotRemoveAnyLinks() {
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.empty());
         sscsCaseDataA.setAssociatedCase(caseLinks("2"));
@@ -177,7 +177,7 @@ class AssociateCaseAboutToSubmitHandlerTest {
         verify(associatedCaseLinkHelper, never()).removeLinkToOtherAssociatedCases(any(), any());
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     void givenCaseBeforeHasNoAssociatedCases_thenDoNotRemoveAnyLinks() {
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBeforeA));
         sscsCaseDataBeforeA.setAssociatedCase(new ArrayList<>());
@@ -188,7 +188,7 @@ class AssociateCaseAboutToSubmitHandlerTest {
         verify(associatedCaseLinkHelper, never()).removeLinkToOtherAssociatedCases(any(), any());
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     void givenCaseBRemovedFromCaseA_thenRemoveLinkFromCaseBOnly() {
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBeforeA));
         sscsCaseDataBeforeA.setAssociatedCase(caseLinks("2", "3"));
@@ -201,7 +201,7 @@ class AssociateCaseAboutToSubmitHandlerTest {
         assertThat(response.getData().getAssociatedCase()).isEqualTo(caseLinks("3"));
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     void givenAllCasesRemovedAndAssociatedCasesNull_thenRemoveLinkFromAllPreviouslyLinkedCases() {
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBeforeA));
         sscsCaseDataBeforeA.setAssociatedCase(caseLinks("2", "3"));
@@ -213,7 +213,7 @@ class AssociateCaseAboutToSubmitHandlerTest {
         assertThat(response.getData().getAssociatedCase()).isNull();
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     void givenRemovedCaseCannotBeRetrieved_thenItIsExcludedFromRemoval() {
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBeforeA));
         sscsCaseDataBeforeA.setAssociatedCase(caseLinks("2", "4"));
@@ -225,7 +225,7 @@ class AssociateCaseAboutToSubmitHandlerTest {
         assertThat(response.getData().getAssociatedCase()).isNull();
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     void givenAllCasesRemovedAndAssociatedCasesEmpty_thenAssociatedCasesSetToNull() {
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBeforeA));
         sscsCaseDataBeforeA.setAssociatedCase(caseLinks("2"));
