@@ -13,6 +13,8 @@ properties([
 
 @Library("Infrastructure@2.12.1")
 
+import uk.gov.hmcts.contino.GradleBuilder
+
 def type = "java"
 def product = "sscs"
 def component = "tribunals-api"
