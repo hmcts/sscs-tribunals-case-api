@@ -1050,8 +1050,8 @@
   {
     "LiveFrom": "02/10/2026",
     "CaseTypeID": "Benefit",
-    "ID": "failedToRetrieveCorrespondence",
-    "Name": "Correspondence unavailable",
+    "ID": "notificationNotSaved",
+    "Name": "Notification not saved",
     "Description": "System failed to save correspondence",
     "DisplayOrder": 770,
     "PreConditionState(s)": "*",

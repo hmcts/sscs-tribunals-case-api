@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -92,7 +93,7 @@ public class SaveCorrespondenceAsyncServiceTest {
         service.recoverSaveLetter(new NotificationClientException("500 ServerError"),
                 notificationClient, NOTIFICATION_ID, correspondence, CCD_ID);
 
-        verify(ccdNotificationsPdfService).notifyFailedToRetrieveCorrespondence(Long.valueOf(CCD_ID), NOTIFICATION_ID, CorrespondenceType.Letter);
+        verify(ccdNotificationsPdfService).notificationNotSaved(Long.valueOf(CCD_ID), NOTIFICATION_ID, CorrespondenceType.Letter);
     }
 
     @Test
@@ -104,7 +105,7 @@ public class SaveCorrespondenceAsyncServiceTest {
         service.recoverSaveBulkPrintLetter(new RuntimeException("500 ServerError"),
                 new byte[]{}, correspondence, CCD_ID);
 
-        verify(ccdNotificationsPdfService).notifyFailedToRetrieveCorrespondence(Long.valueOf(CCD_ID), null, CorrespondenceType.Letter);
+        verify(ccdNotificationsPdfService, never()).notificationNotSaved(Long.valueOf(CCD_ID), null, CorrespondenceType.Letter);
     }
 
     @Test
@@ -116,7 +117,7 @@ public class SaveCorrespondenceAsyncServiceTest {
 
         service.recoverSaveEmailOrSms(new NotificationClientException("500 ServerError"), NOTIFICATION_ID, correspondence, sscsCaseData);
 
-        verify(ccdNotificationsPdfService).notifyFailedToRetrieveCorrespondence(Long.valueOf(CCD_ID), NOTIFICATION_ID, CorrespondenceType.Email);
+        verify(ccdNotificationsPdfService).notificationNotSaved(Long.valueOf(CCD_ID), NOTIFICATION_ID, CorrespondenceType.Email);
         logCapture.assertLogContains("Failed saving Email correspondence into ccd for case id " + CCD_ID + " after retries exhausted, notification id " + NOTIFICATION_ID + ", "
                 + "notification was sent but will not appear on the Notifications Sent tab.", Level.ERROR);
 
@@ -131,7 +132,7 @@ public class SaveCorrespondenceAsyncServiceTest {
         service.recoverSaveLettersToReasonableAdjustment(new NotificationClientException("500 ServerError"),
                 new byte[]{}, correspondence, CCD_ID, SubscriptionType.APPELLANT);
 
-        verify(ccdNotificationsPdfService).notifyFailedToRetrieveCorrespondence(Long.valueOf(CCD_ID), null, CorrespondenceType.Letter);
+        verify(ccdNotificationsPdfService, never()).notificationNotSaved(Long.valueOf(CCD_ID), null, CorrespondenceType.Letter);
     }
 
     @ParameterizedTest

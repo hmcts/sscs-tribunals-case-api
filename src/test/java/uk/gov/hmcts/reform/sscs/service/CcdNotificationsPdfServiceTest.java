@@ -693,50 +693,50 @@ public class CcdNotificationsPdfServiceTest {
 
     @Test
     @Parameters({"Letter", "Email", "Sms"})
-    public void notifyFailedToRetrieveCorrespondenceTriggersFailedToRetrieveCorrespondenceEvent(CorrespondenceType correspondenceType) {
+    public void notificationNotSavedEventTriggersEvent(CorrespondenceType correspondenceType) {
         Long caseId = Long.valueOf(caseData.getCcdCaseId());
 
-        service.notifyFailedToRetrieveCorrespondence(caseId, "notification-id-123", correspondenceType);
+        service.notificationNotSaved(caseId, "notification-id-123", correspondenceType);
 
         verify(updateCcdCaseService).triggerCaseEventV2(
                 eq(caseId),
-                eq(EventType.FAILED_TO_RETRIEVE_CORRESPONDENCE.getCcdType()),
-                eq("Failed to retrieve correspondence"),
-                eq("Failed to save " + correspondenceType + " correspondence to case for notification id notification-id-123"),
+                eq(EventType.NOTIFICATION_NOT_SAVED.getCcdType()),
+                eq("Notification issued via Go.uk"),
+                eq("Copy of notification id notification-id-123 failed to save in Notifications tab"),
                 any());
     }
 
     @Test
-    public void notifyFailedToRetrieveCorrespondenceWithNoNotificationIdOmitsItFromDescription() {
+    public void notificationNotSavedWithNoNotificationIdOmitsItFromDescription() {
         Long caseId = Long.valueOf(caseData.getCcdCaseId());
 
-        service.notifyFailedToRetrieveCorrespondence(caseId, null, CorrespondenceType.Letter);
+        service.notificationNotSaved(caseId, null, CorrespondenceType.Letter);
 
         verify(updateCcdCaseService).triggerCaseEventV2(
                 eq(caseId),
-                eq(EventType.FAILED_TO_RETRIEVE_CORRESPONDENCE.getCcdType()),
-                eq("Failed to retrieve correspondence"),
-                eq("Failed to save Letter correspondence to case"),
+                eq(EventType.NOTIFICATION_NOT_SAVED.getCcdType()),
+                eq("Notification issued via Go.uk"),
+                eq("Copy of notification id failed to save in Notifications tab"),
                 any());
     }
 
     @Test
-    public void notifyFailedToRetrieveCorrespondenceDoesNotThrowExceptionWhenCaseUpdateFails() {
+    public void notificationNotSavedDoesNotThrowExceptionWhenCaseUpdateFails() {
         Long caseId = Long.valueOf(caseData.getCcdCaseId());
         doThrow(new CcdException("some error when updating case")).when(updateCcdCaseService).triggerCaseEventV2(
                 eq(caseId),
-                eq(EventType.FAILED_TO_RETRIEVE_CORRESPONDENCE.getCcdType()),
+                eq(EventType.NOTIFICATION_NOT_SAVED.getCcdType()),
                 any(),
                 any(),
                 any());
 
-        service.notifyFailedToRetrieveCorrespondence(caseId, "notification-id-123", CorrespondenceType.Letter);
+        service.notificationNotSaved(caseId, "notification-id-123", CorrespondenceType.Letter);
 
         verify(updateCcdCaseService).triggerCaseEventV2(
                 eq(caseId),
-                eq(EventType.FAILED_TO_RETRIEVE_CORRESPONDENCE.getCcdType()),
-                eq("Failed to retrieve correspondence"),
-                eq("Failed to save Letter correspondence to case for notification id notification-id-123"),
+                eq(EventType.NOTIFICATION_NOT_SAVED.getCcdType()),
+                eq("Notification issued via Go.uk"),
+                eq("Copy of notification id notification-id-123 failed to save in Notifications tab"),
                 any());
     }
 

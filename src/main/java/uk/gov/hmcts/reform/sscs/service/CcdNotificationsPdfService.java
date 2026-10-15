@@ -39,7 +39,7 @@ public class CcdNotificationsPdfService {
 
     private static final String NOTIFICATION_SENT = "Notification sent";
     private static final String FAILED_TO_UPDATE_CCD_CASE_USING_V_2_BUT_CARRYING_ON_WITH_EVENT = "Failed to update ccd case using v2 but carrying on [{}] with event [{}]";
-    private static final String FAILED_TO_RETRIEVE_CORRESPONDENCE = "Failed to retrieve correspondence";
+    private static final String NOTIFICATION_NOT_SAVED = "Notification issued via Go.uk";
 
     private PdfStoreService pdfStoreService;
 
@@ -160,20 +160,20 @@ public class CcdNotificationsPdfService {
         }
     }
 
-    public void notifyFailedToRetrieveCorrespondence(Long ccdCaseId, String notificationId, CorrespondenceType correspondenceType) {
-        log.info("Updating ccd case using v2 for {} with event {}", ccdCaseId, EventType.FAILED_TO_RETRIEVE_CORRESPONDENCE.getCcdType());
+    public void notificationNotSaved(Long ccdCaseId, String notificationId, CorrespondenceType correspondenceType) {
+        log.info("Updating ccd case using v2 for {} with event {}", ccdCaseId, EventType.NOTIFICATION_NOT_SAVED.getCcdType());
         String description = notificationId == null
-                ? String.format("Failed to save %s correspondence to case", correspondenceType)
-                : String.format("Failed to save %s correspondence to case for notification id %s", correspondenceType, notificationId);
+                ? String.format("Copy of notification id failed to save in Notifications tab")
+                : String.format("Copy of notification id %s failed to save in Notifications tab", notificationId);
         try {
             updateCcdCaseService.triggerCaseEventV2(ccdCaseId,
-                EventType.FAILED_TO_RETRIEVE_CORRESPONDENCE.getCcdType(),
-                FAILED_TO_RETRIEVE_CORRESPONDENCE,
+                EventType.NOTIFICATION_NOT_SAVED.getCcdType(),
+                NOTIFICATION_NOT_SAVED,
                 description,
                 idamService.getIdamTokens());
         } catch (CcdException ccdEx) {
             log.error(FAILED_TO_UPDATE_CCD_CASE_USING_V_2_BUT_CARRYING_ON_WITH_EVENT,
-                    ccdCaseId, EventType.FAILED_TO_RETRIEVE_CORRESPONDENCE.getCcdType(), ccdEx);
+                    ccdCaseId, EventType.NOTIFICATION_NOT_SAVED.getCcdType(), ccdEx);
         }
     }
 

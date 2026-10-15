@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -67,7 +68,7 @@ class SaveCorrespondenceAsyncServiceIt {
         await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
             verify(client, times(3)).getPdfForLetter(NOTIFICATION_ID);
             verify(ccdNotificationsPdfService)
-                    .notifyFailedToRetrieveCorrespondence(Long.valueOf(CCD_ID), NOTIFICATION_ID, CorrespondenceType.Letter);
+                    .notificationNotSaved(Long.valueOf(CCD_ID), NOTIFICATION_ID, CorrespondenceType.Letter);
         });
     }
 
@@ -81,8 +82,8 @@ class SaveCorrespondenceAsyncServiceIt {
         await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
             verify(ccdNotificationsPdfService, times(3)).mergeLetterCorrespondenceIntoCcdV2(
                 any(byte[].class), any(), any(), any());
-            verify(ccdNotificationsPdfService)
-                .notifyFailedToRetrieveCorrespondence(Long.valueOf(CCD_ID), null, CorrespondenceType.Letter);
+            verify(ccdNotificationsPdfService, never())
+                    .notificationNotSaved(Long.valueOf(CCD_ID), null, CorrespondenceType.Letter);
             logCapture.assertLogContains("Failed saving bulk print Letter correspondence into ccd for case id " + CCD_ID
                 + " after retries exhausted, notification was sent but will not appear on the Notifications Sent tab.", Level.ERROR);
         });
@@ -98,8 +99,10 @@ class SaveCorrespondenceAsyncServiceIt {
         await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
             verify(ccdNotificationsPdfService, times(3)).mergeReasonableAdjustmentsCorrespondenceIntoCcdV2(
                 any(byte[].class), any(), any(), any());
-            verify(ccdNotificationsPdfService)
-                .notifyFailedToRetrieveCorrespondence(Long.valueOf(CCD_ID), null, CorrespondenceType.Letter);
+            verify(ccdNotificationsPdfService, never())
+                    .notificationNotSaved(Long.valueOf(CCD_ID), null, CorrespondenceType.Letter);
+            logCapture.assertLogContains("Failed saving reasonable adjustments Letter correspondence into ccd for case id " + CCD_ID
+                    + " after retries exhausted, notification was sent but will not appear on the Notifications Sent tab.", Level.ERROR);
         });
     }
 
@@ -118,7 +121,7 @@ class SaveCorrespondenceAsyncServiceIt {
             verify(ccdNotificationsPdfService, times(3))
                 .mergeCorrespondenceIntoCcdV2(eq(Long.valueOf(CCD_ID)), eq(emailCorrespondence));
             verify(ccdNotificationsPdfService)
-                .notifyFailedToRetrieveCorrespondence(Long.valueOf(CCD_ID), NOTIFICATION_ID, CorrespondenceType.Email);
+                .notificationNotSaved(Long.valueOf(CCD_ID), NOTIFICATION_ID, CorrespondenceType.Email);
             logCapture.assertLogContains("Failed saving Email correspondence into ccd for case id " + CCD_ID
                 + " after retries exhausted, notification id " + NOTIFICATION_ID, Level.ERROR);
         });

@@ -82,7 +82,7 @@ public class SaveCorrespondenceAsyncService {
         log.error("Failed to get letter pdf from gov.notify or save it into ccd for notification id {} and case id {} "
                         + "after retries exhausted, notification was sent but will not appear on the Notifications Sent tab.",
                 notificationId, ccdCaseId, e);
-        ccdNotificationsPdfService.notifyFailedToRetrieveCorrespondence(valueOf(ccdCaseId), notificationId, correspondence.getValue().getCorrespondenceType());
+        ccdNotificationsPdfService.notificationNotSaved(valueOf(ccdCaseId), notificationId, correspondence.getValue().getCorrespondenceType());
     }
 
     @Recover
@@ -91,7 +91,6 @@ public class SaveCorrespondenceAsyncService {
         log.error("Failed saving bulk print {} correspondence into ccd for case id {} after retries exhausted, "
                         + "notification was sent but will not appear on the Notifications Sent tab.",
                 correspondence.getValue().getCorrespondenceType(), ccdCaseId, e);
-        ccdNotificationsPdfService.notifyFailedToRetrieveCorrespondence(valueOf(ccdCaseId), null, correspondence.getValue().getCorrespondenceType());
     }
 
     @Async
@@ -113,7 +112,6 @@ public class SaveCorrespondenceAsyncService {
         log.error("Failed saving reasonable adjustments {} correspondence into ccd for case id {} after retries exhausted, "
                         + "notification was sent but will not appear on the Notifications Sent tab.",
                 correspondence.getValue().getCorrespondenceType(), ccdCaseId, e);
-        ccdNotificationsPdfService.notifyFailedToRetrieveCorrespondence(valueOf(ccdCaseId), null, correspondence.getValue().getCorrespondenceType());
     }
 
     @Async
@@ -134,6 +132,6 @@ public class SaveCorrespondenceAsyncService {
         log.error("Failed saving {} correspondence into ccd for case id {} after retries exhausted, notification id {}, "
                         + "notification was sent but will not appear on the Notifications Sent tab.",
                 correspondence.getValue().getCorrespondenceType(), sscsCaseData.getCcdCaseId(), notificationId, e);
-        ccdNotificationsPdfService.notifyFailedToRetrieveCorrespondence(valueOf(sscsCaseData.getCcdCaseId()), notificationId, correspondence.getValue().getCorrespondenceType());
+        ccdNotificationsPdfService.notificationNotSaved(valueOf(sscsCaseData.getCcdCaseId()), notificationId, correspondence.getValue().getCorrespondenceType());
     }
 }
