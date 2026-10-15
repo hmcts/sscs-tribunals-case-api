@@ -155,7 +155,7 @@ withNightlyPipeline(type, product, component) {
 def runE2eTestsNightly(gradleBuilder) {
     stage('Playwright tests') {
         try {
-            gradleBuilder.gradle('runE2eTests')
+            gradleBuilder.gradle('runE2eTestsNightly')
         } catch (Error) {
             unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
         } finally {
