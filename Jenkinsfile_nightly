@@ -11,11 +11,13 @@ properties([
         ])
 ])
 
-@Library("Infrastructure@2.4.9")
+@Library("Infrastructure@2.12.1")
 
 def type = "java"
 def product = "sscs"
 def component = "tribunals-api"
+
+GradleBuilder gradleBuilder = new GradleBuilder(this, product)
 
 env.NONPROD_ENVIRONMENT_NAME = (params.UI_URL_TO_TEST.contains('demo') && params.API_URL_TO_TEST.contains('demo')) ? "demo" : "aat"
 
@@ -119,7 +121,7 @@ withNightlyPipeline(type, product, component) {
     enableFullFunctionalTest()
 
     afterAlways('fullFunctionalTest') {
-        runE2eTestsNightly()
+        runE2eTestsNightly(gradleBuilder)
         publishHTML([
                 allowMissing         : true,
                 alwaysLinkToLastBuild: true,
@@ -133,7 +135,7 @@ withNightlyPipeline(type, product, component) {
             allowEmptyArchive: true
         )
 
-        runAccessibilityTestsNightly()
+        runAccessibilityTestsNightly(gradleBuilder)
         publishHTML([
                 allowMissing         : true,
                 alwaysLinkToLastBuild: true,
@@ -150,10 +152,10 @@ withNightlyPipeline(type, product, component) {
     }
 }
 
-def runE2eTestsNightly() {
+def runE2eTestsNightly(gradleBuilder) {
     stage('Playwright tests') {
         try {
-            sh './gradlew runE2eTestsNightly'
+            gradleBuilder.gradle('runE2eTestsNightly')
         } catch (Error) {
             unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
         } finally {
@@ -162,10 +164,10 @@ def runE2eTestsNightly() {
     }
 }
 
-def runAccessibilityTestsNightly() {
+def runAccessibilityTestsNightly(gradleBuilder) {
     stage('Accessibility tests') {
         try {
-            sh './gradlew runAccessibilityTestsNightly'
+            gradleBuilder.gradle('runAccessibilityTestsNightly')
         } catch (Error) {
             unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
         } finally {
