@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service.reminder;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -191,6 +192,72 @@ class HearingReminderTest {
 
         Job<String> secondJob = jobCaptor.getAllValues().getLast();
         assertEquals(expectedSecondTriggerBasedOnStart, secondJob.triggerAt);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = NotificationEventType.class, names = {"HEARING_BOOKED", "RESEND_HEARING_BOOKED"})
+    void schedulesReminder_acrossAutumnClockChange(NotificationEventType eventType) {
+
+        // UK clocks go back (BST -> GMT) at 02:00 on 2026-10-25.
+        final String expectedJobGroup = "ID_EVENT";
+        LocalDateTime start = LocalDateTime.of(2026, 10, 26, 9, 0, 0);
+
+        final ZonedDateTime expectedFirstTrigger =
+            ZonedDateTime.of(2026, 10, 22, 9, 0, 0, 0, ZoneId.of(AppConstants.ZONE_ID));
+        final ZonedDateTime expectedSecondTrigger =
+            ZonedDateTime.of(2026, 10, 24, 9, 0, 0, 0, ZoneId.of(AppConstants.ZONE_ID));
+
+        assertHearingRemindersScheduledAt(eventType, expectedJobGroup, start, expectedFirstTrigger, expectedSecondTrigger);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = NotificationEventType.class, names = {"HEARING_BOOKED", "RESEND_HEARING_BOOKED"})
+    void schedulesReminder_acrossSpringClockChange(NotificationEventType eventType) {
+
+        // UK clocks go forward (GMT -> BST) at 01:00 on 2027-03-28.
+        final String expectedJobGroup = "ID_EVENT";
+        LocalDateTime start = LocalDateTime.of(2027, 3, 29, 9, 0, 0);
+
+        final ZonedDateTime expectedFirstTrigger =
+            ZonedDateTime.of(2027, 3, 25, 9, 0, 0, 0, ZoneId.of(AppConstants.ZONE_ID));
+        final ZonedDateTime expectedSecondTrigger =
+            ZonedDateTime.of(2027, 3, 27, 9, 0, 0, 0, ZoneId.of(AppConstants.ZONE_ID));
+
+        assertHearingRemindersScheduledAt(eventType, expectedJobGroup, start, expectedFirstTrigger, expectedSecondTrigger);
+    }
+
+    private void assertHearingRemindersScheduledAt(
+        NotificationEventType eventType,
+        String expectedJobGroup,
+        LocalDateTime start,
+        ZonedDateTime expectedFirstTrigger,
+        ZonedDateTime expectedSecondTrigger
+    ) {
+        LocalDateTime hearingDateTime = start.minusHours(1);
+
+        CcdNotificationWrapper wrapper = SscsCaseDataUtils.buildBasicCcdNotificationWrapper(eventType);
+        List<Hearing> hearingList = List.of(Hearing.builder().value(HearingDetails.builder()
+                        .start(start)
+                        .hearingDate(hearingDateTime.toLocalDate().toString())
+                        .time(hearingDateTime.toLocalTime().toString())
+                .build()).build());
+        wrapper.getNewSscsCaseData().setHearings(hearingList);
+
+        when(jobGroupGenerator.generate(wrapper.getCaseId(), HEARING_REMINDER.getId())).thenReturn(expectedJobGroup);
+
+        hearingReminder.handle(wrapper);
+
+        ArgumentCaptor<Job> jobCaptor = ArgumentCaptor.forClass(Job.class);
+
+        verify(jobScheduler, times(2)).schedule(
+            jobCaptor.capture()
+        );
+
+        Job<String> firstJob = jobCaptor.getAllValues().getFirst();
+        assertThat(firstJob.triggerAt).isEqualTo(expectedFirstTrigger);
+
+        Job<String> secondJob = jobCaptor.getAllValues().getLast();
+        assertThat(secondJob.triggerAt).isEqualTo(expectedSecondTrigger);
     }
 
     @ParameterizedTest
