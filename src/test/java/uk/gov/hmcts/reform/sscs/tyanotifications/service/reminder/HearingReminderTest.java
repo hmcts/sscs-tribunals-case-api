@@ -199,23 +199,21 @@ class HearingReminderTest {
 
     @ParameterizedTest
     @EnumSource(value = NotificationEventType.class, names = {"HEARING_BOOKED", "RESEND_HEARING_BOOKED"})
-    void schedulesReminder_acrossAutumnClockChange(NotificationEventType eventType) {
-        assertHearingRemindersScheduledAcross(eventType, false);
+    void schedulesReminder_acrossSpringClockChange(NotificationEventType eventType) {
+        assertHearingRemindersScheduledAcrossClockChange(eventType, true);
     }
 
     @ParameterizedTest
     @EnumSource(value = NotificationEventType.class, names = {"HEARING_BOOKED", "RESEND_HEARING_BOOKED"})
-    void schedulesReminder_acrossSpringClockChange(NotificationEventType eventType) {
-        assertHearingRemindersScheduledAcross(eventType, true);
+    void schedulesReminder_acrossAutumnClockChange(NotificationEventType eventType) {
+        assertHearingRemindersScheduledAcrossClockChange(eventType, false);
     }
 
-    private void assertHearingRemindersScheduledAcross(NotificationEventType eventType, boolean gap) {
+    private void assertHearingRemindersScheduledAcrossClockChange(NotificationEventType eventType, boolean isSpringChange) {
 
         ZoneId zoneId = ZoneId.of(AppConstants.ZONE_ID);
-        ZoneOffsetTransition transition = nextTransition(zoneId, gap);
+        ZoneOffsetTransition transition = nextClockChange(zoneId, isSpringChange);
 
-        // Start the hearing the day after the transition, comfortably clear of both reminder windows,
-        // so both the 2-day and 4-day reminders land on the other side of the clock change.
         LocalDateTime start = transition.getDateTimeAfter().toLocalDate().plusDays(1).atTime(9, 0);
 
         final ZonedDateTime expectedFirstTrigger =
@@ -226,10 +224,10 @@ class HearingReminderTest {
         assertHearingRemindersScheduledAt(eventType, "ID_EVENT", start, expectedFirstTrigger, expectedSecondTrigger);
     }
 
-    private static ZoneOffsetTransition nextTransition(ZoneId zoneId, boolean gap) {
+    private static ZoneOffsetTransition nextClockChange(ZoneId zoneId, boolean isSpringChange) {
         ZoneRules rules = zoneId.getRules();
         ZoneOffsetTransition transition = rules.nextTransition(Instant.now());
-        while (transition.isGap() != gap) {
+        while (transition.isGap() != isSpringChange) {
             transition = rules.nextTransition(transition.getInstant());
         }
         return transition;
