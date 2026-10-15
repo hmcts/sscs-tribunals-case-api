@@ -28,6 +28,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -681,4 +682,62 @@ public class DwpUploadResponseHandlerTest {
         consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
         assertEquals(RESPONSE_SUBMITTED_DWP, sscsCaseData.getDwpState());
     }
+
+
+    @ParameterizedTest
+    @CsvSource({"LT", "HT", "OC", "OI", "OS", "OX"})
+    public void givenADwpUploadResponseEventWithNoHearingDurationIssueCode_runResponseReceived(String issueCode) {
+        handler = new DwpUploadResponseHandler(updateCcdCaseService, idamService);
+        SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(READY_TO_LIST.getId()).dwpFurtherInfo("No")
+                .elementsDisputedIsDecisionDisputedByOthers("No").appeal(Appeal.builder()
+                        .benefitType(BenefitType.builder().code("taxCredit").build()).build())
+                .urgentCase("No")
+                .issueCode(issueCode)
+                .build();
+        final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(
+                sscsCaseData, INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE);
+
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+        when(updateCcdCaseService.updateCaseV2(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().id(1L)
+                .data(callback.getCaseDetails().getCaseData()).build());
+
+        handler.handle(CallbackType.SUBMITTED, callback);
+
+        verify(idamService).getIdamTokens();
+        verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+                eq(EventType.DWP_RESPOND.getCcdType()), eq("Response received"),
+                eq("Update to response received as an Admin has to review the case"), any(), consumerArgumentCaptor.capture());
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+        assertEquals(RESPONSE_SUBMITTED_DWP, sscsCaseData.getDwpState());
+    }
+
+
+    @Test
+    public void givenADwpUploadResponseUcCaseWithUmIssueCode_runResponseReceivedEvent() {
+        SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(READY_TO_LIST.getId()).dwpFurtherInfo("No")
+                .issueCode("UM")
+                .elementsDisputedIsDecisionDisputedByOthers("no").appeal(Appeal.builder()
+                        .benefitType(BenefitType.builder().code("UC").build())
+                        .build()).build();
+        final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(
+                sscsCaseData, WITH_DWP, DWP_UPLOAD_RESPONSE);
+
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+        when(updateCcdCaseService.updateCaseV2(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().id(1L).state(State.RESPONSE_RECEIVED.getId())
+                .data(callback.getCaseDetails().getCaseData()).build());
+
+        handler.handle(CallbackType.SUBMITTED, callback);
+
+        verify(idamService).getIdamTokens();
+        verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+                eq(EventType.DWP_RESPOND.getCcdType()), eq("Response received"),
+                eq("Update to response received as an Admin has to review the case"), any(), consumerArgumentCaptor.capture());
+
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+        assertEquals(RESPONSE_SUBMITTED_DWP, sscsCaseData.getDwpState());
+    }
+
+
 }
