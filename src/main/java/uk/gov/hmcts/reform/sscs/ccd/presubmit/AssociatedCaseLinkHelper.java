@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.sscs.bulkscan.validators.SscsCaseValidator.isV
 import static uk.gov.hmcts.reform.sscs.utility.StringUtils.getMaskedNino;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -82,13 +83,36 @@ public class AssociatedCaseLinkHelper {
         log.info("Adding link to other associated cases V2");
         if (isNotEmpty(matchedByNinoCases) && isNotEmpty(caseId)) {
             for (SscsCaseDetails sscsCaseDetails: matchedByNinoCases) {
-                Long currentCaseId = Long.parseLong(sscsCaseDetails.getData().getCcdCaseId());
+                Long currentCaseId = sscsCaseDetails.getId();
                 log.info("Linking case {} to case {} using V2", currentCaseId, caseId);
                 updateCcdCaseService.updateCaseV2(currentCaseId, EventType.UPDATE_CASE_ONLY.getCcdType(),
                         "updated case only", "Auto linked case added",
                         idamService.getIdamTokens(), caseDetails -> mutator(caseDetails, caseId));
             }
         }
+    }
+
+    public void removeLinkToOtherAssociatedCases(final List<SscsCaseDetails> cases, final String caseId) {
+        log.info("Removing link from other associated cases");
+        if (isNotEmpty(cases) && isNotEmpty(caseId)) {
+            for (final SscsCaseDetails sscsCaseDetails: cases) {
+                final Long currentCaseId = sscsCaseDetails.getId();
+                log.info("Removing link from case {} to case {}", currentCaseId, caseId);
+                updateCcdCaseService.updateCaseV2(currentCaseId, EventType.UPDATE_CASE_ONLY.getCcdType(),
+                    "updated case only", "Linked case removed",
+                    idamService.getIdamTokens(), caseDetails -> removeLinkMutator(caseDetails, caseId));
+            }
+        }
+    }
+
+    private void removeLinkMutator(final SscsCaseDetails sscsCaseDetails, final String caseId) {
+        final SscsCaseData sscsCaseData = sscsCaseDetails.getData();
+        final List<CaseLink> remainingLinks = Optional.ofNullable(sscsCaseData.getAssociatedCase()).orElse(emptyList())
+            .stream()
+            .filter(caseLink -> caseLink.getValue() == null || !caseId.equals(caseLink.getValue().getCaseReference()))
+            .collect(Collectors.toCollection(ArrayList::new));
+        sscsCaseData.setAssociatedCase(remainingLinks);
+        sscsCaseData.setLinkedCasesBoolean(remainingLinks.isEmpty() ? "No" : "Yes");
     }
 
     private void mutator(SscsCaseDetails sscsCaseDetails, String caseId) {
