@@ -108,7 +108,6 @@ public class AssociateCaseAboutToSubmitHandler implements PreSubmitCallbackHandl
                 associatedCaseLinkHelper.removeLinkToOtherAssociatedCases(removedCases, caseDataAfter.getCcdCaseId());
             }
         }
-
     }
 
 }

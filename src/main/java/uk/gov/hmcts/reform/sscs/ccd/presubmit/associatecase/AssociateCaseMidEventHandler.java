@@ -30,7 +30,9 @@ public class AssociateCaseMidEventHandler implements PreSubmitCallbackHandler<Ss
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
         String userAuthorisation) {
 
-        canHandle(callbackType, callback);
+        if (!canHandle(callbackType, callback)) {
+            throw new IllegalStateException("Cannot handle callback");
+        }
 
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();

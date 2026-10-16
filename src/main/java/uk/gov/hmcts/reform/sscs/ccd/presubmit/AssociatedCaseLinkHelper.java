@@ -83,7 +83,7 @@ public class AssociatedCaseLinkHelper {
         log.info("Adding link to other associated cases V2");
         if (isNotEmpty(matchedByNinoCases) && isNotEmpty(caseId)) {
             for (SscsCaseDetails sscsCaseDetails: matchedByNinoCases) {
-                Long currentCaseId = Long.parseLong(sscsCaseDetails.getData().getCcdCaseId());
+                Long currentCaseId = sscsCaseDetails.getId();
                 log.info("Linking case {} to case {} using V2", currentCaseId, caseId);
                 updateCcdCaseService.updateCaseV2(currentCaseId, EventType.UPDATE_CASE_ONLY.getCcdType(),
                         "updated case only", "Auto linked case added",
@@ -96,7 +96,7 @@ public class AssociatedCaseLinkHelper {
         log.info("Removing link from other associated cases");
         if (isNotEmpty(cases) && isNotEmpty(caseId)) {
             for (final SscsCaseDetails sscsCaseDetails: cases) {
-                final Long currentCaseId = Long.parseLong(sscsCaseDetails.getData().getCcdCaseId());
+                final Long currentCaseId = sscsCaseDetails.getId();
                 log.info("Removing link from case {} to case {}", currentCaseId, caseId);
                 updateCcdCaseService.updateCaseV2(currentCaseId, EventType.UPDATE_CASE_ONLY.getCcdType(),
                     "updated case only", "Linked case removed",

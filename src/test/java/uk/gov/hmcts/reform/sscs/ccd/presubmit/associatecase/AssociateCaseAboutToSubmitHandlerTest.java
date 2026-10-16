@@ -238,7 +238,7 @@ class AssociateCaseAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenNoCasesRemoved_thenDoNoAttemptToRemoveAssociatedCases() {
+    void givenNoCasesRemoved_thenDoNotAttemptToRemoveAssociatedCases() {
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBeforeA));
         sscsCaseDataBeforeA.setAssociatedCase(caseLinks("2"));
         sscsCaseDataA.setAssociatedCase(caseLinks("2"));
@@ -246,7 +246,7 @@ class AssociateCaseAboutToSubmitHandlerTest {
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(associatedCaseLinkHelper, never()).removeLinkToOtherAssociatedCases(List.of(), "1");
+        verify(associatedCaseLinkHelper, never()).removeLinkToOtherAssociatedCases(any(), any());
     }
 
     private static List<CaseLink> caseLinks(final String... caseReferences) {
