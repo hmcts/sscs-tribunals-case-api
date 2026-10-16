@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.associatecase;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
@@ -69,6 +70,13 @@ class AssociateCaseMidEventHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
 
         assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
+    }
+
+    @Test
+    void throwsExceptionIfItCannotHandleTheCallback() {
+        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+        assertThatThrownBy(() -> handler.handle(MID_EVENT, callback, USER_AUTHORISATION))
+                .isInstanceOf(IllegalStateException.class);
     }
 
     @ParameterizedTest
