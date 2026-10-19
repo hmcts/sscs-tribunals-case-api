@@ -6,6 +6,7 @@ import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingStatus.CANCELLED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingStatus.EXCEPTION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INCOMPLETE_APPLICATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INCOMPLETE_APPLICATION_INFORMATION_REQUESTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
@@ -25,7 +26,15 @@ import java.util.Optional;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
 @Slf4j
 public class SscsHelper {
@@ -121,6 +130,17 @@ public class SscsHelper {
                 .filter(hearing -> !CANCELLED.equals(hearing.getValue().getHearingStatus()))
                 .findFirst();
         return futureHearing.isPresent();
+    }
+
+    public static boolean hasHearingNotYetScheduled(SscsCaseData caseData) {
+        Optional<Hearing> anyNonCancelledHearingWithNoScheduledDate = ofNullable(caseData.getHearings())
+            .orElse(Collections.emptyList())
+            .stream()
+            .filter(hearing -> isNull(hearing.getValue().getHearingDate()) && isNull(hearing.getValue().getTime()))
+            .filter(hearing -> CANCELLED != hearing.getValue().getHearingStatus())
+            .filter(hearing -> EXCEPTION != hearing.getValue().getHearingStatus())
+            .findFirst();
+        return anyNonCancelledHearingWithNoScheduledDate.isPresent();
     }
 
     public static String isScottishCase(RegionalProcessingCenter rpc) {

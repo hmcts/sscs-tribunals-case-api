@@ -1085,8 +1085,9 @@ public class NotificationServiceTest {
     }
 
     @Test
-    public void willNotSendHearingNotifications_whenHearingBookedAndDwpStateIsFinalDecisionIssued() {
-        ccdNotificationWrapper = buildBaseWrapper(HEARING_BOOKED, APPELLANT_WITH_ADDRESS, null, null);
+    @Parameters({"HEARING_BOOKED", "RESEND_HEARING_BOOKED"})
+    public void willNotSendHearingNotifications_whenHearingBookedAndDwpStateIsFinalDecisionIssued(NotificationEventType eventType) {
+        ccdNotificationWrapper = buildBaseWrapper(eventType, APPELLANT_WITH_ADDRESS, null, null);
         ccdNotificationWrapper.getNewSscsCaseData().setDwpState(DwpState.FINAL_DECISION_ISSUED);
 
         SendNotificationService sendNotificationService = new SendNotificationService(notificationSender, notificationHandler,

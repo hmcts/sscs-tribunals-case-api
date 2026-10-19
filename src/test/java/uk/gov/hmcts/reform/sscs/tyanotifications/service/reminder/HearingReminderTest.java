@@ -1,14 +1,17 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service.reminder;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.HEARING_BOOKED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.HEARING_REMINDER;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.RESEND_HEARING_BOOKED;
 
 import com.google.common.collect.Lists;
 import java.time.LocalDate;
@@ -16,12 +19,15 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
@@ -33,8 +39,8 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
 
-@RunWith(MockitoJUnitRunner.class)
-public class HearingReminderTest {
+@ExtendWith(MockitoExtension.class)
+class HearingReminderTest {
 
     @Mock
     private JobGroupGenerator jobGroupGenerator;
@@ -43,11 +49,12 @@ public class HearingReminderTest {
 
     private HearingReminder hearingReminder;
 
+    private static final Set<NotificationEventType> HEARING_BOOKED_EVENTS = Set.of(HEARING_BOOKED, RESEND_HEARING_BOOKED);
     private static final int BEFORE_FIRST_HEARING_REMINDER = 172800 * 2;
     private static final int BEFORE_SECOND_HEARING_REMINDER = 172800;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         hearingReminder = new HearingReminder(
             jobGroupGenerator,
             jobScheduler,
@@ -57,14 +64,14 @@ public class HearingReminderTest {
     }
 
     @Test
-    public void canHandleEventWhenOralHearingType() {
+    void canHandleEventWhenOralHearingType() {
 
         for (NotificationEventType eventType : NotificationEventType.values()) {
 
             CcdNotificationWrapper wrapper = SscsCaseDataUtils.buildBasicCcdNotificationWrapper(eventType,
                 AppealHearingType.ORAL.name());
 
-            if (eventType == HEARING_BOOKED) {
+            if (HEARING_BOOKED_EVENTS.contains(eventType)) {
                 assertTrue(hearingReminder.canHandle(wrapper));
             } else {
 
@@ -77,7 +84,7 @@ public class HearingReminderTest {
     }
 
     @Test
-    public void canHandleEventWhenPaperHearingType() {
+    void canHandleEventWhenPaperHearingType() {
 
         for (NotificationEventType eventType : NotificationEventType.values()) {
 
@@ -92,8 +99,9 @@ public class HearingReminderTest {
         }
     }
 
-    @Test
-    public void schedulesReminder() {
+    @ParameterizedTest
+    @EnumSource(value = NotificationEventType.class, names = {"HEARING_BOOKED", "RESEND_HEARING_BOOKED"})
+    void schedulesReminder(NotificationEventType eventType) {
 
         final String expectedJobGroup = "ID_EVENT";
 
@@ -113,7 +121,7 @@ public class HearingReminderTest {
         );
 
         CcdNotificationWrapper wrapper = SscsCaseDataUtils.buildBasicCcdNotificationWrapperWithHearingAndHearingType(
-            HEARING_BOOKED,
+            eventType,
             HearingType.ORAL,
             hearingDate.toString(),
             hearingTime
@@ -142,8 +150,9 @@ public class HearingReminderTest {
         assertEquals(expectedSecondTriggerAt, secondJob.triggerAt);
     }
 
-    @Test
-    public void schedulesReminder_usingStartDateOverHearingDateTime() {
+    @ParameterizedTest
+    @EnumSource(value = NotificationEventType.class, names = {"HEARING_BOOKED", "RESEND_HEARING_BOOKED"})
+    void schedulesReminder_usingStartDateOverHearingDateTime(NotificationEventType eventType) {
 
         final String expectedJobGroup = "ID_EVENT";
         LocalDateTime start = LocalDateTime.now(ZoneId.of(AppConstants.ZONE_ID)).plusDays(10);
@@ -160,7 +169,7 @@ public class HearingReminderTest {
             null
         );
 
-        CcdNotificationWrapper wrapper = SscsCaseDataUtils.buildBasicCcdNotificationWrapper(HEARING_BOOKED);
+        CcdNotificationWrapper wrapper = SscsCaseDataUtils.buildBasicCcdNotificationWrapper(eventType);
         List<Hearing> hearingList = List.of(Hearing.builder().value(HearingDetails.builder()
                         .start(start)
                         .hearingDate(hearingDateTime.toLocalDate().toString())
@@ -185,8 +194,75 @@ public class HearingReminderTest {
         assertEquals(expectedSecondTriggerBasedOnStart, secondJob.triggerAt);
     }
 
-    @Test
-    public void schedulesOnlyFutureReminderWhenOneReminderDateIsInThePast() {
+    @ParameterizedTest
+    @EnumSource(value = NotificationEventType.class, names = {"HEARING_BOOKED", "RESEND_HEARING_BOOKED"})
+    void schedulesReminder_acrossAutumnClockChange(NotificationEventType eventType) {
+
+        // UK clocks go back (BST -> GMT) at 02:00 on 2026-10-25.
+        final String expectedJobGroup = "ID_EVENT";
+        LocalDateTime start = LocalDateTime.of(2026, 10, 26, 9, 0, 0);
+
+        final ZonedDateTime expectedFirstTrigger =
+            ZonedDateTime.of(2026, 10, 22, 9, 0, 0, 0, ZoneId.of(AppConstants.ZONE_ID));
+        final ZonedDateTime expectedSecondTrigger =
+            ZonedDateTime.of(2026, 10, 24, 9, 0, 0, 0, ZoneId.of(AppConstants.ZONE_ID));
+
+        assertHearingRemindersScheduledAt(eventType, expectedJobGroup, start, expectedFirstTrigger, expectedSecondTrigger);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = NotificationEventType.class, names = {"HEARING_BOOKED", "RESEND_HEARING_BOOKED"})
+    void schedulesReminder_acrossSpringClockChange(NotificationEventType eventType) {
+
+        // UK clocks go forward (GMT -> BST) at 01:00 on 2027-03-28.
+        final String expectedJobGroup = "ID_EVENT";
+        LocalDateTime start = LocalDateTime.of(2027, 3, 29, 9, 0, 0);
+
+        final ZonedDateTime expectedFirstTrigger =
+            ZonedDateTime.of(2027, 3, 25, 9, 0, 0, 0, ZoneId.of(AppConstants.ZONE_ID));
+        final ZonedDateTime expectedSecondTrigger =
+            ZonedDateTime.of(2027, 3, 27, 9, 0, 0, 0, ZoneId.of(AppConstants.ZONE_ID));
+
+        assertHearingRemindersScheduledAt(eventType, expectedJobGroup, start, expectedFirstTrigger, expectedSecondTrigger);
+    }
+
+    private void assertHearingRemindersScheduledAt(
+        NotificationEventType eventType,
+        String expectedJobGroup,
+        LocalDateTime start,
+        ZonedDateTime expectedFirstTrigger,
+        ZonedDateTime expectedSecondTrigger
+    ) {
+        LocalDateTime hearingDateTime = start.minusHours(1);
+
+        CcdNotificationWrapper wrapper = SscsCaseDataUtils.buildBasicCcdNotificationWrapper(eventType);
+        List<Hearing> hearingList = List.of(Hearing.builder().value(HearingDetails.builder()
+                        .start(start)
+                        .hearingDate(hearingDateTime.toLocalDate().toString())
+                        .time(hearingDateTime.toLocalTime().toString())
+                .build()).build());
+        wrapper.getNewSscsCaseData().setHearings(hearingList);
+
+        when(jobGroupGenerator.generate(wrapper.getCaseId(), HEARING_REMINDER.getId())).thenReturn(expectedJobGroup);
+
+        hearingReminder.handle(wrapper);
+
+        ArgumentCaptor<Job> jobCaptor = ArgumentCaptor.forClass(Job.class);
+
+        verify(jobScheduler, times(2)).schedule(
+            jobCaptor.capture()
+        );
+
+        Job<String> firstJob = jobCaptor.getAllValues().getFirst();
+        assertThat(firstJob.triggerAt).isEqualTo(expectedFirstTrigger);
+
+        Job<String> secondJob = jobCaptor.getAllValues().getLast();
+        assertThat(secondJob.triggerAt).isEqualTo(expectedSecondTrigger);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = NotificationEventType.class, names = {"HEARING_BOOKED", "RESEND_HEARING_BOOKED"})
+    void schedulesOnlyFutureReminderWhenOneReminderDateIsInThePast(NotificationEventType eventType) {
 
         final String expectedJobGroup = "ID_EVENT";
         LocalDate today = LocalDate.now(ZoneId.of(AppConstants.ZONE_ID));
@@ -200,7 +276,7 @@ public class HearingReminderTest {
         );
 
         CcdNotificationWrapper wrapper = SscsCaseDataUtils.buildBasicCcdNotificationWrapperWithHearingAndHearingType(
-            HEARING_BOOKED,
+            eventType,
             HearingType.ORAL,
             hearingDate.toString(),
             hearingTime
@@ -223,8 +299,9 @@ public class HearingReminderTest {
         assertEquals(expectedTriggerAt, job.triggerAt);
     }
 
-    @Test
-    public void canNotScheduleReminderWhenReminderDateIsInThePast() {
+    @ParameterizedTest
+    @EnumSource(value = NotificationEventType.class, names = {"HEARING_BOOKED", "RESEND_HEARING_BOOKED"})
+    void canNotScheduleReminderWhenReminderDateIsInThePast(NotificationEventType eventType) {
 
         final String expectedJobGroup = "ID_EVENT";
 
@@ -232,7 +309,7 @@ public class HearingReminderTest {
         String hearingTime = "14:01:18";
 
         CcdNotificationWrapper wrapper = SscsCaseDataUtils.buildBasicCcdNotificationWrapperWithHearingAndHearingType(
-            HEARING_BOOKED,
+            eventType,
             HearingType.ORAL,
             hearingDate,
             hearingTime
@@ -251,8 +328,9 @@ public class HearingReminderTest {
         assertTrue(jobCaptor.getAllValues().isEmpty());
     }
 
-    @Test
-    public void canNotSchedulesReminderWhenReminderDateIsNull() {
+    @ParameterizedTest
+    @EnumSource(value = NotificationEventType.class, names = {"HEARING_BOOKED", "RESEND_HEARING_BOOKED"})
+    void canNotSchedulesReminderWhenReminderDateIsNull(NotificationEventType eventType) {
 
         final String expectedJobGroup = "ID_EVENT";
 
@@ -260,7 +338,7 @@ public class HearingReminderTest {
         String hearingTime = "14:01:18";
 
         CcdNotificationWrapper wrapper = SscsCaseDataUtils.buildBasicCcdNotificationWrapperWithHearingAndHearingType(
-            HEARING_BOOKED,
+            eventType,
             HearingType.ORAL,
             hearingDate,
             hearingTime
@@ -281,18 +359,16 @@ public class HearingReminderTest {
         assertTrue(jobCaptor.getAllValues().isEmpty());
     }
 
-    @Test(expected = Exception.class)
-    public void canScheduleReturnFalseWhenFindHearingDateThrowError() {
-
-        CcdNotificationWrapper ccdResponse = null;
-
-        assertFalse(hearingReminder.canSchedule(ccdResponse));
+    @Test
+    void canScheduleReturnFalseWhenFindHearingDateThrowError() {
+        assertThrows(Exception.class, () -> hearingReminder.canSchedule(null));
     }
 
-    @Test
-    public void canScheduleReturnFalseWhenCannotFindHearingDate() {
+    @ParameterizedTest
+    @EnumSource(value = NotificationEventType.class, names = {"HEARING_BOOKED", "RESEND_HEARING_BOOKED"})
+    void canScheduleReturnFalseWhenCannotFindHearingDate(NotificationEventType eventType) {
 
-        CcdNotificationWrapper ccdResponse = SscsCaseDataUtils.buildBasicCcdNotificationWrapper(HEARING_BOOKED);
+        CcdNotificationWrapper ccdResponse = SscsCaseDataUtils.buildBasicCcdNotificationWrapper(eventType);
 
         assertFalse(hearingReminder.canSchedule(ccdResponse));
     }
