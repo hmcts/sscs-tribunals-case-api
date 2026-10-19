@@ -753,8 +753,8 @@ sscs-tribunals-frontend:
           - postcode-lookup-token
           - AppInsightsInstrumentationKey
           - pcq-token-key
-          - sscs-redis-access-key
-          - sscs-redis-connection-string
+          - sscs-managed-redis-access-key
+          - sscs-managed-redis-connection-string
           - sscs-s2s-secret
 
 hmcts-redis:
