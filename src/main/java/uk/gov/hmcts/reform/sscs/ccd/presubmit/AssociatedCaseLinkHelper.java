@@ -86,7 +86,7 @@ public class AssociatedCaseLinkHelper {
                 Long currentCaseId = sscsCaseDetails.getId();
                 log.info("Linking case {} to case {} using V2", currentCaseId, caseId);
                 updateCcdCaseService.updateCaseV2(currentCaseId, EventType.UPDATE_CASE_ONLY.getCcdType(),
-                        "updated case only", "Auto linked case added",
+                        "Updated case only", "Auto linked case added",
                         idamService.getIdamTokens(), caseDetails -> mutator(caseDetails, caseId));
             }
         }
@@ -99,7 +99,7 @@ public class AssociatedCaseLinkHelper {
                 final Long currentCaseId = sscsCaseDetails.getId();
                 log.info("Removing link from case {} to case {}", currentCaseId, caseId);
                 updateCcdCaseService.updateCaseV2(currentCaseId, EventType.UPDATE_CASE_ONLY.getCcdType(),
-                    "updated case only", "Linked case removed",
+                    "Updated case only", "Related case removed",
                     idamService.getIdamTokens(), caseDetails -> removeLinkMutator(caseDetails, caseId));
             }
         }
