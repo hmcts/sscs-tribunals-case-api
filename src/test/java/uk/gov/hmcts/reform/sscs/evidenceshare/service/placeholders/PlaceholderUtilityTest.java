@@ -12,6 +12,7 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLette
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.getPostponementRequestStatus;
 
 import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;

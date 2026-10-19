@@ -5,6 +5,7 @@ import static org.apache.commons.lang3.StringUtils.isNoneBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
@@ -32,7 +33,7 @@ public final class PlaceholderUtility {
     }
 
     public static String truncateAddressLine(String addressLine) {
-        return addressLine != null && addressLine.length() > 45  ? addressLine.substring(0, 45) : addressLine;
+        return addressLine != null && addressLine.length() > 45 ? addressLine.substring(0, 45) : addressLine;
     }
 
     public static Address getAddress(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String otherPartyId) {

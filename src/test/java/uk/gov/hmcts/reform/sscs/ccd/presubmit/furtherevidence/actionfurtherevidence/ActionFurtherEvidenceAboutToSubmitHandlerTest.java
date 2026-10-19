@@ -39,6 +39,7 @@ import static uk.gov.hmcts.reform.sscs.model.PartyItemList.REPRESENTATIVE;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -50,6 +51,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
+
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
@@ -1356,7 +1358,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"ADMIN_ACTION_CORRECTION","SEND_TO_INTERLOC_REVIEW_BY_JUDGE"})
+    @Parameters({"ADMIN_ACTION_CORRECTION", "SEND_TO_INTERLOC_REVIEW_BY_JUDGE"})
     public void shouldSetBundleAdditionForCorrectionApplication(FurtherEvidenceActionDynamicListItems actionType) {
 
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), false, false, false);
@@ -1923,8 +1925,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     @Parameters({"ISSUE_FURTHER_EVIDENCE,No,0", "ISSUE_FURTHER_EVIDENCE,Yes,0", "ISSUE_FURTHER_EVIDENCE,null,0",
             "OTHER_DOCUMENT_MANUAL,Yes,0", "OTHER_DOCUMENT_MANUAL,No,0", "OTHER_DOCUMENT_MANUAL,null,1",
             "SEND_TO_INTERLOC_REVIEW_BY_TCW,Yes,0", "SEND_TO_INTERLOC_REVIEW_BY_TCW,No,0", "SEND_TO_INTERLOC_REVIEW_BY_TCW,,1",
-            "SEND_TO_INTERLOC_REVIEW_BY_JUDGE,Yes,0", "SEND_TO_INTERLOC_REVIEW_BY_JUDGE,No,0","SEND_TO_INTERLOC_REVIEW_BY_JUDGE,,1",
-            "INFORMATION_RECEIVED_FOR_INTERLOC_TCW,Yes,0", "INFORMATION_RECEIVED_FOR_INTERLOC_TCW,No,0","INFORMATION_RECEIVED_FOR_INTERLOC_TCW,,1",
+            "SEND_TO_INTERLOC_REVIEW_BY_JUDGE,Yes,0", "SEND_TO_INTERLOC_REVIEW_BY_JUDGE,No,0", "SEND_TO_INTERLOC_REVIEW_BY_JUDGE,,1",
+            "INFORMATION_RECEIVED_FOR_INTERLOC_TCW,Yes,0", "INFORMATION_RECEIVED_FOR_INTERLOC_TCW,No,0", "INFORMATION_RECEIVED_FOR_INTERLOC_TCW,,1",
             "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,Yes,0", "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,No,0", "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,null,1"})
     public void shouldSetBundleAdditionWarningBasedOnFurtherEvidenceActionType(FurtherEvidenceActionDynamicListItems actionType, String includeInBundle, int warnings) {
 
