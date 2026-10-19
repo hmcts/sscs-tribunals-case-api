@@ -232,7 +232,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerMainTest extends IssueAdj
 
         var overrideFields = schedulingAndListingFields.getOverrideFields();
         assertThat(overrideFields).isNotNull();
-        assertThat(overrideFields.getDuration()).isEqualTo(825);
+        assertThat(overrideFields.getDuration()).isEqualTo(750);
     }
 
     @DisplayName("When duration in minutes and more than default value override fields should return it")
