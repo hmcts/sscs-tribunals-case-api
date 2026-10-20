@@ -2773,6 +2773,7 @@
     "DisplayContext": "MANDATORY",
     "LiveFrom": "05/05/2026",
     "FieldDisplayOrder": 16,
-    "PageID": "1.0"
+    "PageID": "1.0",
+    "RetainHiddenValue" : "Yes"
   }
 ]
