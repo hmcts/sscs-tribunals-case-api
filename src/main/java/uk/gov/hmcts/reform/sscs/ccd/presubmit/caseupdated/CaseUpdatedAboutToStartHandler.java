@@ -85,7 +85,7 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
         if (sscsCaseData.isIbcCase()) {
             setupUkPortsOfEntry(sscsCaseData);
         }
-        if (isValidBenefitTypeForConfidentiality(sscsCaseData.getAppeal().getBenefitType())){
+        if (isValidBenefitTypeForConfidentiality(sscsCaseData.getAppeal().getBenefitType())) {
             sscsCaseData.getAppeal().setIsValidSscs2OrSscs5Case(YES);
         } else {
             sscsCaseData.getAppeal().setIsValidSscs2OrSscs5Case(NO);
