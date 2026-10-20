@@ -48,8 +48,8 @@ public final class PlaceholderUtility {
         }
 
         if (!isValidLetterAddress(address)) {
-            log.error("Sending letter with invalid address for case {}, letterType={}, otherPartyId={}. Address: {}",
-                    caseData.getCcdCaseId(), letterType.getValue(), otherPartyId, address);
+            log.error("Sending letter with invalid address for case {}, letterType={}, otherPartyId={}",
+                    caseData.getCcdCaseId(), letterType.getValue(), otherPartyId);
         }
         return address;
 
