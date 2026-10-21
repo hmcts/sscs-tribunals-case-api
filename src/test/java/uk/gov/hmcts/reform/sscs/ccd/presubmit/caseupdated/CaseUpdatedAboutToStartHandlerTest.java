@@ -273,4 +273,16 @@ class CaseUpdatedAboutToStartHandlerTest {
         assertThat(result.getData().getAppeal().getIsValidSscs2OrSscs5Case()).isEqualTo(YesNo.YES);
     }
 
+
+    @ParameterizedTest
+    @ValueSource(strings = {"PIP", "ESA", "UC", "JSA", "DLA", "UC", "carersAllowance", "attendanceAllowance",
+        "bereavementBenefit", "industrialInjuriesDisablement", "maternityAllowance", "socialFund",
+        "incomeSupport", "bereavementSupportPaymentScheme", "industrialDeathBenefit", "pensionCredit", "retirementPension"})
+    void givenSscs1Case_shouldNotSetIsValidSscs2OrSscs5Case(String benefit) {
+        sscsCaseData.getAppeal().getBenefitType().setCode(benefit);
+        var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertThat(result.getData().getAppeal().getIsValidSscs2OrSscs5Case()).isEqualTo(null);
+    }
+
 }
