@@ -88,7 +88,7 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
         if (isValidBenefitTypeForConfidentiality(sscsCaseData.getAppeal().getBenefitType())) {
             sscsCaseData.getAppeal().setIsValidSscs2OrSscs5Case(YES);
         } else {
-            sscsCaseData.getAppeal().setIsValidSscs2OrSscs5Case(NO);
+            sscsCaseData.getAppeal().setIsValidSscs2OrSscs5Case(null);
         }
 
         if (sscsCaseData.isBenefitType(UC)) {
