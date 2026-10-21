@@ -52,6 +52,7 @@ export const urls = {
   tribunalsApiUri: process.env.TEST_E2E_API_URI || '',
   xuiUrl: process.env.TEST_E2E_URL_WEB || '',
   idamUrl: process.env.IDAM_API_URL || 'https://idam-api.aat.platform.hmcts.net',
+  idamOidcUrl: process.env.IDAM_OIDC_URL || 'https://idam-web-public.aat.platform.hmcts.net',
   s2sUrl:
     process.env.S2S_URL ||
     'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal',
