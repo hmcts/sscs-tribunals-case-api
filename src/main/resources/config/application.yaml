@@ -23,6 +23,11 @@ spring:
             max-request-size: ${MAX_REQUEST_SIZE:10MB}
     lifecycle:
         timeout-per-shutdown-phase: 120s
+    security:
+        oauth2:
+            resourceserver:
+                jwt:
+                    issuer-uri: https://hmcts-access.service.gov.uk/o | ${IDAM_OIDC_URL}/o
 
     datasource:
         driverClassName: org.postgresql.Driver
@@ -86,7 +91,7 @@ appellant:
 auth:
     idam:
         client:
-            baseUrl: ${IDAM_API_URL:http://localhost:5062}
+            baseUrl: ${IDAM_OIDC_URL:http://localhost:5062}
             redirectUri: ${IDAM_OAUTH2_REDIRECT_URL:https://localhost:3000/authenticated}
     provider:
         service:
@@ -283,6 +288,9 @@ feature:
 idam:
     api:
         url: ${IDAM_API_URL:http://localhost:5062}
+    oidc:
+        url: ${IDAM_OIDC_URL:http://localhost:5062}
+        use_oidc_api: true
     client:
         id: ${IDAM_OAUTH2_CLIENT_ID:sscs}
         redirect_uri: ${IDAM_OAUTH2_REDIRECT_URL:https://localhost:3000/authenticated}
