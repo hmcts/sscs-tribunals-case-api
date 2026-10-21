@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service.reminder;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -13,10 +14,13 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.RESEND_HEARING_BOOKED;
 
 import com.google.common.collect.Lists;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.zone.ZoneOffsetTransition;
+import java.time.zone.ZoneRules;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -191,6 +195,76 @@ class HearingReminderTest {
 
         Job<String> secondJob = jobCaptor.getAllValues().getLast();
         assertEquals(expectedSecondTriggerBasedOnStart, secondJob.triggerAt);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = NotificationEventType.class, names = {"HEARING_BOOKED", "RESEND_HEARING_BOOKED"})
+    void schedulesReminder_acrossSpringClockChange(NotificationEventType eventType) {
+        assertHearingRemindersScheduledAcrossClockChange(eventType, true);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = NotificationEventType.class, names = {"HEARING_BOOKED", "RESEND_HEARING_BOOKED"})
+    void schedulesReminder_acrossAutumnClockChange(NotificationEventType eventType) {
+        assertHearingRemindersScheduledAcrossClockChange(eventType, false);
+    }
+
+    private void assertHearingRemindersScheduledAcrossClockChange(NotificationEventType eventType, boolean isSpringChange) {
+
+        ZoneId zoneId = ZoneId.of(AppConstants.ZONE_ID);
+        ZoneOffsetTransition transition = nextClockChange(zoneId, isSpringChange);
+
+        LocalDateTime start = transition.getDateTimeAfter().toLocalDate().plusDays(1).atTime(9, 0);
+
+        final ZonedDateTime expectedFirstTrigger =
+            ZonedDateTime.of(start.minusSeconds(BEFORE_FIRST_HEARING_REMINDER), zoneId);
+        final ZonedDateTime expectedSecondTrigger =
+            ZonedDateTime.of(start.minusSeconds(BEFORE_SECOND_HEARING_REMINDER), zoneId);
+
+        assertHearingRemindersScheduledAt(eventType, "ID_EVENT", start, expectedFirstTrigger, expectedSecondTrigger);
+    }
+
+    private static ZoneOffsetTransition nextClockChange(ZoneId zoneId, boolean isSpringChange) {
+        ZoneRules rules = zoneId.getRules();
+        ZoneOffsetTransition transition = rules.nextTransition(Instant.now());
+        while (transition.isGap() != isSpringChange) {
+            transition = rules.nextTransition(transition.getInstant());
+        }
+        return transition;
+    }
+
+    private void assertHearingRemindersScheduledAt(
+        NotificationEventType eventType,
+        String expectedJobGroup,
+        LocalDateTime start,
+        ZonedDateTime expectedFirstTrigger,
+        ZonedDateTime expectedSecondTrigger
+    ) {
+        LocalDateTime hearingDateTime = start.minusHours(1);
+
+        CcdNotificationWrapper wrapper = SscsCaseDataUtils.buildBasicCcdNotificationWrapper(eventType);
+        List<Hearing> hearingList = List.of(Hearing.builder().value(HearingDetails.builder()
+                        .start(start)
+                        .hearingDate(hearingDateTime.toLocalDate().toString())
+                        .time(hearingDateTime.toLocalTime().toString())
+                .build()).build());
+        wrapper.getNewSscsCaseData().setHearings(hearingList);
+
+        when(jobGroupGenerator.generate(wrapper.getCaseId(), HEARING_REMINDER.getId())).thenReturn(expectedJobGroup);
+
+        hearingReminder.handle(wrapper);
+
+        ArgumentCaptor<Job> jobCaptor = ArgumentCaptor.forClass(Job.class);
+
+        verify(jobScheduler, times(2)).schedule(
+            jobCaptor.capture()
+        );
+
+        Job<String> firstJob = jobCaptor.getAllValues().getFirst();
+        assertThat(firstJob.triggerAt).isEqualTo(expectedFirstTrigger);
+
+        Job<String> secondJob = jobCaptor.getAllValues().getLast();
+        assertThat(secondJob.triggerAt).isEqualTo(expectedSecondTrigger);
     }
 
     @ParameterizedTest

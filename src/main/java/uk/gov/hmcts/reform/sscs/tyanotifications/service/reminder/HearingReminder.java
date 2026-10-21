@@ -110,7 +110,7 @@ public class HearingReminder implements ReminderHandler {
             Hearing hearing = ccdResponse.getHearings().get(0);
             LocalDateTime dateBefore = nonNull(hearing.getValue().getStart())
                     ? hearing.getValue().getStart() : hearing.getValue().getHearingDateTime();
-            return ZonedDateTime.ofLocal(dateBefore, ZoneId.of(AppConstants.ZONE_ID), null).minusSeconds(secondsBeforeHearing);
+            return ZonedDateTime.ofLocal(dateBefore.minusSeconds(secondsBeforeHearing), ZoneId.of(AppConstants.ZONE_ID), null);
         }
 
         return null;
