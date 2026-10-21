@@ -706,7 +706,7 @@ public class DwpUploadResponseHandlerTest {
         verify(idamService).getIdamTokens();
         verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
                 eq(EventType.DWP_RESPOND.getCcdType()), eq("Response received"),
-                eq("Update to response received as an Admin has to review the case"), any(), consumerArgumentCaptor.capture());
+                eq("Update to response received as needs to be referred to a LO/ Judge for listing directions."), any(), consumerArgumentCaptor.capture());
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
         consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
         assertEquals(RESPONSE_SUBMITTED_DWP, sscsCaseData.getDwpState());
@@ -732,7 +732,7 @@ public class DwpUploadResponseHandlerTest {
         verify(idamService).getIdamTokens();
         verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
                 eq(EventType.DWP_RESPOND.getCcdType()), eq("Response received"),
-                eq("Update to response received as an Admin has to review the case"), any(), consumerArgumentCaptor.capture());
+                eq("Update to response received as needs to be referred to a LO/ Judge for listing directions."), any(), consumerArgumentCaptor.capture());
 
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
         consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
