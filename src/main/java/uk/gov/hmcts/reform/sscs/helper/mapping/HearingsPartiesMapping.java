@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.helper.mapping;
 
+import static java.time.LocalDate.now;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
@@ -23,6 +24,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.HMRC
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBCA_ACRONYM;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -68,7 +70,7 @@ import uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil;
 @Slf4j
 public final class HearingsPartiesMapping {
 
-    public static final String ORGANISATION_NAME_REPLACEMENT = "-";
+    private static final String ORGANISATION_NAME_REPLACEMENT = "-";
 
     private HearingsPartiesMapping() {
 
@@ -441,12 +443,16 @@ public final class HearingsPartiesMapping {
         for (ExcludeDate excludeDate : hearingOptions.getExcludeDates()) {
             UnavailabilityRange unavailabilityRange = getUnavailabilityRange(excludeDate.getValue());
 
-            if (nonNull(unavailabilityRange)) {
+            if (nonNull(unavailabilityRange) && !isExpired(unavailabilityRange)) {
                 unavailabilityRanges.add(unavailabilityRange);
             }
         }
 
         return unavailabilityRanges;
+    }
+
+    private static boolean isExpired(UnavailabilityRange unavailabilityRange) {
+        return unavailabilityRange.getUnavailableToDate().isBefore(now(ZoneId.of("Europe/London")));
     }
 
     private static UnavailabilityRange getUnavailabilityRange(DateRange dateRange) throws ListingException {
