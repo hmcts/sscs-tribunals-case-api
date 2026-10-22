@@ -39,7 +39,7 @@ export class LinkCasePage {
 
   async verifyCaseCannotLinkToItself() {
     let errorMessageText = (
-      await this.page.locator('ul#errors li.ng-star-inserted').textContent()
+      await this.page.locator('ul#errors li').textContent()
     ).trim();
     expect(errorMessageText).toEqual(
       `You can’t link the case to itself, please correct`
