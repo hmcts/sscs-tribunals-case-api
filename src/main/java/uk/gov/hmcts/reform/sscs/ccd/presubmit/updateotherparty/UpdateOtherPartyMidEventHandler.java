@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updateotherparty;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
@@ -10,7 +12,12 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_OTHER_PARTY_D
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
+import java.time.LocalDate;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,6 +25,9 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DateRange;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
@@ -36,6 +46,9 @@ public class UpdateOtherPartyMidEventHandler implements PreSubmitCallbackHandler
     private static final String ERROR_POSTCODE = "You must enter a valid UK postcode for the %s";
     private static final String ERROR_MAINLAND_SELECTION = "You must select whether the address is in mainland UK for the %s";
     private static final String ERROR_ADDRESS_MISSING = "Address details are missing for the %s";
+    private static final String ERROR_UNAVAILABILITY_START_AFTER_END = "unavailability start date must be before end date";
+    private static final String ERROR_UNAVAILABILITY_NO_END_DATE = "Add an end date for unavailable dates";
+    private static final String ERROR_UNAVAILABILITY_NO_START_DATE = "Add a start date for unavailable dates";
 
     private final PostcodeValidator postcodeValidator = new PostcodeValidator();
 
@@ -65,6 +78,8 @@ public class UpdateOtherPartyMidEventHandler implements PreSubmitCallbackHandler
 
     private void validateOtherParty(OtherParty party, boolean isIbcCase, PreSubmitCallbackResponse<SscsCaseData> response) {
         response.addErrors(validateAddress(party.getAddress(), OTHER_PARTY, isIbcCase));
+        response.addErrors(validateHearingUnavailabilityDates(Optional.ofNullable(party.getHearingOptions()).map(
+            HearingOptions::getExcludeDates).orElse(emptyList())));
 
         if (party.hasRepresentative()) {
             response.addErrors(validateAddress(party.getRep().getAddress(), OTHER_PARTY_REPRESENTATIVE, isIbcCase));
@@ -73,6 +88,30 @@ public class UpdateOtherPartyMidEventHandler implements PreSubmitCallbackHandler
         if (party.hasAppointee()) {
             response.addErrors(validateAddress(party.getAppointee().getAddress(), OTHER_PARTY_APPOINTEE, isIbcCase));
         }
+    }
+
+    private Collection<String> validateHearingUnavailabilityDates(final List<ExcludeDate> excludeDates) {
+        final List<DateRange> dateRanges = excludeDates.stream()
+            .map(ExcludeDate::getValue)
+            .filter(Objects::nonNull)
+            .toList();
+
+        if (dateRanges.stream().anyMatch(this::isStartDateAfterEndDate)) {
+            return singletonList(ERROR_UNAVAILABILITY_START_AFTER_END);
+        }
+        if (dateRanges.stream().anyMatch(d -> isNotBlank(d.getStart()) && isBlank(d.getEnd()))) {
+            return singletonList(ERROR_UNAVAILABILITY_NO_END_DATE);
+        }
+        if (dateRanges.stream().anyMatch(d -> isBlank(d.getStart()) && isNotBlank(d.getEnd()))) {
+            return singletonList(ERROR_UNAVAILABILITY_NO_START_DATE);
+        }
+        return emptyList();
+    }
+
+    private boolean isStartDateAfterEndDate(final DateRange dateRange) {
+        final LocalDate startDate = dateRange.getStartDate();
+        final LocalDate endDate = dateRange.getEndDate();
+        return nonNull(startDate) && nonNull(endDate) && startDate.isAfter(endDate);
     }
 
     private Set<String> validateAddress(Address address, String addressPrefix, boolean isIbcCase) {
