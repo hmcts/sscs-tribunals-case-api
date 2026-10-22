@@ -12,7 +12,7 @@ export class CommunicateWithFtaPage {
     }
 
     async verifyPageContent(isCommsToFta: boolean) {
-        await webActions.verifyPageLabel('label[for="ftaRequestType"] span.form-label', 'Communication type');
+        await webActions.verifyPageLabel('span.form-label', 'Communication type');
         if(isCommsToFta){
             await webActions.verifyPageLabel('span.govuk-caption-l', 'Communication with FTA');
             await webActions.verifyPageLabel('label.form-label',

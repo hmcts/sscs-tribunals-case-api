@@ -884,7 +884,7 @@ export class WriteFinalDecisionPages {
       writeFinalDecisionData.checkYourAnswersSectionHeading
     );
     await webActions.verifyPageLabel(
-      'form.check-your-answers > div.ng-star-inserted > span.text-16',
+      'form.check-your-answers > div > span.text-16',
       writeFinalDecisionData.checkYourInformationCarefullyLabel
     );
 
@@ -1082,7 +1082,7 @@ export class WriteFinalDecisionPages {
       writeFinalDecisionData.checkYourAnswersSectionHeading
     );
     await webActions.verifyPageLabel(
-      'form.check-your-answers > div.ng-star-inserted > span.text-16',
+      'form.check-your-answers > div > span.text-16',
       writeFinalDecisionData.checkYourInformationCarefullyLabel
     );
 
@@ -1121,7 +1121,7 @@ export class WriteFinalDecisionPages {
       writeFinalDecisionData.checkYourAnswersSectionHeading
     );
     await webActions.verifyPageLabel(
-      'form.check-your-answers > div.ng-star-inserted > span.text-16',
+      'form.check-your-answers > div > span.text-16',
       writeFinalDecisionData.checkYourInformationCarefullyLabel
     );
 
@@ -1657,7 +1657,7 @@ export class WriteFinalDecisionPages {
       writeFinalDecisionData.checkYourAnswersSectionHeading
     );
     await webActions.verifyPageLabel(
-      'form.check-your-answers > div.ng-star-inserted > span.text-16',
+      'form.check-your-answers > div > span.text-16',
       writeFinalDecisionData.checkYourInformationCarefullyLabel
     );
 
