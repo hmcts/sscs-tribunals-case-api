@@ -226,7 +226,8 @@ class HearingReminderTest {
 
     private static ZoneOffsetTransition nextClockChange(ZoneId zoneId, boolean isSpringChange) {
         ZoneRules rules = zoneId.getRules();
-        ZoneOffsetTransition transition = rules.nextTransition(Instant.now());
+        Instant searchFrom = ZonedDateTime.now(zoneId).plusSeconds(BEFORE_FIRST_HEARING_REMINDER).plusDays(1).toInstant();
+        ZoneOffsetTransition transition = rules.nextTransition(searchFrom);
         while (transition.isGap() != isSpringChange) {
             transition = rules.nextTransition(transition.getInstant());
         }
