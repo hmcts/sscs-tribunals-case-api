@@ -78,8 +78,9 @@ public class UpdateOtherPartyMidEventHandler implements PreSubmitCallbackHandler
 
     private void validateOtherParty(OtherParty party, boolean isIbcCase, PreSubmitCallbackResponse<SscsCaseData> response) {
         response.addErrors(validateAddress(party.getAddress(), OTHER_PARTY, isIbcCase));
-        response.addErrors(validateHearingUnavailabilityDates(Optional.ofNullable(party.getHearingOptions()).map(
-            HearingOptions::getExcludeDates).orElse(emptyList())));
+        response.addErrors(validateHearingUnavailabilityDates(Optional.ofNullable(party.getHearingOptions())
+            .map(HearingOptions::getExcludeDates)
+            .orElse(emptyList())));
 
         if (party.hasRepresentative()) {
             response.addErrors(validateAddress(party.getRep().getAddress(), OTHER_PARTY_REPRESENTATIVE, isIbcCase));
