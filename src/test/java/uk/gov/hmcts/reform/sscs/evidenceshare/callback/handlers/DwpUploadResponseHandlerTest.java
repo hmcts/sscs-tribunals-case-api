@@ -41,6 +41,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ElementDisputed;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ElementDisputedDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -718,6 +720,36 @@ public class DwpUploadResponseHandlerTest {
         SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(READY_TO_LIST.getId()).dwpFurtherInfo("No")
                 .issueCode("UM")
                 .elementsDisputedIsDecisionDisputedByOthers("no").appeal(Appeal.builder()
+                        .benefitType(BenefitType.builder().code("UC").build())
+                        .build()).build();
+        final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(
+                sscsCaseData, WITH_DWP, DWP_UPLOAD_RESPONSE);
+
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+        when(updateCcdCaseService.updateCaseV2(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().id(1L).state(State.RESPONSE_RECEIVED.getId())
+                .data(callback.getCaseDetails().getCaseData()).build());
+
+        handler.handle(CallbackType.SUBMITTED, callback);
+
+        verify(idamService).getIdamTokens();
+        verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+                eq(EventType.DWP_RESPOND.getCcdType()), eq("Response received"),
+                eq("Update to response received as needs to be referred to a LO/ Judge for listing directions."), any(), consumerArgumentCaptor.capture());
+
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+        assertEquals(RESPONSE_SUBMITTED_DWP, sscsCaseData.getDwpState());
+    }
+
+
+    @ParameterizedTest
+    @CsvSource({"LT", "HT", "OC", "OI", "OS", "OX"})
+    public void givenADwpUploadResponseUcCaseWithResponseReceivedIssueCode_runResponseReceivedEvent(String issueCode) {
+        SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(READY_TO_LIST.getId()).dwpFurtherInfo("No")
+                .issueCode("US")
+                .elementsDisputedGeneral(List.of(ElementDisputed.builder()
+                        .value(ElementDisputedDetails.builder().issueCode(issueCode)
+                                .build()).build())).appeal(Appeal.builder()
                         .benefitType(BenefitType.builder().code("UC").build())
                         .build()).build();
         final Callback<SscsCaseData> callback = HandlerHelper.buildTestCallbackForGivenData(
