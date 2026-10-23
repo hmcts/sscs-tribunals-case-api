@@ -974,26 +974,26 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
     @DisplayName("When Valid DateRanges are given getPartyUnavailabilityRange returns the correct list of Unavailability Ranges")
     @ParameterizedTest(name = "{0}")
     @MethodSource("getPartyUnavailabilityRangeArguments")
-    void getPartyUnavailabilityRange(final String description, final LocalDate fromOffsetDays, final LocalDate toOffsetDays,
-        final LocalDate expectedFromOffsetDays, final LocalDate expectedToOffsetDays) throws ListingException {
+    void getPartyUnavailabilityRange(final String description, final LocalDate from, final LocalDate to,
+        final LocalDate expectedFrom, final LocalDate expectedTo) throws ListingException {
         final List<ExcludeDate> excludeDates = List.of(ExcludeDate
             .builder()
             .value(DateRange
                 .builder()
-                .start(fromOffsetDays == null ? null : fromOffsetDays.toString())
-                .end(toOffsetDays == null ? null : toOffsetDays.toString())
+                .start(from == null ? null : from.toString())
+                .end(to == null ? null : to.toString())
                 .build())
             .build());
         final HearingOptions hearingOptions = HearingOptions.builder().excludeDates(excludeDates).build();
         final List<UnavailabilityRange> result = HearingsPartiesMapping.getPartyUnavailabilityRange(hearingOptions);
 
-        if (expectedFromOffsetDays == null && expectedToOffsetDays == null) {
+        if (expectedFrom == null && expectedTo == null) {
             assertThat(result).isEmpty();
         } else {
             assertThat(result)
                 .extracting("unavailableFromDate", "unavailableToDate", "unavailabilityType")
                 .containsExactly(
-                    tuple(expectedFromOffsetDays, expectedToOffsetDays, DayOfWeekUnavailabilityType.ALL_DAY.getLabel()));
+                    tuple(expectedFrom, expectedTo, DayOfWeekUnavailabilityType.ALL_DAY.getLabel()));
         }
     }
 
