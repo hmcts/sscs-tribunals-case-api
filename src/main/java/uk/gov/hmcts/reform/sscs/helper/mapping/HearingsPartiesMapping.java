@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.helper.mapping;
 
-import static java.time.LocalDate.now;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
@@ -22,9 +21,9 @@ import static uk.gov.hmcts.reform.sscs.model.hmc.reference.PartyType.ORGANISATIO
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DWP_ACRONYM;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.HMRC_ACRONYM;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBCA_ACRONYM;
+import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDate;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -452,7 +451,7 @@ public final class HearingsPartiesMapping {
     }
 
     private static boolean isExpired(UnavailabilityRange unavailabilityRange) {
-        return unavailabilityRange.getUnavailableToDate().isBefore(now(ZoneId.of("Europe/London")));
+        return unavailabilityRange.getUnavailableToDate().isBefore(getLocalDate());
     }
 
     private static UnavailabilityRange getUnavailabilityRange(DateRange dateRange) throws ListingException {

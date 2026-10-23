@@ -20,10 +20,10 @@ import static uk.gov.hmcts.reform.sscs.model.hmc.reference.PartyRelationshipType
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.PartyType.ORGANISATION;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.FACE_TO_FACE;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.NOT_ATTENDING;
+import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDate;
 import static uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil.getIndividualPreferredHearingChannel;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -82,6 +82,12 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
     private static final String OTHER_PARTY_ID = "4dd6b6fa-6562-4699-8e8b-6c70cf8a333e";
     private static final String DWP_ID = "DWP";
     private static final Name name = Name.builder().title("title").firstName("first").lastName("last").build();
+
+    private static final LocalDate TODAY = getLocalDate();
+    private static final LocalDate TOMORROW = getLocalDate().plusDays(1);
+    private static final LocalDate TWO_DAYS_IN_FUTURE = getLocalDate().plusDays(2);
+    private static final LocalDate YESTERDAY = getLocalDate().minusDays(1);
+    private static final LocalDate TWO_DAYS_IN_PAST = getLocalDate().minusDays(2);
 
 
     @DisplayName("When a valid hearing wrapper with language interpreter is given buildHearingPartiesDetails returns the correct Hearing Parties Details")
@@ -968,16 +974,16 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
     @DisplayName("When Valid DateRanges are given getPartyUnavailabilityRange returns the correct list of Unavailability Ranges")
     @ParameterizedTest(name = "{0}")
     @MethodSource("getPartyUnavailabilityRangeArguments")
-    void getPartyUnavailabilityRange(final String description,
-                                     final Integer fromOffsetDays, final Integer toOffsetDays,
-                                     final Integer expectedFromOffsetDays, final Integer expectedToOffsetDays)
-            throws ListingException {
-        final LocalDate now = LocalDate.now(ZoneId.of("Europe/London"));
-        final List<ExcludeDate> excludeDates = List.of(ExcludeDate.builder().value(DateRange.builder()
-                        .start(fromOffsetDays == null ? null : now.plusDays(fromOffsetDays).toString())
-                        .end(toOffsetDays == null ? null : now.plusDays(toOffsetDays).toString())
-                        .build())
-                .build());
+    void getPartyUnavailabilityRange(final String description, final LocalDate fromOffsetDays, final LocalDate toOffsetDays,
+        final LocalDate expectedFromOffsetDays, final LocalDate expectedToOffsetDays) throws ListingException {
+        final List<ExcludeDate> excludeDates = List.of(ExcludeDate
+            .builder()
+            .value(DateRange
+                .builder()
+                .start(fromOffsetDays == null ? null : fromOffsetDays.toString())
+                .end(toOffsetDays == null ? null : toOffsetDays.toString())
+                .build())
+            .build());
         final HearingOptions hearingOptions = HearingOptions.builder().excludeDates(excludeDates).build();
         final List<UnavailabilityRange> result = HearingsPartiesMapping.getPartyUnavailabilityRange(hearingOptions);
 
@@ -985,25 +991,23 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
             assertThat(result).isEmpty();
         } else {
             assertThat(result)
-                    .extracting("unavailableFromDate", "unavailableToDate", "unavailabilityType")
-                    .containsExactly(tuple(
-                            expectedFromOffsetDays == null ? null : now.plusDays(expectedFromOffsetDays),
-                            expectedToOffsetDays == null ? null : now.plusDays(expectedToOffsetDays),
-                            DayOfWeekUnavailabilityType.ALL_DAY.getLabel()));
+                .extracting("unavailableFromDate", "unavailableToDate", "unavailabilityType")
+                .containsExactly(
+                    tuple(expectedFromOffsetDays, expectedToOffsetDays, DayOfWeekUnavailabilityType.ALL_DAY.getLabel()));
         }
     }
 
     private static Stream<Arguments> getPartyUnavailabilityRangeArguments() {
         return Stream.of(
-                Arguments.of("Future range is included", 1, 2, 1, 2),
-                Arguments.of("Single future day is included", 1, 1, 1, 1),
-                Arguments.of("Range of today only is included", 0, 0, 0, 0),
-                Arguments.of("Range starting in past and ending in future is included", -2, 1, -2, 1),
-                Arguments.of("Range starting in past and ending today is included", -2, 0, -2, 0),
-                Arguments.of("Range entirely in past is excluded", -2, -1, null, null),
-                Arguments.of("Missing start date defaults to future end date", null, 1, 1, 1),
-                Arguments.of("Missing start date with past end date is excluded", null, -1, null, null),
-                Arguments.of("Missing start and end dates is excluded", null, null, null, null)
+            Arguments.of("Future range is included", TOMORROW, TWO_DAYS_IN_FUTURE, TOMORROW, TWO_DAYS_IN_FUTURE),
+            Arguments.of("Single future day is included", TOMORROW, TOMORROW, TOMORROW, TOMORROW),
+            Arguments.of("Range of today only is included", TODAY, TODAY, TODAY, TODAY),
+            Arguments.of("Range starting in past and ending in future is included", TWO_DAYS_IN_PAST, TOMORROW, TWO_DAYS_IN_PAST, TOMORROW),
+            Arguments.of("Range starting in past and ending today is included", TWO_DAYS_IN_PAST, TODAY, TWO_DAYS_IN_PAST, TODAY),
+            Arguments.of("Range entirely in past is excluded", TWO_DAYS_IN_PAST, YESTERDAY, null, null),
+            Arguments.of("Missing start date defaults to future end date", null, TOMORROW, TOMORROW, TOMORROW),
+            Arguments.of("Missing start date with past end date is excluded", null, YESTERDAY, null, null),
+            Arguments.of("Missing start and end dates is excluded", null, null, null, null)
         );
     }
 

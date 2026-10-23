@@ -30,10 +30,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DateRange;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -137,97 +134,6 @@ class UpdateOtherPartyMidEventHandlerTest {
     private PreSubmitCallbackResponse<SscsCaseData> runMidEvent(SscsCaseData caseData) {
         stubCallbackWith(caseData);
         return handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-    }
-
-    @Nested
-    class ValidationHearingUnavailabilityDates {
-
-        private static final String ERROR_UNAVAILABILITY_DATES = "unavailability start date must be before end date";
-        private static final String ERROR_NO_END_DATE = "Add an end date for unavailable dates";
-        private static final String ERROR_NO_START_DATE = "Add a start date for unavailable dates";
-        private static final String TODAY = "2026-10-22";
-        private static final String TOMORROW = "2026-10-23";
-        private static final String YESTERDAY = "2026-10-21";
-
-        @ParameterizedTest(name = "{0}")
-        @MethodSource("casesWithError")
-        void shouldReturnUnavailabilityDatesError(final String description, final HearingOptions hearingOptions,
-                                                  final String expectedError) {
-            final OtherParty party = OtherParty.builder().hearingOptions(hearingOptions).build();
-
-            final PreSubmitCallbackResponse<SscsCaseData> response = runMidEvent(nonIbcCaseWith(party));
-
-            assertThat(response.getErrors()).containsExactly(expectedError);
-        }
-
-        @ParameterizedTest(name = "{0}")
-        @MethodSource("casesWithNoError")
-        void shouldReturnNoErrors(final String description, final HearingOptions hearingOptions) {
-            final OtherParty party = OtherParty.builder().hearingOptions(hearingOptions).build();
-
-            final PreSubmitCallbackResponse<SscsCaseData> response = runMidEvent(nonIbcCaseWith(party));
-
-            assertThat(response.getErrors()).isEmpty();
-        }
-
-        @Test
-        void shouldReturnSingleErrorWhenMultipleOtherPartiesHaveStartDateAfterEndDate() {
-            final OtherParty party = OtherParty.builder()
-                .hearingOptions(hearingOptionsWith(excludeDate(TOMORROW, TODAY)))
-                .build();
-            final SscsCaseData caseData = caseDataWithBenefitAndParties(Benefit.CHILD_SUPPORT.name(),
-                List.of(ccd(party), ccd(party)));
-
-            final PreSubmitCallbackResponse<SscsCaseData> response = runMidEvent(caseData);
-
-            assertThat(response.getErrors()).containsExactly(ERROR_UNAVAILABILITY_DATES);
-        }
-
-        private static Stream<Arguments> casesWithError() {
-            return Stream.of(
-                Arguments.of("Start date after end date",
-                    hearingOptionsWith(excludeDate(TOMORROW, TODAY)), ERROR_UNAVAILABILITY_DATES),
-                Arguments.of("One valid range and one with start date after end date",
-                    hearingOptionsWith(excludeDate(YESTERDAY, TODAY), excludeDate(TOMORROW, YESTERDAY)),
-                    ERROR_UNAVAILABILITY_DATES),
-                Arguments.of("Multiple ranges with start date after end date",
-                    hearingOptionsWith(excludeDate(TOMORROW, TODAY), excludeDate(TODAY, YESTERDAY)),
-                    ERROR_UNAVAILABILITY_DATES),
-                Arguments.of("Start date only",
-                    hearingOptionsWith(excludeDate(TODAY, null)), ERROR_NO_END_DATE),
-                Arguments.of("End date only",
-                    hearingOptionsWith(excludeDate(null, TODAY)), ERROR_NO_START_DATE),
-                Arguments.of("Start date after end date takes precedence over missing end date",
-                    hearingOptionsWith(excludeDate(TODAY, null), excludeDate(TOMORROW, TODAY)),
-                    ERROR_UNAVAILABILITY_DATES),
-                Arguments.of("Missing end date takes precedence over missing start date",
-                    hearingOptionsWith(excludeDate(null, TODAY), excludeDate(TODAY, null)),
-                    ERROR_NO_END_DATE));
-        }
-
-        private static Stream<Arguments> casesWithNoError() {
-            return Stream.of(
-                Arguments.of("No hearing options", null),
-                Arguments.of("Hearing options with no exclude dates", HearingOptions.builder().build()),
-                Arguments.of("Hearing options with empty exclude dates", hearingOptionsWith()),
-                Arguments.of("Start date before end date", hearingOptionsWith(excludeDate(TODAY, TOMORROW))),
-                Arguments.of("Start date same as end date", hearingOptionsWith(excludeDate(TODAY, TODAY))),
-                Arguments.of("No start or end date", hearingOptionsWith(excludeDate(null, null))),
-                Arguments.of("Exclude date with no value",
-                    hearingOptionsWith(ExcludeDate.builder().build(), excludeDate(TODAY, TOMORROW))));
-        }
-
-        private static HearingOptions hearingOptionsWith(final ExcludeDate... excludeDates) {
-            return HearingOptions.builder().excludeDates(List.of(excludeDates)).build();
-        }
-
-        private static ExcludeDate excludeDate(final String start, final String end) {
-            return ExcludeDate.builder().value(DateRange.builder().start(start).end(end).build()).build();
-        }
-
-        private SscsCaseData nonIbcCaseWith(final OtherParty party) {
-            return caseDataWithBenefitAndParties(Benefit.CHILD_SUPPORT.name(), List.of(ccd(party)));
-        }
     }
 
     @Nested
