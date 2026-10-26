@@ -104,6 +104,8 @@ def setEnvVars(envName) {
     env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-${envName}.service.core-compute-${envName}.internal"
     env.TEST_DOCUMENT_MANAGEMENT_URL = "http://dm-store-${envName}.service.core-compute-${envName}.internal"
     env.DOCUMENT_MANAGEMENT_URL = "http://dm-store-${envName}.service.core-compute-${envName}.internal"
+    env.IDAM_API_URL = "https://idam-api.${envName}.platform.hmcts.net"
+    env.IDAM_OIDC_URL = "https://idam-web-public.${envName}.platform.hmcts.net"
     env.ENVIRONMENT = envName
     env.HEARINGS_ENABLED = "Yes"
 }
