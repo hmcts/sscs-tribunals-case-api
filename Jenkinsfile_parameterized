@@ -36,9 +36,10 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
   ]
 }
 
-
 withParameterizedPipeline(params.TYPE, params.PRODUCT_NAME, params.APP, params.ENVIRONMENT, params.SUBSCRIPTION) {
   enableSlackNotifications('#sscs-tech')
   loadVaultSecrets(secrets)
+  env.IDAM_API_URL = "https://idam-api.${env.ENVIRONMENT}.platform.hmcts.net"
+  env.IDAM_OIDC_URL = "https://idam-web-public.${env.ENVIRONMENT}.platform.hmcts.net"
 }
 
