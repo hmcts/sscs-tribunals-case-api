@@ -76,17 +76,17 @@ class ReadyToListIt extends AbstractEventIt {
     static Stream<Arguments> hearingDurations() {
         return Stream.of(
             Arguments.of("pip - face to face without interpreter", faceToFaceHearingOptions(YesNo.NO.toString(), null),
-                faceToFaceSubtype(), 75, HearingChannel.FACE_TO_FACE, PIP_NEW_CLAIM_BENEFIT_CODE, ISSUE_CODE_DD),
+                faceToFaceSubtype(), 60, HearingChannel.FACE_TO_FACE, PIP_NEW_CLAIM_BENEFIT_CODE, ISSUE_CODE_DD),
             Arguments.of("pip - face to face with interpreter", faceToFaceHearingOptions(YesNo.YES.toString(), "Lithuanian"),
-                faceToFaceSubtype(), 105, HearingChannel.FACE_TO_FACE, PIP_NEW_CLAIM_BENEFIT_CODE, ISSUE_CODE_DD),
-            Arguments.of("pip - paper", paperHearingOptions(), HearingSubtype.builder().build(), 45, HearingChannel.PAPER,
+                faceToFaceSubtype(), 90, HearingChannel.FACE_TO_FACE, PIP_NEW_CLAIM_BENEFIT_CODE, ISSUE_CODE_DD),
+            Arguments.of("pip - paper", paperHearingOptions(), HearingSubtype.builder().build(), 30, HearingChannel.PAPER,
                 PIP_NEW_CLAIM_BENEFIT_CODE, ISSUE_CODE_DD),
             Arguments.of("child support - face to face without interpreter", faceToFaceHearingOptions(YesNo.NO.toString(), null),
                 faceToFaceSubtype(), null, HearingChannel.FACE_TO_FACE, CHILD_SUPPORT, ISSUE_CODE_OX),
             Arguments.of("child support - face to face with interpreter",
                 faceToFaceHearingOptions(YesNo.YES.toString(), "Lithuanian"), faceToFaceSubtype(), null,
                 HearingChannel.FACE_TO_FACE, CHILD_SUPPORT, ISSUE_CODE_OX),
-            Arguments.of("child support - paper", paperHearingOptions(), HearingSubtype.builder().build(), 45,
+            Arguments.of("child support - paper", paperHearingOptions(), HearingSubtype.builder().build(), 30,
                 HearingChannel.PAPER, CHILD_SUPPORT, ISSUE_CODE_OX));
     }
 
