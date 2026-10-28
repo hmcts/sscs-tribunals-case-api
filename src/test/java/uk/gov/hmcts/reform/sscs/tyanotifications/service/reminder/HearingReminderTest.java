@@ -14,10 +14,13 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.RESEND_HEARING_BOOKED;
 
 import com.google.common.collect.Lists;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.zone.ZoneOffsetTransition;
+import java.time.zone.ZoneRules;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -196,34 +199,39 @@ class HearingReminderTest {
 
     @ParameterizedTest
     @EnumSource(value = NotificationEventType.class, names = {"HEARING_BOOKED", "RESEND_HEARING_BOOKED"})
-    void schedulesReminder_acrossAutumnClockChange(NotificationEventType eventType) {
-
-        // UK clocks go back (BST -> GMT) at 02:00 on 2026-10-25.
-        final String expectedJobGroup = "ID_EVENT";
-        LocalDateTime start = LocalDateTime.of(2026, 10, 26, 9, 0, 0);
-
-        final ZonedDateTime expectedFirstTrigger =
-            ZonedDateTime.of(2026, 10, 22, 9, 0, 0, 0, ZoneId.of(AppConstants.ZONE_ID));
-        final ZonedDateTime expectedSecondTrigger =
-            ZonedDateTime.of(2026, 10, 24, 9, 0, 0, 0, ZoneId.of(AppConstants.ZONE_ID));
-
-        assertHearingRemindersScheduledAt(eventType, expectedJobGroup, start, expectedFirstTrigger, expectedSecondTrigger);
+    void schedulesReminder_acrossSpringClockChange(NotificationEventType eventType) {
+        assertHearingRemindersScheduledAcrossClockChange(eventType, true);
     }
 
     @ParameterizedTest
     @EnumSource(value = NotificationEventType.class, names = {"HEARING_BOOKED", "RESEND_HEARING_BOOKED"})
-    void schedulesReminder_acrossSpringClockChange(NotificationEventType eventType) {
+    void schedulesReminder_acrossAutumnClockChange(NotificationEventType eventType) {
+        assertHearingRemindersScheduledAcrossClockChange(eventType, false);
+    }
 
-        // UK clocks go forward (GMT -> BST) at 01:00 on 2027-03-28.
-        final String expectedJobGroup = "ID_EVENT";
-        LocalDateTime start = LocalDateTime.of(2027, 3, 29, 9, 0, 0);
+    private void assertHearingRemindersScheduledAcrossClockChange(NotificationEventType eventType, boolean isSpringChange) {
+
+        ZoneId zoneId = ZoneId.of(AppConstants.ZONE_ID);
+        ZoneOffsetTransition transition = nextClockChange(zoneId, isSpringChange);
+
+        LocalDateTime start = transition.getDateTimeAfter().toLocalDate().plusDays(1).atTime(9, 0);
 
         final ZonedDateTime expectedFirstTrigger =
-            ZonedDateTime.of(2027, 3, 25, 9, 0, 0, 0, ZoneId.of(AppConstants.ZONE_ID));
+            ZonedDateTime.of(start.minusSeconds(BEFORE_FIRST_HEARING_REMINDER), zoneId);
         final ZonedDateTime expectedSecondTrigger =
-            ZonedDateTime.of(2027, 3, 27, 9, 0, 0, 0, ZoneId.of(AppConstants.ZONE_ID));
+            ZonedDateTime.of(start.minusSeconds(BEFORE_SECOND_HEARING_REMINDER), zoneId);
 
-        assertHearingRemindersScheduledAt(eventType, expectedJobGroup, start, expectedFirstTrigger, expectedSecondTrigger);
+        assertHearingRemindersScheduledAt(eventType, "ID_EVENT", start, expectedFirstTrigger, expectedSecondTrigger);
+    }
+
+    private static ZoneOffsetTransition nextClockChange(ZoneId zoneId, boolean isSpringChange) {
+        ZoneRules rules = zoneId.getRules();
+        Instant searchFrom = ZonedDateTime.now(zoneId).plusSeconds(BEFORE_FIRST_HEARING_REMINDER).plusDays(1).toInstant();
+        ZoneOffsetTransition transition = rules.nextTransition(searchFrom);
+        while (transition.isGap() != isSpringChange) {
+            transition = rules.nextTransition(transition.getInstant());
+        }
+        return transition;
     }
 
     private void assertHearingRemindersScheduledAt(

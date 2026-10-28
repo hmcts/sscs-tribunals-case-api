@@ -25,7 +25,6 @@ env.NONPROD_ENVIRONMENT_NAME = (params.UI_URL_TO_TEST.contains('demo') && params
 
 def secrets = [
         'sscs-${env}': [
-                secret('idam-api', 'IDAM_API_URL'),
                 secret('idam-oauth-user', 'IDAM_OAUTH2_CLIENT_ID'),
                 secret('ccd-api', 'CORE_CASE_DATA_API_URL'),
                 secret('idam-redirect', 'IDAM_OAUTH2_REDIRECT_URL'),
@@ -105,6 +104,8 @@ def setEnvVars(envName) {
     env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-${envName}.service.core-compute-${envName}.internal"
     env.TEST_DOCUMENT_MANAGEMENT_URL = "http://dm-store-${envName}.service.core-compute-${envName}.internal"
     env.DOCUMENT_MANAGEMENT_URL = "http://dm-store-${envName}.service.core-compute-${envName}.internal"
+    env.IDAM_API_URL = "https://idam-api.${envName}.platform.hmcts.net"
+    env.IDAM_OIDC_URL = "https://idam-web-public.${envName}.platform.hmcts.net"
     env.ENVIRONMENT = envName
     env.HEARINGS_ENABLED = "Yes"
 }
