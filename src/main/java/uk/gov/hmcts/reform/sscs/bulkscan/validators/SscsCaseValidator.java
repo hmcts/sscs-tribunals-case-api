@@ -61,6 +61,7 @@ import uk.gov.hmcts.reform.sscs.domain.CaseResponse;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
+import uk.gov.hmcts.reform.sscs.utility.EmailUtil;
 
 @Component
 @Slf4j
@@ -299,6 +300,7 @@ public class SscsCaseValidator implements CaseValidator {
             }
 
             checkMobileNumber(appellant.getContact(), personType);
+            checkEmail(appellant.getContact(), personType);
 
             checkHearingSubtypeDetails(appeal.getHearingSubtype());
             if (!ignorePartyRoleValidation && formType != null && formType.equals(FormType.SSCS2)) {
@@ -360,6 +362,10 @@ public class SscsCaseValidator implements CaseValidator {
                 warnings.add(getMessageByCallbackType(callbackType, "", HEARING_TYPE_VIDEO_LITERAL,
                     EMAIL_SELECTED_NOT_PROVIDED));
             }
+
+            if (!isEmailValid(hearingSubtype.getHearingVideoEmail())) {
+                errors.add(getMessageByCallbackType(callbackType, "", HEARING_TYPE_VIDEO_LITERAL, IS_INVALID));
+            }
         }
     }
 
@@ -369,6 +375,7 @@ public class SscsCaseValidator implements CaseValidator {
             checkPersonAddressAndDob(appellant.getAppointee().getAddress(), appellant.getAppointee().getIdentity(),
                 PERSON1_VALUE, ocrCaseData, caseData, appellant, isIbcOrSscs8);
             checkMobileNumber(appellant.getAppointee().getContact(), PERSON1_VALUE);
+            checkEmail(appellant.getAppointee().getContact(), PERSON1_VALUE);
         }
     }
 
@@ -394,6 +401,7 @@ public class SscsCaseValidator implements CaseValidator {
             }
 
             checkMobileNumber(repsContact, REPRESENTATIVE_VALUE);
+            checkEmail(repsContact, REPRESENTATIVE_VALUE);
         }
     }
 
@@ -933,6 +941,18 @@ public class SscsCaseValidator implements CaseValidator {
                 getMessageByCallbackType(callbackType, personType, getWarningMessageName(personType, null) + MOBILE,
                     IS_INVALID));
         }
+    }
+
+    private void checkEmail(final Contact contact, final String personType) {
+        if (contact != null && !isEmailValid(contact.getEmail())) {
+            errors.add(
+                getMessageByCallbackType(callbackType, personType, getWarningMessageName(personType, null) + EMAIL,
+                    IS_INVALID));
+        }
+    }
+
+    private boolean isEmailValid(final String email) {
+        return StringUtils.isBlank(email) || EmailUtil.isEmailValid(email);
     }
 
     private boolean isMobileNumberValid(String number) {

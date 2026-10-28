@@ -1575,6 +1575,96 @@ class SscsCaseValidatorTest {
         assertThat(response.getErrors().getFirst()).isEqualTo("representative_mobile is invalid");
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"appellant@example.com.", "appellant.example.com", "appellant@@example.com",
+        "appellant@example..com", ".appellant@example.com", "appellant @example.com"})
+    void givenAnAppealContainsAnInvalidAppellantEmail_thenAddAnError(final String email) {
+        final Appellant appellant = buildAppellant(false);
+        appellant.getContact().setEmail(email);
+
+        final CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord,
+            buildMinimumAppealDataWithBenefitType(PIP.name(), appellant, FormType.SSCS1PE), false);
+
+        assertThat(response.getErrors()).containsExactly("person1_email is invalid");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"appellant@example.com", "first.last@example.co.uk", "first+tag@sub.example.org",
+        "o'brien@example.com", "APPELLANT@EXAMPLE.COM"})
+    void givenAnAppealContainsAValidAppellantEmail_thenDoNotAddAnError(final String email) {
+        final Appellant appellant = buildAppellant(false);
+        appellant.getContact().setEmail(email);
+
+        final CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord,
+            buildMinimumAppealDataWithBenefitType(PIP.name(), appellant, FormType.SSCS1PE), false);
+
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {" "})
+    void givenAnAppealContainsNoAppellantEmail_thenDoNotAddAnError(final String email) {
+        final Appellant appellant = buildAppellant(false);
+        appellant.getContact().setEmail(email);
+
+        final CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord,
+            buildMinimumAppealDataWithBenefitType(PIP.name(), appellant, FormType.SSCS1PE), false);
+
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "appointee, person1_email is invalid",
+        "representative, representative_email is invalid",
+        "hearingVideo, hearing_video_email is invalid"
+    })
+    void givenAnAppealContainsAnInvalidEmail_thenAddAnError(final String emailOwner, final String expectedError) {
+        final CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord,
+            buildMinimumAppealDataWithInvalidEmail(emailOwner), false);
+
+        assertThat(response.getErrors()).containsExactly(expectedError);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "appellant, Appellant email is invalid",
+        "hearingVideo, Hearing video email address is invalid"
+    })
+    void givenAnAppealContainsAnInvalidEmailForValidationRecord_thenAddAnError(final String emailOwner,
+                                                                              final String expectedError) {
+        final CaseResponse response = validator.validateValidationRecord(
+            buildMinimumAppealDataWithInvalidEmail(emailOwner), true);
+
+        assertThat(response.getErrors()).contains(expectedError);
+    }
+
+    private Map<String, Object> buildMinimumAppealDataWithInvalidEmail(final String emailOwner) {
+        final String invalidEmail = "name@example.com.";
+        return switch (emailOwner) {
+            case "appellant" -> {
+                final Appellant appellant = buildAppellant(false);
+                appellant.getContact().setEmail(invalidEmail);
+                yield buildMinimumAppealDataWithBenefitType(PIP.name(), appellant, FormType.SSCS1PE);
+            }
+            case "appointee" -> {
+                final Appellant appellant = buildAppellant(true);
+                appellant.getAppointee().getContact().setEmail(invalidEmail);
+                yield buildMinimumAppealDataWithBenefitType(PIP.name(), appellant, FormType.SSCS1PE);
+            }
+            case "representative" -> {
+                final Representative representative = buildRepresentative();
+                representative.setContact(Contact.builder().email(invalidEmail).build());
+                yield buildMinimumAppealDataWithRepresentative(buildAppellant(false), representative);
+            }
+            case "hearingVideo" -> buildMinimumAppealDataWithHearingSubtype(
+                HearingSubtype.builder().wantsHearingTypeVideo("Yes").hearingVideoEmail(invalidEmail).build(),
+                buildAppellant(false), true, FormType.SSCS1PE);
+            default -> throw new IllegalArgumentException("Unknown email owner: " + emailOwner);
+        };
+    }
+
     @Test
     void givenARepresentativeTitleIsInvalid_thenAddWarning() {
         Representative representative = buildRepresentative();

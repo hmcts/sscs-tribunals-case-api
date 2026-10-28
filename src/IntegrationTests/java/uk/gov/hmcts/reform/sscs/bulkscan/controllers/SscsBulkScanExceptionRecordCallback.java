@@ -458,13 +458,36 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
                 SSCS_1_PEU),
             httpHeaders());
 
-        updateOcrDataFieldValues(request.getBody().getOcrDataFields(), Map.of(HEARING_TYPE_VIDEO, "  Yes ", IS_HEARING_TYPE_PAPER, "  false  ", HEARING_VIDEO_EMAIL, "  my@email.com  "));
+        updateOcrDataFieldValues(request.getBody().getOcrDataFields(), Map.of(HEARING_TYPE_VIDEO, "  Yes ", IS_HEARING_TYPE_PAPER, "  false  ", HEARING_VIDEO_EMAIL, "  MY@EMAIL.COM  "));
 
         ResponseEntity<SuccessfulTransformationResponse> result =
             this.restTemplate
                 .postForEntity(baseUrl + TRANSFORM_SCANNED_DATA, request, SuccessfulTransformationResponse.class);
 
         verifyResultData(result, "mappings/exception/auto-valid-appeal-response.json", this::getAppellantTya);
+    }
+
+    @Test
+    public void auto_scan_should_not_transform_case_when_hearing_video_email_is_invalid() {
+        checkForLinkedCases(NINO);
+        findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "ESA", NINO);
+
+        when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
+
+        final HttpEntity<ExceptionRecord> request = new HttpEntity<>(
+            autoExceptionCaseData(caseDataWithMrnDate(MRN_DATE_YESTERDAY_DD_MM_YYYY, this::addAppellant, SSCS_1_PEU),
+                SSCS_1_PEU),
+            httpHeaders());
+
+        updateOcrDataFieldValues(request.getBody().getOcrDataFields(), Map.of(HEARING_TYPE_VIDEO, "Yes", IS_HEARING_TYPE_PAPER, "false", HEARING_VIDEO_EMAIL, "my@email.com."));
+
+        final ResponseEntity<ErrorResponse> result =
+            this.restTemplate.postForEntity(baseUrl + TRANSFORM_SCANNED_DATA, request, ErrorResponse.class);
+
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
+        assertThat(result.getBody().errors).contains("hearing_video_email is invalid");
+
+        verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
 
     @Test

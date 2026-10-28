@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.bulkscan.transformers;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.lowerCase;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.*;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.WarningMessage.getMessageByCallbackType;
 import static uk.gov.hmcts.reform.sscs.bulkscan.domain.CallbackType.EXCEPTION_CALLBACK;
@@ -286,7 +287,7 @@ public class SscsCaseTransformer implements CaseTransformer {
 
     private Subscription generateSubscriptionWithAppealNumber(Map<String, Object> pairs, String personType) {
         boolean wantsSms = getBoolean(pairs, errors, personType + WANTS_SMS_NOTIFICATIONS);
-        String email = getField(pairs, personType + EMAIL);
+        String email = getEmailField(pairs, personType + EMAIL);
         String mobile = getField(pairs, personType + MOBILE);
 
         boolean wantEmailNotifications = (PERSON1_VALUE.equals(personType) || REPRESENTATIVE_VALUE.equals(personType))
@@ -812,7 +813,7 @@ public class SscsCaseTransformer implements CaseTransformer {
         return Contact.builder()
             .phone(getField(pairs, personType + PHONE))
             .mobile(getField(pairs, personType + MOBILE))
-            .email(getField(pairs, personType + EMAIL))
+            .email(getEmailField(pairs, personType + EMAIL))
             .build();
     }
 
@@ -882,11 +883,15 @@ public class SscsCaseTransformer implements CaseTransformer {
 
     private String findHearingVideoEmail(Map<String, Object> pairs) {
         if (getField(pairs, HEARING_VIDEO_EMAIL_LITERAL) != null) {
-            return getField(pairs, HEARING_VIDEO_EMAIL_LITERAL);
+            return getEmailField(pairs, HEARING_VIDEO_EMAIL_LITERAL);
         } else if (getField(pairs, PERSON1_VALUE + EMAIL) != null) {
-            return getField(pairs, PERSON1_VALUE + EMAIL);
+            return getEmailField(pairs, PERSON1_VALUE + EMAIL);
         }
         return null;
+    }
+
+    private String getEmailField(final Map<String, Object> pairs, final String field) {
+        return lowerCase(getField(pairs, field));
     }
 
     private HearingOptions buildHearingOptions(Map<String, Object> pairs, String hearingType) {
