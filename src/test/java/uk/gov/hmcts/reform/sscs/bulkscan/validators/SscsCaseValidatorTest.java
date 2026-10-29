@@ -1616,6 +1616,7 @@ class SscsCaseValidatorTest {
 
     @ParameterizedTest
     @CsvSource({
+        "appellantWithAppointee, person2_email is invalid",
         "appointee, person1_email is invalid",
         "representative, representative_email is invalid",
         "hearingVideo, hearing_video_email is invalid"
@@ -1630,6 +1631,8 @@ class SscsCaseValidatorTest {
     @ParameterizedTest
     @CsvSource({
         "appellant, Appellant email is invalid",
+        "appellantWithAppointee, Appellant email is invalid",
+        "appointee, Appointee email is invalid",
         "hearingVideo, Hearing video email address is invalid"
     })
     void givenAnAppealContainsAnInvalidEmailForValidationRecord_thenAddAnError(final String emailOwner,
@@ -1645,6 +1648,11 @@ class SscsCaseValidatorTest {
         return switch (emailOwner) {
             case "appellant" -> {
                 final Appellant appellant = buildAppellant(false);
+                appellant.getContact().setEmail(invalidEmail);
+                yield buildMinimumAppealDataWithBenefitType(PIP.name(), appellant, FormType.SSCS1PE);
+            }
+            case "appellantWithAppointee" -> {
+                final Appellant appellant = buildAppellant(true);
                 appellant.getContact().setEmail(invalidEmail);
                 yield buildMinimumAppealDataWithBenefitType(PIP.name(), appellant, FormType.SSCS1PE);
             }

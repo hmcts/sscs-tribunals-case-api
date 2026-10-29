@@ -300,7 +300,7 @@ public class SscsCaseValidator implements CaseValidator {
             }
 
             checkMobileNumber(appellant.getContact(), personType);
-            checkEmail(appellant.getContact(), personType);
+            checkEmail(appellant.getContact(), personType, appellant);
 
             checkHearingSubtypeDetails(appeal.getHearingSubtype());
             if (!ignorePartyRoleValidation && formType != null && formType.equals(FormType.SSCS2)) {
@@ -375,7 +375,7 @@ public class SscsCaseValidator implements CaseValidator {
             checkPersonAddressAndDob(appellant.getAppointee().getAddress(), appellant.getAppointee().getIdentity(),
                 PERSON1_VALUE, ocrCaseData, caseData, appellant, isIbcOrSscs8);
             checkMobileNumber(appellant.getAppointee().getContact(), PERSON1_VALUE);
-            checkEmail(appellant.getAppointee().getContact(), PERSON1_VALUE);
+            checkEmail(appellant.getAppointee().getContact(), PERSON1_VALUE, appellant);
         }
     }
 
@@ -401,7 +401,7 @@ public class SscsCaseValidator implements CaseValidator {
             }
 
             checkMobileNumber(repsContact, REPRESENTATIVE_VALUE);
-            checkEmail(repsContact, REPRESENTATIVE_VALUE);
+            checkEmail(repsContact, REPRESENTATIVE_VALUE, null);
         }
     }
 
@@ -943,10 +943,10 @@ public class SscsCaseValidator implements CaseValidator {
         }
     }
 
-    private void checkEmail(final Contact contact, final String personType) {
+    private void checkEmail(final Contact contact, final String personType, final Appellant appellant) {
         if (contact != null && !isEmailValid(contact.getEmail())) {
             errors.add(
-                getMessageByCallbackType(callbackType, personType, getWarningMessageName(personType, null) + EMAIL,
+                getMessageByCallbackType(callbackType, personType, getWarningMessageName(personType, appellant) + EMAIL,
                     IS_INVALID));
         }
     }
