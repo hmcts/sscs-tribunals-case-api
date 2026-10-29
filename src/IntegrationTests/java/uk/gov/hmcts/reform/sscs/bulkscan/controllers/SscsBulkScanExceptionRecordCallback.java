@@ -103,6 +103,8 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     private static final String IS_PAYING_PARENT = "is_paying_parent";
     private static final String HEARING_TELEPHONE_NUMBER = "hearing_telephone_number";
     private static final String HEARING_VIDEO_EMAIL = "hearing_video_email";
+    private static final String PERSON_1_EMAIL = "person1_email";
+    private static final String REPRESENTATIVE_EMAIL = "representative_email";
     private static final String CHILD_SUPPORT = "childSupport";
     private static final String SSCS_2 = "SSCS2";
     private static final String SSCS_1 = "SSCS1";
@@ -447,15 +449,23 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
     }
 
     @Test
-    public void auto_scan_should_handle_callback_and_return_caseid_and_state_case_created_and_remove_spaces() throws Exception {
+    public void auto_scan_should_handle_callback_and_return_caseid_and_state_case_created_and_remove_spaces_and_lower_case_emails() throws Exception {
         checkForLinkedCases(NINO);
         findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "ESA", NINO);
 
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
+        when(venueService.getEpimsIdForVenue(COVENTRY_CMCB)).thenReturn(COVENTRY_CMCB_EPIMS_ID);
+        when(refDataService.getCourtVenueRefDataByEpimsId(COVENTRY_CMCB_EPIMS_ID)).thenReturn(CourtVenue.builder().regionId(
+            "1").courtStatus("Open").build());
+
         HttpEntity<ExceptionRecord> request = new HttpEntity<>(
-            autoExceptionCaseData(caseDataWithMrnDate(MRN_DATE_YESTERDAY_DD_MM_YYYY, this::addAppellant, SSCS_1_PEU),
-                SSCS_1_PEU),
+            autoExceptionCaseData(caseDataWithMrnDate(MRN_DATE_YESTERDAY_DD_MM_YYYY, ocrList -> {
+                addAppellantAndAppointee(ocrList);
+                addRepresentative(ocrList);
+                ocrList.put(PERSON_1_EMAIL, "  APPOINTEE@Example.COM  ");
+                ocrList.put(REPRESENTATIVE_EMAIL, "  REP@EXAMPLE.COM  ");
+            }, SSCS_1_PEU), SSCS_1_PEU),
             httpHeaders());
 
         updateOcrDataFieldValues(request.getBody().getOcrDataFields(), Map.of(HEARING_TYPE_VIDEO, "  Yes ", IS_HEARING_TYPE_PAPER, "  false  ", HEARING_VIDEO_EMAIL, "  MY@EMAIL.COM  "));
@@ -464,19 +474,23 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
             this.restTemplate
                 .postForEntity(baseUrl + TRANSFORM_SCANNED_DATA, request, SuccessfulTransformationResponse.class);
 
-        verifyResultData(result, "mappings/exception/auto-valid-appeal-response.json", this::getAppellantTya);
+        verifyResultData(result, "mappings/exception/auto-valid-appeal-with-emails-response.json", this::getAppointeeTya);
     }
 
     @Test
-    public void auto_scan_should_not_transform_case_when_hearing_video_email_is_invalid() {
+    public void auto_scan_should_not_transform_case_when_email_addresses_are_invalid() {
         checkForLinkedCases(NINO);
         findCaseByForCaseworker(MRN_DATE_YESTERDAY_YYYY_MM_DD, "ESA", NINO);
 
         when(serviceAuthorisationApi.getServiceName(SERVICE_AUTH_TOKEN)).thenReturn(TEST_SERVICE);
 
         final HttpEntity<ExceptionRecord> request = new HttpEntity<>(
-            autoExceptionCaseData(caseDataWithMrnDate(MRN_DATE_YESTERDAY_DD_MM_YYYY, this::addAppellant, SSCS_1_PEU),
-                SSCS_1_PEU),
+            autoExceptionCaseData(caseDataWithMrnDate(MRN_DATE_YESTERDAY_DD_MM_YYYY, ocrList -> {
+                addAppellant(ocrList);
+                addRepresentative(ocrList);
+                ocrList.put(PERSON_1_EMAIL, "appellant@example.com.");
+                ocrList.put(REPRESENTATIVE_EMAIL, "rep@example.com.");
+            }, SSCS_1_PEU), SSCS_1_PEU),
             httpHeaders());
 
         updateOcrDataFieldValues(request.getBody().getOcrDataFields(), Map.of(HEARING_TYPE_VIDEO, "Yes", IS_HEARING_TYPE_PAPER, "false", HEARING_VIDEO_EMAIL, "my@email.com."));
@@ -485,7 +499,10 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
             this.restTemplate.postForEntity(baseUrl + TRANSFORM_SCANNED_DATA, request, ErrorResponse.class);
 
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
-        assertThat(result.getBody().errors).contains("hearing_video_email is invalid");
+        assertThat(result.getBody().errors).containsExactlyInAnyOrder(
+            "person1_email is invalid",
+            "representative_email is invalid",
+            "hearing_video_email is invalid");
 
         verify(serviceAuthorisationApi).getServiceName(SERVICE_AUTH_TOKEN);
     }
@@ -901,6 +918,19 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         ocrList.put("person1_mobile", "07411222222");
         ocrList.put("person1_dob", "11/11/1976");
         ocrList.put("person1_nino", NINO);
+    }
+
+    private void addRepresentative(Map<String, Object> ocrList) {
+        ocrList.put("representative_title", "Mrs");
+        ocrList.put("representative_first_name", "Jane");
+        ocrList.put("representative_last_name", "Doe");
+        ocrList.put("representative_company", "Rep Law Ltd");
+        ocrList.put("representative_address_line1", "1 Rep Street");
+        ocrList.put("representative_address_line2", "Repton");
+        ocrList.put("representative_address_line3", "Reading");
+        ocrList.put("representative_address_line4", "Berkshire");
+        ocrList.put("representative_postcode", "CM13 1AQ");
+        ocrList.put("representative_mobile", "07411333333");
     }
 
     private void addAppellantAndAppointee(Map<String, Object> ocrList) {
