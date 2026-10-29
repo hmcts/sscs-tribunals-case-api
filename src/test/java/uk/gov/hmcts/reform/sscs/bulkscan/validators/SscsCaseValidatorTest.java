@@ -23,6 +23,7 @@ import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_TYPE_PAPER;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_TYPE_TELEPHONE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_TYPE_VIDEO_LITERAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_VIDEO_EMAIL_LITERAL;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IBC_ROLE_FOR_DECEASED;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IBC_ROLE_FOR_LACKING_CAPACITY;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IBC_ROLE_FOR_POA;
@@ -1618,14 +1619,37 @@ class SscsCaseValidatorTest {
     @CsvSource({
         "appellantWithAppointee, person2_email is invalid",
         "appointee, person1_email is invalid",
-        "representative, representative_email is invalid",
-        "hearingVideo, hearing_video_email is invalid"
+        "representative, representative_email is invalid"
     })
     void givenAnAppealContainsAnInvalidEmail_thenAddAnError(final String emailOwner, final String expectedError) {
         final CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord,
             buildMinimumAppealDataWithInvalidEmail(emailOwner), false);
 
         assertThat(response.getErrors()).containsExactly(expectedError);
+    }
+
+    @Test
+    void givenAnAppealContainsAnInvalidHearingVideoEmailEnteredOnTheForm_thenAddAnError() {
+        ocrCaseData.put(HEARING_VIDEO_EMAIL_LITERAL, "name@example.com.");
+
+        final CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord,
+            buildMinimumAppealDataWithInvalidEmail("hearingVideo"), false);
+
+        assertThat(response.getErrors()).containsExactly("hearing_video_email is invalid");
+    }
+
+    @Test
+    void givenAnInvalidAppellantEmailUsedAsTheHearingVideoEmail_thenOnlyAddAnErrorForTheAppellantEmail() {
+        final String invalidEmail = "name@example.com.";
+        final Appellant appellant = buildAppellant(false);
+        appellant.getContact().setEmail(invalidEmail);
+
+        final CaseResponse response = validator.validateExceptionRecord(transformResponse, exceptionRecord,
+            buildMinimumAppealDataWithHearingSubtype(
+                HearingSubtype.builder().wantsHearingTypeVideo("Yes").hearingVideoEmail(invalidEmail).build(),
+                appellant, true, FormType.SSCS1PE), false);
+
+        assertThat(response.getErrors()).containsExactly("person1_email is invalid");
     }
 
     @ParameterizedTest

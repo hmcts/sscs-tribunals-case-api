@@ -302,7 +302,7 @@ public class SscsCaseValidator implements CaseValidator {
             checkMobileNumber(appellant.getContact(), personType);
             checkEmail(appellant.getContact(), personType, appellant);
 
-            checkHearingSubtypeDetails(appeal.getHearingSubtype());
+            checkHearingSubtypeDetails(appeal.getHearingSubtype(), ocrCaseData);
             if (!ignorePartyRoleValidation && formType != null && formType.equals(FormType.SSCS2)) {
                 checkAppellantRole(appellant.getRole(), ignoreWarnings);
             }
@@ -341,7 +341,7 @@ public class SscsCaseValidator implements CaseValidator {
         }
     }
 
-    private void checkHearingSubtypeDetails(HearingSubtype hearingSubtype) {
+    private void checkHearingSubtypeDetails(final HearingSubtype hearingSubtype, final Map<String, Object> ocrCaseData) {
         if (hearingSubtype != null) {
             if (YES_LITERAL.equals(hearingSubtype.getWantsHearingTypeTelephone())
                 && hearingSubtype.getHearingTelephoneNumber() == null) {
@@ -363,7 +363,7 @@ public class SscsCaseValidator implements CaseValidator {
                     EMAIL_SELECTED_NOT_PROVIDED));
             }
 
-            if (!isEmailValid(hearingSubtype.getHearingVideoEmail())) {
+            if (isHearingVideoEmailEntered(ocrCaseData) && !isEmailValid(hearingSubtype.getHearingVideoEmail())) {
                 errors.add(getMessageByCallbackType(callbackType, "", HEARING_TYPE_VIDEO_LITERAL, IS_INVALID));
             }
         }
@@ -949,6 +949,10 @@ public class SscsCaseValidator implements CaseValidator {
                 getMessageByCallbackType(callbackType, personType, getWarningMessageName(personType, appellant) + EMAIL,
                     IS_INVALID));
         }
+    }
+
+    private boolean isHearingVideoEmailEntered(final Map<String, Object> ocrCaseData) {
+        return ocrCaseData.isEmpty() || getField(ocrCaseData, HEARING_VIDEO_EMAIL_LITERAL) != null;
     }
 
     private boolean isEmailValid(final String email) {

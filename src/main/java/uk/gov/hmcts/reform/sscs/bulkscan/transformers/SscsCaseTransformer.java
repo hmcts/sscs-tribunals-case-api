@@ -287,7 +287,7 @@ public class SscsCaseTransformer implements CaseTransformer {
 
     private Subscription generateSubscriptionWithAppealNumber(Map<String, Object> pairs, String personType) {
         boolean wantsSms = getBoolean(pairs, errors, personType + WANTS_SMS_NOTIFICATIONS);
-        String email = toLowerCase(pairs, personType + EMAIL);
+        String email = getFieldToLowerCase(pairs, personType + EMAIL);
         String mobile = getField(pairs, personType + MOBILE);
 
         boolean wantEmailNotifications = (PERSON1_VALUE.equals(personType) || REPRESENTATIVE_VALUE.equals(personType))
@@ -813,7 +813,7 @@ public class SscsCaseTransformer implements CaseTransformer {
         return Contact.builder()
             .phone(getField(pairs, personType + PHONE))
             .mobile(getField(pairs, personType + MOBILE))
-            .email(toLowerCase(pairs, personType + EMAIL))
+            .email(getFieldToLowerCase(pairs, personType + EMAIL))
             .build();
     }
 
@@ -883,14 +883,14 @@ public class SscsCaseTransformer implements CaseTransformer {
 
     private String findHearingVideoEmail(Map<String, Object> pairs) {
         if (getField(pairs, HEARING_VIDEO_EMAIL_LITERAL) != null) {
-            return toLowerCase(pairs, HEARING_VIDEO_EMAIL_LITERAL);
+            return getFieldToLowerCase(pairs, HEARING_VIDEO_EMAIL_LITERAL);
         } else if (getField(pairs, PERSON1_VALUE + EMAIL) != null) {
-            return toLowerCase(pairs, PERSON1_VALUE + EMAIL);
+            return getFieldToLowerCase(pairs, PERSON1_VALUE + EMAIL);
         }
         return null;
     }
 
-    private String toLowerCase(final Map<String, Object> pairs, final String field) {
+    private String getFieldToLowerCase(final Map<String, Object> pairs, final String field) {
         return lowerCase(getField(pairs, field));
     }
 

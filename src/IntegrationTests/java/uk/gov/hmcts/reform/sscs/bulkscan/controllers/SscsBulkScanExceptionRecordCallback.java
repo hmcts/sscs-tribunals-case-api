@@ -459,7 +459,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         when(refDataService.getCourtVenueRefDataByEpimsId(COVENTRY_CMCB_EPIMS_ID)).thenReturn(CourtVenue.builder().regionId(
             "1").courtStatus("Open").build());
 
-        HttpEntity<ExceptionRecord> request = new HttpEntity<>(
+        final HttpEntity<ExceptionRecord> request = new HttpEntity<>(
             autoExceptionCaseData(caseDataWithMrnDate(MRN_DATE_YESTERDAY_DD_MM_YYYY, ocrList -> {
                 addAppellantAndAppointee(ocrList);
                 addRepresentative(ocrList);
@@ -470,7 +470,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
 
         updateOcrDataFieldValues(request.getBody().getOcrDataFields(), Map.of(HEARING_TYPE_VIDEO, "  Yes ", IS_HEARING_TYPE_PAPER, "  false  ", HEARING_VIDEO_EMAIL, "  MY@EMAIL.COM  "));
 
-        ResponseEntity<SuccessfulTransformationResponse> result =
+        final ResponseEntity<SuccessfulTransformationResponse> result =
             this.restTemplate
                 .postForEntity(baseUrl + TRANSFORM_SCANNED_DATA, request, SuccessfulTransformationResponse.class);
 
@@ -920,7 +920,7 @@ public class SscsBulkScanExceptionRecordCallback extends BaseTest {
         ocrList.put("person1_nino", NINO);
     }
 
-    private void addRepresentative(Map<String, Object> ocrList) {
+    private void addRepresentative(final Map<String, Object> ocrList) {
         ocrList.put("representative_title", "Mrs");
         ocrList.put("representative_first_name", "Jane");
         ocrList.put("representative_last_name", "Doe");
