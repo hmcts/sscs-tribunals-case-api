@@ -13,6 +13,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome.GRANTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.*;
+import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDate;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyName;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.addDocumentToCaseDataDocuments;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.addDocumentToCaseDataInternalDocuments;
@@ -630,8 +631,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             originalSenderOtherPartyName = getOtherPartyName(sscsCaseData, originalSenderOtherPartyId);
         }
 
-        return SscsDocument.builder()
-            .value(SscsDocumentDetails.builder()
+        return SscsDocument
+            .builder()
+            .value(SscsDocumentDetails
+                .builder()
                 .documentType(documentType.getValue())
                 .documentFileName(fileName)
                 .originalPartySender(requestingParty)
@@ -639,6 +642,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                 .documentLink(url)
                 .editedDocumentLink(scannedDocument.getValue().getEditedUrl())
                 .documentDateAdded(scannedDate)
+                .documentDateIssued(isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
+                    ISSUE_FURTHER_EVIDENCE.getCode()) ? getLocalDate().format(DateTimeFormatter.ISO_DATE) : null)
                 .controlNumber(scannedDocument.getValue().getControlNumber())
                 .evidenceIssued(evidenceIssued.getValue())
                 .originalSenderOtherPartyId(originalSenderOtherPartyId)
