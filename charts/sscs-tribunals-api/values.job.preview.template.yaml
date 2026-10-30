@@ -2,5 +2,5 @@ job:
   enabled: true
   image: ${IMAGE_NAME}
   environment:
-    TASK_NAME: ResendHearingBookedTask
-    CORE_CASE_DATA_API_URL: ${CORE_CASE_DATA_API_URL}
+    TASK_NAME: MigrateCasesTask
+
