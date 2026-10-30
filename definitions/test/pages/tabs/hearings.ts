@@ -80,6 +80,7 @@ export class Hearings {
   async updateHearingDuration() {
     await webActions.clickElementById('#hearingLength');
     await webActions.clearInputField('#durationhours');
+    await webActions.clearInputField('#durationmins');
     await webActions.inputField('#durationhours', '2');
 
     //To always choose weekdays for hearing dates
