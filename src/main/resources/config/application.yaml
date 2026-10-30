@@ -317,7 +317,9 @@ s2s:
         ccd: /ccdAboutToStart, /ccdAboutToSubmit, /ccdSubmittedEvent, /ccdMidEvent
         bulkscan: /validate-record, /forms/, /transform-exception-record, /transform-scanned-data
 job:
-    resendHearingBookedReferences: ${RESEND_HEARING_BOOKED_REFERENCES:dummy}
+    resendHearingBooked:
+        enabled: ${RESEND_HEARING_BOOKED_ENABLED:false}
+        references: ${RESEND_HEARING_BOOKED_REFERENCES:dummy}
 judicial-ref:
     api:
         url: ${JUDICIAL_REF_API_URL:http://localhost:5555}

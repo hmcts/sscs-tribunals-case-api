@@ -94,7 +94,7 @@ The application integrates with the `rse-cft-library`. Additional Docker Compose
 
 - Run a cron task locally:
    ```bash
-   TASK_NAME=MigrateCasesTask ./gradlew bootRun
+   TASK_NAME=ResendHearingBookedTask ./gradlew bootRun
    ```
 - Run a cron task in preview by adding the `pr-labels:job` label to the PR in GitHub. Configure additional settings in `charts/sscs-tribunals-api/values.job.preview.template.yaml`.
 
