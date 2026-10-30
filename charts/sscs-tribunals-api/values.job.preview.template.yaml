@@ -4,5 +4,3 @@ job:
   environment:
     TASK_NAME: ResendHearingBookedTask
     CORE_CASE_DATA_API_URL: ${CORE_CASE_DATA_API_URL}
-    RESEND_HEARING_BOOKED_ENABLED: true
-
