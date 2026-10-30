@@ -10,7 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationContext;
-import uk.gov.hmcts.reform.sscs.scheduled.ResendHearingBookedTask;
+import uk.gov.hmcts.reform.sscs.scheduled.MigrateCasesTask;
 
 @ExtendWith(MockitoExtension.class)
 class ScheduledTaskRunnerTest {
@@ -19,7 +19,7 @@ class ScheduledTaskRunnerTest {
     private ApplicationContext context;
 
     @Mock
-    private ResendHearingBookedTask resendHearingBookedTask;
+    private MigrateCasesTask migrateCasesTask;
 
     @InjectMocks
     private ScheduledTaskRunner taskRunner;
@@ -29,11 +29,11 @@ class ScheduledTaskRunnerTest {
 
     @Test
     void shouldRunValidTask() {
-        when(context.getBean("resendHearingBookedTask")).thenReturn(resendHearingBookedTask);
+        when(context.getBean("migrateCasesTask")).thenReturn(migrateCasesTask);
 
-        taskRunner.run("ResendHearingBookedTask");
+        taskRunner.run("MigrateCasesTask");
 
-        verify(resendHearingBookedTask).run();
+        verify(migrateCasesTask).run();
     }
 
     @Test
