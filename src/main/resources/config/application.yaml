@@ -318,7 +318,6 @@ s2s:
         bulkscan: /validate-record, /forms/, /transform-exception-record, /transform-scanned-data
 job:
     resendHearingBooked:
-        enabled: ${RESEND_HEARING_BOOKED_ENABLED:false}
         references: ${RESEND_HEARING_BOOKED_REFERENCES:dummy}
 judicial-ref:
     api:

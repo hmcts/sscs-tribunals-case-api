@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
@@ -16,7 +15,6 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-@ConditionalOnProperty(value = "job.resendHearingBooked.enabled", havingValue = "true")
 public class ResendHearingBookedTask implements Runnable {
 
     private final IdamService idamService;
@@ -45,9 +43,11 @@ public class ResendHearingBookedTask implements Runnable {
                         EventType.RESEND_HEARING_BOOKED.getCcdType(), "Resend hearing booked notification", ref);
                 updateCcdCaseService.triggerCaseEventV2(ref, EventType.RESEND_HEARING_BOOKED.getCcdType(),
                         "Resend hearing booked notification", "", idamService.getIdamTokens());
+                log.info("Case updated successfully for caseId: {}, event: {}",
+                        ref, EventType.RESEND_HEARING_BOOKED.getCcdType());
                 migratedCases.add(ref);
             } catch (Exception e) {
-                log.error("Updating case failed for caseID: {}, event: {}",
+                log.error("Updating case failed for caseId: {}, event: {}",
                          ref, EventType.RESEND_HEARING_BOOKED.getCcdType());
                 failedCases.add(ref);
             }
