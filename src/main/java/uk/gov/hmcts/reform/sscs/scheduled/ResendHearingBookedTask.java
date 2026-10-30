@@ -53,17 +53,12 @@ public class ResendHearingBookedTask implements Runnable {
                     log.info("Case updated successfully for caseId: {}, event: {}",
                             retrievedCase.getId(), EventType.RESEND_HEARING_BOOKED.getCcdType());
                     migratedCases.add(retrievedCase.getId());
-                } else {
-                    log.error("Case not found for caseId: {}", ref);
-                    failedCases.add(ref);
                 }
             } catch (Exception e) {
-                log.error("Updating case failed for caseId: {}, event: {}",
-                        ref, EventType.RESEND_HEARING_BOOKED.getCcdType());
+                log.error("Updating case failed for caseId: {}, due to: {}", ref, e.getMessage());
                 failedCases.add(ref);
             }
         });
-
         log.info(LOG_STRING, getMigratedCases(), getFailedCases());
     }
 }
