@@ -710,6 +710,8 @@ ccd:
         IDAM_HMCTS_ACCESS_URL: https://hmcts-access.aat.platform.hmcts.net
         PROXY_DOCUMENT_MANAGEMENT: http://dm-store-aat.service.core-compute-aat.internal
         ALLOW_CONFIG_MUTATIONS: true
+        IDAM_WEB_PUBLIC_URL: https://idam-web-public.aat.platform.hmcts.net
+        IDAM_HMCTS_ACCESS_URL: https://hmcts-access.aat.platform.hmcts.net
       ingressIP: ${INGRESS_IP}
       ingressHost: gateway-${SERVICE_FQDN}
       disableKeyVaults: true
