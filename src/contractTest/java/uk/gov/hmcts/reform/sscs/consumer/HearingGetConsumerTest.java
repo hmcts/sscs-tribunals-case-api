@@ -63,7 +63,7 @@ class HearingGetConsumerTest extends BasePactTest {
     private static final String FORBIDDEN_CASE_ID = "403";
     private static final String NOT_FOUND_CASE_ID = "404";
 
-    private static final LocalDateTime date = LocalDateTime.now();
+    private static final LocalDateTime date = LocalDateTime.of(2026, 1, 1, 10, 0, 0);
     public static final String STATUS = "status";
     public static final String STATE = "sscs hearing api successfully returns case";
 
