@@ -104,7 +104,7 @@ export class History {
 
   async verifyInterlocReviewState(state: string) {
     await webActions.verifyPageLabel(
-      '#case-viewer-field-read--interlocReviewState .ng-star-inserted span',
+      'ccd-read-fixed-list-field span',
       state
     );
   }

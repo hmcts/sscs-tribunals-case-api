@@ -8,6 +8,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ASSOCIATE_CASE;
 import static uk.gov.hmcts.reform.sscs.utility.StringUtils.getMaskedNino;
@@ -30,6 +31,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLinkDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -191,6 +194,55 @@ class AssociatedCaseLinkHelperTest {
 
         assertThat(matchingCase2.getData().getLinkedCasesBoolean()).isEqualTo("Yes");
         assertThat(matchingCase2.getData().getAssociatedCase().getFirst().getValue().getCaseReference()).isEqualTo("33333333");
+    }
+
+    @Test
+    void givenCaseLinkedToThisAndAnotherCase_whenRemovingLink_thenOnlyThisCaseLinkIsRemoved() {
+        final SscsCaseDetails linkedCase = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder()
+            .ccdCaseId("12345678")
+            .linkedCasesBoolean("Yes")
+            .associatedCase(new ArrayList<>(List.of(caseLink("33333333"), caseLink("44444444"))))
+            .build()).build();
+
+        associatedCaseLinkHelper.removeLinkToOtherAssociatedCases(List.of(linkedCase), "33333333");
+
+        verify(updateCcdCaseService).updateCaseV2(eq(12345678L), eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(),
+            any(IdamTokens.class), caseDetailsCaptor.capture());
+        caseDetailsCaptor.getValue().accept(linkedCase);
+
+        assertThat(linkedCase.getData().getAssociatedCase())
+            .extracting(caseLink -> caseLink.getValue().getCaseReference())
+            .containsExactly("44444444");
+        assertThat(linkedCase.getData().getLinkedCasesBoolean()).isEqualTo("Yes");
+    }
+
+    @Test
+    void givenCaseLinkedOnlyToThisCase_whenRemovingLink_thenNoLinksRemainAndLinkedCasesIsNo() {
+        final SscsCaseDetails linkedCase = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder()
+            .ccdCaseId("12345678")
+            .linkedCasesBoolean("Yes")
+            .associatedCase(new ArrayList<>(List.of(caseLink("33333333"))))
+            .build()).build();
+
+        associatedCaseLinkHelper.removeLinkToOtherAssociatedCases(List.of(linkedCase), "33333333");
+
+        verify(updateCcdCaseService).updateCaseV2(eq(12345678L), eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(),
+            any(IdamTokens.class), caseDetailsCaptor.capture());
+        caseDetailsCaptor.getValue().accept(linkedCase);
+
+        assertThat(linkedCase.getData().getAssociatedCase()).isEmpty();
+        assertThat(linkedCase.getData().getLinkedCasesBoolean()).isEqualTo("No");
+    }
+
+    @Test
+    void givenNoCases_whenRemovingLink_thenNoUpdateIsMade() {
+        associatedCaseLinkHelper.removeLinkToOtherAssociatedCases(List.of(), "33333333");
+
+        verifyNoInteractions(updateCcdCaseService);
+    }
+
+    private static CaseLink caseLink(final String caseReference) {
+        return CaseLink.builder().value(CaseLinkDetails.builder().caseReference(caseReference).build()).build();
     }
 
     @Test
