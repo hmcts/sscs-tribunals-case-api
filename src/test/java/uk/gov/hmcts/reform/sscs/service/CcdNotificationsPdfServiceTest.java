@@ -691,6 +691,55 @@ public class CcdNotificationsPdfServiceTest {
         assertEquals("Testurl", sscsCaseDetails.getData().getReasonableAdjustmentsLetters().getAppellant().get(1).getValue().getDocumentLink().getDocumentUrl());
     }
 
+    @Test
+    @Parameters({"Letter", "Email", "Sms"})
+    public void notificationNotSavedEventTriggersEvent(CorrespondenceType correspondenceType) {
+        Long caseId = Long.valueOf(caseData.getCcdCaseId());
+
+        service.notificationNotSaved(caseId, "notification-id-123", correspondenceType);
+
+        verify(updateCcdCaseService).triggerCaseEventV2(
+                eq(caseId),
+                eq(EventType.NOTIFICATION_NOT_SAVED.getCcdType()),
+                eq("Notification issued via Go.uk"),
+                eq("Copy of notification id notification-id-123 failed to save in Notifications tab"),
+                any());
+    }
+
+    @Test
+    public void notificationNotSavedWithNoNotificationIdOmitsItFromDescription() {
+        Long caseId = Long.valueOf(caseData.getCcdCaseId());
+
+        service.notificationNotSaved(caseId, null, CorrespondenceType.Letter);
+
+        verify(updateCcdCaseService).triggerCaseEventV2(
+                eq(caseId),
+                eq(EventType.NOTIFICATION_NOT_SAVED.getCcdType()),
+                eq("Notification issued via Go.uk"),
+                eq("Copy of notification id failed to save in Notifications tab"),
+                any());
+    }
+
+    @Test
+    public void notificationNotSavedDoesNotThrowExceptionWhenCaseUpdateFails() {
+        Long caseId = Long.valueOf(caseData.getCcdCaseId());
+        doThrow(new CcdException("some error when updating case")).when(updateCcdCaseService).triggerCaseEventV2(
+                eq(caseId),
+                eq(EventType.NOTIFICATION_NOT_SAVED.getCcdType()),
+                any(),
+                any(),
+                any());
+
+        service.notificationNotSaved(caseId, "notification-id-123", CorrespondenceType.Letter);
+
+        verify(updateCcdCaseService).triggerCaseEventV2(
+                eq(caseId),
+                eq(EventType.NOTIFICATION_NOT_SAVED.getCcdType()),
+                eq("Notification issued via Go.uk"),
+                eq("Copy of notification id notification-id-123 failed to save in Notifications tab"),
+                any());
+    }
+
     private List<Correspondence> findLettersToCaptureByParty(ReasonableAdjustmentsLetters reasonableAdjustmentsLetters, LetterType letterType) {
         if (LetterType.APPELLANT.equals(letterType)) {
             return reasonableAdjustmentsLetters.getAppellant();

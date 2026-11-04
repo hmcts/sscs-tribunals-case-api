@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Correspondence;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CorrespondenceType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReasonableAdjustmentsLetters;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -38,6 +39,7 @@ public class CcdNotificationsPdfService {
 
     private static final String NOTIFICATION_SENT = "Notification sent";
     private static final String FAILED_TO_UPDATE_CCD_CASE_USING_V_2_BUT_CARRYING_ON_WITH_EVENT = "Failed to update ccd case using v2 but carrying on [{}] with event [{}]";
+    private static final String NOTIFICATION_NOT_SAVED = "Notification issued via Go.uk";
 
     private PdfStoreService pdfStoreService;
 
@@ -155,6 +157,23 @@ public class CcdNotificationsPdfService {
         } catch (CcdException ccdEx) {
             log.error(FAILED_TO_UPDATE_CCD_CASE_USING_V_2_BUT_CARRYING_ON_WITH_EVENT,
                     ccdCaseId, EventType.NOTIFICATION_SENT.getCcdType(), ccdEx);
+        }
+    }
+
+    public void notificationNotSaved(Long ccdCaseId, String notificationId, CorrespondenceType correspondenceType) {
+        log.info("Updating ccd case using v2 for {} with event {}", ccdCaseId, EventType.NOTIFICATION_NOT_SAVED.getCcdType());
+        String description = notificationId == null
+                ? String.format("Copy of notification id failed to save in Notifications tab")
+                : String.format("Copy of notification id %s failed to save in Notifications tab", notificationId);
+        try {
+            updateCcdCaseService.triggerCaseEventV2(ccdCaseId,
+                EventType.NOTIFICATION_NOT_SAVED.getCcdType(),
+                NOTIFICATION_NOT_SAVED,
+                description,
+                idamService.getIdamTokens());
+        } catch (CcdException ccdEx) {
+            log.error(FAILED_TO_UPDATE_CCD_CASE_USING_V_2_BUT_CARRYING_ON_WITH_EVENT,
+                    ccdCaseId, EventType.NOTIFICATION_NOT_SAVED.getCcdType(), ccdEx);
         }
     }
 
