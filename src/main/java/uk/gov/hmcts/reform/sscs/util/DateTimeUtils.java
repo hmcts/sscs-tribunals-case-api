@@ -64,6 +64,10 @@ public final class DateTimeUtils {
         return isDateInThePast(getLocalDate(dateString).orElse(null));
     }
 
+    public static LocalDate getLocalDate() {
+        return LocalDate.now(ZoneId.of(EUROPE_LONDON));
+    }
+
     public static Optional<LocalDate> getLocalDate(String dateString) {
         return Optional.ofNullable(stripToNull(dateString)).map(LocalDate::parse);
     }
