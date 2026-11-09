@@ -9,10 +9,13 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.RESPONSE_SUBMITTED_DW
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DWP_RESPOND;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.JOINT_PARTY_ADDED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_ADMIN_ACTION;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Issue.UM;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.HandlerUtils.isANewJointParty;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +35,8 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
 
     private final IdamService idamService;
     private final UpdateCcdCaseService updateCcdCaseService;
+    private final List<Issue> responseReceivedIssueCodes
+            = List.of(Issue.LT, Issue.HT, Issue.OC, Issue.OI, Issue.OS, Issue.OX);
 
     @Autowired
     public DwpUploadResponseHandler(UpdateCcdCaseService updateCcdCaseService,
@@ -63,8 +68,11 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
         final BenefitType benefitType = sscsCaseData.getAppeal().getBenefitType();
-
-        if (equalsIgnoreCase(benefitType.getCode(), Benefit.CHILD_SUPPORT.getShortName())
+        final String issueCode = sscsCaseData.getIssueCode();
+        if (responseReceivedIssueCodes.stream().anyMatch(code -> Objects.equals(code.toString(), issueCode))) {
+            triggerDwpResponseReceived(callback.getCaseDetails().getId(), "Response received",
+                    "Update to response received as needs to be referred to a LO/ Judge for listing directions.");
+        } else if (equalsIgnoreCase(benefitType.getCode(), Benefit.CHILD_SUPPORT.getShortName())
             || isPotentiallyHarmfulEvidenceOrHasEditedEvidenceBundle(sscsCaseData)) {
             triggerDwpResponseReceived(callback.getCaseDetails().getId(), "Response received",
                 "Update to response received as an Admin has to review the case");
@@ -122,8 +130,12 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
         if (caseData.getElementsDisputedIsDecisionDisputedByOthers() != null) {
             disputedDecision = equalsIgnoreCase(caseData.getElementsDisputedIsDecisionDisputedByOthers(), "yes");
         }
+        String issueCode = caseData.getIssueCode();
 
-        if ("Yes".equalsIgnoreCase(caseData.getUrgentCase())) {
+        if (Objects.equals(issueCode, UM.toString()) || hasResponseReceivedIssueCodeInElementsDisputed(caseData)) {
+            triggerDwpResponseReceived(callback.getCaseDetails().getId(), "Response received",
+                    "Update to response received as needs to be referred to a LO/ Judge for listing directions.");
+        } else if ("Yes".equalsIgnoreCase(caseData.getUrgentCase())) {
             triggerDwpRespondEventForUrgentCase(callback);
         } else if (!dwpFurtherInfo && !disputedDecision) {
             triggerReadyToListEvent(callback);
@@ -141,6 +153,11 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
                                 callback.getCaseDetails().getId());
                 });
         }
+    }
+
+    private boolean hasResponseReceivedIssueCodeInElementsDisputed(SscsCaseData caseData) {
+        return caseData.getIssueCodesForAllElementsDisputed().stream().anyMatch(element ->
+                responseReceivedIssueCodes.stream().anyMatch(code -> Objects.equals(code.toString(), element)));
     }
 
     private void handleIbcaCase(Callback<SscsCaseData> callback) {
