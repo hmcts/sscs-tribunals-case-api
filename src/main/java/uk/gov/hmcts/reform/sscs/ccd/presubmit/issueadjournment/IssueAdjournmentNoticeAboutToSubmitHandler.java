@@ -11,17 +11,20 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE_AFTER;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType.NON_STANDARD;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.ADJOURNMENT_NOTICE_ISSUED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_ADMIN_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
+import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDate;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getDurationForAdjournment;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.hasChannelChangedForAdjournment;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.hasInterpreterChangedForAdjournment;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -59,7 +62,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final HearingDurationsService hearingDurationsService;
     private final VenueService venueService;
-
+    private final BusinessDaysCalculatorService businessDaysCalculatorService;
 
     private static final int DURATION_SESSIONS_MULTIPLIER = 150;
     private static final int DURATION_DEFAULT = 60;
@@ -96,12 +99,19 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         if (preSubmitCallbackResponse.getErrors().isEmpty()) {
             SscsDocumentTranslationStatus documentTranslationStatus = sscsCaseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
 
-            calculateDueDate(sscsCaseData);
+            try {
+                calculateDueDate(sscsCaseData);
+            } catch (IOException e) {
+                preSubmitCallbackResponse.addError("Error calculating due date");
+            }
 
-            if (sscsCaseData.getAdjournment().getPreviewDocument() != null) {
-                processResponse(sscsCaseData, preSubmitCallbackResponse, documentTranslationStatus, oldCaseDetails);
-            } else {
-                preSubmitCallbackResponse.addError("There is no Draft Adjournment Notice on the case so adjournment cannot be issued");
+            if (preSubmitCallbackResponse.getErrors().isEmpty()) {
+                if (sscsCaseData.getAdjournment().getPreviewDocument() != null) {
+                    processResponse(sscsCaseData, preSubmitCallbackResponse, documentTranslationStatus, oldCaseDetails);
+                } else {
+                    preSubmitCallbackResponse.addError(
+                        "There is no Draft Adjournment Notice on the case so adjournment cannot be issued");
+                }
             }
         }
 
@@ -115,6 +125,9 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
             sscsCaseData.setDwpState(ADJOURNMENT_NOTICE_ISSUED);
             sscsCaseData.setState(isCaseListable(sscsCaseData));
+            if (caseCannotBeListedRightAwayAndDirectionsNotMadeToParties(sscsCaseData.getAdjournment())) {
+                sscsCaseData.setInterlocReviewState(AWAITING_ADMIN_ACTION);
+            }
         } else {
             log.info("Case is a Welsh case so Adjournment Notice requires translation for case id : {}", sscsCaseData.getCcdCaseId());
             sscsCaseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION);
@@ -165,14 +178,25 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         caseData.setAdjournment(Adjournment.builder().build());
     }
 
-    private void calculateDueDate(SscsCaseData sscsCaseData) {
+    private void calculateDueDate(SscsCaseData sscsCaseData) throws IOException {
         if (sscsCaseData.getAdjournment().getDirectionsDueDate() != null) {
             sscsCaseData.setDirectionDueDate(sscsCaseData.getAdjournment().getDirectionsDueDate().toString());
         } else if (sscsCaseData.getAdjournment().getDirectionsDueDateDaysOffset() != null) {
             sscsCaseData.setDirectionDueDate(LocalDate.now()
                 .plusDays(sscsCaseData.getAdjournment().getDirectionsDueDateDaysOffset().getCcdDefinition())
                 .toString());
+        } else if (caseCannotBeListedRightAwayAndDirectionsNotMadeToParties(sscsCaseData.getAdjournment())) {
+            try {
+                sscsCaseData.setDirectionDueDate(businessDaysCalculatorService.getBusinessDay(getLocalDate(), 1).toString());
+            } catch (final IOException e) {
+                log.error("Unable to calculate next business day", e);
+                throw e;
+            }
         }
+    }
+
+    private static boolean caseCannotBeListedRightAwayAndDirectionsNotMadeToParties(Adjournment adjournment) {
+        return NO == adjournment.getCanCaseBeListedRightAway() && NO == adjournment.getAreDirectionsBeingMadeToParties();
     }
 
     private void createAdjournmentNoticeFromPreviewDraft(
