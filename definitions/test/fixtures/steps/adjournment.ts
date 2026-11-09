@@ -102,7 +102,7 @@ export class Adjournment extends BaseStep {
         await this.homePage.navigateToTab('Listing Requirements');
         await this.listingRequirementsTab.verifyContentByKeyValueForASpan(
             'Duration of the hearing',
-            '60'
+            '45'
         );
         await this.listingRequirementsTab.verifyContentByKeyValueForASpan(
             'Is an interpreter wanted?',
