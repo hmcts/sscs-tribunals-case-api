@@ -89,6 +89,7 @@ public class NotificationService {
 
         log.info("Checking if notification event {} is valid for case id {}", notificationType.getId(), caseId);
         if (!isEventAllowedToProceedWithValidData(notificationWrapper, notificationType)) {
+            log.info("Notification event {} is not valid for case id {}", notificationType.getId(), caseId);
             return;
         }
 
@@ -429,9 +430,19 @@ public class NotificationService {
                 HearingDetails newHearingDetails = newHearing.getValue();
                 HearingDetails oldHearingDetails = oldHearing.getValue();
 
+                //remove this log before merge as will cause issue of hearingDetails is null. In place for debugging
+                log.info("Checking if hearing booked notification is valid for case id {} with new hearing details:"
+                                + "{HearingId: {}, DateTime: {}, Epims: {}, Channel: {}} "
+                                + "and old hearing details: {HearingId: {}, DateTime: {}, Epims: {}, Channel: {}}",
+                    notificationWrapper.getCaseId(),
+                        newHearingDetails.getHearingId(), newHearingDetails.getHearingDateTime(), newHearingDetails.getEpimsId(), newHearingDetails.getHearingChannel(),
+                        oldHearingDetails.getHearingId(), oldHearingDetails.getHearingDateTime(), oldHearingDetails.getEpimsId(), oldHearingDetails.getHearingChannel());
+
                 if (hasNonNullHearingDetails(oldHearingDetails, newHearingDetails)
                         && newHearingDetails.getHearingId().equals(oldHearingDetails.getHearingId())
                         && isHearingBookedInformationTheSame(newHearingDetails, oldHearingDetails)) {
+                    log.info("Cannot complete notification {} as the hearing booked information is the same for caseId {}.",
+                        notificationType.getId(), notificationWrapper.getCaseId());
                     return false;
                 }
             }
