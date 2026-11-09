@@ -701,7 +701,7 @@ public class CcdNotificationsPdfServiceTest {
         verify(updateCcdCaseService).triggerCaseEventV2(
                 eq(caseId),
                 eq(EventType.NOTIFICATION_NOT_SAVED.getCcdType()),
-                eq("Notification issued via Go.uk"),
+                eq("Notification issued via Gov.uk"),
                 eq("Copy of notification id notification-id-123 failed to save in Notifications tab"),
                 any());
     }
@@ -715,7 +715,7 @@ public class CcdNotificationsPdfServiceTest {
         verify(updateCcdCaseService).triggerCaseEventV2(
                 eq(caseId),
                 eq(EventType.NOTIFICATION_NOT_SAVED.getCcdType()),
-                eq("Notification issued via Go.uk"),
+                eq("Notification issued via Gov.uk"),
                 eq("Copy of notification id failed to save in Notifications tab"),
                 any());
     }
@@ -735,7 +735,7 @@ public class CcdNotificationsPdfServiceTest {
         verify(updateCcdCaseService).triggerCaseEventV2(
                 eq(caseId),
                 eq(EventType.NOTIFICATION_NOT_SAVED.getCcdType()),
-                eq("Notification issued via Go.uk"),
+                eq("Notification issued via Gov.uk"),
                 eq("Copy of notification id notification-id-123 failed to save in Notifications tab"),
                 any());
     }

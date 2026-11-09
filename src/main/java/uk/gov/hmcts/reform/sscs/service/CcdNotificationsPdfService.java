@@ -39,7 +39,7 @@ public class CcdNotificationsPdfService {
 
     private static final String NOTIFICATION_SENT = "Notification sent";
     private static final String FAILED_TO_UPDATE_CCD_CASE_USING_V_2_BUT_CARRYING_ON_WITH_EVENT = "Failed to update ccd case using v2 but carrying on [{}] with event [{}]";
-    private static final String NOTIFICATION_NOT_SAVED = "Notification issued via Go.uk";
+    private static final String NOTIFICATION_NOT_SAVED = "Notification issued via Gov.uk";
 
     private PdfStoreService pdfStoreService;
 
