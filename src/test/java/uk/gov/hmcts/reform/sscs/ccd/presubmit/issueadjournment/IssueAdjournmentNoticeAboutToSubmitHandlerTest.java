@@ -139,7 +139,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
     }
 
     @Test
-    void givenCannotBeListedAndNoDirectionsAndNoDueDate_thenSetNextBusinessDayDueDateAndAwaitingAdminAction() throws IOException {
+    void givenNoDirectionsAndCaseCannotBeListed_thenSetNextBusinessDayDueDate() throws IOException {
         final LocalDate nextBusinessDay = LocalDate.of(2026, 11, 9);
         when(businessDaysCalculatorService.getBusinessDay(any(LocalDate.class), eq(1))).thenReturn(nextBusinessDay);
         setCannotBeListedAndNoDirectionsWithNoDueDate();
@@ -243,7 +243,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
             softly.assertThat(sscsCaseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.AWAITING_ADMIN_ACTION);
             softly.assertThat(sscsCaseData.getState()).isEqualTo(NOT_LISTABLE);
         });
-        logCapture.assertLogContains("Unable to calculate next business day - defaulting to next week day", Level.ERROR);
+        logCapture.assertLogContains("Unable to calculate next business day - defaulting to next week day. Case Id is: %s".formatted(sscsCaseData.getCcdCaseId()), Level.ERROR);
     }
 
     private void setCannotBeListedAndNoDirectionsWithNoDueDate() {

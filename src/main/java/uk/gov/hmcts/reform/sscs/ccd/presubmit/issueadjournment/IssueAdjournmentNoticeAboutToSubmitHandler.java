@@ -182,7 +182,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             try {
                 sscsCaseData.setDirectionDueDate(businessDaysCalculatorService.getBusinessDay(getLocalDate(), 1).toString());
             } catch (final IOException e) {
-                log.error("Unable to calculate next business day - defaulting to next week day", e);
+                log.error("Unable to calculate next business day - defaulting to next week day. Case Id is: %s".formatted(sscsCaseData.getCcdCaseId()), e);
                 sscsCaseData.setDirectionDueDate(nextWeekday(getLocalDate()).toString());
             }
         }
