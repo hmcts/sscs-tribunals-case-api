@@ -15,4 +15,8 @@ public class LetterAsyncConfigProperties {
     private double multiplier;
     private long maxDelay;
     private long initialDelay;
+    private int emailMaxAttempts;
+    private long emailDelay;
+    private double emailMultiplier;
+    private long emailMaxDelay;
 }
