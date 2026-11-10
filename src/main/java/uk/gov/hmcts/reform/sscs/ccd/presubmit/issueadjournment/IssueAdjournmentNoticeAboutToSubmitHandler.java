@@ -118,7 +118,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
             sscsCaseData.setDwpState(ADJOURNMENT_NOTICE_ISSUED);
             sscsCaseData.setState(isCaseListable(sscsCaseData));
-            if (caseCannotBeListedRightAwayAndDirectionsNotMadeToParties(sscsCaseData.getAdjournment())) {
+            if (englishLanguageCaseCannotBeListedRightAwayAndDirectionsNotMadeToParties(sscsCaseData)) {
                 sscsCaseData.setInterlocReviewState(AWAITING_ADMIN_ACTION);
             }
         } else {
@@ -178,7 +178,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             sscsCaseData.setDirectionDueDate(LocalDate.now()
                 .plusDays(sscsCaseData.getAdjournment().getDirectionsDueDateDaysOffset().getCcdDefinition())
                 .toString());
-        } else if (caseCannotBeListedRightAwayAndDirectionsNotMadeToParties(sscsCaseData.getAdjournment())) {
+        } else if (englishLanguageCaseCannotBeListedRightAwayAndDirectionsNotMadeToParties(sscsCaseData)) {
             try {
                 sscsCaseData.setDirectionDueDate(businessDaysCalculatorService.getBusinessDay(getLocalDate(), 1).toString());
             } catch (final IOException e) {
@@ -188,8 +188,10 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         }
     }
 
-    private static boolean caseCannotBeListedRightAwayAndDirectionsNotMadeToParties(Adjournment adjournment) {
-        return NO == adjournment.getCanCaseBeListedRightAway() && NO == adjournment.getAreDirectionsBeingMadeToParties();
+    private static boolean englishLanguageCaseCannotBeListedRightAwayAndDirectionsNotMadeToParties(SscsCaseData caseData) {
+        return !caseData.isLanguagePreferenceWelsh()
+            && NO == caseData.getAdjournment().getCanCaseBeListedRightAway()
+            && NO == caseData.getAdjournment().getAreDirectionsBeingMadeToParties();
     }
 
     private void createAdjournmentNoticeFromPreviewDraft(

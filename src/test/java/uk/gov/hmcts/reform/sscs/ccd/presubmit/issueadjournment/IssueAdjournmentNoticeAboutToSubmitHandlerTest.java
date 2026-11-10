@@ -214,17 +214,19 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
     }
 
     @Test
-    void givenWelshCaseCannotBeListedAndNoDirections_thenSetDueDateButLeaveInterlocAsWelshTranslation() throws IOException {
-        final LocalDate nextBusinessDay = LocalDate.of(2026, 11, 9);
-        when(businessDaysCalculatorService.getBusinessDay(any(LocalDate.class), eq(1))).thenReturn(nextBusinessDay);
+    void givenWelshCaseCannotBeListedAndNoDirections_thenDoNotSetDueDateAndLeaveInterlocAsWelshTranslation() {
         setCannotBeListedAndNoDirectionsWithNoDueDate();
         sscsCaseData.setLanguagePreferenceWelsh("yes");
         setupHearingDurationValues();
 
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(sscsCaseData.getDirectionDueDate()).isEqualTo(nextBusinessDay.toString());
-        assertThat(sscsCaseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.WELSH_TRANSLATION);
+        assertSoftly(softly -> {
+            softly.assertThat(response.getErrors()).isEmpty();
+            softly.assertThat(sscsCaseData.getDirectionDueDate()).isNull();
+            softly.assertThat(sscsCaseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.WELSH_TRANSLATION);
+        });
+        verifyNoInteractions(businessDaysCalculatorService);
     }
 
     @Test
