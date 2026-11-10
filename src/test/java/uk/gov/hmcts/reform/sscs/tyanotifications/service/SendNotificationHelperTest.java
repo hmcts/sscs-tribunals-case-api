@@ -6,6 +6,9 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.REP_SALUTATION;
 
 import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 
@@ -54,39 +57,18 @@ public class SendNotificationHelperTest {
         assertThat(SendNotificationHelper.getRepSalutation(representative, false)).isEqualTo(REP_SALUTATION);
     }
 
-    @Test
-    public void givenNullFirstName_thenUsesOrganisation() {
-        assertFallbackToOrganisation(null, "Smith");
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {"", "undefined"})
+    void givenInvalidFirstName_thenUsesOrganisation(String firstName) {
+        assertFallbackToOrganisation(firstName, "Smith");
     }
 
-    @Test
-    public void givenBlankFirstName_thenUsesOrganisation() {
-        assertFallbackToOrganisation("", "Smith");
-    }
-
-    @Test
-    public void givenUndefinedFirstName_thenUsesOrganisation() {
-        assertFallbackToOrganisation("undefined", "Smith");
-    }
-
-    @Test
-    public void givenNullLastName_thenUsesOrganisation() {
-        assertFallbackToOrganisation("Jane", null);
-    }
-
-    @Test
-    public void givenBlankLastName_thenUsesOrganisation() {
-        assertFallbackToOrganisation("Jane", "");
-    }
-
-    @Test
-    public void givenUndefinedLastName_thenUsesOrganisation() {
-        assertFallbackToOrganisation("Jane", "undefined");
-    }
-
-    @Test
-    public void givenUppercaseUndefinedLastName_thenUsesOrganisation() {
-        assertFallbackToOrganisation("Jane", "UNDEFINED");
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {"", "undefined", "UNDEFINED"})
+    void givenInvalidLastName_thenUsesOrganisation(String lastName) {
+        assertFallbackToOrganisation("Jane", lastName);
     }
 
     private void assertFallbackToOrganisation(String firstName, String lastName) {
