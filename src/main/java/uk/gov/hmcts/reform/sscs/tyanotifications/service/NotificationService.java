@@ -432,14 +432,13 @@ public class NotificationService {
                 if (hasNonNullHearingDetails(oldHearingDetails, newHearingDetails)
                         && newHearingDetails.getHearingId().equals(oldHearingDetails.getHearingId())
                         && isHearingBookedInformationTheSame(newHearingDetails, oldHearingDetails)) {
-                    log.info("Checking if hearing booked notification is valid for case id {} with new hearing details:"
-                                    + "{HearingId: {}, DateTime: {}, Epims: {}, Channel: {}} "
-                                    + "and old hearing details: {HearingId: {}, DateTime: {}, Epims: {}, Channel: {}}",
+                    log.info("Cannot complete notification {} as the hearing booked information is the same for caseId {}."
+                            + "New hearing details: {HearingId: {}, DateTime: {}, Epims: {}, Channel: {}} "
+                            + "Old hearing details: {HearingId: {}, DateTime: {}, Epims: {}, Channel: {}}",
+                            notificationType.getId(),
                             notificationWrapper.getCaseId(),
                             newHearingDetails.getHearingId(), newHearingDetails.getHearingDateTime(), newHearingDetails.getEpimsId(), newHearingDetails.getHearingChannel(),
                             oldHearingDetails.getHearingId(), oldHearingDetails.getHearingDateTime(), oldHearingDetails.getEpimsId(), oldHearingDetails.getHearingChannel());
-                    log.info("Cannot complete notification {} as the hearing booked information is the same for caseId {}.",
-                        notificationType.getId(), notificationWrapper.getCaseId());
                     return false;
                 }
             }
