@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.bulkscan.transformers;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -706,6 +707,41 @@ class SscsCaseTransformerTest {
                                                         .build();
 
         assertThat(subscriptions.getAppellantSubscription()).isEqualTo(expectedSubscription);
+    }
+
+    @Test
+    void givenUpperCaseEmailAddresses_thenConvertThemToLowerCase() {
+        pairs.put("person1_title", APPELLANT_TITLE);
+        pairs.put("person1_first_name", APPELLANT_FIRST_NAME);
+        pairs.put("person1_last_name", APPELLANT_LAST_NAME);
+        pairs.put("person1_email", "APPELLANT@EXAMPLE.COM");
+        pairs.put("representative_company", REPRESENTATIVE_NAME);
+        pairs.put("representative_email", "Rep@Example.Com");
+        pairs.put(HEARING_TYPE_VIDEO_LITERAL, "Yes");
+        pairs.put(HEARING_VIDEO_EMAIL_LITERAL, "MY@EMAIL.COM");
+
+        final CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
+
+        final Appeal appeal = (Appeal) result.getTransformedCase().get("appeal");
+        final Subscriptions subscriptions = (Subscriptions) result.getTransformedCase().get("subscriptions");
+        assertSoftly(softly -> {
+            softly.assertThat(appeal.getAppellant().getContact().getEmail()).isEqualTo(APPELLANT_EMAIL);
+            softly.assertThat(appeal.getRep().getContact().getEmail()).isEqualTo(REPRESENTATIVE_EMAIL);
+            softly.assertThat(appeal.getHearingSubtype().getHearingVideoEmail()).isEqualTo(HEARING_VIDEO_EMAIL);
+            softly.assertThat(subscriptions.getAppellantSubscription().getEmail()).isEqualTo(APPELLANT_EMAIL);
+            softly.assertThat(subscriptions.getRepresentativeSubscription().getEmail()).isEqualTo(REPRESENTATIVE_EMAIL);
+        });
+    }
+
+    @Test
+    void givenUpperCasePerson1EmailAndNoHearingVideoEmail_thenPopulateHearingVideoEmailInLowerCase() {
+        pairs.put(HEARING_TYPE_VIDEO_LITERAL, "Yes");
+        pairs.put(PERSON1_VALUE + EMAIL, "MY@EMAIL.COM");
+
+        final CaseResponse result = transformer.transformExceptionRecord(exceptionRecord, false);
+
+        assertThat(((Appeal) result.getTransformedCase().get("appeal")).getHearingSubtype().getHearingVideoEmail())
+            .isEqualTo(HEARING_VIDEO_EMAIL);
     }
 
     @ParameterizedTest
