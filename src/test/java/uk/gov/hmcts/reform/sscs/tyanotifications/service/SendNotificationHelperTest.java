@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.REP_SALUTATION;
@@ -20,7 +20,7 @@ public class SendNotificationHelperTest {
         when(name.getLastName()).thenReturn("Smith");
         when(name.getFullNameNoTitle()).thenReturn("Jane Smith");
 
-        assertEquals("Jane Smith", SendNotificationHelper.getRepSalutation(representative, true));
+        assertThat(SendNotificationHelper.getRepSalutation(representative, true)).isEqualTo("Jane Smith");
     }
 
     @Test
@@ -28,7 +28,7 @@ public class SendNotificationHelperTest {
         Representative representative = mock(Representative.class);
         when(representative.getOrganisation()).thenReturn("Example Legal");
 
-        assertEquals("Example Legal", SendNotificationHelper.getRepSalutation(representative, false));
+        assertThat(SendNotificationHelper.getRepSalutation(representative, false)).isEqualTo("Example Legal");
     }
 
     @Test
@@ -36,14 +36,14 @@ public class SendNotificationHelperTest {
         Representative representative = mock(Representative.class);
         when(representative.getOrganisation()).thenReturn("Example Legal");
 
-        assertEquals(REP_SALUTATION, SendNotificationHelper.getRepSalutation(representative, true));
+        assertThat(SendNotificationHelper.getRepSalutation(representative, true)).isEqualTo(REP_SALUTATION);
     }
 
     @Test
     public void givenNullOrganisationAndMissingName_thenReturnsDefaultSalutation() {
         Representative representative = mock(Representative.class);
 
-        assertEquals(REP_SALUTATION, SendNotificationHelper.getRepSalutation(representative, false));
+        assertThat(SendNotificationHelper.getRepSalutation(representative, false)).isEqualTo(REP_SALUTATION);
     }
 
     @Test
@@ -51,7 +51,7 @@ public class SendNotificationHelperTest {
         Representative representative = mock(Representative.class);
         when(representative.getOrganisation()).thenReturn("");
 
-        assertEquals(REP_SALUTATION, SendNotificationHelper.getRepSalutation(representative, false));
+        assertThat(SendNotificationHelper.getRepSalutation(representative, false)).isEqualTo(REP_SALUTATION);
     }
 
     @Test
@@ -97,6 +97,6 @@ public class SendNotificationHelperTest {
         when(name.getFirstName()).thenReturn(firstName);
         when(name.getLastName()).thenReturn(lastName);
 
-        assertEquals("Example Legal", SendNotificationHelper.getRepSalutation(representative, false));
+        assertThat(SendNotificationHelper.getRepSalutation(representative, false)).isEqualTo("Example Legal");
     }
 }
