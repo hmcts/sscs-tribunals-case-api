@@ -11,6 +11,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -132,6 +133,18 @@ class DateTimeUtilsTest {
 
         final LocalDate ukDateAfter = LocalDate.now(ukZone);
         assertThat(ukLocalDate).isBetween(ukDateBefore, ukDateAfter);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "2026-11-02, 2026-11-03",
+        "2026-11-05, 2026-11-06",
+        "2026-11-06, 2026-11-09",
+        "2026-11-07, 2026-11-09",
+        "2026-11-08, 2026-11-09"
+    })
+    void givenDate_whenNextWeekday_thenSkipWeekends(final LocalDate date, final LocalDate expected) {
+        assertThat(DateTimeUtils.nextWeekday(date)).isEqualTo(expected);
     }
 
 }

@@ -18,6 +18,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDate;
+import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.nextWeekday;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getDurationForAdjournment;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.hasChannelChangedForAdjournment;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.hasInterpreterChangedForAdjournment;
@@ -98,20 +99,12 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
 
         if (preSubmitCallbackResponse.getErrors().isEmpty()) {
             SscsDocumentTranslationStatus documentTranslationStatus = sscsCaseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
-
-            try {
-                calculateDueDate(sscsCaseData);
-            } catch (IOException e) {
-                preSubmitCallbackResponse.addError("Error calculating due date");
-            }
-
-            if (preSubmitCallbackResponse.getErrors().isEmpty()) {
-                if (sscsCaseData.getAdjournment().getPreviewDocument() != null) {
-                    processResponse(sscsCaseData, preSubmitCallbackResponse, documentTranslationStatus, oldCaseDetails);
-                } else {
-                    preSubmitCallbackResponse.addError(
-                        "There is no Draft Adjournment Notice on the case so adjournment cannot be issued");
-                }
+            calculateDueDate(sscsCaseData);
+            if (sscsCaseData.getAdjournment().getPreviewDocument() != null) {
+                processResponse(sscsCaseData, preSubmitCallbackResponse, documentTranslationStatus, oldCaseDetails);
+            } else {
+                preSubmitCallbackResponse.addError(
+                    "There is no Draft Adjournment Notice on the case so adjournment cannot be issued");
             }
         }
 
@@ -178,7 +171,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         caseData.setAdjournment(Adjournment.builder().build());
     }
 
-    private void calculateDueDate(SscsCaseData sscsCaseData) throws IOException {
+    private void calculateDueDate(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getAdjournment().getDirectionsDueDate() != null) {
             sscsCaseData.setDirectionDueDate(sscsCaseData.getAdjournment().getDirectionsDueDate().toString());
         } else if (sscsCaseData.getAdjournment().getDirectionsDueDateDaysOffset() != null) {
@@ -189,8 +182,8 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             try {
                 sscsCaseData.setDirectionDueDate(businessDaysCalculatorService.getBusinessDay(getLocalDate(), 1).toString());
             } catch (final IOException e) {
-                log.error("Unable to calculate next business day", e);
-                throw e;
+                log.error("Unable to calculate next business day - defaulting to next week day", e);
+                sscsCaseData.setDirectionDueDate(nextWeekday(getLocalDate()).toString());
             }
         }
     }

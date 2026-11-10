@@ -19,6 +19,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDate;
+import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.nextWeekday;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 
 import ch.qos.logback.classic.Level;
@@ -227,16 +228,20 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
     }
 
     @Test
-    void givenBusinessDayCalculationFails_thenReturnErrorAndDoNotIssueNotice() throws IOException {
+    void givenBusinessDayCalculationFails_thenDefaultDueDateToNextWeekdayAndIssueNotice() throws IOException {
         when(businessDaysCalculatorService.getBusinessDay(any(LocalDate.class), eq(1))).thenThrow(new IOException("failed"));
         setCannotBeListedAndNoDirectionsWithNoDueDate();
+        setupHearingDurationValues();
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getErrors()).containsExactly("Error calculating due date");
-        assertThat(sscsCaseData.getDirectionDueDate()).isNull();
-        verifyNoInteractions(footerService);
-        logCapture.assertLogContains("Unable to calculate next business day", Level.ERROR);
+        assertSoftly(softly -> {
+            softly.assertThat(response.getErrors()).isEmpty();
+            softly.assertThat(sscsCaseData.getDirectionDueDate()).isEqualTo(nextWeekday(getLocalDate()).toString());
+            softly.assertThat(sscsCaseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.AWAITING_ADMIN_ACTION);
+            softly.assertThat(sscsCaseData.getState()).isEqualTo(NOT_LISTABLE);
+        });
+        logCapture.assertLogContains("Unable to calculate next business day - defaulting to next week day", Level.ERROR);
     }
 
     private void setCannotBeListedAndNoDirectionsWithNoDueDate() {
