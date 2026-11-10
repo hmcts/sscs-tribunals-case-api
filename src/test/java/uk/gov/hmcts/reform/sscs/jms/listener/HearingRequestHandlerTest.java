@@ -1,7 +1,8 @@
 package uk.gov.hmcts.reform.sscs.jms.listener;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -12,6 +13,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.retry.ExhaustedRetryException;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -29,6 +31,7 @@ import uk.gov.hmcts.reform.sscs.exception.TribunalsEventProcessingException;
 import uk.gov.hmcts.reform.sscs.exception.UnhandleableHearingStateException;
 import uk.gov.hmcts.reform.sscs.exception.UpdateCaseException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
 import uk.gov.hmcts.reform.sscs.service.CcdCaseService;
 import uk.gov.hmcts.reform.sscs.service.HearingsService;
@@ -72,7 +75,8 @@ class HearingRequestHandlerTest {
 
         doThrow(throwable).when(hearingsService).processHearingRequest(hearingRequest);
 
-        assertThrows(TribunalsEventProcessingException.class, () -> hearingRequestHandler.handleHearingRequest(hearingRequest));
+        assertThatThrownBy(() -> hearingRequestHandler.handleHearingRequest(hearingRequest))
+            .isInstanceOf(TribunalsEventProcessingException.class);
     }
 
     private static Stream<Arguments> throwableParameters() {
@@ -85,7 +89,9 @@ class HearingRequestHandlerTest {
     @Test
     @DisplayName("When an null request comes in make sure exception is thrown")
     void whenAnNullRequestComesIn_makeSureExceptionIsThrown() {
-        assertThrows(TribunalsEventProcessingException.class, () -> hearingRequestHandler.handleHearingRequest(null));
+        assertThatThrownBy(() -> hearingRequestHandler.handleHearingRequest(null))
+            .isInstanceOf(TribunalsEventProcessingException.class)
+            .hasMessageContaining("message did not match format");
     }
 
     private HearingRequest createHearingRequest() {
@@ -115,6 +121,44 @@ class HearingRequestHandlerTest {
         )).thenReturn(caseDetails);
 
         verifyNoInteractions(ccdCaseService);
-        assertDoesNotThrow(() -> hearingRequestHandler.handleHearingRequest(hearingRequest));
+        assertThatCode(() -> hearingRequestHandler.handleHearingRequest(hearingRequest))
+            .doesNotThrowAnyException();
+    }
+
+    @Test
+    @DisplayName("An exhausted retry caused by a listing error triggers the CCD listing error event")
+    void exhaustedRetryWithListingExceptionTriggersListingErrorEvent() throws Exception {
+        HearingRequest hearingRequest = createHearingRequest();
+        IdamTokens idamTokens = IdamTokens.builder().build();
+        ListingException listingException = new ListingException("Hearing duration is required");
+        doThrow(new ExhaustedRetryException("Hearing request retries exhausted", listingException))
+            .when(hearingsService).processHearingRequest(hearingRequest);
+        when(idamService.getIdamTokens()).thenReturn(idamTokens);
+
+        assertThatCode(() -> hearingRequestHandler.handleHearingRequest(hearingRequest))
+            .doesNotThrowAnyException();
+
+        verify(updateCcdCaseService).triggerCaseEventV2(
+            eq(1001L),
+            eq(EventType.LISTING_ERROR.getCcdType()),
+            eq("Listing Exception"),
+            eq("Hearing duration is required"),
+            eq(idamTokens)
+        );
+    }
+
+    @Test
+    @DisplayName("An exhausted retry caused by a non-listing error is propagated")
+    void exhaustedRetryWithUnexpectedCauseIsPropagated() throws Exception {
+        HearingRequest hearingRequest = createHearingRequest();
+        RuntimeException cause = new RuntimeException("HMC unavailable");
+        doThrow(new ExhaustedRetryException("Hearing request retries exhausted", cause))
+            .when(hearingsService).processHearingRequest(hearingRequest);
+
+        assertThatThrownBy(() -> hearingRequestHandler.handleHearingRequest(hearingRequest))
+            .isInstanceOf(TribunalsEventProcessingException.class)
+            .hasCause(cause);
+
+        verifyNoInteractions(updateCcdCaseService);
     }
 }
