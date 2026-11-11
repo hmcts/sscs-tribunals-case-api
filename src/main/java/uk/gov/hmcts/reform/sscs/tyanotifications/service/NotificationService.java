@@ -89,6 +89,7 @@ public class NotificationService {
 
         log.info("Checking if notification event {} is valid for case id {}", notificationType.getId(), caseId);
         if (!isEventAllowedToProceedWithValidData(notificationWrapper, notificationType)) {
+            log.info("Notification event {} is not valid for case id {}", notificationType.getId(), caseId);
             return;
         }
 
@@ -428,10 +429,16 @@ public class NotificationService {
             if (nonNull(newHearing) && nonNull(oldHearing)) {
                 HearingDetails newHearingDetails = newHearing.getValue();
                 HearingDetails oldHearingDetails = oldHearing.getValue();
-
                 if (hasNonNullHearingDetails(oldHearingDetails, newHearingDetails)
                         && newHearingDetails.getHearingId().equals(oldHearingDetails.getHearingId())
                         && isHearingBookedInformationTheSame(newHearingDetails, oldHearingDetails)) {
+                    log.info("Cannot complete notification {} as the hearing booked information is the same for caseId {}."
+                            + "New hearing details: {HearingId: {}, DateTime: {}, Epims: {}, Channel: {}} "
+                            + "Old hearing details: {HearingId: {}, DateTime: {}, Epims: {}, Channel: {}}",
+                            notificationType.getId(),
+                            notificationWrapper.getCaseId(),
+                            newHearingDetails.getHearingId(), newHearingDetails.getHearingDateTime(), newHearingDetails.getEpimsId(), newHearingDetails.getHearingChannel(),
+                            oldHearingDetails.getHearingId(), oldHearingDetails.getHearingDateTime(), oldHearingDetails.getEpimsId(), oldHearingDetails.getHearingChannel());
                     return false;
                 }
             }
