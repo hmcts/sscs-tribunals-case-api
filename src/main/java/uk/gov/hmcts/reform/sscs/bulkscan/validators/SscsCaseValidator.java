@@ -1,7 +1,57 @@
 package uk.gov.hmcts.reform.sscs.bulkscan.validators;
 
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.*;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_LINE1;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_LINE2;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_LINE3;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_LINE4;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_POSTCODE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.APPEAL_GROUNDS;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.APPEAL_GROUNDS_2;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ARE_EMPTY;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.BENEFIT_TYPE_DESCRIPTION;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.DOB;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.EMAIL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.EMAIL_SELECTED_NOT_PROVIDED;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.FIRST_NAME;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HAS_INVALID_ADDRESS;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HAS_REPRESENTATIVE_FIELD_MISSING;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_OPTIONS_EXCLUDE_DATES_LITERAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_SUB_TYPE_TELEPHONE_OR_VIDEO_FACE_TO_FACE_DESCRIPTION;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_TELEPHONE_NUMBER_MULTIPLE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_TYPE_DESCRIPTION;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_TYPE_ORAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_TYPE_PAPER;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_TYPE_TELEPHONE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_TYPE_VIDEO_LITERAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_VIDEO_EMAIL_LITERAL;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IBCA_REFERENCE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IBC_ROLE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IBC_ROLE_FOR_DECEASED;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IBC_ROLE_FOR_LACKING_CAPACITY;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IBC_ROLE_FOR_POA;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IBC_ROLE_FOR_SELF;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IBC_ROLE_FOR_U18;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ISSUING_OFFICE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IS_EMPTY;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IS_INVALID;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IS_IN_FUTURE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IS_IN_PAST;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.IS_MISSING;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.LAST_NAME;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.MOBILE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.MRN_DATE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.NINO;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.OTHER_PARTY_VALUE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.PERSON1_VALUE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.PERSON2_VALUE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.PERSON_1_CHILD_MAINTENANCE_NUMBER;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.PHONE_SELECTED_NOT_PROVIDED;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.PORT_OF_ENTRY_INVALID_ERROR;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.REPRESENTATIVE_NAME_OR_ORGANISATION_DESCRIPTION;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.REPRESENTATIVE_VALUE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.TITLE;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.YES_LITERAL;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.WarningMessage.getMessageByCallbackType;
 import static uk.gov.hmcts.reform.sscs.bulkscan.domain.CallbackType.EXCEPTION_CALLBACK;
 import static uk.gov.hmcts.reform.sscs.bulkscan.domain.CallbackType.VALIDATION_CALLBACK;
@@ -12,6 +62,7 @@ import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.getBoolean;
 import static uk.gov.hmcts.reform.sscs.bulkscan.util.SscsOcrDataUtil.getField;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.isScottishCase;
+import static uk.gov.hmcts.reform.sscs.utility.EmailUtil.isEmailValid;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -299,8 +350,9 @@ public class SscsCaseValidator implements CaseValidator {
             }
 
             checkMobileNumber(appellant.getContact(), personType);
+            checkEmail(appellant.getContact(), personType, appellant);
 
-            checkHearingSubtypeDetails(appeal.getHearingSubtype());
+            checkHearingSubtypeDetails(appeal.getHearingSubtype(), ocrCaseData);
             if (!ignorePartyRoleValidation && formType != null && formType.equals(FormType.SSCS2)) {
                 checkAppellantRole(appellant.getRole(), ignoreWarnings);
             }
@@ -339,7 +391,7 @@ public class SscsCaseValidator implements CaseValidator {
         }
     }
 
-    private void checkHearingSubtypeDetails(HearingSubtype hearingSubtype) {
+    private void checkHearingSubtypeDetails(final HearingSubtype hearingSubtype, final Map<String, Object> ocrCaseData) {
         if (hearingSubtype != null) {
             if (YES_LITERAL.equals(hearingSubtype.getWantsHearingTypeTelephone())
                 && hearingSubtype.getHearingTelephoneNumber() == null) {
@@ -360,6 +412,10 @@ public class SscsCaseValidator implements CaseValidator {
                 warnings.add(getMessageByCallbackType(callbackType, "", HEARING_TYPE_VIDEO_LITERAL,
                     EMAIL_SELECTED_NOT_PROVIDED));
             }
+
+            if (isHearingVideoEmailEntered(ocrCaseData) && !isEmailValidOrEmpty(hearingSubtype.getHearingVideoEmail())) {
+                errors.add(getMessageByCallbackType(callbackType, "", HEARING_TYPE_VIDEO_LITERAL, IS_INVALID));
+            }
         }
     }
 
@@ -369,6 +425,7 @@ public class SscsCaseValidator implements CaseValidator {
             checkPersonAddressAndDob(appellant.getAppointee().getAddress(), appellant.getAppointee().getIdentity(),
                 PERSON1_VALUE, ocrCaseData, caseData, appellant, isIbcOrSscs8);
             checkMobileNumber(appellant.getAppointee().getContact(), PERSON1_VALUE);
+            checkEmail(appellant.getAppointee().getContact(), PERSON1_VALUE, appellant);
         }
     }
 
@@ -394,6 +451,7 @@ public class SscsCaseValidator implements CaseValidator {
             }
 
             checkMobileNumber(repsContact, REPRESENTATIVE_VALUE);
+            checkEmail(repsContact, REPRESENTATIVE_VALUE, null);
         }
     }
 
@@ -933,6 +991,22 @@ public class SscsCaseValidator implements CaseValidator {
                 getMessageByCallbackType(callbackType, personType, getWarningMessageName(personType, null) + MOBILE,
                     IS_INVALID));
         }
+    }
+
+    private void checkEmail(final Contact contact, final String personType, final Appellant appellant) {
+        if (contact != null && !isEmailValidOrEmpty(contact.getEmail())) {
+            errors.add(
+                getMessageByCallbackType(callbackType, personType, getWarningMessageName(personType, appellant) + EMAIL,
+                    IS_INVALID));
+        }
+    }
+
+    private boolean isHearingVideoEmailEntered(final Map<String, Object> ocrCaseData) {
+        return ocrCaseData.isEmpty() || getField(ocrCaseData, HEARING_VIDEO_EMAIL_LITERAL) != null;
+    }
+
+    private boolean isEmailValidOrEmpty(final String email) {
+        return StringUtils.isBlank(email) || isEmailValid(email);
     }
 
     private boolean isMobileNumberValid(String number) {
