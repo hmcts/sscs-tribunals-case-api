@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.jms.listener;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -14,8 +15,10 @@ import static uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus.LISTED;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.collect.Lists;
 import jakarta.jms.JMSException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import org.apache.qpid.jms.message.JmsBytesMessage;
 import org.junit.jupiter.api.Test;
@@ -125,6 +128,48 @@ public class HmcHearingsEventTopicListenerV2ItTest {
         verify(ccdCaseService, never()).updateCaseData(any(), any(), any());
         verify(updateCcdCaseService).updateCaseV2DynamicEvent(eq(Long.parseLong(CASE_ID)), eq(idamTokens), any());
 
+    }
+
+
+    @Test
+    public void testHearingsUpdateV2DeserialisesRealHmcJsonMessage() throws Exception {
+        hmcHearingsEventTopicListener = new HmcHearingsEventTopicListener(processHmcMessageServiceV2);
+        ObjectMapper realObjectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+        ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "objectMapper", realObjectMapper);
+
+        byte[] messagePayload = """
+            {
+              "hmctsServiceCode": "BBA3",
+              "caseRef": 1234123412341234,
+              "hearingID": "1",
+              "hearingUpdate": {
+                "HMCStatus": "LISTED"
+              }
+            }
+            """.getBytes(StandardCharsets.UTF_8);
+        IdamTokens idamTokens = IdamTokens.builder().build();
+        HearingGetResponse hearingGetResponse = getHearingGetResponse();
+
+        when(bytesMessage.getStringProperty("hmctsDeploymentId")).thenReturn("test");
+        when(bytesMessage.getBodyLength()).thenReturn((long) messagePayload.length);
+        doAnswer(invocation -> {
+            byte[] destination = invocation.getArgument(0);
+            System.arraycopy(messagePayload, 0, destination, 0, messagePayload.length);
+            return messagePayload.length;
+        }).when(bytesMessage).readBytes(any(byte[].class));
+        when(idamService.getIdamTokens()).thenReturn(idamTokens);
+        when(ccdCaseService.getCaseDetails(anyLong())).thenReturn(
+            SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
+        when(venueService.getVenueDetailsForActiveVenueByEpimsId(any()))
+            .thenReturn(getVenueDetails());
+        when(hearingApi.getHearingRequest(any(), any(), any(), any(), any(), any(), any()))
+            .thenReturn(hearingGetResponse);
+
+        hmcHearingsEventTopicListener.onMessage(bytesMessage);
+
+        verify(bytesMessage).readBytes(any(byte[].class));
+        verify(hearingApi).getHearingRequest(any(), any(), any(), any(), any(), any(), any());
+        verify(updateCcdCaseService).updateCaseV2DynamicEvent(eq(Long.parseLong(CASE_ID)), eq(idamTokens), any());
     }
 
     private static SscsCaseDetails getSscsCaseDetails() {
