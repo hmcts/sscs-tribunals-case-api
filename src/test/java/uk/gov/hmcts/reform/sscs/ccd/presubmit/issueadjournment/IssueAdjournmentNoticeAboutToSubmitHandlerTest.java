@@ -18,6 +18,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.NOT_LISTABLE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.model.BankHolidayDivision.SCOTLAND;
+import static uk.gov.hmcts.reform.sscs.model.BankHolidayDivision.UK;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDate;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.nextWeekday;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
@@ -25,15 +27,18 @@ import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessi
 import ch.qos.logback.classic.Level;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseDaysOffset;
@@ -141,7 +146,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
     @Test
     void givenNoDirectionsAndCaseCannotBeListed_thenSetNextBusinessDayDueDate() throws IOException {
         final LocalDate nextBusinessDay = LocalDate.of(2026, 11, 9);
-        when(businessDaysCalculatorService.getBusinessDay(any(LocalDate.class), eq(1))).thenReturn(nextBusinessDay);
+        when(businessDaysCalculatorService.getNextBusinessDay(any(LocalDate.class), eq(UK))).thenReturn(nextBusinessDay);
         setCannotBeListedAndNoDirectionsWithNoDueDate();
         setupHearingDurationValues();
 
@@ -153,7 +158,26 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
             softly.assertThat(sscsCaseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.AWAITING_ADMIN_ACTION);
             softly.assertThat(sscsCaseData.getState()).isEqualTo(NOT_LISTABLE);
         });
-        verify(businessDaysCalculatorService).getBusinessDay(getLocalDate(), 1);
+        verify(businessDaysCalculatorService).getNextBusinessDay(getLocalDate(), UK);
+    }
+
+    @Test
+    void givenScottishCaseWithNoDirectionsAndCaseCannotBeListed_thenSetNextScottishBusinessDayDueDate() throws IOException {
+        final LocalDate nextBusinessDay = LocalDate.of(2026, 1, 5);
+        when(businessDaysCalculatorService.getNextBusinessDay(any(LocalDate.class), eq(SCOTLAND))).thenReturn(nextBusinessDay);
+        sscsCaseData.setIsScottishCase("Yes");
+        setCannotBeListedAndNoDirectionsWithNoDueDate();
+        setupHearingDurationValues();
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertSoftly(softly -> {
+            softly.assertThat(response.getErrors()).isEmpty();
+            softly.assertThat(sscsCaseData.getDirectionDueDate()).isEqualTo(nextBusinessDay.toString());
+            softly.assertThat(sscsCaseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.AWAITING_ADMIN_ACTION);
+            softly.assertThat(sscsCaseData.getState()).isEqualTo(NOT_LISTABLE);
+        });
+        verify(businessDaysCalculatorService).getNextBusinessDay(getLocalDate(), SCOTLAND);
     }
 
     @Test
@@ -229,9 +253,10 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         verifyNoInteractions(businessDaysCalculatorService);
     }
 
-    @Test
-    void givenBusinessDayCalculationFails_thenDefaultDueDateToNextWeekdayAndIssueNotice() throws IOException {
-        when(businessDaysCalculatorService.getBusinessDay(any(LocalDate.class), eq(1))).thenThrow(new IOException("failed"));
+    @ParameterizedTest
+    @MethodSource("businessDayCalculationFailures")
+    void givenBusinessDayCalculationFails_thenDefaultDueDateToNextWeekdayAndIssueNotice(final Exception failure) throws IOException {
+        when(businessDaysCalculatorService.getNextBusinessDay(any(LocalDate.class), eq(UK))).thenThrow(failure);
         setCannotBeListedAndNoDirectionsWithNoDueDate();
         setupHearingDurationValues();
 
@@ -244,6 +269,14 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
             softly.assertThat(sscsCaseData.getState()).isEqualTo(NOT_LISTABLE);
         });
         logCapture.assertLogContains("Unable to calculate next business day - defaulting to next week day. Case Id is: %s".formatted(sscsCaseData.getCcdCaseId()), Level.ERROR);
+    }
+
+    private static Stream<Exception> businessDayCalculationFailures() {
+        return Stream.of(
+            new IOException("failed"),
+            new DateTimeParseException("bad date", "", 0),
+            new NullPointerException("no body")
+        );
     }
 
     private void setCannotBeListedAndNoDirectionsWithNoDueDate() {

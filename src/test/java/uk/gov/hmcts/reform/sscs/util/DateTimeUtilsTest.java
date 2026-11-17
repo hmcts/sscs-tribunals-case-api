@@ -135,15 +135,15 @@ class DateTimeUtilsTest {
         assertThat(ukLocalDate).isBetween(ukDateBefore, ukDateAfter);
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{0}")
     @CsvSource({
-        "2026-11-02, 2026-11-03",
-        "2026-11-05, 2026-11-06",
-        "2026-11-06, 2026-11-09",
-        "2026-11-07, 2026-11-09",
-        "2026-11-08, 2026-11-09"
+        "Monday moves to Tuesday, 2026-11-02, 2026-11-03",
+        "Thursday moves to Friday, 2026-11-05, 2026-11-06",
+        "Friday skips the weekend to Monday, 2026-11-06, 2026-11-09",
+        "Saturday moves to Monday, 2026-11-07, 2026-11-09",
+        "Sunday moves to Monday, 2026-11-08, 2026-11-09"
     })
-    void givenDate_whenNextWeekday_thenSkipWeekends(final LocalDate date, final LocalDate expected) {
+    void givenDate_whenNextWeekday_thenSkipWeekends(final String description, final LocalDate date, final LocalDate expected) {
         assertThat(DateTimeUtils.nextWeekday(date)).isEqualTo(expected);
     }
 

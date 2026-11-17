@@ -16,6 +16,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.model.BankHolidayDivision.SCOTLAND;
+import static uk.gov.hmcts.reform.sscs.model.BankHolidayDivision.UK;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDate;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.nextWeekday;
@@ -180,8 +182,9 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
                 .toString());
         } else if (englishLanguageCaseCannotBeListedRightAwayAndDirectionsNotMadeToParties(sscsCaseData)) {
             try {
-                sscsCaseData.setDirectionDueDate(businessDaysCalculatorService.getBusinessDay(getLocalDate(), 1).toString());
-            } catch (final IOException e) {
+                sscsCaseData.setDirectionDueDate(businessDaysCalculatorService.getNextBusinessDay(getLocalDate(),
+                    isYes(sscsCaseData.getIsScottishCase()) ? SCOTLAND : UK).toString());
+            } catch (final IOException | RuntimeException e) {
                 log.error("Unable to calculate next business day - defaulting to next week day. Case Id is: %s".formatted(sscsCaseData.getCcdCaseId()), e);
                 sscsCaseData.setDirectionDueDate(nextWeekday(getLocalDate()).toString());
             }
