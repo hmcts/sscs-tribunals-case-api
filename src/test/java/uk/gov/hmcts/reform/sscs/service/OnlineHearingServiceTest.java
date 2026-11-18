@@ -5,7 +5,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedEmail;
 
+import ch.qos.logback.classic.Level;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +15,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -41,6 +44,7 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.UserDetails;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.UserType;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.util.LogCaptureExtension;
 
 @ExtendWith(MockitoExtension.class)
 public class OnlineHearingServiceTest {
@@ -51,6 +55,10 @@ public class OnlineHearingServiceTest {
     private Long someCaseId;
     private IdamTokens idamTokens;
     private IdamService idamService;
+
+    @RegisterExtension
+    private final LogCaptureExtension logCapture =
+            new LogCaptureExtension(OnlineHearingService.class);
 
     @BeforeEach
     void setUp() {
@@ -92,6 +100,9 @@ public class OnlineHearingServiceTest {
         Optional<OnlineHearing> onlineHearing = underTest.loadHearing(sscsCaseDetails, tya, email);
 
         assertOnlineHearingForAppellant(onlineHearing, sscsCaseDetails);
+        logCapture
+                .assertLogContains(getMaskedEmail(email), Level.INFO)
+                .assertLogDoesNotContain(email, Level.INFO);
     }
 
     @Test
@@ -101,6 +112,9 @@ public class OnlineHearingServiceTest {
         Optional<OnlineHearing> onlineHearing = underTest.loadHearing(sscsCaseDetails, "jointPartyTya", "jointparty@hmcts.com");
 
         assertOnlineHearingForJointParty(onlineHearing, sscsCaseDetails);
+        logCapture
+                .assertLogContains(getMaskedEmail("jointparty@hmcts.com"), Level.INFO)
+                .assertLogDoesNotContain("jointparty@hmcts.com", Level.INFO);
     }
 
     @ParameterizedTest
@@ -111,6 +125,9 @@ public class OnlineHearingServiceTest {
         Optional<OnlineHearing> onlineHearing = underTest.loadHearing(sscsCaseDetails, tya, email);
 
         assertOnlineHearingForOtherParty(onlineHearing, sscsCaseDetails);
+        logCapture
+                .assertLogContains(getMaskedEmail(email), Level.INFO)
+                .assertLogDoesNotContain(email, Level.INFO);
     }
 
     private void assertOnlineHearingForOtherParty(Optional<OnlineHearing> onlineHearing, SscsCaseDetails sscsCaseDetails) {

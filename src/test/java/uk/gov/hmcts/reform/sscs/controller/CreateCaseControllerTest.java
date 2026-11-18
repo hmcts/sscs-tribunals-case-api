@@ -5,12 +5,15 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
+import static uk.gov.hmcts.reform.sscs.utility.StringUtils.getMaskedNino;
 
+import ch.qos.logback.classic.Level;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -19,8 +22,14 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.Objects;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.ArgumentCaptor;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +44,10 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.v2.SubmitAppealService;
+import uk.gov.hmcts.reform.sscs.util.LogCaptureExtension;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class CreateCaseControllerTest {
 
     private CcdService ccdService;
@@ -44,7 +56,10 @@ public class CreateCaseControllerTest {
     private MockMvc mockMvc;
     private CreateCaseController controller;
 
-    @Before
+    @RegisterExtension
+    private final LogCaptureExtension logCapture = new LogCaptureExtension(CreateCaseController.class);
+
+    @BeforeEach
     public void setUp() {
         ccdService = mock(CcdService.class);
         submitAppealService = mock(SubmitAppealService.class);
@@ -80,14 +95,33 @@ public class CreateCaseControllerTest {
 
     @Test
     public void shouldReturnHttpStatusCode201ForTheSubmittedTestAppeal() throws Exception {
-        when(submitAppealService.submitAppeal(any(SyaCaseWrapper.class), any(String.class))).thenReturn(1L);
+        when(submitAppealService.submitAppeal(any(SyaCaseWrapper.class), nullable(String.class))).thenReturn(1L);
 
         String json = getSyaCaseWrapperJson("json/sya.json");
 
         mockMvc.perform(post("/api/appeals")
+                .header("Authorization", "auth-token")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
                 .andExpect(status().isCreated());
+    }
+
+    @Test
+    void shouldMaskNinoInCreateAppealsLogs() throws Exception {
+        ArgumentCaptor<SyaCaseWrapper> captor = ArgumentCaptor.forClass(SyaCaseWrapper.class);
+        when(submitAppealService.submitAppeal(captor.capture(), nullable(String.class))).thenReturn(1L);
+
+        String json = getSyaCaseWrapperJson("json/sya.json");
+
+        mockMvc.perform(post("/api/appeals")
+                .header("Authorization", "auth-token")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isCreated());
+
+        String loggedNino = captor.getValue().getAppellant().getNino();
+        logCapture.assertLogContains("Appeal with (test) Nino - " + getMaskedNino(loggedNino), Level.INFO)
+            .assertLogDoesNotContain(loggedNino, Level.INFO);
     }
 
     @Test

@@ -8,11 +8,11 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CONFIDENTIALITY_CONF
 
 import java.util.Collections;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -34,6 +34,7 @@ class ConfidentialityConfirmedMidEventHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
+    @InjectMocks
     private ConfidentialityConfirmedMidEventHandler handler;
 
     @Mock
@@ -41,11 +42,6 @@ class ConfidentialityConfirmedMidEventHandlerTest {
 
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
-
-    @BeforeEach
-    void setUp() {
-        handler = new ConfidentialityConfirmedMidEventHandler(true);
-    }
 
     @ParameterizedTest
     @EnumSource(value = CallbackType.class, names = {"MID_EVENT"}, mode = EnumSource.Mode.EXCLUDE)
@@ -198,11 +194,6 @@ class ConfidentialityConfirmedMidEventHandlerTest {
 
         assertThatThrownBy(() -> handler.handle(MID_EVENT, callback, USER_AUTHORISATION)).isInstanceOf(
             IllegalStateException.class);
-    }
-
-    @Test
-    void givenCmOtherPartyConfidentialityFlagIsDisabled_thenReturnFalse() {
-        assertThat(new ConfidentialityConfirmedMidEventHandler(false).canHandle(MID_EVENT, callback)).isFalse();
     }
 
     private CcdValue<OtherParty> buildOtherParty(String id, YesNoUndetermined confidentiality) {

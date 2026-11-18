@@ -70,9 +70,9 @@ class HearingsDurationMappingAdjournmentTest extends HearingsMappingBase {
     @CsvSource(value = {
         "120,MINUTES,120",
         "70,MINUTES,70",
-        "1,SESSIONS,165",
-        "2,SESSIONS,330",
-        "3,SESSIONS,495"
+        "1,SESSIONS,150",
+        "2,SESSIONS,300",
+        "3,SESSIONS,450"
     })
     void getHearingDuration(
         Integer adjournCaseDuration,

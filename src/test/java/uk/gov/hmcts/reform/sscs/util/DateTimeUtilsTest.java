@@ -123,4 +123,15 @@ class DateTimeUtilsTest {
         assertThat(ukLocalDateTime.getMinute()).isEqualTo(zonedDateTimeNow.getMinute());
     }
 
+    @Test
+    void shouldReturnCurrentUkLocalDate() {
+        final ZoneId ukZone = ZoneId.of("Europe/London");
+        final LocalDate ukDateBefore = LocalDate.now(ukZone);
+
+        final LocalDate ukLocalDate = DateTimeUtils.getLocalDate();
+
+        final LocalDate ukDateAfter = LocalDate.now(ukZone);
+        assertThat(ukLocalDate).isBetween(ukDateBefore, ukDateAfter);
+    }
+
 }

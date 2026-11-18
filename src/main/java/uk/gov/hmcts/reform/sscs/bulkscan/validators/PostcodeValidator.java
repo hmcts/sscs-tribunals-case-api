@@ -5,6 +5,7 @@ import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.contains;
 import static org.apache.commons.lang3.StringUtils.split;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPostcode;
 
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -56,7 +57,7 @@ public class PostcodeValidator {
             return true;
         }
         if (testPostcodes.contains(postcode)) {
-            log.info("PostcodeValidator received a test postcode {}", postcode);
+            log.info("PostcodeValidator received a test postcode {}", getMaskedPostcode(postcode));
             return true;
         }
         HttpHeaders headers = new HttpHeaders();
@@ -83,7 +84,7 @@ public class PostcodeValidator {
 
     private void logIfNotValidPostCode(String postCode, int statusCode) {
         if (statusCode != 200) {
-            log.info("Post code search returned statusCode {} for postcode {}", statusCode, postCode);
+            log.info("Post code search returned statusCode {} for postcode {}", statusCode, getMaskedPostcode(postCode));
         }
     }
 

@@ -22,15 +22,12 @@ class ConfidentialityConfirmedAboutToSubmitHandler implements PreSubmitCallbackH
 
     private final int dwpResponseDueDays;
     private final int dwpResponseDueDaysChildSupport;
-    private final boolean cmOtherPartyConfidentialityEnabled;
 
     public ConfidentialityConfirmedAboutToSubmitHandler(
         @Value("${dwp.response.due.days}") int dwpResponseDueDays,
-        @Value("${dwp.response.due.days-child-support}") int dwpResponseDueDaysChildSupport,
-        @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
+        @Value("${dwp.response.due.days-child-support}") int dwpResponseDueDaysChildSupport) {
         this.dwpResponseDueDays = dwpResponseDueDays;
         this.dwpResponseDueDaysChildSupport = dwpResponseDueDaysChildSupport;
-        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
 
     @Override
@@ -38,8 +35,7 @@ class ConfidentialityConfirmedAboutToSubmitHandler implements PreSubmitCallbackH
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
 
-        if (!cmOtherPartyConfidentialityEnabled
-            || callbackType != CallbackType.ABOUT_TO_SUBMIT
+        if (callbackType != CallbackType.ABOUT_TO_SUBMIT
             || callback.getEvent() != EventType.CONFIDENTIALITY_CONFIRMED) {
             return false;
         }

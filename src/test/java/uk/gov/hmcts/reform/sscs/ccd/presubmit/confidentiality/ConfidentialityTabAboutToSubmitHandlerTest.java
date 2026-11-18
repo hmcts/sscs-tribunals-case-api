@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -37,6 +38,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNoUndetermined;
 @MockitoSettings(strictness = Strictness.LENIENT)
 class ConfidentialityTabAboutToSubmitHandlerTest {
 
+    @InjectMocks
     private ConfidentialityTabAboutToSubmitHandler handler;
 
     @Mock
@@ -52,7 +54,6 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new ConfidentialityTabAboutToSubmitHandler(true);
         sscsCaseData = SscsCaseData.builder()
                                    .appeal(
                                        Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build()).build())
@@ -86,13 +87,6 @@ class ConfidentialityTabAboutToSubmitHandlerTest {
     @Test
     void canHandleReturnsFalseForNonAboutToSubmit() {
         assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
-    }
-
-    @Test
-    void canHandleReturnsFalseWhenFeatureDisabled() {
-        ConfidentialityTabAboutToSubmitHandler disabledHandler = new ConfidentialityTabAboutToSubmitHandler(false);
-
-        assertThat(disabledHandler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
 
     @Test

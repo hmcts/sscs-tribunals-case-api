@@ -4,6 +4,7 @@ import static java.time.LocalDateTime.now;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyName;
@@ -11,7 +12,6 @@ import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyUcb;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.hasNewOtherPartyAdded;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.haveOtherPartiesChanged;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isConfidential;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isValidBenefitTypeForConfidentiality;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.sendNewOtherPartyNotification;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.updateOtherPartiesConfidentialityChangedDate;
 
@@ -298,68 +298,40 @@ public class OtherPartyDataUtilTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("isConfidentialScenarios")
     void isConfidential_returnsExpectedResult(final String scenario, final SscsCaseData caseData,
-        final boolean cmOtherPartyConfidentialityEnabled, final YesNo expected) {
-        assertThat(isConfidential(caseData, cmOtherPartyConfidentialityEnabled)).isEqualTo(expected);
+        final List<Benefit> additionalBenefits, final YesNo expected) {
+        assertThat(isConfidential(caseData, additionalBenefits)).isEqualTo(expected);
     }
 
     static Stream<Arguments> isConfidentialScenarios() {
         return Stream.of(
-            Arguments.of("null case data returns null", null, false, null),
-            Arguments.of("null appeal returns null", SscsCaseData.builder().build(), false, null),
-            Arguments.of("null benefit type returns null", buildSscsCaseData(null), false, null),
-            Arguments.of("universal credit without confidentiality flag returns null", buildSscsCaseData(Benefit.UC), false, null),
+            Arguments.of("null case data returns null", null, List.of(), null),
+            Arguments.of("null appeal returns null", SscsCaseData.builder().build(), List.of(), null),
+            Arguments.of("null benefit type returns null", buildSscsCaseData(null), List.of(), null),
+            Arguments.of("universal credit without confidentiality flag returns null", buildSscsCaseData(UC), List.of(), null),
             Arguments.of("appellant confidentiality yes returns yes",
-                buildSscsCaseData(Benefit.CHILD_SUPPORT, YesNoUndetermined.YES), false, YesNo.YES),
+                buildSscsCaseData(Benefit.CHILD_SUPPORT, YesNoUndetermined.YES), List.of(), YesNo.YES),
             Arguments.of("other party confidentiality yes with appellant not yes returns yes",
                 withOtherParties(buildSscsCaseData(Benefit.CHILD_SUPPORT),
-                    buildOtherParty("otherparty-1", true, YesNoUndetermined.YES)), false, YesNo.YES),
+                    buildOtherParty("otherparty-1", true, YesNoUndetermined.YES)), List.of(), YesNo.YES),
             Arguments.of("appellant no and no other parties returns no",
-                buildSscsCaseData(Benefit.CHILD_SUPPORT, YesNoUndetermined.NO), false, YesNo.NO),
+                buildSscsCaseData(Benefit.CHILD_SUPPORT, YesNoUndetermined.NO), List.of(), YesNo.NO),
             Arguments.of("appellant no but other party undetermined returns undetermined",
                 withOtherParties(buildSscsCaseData(Benefit.CHILD_SUPPORT, YesNoUndetermined.NO),
-                    buildOtherParty("otherparty-1", true, YesNoUndetermined.UNDETERMINED)), false, null),
+                    buildOtherParty("otherparty-1", true, YesNoUndetermined.UNDETERMINED)), List.of(), null),
             Arguments.of("appellant undetermined and no other party confidentiality returns undetermined",
-                buildSscsCaseData(Benefit.CHILD_SUPPORT), false, null),
+                buildSscsCaseData(Benefit.CHILD_SUPPORT), List.of(), null),
             Arguments.of("universal credit with confidentiality flag enabled and appellant yes returns yes",
-                buildSscsCaseData(Benefit.UC, YesNoUndetermined.YES), true, YesNo.YES),
+                buildSscsCaseData(UC, YesNoUndetermined.YES), List.of(UC), YesNo.YES),
             Arguments.of("universal credit with confidentiality flag enabled and appellant no returns no",
-                buildSscsCaseData(Benefit.UC, YesNoUndetermined.NO), true, YesNo.NO),
+                buildSscsCaseData(UC, YesNoUndetermined.NO), List.of(UC), YesNo.NO),
             Arguments.of("universal credit with confidentiality flag enabled and no confidentiality returns undetermined",
-                buildSscsCaseData(Benefit.UC), true, null)
+                buildSscsCaseData(UC), List.of(UC), null)
         );
     }
 
     private static SscsCaseData withOtherParties(final SscsCaseData caseData, final CcdValue<OtherParty> otherParty) {
         caseData.setOtherParties(List.of(otherParty));
         return caseData;
-    }
-
-    @ParameterizedTest
-    @MethodSource("benefitsWithSsCsType2And5")
-    void givenBenefitWithSsCsType2And5_thenReturnTrue(Benefit benefit) {
-        assertThat(isValidBenefitTypeForConfidentiality(buildBenefitType(benefit))).isTrue();
-    }
-
-    @Test
-    void givenBenefitTypesUniversalCredit_thenReturnFalse() {
-        assertThat(isValidBenefitTypeForConfidentiality(buildBenefitType(Benefit.UC))).isFalse();
-    }
-
-    @Test
-    void givenBenefitTypesUniversalCreditAndCmFlagEnabled_thenReturnTrue() {
-        assertThat(isValidBenefitTypeForConfidentiality(buildBenefitType(Benefit.UC), true)).isTrue();
-    }
-
-    @Test
-    void givenBenefitTypesUniversalCreditAndCmFlagDisabled_thenReturnFalse() {
-        assertThat(isValidBenefitTypeForConfidentiality(buildBenefitType(Benefit.UC), false)).isFalse();
-    }
-
-    static Stream<Benefit> benefitsWithSsCsType2And5() {
-        return Stream.of(Benefit.CHILD_SUPPORT, Benefit.TAX_CREDIT, Benefit.GUARDIANS_ALLOWANCE,
-            Benefit.TAX_FREE_CHILDCARE, Benefit.HOME_RESPONSIBILITIES_PROTECTION, Benefit.CHILD_BENEFIT,
-            Benefit.THIRTY_HOURS_FREE_CHILDCARE, Benefit.GUARANTEED_MINIMUM_PENSION,
-            Benefit.NATIONAL_INSURANCE_CREDITS);
     }
 
     private static CcdValue<OtherParty> buildOtherParty(String id) {

@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_PORT_OF_ENTRY;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.ADDRESS_POSTCODE;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.DOB;
+import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.EMAIL;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.FIRST_NAME;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_OPTIONS_EXCLUDE_DATES_LITERAL;
 import static uk.gov.hmcts.reform.sscs.bulkscan.constants.SscsConstants.HEARING_TELEPHONE_LITERAL;
@@ -71,6 +72,9 @@ public enum WarningMessage {
     APPELLANT_MOBILE(MOBILE, "Appellant mobile"),
     APPOINTEE_MOBILE(MOBILE, "Appointee mobile"),
     REPRESENTATIVE_MOBILE(MOBILE, "Representative mobile"),
+    APPELLANT_EMAIL(EMAIL, "Appellant email"),
+    APPOINTEE_EMAIL(EMAIL, "Appointee email"),
+    REPRESENTATIVE_EMAIL(EMAIL, "Representative email"),
     APPELLANT_DOB(DOB, "Appellant date of birth"),
     APPOINTEE_DOB(DOB, "Appointee date of birth"),
     HEARING_TYPE("is_hearing_type_oral and/or is_hearing_type_paper", "Hearing type"),

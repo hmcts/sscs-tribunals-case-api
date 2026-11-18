@@ -31,7 +31,9 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.CTSC_CLERK;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPostcode;
 
+import ch.qos.logback.classic.Level;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -42,9 +44,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EmptySource;
@@ -103,6 +105,7 @@ import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.RefDataService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
+import uk.gov.hmcts.reform.sscs.util.LogCaptureExtension;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
@@ -126,12 +129,16 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
     private VenueService venueService;
     @Mock
     private PanelCompositionService panelCompositionService;
-  
+
     @Mock
     private HearingDurationsService hearingDurationsService;
 
     @Mock
     private AssociatedCaseLinkHelper associatedCaseLinkHelper;
+
+    @RegisterExtension
+    private final LogCaptureExtension logCapture =
+            new LogCaptureExtension(CaseUpdatedAboutToSubmitHandler.class);
 
     private CaseUpdatedAboutToSubmitHandler handler;
 
@@ -143,7 +150,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
     @BeforeEach
     void setUp() {
-        handler = createNewCaseHandler(false);
+        handler = createNewCaseHandler();
 
         sscsCaseData = SscsCaseData.builder()
                 .ccdCaseId("ccdId")
@@ -993,6 +1000,8 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("AppellantVenue", response.getData().getRegionalProcessingCenter().getName());
+        logCapture.assertLogContains("Checking whether processing venue requires updating for post code " + getMaskedPostcode("AB1200B")
+                + ", case 1234", Level.INFO);
     }
 
     @Disabled("commented out as case loader is failing on this validation checks, we need to do another data exercise to clean the data")
@@ -1423,34 +1432,6 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
 
     private Address buildAddress(String line1, String line2, String county, String town) {
         return Address.builder().line1(line1).line2(line2).county(county).town(town).build();
-    }
-
-    @ParameterizedTest
-    @CsvSource({"childSupport,Child Support", "taxCredit,Tax Credit", "guardiansAllowance,Guardians Allowance",
-        "taxFreeChildcare,Tax-Free Childcare", "homeResponsibilitiesProtection,Home Responsibilities Protection",
-        "childBenefit,Child Benefit","thirtyHoursFreeChildcare,30 Hours Free Childcare",
-        "guaranteedMinimumPension,Guaranteed Minimum Pension (COEG)","nationalInsuranceCredits,National Insurance Credits"})
-    void givenACaseAppellantConfidentialityYes_thenCaseConfidentialYes(String shortName, String benefitDescription) {
-        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(YesNoUndetermined.YES);
-        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
-        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefitDescription);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertEquals(YES, response.getData().getIsConfidentialCase());
-    }
-
-    @ParameterizedTest
-    @CsvSource({"childSupport,Child Support", "taxCredit,Tax Credit", "guardiansAllowance,Guardians Allowance",
-        "taxFreeChildcare,Tax-Free Childcare", "homeResponsibilitiesProtection,Home Responsibilities Protection",
-        "childBenefit,Child Benefit","thirtyHoursFreeChildcare,30 Hours Free Childcare",
-        "guaranteedMinimumPension,Guaranteed Minimum Pension (COEG)","nationalInsuranceCredits,National Insurance Credits"})
-    void givenACaseAppellantConfidentialityNo_thenCaseConfidentialNull(String shortName, String benefitDescription) {
-        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(YesNoUndetermined.NO);
-        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
-        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefitDescription);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertEquals(NO, response.getData().getIsConfidentialCase());
     }
 
     @ParameterizedTest
@@ -2088,7 +2069,7 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
         when(panelCompositionService.resetPanelCompositionIfStale(sscsCaseData, Optional.of(caseDetailsBefore)))
                 .thenReturn(panelMemberComposition);
         when(panelCompositionService.isBenefitIssueCodeValid(any(), any())).thenReturn(true);
-        handler = createNewCaseHandler(false);
+        handler = createNewCaseHandler();
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -2096,99 +2077,44 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
         assertEquals(panelMemberComposition, response.getData().getPanelMemberComposition());
     }
 
-    @Nested
-    class CmOtherPartyConfidentialityDisabled {
-        @BeforeEach
-        void beforeEach() {
-            handler = createNewCaseHandler(false);
-        }
+    @ParameterizedTest
+    @MethodSource("benefits")
+    void givenAppellantConfidentialityYes_thenCaseConfidentialYes(Benefit benefit) {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(YesNoUndetermined.YES);
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(benefit.getShortName());
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefit.getDescription());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
+            USER_AUTHORISATION);
 
-        @Test
-        void givenUniversalCreditBenefitTypeWithoutOtherParties_thenCaseConfidentialNull() {
-            callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(Benefit.UC.getShortName());
-            callback.getCaseDetails()
-                .getCaseData()
-                .getAppeal()
-                .getBenefitType()
-                .setDescription(Benefit.UC.getDescription());
-            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-                USER_AUTHORISATION);
-
-            Assertions.assertThat(response.getData().getIsConfidentialCase()).isNull();
-        }
-
-        @Test
-        void givenUniversalCreditBenefitTypeWithOtherParties_thenCaseConfidentialNull() {
-            callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(Benefit.UC.getShortName());
-            callback.getCaseDetails()
-                .getCaseData()
-                .getAppeal()
-                .getBenefitType()
-                .setDescription(Benefit.UC.getDescription());
-            List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
-            CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder()
-                .value(OtherParty.builder().confidentialityRequirement(YesNoUndetermined.NO).build())
-                .build();
-            otherPartyList.add(ccdValue);
-            CcdValue<OtherParty> ccdValue1 = CcdValue.<OtherParty>builder()
-                .value(OtherParty.builder().confidentialityRequirement(YesNoUndetermined.YES).build())
-                .build();
-            otherPartyList.add(ccdValue1);
-            callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
-            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-                USER_AUTHORISATION);
-
-            Assertions.assertThat(response.getData().getIsConfidentialCase()).isNull();
-        }
+        Assertions.assertThat(response.getData().getIsConfidentialCase()).isEqualTo(YES);
     }
 
-    @Nested
-    class CmOtherPartyConfidentialityEnabled {
+    @ParameterizedTest
+    @MethodSource("benefits")
+    void givenAppellantConfidentialityNoOtherPartyYes_thenCaseConfidentialYes(Benefit benefit) {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(YesNoUndetermined.NO);
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(benefit.getShortName());
+        callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefit.getDescription());
+        List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
+        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder()
+                                                .value(OtherParty.builder().confidentialityRequirement(YesNoUndetermined.YES).build())
+                                                .build();
+        otherPartyList.add(ccdValue);
+        callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
+            USER_AUTHORISATION);
 
-        static Stream<Benefit> benefits() {
-            return Stream.of(Benefit.CHILD_SUPPORT, Benefit.TAX_CREDIT, Benefit.GUARDIANS_ALLOWANCE,
-                Benefit.TAX_FREE_CHILDCARE, Benefit.HOME_RESPONSIBILITIES_PROTECTION, Benefit.CHILD_BENEFIT,
-                Benefit.THIRTY_HOURS_FREE_CHILDCARE, Benefit.GUARANTEED_MINIMUM_PENSION,
-                Benefit.NATIONAL_INSURANCE_CREDITS, Benefit.UC);
-        }
-
-        @BeforeEach
-        void beforeEach() {
-            handler = createNewCaseHandler(true);
-        }
-
-        @ParameterizedTest
-        @MethodSource("benefits")
-        void givenACaseAppellantConfidentialityYes_thenCaseConfidentialYes(Benefit benefit) {
-            callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(YesNoUndetermined.YES);
-            callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(benefit.getShortName());
-            callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefit.getDescription());
-            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-                USER_AUTHORISATION);
-
-            Assertions.assertThat(response.getData().getIsConfidentialCase()).isEqualTo(YES);
-        }
-
-        @ParameterizedTest
-        @MethodSource("benefits")
-        void givenACaseAppellantConfidentialityNoOtherPartyYes_thenCaseConfidentialYes(Benefit benefit) {
-            callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequirement(YesNoUndetermined.NO);
-            callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(benefit.getShortName());
-            callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setDescription(benefit.getDescription());
-            List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
-            CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder()
-                .value(OtherParty.builder().confidentialityRequirement(YesNoUndetermined.YES).build())
-                .build();
-            otherPartyList.add(ccdValue);
-            callback.getCaseDetails().getCaseData().setOtherParties(otherPartyList);
-            PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
-                USER_AUTHORISATION);
-
-            Assertions.assertThat(response.getData().getIsConfidentialCase()).isEqualTo(YES);
-        }
+        Assertions.assertThat(response.getData().getIsConfidentialCase()).isEqualTo(YES);
     }
 
-    private CaseUpdatedAboutToSubmitHandler createNewCaseHandler(boolean cmOtherPartyConfidentialityEnabled) {
+    static Stream<Benefit> benefits() {
+        return Stream.of(Benefit.CHILD_SUPPORT, Benefit.TAX_CREDIT, Benefit.GUARDIANS_ALLOWANCE,
+            Benefit.TAX_FREE_CHILDCARE, Benefit.HOME_RESPONSIBILITIES_PROTECTION, Benefit.CHILD_BENEFIT,
+            Benefit.THIRTY_HOURS_FREE_CHILDCARE, Benefit.GUARANTEED_MINIMUM_PENSION,
+            Benefit.NATIONAL_INSURANCE_CREDITS, Benefit.UC);
+    }
+
+    private CaseUpdatedAboutToSubmitHandler createNewCaseHandler() {
         return new CaseUpdatedAboutToSubmitHandler(
             regionalProcessingCenterService,
             associatedCaseLinkHelper,
@@ -2198,6 +2124,6 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
             refDataService,
             venueService,
             hearingDurationsService,
-            panelCompositionService, cmOtherPartyConfidentialityEnabled);
+            panelCompositionService);
     }
 }

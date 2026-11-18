@@ -5,9 +5,9 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADD_OTHER_PARTY_DATA
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
@@ -19,8 +19,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
+@RequiredArgsConstructor(onConstructor_ = {@Autowired})
 class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
 
     private static final String POSTCODE = "IG10 3XX";
@@ -30,15 +30,10 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
     private static final String LINE_1 = "first line";
     private static final String COUNTY = "Derbyshire";
 
-    @Autowired
-    private IdamService idamService;
-
-    @Autowired
-    private UpdateCcdCaseService updateCcdCaseService;
+    private final UpdateCcdCaseService updateCcdCaseService;
 
     @Test
     @SneakyThrows
-    @EnabledIfEnvironmentVariable(named = "CM_OTHER_PARTY_CONFIDENTIALITY_ENABLED", matches = "true")
     void shouldTransitionToCorrectStateWhenOtherPartyDataAddedToCase() {
 
         final SscsCaseDetails caseWithState = createCaseFromEvent(Benefit.CHILD_SUPPORT, VALID_APPEAL_CREATED,
@@ -48,12 +43,10 @@ class AddOtherPartyDataFunctionalTest extends AbstractFunctionalTest {
             var caseDetails = findCaseById(ccdCaseId);
             assertThat(caseDetails.getState()).isEqualTo(State.AWAIT_OTHER_PARTY_DATA.toString());
         });
-        // add other party
-        var otherParty = buildOtherParty();
 
         updateCcdCaseService.updateCaseV2(caseWithState.getId(), ADD_OTHER_PARTY_DATA.getCcdType(), idamService.getIdamTokens(),
             cd -> {
-                cd.getData().setOtherParties(List.of(new CcdValue<>(otherParty)));
+                cd.getData().setOtherParties(List.of(new CcdValue<>(buildOtherParty())));
                 cd.getData().getExtendedSscsCaseData().setAwareOfAnyAdditionalOtherParties(YesNo.YES);
                 return new UpdateCcdCaseService.UpdateResult(ADD_OTHER_PARTY, ADD_OTHER_PARTY);
             });

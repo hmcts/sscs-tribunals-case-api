@@ -109,7 +109,7 @@ class SendToBulkPrintHandlerTest {
     void setUp() {
         handler = new SendToBulkPrintHandler(documentManagementServiceWrapper,
             documentRequestFactory, pdfStoreService, bulkPrintService, evidenceShareConfig, updateCcdCaseService,
-            idamService, 35, 42, true);
+            idamService, 35, 42);
         placeholders.put("Test", "Value");
     }
 
@@ -171,13 +171,11 @@ class SendToBulkPrintHandlerTest {
         assertTrue(handler.canHandle(SUBMITTED, callback));
     }
 
-    @ParameterizedTest
-    @CsvSource({"pip, 35", "childSupport, 42"})
-    void givenAMessageWhichFindsATemplate_thenConvertToSscsCaseDataAndAddPdfToCaseAndSendToBulkPrint(String benefitType,
-                                                                                                     int expectedResponseDays) {
+    @Test
+    void givenAMessageWhichFindsATemplate_thenConvertToSscsCaseDataAndAddPdfToCaseAndSendToBulkPrint() {
         when(evidenceShareConfig.getSubmitTypes()).thenReturn(singletonList("paper"));
 
-        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(benefitType, "Paper", Arrays.asList(
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(Benefit.PIP.getBenefitCode(), "Paper", Arrays.asList(
             SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName(docPdf.getName())
                 .documentType("sscs1")
@@ -218,7 +216,7 @@ class SendToBulkPrintHandlerTest {
 
         handler = new SendToBulkPrintHandler(documentManagementServiceWrapper,
             documentRequestFactory, pdfStoreService, bulkPrintService, evidenceShareConfig, updateCcdCaseService,
-            idamService, 35, 42, false);
+            idamService, 35, 42);
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
@@ -238,7 +236,7 @@ class SendToBulkPrintHandlerTest {
         assertNull(sscsCaseData.getSscsDocument().getFirst().getValue().getEvidenceIssued());
         assertEquals(sscsCaseData.getHmctsDwpState(), SENT_TO_DWP.getCcdType());
         assertEquals(sscsCaseData.getDateSentToDwp(), LocalDate.now().toString());
-        assertEquals(sscsCaseData.getDwpDueDate(), LocalDate.now().plusDays(expectedResponseDays).toString());
+        assertEquals(sscsCaseData.getDwpDueDate(), LocalDate.now().plusDays(35).toString());
         assertNull(sscsCaseData.getDwpState());
     }
 

@@ -11,10 +11,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
@@ -38,7 +39,6 @@ import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 class CaseUpdatedAboutToStartHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
@@ -63,7 +63,7 @@ class CaseUpdatedAboutToStartHandlerTest {
 
     @BeforeEach
     public void setUp() {
-        handler = new CaseUpdatedAboutToStartHandler(dynamicListLanguageUtil, verbalLanguagesService, signLanguagesService, false);
+        handler = new CaseUpdatedAboutToStartHandler(dynamicListLanguageUtil, verbalLanguagesService, signLanguagesService);
 
         when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -251,7 +251,6 @@ class CaseUpdatedAboutToStartHandlerTest {
 
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
         given(dynamicListLanguageUtil.generateInterpreterLanguageFields(any())).willReturn(list);
-        given(dynamicListLanguageUtil.getLanguageDynamicListItem(any())).willReturn(item);
         given(verbalLanguagesService.getVerbalLanguage(any())).willReturn(null);
         given(signLanguagesService.getSignLanguage(any())).willReturn(null);
 
@@ -262,4 +261,28 @@ class CaseUpdatedAboutToStartHandlerTest {
         Assertions.assertNotNull(hearingOptions.getLanguagesList());
         Assertions.assertNull(hearingOptions.getLanguagesList().getValue());
     }
+
+
+    @ParameterizedTest
+    @ValueSource(strings = {"taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
+        "childBenefit", "thirtyHoursFreeChildcare", "guaranteedMinimumPension", "nationalInsuranceCredits", "childSupport"})
+    void givenSscs2OrSscs5Case_shouldSetIsValidSscs2OrSscs5Case(String benefit) {
+        sscsCaseData.getAppeal().getBenefitType().setCode(benefit);
+        var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertThat(result.getData().getAppeal().getIsValidSscs2OrSscs5Case()).isEqualTo(YesNo.YES);
+    }
+
+
+    @ParameterizedTest
+    @ValueSource(strings = {"PIP", "ESA", "UC", "JSA", "DLA", "UC", "carersAllowance", "attendanceAllowance",
+        "bereavementBenefit", "industrialInjuriesDisablement", "maternityAllowance", "socialFund",
+        "incomeSupport", "bereavementSupportPaymentScheme", "industrialDeathBenefit", "pensionCredit", "retirementPension"})
+    void givenSscs1Case_shouldNotSetIsValidSscs2OrSscs5Case(String benefit) {
+        sscsCaseData.getAppeal().getBenefitType().setCode(benefit);
+        var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertThat(result.getData().getAppeal().getIsValidSscs2OrSscs5Case()).isEqualTo(null);
+    }
+
 }

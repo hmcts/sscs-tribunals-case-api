@@ -1,7 +1,10 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
+import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.bulkscan.validators.SscsCaseValidator.isValidNino;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ASSOCIATE_CASE;
+import static uk.gov.hmcts.reform.sscs.utility.StringUtils.getMaskedNino;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,7 +76,7 @@ public class ReciprocalLinkHandler implements CallbackHandler<SscsCaseData> {
             List<SscsCaseDetails> matchedByNinoCases = getMatchedCases(nino, idamTokens);
 
             if (matchedByNinoCases.size() > 0) {
-                log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino " + nino);
+                log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino " + getMaskedNino(nino));
 
                 backLinkAssociatedCases(callback.getCaseDetails().getId(), matchedByNinoCases, idamTokens);
             }
@@ -81,7 +84,7 @@ public class ReciprocalLinkHandler implements CallbackHandler<SscsCaseData> {
     }
 
     protected List<SscsCaseDetails> getMatchedCases(String nino, IdamTokens idamTokens) {
-        return ccdService.findCaseBy("data.appeal.appellant.identity.nino", nino, idamTokens);
+        return isValidNino(nino) ? ccdService.findCaseBy("data.appeal.appellant.identity.nino", nino, idamTokens) :  emptyList();
     }
 
     private void backLinkAssociatedCases(Long caseId, List<SscsCaseDetails> matchedByNinoCases, IdamTokens idamTokens) {

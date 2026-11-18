@@ -1,11 +1,16 @@
 package uk.gov.hmcts.reform.sscs.config;
 
+import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Retryable;
@@ -29,6 +34,10 @@ public class CitizenCcdClient {
     private final CoreCaseDataApi coreCaseDataApi;
     private final CaseAccessApi caseAccessApi;
     private final boolean elasticSearchEnabled;
+    private static final List<String> EXCLUDED_STATES_FOR_ACTIVE_CASES =
+            List.of(State.DORMANT_APPEAL_STATE.getId(), State.VOID_STATE.getId());
+    private static final int MYA_MAX_CASES_PER_PAGE = 200;
+
 
     @Autowired
     CitizenCcdClient(CcdRequestDetails ccdRequestDetails,
@@ -73,7 +82,7 @@ public class CitizenCcdClient {
                     idamTokens.getServiceAuthorization(),
                     ccdRequestDetails.getCaseTypeId(),
                     searchCriteria);
-            return Optional.ofNullable(searchResult).isEmpty() ? new ArrayList<>() : searchResult.getCases();
+            return ofNullable(searchResult).isEmpty() ? new ArrayList<>() : searchResult.getCases();
         } else {
             Map<String, String> searchCriteria = new HashMap<>();
             searchCriteria.put("state", State.DRAFT.getId());
@@ -99,7 +108,7 @@ public class CitizenCcdClient {
                     idamTokens.getServiceAuthorization(),
                     ccdRequestDetails.getCaseTypeId(),
                     searchCriteria);
-            return Optional.ofNullable(searchResult).isEmpty() ? new ArrayList<>() : searchResult.getCases();
+            return ofNullable(searchResult).isEmpty() ? new ArrayList<>() : searchResult.getCases();
         } else {
             Map<String, String> searchCriteria = new HashMap<>();
             searchCriteria.put("sortDirection", "desc");
@@ -112,6 +121,22 @@ public class CitizenCcdClient {
                     searchCriteria
             );
         }
+    }
+
+    public List<CaseDetails> searchForCitizenAllCasesNonDormant(IdamTokens idamTokens) {
+        SearchSourceBuilder searchBuilder = new SearchSourceBuilder();
+        searchBuilder.query(QueryBuilders
+                        .boolQuery()
+                        .mustNot(QueryBuilders.termsQuery("state.keyword", EXCLUDED_STATES_FOR_ACTIVE_CASES)))
+                .sort("last_modified", SortOrder.DESC)
+                .size(MYA_MAX_CASES_PER_PAGE);
+        String searchCriteria = searchBuilder.toString();
+        SearchResult searchResult = coreCaseDataApi.searchCases(
+                idamTokens.getIdamOauth2Token(),
+                idamTokens.getServiceAuthorization(),
+                ccdRequestDetails.getCaseTypeId(),
+                searchCriteria);
+        return ofNullable(searchResult).map(SearchResult::getCases).orElse(emptyList());
     }
 
     CaseDetails submitEventForCitizen(IdamTokens idamTokens, String caseId, CaseDataContent caseDataContent) {

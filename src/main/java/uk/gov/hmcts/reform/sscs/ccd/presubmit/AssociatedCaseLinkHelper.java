@@ -1,11 +1,15 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
+import static java.util.Collections.emptyList;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static uk.gov.hmcts.reform.sscs.bulkscan.validators.SscsCaseValidator.isValidNino;
+import static uk.gov.hmcts.reform.sscs.utility.StringUtils.getMaskedNino;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -39,10 +43,10 @@ public class AssociatedCaseLinkHelper {
         }
         Identity identity = sscsCaseData.getAppeal().getAppellant().getIdentity();
         final String nino = nonNull(identity) ? identity.getNino() : null;
-        if (isNotEmpty(nino) && isEmpty(previousNino)) {
+        if (isValidNino(nino) && isEmpty(previousNino)) {
             List<SscsCaseDetails> matchedByNinoCases = getMatchedCases(nino, idamService.getIdamTokens());
             if (!matchedByNinoCases.isEmpty()) {
-                log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino " + nino);
+                log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino " + getMaskedNino(nino));
                 return addAssociatedCases(sscsCaseData, matchedByNinoCases);
             }
         }
@@ -50,7 +54,7 @@ public class AssociatedCaseLinkHelper {
     }
 
     protected List<SscsCaseDetails> getMatchedCases(String nino, IdamTokens idamTokens) {
-        return ccdService.findCaseBy("data.appeal.appellant.identity.nino", nino, idamTokens);
+        return isValidNino(nino) ? ccdService.findCaseBy("data.appeal.appellant.identity.nino", nino, idamTokens) : emptyList();
     }
 
     protected SscsCaseData addAssociatedCases(SscsCaseData caseData, List<SscsCaseDetails> matchedByNinoCases) {
@@ -79,13 +83,36 @@ public class AssociatedCaseLinkHelper {
         log.info("Adding link to other associated cases V2");
         if (isNotEmpty(matchedByNinoCases) && isNotEmpty(caseId)) {
             for (SscsCaseDetails sscsCaseDetails: matchedByNinoCases) {
-                Long currentCaseId = Long.parseLong(sscsCaseDetails.getData().getCcdCaseId());
+                Long currentCaseId = sscsCaseDetails.getId();
                 log.info("Linking case {} to case {} using V2", currentCaseId, caseId);
                 updateCcdCaseService.updateCaseV2(currentCaseId, EventType.UPDATE_CASE_ONLY.getCcdType(),
-                        "updated case only", "Auto linked case added",
+                        "Updated case only", "Auto linked case added",
                         idamService.getIdamTokens(), caseDetails -> mutator(caseDetails, caseId));
             }
         }
+    }
+
+    public void removeLinkToOtherAssociatedCases(final List<SscsCaseDetails> cases, final String caseId) {
+        log.info("Removing link from other associated cases");
+        if (isNotEmpty(cases) && isNotEmpty(caseId)) {
+            for (final SscsCaseDetails sscsCaseDetails: cases) {
+                final Long currentCaseId = sscsCaseDetails.getId();
+                log.info("Removing link from case {} to case {}", currentCaseId, caseId);
+                updateCcdCaseService.updateCaseV2(currentCaseId, EventType.UPDATE_CASE_ONLY.getCcdType(),
+                    "Updated case only", "Related case removed",
+                    idamService.getIdamTokens(), caseDetails -> removeLinkMutator(caseDetails, caseId));
+            }
+        }
+    }
+
+    private void removeLinkMutator(final SscsCaseDetails sscsCaseDetails, final String caseId) {
+        final SscsCaseData sscsCaseData = sscsCaseDetails.getData();
+        final List<CaseLink> remainingLinks = Optional.ofNullable(sscsCaseData.getAssociatedCase()).orElse(emptyList())
+            .stream()
+            .filter(caseLink -> caseLink.getValue() == null || !caseId.equals(caseLink.getValue().getCaseReference()))
+            .collect(Collectors.toCollection(ArrayList::new));
+        sscsCaseData.setAssociatedCase(remainingLinks);
+        sscsCaseData.setLinkedCasesBoolean(remainingLinks.isEmpty() ? "No" : "Yes");
     }
 
     private void mutator(SscsCaseDetails sscsCaseDetails, String caseId) {

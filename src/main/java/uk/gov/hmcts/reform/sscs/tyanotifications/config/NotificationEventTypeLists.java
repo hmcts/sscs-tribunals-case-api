@@ -31,6 +31,7 @@ public final class NotificationEventTypeLists {
         DWP_RESPONSE_RECEIVED,
         DWP_UPLOAD_RESPONSE,
         EVIDENCE_RECEIVED,
+        HEARING_BOOKED,
         INTERLOC_VALID_APPEAL,
         ISSUE_ADJOURNMENT_NOTICE,
         ISSUE_ADJOURNMENT_NOTICE_WELSH,
@@ -47,6 +48,7 @@ public final class NotificationEventTypeLists {
         REISSUE_DOCUMENT,
         REQUEST_FOR_INFORMATION,
         RESEND_APPEAL_CREATED,
+        RESEND_HEARING_BOOKED,
         SET_ASIDE_GRANTED,
         SET_ASIDE_REFUSED,
         SOR_EXTEND_TIME,
@@ -167,6 +169,7 @@ public final class NotificationEventTypeLists {
         PROCESS_AUDIO_VIDEO_WELSH,
         PROVIDE_APPOINTEE_DETAILS,
         REQUEST_FOR_INFORMATION,
+        RESEND_HEARING_BOOKED,
         REVIEW_AND_SET_ASIDE,
         REVIEW_CONFIDENTIALITY_REQUEST,
         SET_ASIDE_GRANTED,
@@ -265,6 +268,7 @@ public final class NotificationEventTypeLists {
         PROVIDE_APPOINTEE_DETAILS,
         REQUEST_FOR_INFORMATION,
         RESEND_APPEAL_CREATED,
+        RESEND_HEARING_BOOKED,
         REVIEW_AND_SET_ASIDE,
         REVIEW_CONFIDENTIALITY_REQUEST,
         SET_ASIDE_GRANTED,
@@ -320,6 +324,7 @@ public final class NotificationEventTypeLists {
         POSTPONEMENT,
         PROCESS_AUDIO_VIDEO,
         PROCESS_AUDIO_VIDEO_WELSH,
+        RESEND_HEARING_BOOKED,
         REVIEW_AND_SET_ASIDE,
         SET_ASIDE_REQUEST,
         SET_ASIDE_GRANTED,
@@ -412,6 +417,7 @@ public final class NotificationEventTypeLists {
     );
 
     public static final Set<NotificationEventType> EVENTS_VALID_FOR_OTHER_PARTY = EnumSet.of(
+        ACTION_HEARING_RECORDING_REQUEST,
         ADMIN_CORRECTION_HEADER,
         CORRECTION_GRANTED,
         CORRECTION_REFUSED,
@@ -461,6 +467,7 @@ public final class NotificationEventTypeLists {
         HMCTS_APPEAL_LAPSED,
         POSTPONEMENT,
         RESEND_APPEAL_CREATED,
+        RESEND_HEARING_BOOKED,
         SYA_APPEAL_CREATED,
         VALID_APPEAL_CREATED
     );
@@ -495,6 +502,7 @@ public final class NotificationEventTypeLists {
         JOINT_PARTY_ADDED,
         PROVIDE_APPOINTEE_DETAILS,
         REQUEST_FOR_INFORMATION,
+        RESEND_HEARING_BOOKED,
         REVIEW_CONFIDENTIALITY_REQUEST,
         UPDATE_OTHER_PARTY_DATA,
         VALID_APPEAL_CREATED
@@ -553,6 +561,7 @@ public final class NotificationEventTypeLists {
         PROCESS_AUDIO_VIDEO_WELSH,
         PROVIDE_APPOINTEE_DETAILS,
         REQUEST_FOR_INFORMATION,
+        RESEND_HEARING_BOOKED,
         SET_ASIDE_GRANTED,
         SET_ASIDE_REFUSED,
         SOR_EXTEND_TIME,

@@ -3,6 +3,9 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedEmail;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPhone;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPostcode;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -76,7 +79,7 @@ public class NotificationSender {
 
         if (notificationTestRecipients.getEmails().contains(emailAddress)
             || emailAddress.matches("test[\\d]+@hmcts.net")) {
-            log.info(USING_TEST_GOV_NOTIFY_KEY_FOR, testNotificationClient.getApiKey(), emailAddress);
+            log.info(USING_TEST_GOV_NOTIFY_KEY_FOR, testNotificationClient.getApiKey(), getMaskedEmail(emailAddress));
             client = testNotificationClient;
         } else {
             client = notificationClient;
@@ -86,10 +89,10 @@ public class NotificationSender {
                 getSendEmailResponse(templateId, emailAddress, personalisation, reference, client);
 
         if (saveCorrespondence && sendEmailResponse != null) {
+            log.info("Submitted email correspondence for upload for case id {}", sscsCaseData.getCcdCaseId());
             final Correspondence correspondence =
                     getEmailCorrespondence(sendEmailResponse, emailAddress, notificationEventType);
-            saveCorrespondenceAsyncService.saveEmailOrSms(correspondence, sscsCaseData);
-            log.info("Uploaded correspondence email into ccd for case id {}.", sscsCaseData.getCcdCaseId());
+            saveCorrespondenceAsyncService.saveEmailOrSms(String.valueOf(sendEmailResponse.getNotificationId()), correspondence, sscsCaseData);
         }
 
         log.info("Email Notification send for case id : {}, Gov notify id: {} ", sscsCaseData.getCcdCaseId(),
@@ -124,7 +127,7 @@ public class NotificationSender {
         NotificationClient client;
 
         if (notificationTestRecipients.getSms().contains(phoneNumber)) {
-            log.info(USING_TEST_GOV_NOTIFY_KEY_FOR, testNotificationClient.getApiKey(), phoneNumber);
+            log.info(USING_TEST_GOV_NOTIFY_KEY_FOR, testNotificationClient.getApiKey(), getMaskedPhone(phoneNumber));
             client = testNotificationClient;
         } else {
             client = notificationClient;
@@ -136,8 +139,8 @@ public class NotificationSender {
         if (saveCorrespondence && sendSmsResponse != null) {
             final Correspondence correspondence =
                     getSmsCorrespondence(sendSmsResponse, phoneNumber, notificationEventType);
-            saveCorrespondenceAsyncService.saveEmailOrSms(correspondence, sscsCaseData);
-            log.info("Uploaded correspondence sms into ccd for case id {}.", sscsCaseData.getCcdCaseId());
+            log.info("Submitted sms correspondence for upload for case id {}", sscsCaseData.getCcdCaseId());
+            saveCorrespondenceAsyncService.saveEmailOrSms(String.valueOf(sendSmsResponse.getNotificationId()), correspondence, sscsCaseData);
         }
 
         log.info("Sms Notification send for case id : {}, Gov notify id: {} ", sscsCaseData.getCcdCaseId(),
@@ -315,7 +318,7 @@ public class NotificationSender {
         NotificationClient client;
         if (notificationTestRecipients.getPostcodes().contains("*")
             || notificationTestRecipients.getPostcodes().contains(postcode)) {
-            log.info(USING_TEST_GOV_NOTIFY_KEY_FOR, testNotificationClient.getApiKey(), postcode);
+            log.info(USING_TEST_GOV_NOTIFY_KEY_FOR, testNotificationClient.getApiKey(), getMaskedPostcode(postcode));
             client = testNotificationClient;
         } else {
             client = notificationClient;

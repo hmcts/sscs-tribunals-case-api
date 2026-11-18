@@ -12,9 +12,9 @@ export class CommunicateWithFtaPage {
     }
 
     async verifyPageContent(isCommsToFta: boolean) {
-        await webActions.verifyPageLabel('.form-label.ng-star-inserted', 'Communication type');
+        await webActions.verifyPageLabel('span.form-label', 'Communication type');
         if(isCommsToFta){
-            await webActions.verifyPageLabel('.govuk-caption-l.ng-star-inserted', 'Communication with FTA');
+            await webActions.verifyPageLabel('span.govuk-caption-l', 'Communication with FTA');
             await webActions.verifyPageLabel('label.form-label',
                 [
                     'New Request',
@@ -23,7 +23,7 @@ export class CommunicateWithFtaPage {
                     'Delete a request/reply'
                 ]);
         } else {
-            await webActions.verifyPageLabel('.govuk-caption-l.ng-star-inserted', 'Communication with Tribunal');
+            await webActions.verifyPageLabel('span.govuk-caption-l', 'Communication with Tribunal');
             await webActions.verifyPageLabel('label.form-label',
                 [
                     'New Request',

@@ -2,16 +2,11 @@ import { test } from '../lib/steps.factory';
 import createCaseBasedOnCaseType, {
   createChildSupportCaseForCmConfidentiality
 } from '../api/client/sscs/factory/appeal.type.factory';
-import { credentials, featureFlags } from '../config/config';
+import { credentials } from '../config/config';
 
 const appealTypes = ['UC', 'CHILDSUPPORT'] as const;
 
 test.describe('CM confidentiality send to interloc', () => {
-  test.skip(
-    !featureFlags.cmOtherPartyConfidentialityEnabled,
-    'CM confidentiality flag is disabled'
-  );
-
   for (const appealType of appealTypes) {
       test(
         `Select Review by TCW shows confidentiality reasons for confidential ${appealType} appeal as Caseworker`,

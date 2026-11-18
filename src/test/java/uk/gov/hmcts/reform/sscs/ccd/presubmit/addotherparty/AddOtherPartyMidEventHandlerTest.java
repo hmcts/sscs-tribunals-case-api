@@ -14,12 +14,12 @@ import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtilTest.ID_2;
 
 import java.util.Collections;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -40,6 +40,7 @@ class AddOtherPartyMidEventHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
+    @InjectMocks
     private AddOtherPartyMidEventHandler handler;
 
     @Mock
@@ -50,7 +51,7 @@ class AddOtherPartyMidEventHandlerTest {
 
     private static SscsCaseData caseDataWithBenefit(String benefitCode) {
         return SscsCaseData.builder()
-            .appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefitCode).build()).build()).build();
+                           .appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefitCode).build()).build()).build();
     }
 
     @Nested
@@ -58,81 +59,71 @@ class AddOtherPartyMidEventHandlerTest {
 
         @Test
         void shouldThrowExceptionIfCallbackIsNull() {
-            handler = new AddOtherPartyMidEventHandler(true);
             assertThatThrownBy(() -> handler.canHandle(MID_EVENT, null)).isInstanceOf(NullPointerException.class)
-                .hasMessage("callback must not be null");
+                                                                        .hasMessage("callback must not be null");
         }
 
-        @Nested
-        class ConfidentialityEnabled {
+        @ParameterizedTest
+        @EnumSource(value = CallbackType.class, names = {"MID_EVENT"}, mode = EnumSource.Mode.EXCLUDE)
+        void givenNonMidEvent_thenReturnFalse(CallbackType callbackType) {
+            assertThat(handler.canHandle(callbackType, callback)).isFalse();
+        }
 
-            @BeforeEach
-            void setUp() {
-                handler = new AddOtherPartyMidEventHandler(true);
-            }
+        @ParameterizedTest
+        @EnumSource(value = Benefit.class, mode = EnumSource.Mode.EXCLUDE, names = {"CHILD_SUPPORT", "UC"})
+        void givenSupportedBenefit_thenReturnFalse(Benefit benefit) {
+            when(callback.getEvent()).thenReturn(EventType.ADD_OTHER_PARTY_DATA);
+            when(callback.getCaseDetails()).thenReturn(caseDetails);
+            when(caseDetails.getCaseData()).thenReturn(caseDataWithBenefit(benefit.getShortName()));
 
-            @ParameterizedTest
-            @EnumSource(value = CallbackType.class, names = {"MID_EVENT"}, mode = EnumSource.Mode.EXCLUDE)
-            void givenNonMidEvent_thenReturnFalse(CallbackType callbackType) {
-                assertThat(handler.canHandle(callbackType, callback)).isFalse();
-            }
+            assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
+        }
 
-            @ParameterizedTest
-            @EnumSource(value = Benefit.class, mode = EnumSource.Mode.EXCLUDE, names = {"CHILD_SUPPORT", "UC"})
-            void givenSupportedBenefit_thenReturnFalse(Benefit benefit) {
-                when(callback.getEvent()).thenReturn(EventType.ADD_OTHER_PARTY_DATA);
-                when(callback.getCaseDetails()).thenReturn(caseDetails);
-                when(caseDetails.getCaseData()).thenReturn(caseDataWithBenefit(benefit.getShortName()));
+        @ParameterizedTest
+        @EnumSource(value = EventType.class, mode = EnumSource.Mode.EXCLUDE, names = {"ADD_OTHER_PARTY_DATA"})
+        void givenNonAddOtherPartyEvent_thenReturnFalse(EventType eventType) {
+            when(callback.getEvent()).thenReturn(eventType);
 
-                assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
-            }
+            assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
+        }
 
-            @ParameterizedTest
-            @EnumSource(value = EventType.class, mode = EnumSource.Mode.EXCLUDE, names = {"ADD_OTHER_PARTY_DATA"})
-            void givenNonAddOtherPartyEvent_thenReturnFalse(EventType eventType) {
-                when(callback.getEvent()).thenReturn(eventType);
+        @ParameterizedTest
+        @EnumSource(value = Benefit.class, names = {"CHILD_SUPPORT", "UC"})
+        void givenAddOtherPartyEventAndSupportedBenefitWithoutOtherPartyData_thenReturnFalse(Benefit benefit) {
+            var sscsCaseData = caseDataWithBenefit(benefit.getShortName());
 
-                assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
-            }
+            when(callback.getEvent()).thenReturn(EventType.ADD_OTHER_PARTY_DATA);
+            when(callback.getCaseDetails()).thenReturn(caseDetails);
+            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-            @ParameterizedTest
-            @EnumSource(value = Benefit.class, names = {"CHILD_SUPPORT", "UC"})
-            void givenAddOtherPartyEventAndSupportedBenefitWithoutOtherPartyData_thenReturnFalse(Benefit benefit) {
-                var sscsCaseData = caseDataWithBenefit(benefit.getShortName());
+            assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
+        }
 
-                when(callback.getEvent()).thenReturn(EventType.ADD_OTHER_PARTY_DATA);
-                when(callback.getCaseDetails()).thenReturn(caseDetails);
-                when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        @ParameterizedTest
+        @EnumSource(value = Benefit.class, names = {"CHILD_SUPPORT", "UC"})
+        void givenAddOtherPartyEventAndSupportedBenefit_thenReturnTrue(Benefit benefit) {
+            var sscsCaseData = caseDataWithBenefit(benefit.getShortName());
 
-                assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
-            }
+            when(callback.getEvent()).thenReturn(EventType.ADD_OTHER_PARTY_DATA);
+            when(callback.getCaseDetails()).thenReturn(caseDetails);
+            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-            @ParameterizedTest
-            @EnumSource(value = Benefit.class, names = {"CHILD_SUPPORT", "UC"})
-            void givenAddOtherPartyEventAndSupportedBenefit_thenReturnTrue(Benefit benefit) {
-                var sscsCaseData = caseDataWithBenefit(benefit.getShortName());
+            sscsCaseData.setOtherParties(Collections.singletonList(buildOtherParty(ID_1)));
 
-                when(callback.getEvent()).thenReturn(EventType.ADD_OTHER_PARTY_DATA);
-                when(callback.getCaseDetails()).thenReturn(caseDetails);
-                when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+            assertThat(handler.canHandle(MID_EVENT, callback)).isTrue();
+        }
 
-                sscsCaseData.setOtherParties(Collections.singletonList(buildOtherParty(ID_1)));
+        @Test
+        void givenAddOtherPartyEventAndNonSupportedBenefit_thenReturnFalse() {
+            var sscsCaseData = caseDataWithBenefit(TAX_CREDIT.getShortName());
 
-                assertThat(handler.canHandle(MID_EVENT, callback)).isTrue();
-            }
+            when(callback.getEvent()).thenReturn(EventType.ADD_OTHER_PARTY_DATA);
+            when(callback.getCaseDetails()).thenReturn(caseDetails);
+            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-            @Test
-            void givenAddOtherPartyEventAndNonSupportedBenefit_thenReturnFalse() {
-                var sscsCaseData = caseDataWithBenefit(TAX_CREDIT.getShortName());
+            sscsCaseData.setOtherParties(Collections.singletonList(buildOtherParty(ID_1)));
 
-                when(callback.getEvent()).thenReturn(EventType.ADD_OTHER_PARTY_DATA);
-                when(callback.getCaseDetails()).thenReturn(caseDetails);
-                when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-                sscsCaseData.setOtherParties(Collections.singletonList(buildOtherParty(ID_1)));
-
-                assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
-            }
+            assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
         }
 
     }
@@ -140,114 +131,92 @@ class AddOtherPartyMidEventHandlerTest {
     @Nested
     class HandleTests {
 
-        @Nested
-        class OtherPartyConfidentialityEnabled {
+        @ParameterizedTest
+        @EnumSource(value = Benefit.class, names = {"CHILD_SUPPORT", "UC"})
+        void givenAddOtherPartyEventWithSingleOtherPartyData_thenRunSuccessfully(Benefit benefit) {
+            var sscsCaseData = caseDataWithBenefit(benefit.getShortName());
 
-            @BeforeEach
-            void setUp() {
-                handler = new AddOtherPartyMidEventHandler(true);
-            }
+            when(callback.getEvent()).thenReturn(EventType.ADD_OTHER_PARTY_DATA);
+            when(callback.getCaseDetails()).thenReturn(caseDetails);
+            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-            @ParameterizedTest
-            @EnumSource(value = Benefit.class, names = {"CHILD_SUPPORT", "UC"})
-            void givenAddOtherPartyEventWithSingleOtherPartyData_thenRunSuccessfully(Benefit benefit) {
-                var sscsCaseData = caseDataWithBenefit(benefit.getShortName());
+            sscsCaseData.setOtherParties(List.of(buildOtherParty(ID_1)));
 
-                when(callback.getEvent()).thenReturn(EventType.ADD_OTHER_PARTY_DATA);
-                when(callback.getCaseDetails()).thenReturn(caseDetails);
-                when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+            var response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-                sscsCaseData.setOtherParties(List.of(buildOtherParty(ID_1)));
-
-                var response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-                assertThat(response.getErrors()).isEmpty();
-
-            }
-
-            @Test
-            void throwIllegalStateExceptionIfNoAnyOtherPartyProvided() {
-                var sscsCaseData = caseDataWithBenefit(CHILD_SUPPORT.getShortName());
-
-                when(callback.getEvent()).thenReturn(EventType.ADD_OTHER_PARTY_DATA);
-                when(callback.getCaseDetails()).thenReturn(caseDetails);
-                when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-                IllegalStateException ex = assertThrows(IllegalStateException.class,
-                    () -> handler.handle(MID_EVENT, callback, USER_AUTHORISATION));
-
-                assertThat(ex).hasMessage("Cannot handle callback");
-            }
-
-            @Test
-            void throwIllegalStateExceptionWhenCallbackTypeIsNotMidEvent() {
-
-                IllegalStateException ex = assertThrows(IllegalStateException.class,
-                    () -> handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION));
-
-                assertThat(ex).hasMessage("Cannot handle callback");
-            }
-
-            @Test
-            void throwsExceptionIfItCannotHandleTheAppeal() {
-                when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
-
-                assertThatThrownBy(() -> handler.handle(MID_EVENT, callback, USER_AUTHORISATION)).isInstanceOf(
-                    IllegalStateException.class);
-            }
-
-            @ParameterizedTest
-            @EnumSource(value = Benefit.class, names = {"CHILD_SUPPORT", "UC"})
-            void givenAddOtherPartyEventWithoutOtherPartyData_thenReturnError(Benefit benefit) {
-                var sscsCaseData = caseDataWithBenefit(benefit.getShortName());
-
-                when(callback.getEvent()).thenReturn(EventType.ADD_OTHER_PARTY_DATA);
-                when(callback.getCaseDetails()).thenReturn(caseDetails);
-                when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-                sscsCaseData.setOtherParties(Collections.emptyList());
-
-                var response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-                assertThat(response.getErrors()).contains("Other party must be added to submit this event.");
-            }
-
-            @ParameterizedTest
-            @EnumSource(value = Benefit.class, names = {"CHILD_SUPPORT", "UC"})
-            void givenAddOtherPartyEventWithMultipleOtherParties_thenReturnError(Benefit benefit) {
-                var sscsCaseData = caseDataWithBenefit(benefit.getShortName());
-
-                when(callback.getEvent()).thenReturn(EventType.ADD_OTHER_PARTY_DATA);
-                when(callback.getCaseDetails()).thenReturn(caseDetails);
-                when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-                sscsCaseData.setOtherParties(List.of(buildOtherParty(ID_1), buildOtherParty(ID_2)));
-
-                var response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-                assertThat(response.getErrors()).contains("Only one other party can be added using this event.");
-            }
-        }
-
-        @Nested
-        class OtherPartyConfidentialityDisabled {
-
-            @Test
-            void givenOtherPartyConfidentialityDisabled_throwIllegalStateException() {
-                handler = new AddOtherPartyMidEventHandler(false);
-                IllegalStateException ex = assertThrows(IllegalStateException.class,
-                    () -> handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION));
-
-                assertThat(ex).hasMessage("Cannot handle callback");
-            }
+            assertThat(response.getErrors()).isEmpty();
 
         }
+
+        @Test
+        void throwIllegalStateExceptionIfNoAnyOtherPartyProvided() {
+            var sscsCaseData = caseDataWithBenefit(CHILD_SUPPORT.getShortName());
+
+            when(callback.getEvent()).thenReturn(EventType.ADD_OTHER_PARTY_DATA);
+            when(callback.getCaseDetails()).thenReturn(caseDetails);
+            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+            IllegalStateException ex = assertThrows(IllegalStateException.class,
+                () -> handler.handle(MID_EVENT, callback, USER_AUTHORISATION));
+
+            assertThat(ex).hasMessage("Cannot handle callback");
+        }
+
+        @Test
+        void throwIllegalStateExceptionWhenCallbackTypeIsNotMidEvent() {
+
+            IllegalStateException ex = assertThrows(IllegalStateException.class,
+                () -> handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION));
+
+            assertThat(ex).hasMessage("Cannot handle callback");
+        }
+
+        @Test
+        void throwsExceptionIfItCannotHandleTheAppeal() {
+            when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
+
+            assertThatThrownBy(() -> handler.handle(MID_EVENT, callback, USER_AUTHORISATION)).isInstanceOf(
+                IllegalStateException.class);
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = Benefit.class, names = {"CHILD_SUPPORT", "UC"})
+        void givenAddOtherPartyEventWithoutOtherPartyData_thenReturnError(Benefit benefit) {
+            var sscsCaseData = caseDataWithBenefit(benefit.getShortName());
+
+            when(callback.getEvent()).thenReturn(EventType.ADD_OTHER_PARTY_DATA);
+            when(callback.getCaseDetails()).thenReturn(caseDetails);
+            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+            sscsCaseData.setOtherParties(Collections.emptyList());
+
+            var response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+            assertThat(response.getErrors()).contains("Other party must be added to submit this event.");
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = Benefit.class, names = {"CHILD_SUPPORT", "UC"})
+        void givenAddOtherPartyEventWithMultipleOtherParties_thenReturnError(Benefit benefit) {
+            var sscsCaseData = caseDataWithBenefit(benefit.getShortName());
+
+            when(callback.getEvent()).thenReturn(EventType.ADD_OTHER_PARTY_DATA);
+            when(callback.getCaseDetails()).thenReturn(caseDetails);
+            when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+            sscsCaseData.setOtherParties(List.of(buildOtherParty(ID_1), buildOtherParty(ID_2)));
+
+            var response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+            assertThat(response.getErrors()).contains("Only one other party can be added using this event.");
+        }
+
     }
 
     private CcdValue<OtherParty> buildOtherParty(String id) {
         return CcdValue.<OtherParty>builder().value(
             OtherParty.builder().id(id).unacceptableCustomerBehaviour(YesNo.YES).role(Role.builder().name("PayingParent").build())
-                .build()).build();
+                      .build()).build();
     }
 
 }

@@ -1,9 +1,14 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
 import static io.swagger.v3.oas.annotations.enums.ParameterIn.HEADER;
+import static java.util.Objects.nonNull;
 import static org.springframework.http.ResponseEntity.status;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedEmail;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedPhone;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getMaskedValue;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -11,6 +16,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -22,6 +28,7 @@ import uk.gov.hmcts.reform.sscs.exception.GetCaseException;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.exception.UpdateCaseException;
 import uk.gov.hmcts.reform.sscs.model.service.ServiceHearingRequest;
+import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.PartyDetails;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.ServiceHearingValues;
 import uk.gov.hmcts.reform.sscs.model.service.linkedcases.ServiceLinkedCases;
 import uk.gov.hmcts.reform.sscs.service.ServiceHearingsService;
@@ -32,6 +39,7 @@ import uk.gov.hmcts.reform.sscs.service.ServiceHearingsService;
 public class ServiceHearingsController {
 
     private final ServiceHearingsService serviceHearingsService;
+    private final ObjectMapper objectMapper;
 
     @PostMapping("/serviceHearingValues")
     @Operation(description = "Get Hearing Values for a case")
@@ -55,7 +63,7 @@ public class ServiceHearingsController {
 
             ServiceHearingValues model = serviceHearingsService.getServiceHearingValues(request);
 
-            log.info("serviceHearingValues response {}", model);
+            log.info("serviceHearingValues response {}", getServiceHearingValuesForLogging(model));
 
             return status(HttpStatus.OK).body(model);
         } catch (Exception exc) {
@@ -103,5 +111,37 @@ public class ServiceHearingsController {
         } else if (exc instanceof ListingException) {
             log.error("Listing Exception for case id {}", caseId, exc);
         }
+    }
+
+    private String getServiceHearingValuesForLogging(ServiceHearingValues serviceHearingValues) {
+        ServiceHearingValues copyOfServiceHearingValues = objectMapper.convertValue(serviceHearingValues, ServiceHearingValues.class);
+
+        copyOfServiceHearingValues.setHmctsInternalCaseName(getMaskedValue(copyOfServiceHearingValues.getHmctsInternalCaseName()));
+        copyOfServiceHearingValues.setPublicCaseName(getMaskedValue(copyOfServiceHearingValues.getPublicCaseName()));
+        copyOfServiceHearingValues.setListingComments(getMaskedValue(copyOfServiceHearingValues.getListingComments()));
+
+        List<PartyDetails> partyDetailsList = copyOfServiceHearingValues.getParties();
+        if (nonNull(partyDetailsList)) {
+            for (PartyDetails party : partyDetailsList) {
+                party.setPartyName(getMaskedValue(party.getPartyName()));
+                if (nonNull(party.getIndividualDetails())) {
+                    party.getIndividualDetails().setFirstName(getMaskedValue(party.getIndividualDetails().getFirstName()));
+                    party.getIndividualDetails().setLastName(getMaskedValue(party.getIndividualDetails().getLastName()));
+                    party.getIndividualDetails().setHearingChannelEmail(
+                            nonNull(party.getIndividualDetails().getHearingChannelEmail())
+                                    ? party.getIndividualDetails().getHearingChannelEmail().stream()
+                                    .map(email -> getMaskedEmail(email))
+                                    .collect(Collectors.toList()) : null);
+                    party.getIndividualDetails().setHearingChannelPhone(
+                            nonNull(party.getIndividualDetails().getHearingChannelPhone())
+                                    ? party.getIndividualDetails().getHearingChannelPhone().stream()
+                                    .map(phone -> getMaskedPhone(phone))
+                                    .collect(Collectors.toList()) : null);
+                }
+            }
+        }
+        copyOfServiceHearingValues.setParties(partyDetailsList);
+
+        return copyOfServiceHearingValues.toString();
     }
 }

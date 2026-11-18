@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.config;
 
+import static java.util.Collections.emptyList;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.eq;
@@ -8,13 +10,17 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.ccd.client.CaseAccessApi;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+
 
 public class CitizenCcdClientTest {
 
@@ -87,4 +93,34 @@ public class CitizenCcdClientTest {
                 .searchCases(eq("token"), eq("s2s"), eq("Benefit"), anyString());
 
     }
+
+    @Test
+    public void shouldInvokeCoreCaseDataApiWhenSearchingForCitizenAllCasesNonDormant() {
+        CaseDetails caseDetails = CaseDetails.builder().id(123L).build();
+        SearchResult searchResult = SearchResult.builder()
+                .cases(List.of(caseDetails))
+                .build();
+        when(coreCaseDataApi.searchCases(eq("token"), eq("s2s"), eq("Benefit"), anyString()))
+                .thenReturn(searchResult);
+
+        List<CaseDetails> result = citizenCcdClient.searchForCitizenAllCasesNonDormant(idamTokens);
+
+        assertEquals(List.of(caseDetails), result);
+        verify(coreCaseDataApi)
+                .searchCases(eq("token"), eq("s2s"), eq("Benefit"), anyString());
+    }
+
+    @Test
+    public void shouldReturnEmptyListWhenSearchingForCitizenAllCasesNonDormantAndSearchResultIsNull() {
+        when(coreCaseDataApi.searchCases(eq("token"), eq("s2s"), eq("Benefit"), anyString()))
+                .thenReturn(null);
+
+        List<CaseDetails> result = citizenCcdClient.searchForCitizenAllCasesNonDormant(idamTokens);
+
+        assertEquals(emptyList(), result);
+        verify(coreCaseDataApi)
+                .searchCases(eq("token"), eq("s2s"), eq("Benefit"), anyString());
+    }
+
+
 }

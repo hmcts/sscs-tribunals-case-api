@@ -39,7 +39,7 @@ public class NotificationValidService {
 
     boolean isNotificationStillValidToSend(List<Hearing> hearings, NotificationEventType eventType) {
         return switch (eventType) {
-            case HEARING_BOOKED, HEARING_REMINDER -> checkHearingIsInFuture(hearings);
+            case HEARING_BOOKED, HEARING_REMINDER, RESEND_HEARING_BOOKED -> checkHearingIsInFuture(hearings);
             default -> true;
         };
     }

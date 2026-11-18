@@ -6,7 +6,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.AWAIT_OTHER_PARTY_DATA;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.WITH_DWP;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -17,21 +16,12 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
 class AddOtherPartyAboutToStartEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-
-    private final boolean cmConfidentialityEnabled;
-
-    public AddOtherPartyAboutToStartEventHandler(
-        @Value("${feature.cm-other-party-confidentiality.enabled}") final boolean cmConfidentialityEnabled) {
-        this.cmConfidentialityEnabled = cmConfidentialityEnabled;
-    }
-
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callbackType, "callbackType must not be null");
         requireNonNull(callback, "callback must not be null");
 
-        return cmConfidentialityEnabled
-            && callbackType == CallbackType.ABOUT_TO_START
+        return callbackType == CallbackType.ABOUT_TO_START
             && callback.getEvent() == EventType.ADD_OTHER_PARTY_DATA
             && callback.getCaseDetails() != null
             && callback.getCaseDetails().getCaseData() != null

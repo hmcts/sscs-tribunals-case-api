@@ -6,6 +6,7 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.CONFIDENTIALITY_GRANTED_SEND_TO_ADMIN;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.CONFIDENTIALITY_REFUSED_SEND_TO_ADMIN;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REJECT_HEARING_RECORDING_REQUEST;
@@ -29,6 +30,7 @@ import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isConfidential;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -86,7 +88,6 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private final IdamService idamService;
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
-    private final boolean cmOtherPartyConfidentialityEnabled;
     private static final String OTHER_PARTY_PREFIX = "otherParty";
 
     @Autowired
@@ -94,15 +95,13 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                                                DwpAddressLookupService dwpAddressLookupService,
                                                IdamService idamService, @Value("${dwp.response.due.days}") int dwpResponseDueDays,
                                                @Value("${dwp.response.due.days-child-support}") int dwpResponseDueDaysChildSupport,
-                                               @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled,
-                                               @Value("${feature.cm-other-party-confidentiality.enabled}") boolean cmOtherPartyConfidentialityEnabled) {
+                                               @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled) {
         this.footerService = footerService;
         this.dwpAddressLookupService = dwpAddressLookupService;
         this.idamService = idamService;
         this.dwpResponseDueDays = dwpResponseDueDays;
         this.dwpResponseDueDaysChildSupport = dwpResponseDueDaysChildSupport;
         this.isPostHearingsEnabled = isPostHearingsEnabled;
-        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
 
     @Override
@@ -186,8 +185,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
     private Optional<PreSubmitCallbackResponse<SscsCaseData>> validateConfidentialityDirectionAccess(
         SscsCaseData caseData, String userAuthorisation) {
-        if (!cmOtherPartyConfidentialityEnabled
-            || !isConfidentialityDirection(getDirectionTypeCode(caseData))
+        if (!isConfidentialityDirection(getDirectionTypeCode(caseData))
             || !isBenefitTypeWithConfidentialityTab(caseData)) {
             return Optional.empty();
         }
@@ -269,11 +267,10 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             caseData.setInterlocReferralReason(REJECT_HEARING_RECORDING_REQUEST);
         } else if (DirectionType.ISSUE_AND_SEND_TO_ADMIN.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION);
-        } else if (cmOtherPartyConfidentialityEnabled
-            && isConfidentialityDirection(caseData.getDirectionTypeDl().getValue().getCode())
+        } else if (isConfidentialityDirection(caseData.getDirectionTypeDl().getValue().getCode())
             && isBenefitTypeWithConfidentialityTab(caseData)) {
             applyConfidentialityDecisionFromDirection(caseData);
-            caseData.setIsConfidentialCase(isConfidential(caseData, cmOtherPartyConfidentialityEnabled));
+            caseData.setIsConfidentialCase(isConfidential(caseData, List.of(UC)));
             caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION);
         } else {
             caseData.setInterlocReviewState(null);

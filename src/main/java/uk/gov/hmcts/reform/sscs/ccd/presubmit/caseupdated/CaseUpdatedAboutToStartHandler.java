@@ -6,12 +6,12 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.predicates.BenefitTypeConfidentialityPredicate.isValidBenefitTypeForConfidentiality;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPresent;
 
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -38,17 +38,12 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
     private final VerbalLanguagesService verbalLanguagesService;
     private final SignLanguagesService signLanguagesService;
 
-    private final boolean cmOtherPartyConfidentialityEnabled;
-
     CaseUpdatedAboutToStartHandler(DynamicListLanguageUtil utils,
                                    VerbalLanguagesService verbalLanguagesService,
-                                   SignLanguagesService signLanguagesService,
-                                   @Value("${feature.cm-other-party-confidentiality.enabled}")
-                                   boolean cmOtherPartyConfidentialityEnabled) {
+                                   SignLanguagesService signLanguagesService) {
         this.utils = utils;
         this.verbalLanguagesService = verbalLanguagesService;
         this.signLanguagesService = signLanguagesService;
-        this.cmOtherPartyConfidentialityEnabled = cmOtherPartyConfidentialityEnabled;
     }
 
     @Override
@@ -91,7 +86,10 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
             setupUkPortsOfEntry(sscsCaseData);
         }
 
-        if (cmOtherPartyConfidentialityEnabled && sscsCaseData.isBenefitType(UC)) {
+        sscsCaseData.getAppeal().setIsValidSscs2OrSscs5Case(
+                isValidBenefitTypeForConfidentiality(sscsCaseData.getAppeal().getBenefitType()) ? YES : null);
+
+        if (sscsCaseData.isBenefitType(UC)) {
             sscsCaseData.getAppeal()
                 .setIsOtherPartyAddedForChildMaintUCCase(isOtherPartyPresent(sscsCaseData) ? YES : NO);
         }

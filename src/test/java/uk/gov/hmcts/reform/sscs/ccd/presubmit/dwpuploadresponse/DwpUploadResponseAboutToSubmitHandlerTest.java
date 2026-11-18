@@ -149,7 +149,7 @@ class DwpUploadResponseAboutToSubmitHandlerTest {
         dwpDocumentService = new DwpDocumentService();
         addNoteService = new AddNoteService(userDetailsService);
         handler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
-                addNoteService, panelCompositionService, hearingsService, addedDocumentsUtil, true);
+                addNoteService, panelCompositionService, hearingsService, addedDocumentsUtil);
     }
 
     @Test
@@ -788,7 +788,7 @@ class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     void givenAudioVideoDocuments_shouldComputeCorrectAudioVideoTotals() throws JsonProcessingException {
         handler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
-            new AddNoteService(userDetailsService), panelCompositionService, hearingsService, new AddedDocumentsUtil(true), true);
+            new AddNoteService(userDetailsService), panelCompositionService, hearingsService, new AddedDocumentsUtil(true));
 
         List<AudioVideoEvidence> audioVideoEvidence = new ArrayList<>();
 
@@ -838,7 +838,7 @@ class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     void givenPreExistingAudioVideoDocuments_shouldComputeCorrectAudioVideoTotalsForAvAddedThisEvent() throws JsonProcessingException {
         handler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
-            new AddNoteService(userDetailsService), panelCompositionService, hearingsService, new AddedDocumentsUtil(true), true);
+            new AddNoteService(userDetailsService), panelCompositionService, hearingsService, new AddedDocumentsUtil(true));
 
         List<AudioVideoEvidence> newAudioVideoEvidence = new ArrayList<>();
 
@@ -890,7 +890,7 @@ class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     void givenNoNewAudioVideoDocuments_shouldStillClearAddedDocuments() {
         handler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
-            new AddNoteService(userDetailsService), panelCompositionService, hearingsService, new AddedDocumentsUtil(true), true);
+            new AddNoteService(userDetailsService), panelCompositionService, hearingsService, new AddedDocumentsUtil(true));
 
         sscsCaseData.setDwpUploadAudioVideoEvidence(new ArrayList<>());
         sscsCaseData.setWorkAllocationFields(WorkAllocationFields.builder()
@@ -1573,7 +1573,7 @@ class DwpUploadResponseAboutToSubmitHandlerTest {
         when(panelCompositionService.resetPanelCompositionIfStale(eq(sscsCaseData), eq(Optional.of(caseDetailsBefore))))
             .thenReturn(panelComposition);
         handler = new DwpUploadResponseAboutToSubmitHandler(
-            dwpDocumentService, addNoteService, panelCompositionService, hearingsService, addedDocumentsUtil, true);
+            dwpDocumentService, addNoteService, panelCompositionService, hearingsService, addedDocumentsUtil);
 
         var response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
