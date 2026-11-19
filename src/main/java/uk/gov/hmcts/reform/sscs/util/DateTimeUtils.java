@@ -76,6 +76,15 @@ public final class DateTimeUtils {
         return LocalDate.now().plusDays(numberOfDays).toString();
     }
 
+    public static LocalDate nextWeekday(final LocalDate date) {
+        final LocalDate next = date.plusDays(1);
+        return switch (next.getDayOfWeek()) {
+            case SATURDAY -> next.plusDays(2);
+            case SUNDAY -> next.plusDays(1);
+            default -> next;
+        };
+    }
+
     private static String formatUtc(ZonedDateTime zonedDateTime) {
         ZonedDateTime utcZonedDateTime = ZonedDateTime.ofInstant(zonedDateTime.toInstant(), ZoneId.of(UTC));
         return utcZonedDateTime.format(ofPattern(UTC_STRING_FORMAT));
