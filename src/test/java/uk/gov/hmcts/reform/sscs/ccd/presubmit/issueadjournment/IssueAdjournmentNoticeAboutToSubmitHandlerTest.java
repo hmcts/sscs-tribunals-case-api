@@ -217,8 +217,48 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(sscsCaseData.getDirectionDueDate()).isNull();
-        assertThat(sscsCaseData.getInterlocReviewState()).isNotEqualTo(InterlocReviewState.AWAITING_ADMIN_ACTION);
+        assertThat(sscsCaseData.getInterlocReviewState()).isNull();
         verifyNoInteractions(businessDaysCalculatorService);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"YES, NO", "NO, YES", "YES, YES"})
+    void givenNotBothAnsweredNoAndAwaitingAdminAction_thenClearInterlocReviewState(final YesNo canBeListedRightAway, final YesNo directionsBeingMade) {
+        setCannotBeListedAndNoDirectionsWithNoDueDate();
+        sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(canBeListedRightAway);
+        sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(directionsBeingMade);
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION);
+        setupHearingDurationValues();
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getInterlocReviewState()).isNull();
+    }
+
+    @ParameterizedTest
+    @CsvSource({"YES, NO", "NO, YES", "YES, YES"})
+    void givenNotBothAnsweredNoAndOtherInterlocReviewState_thenKeepInterlocReviewState(final YesNo canBeListedRightAway, final YesNo directionsBeingMade) {
+        setCannotBeListedAndNoDirectionsWithNoDueDate();
+        sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(canBeListedRightAway);
+        sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(directionsBeingMade);
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE);
+        setupHearingDurationValues();
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.REVIEW_BY_JUDGE);
+    }
+
+    @Test
+    void givenBothAnsweredNoAndAlreadyAwaitingAdminAction_thenKeepAwaitingAdminAction() throws IOException {
+        when(businessDaysCalculatorService.getNextBusinessDay(any(LocalDate.class), eq(UK))).thenReturn(LocalDate.of(2026, 11, 9));
+        setCannotBeListedAndNoDirectionsWithNoDueDate();
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION);
+        setupHearingDurationValues();
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.AWAITING_ADMIN_ACTION);
     }
 
     @Test
@@ -227,12 +267,13 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         sscsCaseData.getAdjournment().setGenerateNotice(NO);
         sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(null);
         sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(null);
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION);
         setupHearingDurationValues();
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(sscsCaseData.getDirectionDueDate()).isNull();
-        assertThat(sscsCaseData.getInterlocReviewState()).isNotEqualTo(InterlocReviewState.AWAITING_ADMIN_ACTION);
+        assertThat(sscsCaseData.getInterlocReviewState()).isNull();
         assertThat(sscsCaseData.getState()).isEqualTo(READY_TO_LIST);
         verifyNoInteractions(businessDaysCalculatorService);
     }

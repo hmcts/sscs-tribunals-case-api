@@ -122,6 +122,8 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             sscsCaseData.setState(isCaseListable(sscsCaseData));
             if (englishLanguageCaseCannotBeListedRightAwayAndDirectionsNotMadeToParties(sscsCaseData)) {
                 sscsCaseData.setInterlocReviewState(AWAITING_ADMIN_ACTION);
+            } else if (AWAITING_ADMIN_ACTION == sscsCaseData.getInterlocReviewState()) {
+                sscsCaseData.setInterlocReviewState(null);
             }
         } else {
             log.info("Case is a Welsh case so Adjournment Notice requires translation for case id : {}", sscsCaseData.getCcdCaseId());
