@@ -135,7 +135,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertFalse(body.isEsaIsEntited());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("setEndDate");
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
@@ -204,7 +204,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertFalse(body.isEsaIsEntited());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("setEndDate");
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
@@ -271,7 +271,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertFalse(body.isEsaIsEntited());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("setEndDate");
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
@@ -357,7 +357,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertTrue(body.isEsaIsEntited());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("setEndDate");
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
@@ -420,7 +420,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertTrue(body.isEsaIsEntited());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("setEndDate");
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
@@ -480,7 +480,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertTrue(body.isEsaIsEntited());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("setEndDate");
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
@@ -545,7 +545,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertTrue(body.isEsaIsEntited());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("setEndDate");
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
@@ -605,7 +605,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("setEndDate");
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
@@ -663,7 +663,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("setEndDate");
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
@@ -741,7 +741,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("setEndDate");
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
@@ -850,7 +850,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("setEndDate");
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
@@ -927,7 +927,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("setEndDate");
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
@@ -1056,7 +1056,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("setEndDate");
 
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
@@ -1226,7 +1226,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("setEndDate");
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
@@ -1295,7 +1295,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("setEndDate");
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
@@ -1363,7 +1363,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("setEndDate");
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
@@ -1431,7 +1431,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("setEndDate");
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
@@ -1496,7 +1496,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("setEndDate");
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
@@ -1564,7 +1564,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("setEndDate");
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
@@ -1631,7 +1631,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("setEndDate");
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
@@ -1693,7 +1693,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("setEndDate");
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
@@ -1769,7 +1769,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("setEndDate");
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
@@ -1865,7 +1865,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("setEndDate");
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
@@ -1968,7 +1968,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("setEndDate");
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
@@ -2095,7 +2095,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("setEndDate");
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
@@ -2171,7 +2171,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("setEndDate");
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
@@ -2262,7 +2262,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertThat(payload.getDateIssued()).isNull();
         assertThat(LocalDate.now()).isEqualTo(payload.getGeneratedDate());
-        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isNull();
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("setEndDate");
 
         assertThat(payload.getWriteFinalDecisionTemplateContent()).isNotNull();
         assertThat(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent).isTrue();
@@ -2322,7 +2322,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertThat(body.getSevereCriteriaApplies()).isFalse();
         assertThat(payload.getDateIssued()).isNull();
         assertThat(LocalDate.now()).isEqualTo(payload.getGeneratedDate());
-        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isNull();
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("setEndDate");
 
         assertThat(payload.getWriteFinalDecisionTemplateContent()).isNotNull();
         assertThat(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent).isTrue();
@@ -2399,7 +2399,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertThat(body.getDwpReassessTheAward()).isNull();
         assertThat(payload.getDateIssued()).isNull();
         assertThat(LocalDate.now()).isEqualTo(payload.getGeneratedDate());
-        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isNull();
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("setEndDate");
 
         assertThat(payload.getWriteFinalDecisionTemplateContent()).isNotNull();
         assertThat(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent).isTrue();
@@ -2468,7 +2468,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertThat(body.getSevereCriteriaApplies()).isTrue();
         assertThat(payload.getDateIssued()).isNull();
         assertThat(LocalDate.now()).isEqualTo(payload.getGeneratedDate());
-        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isNull();
+        assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("setEndDate");
 
         assertThat(payload.getWriteFinalDecisionTemplateContent()).isNotNull();
         assertThat(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent).isTrue();

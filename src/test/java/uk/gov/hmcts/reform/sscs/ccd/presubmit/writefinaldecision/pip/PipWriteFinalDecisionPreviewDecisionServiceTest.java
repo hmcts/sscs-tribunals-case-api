@@ -1,9 +1,12 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
@@ -190,6 +193,67 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
     }
 
     @Test
+    public void givenIndefiniteAwardWithStaleEndDate_thenPreviewHasNoEndDateAndIsIndefinite() {
+        setCommonPreviewParams(sscsCaseData, null);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("indefinite");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDate("2018-11-10");
+        setDescriptorFlowIndicator("yes", sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(NO);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
+
+        service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
+
+        final WriteFinalDecisionTemplateBody body = captureTemplateBody();
+        assertSoftly(softly -> {
+            softly.assertThat(body.getStartDate()).isEqualTo("2018-10-11");
+            softly.assertThat(body.getEndDate()).isNull();
+            softly.assertThat(body.isIndefinite()).isTrue();
+        });
+    }
+
+    @Test
+    public void givenNoEndDateTypeWithStaleEndDate_thenPreviewHasNoEndDateAndIsIndefinite() {
+        setCommonPreviewParams(sscsCaseData, null);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType(null);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDate("2018-11-10");
+        setDescriptorFlowIndicator("yes", sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(NO);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
+
+        service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
+
+        final WriteFinalDecisionTemplateBody body = captureTemplateBody();
+        assertSoftly(softly -> {
+            softly.assertThat(body.getStartDate()).isEqualTo("2018-10-11");
+            softly.assertThat(body.getEndDate()).isNull();
+            softly.assertThat(body.isIndefinite()).isTrue();
+        });
+    }
+
+    @Test
+    public void givenSetEndDateAward_thenPreviewHasEndDateAndIsNotIndefinite() {
+        setCommonPreviewParams(sscsCaseData, "2018-11-10");
+        setDescriptorFlowIndicator("yes", sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(NO);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
+
+        service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
+
+        final WriteFinalDecisionTemplateBody body = captureTemplateBody();
+        assertSoftly(softly -> {
+            softly.assertThat(body.getStartDate()).isEqualTo("2018-10-11");
+            softly.assertThat(body.getEndDate()).isEqualTo("2018-11-10");
+            softly.assertThat(body.isIndefinite()).isFalse();
+        });
+    }
+
+    private WriteFinalDecisionTemplateBody captureTemplateBody() {
+        verify(generateFile).assemble(capture.capture());
+        final NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
+        return payload.getWriteFinalDecisionTemplateBody();
+    }
+
+    @Test
     public void willSetPreviewFileForDailyLivingMobility_whenNotGeneratingNotice() {
 
         setCommonPreviewParams(sscsCaseData, null);
@@ -342,7 +406,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
             assertNotNull(body);
 
             // Common assertions
-            assertCommonPreviewParams(body, endDate, false);
+            assertCommonPreviewParams(body, "noAward".equals(rate) ? null : endDate, false);
 
             // Mobility specific assertions
             if ("standardRate".equals(rate)) {
@@ -375,7 +439,8 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
             assertNull(body.getDailyLivingDescriptors());
             assertNull(payload.getDateIssued());
             assertEquals(LocalDate.now(), payload.getGeneratedDate());
-            assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+            final String expectedEndDateType = "noAward".equals(rate) || endDate == null ? null : "setEndDate";
+            assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo(expectedEndDateType);
 
         }
     }

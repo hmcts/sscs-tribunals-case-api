@@ -160,6 +160,9 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     protected void setCommonPreviewParams(SscsCaseData sscsCaseData, String endDate) {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionStartDate("2018-10-11");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDate(endDate);
+        if (endDate != null) {
+            sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("setEndDate");
+        }
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision(DATE_OF_DECISION);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionReasons(Arrays.asList(new CollectionItem<>(null, "My reasons for decision")));
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAnythingElse("Something else.");
