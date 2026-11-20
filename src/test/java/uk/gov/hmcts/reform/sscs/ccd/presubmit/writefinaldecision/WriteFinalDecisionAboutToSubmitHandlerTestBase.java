@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -158,6 +159,70 @@ public abstract class WriteFinalDecisionAboutToSubmitHandlerTestBase<T extends D
         assertEquals(0, response.getErrors().size());
         assertEquals("setEndDate", sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
+    }
+
+    @Test
+    public void givenEndDateTypeOfSetEndDate_thenKeepEndDate() {
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("setEndDate");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDate("2025-01-01");
+        setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertSoftly(softly -> {
+            softly.assertThat(response.getErrors()).isEmpty();
+            softly.assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("setEndDate");
+            softly.assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDate()).isEqualTo("2025-01-01");
+        });
+    }
+
+    @Test
+    public void givenEndDateTypeChangedToIndefiniteWithStaleEndDate_thenClearEndDate() {
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("indefinite");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDate("2025-01-01");
+        setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertSoftly(softly -> {
+            softly.assertThat(response.getErrors()).isEmpty();
+            softly.assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo("indefinite");
+            softly.assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDate()).isNull();
+        });
+    }
+
+    @Test
+    public void givenEndDateTypeOfNaWithStaleEndDate_thenClearEndDateAndEndDateType() {
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("na");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDate("2025-01-01");
+        setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertSoftly(softly -> {
+            softly.assertThat(response.getErrors()).isEmpty();
+            softly.assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isNull();
+            softly.assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDate()).isNull();
+        });
+    }
+
+    @Test
+    public void givenNoEndDateTypeWithStaleEndDate_thenClearEndDate() {
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType(null);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDate("2025-01-01");
+        setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertSoftly(softly -> {
+            softly.assertThat(response.getErrors()).isEmpty();
+            softly.assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isNull();
+            softly.assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDate()).isNull();
+        });
     }
 
     protected abstract void setValidPointsAndActivitiesScenario(SscsCaseData caseData, String descriptorFlowValue);

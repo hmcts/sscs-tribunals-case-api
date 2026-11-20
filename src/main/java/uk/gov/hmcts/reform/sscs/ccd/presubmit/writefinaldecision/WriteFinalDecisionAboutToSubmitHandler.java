@@ -58,6 +58,9 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         if ("na".equals(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType())) {
             sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType(null);
         }
+        if (!"setEndDate".equals(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType())) {
+            sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDate(null);
+        }
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 

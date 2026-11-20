@@ -137,9 +137,12 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
         writeFinalDecisionBuilder.appointeeName(buildName(caseData, true));
 
-        writeFinalDecisionBuilder.endDate(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDate());
+        final String endDate = "setEndDate".equals(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType())
+            ? caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDate()
+            : null;
+        writeFinalDecisionBuilder.endDate(endDate);
         writeFinalDecisionBuilder.startDate(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionStartDate());
-        writeFinalDecisionBuilder.isIndefinite(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDate() == null);
+        writeFinalDecisionBuilder.isIndefinite(endDate == null);
 
         setEntitlements(writeFinalDecisionBuilder, caseData);
         setDescriptorsAndPoints(writeFinalDecisionBuilder, caseData);
