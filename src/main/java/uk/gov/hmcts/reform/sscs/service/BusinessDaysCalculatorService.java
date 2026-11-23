@@ -1,17 +1,19 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static uk.gov.hmcts.reform.sscs.model.BankHolidayDivision.SCOTLAND;
+import static uk.gov.hmcts.reform.sscs.model.BankHolidayDivision.UK;
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Set;
-import lombok.extern.slf4j.Slf4j;
 import net.objectlab.kit.datecalc.common.DefaultHolidayCalendar;
 import net.objectlab.kit.datecalc.jdk8.LocalDateKitCalculatorsFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.client.CachedHolidayClient;
+import uk.gov.hmcts.reform.sscs.model.BankHolidayDivision;
 
-@Slf4j
 @Service
 public class BusinessDaysCalculatorService {
 
@@ -33,11 +35,23 @@ public class BusinessDaysCalculatorService {
         return calculateBusinessDay(date, numberOfBusinessDays);
     }
 
+    public LocalDate getNextBusinessDay(final LocalDate date, final BankHolidayDivision bankHolidayDivision) throws IOException {
+        initialiseHolidays();
+        return LocalDateKitCalculatorsFactory.forwardCalculator(bankHolidayDivision.name())
+            .setStartDate(date.plusDays(1))
+            .getCurrentBusinessDate();
+    }
+
     private void initialiseHolidays() throws IOException {
-        Set<LocalDate> holidays = cachedHolidayClient.getHolidays();
-        DefaultHolidayCalendar<LocalDate> ukCalendar = new DefaultHolidayCalendar<>();
-        ukCalendar.setHolidays(holidays);
-        LocalDateKitCalculatorsFactory.getDefaultInstance().registerHolidays("UK", ukCalendar);
+        registerDivisionHolidays(UK);
+        registerDivisionHolidays(SCOTLAND);
+    }
+
+    private void registerDivisionHolidays(final BankHolidayDivision bankHolidayDivision) throws IOException {
+        final Set<LocalDate> holidays = cachedHolidayClient.getHolidays(bankHolidayDivision);
+        final DefaultHolidayCalendar<LocalDate> calendar = new DefaultHolidayCalendar<>();
+        calendar.setHolidays(holidays);
+        LocalDateKitCalculatorsFactory.getDefaultInstance().registerHolidays(bankHolidayDivision.name(), calendar);
     }
 
     private ZonedDateTime calculateBusinessDay(LocalDate startDate, int numberOfBusinessDays, ZonedDateTime startDateTime) {
@@ -49,7 +63,7 @@ public class BusinessDaysCalculatorService {
     }
 
     private LocalDate calculateBusinessDay(LocalDate startDate, int numberOfBusinessDays) {
-        return LocalDateKitCalculatorsFactory.forwardCalculator("UK")
+        return LocalDateKitCalculatorsFactory.forwardCalculator(UK.name())
             .setStartDate(startDate)
             .moveByBusinessDays(numberOfBusinessDays)
             .getCurrentBusinessDate();
