@@ -41,6 +41,7 @@ public class AppConstants {
     public static final String INFECTED_BLOOD_COMPENSATION = "infectedBloodCompensation";
     public static final int FUNCTIONAL_FETCH_ATTEMPTS = 5;
     public static final int FUNCTIONAL_RETRY_LIMIT = 3;
+    public static final String WRITE_FINAL_DECISION_SET_END_DATE = "setEndDate";
 
     private AppConstants() {
         //

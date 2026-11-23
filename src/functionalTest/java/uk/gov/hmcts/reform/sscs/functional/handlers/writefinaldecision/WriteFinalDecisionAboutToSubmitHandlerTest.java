@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.functional.handlers.writefinaldecision;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.WRITE_FINAL_DECISION_SET_END_DATE;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -44,7 +45,7 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest extends BaseHandler {
             .assertThat().body("writeFinalDecisionDateOfDecision", equalTo("2020-06-01"))
             .assertThat().body("writeFinalDecisionDisabilityQualifiedPanelMemberName", equalTo("Fred"))
             .assertThat().body("writeFinalDecisionEndDate", equalTo("2020-10-10"))
-            .assertThat().body("writeFinalDecisionEndDateType", equalTo("setEndDate"))
+            .assertThat().body("writeFinalDecisionEndDateType", equalTo(WRITE_FINAL_DECISION_SET_END_DATE))
             .assertThat().body("writeFinalDecisionMedicallyQualifiedPanelMemberName", equalTo("Ted"))
             .assertThat().body("writeFinalDecisionPageSectionReference", equalTo("B2"))
             .assertThat().body("writeFinalDecisionAppellantAttendedQuestion", equalTo("Yes"))

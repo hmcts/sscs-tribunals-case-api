@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.WRITE_FINAL_DECISION_SET_END_DATE;
 
 import jakarta.validation.Validator;
 import java.util.ArrayList;
@@ -339,14 +340,14 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
         setNoAwardsScenario(sscsCaseData);
         setEmptyActivitiesListScenario(sscsCaseData);
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("setEndDate");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType(WRITE_FINAL_DECISION_SET_END_DATE);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
         assertEquals(0, response.getWarnings().size());
 
-        assertEquals("setEndDate", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertEquals(WRITE_FINAL_DECISION_SET_END_DATE, caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
     }
 

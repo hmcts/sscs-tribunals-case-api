@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionMidEventValidationHandlerBase.CANT_UPLOAD_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.WRITE_FINAL_DECISION_SET_END_DATE;
 
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -148,7 +149,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
     public void givenAnEndDateIsBeforeStartDate_thenDisplayAnError(String descriptorFlowValue) {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionStartDate("2020-01-01");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDate("2019-01-01");
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("setEndDate");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType(WRITE_FINAL_DECISION_SET_END_DATE);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -242,7 +243,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
     public void givenAnEndDateIsSameAsStartDate_thenDisplayAnError(String descriptorFlowValue) {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionStartDate("2020-01-01");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDate("2020-01-01");
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("setEndDate");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType(WRITE_FINAL_DECISION_SET_END_DATE);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow(descriptorFlowValue);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);

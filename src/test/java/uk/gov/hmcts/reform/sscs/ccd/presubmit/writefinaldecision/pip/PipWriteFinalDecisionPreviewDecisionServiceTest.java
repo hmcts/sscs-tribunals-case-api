@@ -9,6 +9,7 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.WRITE_FINAL_DECISION_SET_END_DATE;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -439,7 +440,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
             assertNull(body.getDailyLivingDescriptors());
             assertNull(payload.getDateIssued());
             assertEquals(LocalDate.now(), payload.getGeneratedDate());
-            final String expectedEndDateType = "noAward".equals(rate) || endDate == null ? null : "setEndDate";
+            final String expectedEndDateType = "noAward".equals(rate) || endDate == null ? null : WRITE_FINAL_DECISION_SET_END_DATE;
             assertThat(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType()).isEqualTo(expectedEndDateType);
 
         }
