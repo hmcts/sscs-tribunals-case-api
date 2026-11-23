@@ -39,8 +39,8 @@ public class CaseUpdatedSubmittedHandler implements PreSubmitCallbackHandler<Ssc
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
         return callbackType.equals(CallbackType.SUBMITTED)
-                && callback.getEvent() == EventType.CASE_UPDATED
-                && READY_TO_LIST.getId().equals(sscsCaseData.getCreatedInGapsFrom());
+            && callback.getEvent() == EventType.CASE_UPDATED
+            && READY_TO_LIST.getId().equals(sscsCaseData.getCreatedInGapsFrom());
     }
 
     @Override
@@ -51,7 +51,7 @@ public class CaseUpdatedSubmittedHandler implements PreSubmitCallbackHandler<Ssc
         }
 
         if (callback.getCaseDetails().getCaseData().getAppeal() == null
-                || callback.getCaseDetails().getCaseData().getAppeal().getBenefitType() == null) {
+            || callback.getCaseDetails().getCaseData().getAppeal().getBenefitType() == null) {
             log.info("Cannot handle this event as no data");
             throw new IllegalStateException("Cannot handle callback");
         }
@@ -64,8 +64,8 @@ public class CaseUpdatedSubmittedHandler implements PreSubmitCallbackHandler<Ssc
         if (StringUtils.equalsIgnoreCase(benefitType.getCode(), "uc") && isANewJointParty(callback, caseData)) {
             log.info("Pre Calling JOINT_PARTY_ADDED event V2 for case id {}", callback.getCaseDetails().getId());
             SscsCaseDetails sscsCaseDetails = updateCcdCaseService.triggerCaseEventV2(callback.getCaseDetails().getId(),
-                    EventType.JOINT_PARTY_ADDED.getCcdType(), "Joint party added",
-                    "", idamService.getIdamTokens());
+                EventType.JOINT_PARTY_ADDED.getCcdType(), "Joint party added",
+                "", idamService.getIdamTokens());
             log.info("jointPartyAdded event updated V2 for case id {}", callback.getCaseDetails().getId());
             return new PreSubmitCallbackResponse<>(sscsCaseDetails.getData());
         }
