@@ -685,6 +685,7 @@ ccd:
         CASE_DOCUMENT_AM_URL: ${CASE_DOCUMENT_AM_URL}
         UPLOAD_TIMESTAMP_FEATURED_CASE_TYPES: CARE_SUPERVISION_EPO
         DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_gw,ccd_ps,sscs,bulk_scan_orchestrator,ccpay_bubble,ctsc_work_allocation,em_ccd_orchestrator,xui_webapp,aac_manage_case_assignment,wa_task_configuration_api,wa_task_monitor,ccd_case_document_am_api,hmc_cft_hearing_service,wa_task_management_api
+        OIDC_ALLOWED_ISSUERS: "https://idam-web-public.aat.platform.hmcts.net/o,https://hmcts-access.aat.platform.hmcts.net/o,https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts"
       secrets:
         DATA_STORE_DB_PASSWORD:
           secretRef: postgres
@@ -705,6 +706,8 @@ ccd:
         IDAM_OAUTH2_CLIENT_SECRET: ${CCD_API_GATEWAY_IDAM_CLIENT_SECRET}
         PROXY_DOCUMENT_MANAGEMENT: http://dm-store-aat.service.core-compute-aat.internal
         ALLOW_CONFIG_MUTATIONS: true
+        IDAM_WEB_PUBLIC_URL: https://idam-web-public.aat.platform.hmcts.net
+        IDAM_HMCTS_ACCESS_URL: https://hmcts-access.aat.platform.hmcts.net
       ingressIP: ${INGRESS_IP}
       ingressHost: gateway-${SERVICE_FQDN}
       disableKeyVaults: true

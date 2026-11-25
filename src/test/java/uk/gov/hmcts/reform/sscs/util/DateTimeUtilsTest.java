@@ -11,6 +11,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -121,6 +122,29 @@ class DateTimeUtilsTest {
         assertThat(ukLocalDateTime.getDayOfYear()).isEqualTo(zonedDateTimeNow.getDayOfYear());
         assertThat(ukLocalDateTime.getHour()).isEqualTo(zonedDateTimeNow.getHour());
         assertThat(ukLocalDateTime.getMinute()).isEqualTo(zonedDateTimeNow.getMinute());
+    }
+
+    @Test
+    void shouldReturnCurrentUkLocalDate() {
+        final ZoneId ukZone = ZoneId.of("Europe/London");
+        final LocalDate ukDateBefore = LocalDate.now(ukZone);
+
+        final LocalDate ukLocalDate = DateTimeUtils.getLocalDate();
+
+        final LocalDate ukDateAfter = LocalDate.now(ukZone);
+        assertThat(ukLocalDate).isBetween(ukDateBefore, ukDateAfter);
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @CsvSource({
+        "Monday moves to Tuesday, 2026-11-02, 2026-11-03",
+        "Thursday moves to Friday, 2026-11-05, 2026-11-06",
+        "Friday skips the weekend to Monday, 2026-11-06, 2026-11-09",
+        "Saturday moves to Monday, 2026-11-07, 2026-11-09",
+        "Sunday moves to Monday, 2026-11-08, 2026-11-09"
+    })
+    void givenDate_whenNextWeekday_thenSkipWeekends(final String description, final LocalDate date, final LocalDate expected) {
+        assertThat(DateTimeUtils.nextWeekday(date)).isEqualTo(expected);
     }
 
 }

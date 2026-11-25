@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.issueadjournment;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
@@ -17,16 +18,27 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.NOT_LISTABLE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.model.BankHolidayDivision.SCOTLAND;
+import static uk.gov.hmcts.reform.sscs.model.BankHolidayDivision.UK;
+import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDate;
+import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.nextWeekday;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 
+import ch.qos.logback.classic.Level;
+import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseDaysOffset;
@@ -52,12 +64,17 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.model.PoDetails;
 import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
+import uk.gov.hmcts.reform.sscs.util.LogCaptureExtension;
 
 class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNoticeAboutToSubmitHandlerTestBase {
+
+    @RegisterExtension
+    private final LogCaptureExtension logCapture = new LogCaptureExtension(IssueAdjournmentNoticeAboutToSubmitHandler.class);
 
 
     @Test
@@ -127,6 +144,190 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
     }
 
     @Test
+    void givenNoDirectionsAndCaseCannotBeListed_thenSetNextBusinessDayDueDate() throws IOException {
+        final LocalDate nextBusinessDay = LocalDate.of(2026, 11, 9);
+        when(businessDaysCalculatorService.getNextBusinessDay(any(LocalDate.class), eq(UK))).thenReturn(nextBusinessDay);
+        setCannotBeListedAndNoDirectionsWithNoDueDate();
+        setupHearingDurationValues();
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertSoftly(softly -> {
+            softly.assertThat(response.getErrors()).isEmpty();
+            softly.assertThat(sscsCaseData.getDirectionDueDate()).isEqualTo(nextBusinessDay.toString());
+            softly.assertThat(sscsCaseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.AWAITING_ADMIN_ACTION);
+            softly.assertThat(sscsCaseData.getState()).isEqualTo(NOT_LISTABLE);
+        });
+        verify(businessDaysCalculatorService).getNextBusinessDay(getLocalDate(), UK);
+    }
+
+    @Test
+    void givenScottishCaseWithNoDirectionsAndCaseCannotBeListed_thenSetNextScottishBusinessDayDueDate() throws IOException {
+        final LocalDate nextBusinessDay = LocalDate.of(2026, 1, 5);
+        when(businessDaysCalculatorService.getNextBusinessDay(any(LocalDate.class), eq(SCOTLAND))).thenReturn(nextBusinessDay);
+        sscsCaseData.setIsScottishCase("Yes");
+        setCannotBeListedAndNoDirectionsWithNoDueDate();
+        setupHearingDurationValues();
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertSoftly(softly -> {
+            softly.assertThat(response.getErrors()).isEmpty();
+            softly.assertThat(sscsCaseData.getDirectionDueDate()).isEqualTo(nextBusinessDay.toString());
+            softly.assertThat(sscsCaseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.AWAITING_ADMIN_ACTION);
+            softly.assertThat(sscsCaseData.getState()).isEqualTo(NOT_LISTABLE);
+        });
+        verify(businessDaysCalculatorService).getNextBusinessDay(getLocalDate(), SCOTLAND);
+    }
+
+    @Test
+    void givenCannotBeListedAndNoDirectionsWithJudgeEnteredDueDate_thenKeepJudgeEnteredDueDate() {
+        final LocalDate judgeDueDate = LocalDate.now().plusDays(7);
+        setCannotBeListedAndNoDirectionsWithNoDueDate();
+        sscsCaseData.getAdjournment().setDirectionsDueDate(judgeDueDate);
+        setupHearingDurationValues();
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getDirectionDueDate()).isEqualTo(judgeDueDate.toString());
+        assertThat(sscsCaseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.AWAITING_ADMIN_ACTION);
+        verifyNoInteractions(businessDaysCalculatorService);
+    }
+
+    @Test
+    void givenCannotBeListedAndNoDirectionsWithDueDateOffset_thenKeepOffsetDueDate() {
+        setCannotBeListedAndNoDirectionsWithNoDueDate();
+        sscsCaseData.getAdjournment().setDirectionsDueDateDaysOffset(AdjournCaseDaysOffset.TWENTY_EIGHT_DAYS);
+        setupHearingDurationValues();
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getDirectionDueDate()).isEqualTo(LocalDate.now().plusDays(28).toString());
+        verifyNoInteractions(businessDaysCalculatorService);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"YES, NO", "NO, YES", "YES, YES"})
+    void givenNotBothAnsweredNo_thenDoNotSetDueDateOrAwaitingAdminAction(final YesNo canBeListedRightAway, final YesNo directionsBeingMade) {
+        setCannotBeListedAndNoDirectionsWithNoDueDate();
+        sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(canBeListedRightAway);
+        sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(directionsBeingMade);
+        setupHearingDurationValues();
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getDirectionDueDate()).isNull();
+        assertThat(sscsCaseData.getInterlocReviewState()).isNull();
+        verifyNoInteractions(businessDaysCalculatorService);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"YES, NO", "NO, YES", "YES, YES"})
+    void givenNotBothAnsweredNoAndAwaitingAdminAction_thenClearInterlocReviewState(final YesNo canBeListedRightAway, final YesNo directionsBeingMade) {
+        setCannotBeListedAndNoDirectionsWithNoDueDate();
+        sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(canBeListedRightAway);
+        sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(directionsBeingMade);
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION);
+        setupHearingDurationValues();
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getInterlocReviewState()).isNull();
+    }
+
+    @ParameterizedTest
+    @CsvSource({"YES, NO", "NO, YES", "YES, YES"})
+    void givenNotBothAnsweredNoAndOtherInterlocReviewState_thenKeepInterlocReviewState(final YesNo canBeListedRightAway, final YesNo directionsBeingMade) {
+        setCannotBeListedAndNoDirectionsWithNoDueDate();
+        sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(canBeListedRightAway);
+        sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(directionsBeingMade);
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE);
+        setupHearingDurationValues();
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.REVIEW_BY_JUDGE);
+    }
+
+    @Test
+    void givenBothAnsweredNoAndAlreadyAwaitingAdminAction_thenKeepAwaitingAdminAction() throws IOException {
+        when(businessDaysCalculatorService.getNextBusinessDay(any(LocalDate.class), eq(UK))).thenReturn(LocalDate.of(2026, 11, 9));
+        setCannotBeListedAndNoDirectionsWithNoDueDate();
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION);
+        setupHearingDurationValues();
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.AWAITING_ADMIN_ACTION);
+    }
+
+    @Test
+    void givenNoticeNotGeneratedAndListingQuestionsUnanswered_thenDoNotSetDueDateOrAwaitingAdminAction() {
+        setCannotBeListedAndNoDirectionsWithNoDueDate();
+        sscsCaseData.getAdjournment().setGenerateNotice(NO);
+        sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(null);
+        sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(null);
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION);
+        setupHearingDurationValues();
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getDirectionDueDate()).isNull();
+        assertThat(sscsCaseData.getInterlocReviewState()).isNull();
+        assertThat(sscsCaseData.getState()).isEqualTo(READY_TO_LIST);
+        verifyNoInteractions(businessDaysCalculatorService);
+    }
+
+    @Test
+    void givenWelshCaseCannotBeListedAndNoDirections_thenDoNotSetDueDateAndLeaveInterlocAsWelshTranslation() {
+        setCannotBeListedAndNoDirectionsWithNoDueDate();
+        sscsCaseData.setLanguagePreferenceWelsh("yes");
+        setupHearingDurationValues();
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertSoftly(softly -> {
+            softly.assertThat(response.getErrors()).isEmpty();
+            softly.assertThat(sscsCaseData.getDirectionDueDate()).isNull();
+            softly.assertThat(sscsCaseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.WELSH_TRANSLATION);
+        });
+        verifyNoInteractions(businessDaysCalculatorService);
+    }
+
+    @ParameterizedTest
+    @MethodSource("businessDayCalculationFailures")
+    void givenBusinessDayCalculationFails_thenDefaultDueDateToNextWeekdayAndIssueNotice(final Exception failure) throws IOException {
+        when(businessDaysCalculatorService.getNextBusinessDay(any(LocalDate.class), eq(UK))).thenThrow(failure);
+        setCannotBeListedAndNoDirectionsWithNoDueDate();
+        setupHearingDurationValues();
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertSoftly(softly -> {
+            softly.assertThat(response.getErrors()).isEmpty();
+            softly.assertThat(sscsCaseData.getDirectionDueDate()).isEqualTo(nextWeekday(getLocalDate()).toString());
+            softly.assertThat(sscsCaseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.AWAITING_ADMIN_ACTION);
+            softly.assertThat(sscsCaseData.getState()).isEqualTo(NOT_LISTABLE);
+        });
+        logCapture.assertLogContains("Unable to calculate next business day - defaulting to next week day. Case Id is: %s".formatted(sscsCaseData.getCcdCaseId()), Level.ERROR);
+    }
+
+    private static Stream<Exception> businessDayCalculationFailures() {
+        return Stream.of(
+            new IOException("failed"),
+            new DateTimeParseException("bad date", "", 0),
+            new NullPointerException("no body")
+        );
+    }
+
+    private void setCannotBeListedAndNoDirectionsWithNoDueDate() {
+        sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(NO);
+        sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(NO);
+        sscsCaseData.getAdjournment().setDirectionsDueDate(null);
+        sscsCaseData.getAdjournment().setDirectionsDueDateDaysOffset(null);
+    }
+
+    @Test
     void givenAnIssueAdjournmentEventForWelshCase0_thenTheCaseStateShouldStayUnchanged() {
 
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
@@ -183,7 +384,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors())
-                .hasSize(0);
+                .isEmpty();
 
         assertThat(response.getData().getSscsDocument())
                 .map(SscsDocument::getValue)
@@ -204,7 +405,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors())
-                .hasSize(0);
+                .isEmpty();
 
         assertThat(response.getData().getInternalCaseDocumentData().getSscsInternalDocument())
                 .isNull();

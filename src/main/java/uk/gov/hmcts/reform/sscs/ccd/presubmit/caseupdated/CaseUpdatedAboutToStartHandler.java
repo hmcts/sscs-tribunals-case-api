@@ -6,6 +6,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.UC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.predicates.BenefitTypeConfidentialityPredicate.isValidBenefitTypeForConfidentiality;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPresent;
 
 import java.util.List;
@@ -84,6 +85,9 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
         if (sscsCaseData.isIbcCase()) {
             setupUkPortsOfEntry(sscsCaseData);
         }
+
+        sscsCaseData.getAppeal().setIsValidSscs2OrSscs5Case(
+                isValidBenefitTypeForConfidentiality(sscsCaseData.getAppeal().getBenefitType()) ? YES : null);
 
         if (sscsCaseData.isBenefitType(UC)) {
             sscsCaseData.getAppeal()

@@ -20,6 +20,7 @@ import static uk.gov.hmcts.reform.sscs.model.hmc.reference.PartyRelationshipType
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.PartyType.ORGANISATION;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.FACE_TO_FACE;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.NOT_ATTENDING;
+import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDate;
 import static uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil.getIndividualPreferredHearingChannel;
 
 import java.time.LocalDate;
@@ -61,7 +62,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Party;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.exception.InvalidMappingException;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.model.HearingWrapper;
 import uk.gov.hmcts.reform.sscs.model.hmc.reference.DayOfWeekUnavailabilityType;
@@ -76,12 +76,18 @@ import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
 @ExtendWith(MockitoExtension.class)
 class HearingsPartiesMappingTest extends HearingsMappingBase {
 
-    public static final String EMAIL_ADDRESS = "test@test.com";
-    public static final String TELEPHONE_NUMBER = "01000000000";
-    public static final String PARTY_ID = "a2b837d5-ee28-4bc9-a3d8-ce2d2de9fb29";
-    public static final String OTHER_PARTY_ID = "4dd6b6fa-6562-4699-8e8b-6c70cf8a333e";
-    public static final String DWP_ID = "DWP";
+    private static final String EMAIL_ADDRESS = "test@test.com";
+    private static final String TELEPHONE_NUMBER = "01000000000";
+    private static final String PARTY_ID = "a2b837d5-ee28-4bc9-a3d8-ce2d2de9fb29";
+    private static final String OTHER_PARTY_ID = "4dd6b6fa-6562-4699-8e8b-6c70cf8a333e";
+    private static final String DWP_ID = "DWP";
     private static final Name name = Name.builder().title("title").firstName("first").lastName("last").build();
+
+    private static final LocalDate TODAY = getLocalDate();
+    private static final LocalDate TOMORROW = getLocalDate().plusDays(1);
+    private static final LocalDate TWO_DAYS_IN_FUTURE = getLocalDate().plusDays(2);
+    private static final LocalDate YESTERDAY = getLocalDate().minusDays(1);
+    private static final LocalDate TWO_DAYS_IN_PAST = getLocalDate().minusDays(2);
 
 
     @DisplayName("When a valid hearing wrapper with language interpreter is given buildHearingPartiesDetails returns the correct Hearing Parties Details")
@@ -265,7 +271,7 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
 
     @DisplayName("When HearingOption is  Null return empty string")
     @Test
-    void getIndividualInterpreterLanguageWhenHearingOptionsNull() throws InvalidMappingException {
+    void getIndividualInterpreterLanguageWhenHearingOptionsNull() {
 
         String individualInterpreterLanguage = HearingsPartiesMapping.getIndividualInterpreterLanguage(
                 null, null, refData, null);
@@ -275,7 +281,7 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
 
     @DisplayName("When HearingOption is Null and adjournLanguage is provided then return adjournLanguage")
     @Test
-    void getIndividualInterpreterLanguageWhenHearingOptionsNullAndAdjournLanguageProvided() throws InvalidMappingException {
+    void getIndividualInterpreterLanguageWhenHearingOptionsNullAndAdjournLanguageProvided() {
         DynamicList languages = new DynamicList(new DynamicListItem("TestLanguage", "TestLanguage"), Collections.emptyList());
         Adjournment adjournment = Adjournment.builder().adjournmentInProgress(YES).interpreterRequired(YES).interpreterLanguage(languages).build();
         String individualInterpreterLanguage = HearingsPartiesMapping.getIndividualInterpreterLanguage(
@@ -286,7 +292,7 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
 
     @DisplayName("When HearingOption is Null and adjournLanguage is null then return null")
     @Test
-    void getIndividualInterpreterLanguageWhenHearingOptionsNullAndAdjournLanguageNull() throws InvalidMappingException {
+    void getIndividualInterpreterLanguageWhenHearingOptionsNullAndAdjournLanguageNull() {
         Adjournment adjournment = Adjournment.builder().adjournmentInProgress(YES).interpreterRequired(NO).build();
         String individualInterpreterLanguage = HearingsPartiesMapping.getIndividualInterpreterLanguage(
                 null, null, refData, adjournment);
@@ -522,13 +528,13 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
     @Test
     void getIndividualLastNameWhenNull() {
         Entity entity = Appellant.builder().name(Name.builder().build()).build();
-        assertThrows(ListingException.class, () -> HearingsPartiesMapping.getIndividualFirstName(entity));
+        assertThrows(ListingException.class, () -> HearingsPartiesMapping.getIndividualLastName(entity));
     }
 
     @DisplayName("When language passed in should return correct LOV format")
     @ParameterizedTest
     @CsvSource({"Acholi,ach", "Afrikaans,afr", "Akan,aka", "Albanian,alb", "Zaza,zza", "Zulu,zul"})
-    void testGetIndividualInterpreterLanguage(String lang, String expected) throws InvalidMappingException {
+    void testGetIndividualInterpreterLanguage(String lang, String expected) {
         given(verbalLanguages.getVerbalLanguage(lang))
                 .willReturn(new Language(expected,"Test",null,null,null,List.of(lang)));
 
@@ -589,7 +595,7 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
         "Hands on signing,handsOnSigning",
         "Deaf Relay,deafRelay",
         "Palantypist / Speech to text,palantypist"})
-    void testGetIndividualInterpreterSignLanguage(String signLang, String expected) throws InvalidMappingException {
+    void testGetIndividualInterpreterSignLanguage(String signLang, String expected) {
 
         given(signLanguages.getSignLanguage(signLang))
                 .willReturn(new Language(expected,"Test",null,null,null,List.of(signLang)));
@@ -609,7 +615,7 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
 
     @DisplayName("When override is Interpreter Wanted is Yes and a override language passed in getIndividualInterpreterLanguage should return the override reference")
     @Test
-    void testGetIndividualInterpreterLanguageOverride() throws InvalidMappingException {
+    void testGetIndividualInterpreterLanguageOverride() {
         HearingOptions hearingOptions = HearingOptions.builder()
                 .languageInterpreter("Yes")
                 .languages("Acholi")
@@ -627,7 +633,7 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
 
     @DisplayName("When override is Interpreter Wanted is No getIndividualInterpreterLanguage should return null")
     @Test
-    void testGetIndividualInterpreterLanguageOverrideNo() throws InvalidMappingException {
+    void testGetIndividualInterpreterLanguageOverrideNo() {
 
         HearingOptions hearingOptions = HearingOptions.builder()
                 .languageInterpreter("Yes")
@@ -646,7 +652,7 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
 
     @DisplayName("When override is Interpreter Wanted is null getIndividualInterpreterLanguage should return the default value")
     @Test
-    void testGetIndividualInterpreterLanguageOverrideNullIsInterpreterWanted() throws InvalidMappingException {
+    void testGetIndividualInterpreterLanguageOverrideNullIsInterpreterWanted() {
         given(verbalLanguages.getVerbalLanguage("Acholi"))
                 .willReturn(new Language("ach","Test",null,null,null,List.of()));
 
@@ -669,7 +675,7 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
 
     @DisplayName("When override Appellant Interpreter is null getIndividualInterpreterLanguage should return the default value")
     @Test
-    void testGetIndividualInterpreterLanguageOverrideNullAppellantInterpreter() throws InvalidMappingException {
+    void testGetIndividualInterpreterLanguageOverrideNullAppellantInterpreter() {
         given(verbalLanguages.getVerbalLanguage("Acholi"))
                 .willReturn(new Language("ach","Test",null,null,null,List.of()));
 
@@ -787,7 +793,7 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
     @DisplayName("When hearing type is blank and face to face then return LOV not attending")
     @Test
     void getIndividualPreferredHearingChannelBlankFaceToFaceTest() {
-        HearingSubtype hearingSubtype = HearingSubtype.builder().wantsHearingTypeFaceToFace("Yes").build();
+        HearingSubtype hearingSubtype = HearingSubtype.builder().wantsHearingTypeFaceToFace(null).build();
         HearingOptions hearingOptions = HearingOptions.builder().wantsToAttend("yes").build();
         HearingChannel result = getIndividualPreferredHearingChannel(hearingSubtype, hearingOptions, null);
         assertThat(result).isEqualTo(FACE_TO_FACE);
@@ -966,36 +972,43 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
     }
 
     @DisplayName("When Valid DateRanges are given getPartyUnavailabilityRange returns the correct list of Unavailability Ranges")
-    @Test
-    void getPartyUnavailabilityRange() throws ListingException {
-        List<ExcludeDate> excludeDates = new ArrayList<>();
-        excludeDates.add(ExcludeDate.builder().value(DateRange.builder()
-                        .start("2022-02-01")
-                        .end("2022-03-31")
-                        .build())
-                .build());
-        excludeDates.add(ExcludeDate.builder().value(DateRange.builder()
-                        .start("2022-06-01")
-                        .end("2022-06-02")
-                        .build())
-                .build());
-        HearingOptions hearingOptions = HearingOptions.builder().excludeDates(excludeDates).build();
-        List<UnavailabilityRange> result = HearingsPartiesMapping.getPartyUnavailabilityRange(hearingOptions);
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("getPartyUnavailabilityRangeArguments")
+    void getPartyUnavailabilityRange(final String description, final LocalDate from, final LocalDate to,
+        final LocalDate expectedFrom, final LocalDate expectedTo) throws ListingException {
+        final List<ExcludeDate> excludeDates = List.of(ExcludeDate
+            .builder()
+            .value(DateRange
+                .builder()
+                .start(from == null ? null : from.toString())
+                .end(to == null ? null : to.toString())
+                .build())
+            .build());
+        final HearingOptions hearingOptions = HearingOptions.builder().excludeDates(excludeDates).build();
+        final List<UnavailabilityRange> result = HearingsPartiesMapping.getPartyUnavailabilityRange(hearingOptions);
 
-        assertThat(result)
+        if (expectedFrom == null && expectedTo == null) {
+            assertThat(result).isEmpty();
+        } else {
+            assertThat(result)
                 .extracting("unavailableFromDate", "unavailableToDate", "unavailabilityType")
-                .contains(
-                        tuple(
-                                LocalDate.of(2022, 2, 1),
-                                LocalDate.of(2022, 3, 31),
-                                DayOfWeekUnavailabilityType.ALL_DAY.getLabel()
-                        ),
-                        tuple(
-                                LocalDate.of(2022, 6, 1),
-                                LocalDate.of(2022, 6, 2),
-                                DayOfWeekUnavailabilityType.ALL_DAY.getLabel()
-                        )
-            );
+                .containsExactly(
+                    tuple(expectedFrom, expectedTo, DayOfWeekUnavailabilityType.ALL_DAY.getLabel()));
+        }
+    }
+
+    private static Stream<Arguments> getPartyUnavailabilityRangeArguments() {
+        return Stream.of(
+            Arguments.of("Future range is included", TOMORROW, TWO_DAYS_IN_FUTURE, TOMORROW, TWO_DAYS_IN_FUTURE),
+            Arguments.of("Single future day is included", TOMORROW, TOMORROW, TOMORROW, TOMORROW),
+            Arguments.of("Range of today only is included", TODAY, TODAY, TODAY, TODAY),
+            Arguments.of("Range starting in past and ending in future is included", TWO_DAYS_IN_PAST, TOMORROW, TWO_DAYS_IN_PAST, TOMORROW),
+            Arguments.of("Range starting in past and ending today is included", TWO_DAYS_IN_PAST, TODAY, TWO_DAYS_IN_PAST, TODAY),
+            Arguments.of("Range entirely in past is excluded", TWO_DAYS_IN_PAST, YESTERDAY, null, null),
+            Arguments.of("Missing start date defaults to future end date", null, TOMORROW, TOMORROW, TOMORROW),
+            Arguments.of("Missing start date with past end date is excluded", null, YESTERDAY, null, null),
+            Arguments.of("Missing start and end dates is excluded", null, null, null, null)
+        );
     }
 
     @DisplayName("When null ExcludeDates is given getPartyUnavailabilityRange returns an empty list")
@@ -1009,7 +1022,7 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
 
     @DisplayName("Unavailability ranges must be set from the excluded dates. Each range must have an UnavailabilityType.")
     @Test
-    void buildHearingPartiesDetails_unavailabilityRanges() throws ListingException, InvalidMappingException {
+    void buildHearingPartiesDetails_unavailabilityRanges() throws ListingException {
         LocalDate start = LocalDate.now();
         LocalDate end = start.plusDays(1);
         SscsCaseData caseData = SscsCaseData.builder()
@@ -1037,7 +1050,7 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
         assertThat(partyDetails).isNotNull();
         assertThat(partyDetails.getUnavailabilityRanges()).hasSize(1);
 
-        UnavailabilityRange unavailabilityRange = partyDetails.getUnavailabilityRanges().get(0);
+        UnavailabilityRange unavailabilityRange = partyDetails.getUnavailabilityRanges().getFirst();
 
         assertThat(unavailabilityRange.getUnavailabilityType()).isEqualTo(DayOfWeekUnavailabilityType.ALL_DAY.getLabel());
         assertThat(unavailabilityRange.getUnavailableFromDate()).isEqualTo(start);
@@ -1069,10 +1082,10 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
         List<UnavailabilityRange> result = HearingsPartiesMapping.getPartyUnavailabilityRange(hearingOptions);
 
         assertThat(result).hasSize(1);
-        assertThat(result.get(0)).isEqualTo(UnavailabilityRange.builder()
-                .unavailableToDate(LocalDate.now())
-                .unavailableFromDate(LocalDate.now())
-                .unavailabilityType(ALL_DAY.getLabel()).build());
+        assertThat(result.getFirst()).isEqualTo(UnavailabilityRange.builder()
+                                                                   .unavailableToDate(LocalDate.now())
+                                                                   .unavailableFromDate(LocalDate.now())
+                                                                   .unavailabilityType(ALL_DAY.getLabel()).build());
     }
 
     @DisplayName("When the start date is in a wrong format and the end date is correct, then return the unavailability range")
@@ -1088,10 +1101,10 @@ class HearingsPartiesMappingTest extends HearingsMappingBase {
         List<UnavailabilityRange> result = HearingsPartiesMapping.getPartyUnavailabilityRange(hearingOptions);
 
         assertThat(result).hasSize(1);
-        assertThat(result.get(0)).isEqualTo(UnavailabilityRange.builder()
-                .unavailableToDate(LocalDate.now())
-                .unavailableFromDate(LocalDate.now())
-                .unavailabilityType(ALL_DAY.getLabel()).build());
+        assertThat(result.getFirst()).isEqualTo(UnavailabilityRange.builder()
+                                                                   .unavailableToDate(LocalDate.now())
+                                                                   .unavailableFromDate(LocalDate.now())
+                                                                   .unavailabilityType(ALL_DAY.getLabel()).build());
     }
 
     @DisplayName("Unavailability ranges must be set from the excluded dates. Each range must have an UnavailabilityType.")

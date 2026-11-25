@@ -21,6 +21,7 @@ import static uk.gov.hmcts.reform.sscs.model.hmc.reference.PartyType.ORGANISATIO
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.DWP_ACRONYM;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.HMRC_ACRONYM;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.IBCA_ACRONYM;
+import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDate;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -68,7 +69,7 @@ import uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil;
 @Slf4j
 public final class HearingsPartiesMapping {
 
-    public static final String ORGANISATION_NAME_REPLACEMENT = "-";
+    private static final String ORGANISATION_NAME_REPLACEMENT = "-";
 
     private HearingsPartiesMapping() {
 
@@ -441,12 +442,16 @@ public final class HearingsPartiesMapping {
         for (ExcludeDate excludeDate : hearingOptions.getExcludeDates()) {
             UnavailabilityRange unavailabilityRange = getUnavailabilityRange(excludeDate.getValue());
 
-            if (nonNull(unavailabilityRange)) {
+            if (nonNull(unavailabilityRange) && !isExpired(unavailabilityRange)) {
                 unavailabilityRanges.add(unavailabilityRange);
             }
         }
 
         return unavailabilityRanges;
+    }
+
+    private static boolean isExpired(UnavailabilityRange unavailabilityRange) {
+        return unavailabilityRange.getUnavailableToDate().isBefore(getLocalDate());
     }
 
     private static UnavailabilityRange getUnavailabilityRange(DateRange dateRange) throws ListingException {

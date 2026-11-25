@@ -316,7 +316,9 @@ s2s:
         sscs: /document, /appeals, /evidence/upload, /api/continuous-online-hearings
         ccd: /ccdAboutToStart, /ccdAboutToSubmit, /ccdSubmittedEvent, /ccdMidEvent
         bulkscan: /validate-record, /forms/, /transform-exception-record, /transform-scanned-data
-
+job:
+    resendHearingBooked:
+        references: ${RESEND_HEARING_BOOKED_REFERENCES:dummy}
 judicial-ref:
     api:
         url: ${JUDICIAL_REF_API_URL:http://localhost:5555}
@@ -507,9 +509,9 @@ notification:
         reviewAndSetAside:
             docmosisId: TB-SCS-LET-ENG-Permission-to-Appeal-Review-v2.docx
         permissionToAppealRefused:
-            docmosisId: TB-SCS-LET-ENG-Permission-to-Appeal-Granted-Refused-v2.docx
+            docmosisId: TB-SCS-LET-ENG-Permission-to-Appeal-Granted-Refused-v3.docx
         permissionToAppealGranted:
-            docmosisId: TB-SCS-LET-ENG-Permission-to-Appeal-Granted-Refused-v2.docx
+            docmosisId: TB-SCS-LET-ENG-Permission-to-Appeal-Granted-Refused-v3.docx
         permissionToAppealRequest:
             docmosisId: TB-SCS-LET-ENG-Action-Further-Evidence-v3.docx
         bundleCreatedForUpperTribunal:
@@ -1243,9 +1245,9 @@ notification:
         reviewAndSetAside:
             docmosisId: TB-SCS-LET-WEL-Permission-to-Appeal-Review-v2.docx
         permissionToAppealRefused:
-            docmosisId: TB-SCS-LET-WEL-Permission-to-Appeal-Granted-Refused-v2.docx
+            docmosisId: TB-SCS-LET-WEL-Permission-to-Appeal-Granted-Refused-v3.docx
         permissionToAppealGranted:
-            docmosisId: TB-SCS-LET-WEL-Permission-to-Appeal-Granted-Refused-v2.docx
+            docmosisId: TB-SCS-LET-WEL-Permission-to-Appeal-Granted-Refused-v3.docx
         permissionToAppealRequest:
             docmosisId: TB-SCS-LET-WEL-Action-Further-Evidence-v2.docx
         bundleCreatedForUpperTribunal:
@@ -1931,6 +1933,10 @@ letter-async:
     multiplier: ${LETTER_ASYNC_MULTIPLIER:2}
     maxDelay: ${LETTER_ASYNC_MAX_DELAY:180000}
     initialDelay: ${LETTER_ASYNC_INITIAL_DELAY:5000}
+    emailMaxAttempts: ${LETTER_ASYNC_EMAIL_MAX_ATTEMPTS:5}
+    emailDelay: ${LETTER_ASYNC_EMAIL_DELAY:1000}
+    emailMultiplier: ${LETTER_ASYNC_EMAIL_MULTIPLIER:2}
+    emailMaxDelay: ${LETTER_ASYNC_EMAIL_MAX_DELAY:10000}
 
 retry:
     max: 3
