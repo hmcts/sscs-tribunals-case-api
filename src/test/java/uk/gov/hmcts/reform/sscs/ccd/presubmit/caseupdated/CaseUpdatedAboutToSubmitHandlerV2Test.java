@@ -1978,6 +1978,40 @@ class CaseUpdatedAboutToSubmitHandlerV2Test {
         assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields(), nullValue());
     }
 
+    @Disabled
+    @Test
+    void shouldReplacePaperVenuesWithProcessingVenueWhenHearingChannelChangesFromPaperToFaceToFace() {
+        final String processingVenue = "Cardiff";
+        final String processingVenueEpimsId = "372653";
+        final List<CcdValue<CcdValue<String>>> paperVenueEpimsIds = List.of(
+                new CcdValue<>(new CcdValue<>("111111")),
+                new CcdValue<>(new CcdValue<>("222222")),
+                new CcdValue<>(new CcdValue<>("333333")));
+
+        sscsCaseDataBefore.getAppeal().setHearingType(HearingType.PAPER.getValue());
+        sscsCaseDataBefore.getAppeal().setHearingOptions(HearingOptions.builder().wantsToAttend(NO.getValue()).build());
+
+        sscsCaseData.setProcessingVenue(processingVenue);
+        sscsCaseData.getAppeal().setHearingType(HearingType.ORAL.getValue());
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().wantsToAttend(YES.getValue()).build());
+        sscsCaseData.getAppeal().setHearingSubtype(HearingSubtype.builder().wantsHearingTypeFaceToFace(YES.getValue()).build());
+        sscsCaseData.getSchedulingAndListingFields().setDefaultListingValues(OverrideFields.builder()
+                .hearingVenueEpimsIds(paperVenueEpimsIds)
+                .build());
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder()
+                .hearingVenueEpimsIds(paperVenueEpimsIds)
+                .build());
+
+        lenient().when(venueService.getEpimsIdForVenue(processingVenue)).thenReturn(processingVenueEpimsId);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        Assertions.assertThat(response.getErrors()).isEmpty();
+        Assertions.assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getHearingVenueEpimsIds())
+                .extracting(venue -> venue.getValue().getValue())
+                .containsExactly(processingVenueEpimsId);
+    }
+
     @Test
     void ifIbcCaseThenSetHearingRouteToListAssist() {
         sscsCaseData.setBenefitCode(IBCA_BENEFIT_CODE);
