@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
 import static java.util.Objects.isNull;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.WRITE_FINAL_DECISION_SET_END_DATE;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -57,6 +58,9 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
         if ("na".equals(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType())) {
             sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType(null);
+        }
+        if (!WRITE_FINAL_DECISION_SET_END_DATE.equals(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType())) {
+            sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDate(null);
         }
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);

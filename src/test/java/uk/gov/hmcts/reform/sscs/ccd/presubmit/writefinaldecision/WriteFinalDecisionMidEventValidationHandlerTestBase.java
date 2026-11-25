@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionMidEventValidationHandlerBase.CANT_UPLOAD_ERROR_MESSAGE;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.WRITE_FINAL_DECISION_SET_END_DATE;
 
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -17,6 +18,7 @@ import junitparams.JUnitParamsRunner;
 import junitparams.NamedParameters;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
+import org.assertj.core.api.Assertions;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.junit.Before;
 import org.junit.Test;
@@ -147,6 +149,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
     public void givenAnEndDateIsBeforeStartDate_thenDisplayAnError(String descriptorFlowValue) {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionStartDate("2020-01-01");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDate("2019-01-01");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType(WRITE_FINAL_DECISION_SET_END_DATE);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -240,6 +243,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
     public void givenAnEndDateIsSameAsStartDate_thenDisplayAnError(String descriptorFlowValue) {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionStartDate("2020-01-01");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDate("2020-01-01");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType(WRITE_FINAL_DECISION_SET_END_DATE);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow(descriptorFlowValue);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -248,6 +252,23 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Decision notice end date must be after decision notice start date", error);
+    }
+
+    @Test
+    @Parameters({"indefinite", "na", "null"})
+    public void givenAnEndDateIsBeforeStartDateAndEndDateTypeIsNotSetEndDate_thenDoNotDisplayAnError(@Nullable final String endDateType) {
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionStartDate("2020-01-01");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDate("2019-01-01");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType(endDateType);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        if (!response.getErrors().isEmpty()) {
+            Assertions.assertThat(response.getErrors())
+                .doesNotContain("Decision notice end date must be after decision notice start date");
+        }
     }
 
     @Test

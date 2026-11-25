@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.WRITE_FINAL_DECISION_SET_END_DATE;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.IN_CHAMBERS;
 
 import java.io.IOException;
@@ -160,6 +161,9 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     protected void setCommonPreviewParams(SscsCaseData sscsCaseData, String endDate) {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionStartDate("2018-10-11");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDate(endDate);
+        if (endDate != null) {
+            sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType(WRITE_FINAL_DECISION_SET_END_DATE);
+        }
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision(DATE_OF_DECISION);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionReasons(Arrays.asList(new CollectionItem<>(null, "My reasons for decision")));
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAnythingElse("Something else.");

@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.WRITE_FINAL_DECISION_SET_END_DATE;
 
 import jakarta.validation.Validator;
 import junitparams.JUnitParamsRunner;
@@ -348,7 +349,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion(award);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparison);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("setEndDate");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType(WRITE_FINAL_DECISION_SET_END_DATE);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -356,7 +357,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         assertEquals(0, response.getErrors().size());
 
-        assertEquals("setEndDate", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertEquals(WRITE_FINAL_DECISION_SET_END_DATE, caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
     }
 
@@ -373,7 +374,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion(award);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(comparison);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("setEndDate");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType(WRITE_FINAL_DECISION_SET_END_DATE);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -381,7 +382,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         assertEquals(0, response.getErrors().size());
 
-        assertEquals("setEndDate", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertEquals(WRITE_FINAL_DECISION_SET_END_DATE, caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
     }
 
@@ -399,7 +400,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion(award);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparison);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("setEndDate");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType(WRITE_FINAL_DECISION_SET_END_DATE);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -409,7 +410,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("End date is not applicable for this decision - please specify 'N/A - No Award'.", error);
 
-        assertEquals("setEndDate", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertEquals(WRITE_FINAL_DECISION_SET_END_DATE, caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
     }
 
@@ -427,7 +428,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion(award);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(comparison);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("Yes");
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("setEndDate");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType(WRITE_FINAL_DECISION_SET_END_DATE);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -437,7 +438,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("End date is not applicable for this decision - please specify 'N/A - No Award'.", error);
 
-        assertEquals("setEndDate", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertEquals(WRITE_FINAL_DECISION_SET_END_DATE, caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
     }
 
@@ -826,14 +827,14 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         setNoAwardsScenario(sscsCaseData);
         setEmptyActivitiesListScenario(sscsCaseData);
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("setEndDate");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType(WRITE_FINAL_DECISION_SET_END_DATE);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
         assertEquals("End date is not applicable for this decision - please specify 'N/A - No Award'.", response.getErrors().iterator().next());
         assertEquals(0, response.getWarnings().size());
-        assertEquals("setEndDate", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+        assertEquals(WRITE_FINAL_DECISION_SET_END_DATE, caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
     }
 

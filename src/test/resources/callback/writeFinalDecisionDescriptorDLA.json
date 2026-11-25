@@ -32,6 +32,7 @@
       "writeFinalDecisionDateOfDecision" : "2018-09-01",
       "writeFinalDecisionStartDate": "START_DATE_PLACEHOLDER",
       "writeFinalDecisionEndDate": "2018-11-10",
+      "writeFinalDecisionEndDateType": "setEndDate",
       "writeFinalDecisionReasons" : [{"id" : null, "value" : "My reasons for decision"}],
       "writeFinalDecisionAnythingElse" : "Something else.",
       "writeFinalDecisionPreviewDocument": {
@@ -757,6 +758,7 @@
       "writeFinalDecisionDateOfDecision" : "2018-09-01",
       "writeFinalDecisionStartDate": "START_DATE_PLACEHOLDER",
       "writeFinalDecisionEndDate": "2018-11-10",
+      "writeFinalDecisionEndDateType": "setEndDate",
       "writeFinalDecisionReasons" : [{"id" : null, "value" : "My reasons for decision"}],
       "writeFinalDecisionAnythingElse" : "Something else.",
       "writeFinalDecisionPreviewDocument": {

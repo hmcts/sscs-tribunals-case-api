@@ -4,6 +4,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.WRITE_FINAL_DECISION_SET_END_DATE;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPresent;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.IN_CHAMBERS;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getLastValidHearing;
@@ -137,9 +138,12 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
         writeFinalDecisionBuilder.appointeeName(buildName(caseData, true));
 
-        writeFinalDecisionBuilder.endDate(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDate());
+        final String endDate = WRITE_FINAL_DECISION_SET_END_DATE.equals(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType())
+            ? caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDate()
+            : null;
+        writeFinalDecisionBuilder.endDate(endDate);
         writeFinalDecisionBuilder.startDate(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionStartDate());
-        writeFinalDecisionBuilder.isIndefinite(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDate() == null);
+        writeFinalDecisionBuilder.isIndefinite(endDate == null);
 
         setEntitlements(writeFinalDecisionBuilder, caseData);
         setDescriptorsAndPoints(writeFinalDecisionBuilder, caseData);

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.WRITE_FINAL_DECISION_SET_END_DATE;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
@@ -110,8 +111,9 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
 
     protected abstract void setDwpReassessAwardPage(SscsCaseData sscsCaseData, String pageId);
 
-    private boolean isDecisionNoticeDatesInvalid(SscsCaseData sscsCaseData) {
-        if (isNotBlank(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionStartDate()) && isNotBlank(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDate())) {
+    private boolean isDecisionNoticeDatesInvalid(final SscsCaseData sscsCaseData) {
+        if (WRITE_FINAL_DECISION_SET_END_DATE.equals(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType())
+            && isNotBlank(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionStartDate()) && isNotBlank(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDate())) {
             LocalDate decisionNoticeStartDate = LocalDate.parse(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionStartDate());
             LocalDate decisionNoticeEndDate = LocalDate.parse(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDate());
             return !decisionNoticeStartDate.isBefore(decisionNoticeEndDate);
