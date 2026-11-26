@@ -775,6 +775,17 @@
     "PageLabel": "Adjournment Details"
   },
   {
+    "CaseEventID": "superUserFullEdit",
+    "CaseFieldID": "hearingRoute",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "26/11/2026",
+    "PageDisplayOrder": 10,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "hearingRoute",
+    "PageLabel": "Hearing Route"
+  },
+  {
     "CaseEventID": "adjournCase",
     "CaseFieldID": "hearingRoute",
     "CaseTypeID": "Benefit",
