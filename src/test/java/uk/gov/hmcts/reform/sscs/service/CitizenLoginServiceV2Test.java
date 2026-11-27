@@ -5,6 +5,7 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -52,6 +53,8 @@ import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.AssociateCaseDetails;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.OnlineHearing;
+import uk.gov.hmcts.reform.sscs.exception.CaseAssociationError;
+import uk.gov.hmcts.reform.sscs.exception.CaseAssociationException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.util.CaseAssignmentVerifier;
@@ -523,45 +526,45 @@ class CitizenLoginServiceV2Test {
         AssociateCaseDetails associateCaseDetails =
                 new AssociateCaseDetails("someOtherEmail@example.com", APPEAL_POSTCODE, null);
 
-        Optional<OnlineHearing> sscsCaseDetails =
-                underTest.associateCaseToCitizen(citizenIdamTokens, tya, associateCaseDetails);
+        CaseAssociationException exception = assertThrows(CaseAssociationException.class,
+                () -> underTest.associateCaseToCitizen(citizenIdamTokens, tya, associateCaseDetails));
 
+        assertThat(exception.getError(), is(CaseAssociationError.POSTCODE_MISMATCH));
         verify(citizenCcdService, never()).addUserToCase(any(IdamTokens.class), any(String.class), anyLong());
-        assertThat(sscsCaseDetails.isPresent(), is(false));
         logCapture.assertLogContains("Associate case: Postcode/Ibca reference does not match id [123456789] for tya [" + tya + "] user [" + citizenIdamTokens.getUserId() + "] postcode [" + getMaskedPostcode(APPEAL_POSTCODE) + "]", Level.INFO);
     }
 
     @Test
     void cannotAssociatesUserWithCaseAsPostcodeIncorrect() {
         SscsCaseDetails expectedCase = createSscsCaseDetailsWithAppellantSubscription(tya);
-        assertThatUserIsNotAddedToCase(expectedCase);
+        assertThatUserIsNotAddedToCase(expectedCase, CaseAssociationError.POSTCODE_MISMATCH);
     }
 
     @Test
     void cannotAssociateUserWithCaseAsCasePostcodeIsEmpty() {
         SscsCaseDetails expectedCase = createSscsCaseDetailsWithAppellantSubscription(tya);
         expectedCase.getData().getAppeal().getAppellant().getAddress().setPostcode("");
-        assertThatUserIsNotAddedToCase(expectedCase);
+        assertThatUserIsNotAddedToCase(expectedCase, CaseAssociationError.POSTCODE_OR_REFERENCE_NOT_CONFIGURED);
     }
 
     @Test
     void cannotAssociateUserWithCaseAsCasePostcodeIsNull() {
         SscsCaseDetails expectedCase = createSscsCaseDetailsWithAppellantSubscription(tya);
         expectedCase.getData().getAppeal().getAppellant().getAddress().setPostcode(null);
-        assertThatUserIsNotAddedToCase(expectedCase);
+        assertThatUserIsNotAddedToCase(expectedCase, CaseAssociationError.POSTCODE_OR_REFERENCE_NOT_CONFIGURED);
     }
 
-    private void assertThatUserIsNotAddedToCase(SscsCaseDetails expectedCase) {
+    private void assertThatUserIsNotAddedToCase(SscsCaseDetails expectedCase, CaseAssociationError expectedError) {
         when(ccdService.findCaseByAppealNumber(tya, serviceIdamTokens))
                 .thenReturn(expectedCase);
         AssociateCaseDetails associateCaseDetails =
                 new AssociateCaseDetails(SUBSCRIPTION_EMAIL_ADDRESS, "someOtherPostcode", null);
 
-        Optional<OnlineHearing> sscsCaseDetails =
-                underTest.associateCaseToCitizen(citizenIdamTokens, tya, associateCaseDetails);
+        CaseAssociationException exception = assertThrows(CaseAssociationException.class,
+                () -> underTest.associateCaseToCitizen(citizenIdamTokens, tya, associateCaseDetails));
 
+        assertThat(exception.getError(), is(expectedError));
         verify(citizenCcdService, never()).addUserToCase(any(IdamTokens.class), any(String.class), anyLong());
-        assertThat(sscsCaseDetails.isPresent(), is(false));
     }
 
     @Test
@@ -572,12 +575,28 @@ class CitizenLoginServiceV2Test {
         AssociateCaseDetails associateCaseDetails =
                 new AssociateCaseDetails(SUBSCRIPTION_EMAIL_ADDRESS, someOtherPostcode, null);
 
-        Optional<OnlineHearing> sscsCaseDetails =
-                underTest.associateCaseToCitizen(citizenIdamTokens, tya, associateCaseDetails);
+        CaseAssociationException exception = assertThrows(CaseAssociationException.class,
+                () -> underTest.associateCaseToCitizen(citizenIdamTokens, tya, associateCaseDetails));
 
+        assertThat(exception.getError(), is(CaseAssociationError.CASE_NOT_FOUND));
         verify(citizenCcdService, never()).addUserToCase(any(IdamTokens.class), any(String.class), anyLong());
-        assertThat(sscsCaseDetails.isPresent(), is(false));
         logCapture.assertLogContains("Associate case: No case found for tya [" + tya + "] user [" + citizenIdamTokens.getUserId() + "] postcode [" + getMaskedPostcode(someOtherPostcode) + "]", Level.INFO);
+    }
+
+    @Test
+    void cannotAssociateUserWithCaseAsSubscriptionMismatch() {
+        SscsCaseDetails expectedCase = createSscsCaseDetailsWithAppellantSubscription("otherTya");
+        when(ccdService.findCaseByAppealNumber(tya, serviceIdamTokens)).thenReturn(expectedCase);
+        when(caseAssignmentVerifier.verifyPostcodeOrIbcaReference(any(SscsCaseDetails.class), eq(APPEAL_POSTCODE), eq(IBCA_REFERENCE), eq(SUBSCRIPTION_EMAIL_ADDRESS))).thenReturn(true);
+        AssociateCaseDetails associateCaseDetails =
+                new AssociateCaseDetails(SUBSCRIPTION_EMAIL_ADDRESS, APPEAL_POSTCODE, IBCA_REFERENCE);
+
+        CaseAssociationException exception = assertThrows(CaseAssociationException.class,
+                () -> underTest.associateCaseToCitizen(citizenIdamTokens, tya, associateCaseDetails));
+
+        assertThat(exception.getError(), is(CaseAssociationError.SUBSCRIPTION_MISMATCH));
+        verify(citizenCcdService, never()).addUserToCase(any(IdamTokens.class), any(String.class), anyLong());
+        logCapture.assertLogContains("Associate case: Subscription does not match id [123456789] for tya [" + tya + "] user [" + citizenIdamTokens.getUserId() + "] postcode [" + getMaskedPostcode(APPEAL_POSTCODE) + "]", Level.INFO);
     }
 
     @Test

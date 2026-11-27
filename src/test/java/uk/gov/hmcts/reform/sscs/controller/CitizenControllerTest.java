@@ -5,6 +5,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -24,6 +25,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CountryOfResidence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.AssociateCaseDetails;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.OnlineHearing;
+import uk.gov.hmcts.reform.sscs.exception.CaseAssociationError;
+import uk.gov.hmcts.reform.sscs.exception.CaseAssociationException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.service.CitizenLoginService;
@@ -124,20 +127,46 @@ public class CitizenControllerTest {
     }
 
     @Test
-    public void cannotAssociateUserWithCase() {
+    public void cannotAssociateUserWithCaseWhenNotFound() {
         String oauthToken = "oAuth";
         String tya = "tya";
+        String userId = "userId";
         AssociateCaseDetails matchCaseDetails =
                 new AssociateCaseDetails("someemail@example.com", "somePostcode", "A12B34");
 
         when(idamService.generateServiceAuthorization()).thenReturn("serviceAuth");
         when(idamService.getUserDetails(oauthToken)).thenReturn(idamUserDetails);
-        when(citizenLoginService.associateCaseToCitizen(null, tya, matchCaseDetails))
-                .thenReturn(Optional.empty());
+        when(citizenLoginService.associateCaseToCitizen(
+                argThat(tokens -> userId.equals(tokens.getUserId()) && oauthToken.equals(tokens.getIdamOauth2Token())),
+                eq(tya),
+                eq(matchCaseDetails)
+        )).thenReturn(Optional.empty());
 
         ResponseEntity<OnlineHearing> response = underTest.associateUserWithCase(oauthToken, tya, matchCaseDetails);
 
-        assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
+        assertThat(response.getStatusCode(), is(HttpStatus.NOT_FOUND));
+    }
+
+    @Test
+    public void cannotAssociateUserWithCaseWhenExceptionThrown() {
+        String oauthToken = "oAuth";
+        String tya = "tya";
+        String userId = "userId";
+        AssociateCaseDetails matchCaseDetails =
+                new AssociateCaseDetails("someemail@example.com", "somePostcode", "A12B34");
+
+        when(idamService.generateServiceAuthorization()).thenReturn("serviceAuth");
+        when(idamService.getUserDetails(oauthToken)).thenReturn(idamUserDetails);
+        when(citizenLoginService.associateCaseToCitizen(
+                argThat(tokens -> userId.equals(tokens.getUserId()) && oauthToken.equals(tokens.getIdamOauth2Token())),
+                eq(tya),
+                eq(matchCaseDetails)
+        )).thenThrow(new CaseAssociationException(CaseAssociationError.POSTCODE_MISMATCH));
+
+        CaseAssociationException exception = assertThrows(CaseAssociationException.class,
+                () -> underTest.associateUserWithCase(oauthToken, tya, matchCaseDetails));
+
+        assertThat(exception.getError(), is(CaseAssociationError.POSTCODE_MISMATCH));
     }
 
     @Test
