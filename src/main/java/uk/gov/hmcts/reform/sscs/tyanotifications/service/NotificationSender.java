@@ -89,10 +89,10 @@ public class NotificationSender {
                 getSendEmailResponse(templateId, emailAddress, personalisation, reference, client);
 
         if (saveCorrespondence && sendEmailResponse != null) {
+            log.info("Submitted email correspondence for upload for case id {}", sscsCaseData.getCcdCaseId());
             final Correspondence correspondence =
                     getEmailCorrespondence(sendEmailResponse, emailAddress, notificationEventType);
-            saveCorrespondenceAsyncService.saveEmailOrSms(correspondence, sscsCaseData);
-            log.info("Uploaded correspondence email into ccd for case id {}.", sscsCaseData.getCcdCaseId());
+            saveCorrespondenceAsyncService.saveEmailOrSms(String.valueOf(sendEmailResponse.getNotificationId()), correspondence, sscsCaseData);
         }
 
         log.info("Email Notification send for case id : {}, Gov notify id: {} ", sscsCaseData.getCcdCaseId(),
@@ -139,8 +139,8 @@ public class NotificationSender {
         if (saveCorrespondence && sendSmsResponse != null) {
             final Correspondence correspondence =
                     getSmsCorrespondence(sendSmsResponse, phoneNumber, notificationEventType);
-            saveCorrespondenceAsyncService.saveEmailOrSms(correspondence, sscsCaseData);
-            log.info("Uploaded correspondence sms into ccd for case id {}.", sscsCaseData.getCcdCaseId());
+            log.info("Submitted sms correspondence for upload for case id {}", sscsCaseData.getCcdCaseId());
+            saveCorrespondenceAsyncService.saveEmailOrSms(String.valueOf(sendSmsResponse.getNotificationId()), correspondence, sscsCaseData);
         }
 
         log.info("Sms Notification send for case id : {}, Gov notify id: {} ", sscsCaseData.getCcdCaseId(),

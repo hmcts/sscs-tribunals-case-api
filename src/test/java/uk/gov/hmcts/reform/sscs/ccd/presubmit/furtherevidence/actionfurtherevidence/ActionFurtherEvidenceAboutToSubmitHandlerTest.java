@@ -1,17 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static java.util.Collections.singletonList;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
@@ -36,32 +27,37 @@ import static uk.gov.hmcts.reform.sscs.model.PartyItemList.DWP;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.JOINT_PARTY;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.OTHER_PARTY;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.REPRESENTATIVE;
+import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import junitparams.converters.Nullable;
-import org.apache.commons.collections4.CollectionUtils;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import java.util.stream.Stream;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -104,16 +100,15 @@ import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
 
-@RunWith(JUnitParamsRunner.class)
-public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
+@Slf4j
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
+class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
-    public static final DocumentLink DOC_LINK = DocumentLink.builder().documentUrl("test.com").build();
+    private static final DocumentLink DOC_LINK = DocumentLink.builder().documentUrl("test.com").build();
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final String NO = "No";
     private static final String YES = "Yes";
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
 
     private ActionFurtherEvidenceAboutToSubmitHandler actionFurtherEvidenceAboutToSubmitHandler;
 
@@ -134,8 +129,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     private List<ScannedDocument> scannedDocumentList = new ArrayList<>();
     private final BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder = new BundleAdditionFilenameBuilder();
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService,
             bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), false, false, false);
 
@@ -167,7 +162,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             ISSUE_FURTHER_EVIDENCE.getLabel());
 
         DynamicListItem value = new DynamicListItem("appellant", "Appellant (or Appointee)");
-        DynamicList originalSender = new DynamicList(value, Collections.singletonList(value));
+        DynamicList originalSender = new DynamicList(value, singletonList(value));
 
         sscsCaseData = SscsCaseData.builder()
                                    .ccdCaseId("1234")
@@ -182,19 +177,19 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAHandleEvidenceEvent_thenReturnTrue() {
-        assertTrue(actionFurtherEvidenceAboutToSubmitHandler.canHandle(ABOUT_TO_SUBMIT, callback));
+    void givenAHandleEvidenceEvent_thenReturnTrue() {
+        assertThat(actionFurtherEvidenceAboutToSubmitHandler.canHandle(ABOUT_TO_SUBMIT, callback)).isTrue();
     }
 
     @Test
-    public void givenANonHandleEvidenceEvent_thenReturnFalse() {
+    void givenANonHandleEvidenceEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
 
-        assertFalse(actionFurtherEvidenceAboutToSubmitHandler.canHandle(ABOUT_TO_SUBMIT, callback));
+        assertThat(actionFurtherEvidenceAboutToSubmitHandler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
 
     @Test
-    public void givenAPostponementRequestWithoutDetails_thenAddAnError() {
+    void givenAPostponementRequestWithoutDetails_thenAddAnError() {
         when(caseDetails.getState()).thenReturn(State.HEARING);
         sscsCaseData.getFurtherEvidenceAction().setValue(
             new DynamicListItem(FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(),
@@ -206,17 +201,16 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                                                                                                                                .documentUrl("test1.com").build()).build()).build();
 
 
-        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+        sscsCaseData.setScannedDocuments(singletonList(scannedDocument));
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getErrors(), is(not(empty())));
-        assertThat(response.getErrors().iterator().next(),
-            is(ActionFurtherEvidenceAboutToSubmitHandler.POSTPONEMENT_DETAILS_IS_MANDATORY));
+        assertThat(response.getErrors()).isNotEmpty();
+        assertThat(response.getErrors().iterator().next()).isEqualTo(ActionFurtherEvidenceAboutToSubmitHandler.POSTPONEMENT_DETAILS_IS_MANDATORY);
     }
 
     @Test
-    public void givenAValidPostponementRequest_thenSscsDocumentTypeIsPostponementRequestAndOriginalSenderIsSetAndNoteIsCreatedAndFlagUnprocessedIsYes() {
+    void givenAValidPostponementRequest_thenSscsDocumentTypeIsPostponementRequestAndOriginalSenderIsSetAndNoteIsCreatedAndFlagUnprocessedIsYes() {
         when(caseDetails.getState()).thenReturn(State.HEARING);
         sscsCaseData.getFurtherEvidenceAction().setValue(
             new DynamicListItem(FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(),
@@ -228,32 +222,32 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                                                                                                                                .documentUrl("test.com").build()).build()).build();
 
 
-        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+        sscsCaseData.setScannedDocuments(singletonList(scannedDocument));
         sscsCaseData.setPostponementRequest(PostponementRequest.builder().postponementRequestDetails("Request Detail Test").build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().getFirst().getValue();
-        assertThat(sscsDocumentDetail.getDocumentType(), is(DocumentType.POSTPONEMENT_REQUEST.getValue()));
-        assertThat(sscsDocumentDetail.getOriginalPartySender(), is(sscsCaseData.getOriginalSender().getValue().getCode()));
-        assertThat(sscsCaseData.getPostponementRequest().getUnprocessedPostponementRequest(), is(YesNo.YES));
-        assertThat(sscsCaseData.getAppealNotePad().getNotesCollection().stream()
-                               .anyMatch(note -> note.getValue().getNoteDetail().equals("Request Detail Test")), is(true));
+        assertThat(sscsDocumentDetail.getDocumentType()).isEqualTo(DocumentType.POSTPONEMENT_REQUEST.getValue());
+        assertThat(sscsDocumentDetail.getOriginalPartySender()).isEqualTo(sscsCaseData.getOriginalSender().getValue().getCode());
+        assertThat(sscsCaseData.getPostponementRequest().getUnprocessedPostponementRequest()).isEqualTo(YesNo.YES);
+        assertThat(sscsCaseData.getAppealNotePad().getNotesCollection())
+            .anyMatch(note -> note.getValue().getNoteDetail().equals("Request Detail Test"));
     }
 
-    @Test
+    @ParameterizedTest
     @DisplayName("Given a valid post hearing application request, "
         + "and review by judge is selected, "
         + "and original sender is DWP, "
         + "then DWP State is updated and types are set")
-    @Parameters({
+    @CsvSource({
         "setAsideApplication, SET_ASIDE_REQUESTED, SET_ASIDE",
         "correctionApplication, CORRECTION_REQUESTED, CORRECTION",
         "statementOfReasonsApplication, STATEMENT_OF_REASONS_REQUESTED, STATEMENT_OF_REASONS",
         "libertyToApplyApplication, LIBERTY_TO_APPLY_REQUESTED, LIBERTY_TO_APPLY",
         "permissionToAppealApplication, PERMISSION_TO_APPEAL_REQUESTED, PERMISSION_TO_APPEAL"
     })
-    public void givenAValidPostHearingApplicationRequest_andReviewByJudgeIsSelected_andOriginalSenderIsDwp_thenDwpStateIsUpdatedAndTypesAreSet(
+    void givenAValidPostHearingApplicationRequest_andReviewByJudgeIsSelected_andOriginalSenderIsDwp_thenDwpStateIsUpdatedAndTypesAreSet(
         String documentType,
         DwpState dwpState,
         PostHearingRequestType requestType
@@ -277,31 +271,31 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                                                          .value(scannedDocDetails)
                                                          .build();
 
-        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+        sscsCaseData.setScannedDocuments(singletonList(scannedDocument));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(DWP.getCode(), DWP.getLabel()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
             ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getDwpState(), is(dwpState));
-        assertThat(response.getData().getPostHearing().getRequestType(), is(requestType));
+        assertThat(response.getData().getDwpState()).isEqualTo(dwpState);
+        assertThat(response.getData().getPostHearing().getRequestType()).isEqualTo(requestType);
         SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().getFirst().getValue();
-        assertThat(sscsDocumentDetail.getDocumentType(), is(documentType));
+        assertThat(sscsDocumentDetail.getDocumentType()).isEqualTo(documentType);
     }
 
-    @Test
+    @ParameterizedTest
     @DisplayName("Given a valid post hearing application request, "
         + "and review by judge is selected, "
         + "and original sender is NOT DWP, "
         + "then DWP State is NOT updated and types are set")
-    @Parameters({
+    @CsvSource({
         "setAsideApplication, SET_ASIDE",
         "correctionApplication, CORRECTION",
         "statementOfReasonsApplication, STATEMENT_OF_REASONS",
         "libertyToApplyApplication, LIBERTY_TO_APPLY",
         "permissionToAppealApplication, PERMISSION_TO_APPEAL"
     })
-    public void givenAValidPostHearingApplicationRequest_andReviewByJudgeIsSelected_andOriginalSenderIsNotDwp_thenDwpStateIsNotUpdatedAndTypesAreSet(
+    void givenAValidPostHearingApplicationRequest_andReviewByJudgeIsSelected_andOriginalSenderIsNotDwp_thenDwpStateIsNotUpdatedAndTypesAreSet(
         String documentType,
         PostHearingRequestType requestType
     ) {
@@ -324,26 +318,26 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                                                          .value(scannedDocDetails)
                                                          .build();
 
-        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+        sscsCaseData.setScannedDocuments(singletonList(scannedDocument));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
             ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getDwpState(), is(nullValue()));
-        assertThat(response.getData().getPostHearing().getRequestType(), is(requestType));
+        assertThat(response.getData().getDwpState()).isNull();
+        assertThat(response.getData().getPostHearing().getRequestType()).isEqualTo(requestType);
         SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().getFirst().getValue();
-        assertThat(sscsDocumentDetail.getDocumentType(), is(documentType));
+        assertThat(sscsDocumentDetail.getDocumentType()).isEqualTo(documentType);
     }
 
-    @Test
+    @ParameterizedTest
     @DisplayName("Given a valid post hearing application request from an FTA user with 'Admin Action X' selected, "
         + "then DWP state and Interloc Review state are updated, "
         + "and post hearing request type and document type are identified as expected.")
-    @Parameters({
+    @CsvSource({
         "ADMIN_ACTION_CORRECTION, correctionApplication, CORRECTION_REQUESTED, CORRECTION",
     })
-    public void givenAValidPostHearingApplicationRequest_andAdminActionIsSelected_thenDwpStateIsUpdatedAndTypesAreSet(
+    void givenAValidPostHearingApplicationRequest_andAdminActionIsSelected_thenDwpStateIsUpdatedAndTypesAreSet(
         FurtherEvidenceActionDynamicListItems adminAction,
         String documentType,
         DwpState dwpState,
@@ -368,30 +362,30 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                                                          .value(scannedDocDetails)
                                                          .build();
 
-        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+        sscsCaseData.setScannedDocuments(singletonList(scannedDocument));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(DWP.getCode(), DWP.getLabel()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
             ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getDwpState(), is(dwpState));
-        assertThat(response.getData().getPostHearing().getRequestType(), is(requestType));
+        assertThat(response.getData().getDwpState()).isEqualTo(dwpState);
+        assertThat(response.getData().getPostHearing().getRequestType()).isEqualTo(requestType);
         SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().getFirst().getValue();
-        assertThat(sscsDocumentDetail.getDocumentType(), is(documentType));
+        assertThat(sscsDocumentDetail.getDocumentType()).isEqualTo(documentType);
     }
 
-    @Test
+    @ParameterizedTest
     @DisplayName("Given a post hearing document is uploaded from an FTA user "
         + "and post hearings flag is disabled, "
         + "then DWP state and post hearing are not updated.")
-    @Parameters({
+    @CsvSource({
         "setAsideApplication",
         "correctionApplication",
         "statementOfReasonsApplication",
         "libertyToApplyApplication",
         "permissionToAppealApplication"
     })
-    public void givenAPostHearingDocumentUpload_andPostHearingsFlagIsDisabled_thenDoesNotUpdatePostHearingOrDwpState(
+    void givenAPostHearingDocumentUpload_andPostHearingsFlagIsDisabled_thenDoesNotUpdatePostHearingOrDwpState(
         String documentType
     ) {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), false, false, false);
@@ -413,28 +407,28 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                                                          .value(scannedDocDetails)
                                                          .build();
 
-        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+        sscsCaseData.setScannedDocuments(singletonList(scannedDocument));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(DWP.getCode(), DWP.getLabel()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
             ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getDwpState(), is(nullValue()));
-        assertThat(response.getData().getPostHearing().getRequestType(), is(nullValue()));
+        assertThat(response.getData().getDwpState()).isNull();
+        assertThat(response.getData().getPostHearing().getRequestType()).isNull();
         SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().getFirst().getValue();
-        assertThat(sscsDocumentDetail.getDocumentType(), is(documentType));
+        assertThat(sscsDocumentDetail.getDocumentType()).isEqualTo(documentType);
     }
 
 
-    @Test
+    @ParameterizedTest
     @DisplayName("Given a post hearing B document is uploaded from an FTA user "
         + "and post hearings B flag is disabled, "
         + "then DWP state and post hearing are not updated.")
-    @Parameters({
+    @CsvSource({
         "libertyToApplyApplication",
         "permissionToAppealApplication"
     })
-    public void givenAPostHearingBDocumentUpload_andPostHearingsBFlagIsDisabled_thenDoesNotUpdatePostHearingOrDwpState(
+    void givenAPostHearingBDocumentUpload_andPostHearingsBFlagIsDisabled_thenDoesNotUpdatePostHearingOrDwpState(
         String documentType
     ) {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), true, false, false);
@@ -456,26 +450,26 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                                                          .value(scannedDocDetails)
                                                          .build();
 
-        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+        sscsCaseData.setScannedDocuments(singletonList(scannedDocument));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(DWP.getCode(), DWP.getLabel()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
             ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getDwpState(), is(nullValue()));
-        assertThat(response.getData().getPostHearing().getRequestType(), is(nullValue()));
+        assertThat(response.getData().getDwpState()).isNull();
+        assertThat(response.getData().getPostHearing().getRequestType()).isNull();
         SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().getFirst().getValue();
-        assertThat(sscsDocumentDetail.getDocumentType(), is(documentType));
+        assertThat(sscsDocumentDetail.getDocumentType()).isEqualTo(documentType);
     }
 
-    @Test
-    @Parameters({
+    @ParameterizedTest
+    @CsvSource({
         "setAsideApplication",
         "statementOfReasonsApplication",
         "libertyToApplyApplication",
         "permissionToAppealApplication"
     })
-    public void givenAValidPostHearingApplicationWithInvalidFurtherEvidenceAction_thenThrowInvalidActionError(String documentType) {
+    void givenAValidPostHearingApplicationWithInvalidFurtherEvidenceAction_thenThrowInvalidActionError(String documentType) {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), true, true, false);
 
         DynamicListItem issueEvidenceAction = new DynamicListItem(
@@ -495,22 +489,21 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                                                          .value(scannedDocDetails)
                                                          .build();
 
-        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+        sscsCaseData.setScannedDocuments(singletonList(scannedDocument));
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
             ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getErrors(), hasSize(1));
-        assertThat(response.getErrors(), hasItem(
-            String.format("'Further Evidence Action' must be set to '%s'",
-                SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel())));
+        assertThat(response.getErrors()).hasSize(1);
+        assertThat(response.getErrors()).contains(String.format("'Further Evidence Action' must be set to '%s'",
+                SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel()));
     }
 
-    @Test
-    @Parameters({
+    @ParameterizedTest
+    @CsvSource({
         "correctionApplication,Admin action correction",
     })
-    public void givenAValidPostHearingApplicationWithInvalidFurtherEvidenceAction_thenThrowInvalidActionError(String documentType, String actionLabel) {
+    void givenAValidPostHearingApplicationWithInvalidFurtherEvidenceAction_thenThrowInvalidActionError(String documentType, String actionLabel) {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), true, true, false);
 
         DynamicListItem issueEvidenceAction = new DynamicListItem(
@@ -530,19 +523,18 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                                                          .value(scannedDocDetails)
                                                          .build();
 
-        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+        sscsCaseData.setScannedDocuments(singletonList(scannedDocument));
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
             ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getErrors(), hasSize(1));
-        assertThat(response.getErrors(), hasItem(
-            String.format("'Further Evidence Action' must be set to '%s' or '%s'",
-                SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel(), actionLabel)));
+        assertThat(response.getErrors()).hasSize(1);
+        assertThat(response.getErrors()).contains(String.format("'Further Evidence Action' must be set to '%s' or '%s'",
+                SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel(), actionLabel));
     }
 
-    @Test
-    @Parameters({
+    @ParameterizedTest
+    @CsvSource({
         "setAsideApplication,APPELLANT",
         "setAsideApplication,REPRESENTATIVE",
         "setAsideApplication,DWP",
@@ -564,7 +556,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         "permissionToAppealApplication,DWP",
         "permissionToAppealApplication,HMCTS"
     })
-    public void givenAValidPostHearingRequestFromParty_thenOriginalSenderSetOnSscsDocument(String documentType, PartyItemList sender) {
+    void givenAValidPostHearingRequestFromParty_thenOriginalSenderSetOnSscsDocument(String documentType, PartyItemList sender) {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), true, true, false);
 
         DynamicListItem sendToInterlocListItem = new DynamicListItem(
@@ -586,17 +578,17 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                                                          .value(scannedDocDetails)
                                                          .build();
 
-        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+        sscsCaseData.setScannedDocuments(singletonList(scannedDocument));
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
             ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getOriginalSender().getValue().getCode(), is(sender.getCode()));
-        assertThat(response.getData().getOriginalSender().getValue().getLabel(), is(sender.getLabel()));
+        assertThat(response.getData().getOriginalSender().getValue().getCode()).isEqualTo(sender.getCode());
+        assertThat(response.getData().getOriginalSender().getValue().getLabel()).isEqualTo(sender.getLabel());
     }
 
-    @Test
-    @Parameters({
+    @ParameterizedTest
+    @CsvSource({
         "setAsideApplication,APPELLANT",
         "setAsideApplication,REPRESENTATIVE",
         "setAsideApplication,DWP",
@@ -618,7 +610,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         "permissionToAppealApplication,DWP",
         "permissionToAppealApplication,HMCTS"
     })
-    public void givenValidAPostHearingRequestFromParty_thenAddFooterTextToDocument(String documentType, PartyItemList sender) {
+    void givenValidAPostHearingRequestFromParty_thenAddFooterTextToDocument(String documentType, PartyItemList sender) {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), true, true, false);
 
         DynamicListItem sendToInterlocListItem = new DynamicListItem(
@@ -641,19 +633,19 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                                                          .value(scannedDocDetails)
                                                          .build();
 
-        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+        sscsCaseData.setScannedDocuments(singletonList(scannedDocument));
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
             ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(footerService).addFooter(eq(scannedDocument.getValue().getUrl()), eq(sender.getDocumentFooter()), eq(null));
-        assertEquals(0, response.getErrors().size());
-        assertEquals(0, response.getWarnings().size());
-        assertEquals(documentType, response.getData().getSscsDocument().getFirst().getValue().getDocumentType());
+        verify(footerService).addFooter(scannedDocument.getValue().getUrl(), sender.getDocumentFooter(), null);
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getWarnings()).isEmpty();
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentType()).isEqualTo(documentType);
     }
 
-    @Test
-    @Parameters({
+    @ParameterizedTest
+    @CsvSource({
         "setAsideApplication,APPELLANT",
         "setAsideApplication,REPRESENTATIVE",
         "correctionApplication,APPELLANT",
@@ -665,7 +657,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         "permissionToAppealApplication,APPELLANT",
         "permissionToAppealApplication,REPRESENTATIVE"
     })
-    public void givenValidAPostHearingRequestFromPartyWhenIncludeInBundle_thenAddDocumentToBundle(String documentType, PartyItemList sender) {
+    void givenValidAPostHearingRequestFromPartyWhenIncludeInBundle_thenAddDocumentToBundle(String documentType, PartyItemList sender) {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), true, true, false);
 
         when(footerService.getNextBundleAddition(any())).thenReturn("A");
@@ -690,19 +682,19 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                                                          .value(scannedDocDetails)
                                                          .build();
 
-        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+        sscsCaseData.setScannedDocuments(singletonList(scannedDocument));
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
             ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(1, response.getData().getSscsDocument().stream().filter(doc -> "A".equals(doc.getValue().getBundleAddition())).count());
+        assertThat(response.getData().getSscsDocument().stream().filter(doc -> "A".equals(doc.getValue().getBundleAddition())).count()).isEqualTo(1);
     }
 
-    @Test
-    @Parameters(method = "generateFurtherEvidenceActionListScenarios")
-    public void givenACaseWithScannedDocuments_shouldMoveToSscsDocuments(@Nullable DynamicList furtherEvidenceActionList,
-        @Nullable DynamicList originalSender,
-        @Nullable String evidenceHandle,
+    @ParameterizedTest
+    @MethodSource("generateFurtherEvidenceActionListScenarios")
+    void givenACaseWithScannedDocuments_shouldMoveToSscsDocuments(DynamicList furtherEvidenceActionList,
+        DynamicList originalSender,
+        String evidenceHandle,
         DocumentType expectedDocumentType) {
         sscsCaseData.setFurtherEvidenceAction(furtherEvidenceActionList);
         sscsCaseData.setOriginalSender(originalSender);
@@ -712,7 +704,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         try {
             response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         } catch (IllegalStateException e) {
-            assertTrue(furtherEvidenceActionList == null || originalSender == null);
+            assertThat(furtherEvidenceActionList == null || originalSender == null).isTrue();
         }
         if (null != furtherEvidenceActionList && null != originalSender) {
             assertHappyPaths(expectedDocumentType, response);
@@ -720,7 +712,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAConfidentialCaseWithScannedDocumentsAndEditedDocument_shouldMoveToSscsDocumentsWithEditedDocument() {
+    void givenAConfidentialCaseWithScannedDocumentsAndEditedDocument_shouldMoveToSscsDocumentsWithEditedDocument() {
         sscsCaseData.setIsConfidentialCase(YesNo.YES);
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
@@ -737,20 +729,20 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().getFirst().getValue();
-        assertEquals("Appellant evidence received on 13-06-2020", sscsDocumentDetail.getDocumentFileName());
-        assertEquals("appellantEvidence", sscsDocumentDetail.getDocumentType());
-        assertEquals("www.test.com", sscsDocumentDetail.getDocumentLink().getDocumentUrl());
-        assertEquals("www.edited.com", sscsDocumentDetail.getEditedDocumentLink().getDocumentUrl());
-        assertEquals("2020-06-13", sscsDocumentDetail.getDocumentDateAdded());
-        assertEquals("123", sscsDocumentDetail.getControlNumber());
-        assertEquals(NO, response.getData().getSscsDocument().get(1).getValue().getEvidenceIssued());
-        assertNull(response.getData().getScannedDocuments());
-        assertEquals(YES, response.getData().getEvidenceHandled());
+        assertThat(sscsDocumentDetail.getDocumentFileName()).isEqualTo("Appellant evidence received on 13-06-2020");
+        assertThat(sscsDocumentDetail.getDocumentType()).isEqualTo("appellantEvidence");
+        assertThat(sscsDocumentDetail.getDocumentLink().getDocumentUrl()).isEqualTo("www.test.com");
+        assertThat(sscsDocumentDetail.getEditedDocumentLink().getDocumentUrl()).isEqualTo("www.edited.com");
+        assertThat(sscsDocumentDetail.getDocumentDateAdded()).isEqualTo("2020-06-13");
+        assertThat(sscsDocumentDetail.getControlNumber()).isEqualTo("123");
+        assertThat(response.getData().getSscsDocument().get(1).getValue().getEvidenceIssued()).isEqualTo(NO);
+        assertThat(response.getData().getScannedDocuments()).isNull();
+        assertThat(response.getData().getEvidenceHandled()).isEqualTo(YES);
     }
 
-    @Test
-    @Parameters({"true", "false"})
-    public void givenACaseWithScannedDocumentOfTypeCoversheet_shouldNotMoveToSscsDocumentsAndWarningShouldBeReturned(boolean ignoreWarnings) {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void givenACaseWithScannedDocumentOfTypeCoversheet_shouldNotMoveToSscsDocumentsAndWarningShouldBeReturned(boolean ignoreWarnings) {
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder()
                                   .type("coversheet")
@@ -774,20 +766,20 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertTrue(CollectionUtils.isEmpty(response.getData().getSscsDocument()));
-        assertEquals(YES, response.getData().getEvidenceHandled());
+        assertThat(response.getData().getSscsDocument()).isNullOrEmpty();
+        assertThat(response.getData().getEvidenceHandled()).isEqualTo(YES);
 
         if (ignoreWarnings) {
-            assertEquals(0, response.getWarnings().size());
+            assertThat(response.getWarnings()).isEmpty();
         } else {
             String warning = response.getWarnings().stream().findFirst().orElse("");
-            assertEquals("Coversheet will be ignored, are you happy to proceed?", warning);
+            assertThat(warning).isEqualTo("Coversheet will be ignored, are you happy to proceed?");
         }
     }
 
-    @Test
-    @Parameters({"true", "false"})
-    public void givenACaseWithAnEmptyScannedDocumentType_shouldMoveToSscsDocumentsAndWarningShouldBeReturned(boolean ignoreWarnings) {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void givenACaseWithAnEmptyScannedDocumentType_shouldMoveToSscsDocumentsAndWarningShouldBeReturned(boolean ignoreWarnings) {
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder()
                                   .type(null)
@@ -813,19 +805,19 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response =
             actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(1, response.getData().getSscsDocument().size());
-        assertEquals(YES, response.getData().getEvidenceHandled());
+        assertThat(response.getData().getSscsDocument()).hasSize(1);
+        assertThat(response.getData().getEvidenceHandled()).isEqualTo(YES);
 
         if (ignoreWarnings) {
-            assertEquals(0, response.getWarnings().size());
+            assertThat(response.getWarnings()).isEmpty();
         } else {
             String warning = response.getWarnings().stream().findFirst().orElse("");
-            assertEquals("Document type is empty, are you happy to proceed?", warning);
+            assertThat(warning).isEqualTo("Document type is empty, are you happy to proceed?");
         }
     }
 
     @Test
-    public void edgeCaseWhereEvidenceIsSentToBulkPrintSinceNoFurtherActionIsSelected() {
+    void edgeCaseWhereEvidenceIsSentToBulkPrintSinceNoFurtherActionIsSelected() {
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder()
                                   .type(ScannedDocumentType.REINSTATEMENT_REQUEST.getValue())
@@ -850,28 +842,33 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response =
             actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(1, response.getData().getSscsDocument().size());
-        assertEquals(NO, response.getData().getSscsDocument().getFirst().getValue().getEvidenceIssued());
-        assertEquals(YES, response.getData().getEvidenceHandled());
-        assertEquals(0, response.getWarnings().size());
+        assertThat(response.getData().getSscsDocument()).hasSize(1);
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getEvidenceIssued()).isEqualTo(NO);
+        assertThat(response.getData().getEvidenceHandled()).isEqualTo(YES);
+        assertThat(response.getWarnings()).isEmpty();
     }
 
     private void assertHappyPaths(DocumentType expectedDocumentType,
         PreSubmitCallbackResponse<SscsCaseData> response) {
 
         SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().getFirst().getValue();
-        assertEquals((expectedDocumentType.getLabel() != null ? expectedDocumentType.getLabel() : expectedDocumentType.getValue()) + " received on 13-06-2019", sscsDocumentDetail.getDocumentFileName());
-        assertEquals(expectedDocumentType.getValue(), sscsDocumentDetail.getDocumentType());
-        assertEquals("www.test.com", sscsDocumentDetail.getDocumentLink().getDocumentUrl());
-        assertEquals("2019-06-13", sscsDocumentDetail.getDocumentDateAdded());
-        assertEquals("123", sscsDocumentDetail.getControlNumber());
+        assertThat(sscsDocumentDetail.getDocumentFileName()).isEqualTo((expectedDocumentType.getLabel() != null ? expectedDocumentType.getLabel() : expectedDocumentType.getValue()) + " received on 13-06-2019");
+        assertThat(sscsDocumentDetail.getDocumentType()).isEqualTo(expectedDocumentType.getValue());
+        assertThat(sscsDocumentDetail.getDocumentLink().getDocumentUrl()).isEqualTo("www.test.com");
+        assertThat(sscsDocumentDetail.getDocumentDateAdded()).isEqualTo("2019-06-13");
+        assertThat(sscsDocumentDetail.getControlNumber()).isEqualTo("123");
         String expectedEvidenceIssued = ACTIONS_THAT_REQUIRES_EVIDENCE_ISSUED_SET_TO_YES_AND_NOT_BULK_PRINTED.contains(response.getData().getFurtherEvidenceAction().getValue().getCode()) ? YES : NO;
-        assertEquals(expectedEvidenceIssued, response.getData().getSscsDocument().get(1).getValue().getEvidenceIssued());
-        assertNull(response.getData().getScannedDocuments());
-        assertEquals(YES, response.getData().getEvidenceHandled());
+        assertThat(response.getData().getSscsDocument().get(1).getValue().getEvidenceIssued()).isEqualTo(expectedEvidenceIssued);
+        final String expectedDateIssued = ISSUE_FURTHER_EVIDENCE.getCode().equals(response.getData().getFurtherEvidenceAction().getValue().getCode())
+            ? getLocalDate().format(DateTimeFormatter.ISO_DATE) : null;
+        assertThat(response.getData().getSscsDocument())
+            .extracting(document -> document.getValue().getDocumentDateIssued())
+            .containsOnly(expectedDateIssued);
+        assertThat(response.getData().getScannedDocuments()).isNull();
+        assertThat(response.getData().getEvidenceHandled()).isEqualTo(YES);
     }
 
-    private Object[] generateFurtherEvidenceActionListScenarios() {
+    private static Stream<Arguments> generateFurtherEvidenceActionListScenarios() {
         DynamicList furtherEvidenceActionListOtherDocuments =
             buildFurtherEvidenceActionItemListForGivenOption("otherDocumentManual",
                 "Other document type - action manually");
@@ -893,62 +890,62 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         DynamicList jointPartyOriginalSender = buildOriginalSenderItemListForGivenOption("jointParty",
             "Joint Party");
 
-        return new Object[]{
+        return Stream.of(
             //other options scenarios
-            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, null, APPELLANT_EVIDENCE},
-            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, NO, APPELLANT_EVIDENCE},
-            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, YES, APPELLANT_EVIDENCE},
-            new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, NO, REPRESENTATIVE_EVIDENCE},
-            new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, null, REPRESENTATIVE_EVIDENCE},
-            new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, YES, REPRESENTATIVE_EVIDENCE},
-            new Object[]{furtherEvidenceActionListOtherDocuments, dwpOriginalSender, NO, DWP_EVIDENCE},
-            new Object[]{furtherEvidenceActionListOtherDocuments, dwpOriginalSender, null, DWP_EVIDENCE},
-            new Object[]{furtherEvidenceActionListOtherDocuments, dwpOriginalSender, YES, DWP_EVIDENCE},
+            Arguments.of(furtherEvidenceActionListOtherDocuments, appellantOriginalSender, null, APPELLANT_EVIDENCE),
+            Arguments.of(furtherEvidenceActionListOtherDocuments, appellantOriginalSender, NO, APPELLANT_EVIDENCE),
+            Arguments.of(furtherEvidenceActionListOtherDocuments, appellantOriginalSender, YES, APPELLANT_EVIDENCE),
+            Arguments.of(furtherEvidenceActionListOtherDocuments, representativeOriginalSender, NO, REPRESENTATIVE_EVIDENCE),
+            Arguments.of(furtherEvidenceActionListOtherDocuments, representativeOriginalSender, null, REPRESENTATIVE_EVIDENCE),
+            Arguments.of(furtherEvidenceActionListOtherDocuments, representativeOriginalSender, YES, REPRESENTATIVE_EVIDENCE),
+            Arguments.of(furtherEvidenceActionListOtherDocuments, dwpOriginalSender, NO, DWP_EVIDENCE),
+            Arguments.of(furtherEvidenceActionListOtherDocuments, dwpOriginalSender, null, DWP_EVIDENCE),
+            Arguments.of(furtherEvidenceActionListOtherDocuments, dwpOriginalSender, YES, DWP_EVIDENCE),
             //issue parties scenarios
-            new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, null, APPELLANT_EVIDENCE},
-            new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, NO, APPELLANT_EVIDENCE},
-            new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, YES, APPELLANT_EVIDENCE},
-            new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, NO, REPRESENTATIVE_EVIDENCE},
-            new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, YES, REPRESENTATIVE_EVIDENCE},
-            new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, null, REPRESENTATIVE_EVIDENCE},
-            new Object[]{furtherEvidenceActionListIssueParties, dwpOriginalSender, NO, DWP_EVIDENCE},
-            new Object[]{furtherEvidenceActionListIssueParties, dwpOriginalSender, YES, DWP_EVIDENCE},
-            new Object[]{furtherEvidenceActionListIssueParties, dwpOriginalSender, null, DWP_EVIDENCE},
-            new Object[]{furtherEvidenceActionListIssueParties, jointPartyOriginalSender, NO, JOINT_PARTY_EVIDENCE},
-            new Object[]{furtherEvidenceActionListIssueParties, jointPartyOriginalSender, YES, JOINT_PARTY_EVIDENCE},
-            new Object[]{furtherEvidenceActionListIssueParties, jointPartyOriginalSender, null, JOINT_PARTY_EVIDENCE},
+            Arguments.of(furtherEvidenceActionListIssueParties, appellantOriginalSender, null, APPELLANT_EVIDENCE),
+            Arguments.of(furtherEvidenceActionListIssueParties, appellantOriginalSender, NO, APPELLANT_EVIDENCE),
+            Arguments.of(furtherEvidenceActionListIssueParties, appellantOriginalSender, YES, APPELLANT_EVIDENCE),
+            Arguments.of(furtherEvidenceActionListIssueParties, representativeOriginalSender, NO, REPRESENTATIVE_EVIDENCE),
+            Arguments.of(furtherEvidenceActionListIssueParties, representativeOriginalSender, YES, REPRESENTATIVE_EVIDENCE),
+            Arguments.of(furtherEvidenceActionListIssueParties, representativeOriginalSender, null, REPRESENTATIVE_EVIDENCE),
+            Arguments.of(furtherEvidenceActionListIssueParties, dwpOriginalSender, NO, DWP_EVIDENCE),
+            Arguments.of(furtherEvidenceActionListIssueParties, dwpOriginalSender, YES, DWP_EVIDENCE),
+            Arguments.of(furtherEvidenceActionListIssueParties, dwpOriginalSender, null, DWP_EVIDENCE),
+            Arguments.of(furtherEvidenceActionListIssueParties, jointPartyOriginalSender, NO, JOINT_PARTY_EVIDENCE),
+            Arguments.of(furtherEvidenceActionListIssueParties, jointPartyOriginalSender, YES, JOINT_PARTY_EVIDENCE),
+            Arguments.of(furtherEvidenceActionListIssueParties, jointPartyOriginalSender, null, JOINT_PARTY_EVIDENCE),
             //interloc scenarios
-            new Object[]{furtherEvidenceActionListInterloc, appellantOriginalSender, null, APPELLANT_EVIDENCE},
-            new Object[]{furtherEvidenceActionListInterloc, appellantOriginalSender, NO, APPELLANT_EVIDENCE},
-            new Object[]{furtherEvidenceActionListInterloc, appellantOriginalSender, YES, APPELLANT_EVIDENCE},
-            new Object[]{furtherEvidenceActionListInterloc, representativeOriginalSender, null, REPRESENTATIVE_EVIDENCE},
-            new Object[]{furtherEvidenceActionListInterloc, representativeOriginalSender, NO, REPRESENTATIVE_EVIDENCE},
-            new Object[]{furtherEvidenceActionListInterloc, representativeOriginalSender, YES, REPRESENTATIVE_EVIDENCE},
-            new Object[]{furtherEvidenceActionListInterloc, dwpOriginalSender, null, DWP_EVIDENCE},
-            new Object[]{furtherEvidenceActionListInterloc, dwpOriginalSender, NO, DWP_EVIDENCE},
-            new Object[]{furtherEvidenceActionListInterloc, dwpOriginalSender, YES, DWP_EVIDENCE},
-            new Object[]{furtherEvidenceActionListInterloc, jointPartyOriginalSender, null, JOINT_PARTY_EVIDENCE},
-            new Object[]{furtherEvidenceActionListInterloc, jointPartyOriginalSender, NO, JOINT_PARTY_EVIDENCE},
-            new Object[]{furtherEvidenceActionListInterloc, jointPartyOriginalSender, YES, JOINT_PARTY_EVIDENCE},
+            Arguments.of(furtherEvidenceActionListInterloc, appellantOriginalSender, null, APPELLANT_EVIDENCE),
+            Arguments.of(furtherEvidenceActionListInterloc, appellantOriginalSender, NO, APPELLANT_EVIDENCE),
+            Arguments.of(furtherEvidenceActionListInterloc, appellantOriginalSender, YES, APPELLANT_EVIDENCE),
+            Arguments.of(furtherEvidenceActionListInterloc, representativeOriginalSender, null, REPRESENTATIVE_EVIDENCE),
+            Arguments.of(furtherEvidenceActionListInterloc, representativeOriginalSender, NO, REPRESENTATIVE_EVIDENCE),
+            Arguments.of(furtherEvidenceActionListInterloc, representativeOriginalSender, YES, REPRESENTATIVE_EVIDENCE),
+            Arguments.of(furtherEvidenceActionListInterloc, dwpOriginalSender, null, DWP_EVIDENCE),
+            Arguments.of(furtherEvidenceActionListInterloc, dwpOriginalSender, NO, DWP_EVIDENCE),
+            Arguments.of(furtherEvidenceActionListInterloc, dwpOriginalSender, YES, DWP_EVIDENCE),
+            Arguments.of(furtherEvidenceActionListInterloc, jointPartyOriginalSender, null, JOINT_PARTY_EVIDENCE),
+            Arguments.of(furtherEvidenceActionListInterloc, jointPartyOriginalSender, NO, JOINT_PARTY_EVIDENCE),
+            Arguments.of(furtherEvidenceActionListInterloc, jointPartyOriginalSender, YES, JOINT_PARTY_EVIDENCE),
             //edge cases scenarios
-            new Object[]{null, representativeOriginalSender, "", null}, //edge case: furtherEvidenceActionOption is null
-            new Object[]{furtherEvidenceActionListIssueParties, null, null, null} //edge case: originalSender is null
-        };
+            Arguments.of(null, representativeOriginalSender, "", null), //edge case: furtherEvidenceActionOption is null
+            Arguments.of(furtherEvidenceActionListIssueParties, null, null, null) //edge case: originalSender is null
+        );
     }
 
-    protected static DynamicList buildOriginalSenderItemListForGivenOption(String code, String label) {
+    static DynamicList buildOriginalSenderItemListForGivenOption(String code, String label) {
         DynamicListItem value = new DynamicListItem(code, label);
-        return new DynamicList(value, Collections.singletonList(value));
+        return new DynamicList(value, singletonList(value));
     }
 
-    private DynamicList buildFurtherEvidenceActionItemListForGivenOption(String code, String label) {
+    private static DynamicList buildFurtherEvidenceActionItemListForGivenOption(String code, String label) {
         DynamicListItem selectedOption = new DynamicListItem(code, label);
         return new DynamicList(selectedOption,
-            Collections.singletonList(selectedOption));
+            singletonList(selectedOption));
     }
 
     @Test
-    public void givenACaseWithScannedDocumentsAndSscsCaseDocuments_thenAppendNewDocumentsToSscsDocumentsList() {
+    void givenACaseWithScannedDocumentsAndSscsCaseDocuments_thenAppendNewDocumentsToSscsDocumentsList() {
         List<SscsDocument> sscsDocuments = new ArrayList<>();
         SscsDocument doc = SscsDocument.builder()
                                        .value(SscsDocumentDetails.builder()
@@ -963,17 +960,17 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("Appellant evidence received on 13-06-2019", response.getData().getSscsDocument().getFirst().getValue().getDocumentFileName());
-        assertEquals("2019-06-13", response.getData().getSscsDocument().getFirst().getValue().getDocumentDateAdded());
-        assertEquals("Appellant evidence received on 12-06-2019", response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
-        assertEquals("2019-06-12", response.getData().getSscsDocument().get(1).getValue().getDocumentDateAdded());
-        assertEquals("exist.pdf", response.getData().getSscsDocument().get(2).getValue().getDocumentFileName());
-        assertNotNull(response.getData().getSscsDocument().getFirst().getValue().getControlNumber());
-        assertNull(response.getData().getScannedDocuments());
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentFileName()).isEqualTo("Appellant evidence received on 13-06-2019");
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentDateAdded()).isEqualTo("2019-06-13");
+        assertThat(response.getData().getSscsDocument().get(1).getValue().getDocumentFileName()).isEqualTo("Appellant evidence received on 12-06-2019");
+        assertThat(response.getData().getSscsDocument().get(1).getValue().getDocumentDateAdded()).isEqualTo("2019-06-12");
+        assertThat(response.getData().getSscsDocument().get(2).getValue().getDocumentFileName()).isEqualTo("exist.pdf");
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getControlNumber()).isNotNull();
+        assertThat(response.getData().getScannedDocuments()).isNull();
     }
 
     @Test
-    public void givenAWelshCaseWithScannedDocuments_thenSetTranslationStatusToRequired() {
+    void givenAWelshCaseWithScannedDocuments_thenSetTranslationStatusToRequired() {
         List<SscsDocument> sscsDocuments = new ArrayList<>();
         SscsDocument doc = SscsDocument.builder()
                                        .value(SscsDocumentDetails.builder()
@@ -989,22 +986,22 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("Appellant evidence received on 12-06-2019", response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
-        assertEquals("2019-06-12", response.getData().getSscsDocument().get(1).getValue().getDocumentDateAdded());
-        assertEquals(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED, response.getData().getSscsDocument().get(1).getValue().getDocumentTranslationStatus());
+        assertThat(response.getData().getSscsDocument().get(1).getValue().getDocumentFileName()).isEqualTo("Appellant evidence received on 12-06-2019");
+        assertThat(response.getData().getSscsDocument().get(1).getValue().getDocumentDateAdded()).isEqualTo("2019-06-12");
+        assertThat(response.getData().getSscsDocument().get(1).getValue().getDocumentTranslationStatus()).isEqualTo(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED);
 
-        assertEquals("Appellant evidence received on 13-06-2019", response.getData().getSscsDocument().getFirst().getValue().getDocumentFileName());
-        assertEquals("2019-06-13", response.getData().getSscsDocument().getFirst().getValue().getDocumentDateAdded());
-        assertEquals(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED, response.getData().getSscsDocument().getFirst().getValue().getDocumentTranslationStatus());
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentFileName()).isEqualTo("Appellant evidence received on 13-06-2019");
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentDateAdded()).isEqualTo("2019-06-13");
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentTranslationStatus()).isEqualTo(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED);
 
-        assertEquals("exist.pdf", response.getData().getSscsDocument().get(2).getValue().getDocumentFileName());
-        assertNull(response.getData().getSscsDocument().get(2).getValue().getDocumentTranslationStatus());
-        assertNull(response.getData().getScannedDocuments());
-        assertEquals(YES, response.getData().getTranslationWorkOutstanding());
+        assertThat(response.getData().getSscsDocument().get(2).getValue().getDocumentFileName()).isEqualTo("exist.pdf");
+        assertThat(response.getData().getSscsDocument().get(2).getValue().getDocumentTranslationStatus()).isNull();
+        assertThat(response.getData().getScannedDocuments()).isNull();
+        assertThat(response.getData().getTranslationWorkOutstanding()).isEqualTo(YES);
     }
 
     @Test
-    public void givenACaseWithScannedDocumentWithEmptyValues_thenHandleTheDocument() {
+    void givenACaseWithScannedDocumentWithEmptyValues_thenHandleTheDocument() {
         List<ScannedDocument> docs = new ArrayList<>();
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
@@ -1018,109 +1015,109 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("www.test.com", response.getData().getSscsDocument().getFirst().getValue().getDocumentLink().getDocumentUrl());
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentLink().getDocumentUrl()).isEqualTo("www.test.com");
     }
 
     @Test
-    public void givenACaseWithNoScannedDocuments_thenAddAnErrorToResponse() {
+    void givenACaseWithNoScannedDocuments_thenAddAnErrorToResponse() {
         sscsCaseData.setScannedDocuments(null);
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(1, response.getErrors().size());
+        assertThat(response.getErrors()).hasSize(1);
 
         for (String error : response.getErrors()) {
-            assertEquals("No further evidence to process", error);
+            assertThat(error).isEqualTo("No further evidence to process");
         }
     }
 
     private Callback<SscsCaseData> buildCallback(String dynamicListItemCode, State state) {
         DynamicList dynamicList = new DynamicList(new DynamicListItem(dynamicListItemCode, "label"),
-            Collections.singletonList(new DynamicListItem(dynamicListItemCode, "label")));
-        SscsCaseData sscsCaseData = SscsCaseData.builder()
+            singletonList(new DynamicListItem(dynamicListItemCode, "label")));
+        SscsCaseData caseData = SscsCaseData.builder()
                                                 .originalSender(dynamicList)
                                                 .furtherEvidenceAction(dynamicList)
                                                 .state(state)
-                                                .scannedDocuments(Collections.singletonList(ScannedDocument.builder().build()))
+                                                .scannedDocuments(singletonList(ScannedDocument.builder().build()))
                                                 .appeal(Appeal.builder().appellant(Appellant.builder().address(Address.builder().line1("My Road").postcode("TS1 2BA").build()).build()).build())
                                                 .build();
-        CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
-            state, sscsCaseData, LocalDateTime.now(), "Benefit");
-        return new Callback<>(caseDetails, Optional.empty(), EventType.ACTION_FURTHER_EVIDENCE, false);
+        CaseDetails<SscsCaseData> details = new CaseDetails<>(123L, "sscs",
+            state, caseData, LocalDateTime.now(), "Benefit");
+        return new Callback<>(details, Optional.empty(), EventType.ACTION_FURTHER_EVIDENCE, false);
     }
 
     @Test
-    public void givenIssueFurtherEvidenceWhenStateNotWithDwp_shouldUpdateDwpFurtherEvidenceStates() {
-        Callback<SscsCaseData> callback = buildCallback(ISSUE_FURTHER_EVIDENCE.getCode(), State.INTERLOCUTORY_REVIEW_STATE);
+    void givenIssueFurtherEvidenceWhenStateNotWithDwp_shouldUpdateDwpFurtherEvidenceStates() {
+        Callback<SscsCaseData> callbackData = buildCallback(ISSUE_FURTHER_EVIDENCE.getCode(), State.INTERLOCUTORY_REVIEW_STATE);
 
-        PreSubmitCallbackResponse<SscsCaseData> updated = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> updated = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callbackData, USER_AUTHORISATION);
 
-        assertEquals(FURTHER_EVIDENCE_RECEIVED, updated.getData().getDwpFurtherEvidenceStates());
-        assertEquals(DwpState.FE_RECEIVED, updated.getData().getDwpState());
+        assertThat(updated.getData().getDwpFurtherEvidenceStates()).isEqualTo(FURTHER_EVIDENCE_RECEIVED);
+        assertThat(updated.getData().getDwpState()).isEqualTo(DwpState.FE_RECEIVED);
     }
 
     @Test
-    public void givenIssueFurtherEvidenceAndStateIsWithDwp_shouldNotUpdateDwpFurtherEvidenceStates() {
-        Callback<SscsCaseData> callback = buildCallback(ISSUE_FURTHER_EVIDENCE.getCode(), State.WITH_DWP);
+    void givenIssueFurtherEvidenceAndStateIsWithDwp_shouldNotUpdateDwpFurtherEvidenceStates() {
+        Callback<SscsCaseData> callbackData = buildCallback(ISSUE_FURTHER_EVIDENCE.getCode(), State.WITH_DWP);
 
-        PreSubmitCallbackResponse<SscsCaseData> updated = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> updated = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callbackData, USER_AUTHORISATION);
 
-        assertNull(updated.getData().getDwpState());
-        assertNull(updated.getData().getDwpFurtherEvidenceStates());
+        assertThat(updated.getData().getDwpState()).isNull();
+        assertThat(updated.getData().getDwpFurtherEvidenceStates()).isNull();
     }
 
-    @Test
-    @Parameters(method = "generateIssueFurtherEvidenceAddressEmptyScenarios")
-    public void givenIssueFurtherEvidenceAndEmptyAppellantAddress_shouldReturnAnErrorToUser(Appeal appeal, String... parties) {
-        Callback<SscsCaseData> callback = buildCallback(ISSUE_FURTHER_EVIDENCE.getCode(), State.INTERLOCUTORY_REVIEW_STATE);
+    @ParameterizedTest
+    @MethodSource("generateIssueFurtherEvidenceAddressEmptyScenarios")
+    void givenIssueFurtherEvidenceAndEmptyAppellantAddress_shouldReturnAnErrorToUser(Appeal appeal, List<String> parties) {
+        Callback<SscsCaseData> callbackData = buildCallback(ISSUE_FURTHER_EVIDENCE.getCode(), State.INTERLOCUTORY_REVIEW_STATE);
 
-        callback.getCaseDetails().getCaseData().setAppeal(appeal);
-        PreSubmitCallbackResponse<SscsCaseData> result = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        callbackData.getCaseDetails().getCaseData().setAppeal(appeal);
+        PreSubmitCallbackResponse<SscsCaseData> result = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callbackData, USER_AUTHORISATION);
 
         for (String party : parties) {
             String expectedError = "Address details are missing for the " + party + ", please validate or process manually";
-            assertTrue(result.getErrors().contains(expectedError));
+            assertThat(result.getErrors()).contains(expectedError);
         }
     }
 
-    private Object[] generateIssueFurtherEvidenceAddressEmptyScenarios() {
+    private static Stream<Arguments> generateIssueFurtherEvidenceAddressEmptyScenarios() {
 
-        return new Object[]{
-            new Object[]{Appeal.builder().appellant(Appellant.builder().address(Address.builder().build()).build()).build(), "Appellant"},
-            new Object[]{Appeal.builder().appellant(Appellant.builder().address(Address.builder().line1("Line1").build()).build()).build(), "Appellant"},
-            new Object[]{Appeal.builder().appellant(Appellant.builder().address(Address.builder().postcode("TS1 2BA").build()).build()).build(), "Appellant"},
-            new Object[]{Appeal.builder().appellant(Appellant.builder().address(null).build()).build(), "Appellant"},
-            new Object[]{Appeal.builder().appellant(null).build(), "Appellant"},
-            new Object[]{Appeal.builder().appellant(Appellant.builder().isAppointee(YES).build()).build(), "Appointee"},
-            new Object[]{Appeal.builder().appellant(Appellant.builder().isAppointee(YES).appointee(Appointee.builder().build()).build()).build(), "Appointee"},
-            new Object[]{Appeal.builder().appellant(Appellant.builder().isAppointee(YES).appointee(Appointee.builder().address(Address.builder().build()).build()).build()).build(), "Appointee"},
-            new Object[]{Appeal.builder().appellant(Appellant.builder().isAppointee(YES).appointee(Appointee.builder().address(null).build()).build()).build(), "Appointee"},
-            new Object[]{Appeal.builder().rep(Representative.builder().hasRepresentative(YES).address(Address.builder().build()).build()).appellant(Appellant.builder().address(Address.builder().line1("The road").build()).build()).build(), "Representative"},
-            new Object[]{Appeal.builder().rep(Representative.builder().hasRepresentative(YES).address(null).build()).appellant(Appellant.builder().address(Address.builder().line1("The road").build()).build()).build(), "Representative"},
-            new Object[]{Appeal.builder().rep(Representative.builder().hasRepresentative(YES).address(Address.builder().build()).build()).appellant(Appellant.builder().address(null).build()).build(), "Appellant", "Representative"},
-        };
+        return Stream.of(
+            Arguments.of(Appeal.builder().appellant(Appellant.builder().address(Address.builder().build()).build()).build(), List.of("Appellant")),
+            Arguments.of(Appeal.builder().appellant(Appellant.builder().address(Address.builder().line1("Line1").build()).build()).build(), List.of("Appellant")),
+            Arguments.of(Appeal.builder().appellant(Appellant.builder().address(Address.builder().postcode("TS1 2BA").build()).build()).build(), List.of("Appellant")),
+            Arguments.of(Appeal.builder().appellant(Appellant.builder().address(null).build()).build(), List.of("Appellant")),
+            Arguments.of(Appeal.builder().appellant(null).build(), List.of("Appellant")),
+            Arguments.of(Appeal.builder().appellant(Appellant.builder().isAppointee(YES).build()).build(), List.of("Appointee")),
+            Arguments.of(Appeal.builder().appellant(Appellant.builder().isAppointee(YES).appointee(Appointee.builder().build()).build()).build(), List.of("Appointee")),
+            Arguments.of(Appeal.builder().appellant(Appellant.builder().isAppointee(YES).appointee(Appointee.builder().address(Address.builder().build()).build()).build()).build(), List.of("Appointee")),
+            Arguments.of(Appeal.builder().appellant(Appellant.builder().isAppointee(YES).appointee(Appointee.builder().address(null).build()).build()).build(), List.of("Appointee")),
+            Arguments.of(Appeal.builder().rep(Representative.builder().hasRepresentative(YES).address(Address.builder().build()).build()).appellant(Appellant.builder().address(Address.builder().line1("The road").build()).build()).build(), List.of("Representative")),
+            Arguments.of(Appeal.builder().rep(Representative.builder().hasRepresentative(YES).address(null).build()).appellant(Appellant.builder().address(Address.builder().line1("The road").build()).build()).build(), List.of("Representative")),
+            Arguments.of(Appeal.builder().rep(Representative.builder().hasRepresentative(YES).address(Address.builder().build()).build()).appellant(Appellant.builder().address(null).build()).build(), List.of("Appellant", "Representative"))
+        );
     }
 
     @Test
-    public void givenOtherDocument_shouldNotUpdateDwpFurtherEvidenceStates() {
-        Callback<SscsCaseData> callback = buildCallback(OTHER_DOCUMENT_MANUAL.getCode(), State.INTERLOCUTORY_REVIEW_STATE);
+    void givenOtherDocument_shouldNotUpdateDwpFurtherEvidenceStates() {
+        Callback<SscsCaseData> callbackData = buildCallback(OTHER_DOCUMENT_MANUAL.getCode(), State.INTERLOCUTORY_REVIEW_STATE);
 
-        PreSubmitCallbackResponse<SscsCaseData> updated = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> updated = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callbackData, USER_AUTHORISATION);
 
-        assertNull(updated.getData().getDwpFurtherEvidenceStates());
+        assertThat(updated.getData().getDwpFurtherEvidenceStates()).isNull();
     }
 
     @Test
-    public void givenNullFurtherEvidenceAction_shouldNotUpdateDwpFurtherEvidenceStates() {
-        Callback<SscsCaseData> callback = buildCallback(null, State.INTERLOCUTORY_REVIEW_STATE);
+    void givenNullFurtherEvidenceAction_shouldNotUpdateDwpFurtherEvidenceStates() {
+        Callback<SscsCaseData> callbackData = buildCallback(null, State.INTERLOCUTORY_REVIEW_STATE);
 
-        PreSubmitCallbackResponse<SscsCaseData> updated = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> updated = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callbackData, USER_AUTHORISATION);
 
-        assertNull(updated.getData().getDwpFurtherEvidenceStates());
+        assertThat(updated.getData().getDwpFurtherEvidenceStates()).isNull();
     }
 
     @Test
-    public void givenADocumentWithNoUrl_thenAddAnErrorToResponse() {
+    void givenADocumentWithNoUrl_thenAddAnErrorToResponse() {
         List<ScannedDocument> docs = new ArrayList<>();
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
@@ -1132,15 +1129,15 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(1, response.getErrors().size());
+        assertThat(response.getErrors()).hasSize(1);
 
         for (String error : response.getErrors()) {
-            assertEquals("No document URL so could not process", error);
+            assertThat(error).isEqualTo("No document URL so could not process");
         }
     }
 
     @Test
-    public void givenANonConfidentialCaseAndEditedDocumentPopulated_thenAddAnErrorToResponse() {
+    void givenANonConfidentialCaseAndEditedDocumentPopulated_thenAddAnErrorToResponse() {
         List<ScannedDocument> docs = new ArrayList<>();
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
@@ -1154,15 +1151,15 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(1, response.getErrors().size());
+        assertThat(response.getErrors()).hasSize(1);
 
         for (String error : response.getErrors()) {
-            assertEquals("Case is not marked as confidential so cannot upload an edited document", error);
+            assertThat(error).isEqualTo("Case is not marked as confidential so cannot upload an edited document");
         }
     }
 
     @Test
-    public void givenAConfidentialCaseAndEditedDocumentPopulated_thenDoNotAddAnErrorToResponse() {
+    void givenAConfidentialCaseAndEditedDocumentPopulated_thenDoNotAddAnErrorToResponse() {
         List<ScannedDocument> docs = new ArrayList<>();
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
@@ -1176,13 +1173,14 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(0, response.getErrors().size());
+        assertThat(response.getErrors()).isEmpty();
 
     }
 
-    @Test
-    @Parameters({"null", " ", "    "})
-    public void givenADocumentWithNoDocFileName_thenAddAnErrorToResponse(@Nullable String filename) {
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {" ", "    "})
+    void givenADocumentWithNoDocFileName_thenAddAnErrorToResponse(String filename) {
         List<ScannedDocument> docs = new ArrayList<>();
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
@@ -1194,16 +1192,17 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(1, response.getErrors().size());
+        assertThat(response.getErrors()).hasSize(1);
 
         for (String error : response.getErrors()) {
-            assertEquals("No document file name so could not process", error);
+            assertThat(error).isEqualTo("No document file name so could not process");
         }
     }
 
-    @Test
-    @Parameters({"null", "DORMANT_APPEAL_STATE", "VOID_STATE"})
-    public void shouldReviewByJudgeAndUpdatePreviousStateWhenActionManuallyAndHasReinstatementRequestDocument(@Nullable State previousState) {
+    @ParameterizedTest
+    @NullSource
+    @EnumSource(value = State.class, names = {"DORMANT_APPEAL_STATE", "VOID_STATE"})
+    void shouldReviewByJudgeAndUpdatePreviousStateWhenActionManuallyAndHasReinstatementRequestDocument(State previousState) {
 
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), false, false, false);
 
@@ -1217,16 +1216,16 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(0, response.getErrors().size());
-        assertEquals(State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData.getPreviousState());
-        assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getReinstatementOutcome());
-        assertEquals(LocalDate.now(), sscsCaseData.getReinstatementRegistered());
-        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, sscsCaseData.getInterlocReviewState());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(sscsCaseData.getPreviousState()).isEqualTo(State.INTERLOCUTORY_REVIEW_STATE);
+        assertThat(sscsCaseData.getReinstatementOutcome()).isEqualTo(RequestOutcome.IN_PROGRESS);
+        assertThat(sscsCaseData.getReinstatementRegistered()).isEqualTo(LocalDate.now());
+        assertThat(sscsCaseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.REVIEW_BY_JUDGE);
     }
 
-    @Test
-    @Parameters({"VALID_APPEAL", "READY_TO_LIST"})
-    public void shouldReviewByJudgeButNotUpdatePreviousStateWhenActionManuallyAndHasReinstatementRequestDocument(@Nullable State previousState) {
+    @ParameterizedTest
+    @CsvSource({"VALID_APPEAL", "READY_TO_LIST"})
+    void shouldReviewByJudgeButNotUpdatePreviousStateWhenActionManuallyAndHasReinstatementRequestDocument(State previousState) {
 
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), false, false, false);
 
@@ -1241,15 +1240,15 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(0, response.getErrors().size());
-        assertEquals(previousState, sscsCaseData.getPreviousState());
-        assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getReinstatementOutcome());
-        assertEquals(LocalDate.now(), sscsCaseData.getReinstatementRegistered());
-        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, sscsCaseData.getInterlocReviewState());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(sscsCaseData.getPreviousState()).isEqualTo(previousState);
+        assertThat(sscsCaseData.getReinstatementOutcome()).isEqualTo(RequestOutcome.IN_PROGRESS);
+        assertThat(sscsCaseData.getReinstatementRegistered()).isEqualTo(LocalDate.now());
+        assertThat(sscsCaseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.REVIEW_BY_JUDGE);
     }
 
     @Test
-    public void skipReinstatementRequestSettingIfWelsh() {
+    void skipReinstatementRequestSettingIfWelsh() {
 
         State previousState = State.VALID_APPEAL;
 
@@ -1266,17 +1265,17 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(0, response.getErrors().size());
-        assertEquals(previousState, sscsCaseData.getPreviousState());
-        assertNull(sscsCaseData.getReinstatementOutcome());
-        assertNull(sscsCaseData.getReinstatementRegistered());
-        assertNull(sscsCaseData.getInterlocReviewState());
-        assertTrue(sscsCaseData.isTranslationWorkOutstanding());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(sscsCaseData.getPreviousState()).isEqualTo(previousState);
+        assertThat(sscsCaseData.getReinstatementOutcome()).isNull();
+        assertThat(sscsCaseData.getReinstatementRegistered()).isNull();
+        assertThat(sscsCaseData.getInterlocReviewState()).isNull();
+        assertThat(sscsCaseData.isTranslationWorkOutstanding()).isTrue();
     }
 
-    @Test
-    @Parameters({"VALID_APPEAL", "READY_TO_LIST"})
-    public void shouldReviewByJudgeButNotUpdatePreviousStateWhenActionManuallyAndHasUrgentHearingRequestDocument(@Nullable State previousState) {
+    @ParameterizedTest
+    @CsvSource({"VALID_APPEAL", "READY_TO_LIST"})
+    void shouldReviewByJudgeButNotUpdatePreviousStateWhenActionManuallyAndHasUrgentHearingRequestDocument(State previousState) {
 
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), false, false, false);
 
@@ -1291,14 +1290,14 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(0, response.getErrors().size());
-        assertEquals(previousState, sscsCaseData.getPreviousState());
-        assertEquals(1, response.getData().getSscsDocument().stream().filter(d -> URGENT_HEARING_REQUEST.getValue().equals(d.getValue().getDocumentType())).count());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(sscsCaseData.getPreviousState()).isEqualTo(previousState);
+        assertThat(response.getData().getSscsDocument().stream().filter(d -> URGENT_HEARING_REQUEST.getValue().equals(d.getValue().getDocumentType())).count()).isEqualTo(1);
     }
 
-    @Test
-    @Parameters({"READY_TO_LIST,1", "RESPONSE_RECEIVED,1", "DORMANT_APPEAL_STATE,1", "HEARING,1", "WITH_DWP,1", "VALID_APPEAL,0", "NOT_LISTABLE,1", "LISTING_ERROR,1", "HANDLING_ERROR,1"})
-    public void shouldSetBundleAdditionBasedOnPreviousState(@Nullable State state, int occurrence) {
+    @ParameterizedTest
+    @CsvSource({"READY_TO_LIST,1", "RESPONSE_RECEIVED,1", "DORMANT_APPEAL_STATE,1", "HEARING,1", "WITH_DWP,1", "VALID_APPEAL,0", "NOT_LISTABLE,1", "LISTING_ERROR,1", "HANDLING_ERROR,1"})
+    void shouldSetBundleAdditionBasedOnPreviousState(State state, int occurrence) {
 
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), false, false, false);
 
@@ -1321,16 +1320,16 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(occurrence, response.getData().getSscsDocument().stream().filter(doc -> "A".equals(doc.getValue().getBundleAddition())).count());
+        assertThat(response.getData().getSscsDocument().stream().filter(doc -> "A".equals(doc.getValue().getBundleAddition())).count()).isEqualTo(occurrence);
     }
 
-    @Test
-    @Parameters({"ISSUE_FURTHER_EVIDENCE,No,1", "OTHER_DOCUMENT_MANUAL,Yes,1", "OTHER_DOCUMENT_MANUAL,No,0",
+    @ParameterizedTest
+    @CsvSource({"ISSUE_FURTHER_EVIDENCE,No,1", "OTHER_DOCUMENT_MANUAL,Yes,1", "OTHER_DOCUMENT_MANUAL,No,0",
         "SEND_TO_INTERLOC_REVIEW_BY_TCW,Yes,1", "SEND_TO_INTERLOC_REVIEW_BY_TCW,No,0",
         "SEND_TO_INTERLOC_REVIEW_BY_JUDGE,Yes,1", "SEND_TO_INTERLOC_REVIEW_BY_JUDGE,No,0",
         "INFORMATION_RECEIVED_FOR_INTERLOC_TCW,Yes,1", "INFORMATION_RECEIVED_FOR_INTERLOC_TCW,No,0",
         "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,Yes,1", "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,No,0"})
-    public void shouldSetBundleAdditionBasedOnFurtherEvidenceActionType(FurtherEvidenceActionDynamicListItems actionType, String includeInBundle, int occurs) {
+    void shouldSetBundleAdditionBasedOnFurtherEvidenceActionType(FurtherEvidenceActionDynamicListItems actionType, String includeInBundle, int occurs) {
 
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), false, false, false);
 
@@ -1351,13 +1350,13 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(occurs, response.getData().getSscsDocument().stream().filter(doc -> "A".equals(doc.getValue().getBundleAddition())).count());
-        assertEquals(0, response.getWarnings().size());
+        assertThat(response.getData().getSscsDocument().stream().filter(doc -> "A".equals(doc.getValue().getBundleAddition())).count()).isEqualTo(occurs);
+        assertThat(response.getWarnings()).isEmpty();
     }
 
-    @Test
-    @Parameters({"ADMIN_ACTION_CORRECTION","SEND_TO_INTERLOC_REVIEW_BY_JUDGE"})
-    public void shouldSetBundleAdditionForCorrectionApplication(FurtherEvidenceActionDynamicListItems actionType) {
+    @ParameterizedTest
+    @CsvSource({"ADMIN_ACTION_CORRECTION","SEND_TO_INTERLOC_REVIEW_BY_JUDGE"})
+    void shouldSetBundleAdditionForCorrectionApplication(FurtherEvidenceActionDynamicListItems actionType) {
 
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), false, false, false);
 
@@ -1382,35 +1381,35 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(1, response.getData().getSscsDocument().stream().filter(doc -> "A".equals(doc.getValue().getBundleAddition())).count());
-        assertEquals(0, response.getWarnings().size());
+        assertThat(response.getData().getSscsDocument().stream().filter(doc -> "A".equals(doc.getValue().getBundleAddition())).count()).isEqualTo(1);
+        assertThat(response.getWarnings()).isEmpty();
     }
 
     @Test
-    public void shouldNotUpdateInterlocReviewStateWhenActionManuallyAndHasNoReinstatementRequestDocument() {
+    void shouldNotUpdateInterlocReviewStateWhenActionManuallyAndHasNoReinstatementRequestDocument() {
         sscsCaseData.setPreviousState(null);
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(0, response.getErrors().size());
-        assertNull(sscsCaseData.getPreviousState());
-        assertNull(sscsCaseData.getReinstatementOutcome());
-        assertNull(sscsCaseData.getReinstatementRegistered());
-        assertNull(sscsCaseData.getInterlocReviewState());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(sscsCaseData.getPreviousState()).isNull();
+        assertThat(sscsCaseData.getReinstatementOutcome()).isNull();
+        assertThat(sscsCaseData.getReinstatementRegistered()).isNull();
+        assertThat(sscsCaseData.getInterlocReviewState()).isNull();
     }
 
     @Test
-    public void shouldNotUpdateInterlocReviewStateWhenActionManuallyAndHasNoUrgentHearingRequestDocument() {
+    void shouldNotUpdateInterlocReviewStateWhenActionManuallyAndHasNoUrgentHearingRequestDocument() {
         sscsCaseData.setPreviousState(null);
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(0, response.getErrors().size());
-        assertNull(sscsCaseData.getPreviousState());
-        assertNull(sscsCaseData.getInterlocReviewState());
-        assertEquals(0, response.getData().getSscsDocument().stream().filter(d -> URGENT_HEARING_REQUEST.getValue().equals(d.getValue().getDocumentType())).count());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(sscsCaseData.getPreviousState()).isNull();
+        assertThat(sscsCaseData.getInterlocReviewState()).isNull();
+        assertThat(response.getData().getSscsDocument().stream().filter(d -> URGENT_HEARING_REQUEST.getValue().equals(d.getValue().getDocumentType())).count()).isZero();
     }
 
     @Test
-    public void givenWhenNotActionManuallyAndHasReinstatementRequestDocumentThenSetReinstateCaseFields() {
+    void givenWhenNotActionManuallyAndHasReinstatementRequestDocumentThenSetReinstateCaseFields() {
         sscsCaseData.setPreviousState(null);
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.code, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.label));
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
@@ -1420,16 +1419,16 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(0, response.getErrors().size());
-        assertEquals(LocalDate.now(), sscsCaseData.getReinstatementRegistered());
-        assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getReinstatementOutcome());
-        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, sscsCaseData.getInterlocReviewState());
-        assertEquals(State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData.getPreviousState());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(sscsCaseData.getReinstatementRegistered()).isEqualTo(LocalDate.now());
+        assertThat(sscsCaseData.getReinstatementOutcome()).isEqualTo(RequestOutcome.IN_PROGRESS);
+        assertThat(sscsCaseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.REVIEW_BY_JUDGE);
+        assertThat(sscsCaseData.getPreviousState()).isEqualTo(State.INTERLOCUTORY_REVIEW_STATE);
     }
 
-    @Test
-    @Parameters({"SEND_TO_INTERLOC_REVIEW_BY_JUDGE", "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE"})
-    public void givenConfidentialRequestWhenJointPartyExistsFromOriginalSenderAppellant_thenUpdateCaseWithConfidentialFields(FurtherEvidenceActionDynamicListItems furtherEvidenceActionDynamicListItem) {
+    @ParameterizedTest
+    @CsvSource({"SEND_TO_INTERLOC_REVIEW_BY_JUDGE", "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE"})
+    void givenConfidentialRequestWhenJointPartyExistsFromOriginalSenderAppellant_thenUpdateCaseWithConfidentialFields(FurtherEvidenceActionDynamicListItems furtherEvidenceActionDynamicListItem) {
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(furtherEvidenceActionDynamicListItem.code, furtherEvidenceActionDynamicListItem.label));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
@@ -1442,31 +1441,31 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(0, response.getErrors().size());
-        assertEquals(0, response.getWarnings().size());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getWarnings()).isEmpty();
 
-        assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeAppellant().getRequestOutcome());
-        assertNull(sscsCaseData.getConfidentialityRequestOutcomeJointParty());
-        assertEquals(LocalDate.now(), sscsCaseData.getConfidentialityRequestOutcomeAppellant().getDate());
+        assertThat(sscsCaseData.getConfidentialityRequestOutcomeAppellant().getRequestOutcome()).isEqualTo(RequestOutcome.IN_PROGRESS);
+        assertThat(sscsCaseData.getConfidentialityRequestOutcomeJointParty()).isNull();
+        assertThat(sscsCaseData.getConfidentialityRequestOutcomeAppellant().getDate()).isEqualTo(LocalDate.now());
     }
 
-    @Test
-    @Parameters({
+    @ParameterizedTest
+    @CsvSource(nullValues = "null", value = {
         "SEND_TO_INTERLOC_REVIEW_BY_JUDGE, Yes",
         "SEND_TO_INTERLOC_REVIEW_BY_JUDGE, No",
         "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE, Yes",
         "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE, No",
         "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE, null"
     })
-    public void givenConfidentialRequestWhenJointPartyExistsAndAlreadyHasConfidentialityFromOriginalSenderAppellant_thenUpdateCaseWithConfidentialFieldsAndDisplayWarning(
+    void givenConfidentialRequestWhenJointPartyExistsAndAlreadyHasConfidentialityFromOriginalSenderAppellant_thenUpdateCaseWithConfidentialFieldsAndDisplayWarning(
         FurtherEvidenceActionDynamicListItems furtherEvidenceActionDynamicListItem,
-        @Nullable String isProgressingViaGaps
+        String isProgressingViaGaps
     ) {
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(furtherEvidenceActionDynamicListItem.code, furtherEvidenceActionDynamicListItem.label));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
         sscsCaseData.getJointParty().setHasJointParty(YesNo.YES);
         sscsCaseData.setIsProgressingViaGaps(isProgressingViaGaps);
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedRequestOutcome(RequestOutcome.GRANTED));
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedRequestOutcome());
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue())
@@ -1475,16 +1474,16 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(0, response.getErrors().size());
-        assertEquals(0, response.getWarnings().size());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getWarnings()).isEmpty();
 
-        assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeAppellant().getRequestOutcome());
-        assertEquals(createDatedRequestOutcome(RequestOutcome.GRANTED), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
-        assertEquals(LocalDate.now(), sscsCaseData.getConfidentialityRequestOutcomeAppellant().getDate());
+        assertThat(sscsCaseData.getConfidentialityRequestOutcomeAppellant().getRequestOutcome()).isEqualTo(RequestOutcome.IN_PROGRESS);
+        assertThat(sscsCaseData.getConfidentialityRequestOutcomeJointParty()).isEqualTo(createDatedRequestOutcome());
+        assertThat(sscsCaseData.getConfidentialityRequestOutcomeAppellant().getDate()).isEqualTo(LocalDate.now());
     }
 
     @Test
-    public void givenAnAppellantHasConfidentialityRequestGrantedAndAppellantSendsFurtherEvidence_thenDisplayWarningWhenActionFurtherEvidenceEventTriggered() {
+    void givenAnAppellantHasConfidentialityRequestGrantedAndAppellantSendsFurtherEvidence_thenDisplayWarningWhenActionFurtherEvidenceEventTriggered() {
         when(callback.isIgnoreWarnings()).thenReturn(false);
         sscsCaseData.setConfidentialityRequestOutcomeAppellant(DatedRequestOutcome.builder().requestOutcome(RequestOutcome.GRANTED).build());
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
@@ -1497,14 +1496,14 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(0, response.getErrors().size());
+        assertThat(response.getErrors()).isEmpty();
 
-        assertEquals(1, response.getWarnings().size());
-        assertEquals("This case has a confidentiality flag, ensure any evidence from the appellant (or appointee) has confidential information redacted", response.getWarnings().iterator().next());
+        assertThat(response.getWarnings()).hasSize(1);
+        assertThat(response.getWarnings().iterator().next()).isEqualTo("This case has a confidentiality flag, ensure any evidence from the appellant (or appointee) has confidential information redacted");
     }
 
     @Test
-    public void givenAJointPartyHasConfidentialityRequestGrantedAndJointPartySendsFurtherEvidence_thenDisplayWarningWhenActionFurtherEvidenceEventTriggered() {
+    void givenAJointPartyHasConfidentialityRequestGrantedAndJointPartySendsFurtherEvidence_thenDisplayWarningWhenActionFurtherEvidenceEventTriggered() {
         when(callback.isIgnoreWarnings()).thenReturn(false);
         sscsCaseData.setConfidentialityRequestOutcomeJointParty(DatedRequestOutcome.builder().requestOutcome(RequestOutcome.GRANTED).build());
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(JOINT_PARTY.getCode(), JOINT_PARTY.getLabel()));
@@ -1517,14 +1516,14 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(0, response.getErrors().size());
+        assertThat(response.getErrors()).isEmpty();
 
-        assertEquals(1, response.getWarnings().size());
-        assertEquals("This case has a confidentiality flag, ensure any evidence from the joint party has confidential information redacted", response.getWarnings().iterator().next());
+        assertThat(response.getWarnings()).hasSize(1);
+        assertThat(response.getWarnings().iterator().next()).isEqualTo("This case has a confidentiality flag, ensure any evidence from the joint party has confidential information redacted");
     }
 
     @Test
-    public void givenAConfidentialChildSupportCase_thenDisplayWarningWhenActionFurtherEvidenceEventTriggered() {
+    void givenAConfidentialChildSupportCase_thenDisplayWarningWhenActionFurtherEvidenceEventTriggered() {
         when(callback.isIgnoreWarnings()).thenReturn(false);
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
@@ -1538,14 +1537,14 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(0, response.getErrors().size());
+        assertThat(response.getErrors()).isEmpty();
 
-        assertEquals(2, response.getWarnings().size());
-        assertEquals("This case has a confidentiality flag, ensure any evidence from the appellant (or appointee) has confidential information redacted", response.getWarnings().iterator().next());
+        assertThat(response.getWarnings()).hasSize(2);
+        assertThat(response.getWarnings().iterator().next()).isEqualTo("This case has a confidentiality flag, ensure any evidence from the appellant (or appointee) has confidential information redacted");
     }
 
     @Test
-    public void givenAnAppellantHasConfidentialityRequestGrantedAndJointPartySendsFurtherEvidence_thenDisplayWarningWhenActionFurtherEvidenceEventTriggered() {
+    void givenAnAppellantHasConfidentialityRequestGrantedAndJointPartySendsFurtherEvidence_thenDisplayWarningWhenActionFurtherEvidenceEventTriggered() {
         sscsCaseData.setConfidentialityRequestOutcomeAppellant(DatedRequestOutcome.builder().requestOutcome(RequestOutcome.GRANTED).build());
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(JOINT_PARTY.getCode(), JOINT_PARTY.getLabel()));
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
@@ -1557,12 +1556,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(0, response.getErrors().size());
-        assertEquals(0, response.getWarnings().size());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getWarnings()).isEmpty();
     }
 
     @Test
-    public void givenAJointPartyHasConfidentialityRequestGrantedAndAppellantSendsFurtherEvidence_thenDoNotDisplayWarningWhenActionFurtherEvidenceEventTriggered() {
+    void givenAJointPartyHasConfidentialityRequestGrantedAndAppellantSendsFurtherEvidence_thenDoNotDisplayWarningWhenActionFurtherEvidenceEventTriggered() {
         sscsCaseData.setConfidentialityRequestOutcomeJointParty(DatedRequestOutcome.builder().requestOutcome(RequestOutcome.GRANTED).build());
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
@@ -1574,12 +1573,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(0, response.getErrors().size());
-        assertEquals(0, response.getWarnings().size());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getWarnings()).isEmpty();
     }
 
     @Test
-    public void givenANonConfidentialChildSupportCase_thenDoNotDisplayWarningWhenActionFurtherEvidenceEventTriggered() {
+    void givenANonConfidentialChildSupportCase_thenDoNotDisplayWarningWhenActionFurtherEvidenceEventTriggered() {
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
@@ -1595,15 +1594,15 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(0, response.getErrors().size());
-        assertEquals(0, response.getWarnings().size());
-        assertEquals("1", response.getData().getSscsDocument().getFirst().getValue().getOriginalSenderOtherPartyId());
-        assertEquals("Other Party", response.getData().getSscsDocument().getFirst().getValue().getOriginalSenderOtherPartyName());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getWarnings()).isEmpty();
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getOriginalSenderOtherPartyId()).isEqualTo("1");
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getOriginalSenderOtherPartyName()).isEqualTo("Other Party");
     }
 
-    @Test
-    @Parameters({"SEND_TO_INTERLOC_REVIEW_BY_JUDGE", "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE"})
-    public void givenConfidentialRequestWhenJointPartyDoesNotExistFromOriginalSenderAppellant_thenShowError(FurtherEvidenceActionDynamicListItems furtherEvidenceActionDynamicListItem) {
+    @ParameterizedTest
+    @CsvSource({"SEND_TO_INTERLOC_REVIEW_BY_JUDGE", "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE"})
+    void givenConfidentialRequestWhenJointPartyDoesNotExistFromOriginalSenderAppellant_thenShowError(FurtherEvidenceActionDynamicListItems furtherEvidenceActionDynamicListItem) {
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(furtherEvidenceActionDynamicListItem.code, furtherEvidenceActionDynamicListItem.label));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
@@ -1615,14 +1614,14 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(1, response.getErrors().size());
-        assertEquals("Document type \"Confidentiality Request\" is invalid as there is no joint party on the case", response.getErrors().iterator().next());
-        assertNull(sscsCaseData.getConfidentialityRequestOutcomeAppellant());
-        assertNull(sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        assertThat(response.getErrors()).hasSize(1);
+        assertThat(response.getErrors().iterator().next()).isEqualTo("Document type \"Confidentiality Request\" is invalid as there is no joint party on the case");
+        assertThat(sscsCaseData.getConfidentialityRequestOutcomeAppellant()).isNull();
+        assertThat(sscsCaseData.getConfidentialityRequestOutcomeJointParty()).isNull();
     }
 
     @Test
-    public void givenConfidentialRequestWhenJointPartyExistsFromOriginalSenderJointParty_thenUpdateCaseWithConfidentialFields() {
+    void givenConfidentialRequestWhenJointPartyExistsFromOriginalSenderJointParty_thenUpdateCaseWithConfidentialFields() {
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.code, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.label));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(JOINT_PARTY.getCode(), JOINT_PARTY.getLabel()));
@@ -1635,14 +1634,14 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(0, response.getErrors().size());
-        assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeJointParty().getRequestOutcome());
-        assertNull(sscsCaseData.getConfidentialityRequestOutcomeAppellant());
-        assertEquals(LocalDate.now(), sscsCaseData.getConfidentialityRequestOutcomeJointParty().getDate());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(sscsCaseData.getConfidentialityRequestOutcomeJointParty().getRequestOutcome()).isEqualTo(RequestOutcome.IN_PROGRESS);
+        assertThat(sscsCaseData.getConfidentialityRequestOutcomeAppellant()).isNull();
+        assertThat(sscsCaseData.getConfidentialityRequestOutcomeJointParty().getDate()).isEqualTo(LocalDate.now());
     }
 
     @Test
-    public void givenConfidentialRequestWhenJointPartyDoesNotExistFromOriginalSenderJointParty_thenUpdateCaseWithConfidentialFields() {
+    void givenConfidentialRequestWhenJointPartyDoesNotExistFromOriginalSenderJointParty_thenUpdateCaseWithConfidentialFields() {
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.code, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.label));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(JOINT_PARTY.getCode(), JOINT_PARTY.getLabel()));
@@ -1654,15 +1653,15 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(1, response.getErrors().size());
-        assertEquals("Document type \"Confidentiality Request\" is invalid as there is no joint party on the case", response.getErrors().iterator().next());
-        assertNull(sscsCaseData.getConfidentialityRequestOutcomeJointParty());
-        assertNull(sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        assertThat(response.getErrors()).hasSize(1);
+        assertThat(response.getErrors().iterator().next()).isEqualTo("Document type \"Confidentiality Request\" is invalid as there is no joint party on the case");
+        assertThat(sscsCaseData.getConfidentialityRequestOutcomeJointParty()).isNull();
+        assertThat(sscsCaseData.getConfidentialityRequestOutcomeAppellant()).isNull();
     }
 
 
     @Test
-    public void givenConfidentialRequestFromRep_thenShowAnError() {
+    void givenConfidentialRequestFromRep_thenShowAnError() {
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.code, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.label));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(REPRESENTATIVE.getCode(), REPRESENTATIVE.getLabel()));
@@ -1675,20 +1674,20 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(1, response.getErrors().size());
+        assertThat(response.getErrors()).hasSize(1);
         for (String error : response.getErrors()) {
-            assertEquals("Original sender must be appellant or joint party for a confidential document", error);
+            assertThat(error).isEqualTo("Original sender must be appellant or joint party for a confidential document");
         }
     }
 
     @Test
-    public void givenChildSupportWithConfidentialRequestFromOtherPartyDoNotMatchWithDocumentOriginalSender_thenShowAnError() {
+    void givenChildSupportWithConfidentialRequestFromOtherPartyDoNotMatchWithDocumentOriginalSender_thenShowAnError() {
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.code, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.label));
         sscsCaseData.getJointParty().setHasJointParty(YesNo.YES);
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
         OtherParty otherParty = OtherParty.builder().id("10").name(Name.builder().firstName("John").lastName("smith").build()).build();
-        CcdValue ccdValue = CcdValue.builder().value(otherParty).build();
+        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(otherParty).build();
         otherPartyList.add(ccdValue);
         sscsCaseData.setOtherParties(otherPartyList);
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
@@ -1703,18 +1702,18 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(2, response.getErrors().size());
-        assertTrue(response.getErrors().stream().anyMatch(e -> e.equals("The PDF evidence does not match the Original Sender selected")));
+        assertThat(response.getErrors()).hasSize(2);
+        assertThat(response.getErrors()).contains("The PDF evidence does not match the Original Sender selected");
     }
 
     @Test
-    public void givenChildSupportWithOtherRequestFromOtherPartyWithDocumentOriginalSenderIsNull_thenDonNotShowAnError() {
+    void givenChildSupportWithOtherRequestFromOtherPartyWithDocumentOriginalSenderIsNull_thenDonNotShowAnError() {
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.code, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.label));
         sscsCaseData.getJointParty().setHasJointParty(YesNo.YES);
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
         OtherParty otherParty = OtherParty.builder().id("10").name(Name.builder().firstName("John").lastName("smith").build()).build();
-        CcdValue ccdValue = CcdValue.builder().value(otherParty).build();
+        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(otherParty).build();
         otherPartyList.add(ccdValue);
         sscsCaseData.setOtherParties(otherPartyList);
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
@@ -1729,17 +1728,17 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(0, response.getErrors().size());
+        assertThat(response.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenChildSupportWithConfidentialRequestFromOtherPartyDoMatchWithDocumentOriginalSender_thenDontShowAnError() {
+    void givenChildSupportWithConfidentialRequestFromOtherPartyDoMatchWithDocumentOriginalSender_thenDontShowAnError() {
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.code, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.label));
         sscsCaseData.getJointParty().setHasJointParty(YesNo.YES);
         List<CcdValue<OtherParty>> otherPartyList = new ArrayList<>();
         OtherParty otherParty = OtherParty.builder().id("10").name(Name.builder().firstName("John").lastName("smith").build()).build();
-        CcdValue ccdValue = CcdValue.builder().value(otherParty).build();
+        CcdValue<OtherParty> ccdValue = CcdValue.<OtherParty>builder().value(otherParty).build();
         otherPartyList.add(ccdValue);
         sscsCaseData.setOtherParties(otherPartyList);
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build());
@@ -1754,11 +1753,11 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(0, response.getErrors().size());
+        assertThat(response.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenChildSupportWithOtherRequestWhenOtherPartyIsEmpty_thenDontShowAnError() {
+    void givenChildSupportWithOtherRequestWhenOtherPartyIsEmpty_thenDontShowAnError() {
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.code, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.label));
         sscsCaseData.getJointParty().setHasJointParty(YesNo.YES);
@@ -1775,11 +1774,11 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(0, response.getErrors().size());
+        assertThat(response.getErrors()).isEmpty();
     }
 
     @Test
-    public void givenConfidentialRequestWithInvalidFurtherEvidenceAction_thenShowAnError() {
+    void givenConfidentialRequestWithInvalidFurtherEvidenceAction_thenShowAnError() {
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(ISSUE_FURTHER_EVIDENCE.code, ISSUE_FURTHER_EVIDENCE.label));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
@@ -1792,15 +1791,15 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(1, response.getErrors().size());
+        assertThat(response.getErrors()).hasSize(1);
         for (String error : response.getErrors()) {
-            assertEquals("Further evidence action must be 'Send to Interloc - Review by Judge' or 'Information received for Interloc - send to Judge' for a confidential document", error);
+            assertThat(error).isEqualTo("Further evidence action must be 'Send to Interloc - Review by Judge' or 'Information received for Interloc - send to Judge' for a confidential document");
         }
     }
 
-    @Test
-    @Parameters({"APPELLANT", "REPRESENTATIVE", "DWP", "JOINT_PARTY", "HMCTS"})
-    public void shouldIssueToAllParties_willAddFooterTextToDocument(PartyItemList sender) {
+    @ParameterizedTest
+    @CsvSource({"APPELLANT", "REPRESENTATIVE", "DWP", "JOINT_PARTY", "HMCTS"})
+    void shouldIssueToAllParties_willAddFooterTextToDocument(PartyItemList sender) {
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(ISSUE_FURTHER_EVIDENCE.code, ISSUE_FURTHER_EVIDENCE.label));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(sender.getCode(), sender.getLabel()));
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
@@ -1815,13 +1814,15 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         verify(footerService).addFooter(eq(scannedDocument.getValue().getUrl()), eq(sender.getDocumentFooter()), eq(null));
-        assertEquals(0, response.getErrors().size());
-        assertEquals(0, response.getWarnings().size());
-        assertEquals(sender.getDocumentType().getValue(), response.getData().getSscsDocument().getFirst().getValue().getDocumentType());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getWarnings()).isEmpty();
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentType()).isEqualTo(sender.getDocumentType().getValue());
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getDocumentDateIssued())
+            .isEqualTo(getLocalDate().format(DateTimeFormatter.ISO_DATE));
     }
 
-    @Test
-    @Parameters({
+    @ParameterizedTest
+    @CsvSource({
         "ISSUE_FURTHER_EVIDENCE,Yes,1",
         "ISSUE_FURTHER_EVIDENCE,No,1",
         "OTHER_DOCUMENT_MANUAL,Yes,1",
@@ -1829,7 +1830,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         "SEND_TO_INTERLOC_REVIEW_BY_TCW,Yes,1",
         "SEND_TO_INTERLOC_REVIEW_BY_TCW,No,0"
     })
-    public void shouldAddDocumentToBundleBasedOnFurtherEvidenceActionType(FurtherEvidenceActionDynamicListItems actionType, String includeInBundle, int occurs) {
+    void shouldAddDocumentToBundleBasedOnFurtherEvidenceActionType(FurtherEvidenceActionDynamicListItems actionType, String includeInBundle, int occurs) {
 
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), false, false, false);
 
@@ -1849,15 +1850,15 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(occurs, response.getData().getSscsDocument().stream().filter(doc -> "A".equals(doc.getValue().getBundleAddition())).count());
+        assertThat(response.getData().getSscsDocument().stream().filter(doc -> "A".equals(doc.getValue().getBundleAddition())).count()).isEqualTo(occurs);
     }
 
-    @Test
-    @Parameters({
+    @ParameterizedTest
+    @CsvSource({
         "otherParty,    1, Other Party",
         "otherPartyRep, 2, Rep Party"
     })
-    public void findOriginalSenderOtherPartyId(String otherPartyCode, String otherPartyId, String expectedName) {
+    void findOriginalSenderOtherPartyId(String otherPartyCode, String otherPartyId, String expectedName) {
         ScannedDocument scannedDocument = ScannedDocument
             .builder()
             .value(
@@ -1882,16 +1883,16 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(otherPartyId, response.getData().getSscsDocument().getFirst().getValue().getOriginalSenderOtherPartyId());
-        assertEquals(expectedName, response.getData().getSscsDocument().getFirst().getValue().getOriginalSenderOtherPartyName());
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getOriginalSenderOtherPartyId()).isEqualTo(otherPartyId);
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getOriginalSenderOtherPartyName()).isEqualTo(expectedName);
     }
 
-    @Test
-    @Parameters({
+    @ParameterizedTest
+    @CsvSource({
         "otherParty,    df0d77d2-3852-40b2-9be6-3383e17aa3ad, Other Party",
         "otherPartyRep, b594060e-4506-4dbf-a6fd-07ceaed5099e, Rep Party"
     })
-    public void findOriginalSenderOtherPartyIdPreservesHexCharsInUuid(String otherPartyCode, String otherPartyId, String expectedName) {
+    void findOriginalSenderOtherPartyIdPreservesHexCharsInUuid(String otherPartyCode, String otherPartyId, String expectedName) {
         ScannedDocument scannedDocument = ScannedDocument
                 .builder()
                 .value(
@@ -1916,17 +1917,18 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(otherPartyId, response.getData().getSscsDocument().getFirst().getValue().getOriginalSenderOtherPartyId());
-        assertEquals(expectedName, response.getData().getSscsDocument().getFirst().getValue().getOriginalSenderOtherPartyName());
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getOriginalSenderOtherPartyId()).isEqualTo(otherPartyId);
+        assertThat(response.getData().getSscsDocument().getFirst().getValue().getOriginalSenderOtherPartyName()).isEqualTo(expectedName);
     }
 
-    @Parameters({"ISSUE_FURTHER_EVIDENCE,No,0", "ISSUE_FURTHER_EVIDENCE,Yes,0", "ISSUE_FURTHER_EVIDENCE,null,0",
+    @ParameterizedTest
+    @CsvSource(nullValues = "null", value = {"ISSUE_FURTHER_EVIDENCE,No,0", "ISSUE_FURTHER_EVIDENCE,Yes,0", "ISSUE_FURTHER_EVIDENCE,null,0",
         "OTHER_DOCUMENT_MANUAL,Yes,0", "OTHER_DOCUMENT_MANUAL,No,0", "OTHER_DOCUMENT_MANUAL,null,1",
-        "SEND_TO_INTERLOC_REVIEW_BY_TCW,Yes,0", "SEND_TO_INTERLOC_REVIEW_BY_TCW,No,0", "SEND_TO_INTERLOC_REVIEW_BY_TCW,,1",
-        "SEND_TO_INTERLOC_REVIEW_BY_JUDGE,Yes,0", "SEND_TO_INTERLOC_REVIEW_BY_JUDGE,No,0","SEND_TO_INTERLOC_REVIEW_BY_JUDGE,,1",
-        "INFORMATION_RECEIVED_FOR_INTERLOC_TCW,Yes,0", "INFORMATION_RECEIVED_FOR_INTERLOC_TCW,No,0","INFORMATION_RECEIVED_FOR_INTERLOC_TCW,,1",
+        "SEND_TO_INTERLOC_REVIEW_BY_TCW,Yes,0", "SEND_TO_INTERLOC_REVIEW_BY_TCW,No,0", "SEND_TO_INTERLOC_REVIEW_BY_TCW,'',1",
+        "SEND_TO_INTERLOC_REVIEW_BY_JUDGE,Yes,0", "SEND_TO_INTERLOC_REVIEW_BY_JUDGE,No,0","SEND_TO_INTERLOC_REVIEW_BY_JUDGE,'',1",
+        "INFORMATION_RECEIVED_FOR_INTERLOC_TCW,Yes,0", "INFORMATION_RECEIVED_FOR_INTERLOC_TCW,No,0","INFORMATION_RECEIVED_FOR_INTERLOC_TCW,'',1",
         "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,Yes,0", "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,No,0", "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,null,1"})
-    public void shouldSetBundleAdditionWarningBasedOnFurtherEvidenceActionType(FurtherEvidenceActionDynamicListItems actionType, String includeInBundle, int warnings) {
+    void shouldSetBundleAdditionWarningBasedOnFurtherEvidenceActionType(FurtherEvidenceActionDynamicListItems actionType, String includeInBundle, int warnings) {
 
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), false, false, false);
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(actionType.code, actionType.label));
@@ -1946,20 +1948,20 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(warnings, response.getWarnings().size());
+        assertThat(response.getWarnings()).hasSize(warnings);
         if (warnings == 1) {
             String warning = response.getWarnings().stream().findFirst().orElse("");
-            assertEquals("No documents have been ticked to be added as an addition. These document(s) will NOT be added to the bundle. Are you sure?", warning);
+            assertThat(warning).isEqualTo("No documents have been ticked to be added as an addition. These document(s) will NOT be added to the bundle. Are you sure?");
         }
     }
 
-    private DatedRequestOutcome createDatedRequestOutcome(RequestOutcome requestOutcome) {
+    private DatedRequestOutcome createDatedRequestOutcome() {
         return DatedRequestOutcome.builder().date(LocalDate.now().minusDays(1))
-                                  .requestOutcome(requestOutcome).build();
+                                  .requestOutcome(RequestOutcome.GRANTED).build();
     }
 
     @Test
-    public void isThreadSafe() throws Exception {
+    void isThreadSafe() {
 
         DynamicList furtherEvidenceActionList =
             buildFurtherEvidenceActionItemListForGivenOption(OTHER_DOCUMENT_MANUAL.getCode(),
@@ -1971,11 +1973,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         String evidenceHandle = null;
 
         int numberOfTasks = 3;
-        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
         AtomicBoolean noOverwrite = new AtomicBoolean(true);
 
-        try {
+        try (final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())) {
             for (int i = 0; i < numberOfTasks; i++) {
 
                 String expectedId1 = String.valueOf(i);
@@ -1992,8 +1993,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                 thisCaseData.setOriginalSender(originalSender);
                 thisCaseData.setEvidenceHandled(evidenceHandle);
 
-                Callback<SscsCaseData> mockCallback = mock(Callback.class);
-                CaseDetails<SscsCaseData> mockCaseDetails = mock(CaseDetails.class);
+                final Callback<SscsCaseData> mockCallback = mock();
+                final CaseDetails<SscsCaseData> mockCaseDetails = mock();
 
                 when(mockCallback.getEvent()).thenReturn(EventType.ACTION_FURTHER_EVIDENCE);
                 when(mockCallback.getCaseDetails()).thenReturn(mockCaseDetails);
@@ -2002,16 +2003,14 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                 executor.execute(new ThreadRunnable(i, actionFurtherEvidenceAboutToSubmitHandler, mockCallback, expectedId1, noOverwrite));
             }
         } catch (Exception err) {
-            err.printStackTrace();
+            log.error("Error occurred", err);
         }
 
-        Thread.sleep(3000);
-        assertTrue(noOverwrite.get());
-        executor.shutdown();
+        assertThat(noOverwrite.get()).isTrue();
     }
 
     @Test
-    public void givenACaseWithScannedDocuments_shouldGenerateAMapOfSscsDocuments() throws JsonProcessingException {
+    void givenACaseWithScannedDocuments_shouldGenerateAMapOfSscsDocuments() throws JsonProcessingException {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(true), false, false, false);
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder()
@@ -2024,7 +2023,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                                   .controlNumber("4321")
                                   .build()).build();
 
-        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+        sscsCaseData.setScannedDocuments(singletonList(scannedDocument));
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
             ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -2032,13 +2031,13 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         Map<String, Integer> addedDocuments = new ObjectMapper().readerFor(Map.class)
                                                                 .readValue(response.getData().getWorkAllocationFields().getAddedDocuments());
 
-        org.assertj.core.api.Assertions.assertThat(addedDocuments)
+        assertThat(addedDocuments)
                                        .as("One document has been added to the case and should be added to added documents.")
-                                       .containsOnly(org.assertj.core.api.Assertions.entry("reinstatementRequest", 1));
+                                       .containsOnly(entry("reinstatementRequest", 1));
     }
 
     @Test
-    public void givenACaseWithScannedDocumentsSubmittedMultipleTimes_shouldGenerateAMapOfSscsDocumentsWithTheMostRecentDocuments()
+    void givenACaseWithScannedDocumentsSubmittedMultipleTimes_shouldGenerateAMapOfSscsDocumentsWithTheMostRecentDocuments()
         throws JsonProcessingException {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(true), false, false, false);
         ScannedDocument reinstatementRequestScannedDocument = ScannedDocument.builder().value(
@@ -2052,7 +2051,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                                   .controlNumber("4321")
                                   .build()).build();
 
-        sscsCaseData.setScannedDocuments(Collections.singletonList(reinstatementRequestScannedDocument));
+        sscsCaseData.setScannedDocuments(singletonList(reinstatementRequestScannedDocument));
 
         actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -2067,7 +2066,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                                   .controlNumber("111")
                                   .build()).build();
 
-        sscsCaseData.setScannedDocuments(Collections.singletonList(confidentialityRequestScannedDocument));
+        sscsCaseData.setScannedDocuments(singletonList(confidentialityRequestScannedDocument));
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
             ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -2075,13 +2074,13 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         Map<String, Integer> addedDocuments = new ObjectMapper().readerFor(Map.class)
                                                                 .readValue(response.getData().getWorkAllocationFields().getAddedDocuments());
 
-        org.assertj.core.api.Assertions.assertThat(addedDocuments)
+        assertThat(addedDocuments)
                                        .as("Added documents should only contain documents from the current event.")
-                                       .containsOnly(org.assertj.core.api.Assertions.entry("confidentialityRequest", 1));
+                                       .containsOnly(entry("confidentialityRequest", 1));
     }
 
     @Test
-    public void givenACaseWithNoScannedDocument_shouldClearAddedDocuments() {
+    void givenACaseWithNoScannedDocument_shouldClearAddedDocuments() {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(true), false, false, false);
 
         sscsCaseData.setScannedDocuments(null);
@@ -2092,13 +2091,13 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
             ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        org.assertj.core.api.Assertions.assertThat(response.getData().getWorkAllocationFields().getAddedDocuments())
+        assertThat(response.getData().getWorkAllocationFields().getAddedDocuments())
                                        .as("Added documents should be reset on each event.")
                                        .isNull();
     }
 
     @Test
-    public void givenACaseWithScannedDocumentCoversheet_shouldGenerateAnEmptyMapOfSscsDocuments() {
+    void givenACaseWithScannedDocumentCoversheet_shouldGenerateAnEmptyMapOfSscsDocuments() {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(true), false, false, false);
         List<ScannedDocument> scannedDocuments = new ArrayList<>();
         scannedDocuments.add(ScannedDocument.builder().value(
@@ -2117,14 +2116,14 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
             ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        org.assertj.core.api.Assertions.assertThat(response.getData().getWorkAllocationFields().getAddedDocuments())
+        assertThat(response.getData().getWorkAllocationFields().getAddedDocuments())
                                        .as("Only a coversheet has been attached - this should be ignored.")
                                        .isNull();
     }
 
-    @Test
-    @Parameters({"SEND_TO_INTERLOC_REVIEW_BY_JUDGE, CONFIDENTIALITY_REQUEST"})
-    public void givenScannedDocumentsAreUploaded_thenUpdateCaseWithListOfScannedDocumentTypes(FurtherEvidenceActionDynamicListItems furtherEvidenceActionDynamicListItem, ScannedDocumentType documentType) {
+    @ParameterizedTest
+    @CsvSource({"SEND_TO_INTERLOC_REVIEW_BY_JUDGE, CONFIDENTIALITY_REQUEST"})
+    void givenScannedDocumentsAreUploaded_thenUpdateCaseWithListOfScannedDocumentTypes(FurtherEvidenceActionDynamicListItems furtherEvidenceActionDynamicListItem, ScannedDocumentType documentType) {
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(furtherEvidenceActionDynamicListItem.code, furtherEvidenceActionDynamicListItem.label));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
         sscsCaseData.getJointParty().setHasJointParty(YesNo.YES);
@@ -2140,13 +2139,14 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         ActionFurtherEvidenceAboutToSubmitHandler handler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(true), false, false, false);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(0, response.getErrors().size());
-        assertEquals(0, response.getWarnings().size());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getWarnings()).isEmpty();
 
-        assertEquals(Arrays.asList(documentType.getValue()), sscsCaseData.getWorkAllocationFields().getScannedDocumentTypes());
+        assertThat(sscsCaseData.getWorkAllocationFields().getScannedDocumentTypes()).isEqualTo(
+            singletonList(documentType.getValue()));
     }
 
-    public void givenAValidPostHearingOtherRequest_andReviewByJudgeIsSelected_thenDontThrowError() {
+    void givenAValidPostHearingOtherRequest_andReviewByJudgeIsSelected_thenDontThrowError() {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), true, true, false);
 
         DynamicListItem sendToInterlocListItem = new DynamicListItem(
@@ -2166,19 +2166,19 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                                                          .value(scannedDocDetails)
                                                          .build();
 
-        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+        sscsCaseData.setScannedDocuments(singletonList(scannedDocument));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
             ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getDwpState(), is(nullValue()));
+        assertThat(response.getData().getDwpState()).isNull();
         SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().getFirst().getValue();
-        assertThat(sscsDocumentDetail.getDocumentType(), is(POST_HEARING_OTHER.getLabel()));
+        assertThat(sscsDocumentDetail.getDocumentType()).isEqualTo(POST_HEARING_OTHER.getLabel());
     }
 
     @Test
-    public void givenInternalTribunalDocument_andFlagIsOn_thenPutInTribunalInternalDocumentsCollection() {
+    void givenInternalTribunalDocument_andFlagIsOn_thenPutInTribunalInternalDocumentsCollection() {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), false, false, true);
 
         DynamicListItem sendToInterlocListItem = new DynamicListItem(
@@ -2201,21 +2201,22 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         ScannedDocument scannedDocument = ScannedDocument.builder()
                                                          .value(scannedDocDetails)
                                                          .build();
-        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+        sscsCaseData.setScannedDocuments(singletonList(scannedDocument));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
             ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(4, response.getData().getInternalCaseDocumentData().getSscsInternalDocument().size());
-        assertNull(response.getData().getSscsDocument());
+        assertThat(response.getData().getInternalCaseDocumentData().getSscsInternalDocument()).hasSize(4);
+        assertThat(response.getData().getSscsDocument()).isNull();
         SscsDocumentDetails sscsDocument = response.getData().getInternalCaseDocumentData().getSscsInternalDocument().getFirst().getValue();
-        assertEquals(scannedDocDetails.getUrl(), sscsDocument.getDocumentLink());
+        assertThat(sscsDocument.getDocumentLink()).isEqualTo(scannedDocDetails.getUrl());
     }
 
-    @Test
-    @Parameters({"REGULAR", "null"})
-    public void givenNonInternalTribunalDocument_andFlagIsOn_thenPutInDocumentsCollection(@Nullable DocumentTabChoice option) {
+    @ParameterizedTest
+    @NullSource
+    @EnumSource(value = DocumentTabChoice.class, names = {"REGULAR"})
+    void givenNonInternalTribunalDocument_andFlagIsOn_thenPutInDocumentsCollection(DocumentTabChoice option) {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), false, false, true);
 
         DynamicListItem sendToInterlocListItem = new DynamicListItem(
@@ -2233,21 +2234,22 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                                                          .value(scannedDocDetails)
                                                          .build();
 
-        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+        sscsCaseData.setScannedDocuments(singletonList(scannedDocument));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
         sscsCaseData.setInternalCaseDocumentData(InternalCaseDocumentData.builder().build());
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
             ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(1, response.getData().getSscsDocument().size());
-        assertNull(response.getData().getInternalCaseDocumentData().getSscsInternalDocument());
+        assertThat(response.getData().getSscsDocument()).hasSize(1);
+        assertThat(response.getData().getInternalCaseDocumentData().getSscsInternalDocument()).isNull();
         SscsDocumentDetails sscsDocument = response.getData().getSscsDocument().getFirst().getValue();
-        assertEquals(scannedDocDetails.getUrl(), sscsDocument.getDocumentLink());
+        assertThat(sscsDocument.getDocumentLink()).isEqualTo(scannedDocDetails.getUrl());
     }
 
-    @Test
-    @Parameters({"INTERNAL", "REGULAR", "null"})
-    public void givenIsInternalTribunalDocumentAny_andFlagIsOff_thenPutInDocumentsCollection(@Nullable DocumentTabChoice option) {
+    @ParameterizedTest
+    @NullSource
+    @EnumSource(value = DocumentTabChoice.class, names = {"INTERNAL", "REGULAR"})
+    void givenIsInternalTribunalDocumentAny_andFlagIsOff_thenPutInDocumentsCollection(DocumentTabChoice option) {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), false, false, false);
 
         DynamicListItem sendToInterlocListItem = new DynamicListItem(
@@ -2265,15 +2267,15 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                                                          .value(scannedDocDetails)
                                                          .build();
 
-        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+        sscsCaseData.setScannedDocuments(singletonList(scannedDocument));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
             ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(1, response.getData().getSscsDocument().size());
-        assertNull(response.getData().getInternalCaseDocumentData());
+        assertThat(response.getData().getSscsDocument()).hasSize(1);
+        assertThat(response.getData().getInternalCaseDocumentData()).isNull();
         SscsDocumentDetails sscsDocument = response.getData().getSscsDocument().getFirst().getValue();
-        assertEquals(scannedDocDetails.getUrl(), sscsDocument.getDocumentLink());
+        assertThat(sscsDocument.getDocumentLink()).isEqualTo(scannedDocDetails.getUrl());
     }
 }
