@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -139,6 +138,7 @@ public class CitizenController {
         @ApiResponse(responseCode = "200", description = "The citizen has been associated with the case"),
         @ApiResponse(responseCode = "403", description = "The citizen cannot be associated with the case, "
             + "either the user does not exists or the email/postcode do not match the case the tya number is for."),
+        @ApiResponse(responseCode = "404", description = "No appeal found for given TYA number")
     })
     public ResponseEntity<OnlineHearing> associateUserWithCase(
         @Parameter(description = "user authorisation header", example = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdW")
@@ -153,7 +153,7 @@ public class CitizenController {
 
         return onlineHearing
             .map(ResponseEntity::ok)
-            .orElseGet(() -> ResponseEntity.status(FORBIDDEN.value()).build());
+            .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @Operation(summary = "Log time against a case for a citizen", description = "Log time against a case a case for "
